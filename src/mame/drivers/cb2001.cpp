@@ -68,9 +68,9 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_other1;
 	int m_other2;
-	DECLARE_WRITE16_MEMBER(cb2001_vidctrl_w);
-	DECLARE_WRITE16_MEMBER(cb2001_vidctrl2_w);
-	DECLARE_WRITE16_MEMBER(cb2001_bg_w);
+	void cb2001_vidctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cb2001_vidctrl2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cb2001_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
 	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
@@ -445,7 +445,7 @@ uint32_t cb2001_state::screen_update_cb2001(screen_device &screen, bitmap_rgb32 
 /* these ports sometimes get written with similar values
  - they could be hooked up wrong, or subject to change it the code
    is being executed incorrectly */
-WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
+void cb2001_state::cb2001_vidctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15) // video control?
 	{
@@ -456,7 +456,7 @@ WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 		m_other1 = data & 0x00ff;
 }
 
-WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
+void cb2001_state::cb2001_vidctrl2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15) // video control?
 	{
@@ -533,7 +533,7 @@ void cb2001_state::video_start()
 	m_reel3_tilemap->set_scroll_cols(64);
 }
 
-WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
+void cb2001_state::cb2001_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 

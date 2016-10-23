@@ -148,7 +148,7 @@ void bw12_state::ls259_w(int address, int data)
 	m_floppy1->mon_w(!m_motor_on);
 }
 
-WRITE8_MEMBER( bw12_state::ls259_w )
+void bw12_state::ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int d = BIT(offset, 0);
 	int a = (offset >> 1) & 0x07;
@@ -156,7 +156,7 @@ WRITE8_MEMBER( bw12_state::ls259_w )
 	ls259_w(a, d);
 }
 
-READ8_MEMBER( bw12_state::ls259_r )
+uint8_t bw12_state::ls259_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	ls259_w(space, offset, 0);
 
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER( bw12_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( bw12_state::pia_pa_r )
+uint8_t bw12_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

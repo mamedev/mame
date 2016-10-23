@@ -90,7 +90,7 @@ READ8Z_MEMBER( geneve_memex_device::readz )
 /*
     Memory write
 */
-WRITE8_MEMBER( geneve_memex_device::write )
+void geneve_memex_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* If not Genmod, add the upper two address bits 10 */
 	if (!m_genmod) offset |= 0x100000;

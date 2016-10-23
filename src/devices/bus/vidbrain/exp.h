@@ -119,12 +119,12 @@ public:
 	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);
 	void bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2);
 
-	DECLARE_READ8_MEMBER( cs1_r ) { return bo_r(space, offset + 0x1000, 0, 1); }
-	DECLARE_WRITE8_MEMBER( cs1_w ) { bo_w(space, offset + 0x1000, data, 0, 1); }
-	DECLARE_READ8_MEMBER( cs2_r ) { return bo_r(space, offset + 0x1800, 1, 0); }
-	DECLARE_WRITE8_MEMBER( cs2_w ) { bo_w(space, offset + 0x1800, data, 1, 0); }
-	DECLARE_READ8_MEMBER( unmap_r ) { return bo_r(space, offset + 0x3000, 1, 0); }
-	DECLARE_WRITE8_MEMBER( unmap_w ) { bo_w(space, offset + 0x3000, data, 1, 0); }
+	uint8_t cs1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return bo_r(space, offset + 0x1000, 0, 1); }
+	void cs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { bo_w(space, offset + 0x1000, data, 0, 1); }
+	uint8_t cs2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return bo_r(space, offset + 0x1800, 1, 0); }
+	void cs2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { bo_w(space, offset + 0x1800, data, 1, 0); }
+	uint8_t unmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return bo_r(space, offset + 0x3000, 1, 0); }
+	void unmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { bo_w(space, offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }

@@ -15,7 +15,7 @@
 #include "am53cf96.h"
 #include "bus/scsi/scsihle.h"
 
-READ8_MEMBER( am53cf96_device::read )
+uint8_t am53cf96_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rv;
 	static const int states[] = { 0, 0, 1, 1, 2, 3, 4, 5, 6, 7, 0 };
@@ -55,7 +55,7 @@ void am53cf96_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 	m_irq_handler(1);
 }
 
-WRITE8_MEMBER( am53cf96_device::write )
+void am53cf96_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("53cf96: w %x to reg %d (PC=%x)\n", data, offset, space.device().safe_pc());
 

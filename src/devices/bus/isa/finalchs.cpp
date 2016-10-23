@@ -13,12 +13,12 @@
 #include "finalchs.h"
 #include "cpu/m6502/m65c02.h"
 
-WRITE8_MEMBER( isa8_finalchs_device::io7ff8_write )
+void isa8_finalchs_device::io7ff8_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_FCH_latch_data = data;
 }
 
-READ8_MEMBER( isa8_finalchs_device::io7ff8_read )
+uint8_t isa8_finalchs_device::io7ff8_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static unsigned char table[] = { 0xff, 0xfd, 0xfe };
 	static int i = -1;
@@ -27,12 +27,12 @@ READ8_MEMBER( isa8_finalchs_device::io7ff8_read )
 	return table[i];  // exercise the NMI handler for now with known commands
 }
 
-READ8_MEMBER( isa8_finalchs_device::io6000_read )
+uint8_t isa8_finalchs_device::io6000_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x55;
 }
 
-WRITE8_MEMBER( isa8_finalchs_device::io6000_write )
+void isa8_finalchs_device::io6000_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_FCH_latch_data = data;
 }
@@ -56,12 +56,12 @@ ROM_START(finalchs)
 	ROM_LOAD("finalchs.bin", 0x8000, 0x8000, CRC(c8e72dff) SHA1(f422b19a806cef4fadd580caefaaf8c32b644098))
 ROM_END
 
-READ8_MEMBER( isa8_finalchs_device::finalchs_r )
+uint8_t isa8_finalchs_device::finalchs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( isa8_finalchs_device::finalchs_w )
+void isa8_finalchs_device::finalchs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

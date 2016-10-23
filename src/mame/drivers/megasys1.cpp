@@ -255,14 +255,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 
  in that order.         */
 
-READ16_MEMBER(megasys1_state::ip_select_r) // FROM MCU
+uint16_t megasys1_state::ip_select_r(address_space &space, offs_t offset, uint16_t mem_mask) // FROM MCU
 {
 	return m_ip_latched;
 }
 
 
 
-WRITE16_MEMBER(megasys1_state::ip_select_w) // TO MCU
+void megasys1_state::ip_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) // TO MCU
 {
 	int i;
 
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C INTERRUPT_NUM_B
 #define interrupt_C     interrupt_B
 
-WRITE16_MEMBER(megasys1_state::ram_w )
+void megasys1_state::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// DON'T use COMBINE_DATA
 	// byte writes end up mirroring in both bytes of the word like nmk16.c
@@ -480,7 +480,7 @@ WRITE_LINE_MEMBER(megasys1_state::sound_irq)
 		m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-READ8_MEMBER(megasys1_state::oki_status_1_r)
+uint8_t megasys1_state::oki_status_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_ignore_oki_status == 1)
 		return 0;
@@ -488,7 +488,7 @@ READ8_MEMBER(megasys1_state::oki_status_1_r)
 		return m_oki1->read_status();
 }
 
-READ8_MEMBER(megasys1_state::oki_status_2_r)
+uint8_t megasys1_state::oki_status_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_ignore_oki_status == 1)
 		return 0;
@@ -1522,7 +1522,7 @@ INPUT_PORTS_END
 
 
 /* Read the input ports, through a protection device */
-READ16_MEMBER(megasys1_state::protection_peekaboo_r)
+uint16_t megasys1_state::protection_peekaboo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_protection_val)
 	{
@@ -1533,7 +1533,7 @@ READ16_MEMBER(megasys1_state::protection_peekaboo_r)
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
+void megasys1_state::protection_peekaboo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_protection_val);
 
@@ -4204,7 +4204,7 @@ void megasys1_state::init_64street()
 	save_item(NAME(m_sprite_bank));
 }
 
-READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
+uint16_t megasys1_state::megasys1A_mcu_hs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4217,7 +4217,7 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
+void megasys1_state::megasys1A_mcu_hs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// following is hachoo, other games differs slightly
 	// R 0x5f0, if bit 0 == 0 then skips hs seq (debug?)
@@ -4351,7 +4351,7 @@ void megasys1_state::init_hayaosi1()
 	save_item(NAME(m_ip_latched));
 }
 
-READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
+uint16_t megasys1_state::iganinju_mcu_hs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4364,7 +4364,7 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
+void megasys1_state::iganinju_mcu_hs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// [0/2]: 0x0000
 	// [2/2]: 0x0055
@@ -4402,11 +4402,11 @@ void megasys1_state::init_iganinju()
 }
 
 // jitsupro writes oki commands to both the lsb and msb; it works because of byte smearing
-WRITE16_MEMBER(megasys1_state::okim6295_both_1_w)
+void megasys1_state::okim6295_both_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki1->write_command(data & 0xff);
 }
-WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
+void megasys1_state::okim6295_both_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki2->write_command(data & 0xff);
 }
@@ -4475,12 +4475,12 @@ void megasys1_state::init_rittam()
 	astyanax_rom_decode(machine(), "maincpu");
 }
 
-READ16_MEMBER(megasys1_state::soldamj_spriteram16_r)
+uint16_t megasys1_state::soldamj_spriteram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::soldamj_spriteram16_w)
+void megasys1_state::soldamj_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x800/2)   COMBINE_DATA(&m_spriteram[offset]);
 }
@@ -4500,7 +4500,7 @@ void megasys1_state::init_soldam()
 }
 
 
-READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
+uint16_t megasys1_state::stdragon_mcu_hs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4513,7 +4513,7 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 	return m_rom_maincpu[offset];
 }
 
-WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
+void megasys1_state::stdragon_mcu_hs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_hs_ram[offset]);
 

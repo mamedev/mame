@@ -53,23 +53,23 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	uint8_t via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( via1_r );
-	DECLARE_WRITE8_MEMBER( via1_w );
+	uint8_t via1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
-	DECLARE_READ8_MEMBER( via1_pb_r );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
+	uint8_t via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
-	DECLARE_READ8_MEMBER( cia_pb_r );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
+	uint8_t cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 
@@ -151,8 +151,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
@@ -168,9 +168,9 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER( cia_pa_r );
-	DECLARE_WRITE8_MEMBER( cia_pa_w );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
+	uint8_t cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 

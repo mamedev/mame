@@ -892,7 +892,7 @@ void sns_sa1_device::write_bwram(uint32_t offset, uint8_t data)
  -------------------------------------------------*/
 
 
-READ8_MEMBER(sns_sa1_device::read_l)
+uint8_t sns_sa1_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank;
 
@@ -927,7 +927,7 @@ READ8_MEMBER(sns_sa1_device::read_l)
 		return 0; // this should not happen (the driver should only call read_l in the above case)
 }
 
-READ8_MEMBER(sns_sa1_device::read_h)
+uint8_t sns_sa1_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank;
 
@@ -963,15 +963,15 @@ READ8_MEMBER(sns_sa1_device::read_h)
 		return m_rom[rom_bank_map[(m_bank_f_rom * 0x20) + ((offset - 0x700000) / 0x8000)] * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER(sns_sa1_device::write_l)
+void sns_sa1_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(sns_sa1_device::write_h)
+void sns_sa1_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( sns_sa1_device::chip_read )
+uint8_t sns_sa1_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -991,7 +991,7 @@ READ8_MEMBER( sns_sa1_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_sa1_device::chip_write )
+void sns_sa1_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -1017,7 +1017,7 @@ WRITE8_MEMBER( sns_sa1_device::chip_write )
 // I/O regs or WRAM, and there are a few additional accesses to IRAM (in [00-3f][0000-07ff])
 // and to BWRAM (in [60-6f][0000-ffff], so-called bitmap mode)
 
-READ8_MEMBER( sns_sa1_device::sa1_hi_r )
+uint8_t sns_sa1_device::sa1_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -1043,7 +1043,7 @@ READ8_MEMBER( sns_sa1_device::sa1_hi_r )
 		return read_h(space, offset);   // ROM
 }
 
-READ8_MEMBER( sns_sa1_device::sa1_lo_r )
+uint8_t sns_sa1_device::sa1_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -1097,7 +1097,7 @@ READ8_MEMBER( sns_sa1_device::sa1_lo_r )
 		return 0xff;    // nothing should be mapped here, so maybe open bus?
 }
 
-WRITE8_MEMBER( sns_sa1_device::sa1_hi_w )
+void sns_sa1_device::sa1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 	if (offset < 0x400000)
@@ -1116,7 +1116,7 @@ WRITE8_MEMBER( sns_sa1_device::sa1_hi_w )
 	}
 }
 
-WRITE8_MEMBER( sns_sa1_device::sa1_lo_w )
+void sns_sa1_device::sa1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x400000 && offset < 0x500000)
 		write_bwram(offset & 0xfffff, data);        // SA-1 BWRAM (not mirrored above!)

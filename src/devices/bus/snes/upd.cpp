@@ -102,12 +102,12 @@ void sns_rom_setadsp_device::device_start()
 // Lo-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_rom20_necdsp_device::necdsp_prg_r )
+uint32_t sns_rom20_necdsp_device::necdsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
+uint16_t sns_rom20_necdsp_device::necdsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -151,14 +151,14 @@ machine_config_constructor sns_rom20_necdsp_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
 }
 
-READ8_MEMBER( sns_rom20_necdsp_device::chip_read )
+uint8_t sns_rom20_necdsp_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x7fff;
 	return m_upd7725->snesdsp_read(offset < 0x4000);
 }
 
 
-WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
+void sns_rom20_necdsp_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7fff;
 	m_upd7725->snesdsp_write(offset < 0x4000, data);
@@ -168,12 +168,12 @@ WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
 // Hi-ROM
 
 // DSP dump contains prg at offset 0 and data at offset 0x2000
-READ32_MEMBER( sns_rom21_necdsp_device::necdsp_prg_r )
+uint32_t sns_rom21_necdsp_device::necdsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
+uint16_t sns_rom21_necdsp_device::necdsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return get_data(&m_bios[0], offset + 0x2000/2);
 }
@@ -217,14 +217,14 @@ machine_config_constructor sns_rom21_necdsp_device::device_mconfig_additions() c
 	return MACHINE_CONFIG_NAME( snes_dsp_hirom );
 }
 
-READ8_MEMBER( sns_rom21_necdsp_device::chip_read )
+uint8_t sns_rom21_necdsp_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x1fff;
 	return m_upd7725->snesdsp_read(offset < 0x1000);
 }
 
 
-WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
+void sns_rom21_necdsp_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x1fff;
 	m_upd7725->snesdsp_write(offset < 0x1000, data);
@@ -237,7 +237,7 @@ WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
 
 // same as above but additional read/write handling for the add-on chip
 
-READ8_MEMBER( sns_rom_setadsp_device::chip_read )
+uint8_t sns_rom_setadsp_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 		m_upd96050->snesdsp_read((offset & 0x01) ? false : true);
@@ -256,7 +256,7 @@ READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
+void sns_rom_setadsp_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
 	{
@@ -287,12 +287,12 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 
 
 // DSP dump contains prg at offset 0 and data at offset 0x10000
-READ32_MEMBER( sns_rom_setadsp_device::setadsp_prg_r )
+uint32_t sns_rom_setadsp_device::setadsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return get_prg(&m_bios[0], offset);
 }
 
-READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
+uint16_t sns_rom_setadsp_device::setadsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return get_data(&m_bios[0], offset + 0x10000/2);
 }

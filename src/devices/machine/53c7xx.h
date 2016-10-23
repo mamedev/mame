@@ -80,8 +80,8 @@ public:
 	template<class _Object> static devcb_base &set_host_read(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_host_read.set_callback(object); }
 
 	// our API
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

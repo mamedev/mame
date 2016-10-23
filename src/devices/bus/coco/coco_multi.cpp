@@ -210,7 +210,7 @@ uint8_t* coco_multipak_device::get_cart_base()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(coco_multipak_device::read)
+uint8_t coco_multipak_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return active_scs_slot()->read(space,offset);
 }
@@ -221,7 +221,7 @@ READ8_MEMBER(coco_multipak_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::write)
+void coco_multipak_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	active_scs_slot()->write(space,offset,data);
 }
@@ -232,7 +232,7 @@ WRITE8_MEMBER(coco_multipak_device::write)
 //  ff7f_write
 //-------------------------------------------------
 
-WRITE8_MEMBER(coco_multipak_device::ff7f_write)
+void coco_multipak_device::ff7f_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_select(data);
 }

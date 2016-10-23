@@ -80,13 +80,13 @@ void cinemat_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::inputs_r)
+uint8_t cinemat_state::inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("INPUTS")->read() >> offset) & 1;
 }
 
 
-READ8_MEMBER(cinemat_state::switches_r)
+uint8_t cinemat_state::switches_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
 	return (ioport("SWITCHES")->read() >> switch_shuffle[offset]) & 1;
@@ -108,7 +108,7 @@ INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
 }
 
 
-READ8_MEMBER(cinemat_state::coin_input_r)
+uint8_t cinemat_state::coin_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return !m_coin_detected;
 }
@@ -121,7 +121,7 @@ READ8_MEMBER(cinemat_state::coin_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::coin_reset_w)
+void cinemat_state::coin_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* on the rising edge of a coin reset, clear the coin_detected flag */
 	if (m_coin_last_reset != data && data != 0)
@@ -130,7 +130,7 @@ WRITE8_MEMBER(cinemat_state::coin_reset_w)
 }
 
 
-WRITE8_MEMBER(cinemat_state::mux_select_w)
+void cinemat_state::mux_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_select = data;
 	cinemat_sound_control_w(space, 0x07, data);
@@ -144,7 +144,7 @@ WRITE8_MEMBER(cinemat_state::mux_select_w)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::joystick_read)
+uint8_t cinemat_state::joystick_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (machine().phase() != MACHINE_PHASE_RUNNING)
 		return 0;
@@ -163,7 +163,7 @@ READ8_MEMBER(cinemat_state::joystick_read)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
+uint8_t cinemat_state::speedfrk_wheel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t speedfrk_steer[] = {0xe, 0x6, 0x2, 0x0, 0x3, 0x7, 0xf};
 	int delta_wheel;
@@ -179,7 +179,7 @@ READ8_MEMBER(cinemat_state::speedfrk_wheel_r)
 }
 
 
-READ8_MEMBER(cinemat_state::speedfrk_gear_r)
+uint8_t cinemat_state::speedfrk_gear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int gearval = ioport("GEAR")->read();
 
@@ -230,7 +230,7 @@ static const struct
 };
 
 
-READ8_MEMBER(cinemat_state::sundance_inputs_r)
+uint8_t cinemat_state::sundance_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
@@ -247,7 +247,7 @@ READ8_MEMBER(cinemat_state::sundance_inputs_r)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::boxingb_dial_r)
+uint8_t cinemat_state::boxingb_dial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int value = ioport("DIAL")->read();
 	if (!m_mux_select) offset += 4;
@@ -262,7 +262,7 @@ READ8_MEMBER(cinemat_state::boxingb_dial_r)
  *
  *************************************/
 
-READ8_MEMBER(cinemat_state::qb3_frame_r)
+uint8_t cinemat_state::qb3_frame_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	attotime next_update = m_screen->time_until_update();
 	attotime frame_period = m_screen->frame_period();
@@ -273,7 +273,7 @@ READ8_MEMBER(cinemat_state::qb3_frame_r)
 }
 
 
-WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
+void cinemat_state::qb3_ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(m_maincpu->state_int(CCPU_P) & 3);
 }

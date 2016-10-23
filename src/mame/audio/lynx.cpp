@@ -348,7 +348,7 @@ void lynx_sound_device::execute(int chan_nr)
 	}
 }
 
-READ8_MEMBER(lynx_sound_device::read)
+uint8_t lynx_sound_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];
@@ -411,7 +411,7 @@ READ8_MEMBER(lynx_sound_device::read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_sound_device::write)
+void lynx_sound_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("audio write %.2x %.2x\n", offset, data);
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];

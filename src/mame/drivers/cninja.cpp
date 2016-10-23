@@ -52,13 +52,13 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
-WRITE16_MEMBER(cninja_state::cninja_sound_w)
+void cninja_state::cninja_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE16_MEMBER(cninja_state::stoneage_sound_w)
+void cninja_state::stoneage_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -70,7 +70,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cninja_state::interrupt_gen)
 	m_raster_irq_timer->reset();
 }
 
-READ16_MEMBER(cninja_state::cninja_irq_r)
+uint16_t cninja_state::cninja_irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -87,7 +87,7 @@ READ16_MEMBER(cninja_state::cninja_irq_r)
 	return 0;
 }
 
-WRITE16_MEMBER(cninja_state::cninja_irq_w)
+void cninja_state::cninja_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -127,21 +127,21 @@ WRITE16_MEMBER(cninja_state::cninja_irq_w)
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(cninja_state::cninja_pf12_control_w)
+void cninja_state::cninja_pf12_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_deco_tilegen1->pf_control_w(space, offset, data, mem_mask);
 }
 
 
-WRITE16_MEMBER(cninja_state::cninja_pf34_control_w)
+void cninja_state::cninja_pf34_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_deco_tilegen2->pf_control_w(space, offset, data, mem_mask);
 }
 
 
-READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
+uint16_t cninja_state::cninja_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -150,7 +150,7 @@ READ16_MEMBER( cninja_state::cninja_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
+void cninja_state::cninja_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -158,7 +158,7 @@ WRITE16_MEMBER( cninja_state::cninja_protection_region_0_104_w )
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER(cninja_state::cninjabl2_sprite_dma_r)
+uint16_t cninja_state::cninjabl2_sprite_dma_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_spriteram->copy();
 	return 0;
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 ADDRESS_MAP_END
 
-READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
+uint16_t cninja_state::sshangha_protection_region_8_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -232,7 +232,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_8_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
+void cninja_state::sshangha_protection_region_8_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0x1a0000 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -240,7 +240,7 @@ WRITE16_MEMBER( cninja_state::sshangha_protection_region_8_146_w )
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
-READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
+uint16_t cninja_state::sshangha_protection_region_6_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  uint16_t realdat = deco16_60_prot_r(space,offset&0x3ff,mem_mask);
 
@@ -256,7 +256,7 @@ READ16_MEMBER( cninja_state::sshangha_protection_region_6_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::sshangha_protection_region_6_146_w )
+void cninja_state::sshangha_protection_region_6_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  deco16_60_prot_w(space,offset&0x3ff,data,mem_mask);
 
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 
 
 
-READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
+uint16_t cninja_state::mutantf_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -338,7 +338,7 @@ READ16_MEMBER( cninja_state::mutantf_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( cninja_state::mutantf_protection_region_0_146_w )
+void cninja_state::mutantf_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -785,7 +785,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(cninja_state::sound_bankswitch_w)
+void cninja_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);

@@ -113,12 +113,12 @@ xxxx ---- Mode register
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( upd4992_device::read )
+uint8_t upd4992_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_regs[offset];
 }
 
-WRITE8_MEMBER( upd4992_device::write )
+void upd4992_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 7)
 	{

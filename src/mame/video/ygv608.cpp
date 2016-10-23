@@ -1039,7 +1039,7 @@ uint32_t ygv608_device::update_screen(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ16_MEMBER( ygv608_device::read )
+uint16_t ygv608_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static int p0_state = 0;
 	static int p3_state = 0;
@@ -1193,7 +1193,7 @@ READ16_MEMBER( ygv608_device::read )
 	return( 0 );
 }
 
-WRITE16_MEMBER( ygv608_device::write )
+void ygv608_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int p0_state = 0;
 	static int p3_state = 0;
@@ -1678,7 +1678,7 @@ void dump_block( char *name, uint8_t *block, int len )
 	logerror( "};\n" );
 }
 #endif
-READ16_MEMBER( ygv608_device::debug_trigger_r )
+uint16_t ygv608_device::debug_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static int oneshot = 0;
 

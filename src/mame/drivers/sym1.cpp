@@ -66,11 +66,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_3_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_4_w);
 	DECLARE_WRITE_LINE_MEMBER(sym1_74145_output_5_w);
-	DECLARE_READ8_MEMBER(sym1_riot_a_r);
-	DECLARE_READ8_MEMBER(sym1_riot_b_r);
-	DECLARE_WRITE8_MEMBER(sym1_riot_a_w);
-	DECLARE_WRITE8_MEMBER(sym1_riot_b_w);
-	DECLARE_WRITE8_MEMBER(sym1_via2_a_w);
+	uint8_t sym1_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sym1_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sym1_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sym1_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sym1_via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -100,7 +100,7 @@ TIMER_CALLBACK_MEMBER( sym1_state::led_refresh )
 	output().set_digit_value(param, m_riot_port_a);
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_a_r )
+uint8_t sym1_state::sym1_riot_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0x7f;
 
@@ -117,7 +117,7 @@ READ8_MEMBER( sym1_state::sym1_riot_a_r )
 	return data;
 }
 
-READ8_MEMBER( sym1_state::sym1_riot_b_r )
+uint8_t sym1_state::sym1_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 
@@ -136,7 +136,7 @@ READ8_MEMBER( sym1_state::sym1_riot_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
+void sym1_state::sym1_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%x: riot_a_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER( sym1_state::sym1_riot_a_w )
 	m_riot_port_a = data;
 }
 
-WRITE8_MEMBER( sym1_state::sym1_riot_b_w )
+void sym1_state::sym1_riot_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%x: riot_b_w 0x%02x\n", m_maincpu->pc(), data);
 
@@ -227,7 +227,7 @@ INPUT_PORTS_END
     PA2: Write protect RAM 0x800-0xbff
     PA3: Write protect RAM 0xc00-0xfff
  */
-WRITE8_MEMBER( sym1_state::sym1_via2_a_w )
+void sym1_state::sym1_via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
 

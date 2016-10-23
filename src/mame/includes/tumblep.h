@@ -37,8 +37,8 @@ public:
 	required_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(tumblep_sound_w);
-	DECLARE_READ16_MEMBER(tumblepop_controls_r);
+	void tumblep_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tumblepop_controls_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_tumblep();
 	virtual void machine_start() override;
 	uint32_t screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

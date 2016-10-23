@@ -39,12 +39,12 @@ TilemapCB( running_machine &machine, uint16_t code, int *tile, int *mask )
  * ---- ---- xxxx ---- always zero?
  * ---- ---- ---- xxxx sprite bank
  */
-READ16_MEMBER( namcos2_state::gfx_ctrl_r )
+uint16_t namcos2_state::gfx_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gfx_ctrl;
 }
 
-WRITE16_MEMBER( namcos2_state::gfx_ctrl_w )
+void namcos2_state::gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gfx_ctrl);
 }
@@ -288,7 +288,7 @@ void namcos2_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 	draw_roz_helper( screen, bitmap, m_tilemap_roz, cliprect, &rozParam );
 }
 
-WRITE16_MEMBER( namcos2_state::rozram_word_w )
+void namcos2_state::rozram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_tilemap_roz->mark_tile_dirty(offset);
@@ -306,7 +306,7 @@ uint16_t namcos2_state::get_palette_register( int which )
 	return ((source[which*2]&0xff)<<8) | (source[which*2+1]&0xff);
 }
 
-READ16_MEMBER( namcos2_state::paletteram_word_r )
+uint16_t namcos2_state::paletteram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( (offset&0x1800) == 0x1800 )
 	{
@@ -319,7 +319,7 @@ READ16_MEMBER( namcos2_state::paletteram_word_r )
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER( namcos2_state::paletteram_word_w )
+void namcos2_state::paletteram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( (offset&0x1800) == 0x1800 )
 	{

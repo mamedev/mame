@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
 }
 
 /* adpcm address write */
-WRITE8_MEMBER(appoooh_state::adpcm_w)
+void appoooh_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_address = data << 8;
 	m_msm->reset_w(0);

@@ -13,13 +13,13 @@
 #include "includes/bagman.h"
 
 
-WRITE8_MEMBER(bagman_state::videoram_w)
+void bagman_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bagman_state::colorram_w)
+void bagman_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 	}
 }
 
-WRITE8_MEMBER(bagman_state::flipscreen_w)
+void bagman_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }

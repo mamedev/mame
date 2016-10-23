@@ -20,7 +20,7 @@
 #include "sound/k053260.h"
 #include "includes/rollerg.h"
 
-WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
+void rollerg_state::rollerg_0010_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: write %02x to 0010\n",space.device().safe_pc(), data);
 
@@ -37,7 +37,7 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 	/* other bits unknown */
 }
 
-READ8_MEMBER(rollerg_state::rollerg_k051316_r)
+uint8_t rollerg_state::rollerg_k051316_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_readzoomroms)
 		return m_k051316->rom_r(space, offset);
@@ -45,7 +45,7 @@ READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 		return m_k051316->read(space, offset);
 }
 
-WRITE8_MEMBER(rollerg_state::soundirq_w)
+void rollerg_state::soundirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -62,13 +62,13 @@ void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
+void rollerg_state::sound_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(attotime::from_usec(50), TIMER_NMI);   /* kludge until the K053260 is emulated correctly */
 }
 
-READ8_MEMBER(rollerg_state::pip_r)
+uint8_t rollerg_state::pip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7f;
 }
@@ -230,7 +230,7 @@ void rollerg_state::machine_reset()
 	m_readzoomroms = 0;
 }
 
-WRITE8_MEMBER( rollerg_state::banking_callback )
+void rollerg_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }

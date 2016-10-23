@@ -60,7 +60,7 @@ public:
 	template<class _Object> static devcb_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
 
 	/* keyboard data */
-	DECLARE_READ8_MEMBER( data_r );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* Set an input pin */
 	void set_input_pin( kr2376_input_pin_t pin, int data );

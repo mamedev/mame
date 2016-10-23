@@ -129,17 +129,17 @@ void towns_state::towns_crtc_refresh_mode()
 	machine().first_screen()->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
-READ8_MEMBER( towns_state::towns_gfx_high_r )
+uint8_t towns_state::towns_gfx_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_towns_gfxvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_high_w )
+void towns_state::towns_gfx_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_towns_gfxvram[offset] = data;
 }
 
-READ8_MEMBER( towns_state::towns_gfx_r )
+uint8_t towns_state::towns_gfx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -163,7 +163,7 @@ READ8_MEMBER( towns_state::towns_gfx_r )
 	return ret;
 }
 
-WRITE8_MEMBER( towns_state::towns_gfx_w )
+void towns_state::towns_gfx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
@@ -247,7 +247,7 @@ void towns_state::towns_update_kanji_offset()
 	}
 }
 
-READ8_MEMBER( towns_state::towns_video_cff80_r )
+uint8_t towns_state::towns_video_cff80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* ROM = m_user->base();
 
@@ -285,7 +285,7 @@ READ8_MEMBER( towns_state::towns_video_cff80_r )
 	return 0;
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_w )
+void towns_state::towns_video_cff80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -324,7 +324,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_w )
 	}
 }
 
-READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
+uint8_t towns_state::towns_video_cff80_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_towns_mainmem_enable != 0)
 		return m_messram->pointer()[offset+0xcff80];
@@ -332,7 +332,7 @@ READ8_MEMBER( towns_state::towns_video_cff80_mem_r )
 	return towns_video_cff80_r(space,offset);
 }
 
-WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
+void towns_state::towns_video_cff80_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_towns_mainmem_enable != 0)
 	{
@@ -350,7 +350,7 @@ WRITE8_MEMBER( towns_state::towns_video_cff80_mem_w )
  *      0x44a = shifter register data (8-bit)
  *
  */
-READ8_MEMBER(towns_state::towns_video_440_r)
+uint8_t towns_state::towns_video_440_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	uint16_t xpos,ypos;
@@ -413,7 +413,7 @@ READ8_MEMBER(towns_state::towns_video_440_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_440_w)
+void towns_state::towns_video_440_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -451,7 +451,7 @@ WRITE8_MEMBER(towns_state::towns_video_440_w)
 	}
 }
 
-READ8_MEMBER(towns_state::towns_video_5c8_r)
+uint8_t towns_state::towns_video_5c8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//if(LOG_VID) logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
@@ -468,7 +468,7 @@ READ8_MEMBER(towns_state::towns_video_5c8_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_5c8_w)
+void towns_state::towns_video_5c8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pic8259_device* dev = m_pic_slave;
 
@@ -498,7 +498,7 @@ void towns_state::towns_update_palette()
  * 0xfd92/4/6 - BRG value
  * 0xfd98-9f  - degipal(?)
  */
-READ8_MEMBER(towns_state::towns_video_fd90_r)
+uint8_t towns_state::towns_video_fd90_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	uint16_t xpos;
@@ -536,7 +536,7 @@ READ8_MEMBER(towns_state::towns_video_fd90_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_fd90_w)
+void towns_state::towns_video_fd90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -573,12 +573,12 @@ WRITE8_MEMBER(towns_state::towns_video_fd90_w)
 	if(LOG_VID) logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
-READ8_MEMBER(towns_state::towns_video_ff81_r)
+uint8_t towns_state::towns_video_ff81_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_video.towns_vram_rplane << 6) & 0xc0) | m_video.towns_vram_wplane;
 }
 
-WRITE8_MEMBER(towns_state::towns_video_ff81_w)
+void towns_state::towns_video_ff81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video.towns_vram_wplane = data & 0x0f;
 	m_video.towns_vram_rplane = (data & 0xc0) >> 6;
@@ -586,7 +586,7 @@ WRITE8_MEMBER(towns_state::towns_video_ff81_w)
 	logerror("VID: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
-READ8_MEMBER(towns_state::towns_video_unknown_r)
+uint8_t towns_state::towns_video_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -601,7 +601,7 @@ READ8_MEMBER(towns_state::towns_video_unknown_r)
  *    0xc8000-0xc8fff: ASCII text (2 bytes each: ISO646 code, then attribute)
  *    0xca000-0xcafff: JIS code
  */
-READ8_MEMBER(towns_state::towns_spriteram_low_r)
+uint8_t towns_state::towns_spriteram_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* RAM = m_messram->pointer();
 	uint8_t* ROM = m_user->base();
@@ -639,7 +639,7 @@ READ8_MEMBER(towns_state::towns_spriteram_low_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
+void towns_state::towns_spriteram_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* RAM = m_messram->pointer();
 
@@ -665,12 +665,12 @@ WRITE8_MEMBER(towns_state::towns_spriteram_low_w)
 	}
 }
 
-READ8_MEMBER( towns_state::towns_spriteram_r )
+uint8_t towns_state::towns_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_towns_txtvram[offset];
 }
 
-WRITE8_MEMBER( towns_state::towns_spriteram_w )
+void towns_state::towns_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_towns_txtvram[offset] = data;
 }

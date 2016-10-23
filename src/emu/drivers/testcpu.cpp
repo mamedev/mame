@@ -148,7 +148,7 @@ public:
 	}
 
 	// report reads from anywhere
-	READ64_MEMBER( general_r )
+	uint64_t general_r(address_space &space, offs_t offset, uint64_t mem_mask)
 	{
 		uint64_t fulloffs = offset;
 		uint64_t result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
@@ -157,7 +157,7 @@ public:
 	}
 
 	// report writes to anywhere
-	WRITE64_MEMBER( general_w )
+	void general_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 	{
 		printf("Write to %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((data&0xffffffff00000000LL) >> 32), (int)(data&0xffffffff));
 	}

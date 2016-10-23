@@ -22,9 +22,9 @@ public:
 
 	tilemap_t *m_pant[2];
 
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_counter_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);

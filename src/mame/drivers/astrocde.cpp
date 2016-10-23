@@ -135,20 +135,20 @@
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
+void astrocde_state::protected_ram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_write_enable = true;
 }
 
 
-READ8_MEMBER(astrocde_state::protected_ram_r)
+uint8_t astrocde_state::protected_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ram_write_enable = false;
 	return m_protected_ram[offset];
 }
 
 
-WRITE8_MEMBER(astrocde_state::protected_ram_w)
+void astrocde_state::protected_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ram_write_enable)
 		m_protected_ram[offset] = data;
@@ -163,7 +163,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
+void astrocde_state::seawolf2_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x42 = player 2 (left), 0x43 = player 1 (right) */
 	/* --x----- explosion */
@@ -183,7 +183,7 @@ WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
 }
 
 
-WRITE8_MEMBER(astrocde_state::seawolf2_sound_1_w)// Port 40
+void astrocde_state::seawolf2_sound_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)// Port 40
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
@@ -197,7 +197,7 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_1_w)// Port 40
 }
 
 
-WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
+void astrocde_state::seawolf2_sound_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)// Port 41
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
@@ -240,13 +240,13 @@ CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::ebases_trackball_select_w)
+void astrocde_state::ebases_trackball_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data & 3;
 }
 
 
-WRITE8_MEMBER(astrocde_state::ebases_coin_w)
+void astrocde_state::ebases_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -259,7 +259,7 @@ WRITE8_MEMBER(astrocde_state::ebases_coin_w)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::spacezap_io_r)
+uint8_t astrocde_state::spacezap_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
@@ -274,7 +274,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::wow_io_r)
+uint8_t astrocde_state::wow_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (offset >> 8) & 1;
 
@@ -299,7 +299,7 @@ READ8_MEMBER(astrocde_state::wow_io_r)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::gorf_io_1_r)
+uint8_t astrocde_state::gorf_io_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (offset >> 8) & 1;
 
@@ -325,7 +325,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 }
 
 
-READ8_MEMBER(astrocde_state::gorf_io_2_r)
+uint8_t astrocde_state::gorf_io_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (offset >> 8) & 1;
 
@@ -351,7 +351,7 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::robby_io_r)
+uint8_t astrocde_state::robby_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (offset >> 8) & 1;
 
@@ -374,7 +374,7 @@ READ8_MEMBER(astrocde_state::robby_io_r)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::profpac_io_1_r)
+uint8_t astrocde_state::profpac_io_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
@@ -384,7 +384,7 @@ READ8_MEMBER(astrocde_state::profpac_io_1_r)
 }
 
 
-READ8_MEMBER(astrocde_state::profpac_io_2_r)
+uint8_t astrocde_state::profpac_io_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	output().set_lamp_value(0, (offset >> 8) & 1);    /* left lamp A */
 	output().set_lamp_value(1, (offset >> 9) & 1);    /* left lamp B */
@@ -396,7 +396,7 @@ READ8_MEMBER(astrocde_state::profpac_io_2_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
+void astrocde_state::demndrgn_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = (data >> 5) & 3;
 	m_bank4000->set_bank(bank);
@@ -404,7 +404,7 @@ WRITE8_MEMBER(astrocde_state::demndrgn_banksw_w)
 }
 
 
-WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
+void astrocde_state::profpac_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	demndrgn_banksw_w(space, 0, data);
 
@@ -428,7 +428,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
  *
  *************************************/
 
-READ8_MEMBER(astrocde_state::demndrgn_io_r)
+uint8_t astrocde_state::demndrgn_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
@@ -446,7 +446,7 @@ CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
 }
 
 
-WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
+void astrocde_state::demndrgn_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Trigger sound sample 0x%02x\n",data);
 }
@@ -459,14 +459,14 @@ WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::tenpindx_sound_w)
+void astrocde_state::tenpindx_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
+void astrocde_state::tenpindx_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* lamps */
 	if (offset == 0)
@@ -488,14 +488,14 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
 }
 
 
-WRITE8_MEMBER(astrocde_state::tenpindx_counter_w)
+void astrocde_state::tenpindx_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	if (data & 0xfc) osd_printf_debug("tenpindx_counter_w = %02X\n", data);
 }
 
 
-WRITE8_MEMBER(astrocde_state::tenpindx_lights_w)
+void astrocde_state::tenpindx_lights_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* "flashlights" */
 	int which = data >> 4;

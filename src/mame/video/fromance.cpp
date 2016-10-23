@@ -124,7 +124,7 @@ void fromance_state::video_start_hatris()
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
+void fromance_state::fromance_gfxreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxreg = data;
 	m_flipscreen = (data & 0x01);
@@ -146,7 +146,7 @@ WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_paletteram_r)
+uint8_t fromance_state::fromance_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* adjust for banking and read */
 	offset |= m_selected_paletteram << 11;
@@ -154,7 +154,7 @@ READ8_MEMBER(fromance_state::fromance_paletteram_r)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
+void fromance_state::fromance_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int palword;
 
@@ -175,13 +175,13 @@ WRITE8_MEMBER(fromance_state::fromance_paletteram_w)
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_videoram_r)
+uint8_t fromance_state::fromance_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_local_videoram[m_selected_videoram][offset];
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_videoram_w)
+void fromance_state::fromance_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_local_videoram[m_selected_videoram][offset] = data;
 	(m_selected_videoram ? m_fg_tilemap : m_bg_tilemap)->mark_tile_dirty(offset & 0x0fff);
@@ -195,7 +195,7 @@ WRITE8_MEMBER(fromance_state::fromance_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_scroll_w)
+void fromance_state::fromance_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen)
 	{
@@ -251,7 +251,7 @@ TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
+void fromance_state::fromance_crtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_data[m_crtc_register] = data;
 
@@ -269,7 +269,7 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
+void fromance_state::fromance_crtc_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_register = data;
 }

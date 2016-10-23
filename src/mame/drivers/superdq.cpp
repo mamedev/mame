@@ -46,10 +46,10 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
 	int m_color_bank;
-	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
-	DECLARE_WRITE8_MEMBER(superdq_io_w);
-	DECLARE_READ8_MEMBER(superdq_ld_r);
-	DECLARE_WRITE8_MEMBER(superdq_ld_w);
+	void superdq_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void superdq_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t superdq_ld_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void superdq_ld_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -150,13 +150,13 @@ INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(superdq_state::superdq_videoram_w)
+void superdq_state::superdq_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(superdq_state::superdq_io_w)
+void superdq_state::superdq_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int             i;
 	static const uint8_t black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
@@ -185,12 +185,12 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 	*/
 }
 
-READ8_MEMBER(superdq_state::superdq_ld_r)
+uint8_t superdq_state::superdq_ld_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ld_in_latch;
 }
 
-WRITE8_MEMBER(superdq_state::superdq_ld_w)
+void superdq_state::superdq_ld_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ld_out_latch = data;
 }

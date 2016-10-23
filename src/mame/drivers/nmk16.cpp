@@ -159,7 +159,7 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "includes/nmk16.h"
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_x0016_w)
+void nmk16_state::nmk16_x0016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is part of a watchdog scheme
 	// generating an NMI on the NMK004 keeps a timer alive
@@ -168,7 +168,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_x0016_w)
 }
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_bioship_x0016_w)
+void nmk16_state::nmk16_bioship_x0016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ugly, ugly logic invert hack, but otherwise bioship doesn't hit the NMI enough to keep the game alive!
 	m_nmk004->m_cpu->set_input_line(INPUT_LINE_NMI, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -191,7 +191,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_bioship_x0016_w)
 **********************************************************/
 
 
-WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
+void nmk16_state::nmk16_mainram_strange_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	uint16_t* dstram;
@@ -217,7 +217,7 @@ WRITE16_MEMBER(nmk16_state::nmk16_mainram_strange_w)
 }
 
 
-WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
+void nmk16_state::ssmissin_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,19 +228,19 @@ WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 
 
 
-WRITE8_MEMBER(nmk16_state::ssmissin_soundbank_w)
+void nmk16_state::ssmissin_soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank1")->set_entry(data & 0x3);
 }
 
 
 
-WRITE16_MEMBER(nmk16_state::tharrier_mcu_control_w)
+void nmk16_state::tharrier_mcu_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%04x: mcu_control_w %02x\n",space.device().safe_pc(),data);
 }
 
-READ16_MEMBER(nmk16_state::tharrier_mcu_r)
+uint16_t nmk16_state::tharrier_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* The MCU is mapped as the top byte for byte accesses only,
 	    all word accesses are to the input port */
@@ -273,39 +273,39 @@ READ16_MEMBER(nmk16_state::tharrier_mcu_r)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
+void nmk16_state::macross2_sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
 	   every time music changes Z80 is reset */
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(nmk16_state::macross2_sound_command_w)
+void nmk16_state::macross2_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space,0,data & 0xff);
 }
 
-WRITE8_MEMBER(nmk16_state::macross2_sound_bank_w)
+void nmk16_state::macross2_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_0_w)
+void nmk16_state::tharrier_oki6295_bankswitch_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	if (data != 3)
 		membank("okibank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(nmk16_state::tharrier_oki6295_bankswitch_1_w)
+void nmk16_state::tharrier_oki6295_bankswitch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	if (data != 3)
 		membank("okibank2")->set_entry(data);
 }
 
-WRITE16_MEMBER(nmk16_state::afega_soundlatch_w)
+void nmk16_state::afega_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -527,7 +527,7 @@ printed on the up-left corner of the screen).
 	}
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(nmk16_state::mcu_shared_r)
+uint16_t nmk16_state::mcu_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return nmk16_mcu_shared_ram[offset];
 }
@@ -599,7 +599,7 @@ f0 - player bombs (8c36)
 
 */
 
-WRITE16_MEMBER(nmk16_state::hachamf_mainram_w)
+void nmk16_state::hachamf_mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 #define DUMMYA 0x7b9c
@@ -680,7 +680,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(nmk16_state::tdragon_mainram_w)
+void nmk16_state::tdragon_mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 ADDRESS_MAP_END
 
 // No sprites without this. Is it actually protection?
-READ16_MEMBER(nmk16_state::tdragonb_prot_r)
+uint16_t nmk16_state::tdragonb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0003;
 }
@@ -4923,7 +4923,7 @@ void nmk16_state::init_bjtwin()
 }
 
 /* NO NMK004, it has a PIC instead */
-READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
+uint16_t nmk16_state::vandykeb_r(address_space &space, offs_t offset, uint16_t mem_mask){ return 0x0000; }
 void nmk16_state::init_vandykeb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
@@ -4939,7 +4939,7 @@ void nmk16_state::init_vandykeb()
 
 ***************************************************************************/
 
-READ16_MEMBER(nmk16_state::afega_unknown_r)
+uint16_t nmk16_state::afega_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* This fixes the text in Service Mode. */
 	return 0x0100;
@@ -4947,12 +4947,12 @@ READ16_MEMBER(nmk16_state::afega_unknown_r)
 
 
 
-WRITE16_MEMBER(nmk16_state::afega_scroll0_w)
+void nmk16_state::afega_scroll0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_afega_scroll_0[offset]);
 }
 
-WRITE16_MEMBER(nmk16_state::afega_scroll1_w)
+void nmk16_state::afega_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_afega_scroll_1[offset]);
 }
@@ -5021,7 +5021,7 @@ ADDRESS_MAP_END
 
 
 ***************************************************************************/
-WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
+void nmk16_state::spec2k_oki1_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0xfe)
 		m_oki2->set_rom_bank(0);
@@ -5050,7 +5050,7 @@ static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
+void nmk16_state::twinactn_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki1->set_rom_bank(data & 3);
 

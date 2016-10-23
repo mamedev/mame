@@ -43,12 +43,12 @@ void h8_timer16_channel_device::set_info(int _tgr_count, int _tbr_count, const c
 	interrupt[5] = irq_base;
 }
 
-READ8_MEMBER(h8_timer16_channel_device::tcr_r)
+uint8_t h8_timer16_channel_device::tcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tcr;
 }
 
-WRITE8_MEMBER(h8_timer16_channel_device::tcr_w)
+void h8_timer16_channel_device::tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 	tcr = data;
@@ -57,22 +57,22 @@ WRITE8_MEMBER(h8_timer16_channel_device::tcr_w)
 	recalc_event();
 }
 
-READ8_MEMBER(h8_timer16_channel_device::tmdr_r)
+uint8_t h8_timer16_channel_device::tmdr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_channel_device::tmdr_w)
+void h8_timer16_channel_device::tmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tmdr_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_channel_device::tior_r)
+uint8_t h8_timer16_channel_device::tior_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_channel_device::tior_w)
+void h8_timer16_channel_device::tior_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tior_w %d, %02x\n", offset, data);
 }
@@ -91,12 +91,12 @@ void h8_timer16_channel_device::set_enable(bool enable)
 	recalc_event();
 }
 
-READ8_MEMBER(h8_timer16_channel_device::tier_r)
+uint8_t h8_timer16_channel_device::tier_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tier;
 }
 
-WRITE8_MEMBER(h8_timer16_channel_device::tier_w)
+void h8_timer16_channel_device::tier_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 	if(V>=1) logerror("tier_w %02x\n", data);
@@ -113,24 +113,24 @@ WRITE8_MEMBER(h8_timer16_channel_device::tier_w)
 	recalc_event();
 }
 
-READ8_MEMBER(h8_timer16_channel_device::tsr_r)
+uint8_t h8_timer16_channel_device::tsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return isr_to_sr();
 }
 
-WRITE8_MEMBER(h8_timer16_channel_device::tsr_w)
+void h8_timer16_channel_device::tsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tsr_w %02x\n", data);
 	isr_update(data);
 }
 
-READ16_MEMBER(h8_timer16_channel_device::tcnt_r)
+uint16_t h8_timer16_channel_device::tcnt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	update_counter();
 	return tcnt;
 }
 
-WRITE16_MEMBER(h8_timer16_channel_device::tcnt_w)
+void h8_timer16_channel_device::tcnt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(&tcnt);
@@ -138,12 +138,12 @@ WRITE16_MEMBER(h8_timer16_channel_device::tcnt_w)
 	recalc_event();
 }
 
-READ16_MEMBER(h8_timer16_channel_device::tgr_r)
+uint16_t h8_timer16_channel_device::tgr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return tgr[offset];
 }
 
-WRITE16_MEMBER(h8_timer16_channel_device::tgr_w)
+void h8_timer16_channel_device::tgr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(tgr + offset);
@@ -151,12 +151,12 @@ WRITE16_MEMBER(h8_timer16_channel_device::tgr_w)
 	recalc_event();
 }
 
-READ16_MEMBER(h8_timer16_channel_device::tbr_r)
+uint16_t h8_timer16_channel_device::tbr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return tgr[offset+tgr_count];
 }
 
-WRITE16_MEMBER(h8_timer16_channel_device::tbr_w)
+void h8_timer16_channel_device::tbr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(tgr + offset + tgr_count);
 	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, tgr[offset]);
@@ -347,12 +347,12 @@ void h8_timer16_device::device_reset()
 }
 
 
-READ8_MEMBER(h8_timer16_device::tstr_r)
+uint8_t h8_timer16_device::tstr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tstr;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tstr_w)
+void h8_timer16_device::tstr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tstr_w %02x\n", data);
 	tstr = data;
@@ -360,57 +360,57 @@ WRITE8_MEMBER(h8_timer16_device::tstr_w)
 		timer_channel[i]->set_enable((tstr >> i) & 1);
 }
 
-READ8_MEMBER(h8_timer16_device::tsyr_r)
+uint8_t h8_timer16_device::tsyr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tsyr_w)
+void h8_timer16_device::tsyr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tsyr_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_device::tmdr_r)
+uint8_t h8_timer16_device::tmdr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tmdr_w)
+void h8_timer16_device::tmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tmdr_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_device::tfcr_r)
+uint8_t h8_timer16_device::tfcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tfcr_w)
+void h8_timer16_device::tfcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tfcr_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_device::toer_r)
+uint8_t h8_timer16_device::toer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_device::toer_w)
+void h8_timer16_device::toer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("toer_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_device::tocr_r)
+uint8_t h8_timer16_device::tocr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tocr_w)
+void h8_timer16_device::tocr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tocr_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_timer16_device::tisr_r)
+uint8_t h8_timer16_device::tisr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0;
 	for(int i=0; i<timer_count; i++)
@@ -423,24 +423,24 @@ READ8_MEMBER(h8_timer16_device::tisr_r)
 	return r;
 }
 
-WRITE8_MEMBER(h8_timer16_device::tisr_w)
+void h8_timer16_device::tisr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
 	for(int i=0; i<timer_count; i++)
 		timer_channel[i]->tisr_w(offset, data >> i);
 }
 
-READ8_MEMBER(h8_timer16_device::tisrc_r)
+uint8_t h8_timer16_device::tisrc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tisr_r(space, 2, mem_mask);
 }
 
-WRITE8_MEMBER(h8_timer16_device::tisrc_w)
+void h8_timer16_device::tisrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tisr_w(space, 2, data, mem_mask);
 }
 
-WRITE8_MEMBER(h8_timer16_device::tolr_w)
+void h8_timer16_device::tolr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("tocr_w %02x\n", data);
 }

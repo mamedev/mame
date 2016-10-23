@@ -40,7 +40,7 @@
 #include "includes/crospang.h"
 
 
-WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
+void crospang_state::crospang_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{

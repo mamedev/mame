@@ -138,12 +138,12 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK    0
 
 
-WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
+void crshrace_state::crshrace_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80bank->set_entry(data & 0x03);
 }
 
-WRITE16_MEMBER(crshrace_state::sound_command_w)
+void crshrace_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -158,7 +158,7 @@ CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
 	return m_pending_command;
 }
 
-WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
+void crshrace_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }

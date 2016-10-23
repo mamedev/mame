@@ -61,7 +61,7 @@ public:
 	floppy_image_device *m_floppy;
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 };
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER(ht68k_state::duart_txb)
 	//This is the second serial channel named AUX, for modem or other serial devices.
 }
 
-WRITE8_MEMBER(ht68k_state::duart_output)
+void ht68k_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_floppy = nullptr;
 

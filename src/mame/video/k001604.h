@@ -19,12 +19,12 @@ public:
 
 	void draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE32_MEMBER( tile_w );
-	DECLARE_READ32_MEMBER( tile_r );
-	DECLARE_WRITE32_MEMBER( char_w );
-	DECLARE_READ32_MEMBER( char_r );
-	DECLARE_WRITE32_MEMBER( reg_w );
-	DECLARE_READ32_MEMBER( reg_r );
+	void tile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t tile_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void char_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t char_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

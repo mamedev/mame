@@ -25,9 +25,9 @@ public:
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 
 	virtual void update_interrupts() override;
-	DECLARE_WRITE16_MEMBER(interrupt_ack_w);
+	void interrupt_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(klax_latch_w);
+	void klax_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void video_start_klax();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

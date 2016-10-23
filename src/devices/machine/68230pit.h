@@ -120,8 +120,8 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	template<class _Object> static devcb_base &set_h3_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (object); }
 	template<class _Object> static devcb_base &set_h4_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (object); }
 
-	DECLARE_WRITE8_MEMBER (write);
-	DECLARE_READ8_MEMBER (read);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void h1_set (uint8_t state);
 	void portb_setbit (uint8_t bit, uint8_t state);

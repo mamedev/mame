@@ -56,27 +56,27 @@ void pecom_state::machine_reset()
 	m_reset_timer->adjust(attotime::from_msec(5));
 }
 
-READ8_MEMBER(pecom_state::pecom_cdp1869_charram_r)
+uint8_t pecom_state::pecom_cdp1869_charram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cdp1869->char_ram_r(space, offset);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_charram_w)
+void pecom_state::pecom_cdp1869_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_cdp1869->char_ram_w(space, offset, data);
 }
 
-READ8_MEMBER(pecom_state::pecom_cdp1869_pageram_r)
+uint8_t pecom_state::pecom_cdp1869_pageram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cdp1869->page_ram_r(space, offset);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
+void pecom_state::pecom_cdp1869_pageram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_cdp1869->page_ram_w(space, offset, data);
 }
 
-WRITE8_MEMBER(pecom_state::pecom_bank_w)
+void pecom_state::pecom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space2 = m_cdp1802->space(AS_PROGRAM);
 	uint8_t *rom = memregion(CDP1802_TAG)->base();
@@ -101,7 +101,7 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 	}
 }
 
-READ8_MEMBER(pecom_state::pecom_keyboard_r)
+uint8_t pecom_state::pecom_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	   INP command BUS -> M(R(X)) BUS -> D
@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER(pecom_state::q_w)
 	m_cassette->output(state ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER(pecom_state::sc_w )
+void pecom_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{

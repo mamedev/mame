@@ -262,7 +262,7 @@ void m90_state::dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitma
 	}
 }
 
-WRITE16_MEMBER(m90_state::m90_video_control_w)
+void m90_state::m90_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_control_data[offset]);
 }
@@ -275,7 +275,7 @@ void m90_state::markdirty(tilemap_t *tmap,int page,offs_t offset)
 		tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(m90_state::m90_video_w)
+void m90_state::m90_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 

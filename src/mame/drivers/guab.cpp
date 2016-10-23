@@ -74,12 +74,12 @@ public:
 		m_palette(*this, "palette") { }
 
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
-	DECLARE_READ16_MEMBER(guab_tms34061_r);
-	DECLARE_WRITE16_MEMBER(ef9369_w);
-	DECLARE_READ16_MEMBER(ef9369_r);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	void guab_tms34061_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t guab_tms34061_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ef9369_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ef9369_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(guab_state::generate_tms34061_interrupt)
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
 
-WRITE16_MEMBER(guab_state::guab_tms34061_w)
+void guab_state::guab_tms34061_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
@@ -146,7 +146,7 @@ WRITE16_MEMBER(guab_state::guab_tms34061_w)
 }
 
 
-READ16_MEMBER(guab_state::guab_tms34061_r)
+uint16_t guab_state::guab_tms34061_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -174,7 +174,7 @@ READ16_MEMBER(guab_state::guab_tms34061_r)
  ****************************/
 
 /* Non-multiplexed mode */
-WRITE16_MEMBER(guab_state::ef9369_w)
+void guab_state::ef9369_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct ef9369 &pal = m_pal;
 	data &= 0x00ff;
@@ -214,7 +214,7 @@ WRITE16_MEMBER(guab_state::ef9369_w)
 	}
 }
 
-READ16_MEMBER(guab_state::ef9369_r)
+uint16_t guab_state::ef9369_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	struct ef9369 &pal = m_pal;
 	if ((offset & 1) == 0)
@@ -271,7 +271,7 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
  *
  ****************************************/
 
-READ16_MEMBER(guab_state::io_r)
+uint16_t guab_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -315,7 +315,7 @@ INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
  *
  ****************************************/
 
-WRITE16_MEMBER(guab_state::io_w)
+void guab_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

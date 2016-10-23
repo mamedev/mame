@@ -248,7 +248,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<uint16_t> m_videoram;
-	DECLARE_READ16_MEMBER(unk_r);
+	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(goldngam);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -293,7 +293,7 @@ PALETTE_INIT_MEMBER(goldngam_state, goldngam)
 * Memory Map Information *
 *************************/
 
-READ16_MEMBER(goldngam_state::unk_r)
+uint16_t goldngam_state::unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int test1 = (machine().rand() & 0xae00);
 //  popmessage("VAL = %02x", test1);

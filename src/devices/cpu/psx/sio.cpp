@@ -208,7 +208,7 @@ void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 	sio_timer_adjust();
 }
 
-WRITE32_MEMBER( psxsio_device::write )
+void psxsio_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset % 4 )
 	{
@@ -284,7 +284,7 @@ WRITE32_MEMBER( psxsio_device::write )
 	}
 }
 
-READ32_MEMBER( psxsio_device::read )
+uint32_t psxsio_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 

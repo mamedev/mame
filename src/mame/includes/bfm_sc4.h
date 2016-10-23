@@ -110,8 +110,8 @@ public:
 	bool m_segment_34_encoding;
 	uint8_t m_segment_34_cache[32];
 
-	DECLARE_WRITE8_MEMBER(mux_output_w);
-	DECLARE_WRITE8_MEMBER(mux_output2_w);
+	void mux_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bfm_sc4_reset_serial_vfd();
 	void bfm_sc45_write_serial_vfd(bool cs, bool clock, bool data);
 };
@@ -176,19 +176,19 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
 
-	DECLARE_READ16_MEMBER(sc4_mem_r);
-	DECLARE_WRITE16_MEMBER(sc4_mem_w);
+	uint16_t sc4_mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sc4_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(sc4_cs1_r);
+	uint16_t sc4_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc4_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc4_duart_output_w);
+	uint8_t bfm_sc4_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bfm_sc4_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
-	DECLARE_READ8_MEMBER(m68307_duart_input_r);
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w);
+	uint8_t m68307_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m68307_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_sc4();
 	void init_sc4mbus();
@@ -609,8 +609,8 @@ public:
 
 
 	void bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint8_t data, uint8_t line_mask);
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel3_w );
-	DECLARE_WRITE8_MEMBER( bfm_sc4_reel4_w );
+	void bfm_sc4_reel3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bfm_sc4_reel4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, uint16_t data, uint16_t line_mask);
 	uint8_t bfm_sc4_68307_porta_r(address_space &space, bool dedicated, uint8_t line_mask);
 	uint16_t bfm_sc4_68307_portb_r(address_space &space, bool dedicated, uint16_t line_mask);
@@ -633,8 +633,8 @@ public:
 	uint32_t* m_adder4cpuregion;
 	std::unique_ptr<uint32_t[]> m_adder4ram;
 
-	DECLARE_READ32_MEMBER(adder4_mem_r);
-	DECLARE_WRITE32_MEMBER(adder4_mem_w);
+	uint32_t adder4_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void adder4_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void machine_start_adder4();
 
 	// devices

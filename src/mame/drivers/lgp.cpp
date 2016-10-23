@@ -86,8 +86,8 @@ public:
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
+	uint8_t ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -138,12 +138,12 @@ uint32_t lgp_state::screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitma
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-READ8_MEMBER(lgp_state::ldp_read)
+uint8_t lgp_state::ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(lgp_state::ldp_write)
+void lgp_state::ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc->data_w(data);
 }

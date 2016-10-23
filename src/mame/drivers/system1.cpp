@@ -430,7 +430,7 @@ void system1_state::bank0c_custom_w(uint8_t data, uint8_t prevdata)
 }
 
 
-WRITE8_MEMBER(system1_state::videomode_w)
+void system1_state::videomode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 6 is connected to the 8751 IRQ */
 	if (m_mcu != nullptr)
@@ -488,7 +488,7 @@ void system1_state::dakkochn_custom_w(uint8_t data, uint8_t prevdata)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::shtngmst_gunx_r)
+uint8_t system1_state::shtngmst_gunx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// x is slightly offset, and has a range of 00-fe
 	uint8_t x = ioport("GUNX")->read() - 0x12;
@@ -503,7 +503,7 @@ READ8_MEMBER(system1_state::shtngmst_gunx_r)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::sound_control_w)
+void system1_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = MUTE (inverted sense on System 2) */
 	machine().sound().system_mute((data ^ m_mute_xor) & 1);
@@ -518,7 +518,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 }
 
 
-READ8_MEMBER(system1_state::sound_data_r)
+uint8_t system1_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	z80pio_device *pio = machine().device<z80pio_device>("pio");
 
@@ -543,7 +543,7 @@ READ8_MEMBER(system1_state::sound_data_r)
 }
 
 
-WRITE8_MEMBER(system1_state::soundport_w)
+void system1_state::soundport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* boost interleave when communicating with the sound CPU */
 	m_soundlatch->write(space, 0, data);
@@ -565,7 +565,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::mcu_control_w)
+void system1_state::mcu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
@@ -583,7 +583,7 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 }
 
 
-WRITE8_MEMBER(system1_state::mcu_io_w)
+void system1_state::mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -603,7 +603,7 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 }
 
 
-READ8_MEMBER(system1_state::mcu_io_r)
+uint8_t system1_state::mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ((m_mcu_control >> 3) & 3)
 	{
@@ -655,7 +655,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
+void system1_state::nob_mcu_control_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 triggers a read from MCU port 0 */
 	if (((m_mcu_control ^ data) & 0x01) && !(data & 0x01))
@@ -679,13 +679,13 @@ WRITE8_MEMBER(system1_state::nob_mcu_control_p2_w)
 }
 
 
-READ8_MEMBER(system1_state::nob_maincpu_latch_r)
+uint8_t system1_state::nob_maincpu_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nob_maincpu_latch;
 }
 
 
-WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
+void system1_state::nob_maincpu_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nob_maincpu_latch = data;
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -693,7 +693,7 @@ WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 }
 
 
-READ8_MEMBER(system1_state::nob_mcu_status_r)
+uint8_t system1_state::nob_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return *m_nob_mcu_status;
 }
@@ -706,25 +706,25 @@ READ8_MEMBER(system1_state::nob_mcu_status_r)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::nobb_inport1c_r)
+uint8_t system1_state::nobb_inport1c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $1c : pc = %04x - data = 0x80\n",space.device().safe_pc());
 	return(0x80);   // infinite loop (at 0x0fb3) until bit 7 is set
 }
 
-READ8_MEMBER(system1_state::nobb_inport22_r)
+uint8_t system1_state::nobb_inport22_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $22 : pc = %04x - data = %02x\n",space.device().safe_pc(),nobb_inport17_step);
 	return(0);//nobb_inport17_step);
 }
 
-READ8_MEMBER(system1_state::nobb_inport23_r)
+uint8_t system1_state::nobb_inport23_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("IN  $23 : pc = %04x - step = %02x\n",space.device().safe_pc(),m_nobb_inport23_step);
 	return(m_nobb_inport23_step);
 }
 
-WRITE8_MEMBER(system1_state::nobb_outport24_w)
+void system1_state::nobb_outport24_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("OUT $24 : pc = %04x - data = %02x\n",space.device().safe_pc(),data);
 	m_nobb_inport23_step = data;
@@ -5242,7 +5242,7 @@ void system1_state::init_dakkochn()
 
 
 
-READ8_MEMBER(system1_state::nob_start_r)
+uint8_t system1_state::nob_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* in reality, it's likely some M1-dependent behavior */
 	return (space.device().safe_pc() <= 0x0003) ? 0x80 : m_maincpu_region->base()[1];

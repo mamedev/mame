@@ -105,7 +105,7 @@ void huc6272_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ32_MEMBER( huc6272_device::read )
+uint32_t huc6272_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res = 0;
 
@@ -160,7 +160,7 @@ READ32_MEMBER( huc6272_device::read )
 	return res;
 }
 
-WRITE32_MEMBER( huc6272_device::write )
+void huc6272_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if((offset & 1) == 0)
 		m_register = data & 0x7f;

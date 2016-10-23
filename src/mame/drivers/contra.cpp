@@ -34,17 +34,17 @@ INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(contra_state::contra_bankswitch_w)
+void contra_state::contra_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
+void contra_state::contra_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(contra_state::contra_coin_counter_w)
+void contra_state::contra_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);

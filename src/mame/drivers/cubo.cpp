@@ -337,7 +337,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
 
-	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+	void akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_cubo();
 	void init_mgprem11();
@@ -392,7 +392,7 @@ private:
  *************************************/
 
 
-WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
+void cubo_state::akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 = cd audio mute */
 	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );

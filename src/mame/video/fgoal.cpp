@@ -10,19 +10,19 @@
 #include "includes/fgoal.h"
 
 
-WRITE8_MEMBER(fgoal_state::color_w)
+void fgoal_state::color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_current_color = data & 3;
 }
 
 
-WRITE8_MEMBER(fgoal_state::ypos_w)
+void fgoal_state::ypos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ypos = data;
 }
 
 
-WRITE8_MEMBER(fgoal_state::xpos_w)
+void fgoal_state::xpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xpos = data;
 }

@@ -310,7 +310,7 @@ WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::data_write )
 //  bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
+uint8_t ibm_pc_xt_83_keyboard_device::bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// HACK this should be handled in mcs48.c
 	return m_bus;
@@ -321,7 +321,7 @@ READ8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
+void ibm_pc_xt_83_keyboard_device::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -369,7 +369,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::bus_w )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
+void ibm_pc_xt_83_keyboard_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -394,7 +394,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p1_w )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
+void ibm_pc_xt_83_keyboard_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -424,7 +424,7 @@ WRITE8_MEMBER( ibm_pc_xt_83_keyboard_device::p2_w )
 //  t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t0_r )
+uint8_t ibm_pc_xt_83_keyboard_device::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return clock_signal();
 }
@@ -434,7 +434,7 @@ READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t0_r )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_xt_83_keyboard_device::t1_r )
+uint8_t ibm_pc_xt_83_keyboard_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BIT(m_p2, 3) && m_q;
 }

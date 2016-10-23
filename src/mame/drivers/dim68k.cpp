@@ -52,20 +52,20 @@ public:
 		m_ram(*this, "ram"),
 		m_palette(*this, "palette") { }
 
-	DECLARE_READ16_MEMBER( dim68k_duart_r );
-	DECLARE_READ16_MEMBER( dim68k_fdc_r );
-	DECLARE_READ16_MEMBER( dim68k_game_switches_r );
-	DECLARE_READ16_MEMBER( dim68k_speaker_r );
-	DECLARE_WRITE16_MEMBER( dim68k_banksw_w );
-	DECLARE_WRITE16_MEMBER( dim68k_duart_w );
-	DECLARE_WRITE16_MEMBER( dim68k_fdc_w );
-	DECLARE_WRITE16_MEMBER( dim68k_printer_strobe_w );
-	DECLARE_WRITE16_MEMBER( dim68k_reset_timers_w );
-	DECLARE_WRITE16_MEMBER( dim68k_speaker_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_control_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_high_w );
-	DECLARE_WRITE16_MEMBER( dim68k_video_reset_w );
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t dim68k_duart_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dim68k_fdc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dim68k_game_switches_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dim68k_speaker_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dim68k_banksw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_duart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_fdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_printer_strobe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_reset_timers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_speaker_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_video_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dim68k_video_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	const uint8_t *m_p_chargen;
 	bool m_speaker_bit;
@@ -80,7 +80,7 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-READ16_MEMBER( dim68k_state::dim68k_duart_r )
+uint16_t dim68k_state::dim68k_duart_r(address_space &space, offs_t offset, uint16_t mem_mask)
 // Port A is for the keyboard : 300 baud, no parity, 8 bits, 1 stop bit. Port B is for RS232.
 // The device also controls the parallel printer (except the strobe) and the RTC.
 // Device = SCN2681, not emulated. The keyboard is standard ASCII, so we can use the terminal
@@ -92,12 +92,12 @@ READ16_MEMBER( dim68k_state::dim68k_duart_r )
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_fdc_r )
+uint16_t dim68k_state::dim68k_fdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
+uint16_t dim68k_state::dim68k_game_switches_r(address_space &space, offs_t offset, uint16_t mem_mask)
 // Reading the game port switches
 // FFCC11 = switch 0; FFCC13 = switch 1, etc to switch 3
 // FFCC19 = paddle 0; FFCC1B = paddle 1, etc to paddle 3
@@ -105,7 +105,7 @@ READ16_MEMBER( dim68k_state::dim68k_game_switches_r )
 	return 0xffff;
 }
 
-READ16_MEMBER( dim68k_state::dim68k_speaker_r )
+uint16_t dim68k_state::dim68k_speaker_r(address_space &space, offs_t offset, uint16_t mem_mask)
 // Any read or write of this address will toggle the position of the speaker cone
 {
 	m_speaker_bit ^= 1;
@@ -113,22 +113,22 @@ READ16_MEMBER( dim68k_state::dim68k_speaker_r )
 	return 0;
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_speaker_w )
+void dim68k_state::dim68k_speaker_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_speaker_bit ^= 1;
 	m_speaker->level_w(m_speaker_bit);
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_fdc_w )
+void dim68k_state::dim68k_fdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_high_w )
+void dim68k_state::dim68k_video_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 // "write high byte of address in memory of start of display buffer"
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
+void dim68k_state::dim68k_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /* D7 0 = Hires/Graphics; 1= Lores/Text [not emulated yet]
    D6 0 = 8 dots per character; 1 = 7 dots [emulated]
@@ -154,25 +154,25 @@ WRITE16_MEMBER( dim68k_state::dim68k_video_control_w )
 	}
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_video_reset_w )
+void dim68k_state::dim68k_video_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_duart_w )
+void dim68k_state::dim68k_duart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_reset_timers_w )
+void dim68k_state::dim68k_reset_timers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 // reset game port timer before reading paddles
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_printer_strobe_w )
+void dim68k_state::dim68k_printer_strobe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 // anything sent here will trigger a one-shot for a strobe pulse
 {
 }
 
-WRITE16_MEMBER( dim68k_state::dim68k_banksw_w )
+void dim68k_state::dim68k_banksw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 // At boot time, the rom and IO occupy 0-FFFF, this moves it to the proper place
 {
 }
@@ -298,7 +298,7 @@ static SLOT_INTERFACE_START( dim68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( dim68k_state::kbd_put )
+void dim68k_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

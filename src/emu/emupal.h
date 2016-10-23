@@ -426,16 +426,16 @@ public:
 	void set_shadow_mode(int mode) { assert(mode >= 0 && mode < MAX_SHADOW_PRESETS); m_shadow_table = m_shadow_tables[mode].base; }
 
 	// generic read/write handlers
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_ext);
-	DECLARE_WRITE8_MEMBER(write_indirect);
-	DECLARE_WRITE8_MEMBER(write_indirect_ext);
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(write_ext);
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_indirect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_indirect_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_ext(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// generic palette init routines
 	void palette_init_all_black(palette_device &palette);

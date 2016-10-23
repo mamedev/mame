@@ -272,20 +272,20 @@ public:
 	int m_output_last[ 0x100 ];
 	int m_last_io_offset;
 	uint8_t m_sector_buffer[ 4096 ];
-	DECLARE_WRITE8_MEMBER(twinkle_io_w);
-	DECLARE_READ8_MEMBER(twinkle_io_r);
-	DECLARE_WRITE16_MEMBER(twinkle_output_w);
-	DECLARE_WRITE16_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(shared_psx_w);
-	DECLARE_READ8_MEMBER(shared_psx_r);
-	DECLARE_WRITE16_MEMBER(twinkle_spu_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spu_ata_dma_low_w);
-	DECLARE_WRITE16_MEMBER(spu_ata_dma_high_w);
-	DECLARE_READ16_MEMBER(twinkle_waveram_r);
-	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
-	DECLARE_READ16_MEMBER(shared_68k_r);
-	DECLARE_WRITE16_MEMBER(shared_68k_w);
-	DECLARE_READ16_MEMBER(unk_68k_r);
+	void twinkle_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t twinkle_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void twinkle_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void serial_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void shared_psx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t shared_psx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void twinkle_spu_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spu_ata_dma_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spu_ata_dma_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t twinkle_waveram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void twinkle_waveram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t shared_68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void shared_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t unk_68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
 	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
 	required_device<cpu_device> m_maincpu;
@@ -464,7 +464,7 @@ static const uint16_t asciicharset[]=
 	0, //
 };
 
-WRITE8_MEMBER(twinkle_state::twinkle_io_w)
+void twinkle_state::twinkle_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -532,7 +532,7 @@ WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 	}
 }
 
-READ8_MEMBER(twinkle_state::twinkle_io_r)
+uint8_t twinkle_state::twinkle_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -582,7 +582,7 @@ READ8_MEMBER(twinkle_state::twinkle_io_r)
 	return data;
 }
 
-WRITE16_MEMBER(twinkle_state::twinkle_output_w)
+void twinkle_state::twinkle_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -640,7 +640,7 @@ WRITE16_MEMBER(twinkle_state::twinkle_output_w)
 	}
 }
 
-WRITE16_MEMBER(twinkle_state::serial_w)
+void twinkle_state::serial_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int _do = ( data >> 4 ) & 1;
 	int clock = ( data >> 5 ) & 1;
@@ -670,7 +670,7 @@ WRITE16_MEMBER(twinkle_state::serial_w)
 	m_serial_clock = clock;
 }
 
-WRITE8_MEMBER(twinkle_state::shared_psx_w)
+void twinkle_state::shared_psx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("shared_psx_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
@@ -684,7 +684,7 @@ WRITE8_MEMBER(twinkle_state::shared_psx_w)
 	}
 }
 
-READ8_MEMBER(twinkle_state::shared_psx_r)
+uint8_t twinkle_state::shared_psx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t result = m_spu_shared[offset];
 
@@ -733,7 +733,7 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
 
     Other bits unknown.
 */
-WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
+void twinkle_state::twinkle_spu_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((!(data & 0x0080)) && (m_spu_ctrl & 0x0080))
 	{
@@ -755,12 +755,12 @@ WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 	m_spu_ctrl = data;
 }
 
-WRITE16_MEMBER(twinkle_state::spu_ata_dma_low_w)
+void twinkle_state::spu_ata_dma_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & ~0xffff) | data;
 }
 
-WRITE16_MEMBER(twinkle_state::spu_ata_dma_high_w)
+void twinkle_state::spu_ata_dma_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | (data << 16);
 }
@@ -797,17 +797,17 @@ WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
 	}
 }
 
-READ16_MEMBER(twinkle_state::twinkle_waveram_r)
+uint16_t twinkle_state::twinkle_waveram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_waveram[offset];
 }
 
-WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
+void twinkle_state::twinkle_waveram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_waveram[offset]);
 }
 
-READ16_MEMBER(twinkle_state::shared_68k_r)
+uint16_t twinkle_state::shared_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_spu_shared[offset];
 
@@ -816,14 +816,14 @@ READ16_MEMBER(twinkle_state::shared_68k_r)
 	return result;
 }
 
-WRITE16_MEMBER(twinkle_state::shared_68k_w)
+void twinkle_state::shared_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("shared_68k_w: %04x, %04x, %04x\n", offset, data, mem_mask);
 
 	m_spu_shared[offset] = data & 0xff;
 }
 
-READ16_MEMBER(twinkle_state::unk_68k_r)
+uint16_t twinkle_state::unk_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;  // must return 0xff for 68000 POST to complete properly
 }

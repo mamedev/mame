@@ -51,7 +51,7 @@ Notes:
 #include "includes/deniam.h"
 
 
-WRITE16_MEMBER(deniam_state::sound_command_w)
+void deniam_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -60,12 +60,12 @@ WRITE16_MEMBER(deniam_state::sound_command_w)
 	}
 }
 
-WRITE8_MEMBER(deniam_state::deniam16b_oki_rom_bank_w)
+void deniam_state::deniam16b_oki_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank((data >> 6) & 1);
 }
 
-WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
+void deniam_state::deniam16c_oki_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -74,7 +74,7 @@ WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
 	}
 }
 
-WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
+void deniam_state::deniam_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }

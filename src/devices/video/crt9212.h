@@ -76,7 +76,7 @@ public:
 	template<class _Object> static devcb_base &set_rof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_rof.set_callback(object); }
 	template<class _Object> static devcb_base &set_wof_wr_callback(device_t &device, _Object object) { return downcast<crt9212_t &>(device).m_write_wof.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( write ) { m_data = data; }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_data = data; }
 	DECLARE_WRITE_LINE_MEMBER( clrcnt_w );
 	DECLARE_WRITE_LINE_MEMBER( tog_w ) { m_tog = state; }
 	DECLARE_WRITE_LINE_MEMBER( ren_w ) { m_ren = state; }

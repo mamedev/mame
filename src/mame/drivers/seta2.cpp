@@ -124,7 +124,7 @@ reelquak:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::sound_bank_w)
+void seta2_state::sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -144,7 +144,7 @@ WRITE16_MEMBER(seta2_state::sound_bank_w)
                                 Guardians
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::grdians_lockout_w)
+void seta2_state::grdians_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -179,12 +179,12 @@ ADDRESS_MAP_END
                         Mobile Suit Gundam EX Revue
 ***************************************************************************/
 
-READ16_MEMBER(seta2_state::gundamex_eeprom_r)
+uint16_t seta2_state::gundamex_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_eeprom->do_read() & 1)) << 3;
 }
 
-WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
+void seta2_state::gundamex_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eeprom->clk_write((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(data & 0x1);
@@ -223,7 +223,7 @@ void seta2_state::machine_start_mj4simai()
 	save_item(NAME(m_keyboard_row));
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p1_r)
+uint16_t seta2_state::mj4simai_p1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_keyboard_row)
 	{
@@ -236,7 +236,7 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 	}
 }
 
-READ16_MEMBER(seta2_state::mj4simai_p2_r)
+uint16_t seta2_state::mj4simai_p2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_keyboard_row)
 	{
@@ -249,7 +249,7 @@ READ16_MEMBER(seta2_state::mj4simai_p2_r)
 	}
 }
 
-WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
+void seta2_state::mj4simai_keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_keyboard_row = data & 0xff;
@@ -327,18 +327,18 @@ ADDRESS_MAP_END
 
 /*  The game checks for a specific value read from the ROM region.
     The offset to use is stored in RAM at address 0x20BA16 */
-READ16_MEMBER(seta2_state::pzlbowl_protection_r)
+uint16_t seta2_state::pzlbowl_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t address = (space.read_word(0x20ba16) << 16) | space.read_word(0x20ba18);
 	return memregion("maincpu")->base()[address - 2];
 }
 
-READ16_MEMBER(seta2_state::pzlbowl_coins_r)
+uint16_t seta2_state::pzlbowl_coins_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("SYSTEM")->read() | (machine().rand() & 0x80 );
 }
 
-WRITE16_MEMBER(seta2_state::pzlbowl_coin_counter_w)
+void seta2_state::pzlbowl_coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
                               Reel'N Quake
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::reelquak_leds_w)
+void seta2_state::reelquak_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -416,7 +416,7 @@ WRITE16_MEMBER(seta2_state::reelquak_leds_w)
 //  popmessage("LED %04X", data);
 }
 
-WRITE16_MEMBER(seta2_state::reelquak_coin_w)
+void seta2_state::reelquak_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
                             Sammy Outdoor Shooting
 ***************************************************************************/
 
-WRITE16_MEMBER(seta2_state::samshoot_coin_w)
+void seta2_state::samshoot_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -520,7 +520,7 @@ void seta2_state::staraudi_debug_outputs()
 //  popmessage("L1: %04X L2: %04X CAM: %04X", m_lamps1, m_lamps2, m_cam);
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
+void seta2_state::staraudi_lamps1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps1);
 	if (ACCESSING_BITS_0_7)
@@ -533,7 +533,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps1_w)
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
+void seta2_state::staraudi_lamps2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lamps2);
 	if (ACCESSING_BITS_0_7)
@@ -545,7 +545,7 @@ WRITE16_MEMBER(seta2_state::staraudi_lamps2_w)
 	staraudi_debug_outputs();
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_camera_w)
+void seta2_state::staraudi_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cam);
 	if (ACCESSING_BITS_0_7)
@@ -563,12 +563,12 @@ WRITE16_MEMBER(seta2_state::staraudi_camera_w)
 #define TILE0 (0x7c000)
 #define TILERAM(offset) ((uint16_t*)(memregion("sprites")->base() + TILE0 * 8*8 + (offset * 2 / 0x20000) * 2 + ((offset * 2) % 0x20000) / 2 * 8))
 
-READ16_MEMBER(seta2_state::staraudi_tileram_r)
+uint16_t seta2_state::staraudi_tileram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return *TILERAM(offset);
 }
 
-WRITE16_MEMBER(seta2_state::staraudi_tileram_w)
+void seta2_state::staraudi_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(TILERAM(offset));
 	int tile = TILE0 + ((offset * 2) % 0x20000) / (8*2);
@@ -735,13 +735,13 @@ void funcube_touchscreen_device::tra_callback()
 // Bus conversion functions:
 
 // RAM shared with the sub CPU
-READ32_MEMBER(seta2_state::funcube_nvram_dword_r)
+uint32_t seta2_state::funcube_nvram_dword_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t val = m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
-WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
+void seta2_state::funcube_nvram_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -753,12 +753,12 @@ WRITE32_MEMBER(seta2_state::funcube_nvram_dword_w)
 	}
 }
 
-WRITE16_MEMBER(seta2_state::spriteram16_word_w)
+void seta2_state::spriteram16_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_spriteram[offset] );
 }
 
-READ16_MEMBER(seta2_state::spriteram16_word_r)
+uint16_t seta2_state::spriteram16_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
@@ -766,7 +766,7 @@ READ16_MEMBER(seta2_state::spriteram16_word_r)
 // Main CPU
 
 
-READ32_MEMBER(seta2_state::funcube_debug_r)
+uint32_t seta2_state::funcube_debug_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = ioport("DEBUG")->read();
 
@@ -777,11 +777,11 @@ READ32_MEMBER(seta2_state::funcube_debug_r)
 	return ret;
 }
 
-READ32_MEMBER(seta2_state::oki_read)
+uint32_t seta2_state::oki_read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_oki->read_status() << 16;
 }
-WRITE32_MEMBER(seta2_state::oki_write)
+void seta2_state::oki_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -847,7 +847,7 @@ ADDRESS_MAP_END
 
 #define FUNCUBE_SUB_CPU_CLOCK (XTAL_14_7456MHz)
 
-READ16_MEMBER(seta2_state::funcube_coins_r)
+uint16_t seta2_state::funcube_coins_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = ioport("SWITCH")->read();
 	uint8_t coin_bit0 = 1;    // active low
@@ -884,7 +884,7 @@ void seta2_state::funcube_debug_outputs()
 #endif
 }
 
-WRITE16_MEMBER(seta2_state::funcube_leds_w)
+void seta2_state::funcube_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	*m_funcube_leds = data;
 
@@ -900,13 +900,13 @@ WRITE16_MEMBER(seta2_state::funcube_leds_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_outputs_r)
+uint16_t seta2_state::funcube_outputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
 }
 
-WRITE16_MEMBER(seta2_state::funcube_outputs_w)
+void seta2_state::funcube_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	*m_funcube_outputs = data;
 
@@ -923,7 +923,7 @@ WRITE16_MEMBER(seta2_state::funcube_outputs_w)
 	funcube_debug_outputs();
 }
 
-READ16_MEMBER(seta2_state::funcube_battery_r)
+uint16_t seta2_state::funcube_battery_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("BATTERY")->read() ? 0x40 : 0x00;
 }

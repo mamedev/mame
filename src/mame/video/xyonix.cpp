@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(xyonix_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,attr >> 4,0);
 }
 
-WRITE8_MEMBER(xyonix_state::vidram_w)
+void xyonix_state::vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidram[offset] = data;
 	m_tilemap->mark_tile_dirty((offset-1)&0x0fff);

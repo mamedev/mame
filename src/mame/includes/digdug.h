@@ -26,6 +26,6 @@ public:
 	DECLARE_PALETTE_INIT(digdug);
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER( digdug_videoram_w );
-	DECLARE_WRITE8_MEMBER( digdug_PORT_w );
+	void digdug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digdug_PORT_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

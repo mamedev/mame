@@ -50,12 +50,12 @@ public:
 	required_device<beep_device> m_speaker;
 	required_device<i8251_device> m_uart;
 	required_device<com8116_device> m_dbrg;
-	DECLARE_READ8_MEMBER(vt100_flags_r);
-	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
-	DECLARE_READ8_MEMBER(vt100_keyboard_r);
-	DECLARE_WRITE8_MEMBER(vt100_baud_rate_w);
-	DECLARE_WRITE8_MEMBER(vt100_nvr_latch_w);
-	DECLARE_READ8_MEMBER(vt100_read_video_ram_r);
+	uint8_t vt100_flags_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vt100_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vt100_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vt100_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vt100_nvr_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vt100_read_video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
 	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 // 5 - NVR data H
 // 6 - LBA 7 H
 // 7 - Keyboard TBMT H
-READ8_MEMBER( vt100_state::vt100_flags_r )
+uint8_t vt100_state::vt100_flags_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	ret |= m_crtc->lba7_r(space, 0) << 6;
@@ -149,7 +149,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 }
 
 
-WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
+void vt100_state::vt100_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("online_led",BIT(data, 5) ? 0 : 1);
 	output().set_value("local_led", BIT(data, 5));
@@ -162,18 +162,18 @@ WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 	m_speaker->set_state(BIT(data, 7));
 }
 
-READ8_MEMBER( vt100_state::vt100_keyboard_r )
+uint8_t vt100_state::vt100_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_key_code;
 }
 
-WRITE8_MEMBER( vt100_state::vt100_baud_rate_w )
+void vt100_state::vt100_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
 
-WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
+void vt100_state::vt100_nvr_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -362,7 +362,7 @@ void vt100_state::machine_reset()
 	m_key_scan = 0;
 }
 
-READ8_MEMBER( vt100_state::vt100_read_video_ram_r )
+uint8_t vt100_state::vt100_read_video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_ram[offset];
 }

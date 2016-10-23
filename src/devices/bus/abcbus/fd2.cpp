@@ -85,7 +85,7 @@ const tiny_rom_entry *abc_fd2_t::device_rom_region() const
 //  status_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc_fd2_t::status_w )
+void abc_fd2_t::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -135,17 +135,17 @@ ADDRESS_MAP_END
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc_fd2_t::pio_pa_r )
+uint8_t abc_fd2_t::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( abc_fd2_t::pio_pa_w )
+void abc_fd2_t::pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data = data;
 }
 
-READ8_MEMBER( abc_fd2_t::pio_pb_r )
+uint8_t abc_fd2_t::pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -171,7 +171,7 @@ READ8_MEMBER( abc_fd2_t::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc_fd2_t::pio_pb_w )
+void abc_fd2_t::pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

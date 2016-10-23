@@ -414,7 +414,7 @@ void wgp_state::parse_control()
 	/* bit 1 is "vibration" acc. to test mode */
 }
 
-WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
+void wgp_state::cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)/* assumes Z80 sandwiched between 68Ks */
 {
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;   /* for Wgp */
@@ -467,14 +467,14 @@ INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
                          GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(wgp_state::lan_status_r)
+uint16_t wgp_state::lan_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("CPU #2 PC %06x: warning - read lan status\n",space.device().safe_pc());
 
 	return  (0x4 << 8); /* CPUB expects this in code at $104d0 (Wgp) */
 }
 
-WRITE16_MEMBER(wgp_state::rotate_port_w)
+void wgp_state::rotate_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* This port may be for piv/sprite layer rotation.
 
@@ -514,7 +514,7 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 #define UNKNOWN_PORT_TAG "UNKNOWN"
 #define FAKE_PORT_TAG    "FAKE"
 
-READ16_MEMBER(wgp_state::wgp_adinput_r)
+uint16_t wgp_state::wgp_adinput_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int steer = 0x40;
 	int fake = m_fake.read_safe(0);
@@ -575,7 +575,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space
 	return 0xff;
 }
 
-WRITE16_MEMBER(wgp_state::wgp_adinput_w)
+void wgp_state::wgp_adinput_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Each write invites a new interrupt as soon as the
 	   hardware has got the next a/d conversion ready. We set a token
@@ -589,12 +589,12 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
                           SOUND
 **********************************************************/
 
-WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
+void wgp_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80bank->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(wgp_state::wgp_sound_w)
+void wgp_state::wgp_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -602,7 +602,7 @@ WRITE16_MEMBER(wgp_state::wgp_sound_w)
 		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(wgp_state::wgp_sound_r)
+uint16_t wgp_state::wgp_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));

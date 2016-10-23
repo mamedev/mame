@@ -148,15 +148,15 @@ void kaneko_toybox_device::mcu_com_w(offs_t offset, uint16_t data, uint16_t mem_
 	mcu_run();
 }
 
-WRITE16_MEMBER(kaneko_toybox_device::mcu_com0_w){ mcu_com_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko_toybox_device::mcu_com1_w){ mcu_com_w(offset, data, mem_mask, 1); }
-WRITE16_MEMBER(kaneko_toybox_device::mcu_com2_w){ mcu_com_w(offset, data, mem_mask, 2); }
-WRITE16_MEMBER(kaneko_toybox_device::mcu_com3_w){ mcu_com_w(offset, data, mem_mask, 3); }
+void kaneko_toybox_device::mcu_com0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 0); }
+void kaneko_toybox_device::mcu_com1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 1); }
+void kaneko_toybox_device::mcu_com2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 2); }
+void kaneko_toybox_device::mcu_com3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ mcu_com_w(offset, data, mem_mask, 3); }
 
 /*
     bonkadv and bloodwar test bit 0
 */
-READ16_MEMBER(kaneko_toybox_device::mcu_status_r)
+uint16_t kaneko_toybox_device::mcu_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("CPU %s (PC=%06X) : read MCU status\n", space.device().tag(), space.device().safe_pcbase());
 	return 0; // most games test bit 0 for failure

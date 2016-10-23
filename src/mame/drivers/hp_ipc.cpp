@@ -273,9 +273,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE16_MEMBER(mmu_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
+	void mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -298,14 +298,14 @@ static INPUT_PORTS_START(hp_ipc)
 INPUT_PORTS_END
 
 
-WRITE16_MEMBER(hp_ipc_state::mmu_w)
+void hp_ipc_state::mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("mmu_w: offset = %08x, data = %04x, register = %d, data_to_add = %08x\n", offset, data, offset & 3, (data & 0xFFF) << 10);
 	m_mmu[offset & 3] = (data & 0xFFF) << 10;
 }
 
 
-READ16_MEMBER(hp_ipc_state::ram_r)
+uint16_t hp_ipc_state::ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t ram_address = get_ram_address(offset);
 
@@ -324,7 +324,7 @@ READ16_MEMBER(hp_ipc_state::ram_r)
 }
 
 
-WRITE16_MEMBER(hp_ipc_state::ram_w)
+void hp_ipc_state::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t ram_address = get_ram_address(offset);
 

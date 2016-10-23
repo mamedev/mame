@@ -82,7 +82,7 @@
 #include "includes/laserbat.h"
 
 
-WRITE8_MEMBER(laserbat_state_base::videoram_w)
+void laserbat_state_base::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_mpx_bkeff)
 		m_bg_ram[offset] = data;
@@ -90,19 +90,19 @@ WRITE8_MEMBER(laserbat_state_base::videoram_w)
 		m_eff_ram[offset & 0x1ff] = data; // A9 is not connected, only half the chip is used
 }
 
-WRITE8_MEMBER(laserbat_state_base::wcoh_w)
+void laserbat_state_base::wcoh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// sprite horizontal offset
 	m_wcoh = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::wcov_w)
+void laserbat_state_base::wcov_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// sprite vertical offset
 	m_wcov = data;
 }
 
-WRITE8_MEMBER(laserbat_state_base::cnt_eff_w)
+void laserbat_state_base::cnt_eff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    +-----+-------------+-----------------------------------------------+
@@ -130,7 +130,7 @@ WRITE8_MEMBER(laserbat_state_base::cnt_eff_w)
 //  popmessage("effect: 0x%02X", data);
 }
 
-WRITE8_MEMBER(laserbat_state_base::cnt_nav_w)
+void laserbat_state_base::cnt_nav_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    +-----+-----------+--------------------------------------+

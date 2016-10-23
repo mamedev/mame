@@ -1309,7 +1309,7 @@ CUSTOM_INPUT_MEMBER( avgdvg_device::done_r )
 	return m_sync_halt ? 0x01 : 0x00;
 }
 
-WRITE8_MEMBER( avgdvg_device::go_w )
+void avgdvg_device::go_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	vggo();
 
@@ -1328,7 +1328,7 @@ WRITE8_MEMBER( avgdvg_device::go_w )
 	vg_run_timer->adjust(attotime::zero);
 }
 
-WRITE16_MEMBER( avgdvg_device::go_word_w )
+void avgdvg_device::go_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	go_w(space, offset, data);
 }
@@ -1340,13 +1340,13 @@ WRITE16_MEMBER( avgdvg_device::go_word_w )
  *
  ************************************/
 
-WRITE8_MEMBER( avgdvg_device::reset_w )
+void avgdvg_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	vgrst();
 	vg_set_halt(1);
 }
 
-WRITE16_MEMBER( avgdvg_device::reset_word_w )
+void avgdvg_device::reset_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	reset_w (space,0,0);
 }

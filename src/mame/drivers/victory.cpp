@@ -110,7 +110,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(victory_state::lamp_control_w)
+void victory_state::lamp_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x80);
 	output().set_led_value(1, data & 0x40);

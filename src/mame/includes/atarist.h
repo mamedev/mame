@@ -160,42 +160,42 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// video
-	DECLARE_READ8_MEMBER( shifter_base_r );
-	DECLARE_READ8_MEMBER( shifter_counter_r );
-	DECLARE_READ8_MEMBER( shifter_sync_r );
-	DECLARE_READ16_MEMBER( shifter_palette_r );
-	DECLARE_READ8_MEMBER( shifter_mode_r );
+	uint8_t shifter_base_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t shifter_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t shifter_sync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t shifter_palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t shifter_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( shifter_base_w );
-	DECLARE_WRITE8_MEMBER( shifter_sync_w );
-	DECLARE_WRITE16_MEMBER( shifter_palette_w );
-	DECLARE_WRITE8_MEMBER( shifter_mode_w );
+	void shifter_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shifter_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shifter_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void shifter_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER( blitter_halftone_r );
-	DECLARE_READ16_MEMBER( blitter_src_inc_x_r );
-	DECLARE_READ16_MEMBER( blitter_src_inc_y_r );
-	DECLARE_READ16_MEMBER( blitter_src_r );
-	DECLARE_READ16_MEMBER( blitter_end_mask_r );
-	DECLARE_READ16_MEMBER( blitter_dst_inc_x_r );
-	DECLARE_READ16_MEMBER( blitter_dst_inc_y_r );
-	DECLARE_READ16_MEMBER( blitter_dst_r );
-	DECLARE_READ16_MEMBER( blitter_count_x_r );
-	DECLARE_READ16_MEMBER( blitter_count_y_r );
-	DECLARE_READ16_MEMBER( blitter_op_r );
-	DECLARE_READ16_MEMBER( blitter_ctrl_r );
+	uint16_t blitter_halftone_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_src_inc_x_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_src_inc_y_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_src_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_end_mask_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_dst_inc_x_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_dst_inc_y_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_dst_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_count_x_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_count_y_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_op_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t blitter_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( blitter_halftone_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_inc_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_inc_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_src_w );
-	DECLARE_WRITE16_MEMBER( blitter_end_mask_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_inc_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_inc_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_dst_w );
-	DECLARE_WRITE16_MEMBER( blitter_count_x_w );
-	DECLARE_WRITE16_MEMBER( blitter_count_y_w );
-	DECLARE_WRITE16_MEMBER( blitter_op_w );
-	DECLARE_WRITE16_MEMBER( blitter_ctrl_w );
+	void blitter_halftone_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_src_inc_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_src_inc_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_src_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_end_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_dst_inc_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_dst_inc_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_dst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_count_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_count_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_op_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void mouse_tick();
 	inline pen_t shift_mode_0();
@@ -211,32 +211,32 @@ public:
 	void blitter_tick();
 
 	// driver
-	DECLARE_READ16_MEMBER( fdc_data_r );
-	DECLARE_WRITE16_MEMBER( fdc_data_w );
-	DECLARE_READ16_MEMBER( dma_status_r );
-	DECLARE_WRITE16_MEMBER( dma_mode_w );
-	DECLARE_READ8_MEMBER( dma_counter_r );
-	DECLARE_WRITE8_MEMBER( dma_base_w );
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_READ16_MEMBER( berr_r );
-	DECLARE_WRITE16_MEMBER( berr_w );
-	DECLARE_READ8_MEMBER( ikbd_port1_r );
-	DECLARE_READ8_MEMBER( ikbd_port2_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port2_w );
-	DECLARE_WRITE8_MEMBER( ikbd_port3_w );
-	DECLARE_READ8_MEMBER( ikbd_port4_r );
-	DECLARE_WRITE8_MEMBER( ikbd_port4_w );
+	uint16_t fdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dma_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dma_mode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t dma_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t berr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void berr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t ikbd_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ikbd_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ikbd_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ikbd_port3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ikbd_port4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ikbd_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
+	void psg_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_ikbd_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_midi_irq_w );
 
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	uint8_t mfp_gpio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
 
 	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
@@ -345,8 +345,8 @@ public:
 		: st_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ16_MEMBER( fpu_r );
-	DECLARE_WRITE16_MEMBER( fpu_w );
+	uint16_t fpu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 class ste_state : public st_state
@@ -369,29 +369,29 @@ public:
 
 	void video_start() override;
 
-	DECLARE_READ8_MEMBER( shifter_base_low_r );
-	DECLARE_WRITE8_MEMBER( shifter_base_low_w );
-	DECLARE_READ8_MEMBER( shifter_counter_r );
-	DECLARE_WRITE8_MEMBER( shifter_counter_w );
-	DECLARE_WRITE16_MEMBER( shifter_palette_w );
-	DECLARE_READ8_MEMBER( shifter_lineofs_r );
-	DECLARE_WRITE8_MEMBER( shifter_lineofs_w );
-	DECLARE_READ8_MEMBER( shifter_pixelofs_r );
-	DECLARE_WRITE8_MEMBER( shifter_pixelofs_w );
+	uint8_t shifter_base_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shifter_base_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t shifter_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shifter_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shifter_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t shifter_lineofs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shifter_lineofs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t shifter_pixelofs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shifter_pixelofs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( sound_dma_control_r );
-	DECLARE_READ8_MEMBER( sound_dma_base_r );
-	DECLARE_READ8_MEMBER( sound_dma_counter_r );
-	DECLARE_READ8_MEMBER( sound_dma_end_r );
-	DECLARE_READ8_MEMBER( sound_mode_r );
-	DECLARE_WRITE8_MEMBER( sound_dma_control_w );
-	DECLARE_WRITE8_MEMBER( sound_dma_base_w );
-	DECLARE_WRITE8_MEMBER( sound_dma_end_w );
-	DECLARE_WRITE8_MEMBER( sound_mode_w );
-	DECLARE_READ16_MEMBER( microwire_data_r );
-	DECLARE_WRITE16_MEMBER( microwire_data_w );
-	DECLARE_READ16_MEMBER( microwire_mask_r );
-	DECLARE_WRITE16_MEMBER( microwire_mask_w );
+	uint8_t sound_dma_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_dma_base_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_dma_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_dma_end_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_dma_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_dma_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_dma_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t microwire_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void microwire_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t microwire_mask_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void microwire_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
@@ -439,8 +439,8 @@ public:
 
 	void machine_start() override;
 
-	DECLARE_READ16_MEMBER( cache_r );
-	DECLARE_WRITE16_MEMBER( cache_w );
+	uint16_t cache_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cache_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint16_t m_cache;
 };
@@ -458,11 +458,11 @@ public:
 	void machine_start() override;
 	void video_start() override;
 
-	DECLARE_READ16_MEMBER( config_r );
-	DECLARE_WRITE16_MEMBER( lcd_control_w );
+	uint16_t config_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lcd_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER( psg_pa_w );
-	DECLARE_READ8_MEMBER( mfp_gpio_r );
+	void psg_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mfp_gpio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 #endif

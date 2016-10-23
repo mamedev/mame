@@ -192,7 +192,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 
 // It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
-READ16_MEMBER(tecmosys_state::sound_r)
+uint16_t tecmosys_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -203,7 +203,7 @@ READ16_MEMBER(tecmosys_state::sound_r)
 	return 0;
 }
 
-WRITE16_MEMBER(tecmosys_state::sound_w)
+void tecmosys_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -222,7 +222,7 @@ WRITE16_MEMBER(tecmosys_state::sound_w)
     - 880000 & 03, crash
 */
 
-WRITE16_MEMBER(tecmosys_state::unk880000_w)
+void tecmosys_state::unk880000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_880000regs[offset]);
 
@@ -249,7 +249,7 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 	}
 }
 
-READ16_MEMBER(tecmosys_state::unk880000_r)
+uint16_t tecmosys_state::unk880000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//uint16_t ret = m_880000regs[offset];
 
@@ -268,12 +268,12 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 	}
 }
 
-READ16_MEMBER(tecmosys_state::eeprom_r)
+uint16_t tecmosys_state::eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_eeprom->do_read() & 0x01) << 11);
 }
 
-WRITE16_MEMBER(tecmosys_state::eeprom_w)
+void tecmosys_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -323,12 +323,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tecmosys_state::z80_bank_w)
+void tecmosys_state::z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(tecmosys_state::oki_bank_w)
+void tecmosys_state::oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t upperbank = (data & 0x30) >> 4;
 	uint8_t lowerbank = (data & 0x03) >> 0;

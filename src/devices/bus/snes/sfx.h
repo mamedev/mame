@@ -24,19 +24,19 @@ public:
 	required_device<superfx_device> m_superfx;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ8_MEMBER(superfx_r_bank1);
-	virtual DECLARE_READ8_MEMBER(superfx_r_bank2);
-	virtual DECLARE_READ8_MEMBER(superfx_r_bank3);
-	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank1);
-	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank2);
-	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank3);
+	virtual uint8_t superfx_r_bank1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t superfx_r_bank2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t superfx_r_bank3(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void superfx_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void superfx_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void superfx_w_bank3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 
 

@@ -53,31 +53,31 @@ public:
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p3_r);
-	DECLARE_WRITE8_MEMBER(p3_w);
-	DECLARE_READ8_MEMBER(ppia_c_r);
-	DECLARE_WRITE8_MEMBER(ppia_a_w);
-	DECLARE_WRITE8_MEMBER(ppia_b_w);
-	DECLARE_WRITE8_MEMBER(ppia_c_w);
-	DECLARE_READ8_MEMBER(ppim_c_r);
-	DECLARE_WRITE8_MEMBER(ppim_a_w);
-	DECLARE_WRITE8_MEMBER(ppim_b_w);
-	DECLARE_WRITE8_MEMBER(ppim_c_w);
-	DECLARE_WRITE8_MEMBER(ppi60a_w);
-	DECLARE_WRITE8_MEMBER(ppi60b_w);
-	DECLARE_WRITE8_MEMBER(ppi64c_w);
-	DECLARE_READ8_MEMBER(sw_r);
-	DECLARE_WRITE8_MEMBER(dmdram_w);
-	DECLARE_READ8_MEMBER(dmdram_r);
-	DECLARE_READ8_MEMBER(sndcmd_r);
-	DECLARE_WRITE8_MEMBER(sndbank_a_w);
-	DECLARE_WRITE8_MEMBER(sndbank_m_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(volume_w) { };
-	DECLARE_WRITE8_MEMBER(disp_w);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppia_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppia_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppia_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppia_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppim_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppim_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppim_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppim_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi60a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi60b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi64c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmdram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmdram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sndcmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sndbank_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sndbank_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
 	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
 	DECLARE_WRITE_LINE_MEMBER(vck_a_w);
@@ -283,7 +283,7 @@ m_game == 0 : P1.0 low for RAM, P1.5 low for data input. They shouldn't both be 
 m_game == 1 : P1.0 low for RAM, P1.5 low for data input. They shouldn't both be low. Extra ROM selected by P3.4
 m_game == 2 : P1.0 and P1.5 go to 74LS139 selector: 0 = RAM; 1 = ROM1; 2 = ROM2; 3 = data input
 */
-WRITE8_MEMBER( spinb_state::p1_w )
+void spinb_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmdbank = (BIT(data, 5) << 1) + BIT(data, 0);
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( spinb_state::p1_w )
 	}
 }
 
-READ8_MEMBER( spinb_state::p3_r )
+uint8_t spinb_state::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p3 | m_p32;
 }
@@ -319,7 +319,7 @@ d2 = Interrupt Input when data is coming from maincpu
 d6 = External /WR
 d7 = External /RD
 */
-WRITE8_MEMBER( spinb_state::p3_w )
+void spinb_state::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p3 = data & 0xfb;
 	m_dmdextaddr = 0;
@@ -331,27 +331,27 @@ WRITE8_MEMBER( spinb_state::p3_w )
 		m_dmdextaddr = BIT(data, 3) | (BIT(data, 5) << 1) | (BIT(data, 4) << 2);
 }
 
-READ8_MEMBER( spinb_state::sw_r )
+uint8_t spinb_state::sw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_switches[m_row]->read();
 }
 
-WRITE8_MEMBER( spinb_state::sndcmd_w )
+void spinb_state::sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndcmd = data;
 }
 
-READ8_MEMBER( spinb_state::sndcmd_r )
+uint8_t spinb_state::sndcmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sndcmd;
 }
 
-WRITE8_MEMBER( spinb_state::dmdram_w )
+void spinb_state::dmdram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmdram[offset & 0x1fff] = data;
 }
 
-READ8_MEMBER( spinb_state::dmdram_r )
+uint8_t spinb_state::dmdram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dmdbank)
 	{
@@ -368,14 +368,14 @@ READ8_MEMBER( spinb_state::dmdram_r )
 	return m_dmdcmd;
 }
 
-WRITE8_MEMBER( spinb_state::disp_w )
+void spinb_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmdcmd = data;
 	m_p32 = 0;
 	m_dmdcpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER( spinb_state::ppi60a_w )
+void spinb_state::ppi60a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		for (uint8_t i = 0; i < 8; i++)
@@ -384,7 +384,7 @@ WRITE8_MEMBER( spinb_state::ppi60a_w )
 }
 
 // always 0 but we'll support it anyway
-WRITE8_MEMBER( spinb_state::ppi60b_w )
+void spinb_state::ppi60b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 7)
 		for (uint8_t i = 0; i < 3; i++)
@@ -392,11 +392,11 @@ WRITE8_MEMBER( spinb_state::ppi60b_w )
 				m_row = i+8;
 }
 
-WRITE8_MEMBER( spinb_state::ppi64c_w )
+void spinb_state::ppi64c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( spinb_state::sndbank_a_w )
+void spinb_state::sndbank_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndbank_a = data;
 	m_sound_addr_a = (m_sound_addr_a & 0xffff) | ((data & 7) << 16);
@@ -409,7 +409,7 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 		m_sndbank_a = 0xff;
 }
 
-WRITE8_MEMBER( spinb_state::sndbank_m_w )
+void spinb_state::sndbank_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndbank_m = data;
 	m_sound_addr_m = (m_sound_addr_m & 0xffff) | ((data & 7) << 16);
@@ -466,37 +466,37 @@ WRITE_LINE_MEMBER( spinb_state::ic5m_w )
 	m_ic5m->d_w(state);
 }
 
-READ8_MEMBER( spinb_state::ppia_c_r )
+uint8_t spinb_state::ppia_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_pc0a ? 1 : 0) | m_portc_a;
 }
 
-READ8_MEMBER( spinb_state::ppim_c_r )
+uint8_t spinb_state::ppim_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_pc0m ? 1 : 0) | m_portc_m;
 }
 
-WRITE8_MEMBER( spinb_state::ppia_b_w )
+void spinb_state::ppia_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_addr_a = (m_sound_addr_a & 0xffff00) | data;
 }
 
-WRITE8_MEMBER( spinb_state::ppim_b_w )
+void spinb_state::ppim_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_addr_m = (m_sound_addr_m & 0xffff00) | data;
 }
 
-WRITE8_MEMBER( spinb_state::ppia_a_w )
+void spinb_state::ppia_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_addr_a = (m_sound_addr_a & 0xff00ff) | (data << 8);
 }
 
-WRITE8_MEMBER( spinb_state::ppim_a_w )
+void spinb_state::ppim_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_addr_m = (m_sound_addr_m & 0xff00ff) | (data << 8);
 }
 
-WRITE8_MEMBER( spinb_state::ppia_c_w )
+void spinb_state::ppia_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_a, 5))
@@ -506,7 +506,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 	m_portc_a = data & 0xfe;
 }
 
-WRITE8_MEMBER( spinb_state::ppim_c_w )
+void spinb_state::ppim_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_m, 5))

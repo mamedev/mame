@@ -79,95 +79,95 @@ void mb8795_device::recv_cb(uint8_t *buf, int len)
 	receive();
 }
 
-READ8_MEMBER(mb8795_device::txstat_r)
+uint8_t mb8795_device::txstat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  logerror("%s: txstat_r %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
 	return txstat;
 }
 
-WRITE8_MEMBER(mb8795_device::txstat_w)
+void mb8795_device::txstat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	txstat = txstat & (0xf0 | ~data);
 	check_irq();
 	logerror("%s: txstat_w %02x (%08x)\n", tag(), txstat, space.device().safe_pc());
 }
 
-READ8_MEMBER(mb8795_device::txmask_r)
+uint8_t mb8795_device::txmask_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: txmask_r %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
 	return txmask;
 }
 
-WRITE8_MEMBER(mb8795_device::txmask_w)
+void mb8795_device::txmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	txmask = data & 0xaf;
 	check_irq();
 	logerror("%s: txmask_w %02x (%08x)\n", tag(), txmask, space.device().safe_pc());
 }
 
-READ8_MEMBER(mb8795_device::rxstat_r)
+uint8_t mb8795_device::rxstat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: rxstat_r %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
 	return rxstat;
 }
 
-WRITE8_MEMBER(mb8795_device::rxstat_w)
+void mb8795_device::rxstat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rxstat = rxstat & (0x70 | ~data);
 	check_irq();
 	logerror("%s: rxstat_w %02x (%08x)\n", tag(), rxstat, space.device().safe_pc());
 }
 
-READ8_MEMBER(mb8795_device::rxmask_r)
+uint8_t mb8795_device::rxmask_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: rxmask_r %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
 	return rxmask;
 }
 
-WRITE8_MEMBER(mb8795_device::rxmask_w)
+void mb8795_device::rxmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rxmask = data & 0x9f;
 	check_irq();
 	logerror("%s: rxmask_w %02x (%08x)\n", tag(), rxmask, space.device().safe_pc());
 }
 
-READ8_MEMBER(mb8795_device::txmode_r)
+uint8_t mb8795_device::txmode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: txmode_r %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
 	return txmode;
 }
 
-WRITE8_MEMBER(mb8795_device::txmode_w)
+void mb8795_device::txmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	txmode = data;
 	logerror("%s: txmode_w %02x (%08x)\n", tag(), txmode, space.device().safe_pc());
 }
 
-READ8_MEMBER(mb8795_device::rxmode_r)
+uint8_t mb8795_device::rxmode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: rxmode_r %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
 	return rxmode;
 }
 
-WRITE8_MEMBER(mb8795_device::rxmode_w)
+void mb8795_device::rxmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rxmode = data;
 	logerror("%s: rxmode_w %02x (%08x)\n", tag(), rxmode, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(mb8795_device::reset_w)
+void mb8795_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & EN_RST_RESET)
 		device_reset();
 }
 
-READ8_MEMBER(mb8795_device::tdc_lsb_r)
+uint8_t mb8795_device::tdc_lsb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: tdc_lsb_r %02x (%08x)\n", tag(), txcount & 0xff, space.device().safe_pc());
 	return txcount;
 }
 
-READ8_MEMBER(mb8795_device::mac_r)
+uint8_t mb8795_device::mac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset < 6)
 		return mac[offset];
@@ -178,7 +178,7 @@ READ8_MEMBER(mb8795_device::mac_r)
 	return 0;
 }
 
-WRITE8_MEMBER(mb8795_device::mac_w)
+void mb8795_device::mac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset < 6) {
 		mac[offset] = data;

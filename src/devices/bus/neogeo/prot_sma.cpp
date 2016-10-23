@@ -31,7 +31,7 @@ void sma_prot_device::device_reset()
 
 // temporarily replaced by the get_bank_base functions below, until we clean up bankswitch implementation
 #if 0
-WRITE16_MEMBER( sma_prot_device::kof99_bankswitch_w )
+void sma_prot_device::kof99_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bankaddress;
 	static const int bankoffset[64] =
@@ -61,7 +61,7 @@ WRITE16_MEMBER( sma_prot_device::kof99_bankswitch_w )
 }
 
 
-WRITE16_MEMBER( sma_prot_device::garou_bankswitch_w )
+void sma_prot_device::garou_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// thanks to Razoola and Mr K for the info
 	int bankaddress;
@@ -97,7 +97,7 @@ WRITE16_MEMBER( sma_prot_device::garou_bankswitch_w )
 }
 
 
-WRITE16_MEMBER( sma_prot_device::garouh_bankswitch_w )
+void sma_prot_device::garouh_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// thanks to Razoola and Mr K for the info
 	int bankaddress;
@@ -135,7 +135,7 @@ WRITE16_MEMBER( sma_prot_device::garouh_bankswitch_w )
 }
 
 
-WRITE16_MEMBER( sma_prot_device::mslug3_bankswitch_w )
+void sma_prot_device::mslug3_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// thanks to Razoola and Mr K for the info
 	int bankaddress;
@@ -170,7 +170,7 @@ WRITE16_MEMBER( sma_prot_device::mslug3_bankswitch_w )
 }
 
 
-WRITE16_MEMBER( sma_prot_device::kof2000_bankswitch_w )
+void sma_prot_device::kof2000_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// thanks to Razoola and Mr K for the info
 	int bankaddress;
@@ -363,7 +363,7 @@ uint32_t sma_prot_device::kof2000_bank_base(uint16_t sel)
 
 
 
-READ16_MEMBER( sma_prot_device::prot_9a37_r )
+uint16_t sma_prot_device::prot_9a37_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x9a37;
 }
@@ -372,7 +372,7 @@ READ16_MEMBER( sma_prot_device::prot_9a37_r )
 /* information about the sma random number generator provided by razoola */
 /* this RNG is correct for KOF99, other games might be different */
 
-READ16_MEMBER( sma_prot_device::random_r )
+uint16_t sma_prot_device::random_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t old = m_sma_rng;
 	uint16_t newbit = ((m_sma_rng >> 2) ^

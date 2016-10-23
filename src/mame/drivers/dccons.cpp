@@ -274,7 +274,7 @@
 
 #define CPU_CLOCK (200000000)
 
-READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
+uint64_t dc_cons_state::dcus_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	//if (space.device().safe_pc()==0xc0ba52a)
 	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
@@ -283,7 +283,7 @@ READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 	return dc_ram[0x2303b0/8];
 }
 
-READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
+uint64_t dc_cons_state::dcjp_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	//if (space.device().safe_pc()==0xc0bac62)
 	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
@@ -311,7 +311,7 @@ void dc_cons_state::init_dcjp()
 	init_dc();
 }
 
-READ64_MEMBER(dc_cons_state::dc_pdtra_r )
+uint64_t dc_cons_state::dc_pdtra_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t out = PCTRA<<32;
 
@@ -341,29 +341,29 @@ READ64_MEMBER(dc_cons_state::dc_pdtra_r )
 	return out;
 }
 
-WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
+void dc_cons_state::dc_pdtra_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	PCTRA = (data>>16) & 0xffff;
 	PDTRA = (data & 0xffff);
 }
 
-READ64_MEMBER(dc_cons_state::dc_arm_r )
+uint64_t dc_cons_state::dc_arm_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return *((uint64_t *)dc_sound_ram.target()+offset);
 }
 
-WRITE64_MEMBER(dc_cons_state::dc_arm_w )
+void dc_cons_state::dc_arm_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
 }
 
 #if 0
-READ8_MEMBER(dc_cons_state::dc_flash_r)
+uint8_t dc_cons_state::dc_flash_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dcflash->read(offset);
 }
 
-WRITE8_MEMBER(dc_cons_state::dc_flash_w)
+void dc_cons_state::dc_flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dcflash->write(offset,data);
 }

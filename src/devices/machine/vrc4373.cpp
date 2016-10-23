@@ -210,27 +210,27 @@ void vrc4373_device::set_cpu_tag(const char *_cpu_tag)
 	cpu_tag = _cpu_tag;
 }
 // PCI bus control
-READ32_MEMBER (vrc4373_device::pcictrl_r)
+uint32_t vrc4373_device::pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (LOG_NILE)
 		logerror("%06X:nile pcictrl_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::pcictrl_w)
+void vrc4373_device::pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_NILE)
 		logerror("%06X:nile pcictrl_w to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);
 }
 // PCI Master Window 1
-READ32_MEMBER (vrc4373_device::master1_r)
+uint32_t vrc4373_device::master1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = this->space(AS_DATA).read_dword(m_pci1_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_MASTER)
 		logerror("%06X:nile master1 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::master1_w)
+void vrc4373_device::master1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	this->space(AS_DATA).write_dword(m_pci1_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_MASTER)
@@ -238,14 +238,14 @@ WRITE32_MEMBER (vrc4373_device::master1_w)
 }
 
 // PCI Master Window 2
-READ32_MEMBER (vrc4373_device::master2_r)
+uint32_t vrc4373_device::master2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = this->space(AS_DATA).read_dword(m_pci2_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_MASTER)
 		logerror("%06X:nile master2 read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::master2_w)
+void vrc4373_device::master2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	this->space(AS_DATA).write_dword(m_pci2_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_MASTER)
@@ -253,14 +253,14 @@ WRITE32_MEMBER (vrc4373_device::master2_w)
 }
 
 // PCI Master IO Window
-READ32_MEMBER (vrc4373_device::master_io_r)
+uint32_t vrc4373_device::master_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = this->space(AS_IO).read_dword(m_pci_io_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_MASTER)
 		logerror("%06X:nile master io read from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::master_io_w)
+void vrc4373_device::master_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	this->space(AS_IO).write_dword(m_pci_io_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_MASTER)
@@ -268,14 +268,14 @@ WRITE32_MEMBER (vrc4373_device::master_io_w)
 }
 
 // PCI Target Window 1
-READ32_MEMBER (vrc4373_device::target1_r)
+uint32_t vrc4373_device::target1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_cpu->space(AS_PROGRAM).read_dword(m_target1_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%08X:nile target1 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::target1_w)
+void vrc4373_device::target1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cpu->space(AS_PROGRAM).write_dword(m_target1_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
@@ -283,14 +283,14 @@ WRITE32_MEMBER (vrc4373_device::target1_w)
 }
 
 // PCI Target Window 2
-READ32_MEMBER (vrc4373_device::target2_r)
+uint32_t vrc4373_device::target2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_cpu->space(AS_PROGRAM).read_dword(m_target2_laddr | (offset*4), mem_mask);
 	if (LOG_NILE_TARGET)
 		logerror("%08X:nile target2 read from offset %02X = %08X & %08X\n", m_cpu->device_t::safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (vrc4373_device::target2_w)
+void vrc4373_device::target2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cpu->space(AS_PROGRAM).write_dword(m_target2_laddr | (offset*4), data, mem_mask);
 	if (LOG_NILE_TARGET)
@@ -362,7 +362,7 @@ TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
 }
 
 // CPU I/F
-READ32_MEMBER (vrc4373_device::cpu_if_r)
+uint32_t vrc4373_device::cpu_if_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_cpu_regs[offset];
 	switch (offset) {
@@ -380,7 +380,7 @@ READ32_MEMBER (vrc4373_device::cpu_if_r)
 	return result;
 }
 
-WRITE32_MEMBER(vrc4373_device::cpu_if_w)
+void vrc4373_device::cpu_if_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_NILE)
 		logerror("%06X:nile write to offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, data, mem_mask);

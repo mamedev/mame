@@ -53,8 +53,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_led);
 	DECLARE_READ_LINE_MEMBER(sid_line);
 	virtual void machine_reset() override;
-	DECLARE_WRITE16_MEMBER(sitcom_update_ds0);
-	DECLARE_WRITE16_MEMBER(sitcom_update_ds1);
+	void sitcom_update_ds0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sitcom_update_ds1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 static ADDRESS_MAP_START( sitcom_mem, AS_PROGRAM, 8, sitcom_state )
@@ -85,12 +85,12 @@ void sitcom_state::machine_reset()
 	m_ds1->cu_w(1);
 }
 
-WRITE16_MEMBER(sitcom_state::sitcom_update_ds0)
+void sitcom_state::sitcom_update_ds0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(offset, data);
 }
 
-WRITE16_MEMBER(sitcom_state::sitcom_update_ds1)
+void sitcom_state::sitcom_update_ds1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(4 + offset, data);
 }

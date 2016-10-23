@@ -2051,7 +2051,7 @@ inline uint32_t snes_ppu_device::get_vram_address()
 	return addr << 1;
 }
 
-READ8_MEMBER( snes_ppu_device::vram_read )
+uint8_t snes_ppu_device::vram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	offset &= 0xffff; // only 64KB are present on SNES
@@ -2087,7 +2087,7 @@ READ8_MEMBER( snes_ppu_device::vram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_device::vram_write )
+void snes_ppu_device::vram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0xffff; // only 64KB are present on SNES, Robocop 3 relies on this
 
@@ -2152,7 +2152,7 @@ WRITE8_MEMBER( snes_ppu_device::vram_write )
  to choose the high/low byte of the snes_oam word.
 *************************************************/
 
-READ8_MEMBER( snes_ppu_device::oam_read )
+uint8_t snes_ppu_device::oam_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x1ff;
 
@@ -2170,7 +2170,7 @@ READ8_MEMBER( snes_ppu_device::oam_read )
 	return (m_oam_ram[offset] >> (PPU_REG(OAMDATA) << 3)) & 0xff;
 }
 
-WRITE8_MEMBER( snes_ppu_device::oam_write )
+void snes_ppu_device::oam_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x1ff;
 
@@ -2212,7 +2212,7 @@ WRITE8_MEMBER( snes_ppu_device::oam_write )
  solution adopted by BSNES without enabling it.
 *************************************************/
 
-READ8_MEMBER( snes_ppu_device::cgram_read )
+uint8_t snes_ppu_device::cgram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	offset &= 0x1ff;
@@ -2238,7 +2238,7 @@ READ8_MEMBER( snes_ppu_device::cgram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_device::cgram_write )
+void snes_ppu_device::cgram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x1ff;
 

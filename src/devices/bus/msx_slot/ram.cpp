@@ -18,7 +18,7 @@ void msx_slot_ram_device::device_start()
 	save_item(NAME(m_ram));
 }
 
-READ8_MEMBER(msx_slot_ram_device::read)
+uint8_t msx_slot_ram_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{
@@ -27,7 +27,7 @@ READ8_MEMBER(msx_slot_ram_device::read)
 	return 0xFF;
 }
 
-WRITE8_MEMBER(msx_slot_ram_device::write)
+void msx_slot_ram_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{

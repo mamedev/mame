@@ -50,16 +50,16 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
-	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
-	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
-	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
+	uint16_t pckgaldx_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pckgaldx_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pktgaldx_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_pktgaldx();
 	virtual void machine_start() override;
 	uint32_t screen_update_pktgaldx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pktgaldb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	READ16_MEMBER( pktgaldx_protection_region_f_104_r );
-	WRITE16_MEMBER( pktgaldx_protection_region_f_104_w );
+	uint16_t pktgaldx_protection_region_f_104_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void pktgaldx_protection_region_f_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

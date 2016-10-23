@@ -151,10 +151,10 @@ public:
 
 	// computer interface
 	uint8_t mrq_r(address_space &space, offs_t offset, uint8_t data, bool &mdis);
-	DECLARE_WRITE8_MEMBER( mrq_w );
+	void mrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data);
-	DECLARE_WRITE8_MEMBER( iorq_w );
+	void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( busak_w );
 
@@ -162,8 +162,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( busrq_w ) { m_busrq_cb(state); }
-	DECLARE_READ8_MEMBER( exin_mrq_r ) { return m_in_mrq_cb(offset); }
-	DECLARE_WRITE8_MEMBER( exin_mrq_w ) { m_out_mrq_cb(offset, data); }
+	uint8_t exin_mrq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_mrq_cb(offset); }
+	void exin_mrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_mrq_cb(offset, data); }
 
 protected:
 	// device-level overrides

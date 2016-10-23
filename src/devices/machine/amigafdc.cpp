@@ -442,7 +442,7 @@ void amiga_fdc::setup_leds()
 	}
 }
 
-WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
+void amiga_fdc::ciaaprb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *old_floppy = floppy;
 

@@ -18,7 +18,7 @@ Preliminary driver by:
 #include "includes/aliens.h"
 
 
-WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
+void aliens_state::aliens_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -40,13 +40,13 @@ WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 #endif
 }
 
-WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
+void aliens_state::aliens_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
+void aliens_state::aliens_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* b1: bank for chanel A */
 	/* b0: bank for chanel B */
@@ -58,7 +58,7 @@ WRITE8_MEMBER(aliens_state::aliens_snd_bankswitch_w)
 }
 
 
-READ8_MEMBER(aliens_state::k052109_051960_r)
+uint8_t aliens_state::k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -73,7 +73,7 @@ READ8_MEMBER(aliens_state::k052109_051960_r)
 		return m_k052109->read(space, offset);
 }
 
-WRITE8_MEMBER(aliens_state::k052109_051960_w)
+void aliens_state::k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(space, offset - 0x3800, data);
@@ -167,7 +167,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(aliens_state::volume_callback)
+void aliens_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data & 0x0f) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data >> 4) * 0x11);
@@ -184,7 +184,7 @@ void aliens_state::machine_reset()
 	m_bank0000->set_bank(0);
 }
 
-WRITE8_MEMBER( aliens_state::banking_callback )
+void aliens_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank->set_entry(data & 0x1f);
 }

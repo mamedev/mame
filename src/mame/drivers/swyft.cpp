@@ -339,26 +339,26 @@ public:
 
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(swyft_d0000);
+	uint8_t swyft_d0000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(swyft_via0_r);
-	DECLARE_WRITE8_MEMBER(swyft_via0_w);
-	DECLARE_READ8_MEMBER(via0_pa_r);
-	DECLARE_WRITE8_MEMBER(via0_pa_w);
+	uint8_t swyft_via0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void swyft_via0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
-	DECLARE_READ8_MEMBER(via0_pb_r);
-	DECLARE_WRITE8_MEMBER(via0_pb_w);
+	uint8_t via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via0_int_w);
 
-	DECLARE_READ8_MEMBER(swyft_via1_r);
-	DECLARE_WRITE8_MEMBER(swyft_via1_w);
-	DECLARE_READ8_MEMBER(via1_pa_r);
-	DECLARE_WRITE8_MEMBER(via1_pa_w);
+	uint8_t swyft_via1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void swyft_via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
-	DECLARE_READ8_MEMBER(via1_pb_r);
-	DECLARE_WRITE8_MEMBER(via1_pb_w);
+	uint8_t via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
@@ -619,7 +619,7 @@ uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ8_MEMBER( swyft_state::swyft_d0000 )
+uint8_t swyft_state::swyft_d0000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// wtf is this supposed to be?
 	uint8_t byte = 0xFF; // ?
@@ -636,7 +636,7 @@ READ8_MEMBER( swyft_state::swyft_d0000 )
 //                                                         ^   ^   ^   ^  <- these four bits address the VIA registers? is this correct?
 static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2: DDRB", "3: DDRA", "4: T1C-L", "5: T1C-H", "6: T1L-L", "7: T1L-H", "8: T2C-L", "9: T2C-H", "A: SR", "B: ACR", "C: PCR", "D: IFR", "E: IER", "F: ORA/IRA*" };
 
-READ8_MEMBER( swyft_state::swyft_via0_r )
+uint8_t swyft_state::swyft_via0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
 	uint8_t data = m_via0->read(space, (offset>>6)&0xF);
@@ -646,7 +646,7 @@ READ8_MEMBER( swyft_state::swyft_via0_r )
 	return data;
 }
 
-WRITE8_MEMBER( swyft_state::swyft_via0_w )
+void swyft_state::swyft_via0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef DEBUG_SWYFT_VIA0
 	logerror("VIA0 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
@@ -655,7 +655,7 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 	m_via1->write(space, (offset>>6)&0xF, data);
 }
 
-READ8_MEMBER( swyft_state::swyft_via1_r )
+uint8_t swyft_state::swyft_via1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
 	uint8_t data = m_via1->read(space, (offset>>6)&0xF);
@@ -665,7 +665,7 @@ READ8_MEMBER( swyft_state::swyft_via1_r )
 	return data;
 }
 
-WRITE8_MEMBER( swyft_state::swyft_via1_w )
+void swyft_state::swyft_via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef DEBUG_SWYFT_VIA1
 	logerror(" VIA1 register %s written by cpu with data %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
@@ -675,13 +675,13 @@ WRITE8_MEMBER( swyft_state::swyft_via1_w )
 }
 
 // first via
-READ8_MEMBER( swyft_state::via0_pa_r )
+uint8_t swyft_state::via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("VIA0: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pa_w )
+void swyft_state::via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("VIA0: Port A written with data of 0x%02x!\n", data);
 }
@@ -691,13 +691,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
 	logerror("VIA0: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via0_pb_r )
+uint8_t swyft_state::via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("VIA0: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via0_pb_w )
+void swyft_state::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("VIA0: Port B written with data of 0x%02x!\n", data);
 }
@@ -718,13 +718,13 @@ WRITE_LINE_MEMBER ( swyft_state::via0_int_w )
 }
 
 // second via
-READ8_MEMBER( swyft_state::via1_pa_r )
+uint8_t swyft_state::via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror(" VIA1: Port A read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pa_w )
+void swyft_state::via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror(" VIA1: Port A written with data of 0x%02x!\n", data);
 }
@@ -734,13 +734,13 @@ WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
 	logerror(" VIA1: CA2 written with %d!\n", state);
 }
 
-READ8_MEMBER( swyft_state::via1_pb_r )
+uint8_t swyft_state::via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror(" VIA1: Port B read!\n");
 	return 0xFF;
 }
 
-WRITE8_MEMBER( swyft_state::via1_pb_w )
+void swyft_state::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror(" VIA1: Port B written with data of 0x%02x!\n", data);
 }

@@ -500,7 +500,7 @@ void hp9845b_state::set_graphic_mode(bool graphic)
 		}
 }
 
-READ16_MEMBER(hp9845b_state::graphic_r)
+uint16_t hp9845b_state::graphic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		uint16_t res = 0;
 
@@ -539,7 +539,7 @@ READ16_MEMBER(hp9845b_state::graphic_r)
 		return res;
 }
 
-WRITE16_MEMBER(hp9845b_state::graphic_w)
+void hp9845b_state::graphic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		//logerror("wr gv R%u = %04x\n", 4 + offset , data);
 
@@ -943,17 +943,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 		memcpy(&m_kb_state[ 0 ] , &input[ 0 ] , sizeof(m_kb_state));
 }
 
-READ16_MEMBER(hp9845b_state::kb_scancode_r)
+uint16_t hp9845b_state::kb_scancode_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return ~m_kb_scancode & 0x7f;
 }
 
-READ16_MEMBER(hp9845b_state::kb_status_r)
+uint16_t hp9845b_state::kb_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_kb_status;
 }
 
-WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
+void hp9845b_state::kb_irq_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		irq_w(0 , 0);
 		BIT_CLR(m_kb_status, 0);
@@ -971,7 +971,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::beeper_off)
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(hp9845b_state::pa_w)
+void hp9845b_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != m_pa) {
 		m_pa = data;

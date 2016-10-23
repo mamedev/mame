@@ -60,19 +60,19 @@ public:
 	uint8_t m_sync2_value;
 	uint8_t m_pot_mask[2];
 	uint8_t m_pot_trigger[2];
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(switches_r);
-	DECLARE_READ8_MEMBER(sbrkoutct_switches_r);
-	DECLARE_WRITE8_MEMBER(pot_mask1_w);
-	DECLARE_WRITE8_MEMBER(pot_mask2_w);
-	DECLARE_WRITE8_MEMBER(start_1_led_w);
-	DECLARE_WRITE8_MEMBER(start_2_led_w);
-	DECLARE_WRITE8_MEMBER(serve_led_w);
-	DECLARE_WRITE8_MEMBER(serve_2_led_w);
-	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_READ8_MEMBER(sync_r);
-	DECLARE_READ8_MEMBER(sync2_r);
-	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switches_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sbrkoutct_switches_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pot_mask1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pot_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void start_1_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void start_2_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serve_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serve_2_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sync2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sbrkout_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -175,7 +175,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 }
 
 
-WRITE8_MEMBER(sbrkout_state::irq_ack_w)
+void sbrkout_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -188,7 +188,7 @@ WRITE8_MEMBER(sbrkout_state::irq_ack_w)
  *
  *************************************/
 
-READ8_MEMBER(sbrkout_state::switches_r)
+uint8_t sbrkout_state::switches_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -217,7 +217,7 @@ READ8_MEMBER(sbrkout_state::switches_r)
 	return result;
 }
 
-READ8_MEMBER(sbrkout_state::sbrkoutct_switches_r)
+uint8_t sbrkout_state::sbrkoutct_switches_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -251,7 +251,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
 }
 
 
-WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
+void sbrkout_state::pot_mask1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pot_mask[0] = ~offset & 1;
 	m_pot_trigger[0] = 0;
@@ -259,7 +259,7 @@ WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
 }
 
 
-WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
+void sbrkout_state::pot_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pot_mask[1] = ~offset & 1;
 	m_pot_trigger[1] = 0;
@@ -280,29 +280,29 @@ WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
     reversed for the Serve LED, which has a NOT on the signal.
 */
 
-WRITE8_MEMBER(sbrkout_state::start_1_led_w)
+void sbrkout_state::start_1_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset & 1);
 }
 
 
-WRITE8_MEMBER(sbrkout_state::start_2_led_w)
+void sbrkout_state::start_2_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, offset & 1);
 }
 
 
-WRITE8_MEMBER(sbrkout_state::serve_led_w)
+void sbrkout_state::serve_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, ~offset & 1);
 }
 
-WRITE8_MEMBER(sbrkout_state::serve_2_led_w)
+void sbrkout_state::serve_2_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, ~offset & 1);
 }
 
-WRITE8_MEMBER(sbrkout_state::coincount_w)
+void sbrkout_state::coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, offset & 1);
 }
@@ -315,7 +315,7 @@ WRITE8_MEMBER(sbrkout_state::coincount_w)
  *
  *************************************/
 
-READ8_MEMBER(sbrkout_state::sync_r)
+uint8_t sbrkout_state::sync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int hpos = m_screen->hpos();
 	m_sync2_value = (hpos >= 128 && hpos <= m_screen->visible_area().max_x);
@@ -323,7 +323,7 @@ READ8_MEMBER(sbrkout_state::sync_r)
 }
 
 
-READ8_MEMBER(sbrkout_state::sync2_r)
+uint8_t sbrkout_state::sync2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_sync2_value << 7) | 0x7f;
 }
@@ -350,7 +350,7 @@ void sbrkout_state::video_start()
 }
 
 
-WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
+void sbrkout_state::sbrkout_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

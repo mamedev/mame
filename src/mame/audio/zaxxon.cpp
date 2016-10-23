@@ -107,7 +107,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_sound_a_w)
+void zaxxon_state::zaxxon_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
@@ -141,7 +141,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_sound_a_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_sound_b_w)
+void zaxxon_state::zaxxon_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -157,7 +157,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_sound_b_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_sound_c_w)
+void zaxxon_state::zaxxon_sound_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
@@ -207,7 +207,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::congo_sound_b_w)
+void zaxxon_state::congo_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -219,7 +219,7 @@ WRITE8_MEMBER(zaxxon_state::congo_sound_b_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_sound_c_w)
+void zaxxon_state::congo_sound_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;

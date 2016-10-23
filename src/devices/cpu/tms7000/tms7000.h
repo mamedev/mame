@@ -48,13 +48,13 @@ public:
 	tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER(tms7000_unmapped_rf_r) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
-	DECLARE_WRITE8_MEMBER(tms7000_unmapped_rf_w) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
+	uint8_t tms7000_unmapped_rf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if (!space.debugger_access()) logerror("'%s' (%04X): unmapped_rf_r @ $%04x\n", tag(), m_pc, offset + 0x80); return 0; };
+	void tms7000_unmapped_rf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("'%s' (%04X): unmapped_rf_w @ $%04x = $%02x\n", tag(), m_pc, offset + 0x80, data); };
 
-	DECLARE_READ8_MEMBER(tms7000_pf_r);
-	DECLARE_WRITE8_MEMBER(tms7000_pf_w);
-	DECLARE_READ8_MEMBER(tms7002_pf_r) { return tms7000_pf_r(space, offset + 0x10); }
-	DECLARE_WRITE8_MEMBER(tms7002_pf_w) { tms7000_pf_w(space, offset + 0x10, data); }
+	uint8_t tms7000_pf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms7000_pf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms7002_pf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return tms7000_pf_r(space, offset + 0x10); }
+	void tms7002_pf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { tms7000_pf_w(space, offset + 0x10, data); }
 
 	bool chip_is_cmos() { return (m_info_flags & TMS7000_CHIP_IS_CMOS) ? true : false; }
 	uint32_t chip_get_family() { return m_info_flags & TMS7000_CHIP_FAMILY_MASK; }
@@ -309,17 +309,17 @@ class tms70c46_device : public tms7000_device
 public:
 	tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(dockbus_status_r);
-	DECLARE_WRITE8_MEMBER(dockbus_status_w);
-	DECLARE_READ8_MEMBER(dockbus_data_r);
-	DECLARE_WRITE8_MEMBER(dockbus_data_w);
+	uint8_t dockbus_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dockbus_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dockbus_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dockbus_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// access I/O port E if databus is disabled
-	DECLARE_READ8_MEMBER(e_bus_data_r) { return (space.debugger_access()) ? 0xff : ((m_control & 0x20) ? 0xff : m_io->read_byte(TMS7000_PORTE)); }
-	DECLARE_WRITE8_MEMBER(e_bus_data_w) { if (~m_control & 0x20) m_io->write_byte(TMS7000_PORTE, data); }
+	uint8_t e_bus_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (space.debugger_access()) ? 0xff : ((m_control & 0x20) ? 0xff : m_io->read_byte(TMS7000_PORTE)); }
+	void e_bus_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (~m_control & 0x20) m_io->write_byte(TMS7000_PORTE, data); }
 
 protected:
 	// device-level overrides

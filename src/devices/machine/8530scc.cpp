@@ -462,7 +462,7 @@ void scc8530_t::set_reg_b(int reg, uint8_t data)
 //  getter
 //-------------------------------------------------
 
-READ8_MEMBER(scc8530_t::reg_r)
+uint8_t scc8530_t::reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_reg(offset & 3);
 }
@@ -506,7 +506,7 @@ uint8_t scc8530_t::read_reg(int offset)
 //  setter
 //-------------------------------------------------
 
-WRITE8_MEMBER( scc8530_t::reg_w )
+void scc8530_t::reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_reg(offset & 3, data);
 }

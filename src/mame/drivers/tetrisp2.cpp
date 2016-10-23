@@ -67,7 +67,7 @@ stepstag:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_systemregs_w)
+void tetrisp2_state::tetrisp2_systemregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -77,7 +77,7 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_systemregs_w)
 
 #define ROCKN_TIMER_BASE attotime::from_nsec(500000)
 
-WRITE16_MEMBER(tetrisp2_state::rockn_systemregs_w)
+void tetrisp2_state::rockn_systemregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -91,7 +91,7 @@ WRITE16_MEMBER(tetrisp2_state::rockn_systemregs_w)
 }
 
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_systemregs_w)
+void tetrisp2_state::rocknms_sub_systemregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -113,12 +113,12 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_systemregs_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(tetrisp2_state::rockn_adpcmbank_r)
+uint16_t tetrisp2_state::rockn_adpcmbank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_rockn_adpcmbank & 0xf0ff) | (m_rockn_protectdata << 8));
 }
 
-WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
+void tetrisp2_state::rockn_adpcmbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
@@ -135,7 +135,7 @@ WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 	memcpy(&SNDROM[0x0400000], &SNDROM[0x1000000 + (0x0c00000 * bank)], 0x0c00000);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rockn2_adpcmbank_w)
+void tetrisp2_state::rockn2_adpcmbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
@@ -168,18 +168,18 @@ WRITE16_MEMBER(tetrisp2_state::rockn2_adpcmbank_w)
 }
 
 
-READ16_MEMBER(tetrisp2_state::rockn_soundvolume_r)
+uint16_t tetrisp2_state::rockn_soundvolume_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(tetrisp2_state::rockn_soundvolume_w)
+void tetrisp2_state::rockn_soundvolume_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rockn_soundvolume = data;
 }
 
 
-WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
+void tetrisp2_state::nndmseal_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(tetrisp2_state::tetrisp2_ip_1_word_r)
+uint16_t tetrisp2_state::tetrisp2_ip_1_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  ( ioport("SYSTEM")->read() &  0xfcff ) |
 			(           machine().rand() & ~0xfcff ) |
@@ -231,18 +231,18 @@ READ16_MEMBER(tetrisp2_state::tetrisp2_ip_1_word_r)
 
 
 /* The game only ever writes even bytes and reads odd bytes */
-READ16_MEMBER(tetrisp2_state::tetrisp2_nvram_r)
+uint16_t tetrisp2_state::tetrisp2_nvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  ( (m_nvram[offset] >> 8) & 0x00ff ) |
 			( (m_nvram[offset] << 8) & 0xff00 ) ;
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_nvram_w)
+void tetrisp2_state::tetrisp2_nvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nvram[offset]);
 }
 
-READ16_MEMBER(tetrisp2_state::rockn_nvram_r)
+uint16_t tetrisp2_state::rockn_nvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  m_nvram[offset];
 }
@@ -257,12 +257,12 @@ READ16_MEMBER(tetrisp2_state::rockn_nvram_r)
 ***************************************************************************/
 
 
-READ16_MEMBER(tetrisp2_state::rocknms_main2sub_r)
+uint16_t tetrisp2_state::rocknms_main2sub_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rocknms_main2sub;
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_main2sub_w)
+void tetrisp2_state::rocknms_main2sub_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_main2sub = (data ^ 0xffff);
@@ -273,14 +273,14 @@ CUSTOM_INPUT_MEMBER(tetrisp2_state::rocknms_main2sub_status_r)
 	return  m_rocknms_sub2main & 0x0003;
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub2main_w)
+void tetrisp2_state::rocknms_sub2main_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_sub2main = (data ^ 0xffff);
 }
 
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_coincounter_w)
+void tetrisp2_state::tetrisp2_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x0001));
 }
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(tetrisp2_state::nndmseal_coincounter_w)
+void tetrisp2_state::nndmseal_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -346,7 +346,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_coincounter_w)
 //  popmessage("%04x",data);
 }
 
-WRITE16_MEMBER(tetrisp2_state::nndmseal_b20000_w)
+void tetrisp2_state::nndmseal_b20000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// leds?
 //  popmessage("%04x",data);
@@ -538,7 +538,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-READ16_MEMBER(stepstag_state::stepstag_coins_r)
+uint16_t stepstag_state::stepstag_coins_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bits 8 & 9?
 	return  ( ioport("COINS")->read() &  0xfcff ) |
@@ -546,22 +546,22 @@ READ16_MEMBER(stepstag_state::stepstag_coins_r)
 			(      1 << (8 + (machine().rand()&1)) );
 }
 
-READ16_MEMBER(stepstag_state::unknown_read_0xc00000)
+uint16_t stepstag_state::unknown_read_0xc00000(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(stepstag_state::unknown_read_0xffff00)
+uint16_t stepstag_state::unknown_read_0xffff00(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ16_MEMBER(stepstag_state::unk_a42000_r)
+uint16_t stepstag_state::unk_a42000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x2000;
 }
 
-WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
+void stepstag_state::stepstag_soundlatch_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data, mem_mask);
 
@@ -571,7 +571,7 @@ WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 }
 
 
-WRITE16_MEMBER(stepstag_state::stepstag_leds_w)
+void stepstag_state::stepstag_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  data = COMBINE_DATA()
 	if (ACCESSING_BITS_0_7)

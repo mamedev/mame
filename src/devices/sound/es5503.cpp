@@ -272,7 +272,7 @@ void es5503_device::device_reset()
 	output_rate = (clock()/8)/34;   // (input clock / 8) / # of oscs. enabled + 2
 }
 
-READ8_MEMBER( es5503_device::read )
+uint8_t es5503_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retval;
 	int i;
@@ -363,7 +363,7 @@ READ8_MEMBER( es5503_device::read )
 	return 0;
 }
 
-WRITE8_MEMBER( es5503_device::write )
+void es5503_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 

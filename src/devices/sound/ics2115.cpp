@@ -757,7 +757,7 @@ void ics2115_device::reg_write(uint8_t data, bool msb) {
 	}
 }
 
-READ8_MEMBER(ics2115_device::read)
+uint8_t ics2115_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -796,7 +796,7 @@ READ8_MEMBER(ics2115_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(ics2115_device::write)
+void ics2115_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset) {
 		case 1:

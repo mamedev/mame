@@ -189,11 +189,11 @@ uint32_t macpds_sedisplay_device::screen_update(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE16_MEMBER( macpds_sedisplay_device::sedisplay_w )
+void macpds_sedisplay_device::sedisplay_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER( macpds_sedisplay_device::sedisplay_r )
+uint16_t macpds_sedisplay_device::sedisplay_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)    // ack vbl
 	{
@@ -207,7 +207,7 @@ READ16_MEMBER( macpds_sedisplay_device::sedisplay_r )
 	return 0;
 }
 
-WRITE16_MEMBER( macpds_sedisplay_device::ramdac_w )
+void macpds_sedisplay_device::ramdac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -232,7 +232,7 @@ WRITE16_MEMBER( macpds_sedisplay_device::ramdac_w )
 	}
 }
 
-READ16_MEMBER( macpds_sedisplay_device::ramdac_r )
+uint16_t macpds_sedisplay_device::ramdac_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }

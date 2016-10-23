@@ -39,7 +39,7 @@ void radio86_state::init_radioram()
 	m_radio_ram_disk = std::make_unique<uint8_t[]>(0x20000);
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
-READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
+uint8_t radio86_state::radio86_8255_portb_r2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
@@ -53,7 +53,7 @@ READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 	return key;
 }
 
-READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
+uint8_t radio86_state::radio86_8255_portc_r2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double level = m_cassette->input();
 	uint8_t dat = m_io_line8->read();
@@ -63,18 +63,18 @@ READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
 	return dat;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_8255_porta_w2)
+void radio86_state::radio86_8255_porta_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_8255_portc_w2)
+void radio86_state::radio86_8255_portc_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->output(data & 0x01 ? 1 : -1);
 }
 
 
-READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
+uint8_t radio86_state::rk7007_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double level = m_cassette->input();
 	uint8_t key = 0xff;
@@ -102,13 +102,13 @@ WRITE_LINE_MEMBER(radio86_state::hrq_w)
 	m_dma8257->hlda_w(state);
 }
 
-READ8_MEMBER(radio86_state::memory_read_byte)
+uint8_t radio86_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(radio86_state::memory_write_byte)
+void radio86_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
@@ -127,17 +127,17 @@ void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-READ8_MEMBER(radio86_state::radio_cpu_state_r)
+uint8_t radio86_state::radio_cpu_state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.device().state().state_int(I8085_STATUS);
 }
 
-READ8_MEMBER(radio86_state::radio_io_r)
+uint8_t radio86_state::radio_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte((offset << 8) + offset);
 }
 
-WRITE8_MEMBER(radio86_state::radio_io_w)
+void radio86_state::radio_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte((offset << 8) + offset,data);
 }
@@ -152,12 +152,12 @@ void radio86_state::machine_reset_radio86()
 }
 
 
-WRITE8_MEMBER(radio86_state::radio86_pagesel)
+void radio86_state::radio86_pagesel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_disk_sel = data;
 }
 
-READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
+uint8_t radio86_state::radio86rom_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
@@ -166,7 +166,7 @@ READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
 		return 0xff;
 }
 
-READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
+uint8_t radio86_state::radio86ram_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *romdisk = m_region_maincpu->base() + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0) {
@@ -180,17 +180,17 @@ READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
 	}
 }
 
-WRITE8_MEMBER(radio86_state::radio86_romdisk_portb_w)
+void radio86_state::radio86_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(radio86_state::radio86_romdisk_portc_w)
+void radio86_state::radio86_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romdisk_msb = data;
 }
 
-WRITE8_MEMBER(radio86_state::mikrosha_8255_font_page_w)
+void radio86_state::mikrosha_8255_font_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mikrosha_font_page = (data  > 7) & 1;
 }

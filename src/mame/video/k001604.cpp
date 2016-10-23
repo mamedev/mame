@@ -281,12 +281,12 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	m_layer_8x8[0]->draw(screen, bitmap, cliprect, 0,0);
 }
 
-READ32_MEMBER( k001604_device::tile_r )
+uint32_t k001604_device::tile_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_tile_ram[offset];
 }
 
-READ32_MEMBER( k001604_device::char_r )
+uint32_t k001604_device::char_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -303,7 +303,7 @@ READ32_MEMBER( k001604_device::char_r )
 	return m_char_ram[addr];
 }
 
-READ32_MEMBER( k001604_device::reg_r )
+uint32_t k001604_device::reg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -314,7 +314,7 @@ READ32_MEMBER( k001604_device::reg_r )
 	return m_reg[offset];
 }
 
-WRITE32_MEMBER( k001604_device::tile_w )
+void k001604_device::tile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int x/*, y*/;
 	COMBINE_DATA(m_tile_ram.get() + offset);
@@ -360,7 +360,7 @@ WRITE32_MEMBER( k001604_device::tile_w )
 	}
 }
 
-WRITE32_MEMBER( k001604_device::char_w )
+void k001604_device::char_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int set, bank;
 	uint32_t addr;
@@ -380,7 +380,7 @@ WRITE32_MEMBER( k001604_device::char_w )
 	gfx(1)->mark_dirty(addr / 128);
 }
 
-WRITE32_MEMBER( k001604_device::reg_w )
+void k001604_device::reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_reg.get() + offset);
 

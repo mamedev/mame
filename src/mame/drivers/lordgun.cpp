@@ -54,7 +54,7 @@ Notes:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
+void lordgun_state::lordgun_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & 0x60)
 	{
@@ -75,7 +75,7 @@ WRITE16_MEMBER(lordgun_state::lordgun_protection_w)
 	}
 }
 
-READ16_MEMBER(lordgun_state::lordgun_protection_r)
+uint16_t lordgun_state::lordgun_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x60)
 	{
@@ -105,7 +105,7 @@ READ16_MEMBER(lordgun_state::lordgun_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(lordgun_state::aliencha_protection_w)
+void lordgun_state::aliencha_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & 0x60)
 	{
@@ -118,7 +118,7 @@ WRITE16_MEMBER(lordgun_state::aliencha_protection_w)
 	}
 }
 
-READ16_MEMBER(lordgun_state::aliencha_protection_r)
+uint16_t lordgun_state::aliencha_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x60)
 	{
@@ -156,17 +156,17 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 	return 0;
 }
 
-WRITE8_MEMBER(lordgun_state::fake_w)
+void lordgun_state::fake_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::fake2_w)
+void lordgun_state::fake2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
+void lordgun_state::lordgun_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 	m_old = data;
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
+void lordgun_state::aliencha_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~data & ~0xf8)
 	{
@@ -222,7 +222,7 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 }
 
 
-READ8_MEMBER(lordgun_state::aliencha_dip_r)
+uint8_t lordgun_state::aliencha_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_aliencha_dip_sel & 0x70)
 	{
@@ -236,39 +236,39 @@ READ8_MEMBER(lordgun_state::aliencha_dip_r)
 	}
 }
 
-WRITE8_MEMBER(lordgun_state::aliencha_dip_w)
+void lordgun_state::aliencha_dip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_aliencha_dip_sel = data;
 }
 
 // Unknown, always equal to 7 in lordgun, aliencha.
-WRITE16_MEMBER(lordgun_state::lordgun_priority_w)
+void lordgun_state::lordgun_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 }
 
 
-READ16_MEMBER(lordgun_state::lordgun_gun_0_x_r)
+uint16_t lordgun_state::lordgun_gun_0_x_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun[0].hw_x;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_0_y_r)
+uint16_t lordgun_state::lordgun_gun_0_y_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun[0].hw_y;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_1_x_r)
+uint16_t lordgun_state::lordgun_gun_1_x_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun[1].hw_x;
 }
 
-READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
+uint16_t lordgun_state::lordgun_gun_1_y_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun[1].hw_y;
 }
 
-WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
+void lordgun_state::lordgun_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)     m_soundlatch->write(space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)    m_soundlatch2->write(space, 0, (data >> 8) & 0xff);
@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8, lordgun_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
+void lordgun_state::lordgun_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank((data >> 1) & 1);
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);

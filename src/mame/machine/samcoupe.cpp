@@ -22,7 +22,7 @@
     MEMORY BANKING
 ***************************************************************************/
 
-READ8_MEMBER(samcoupe_state::sam_bank1_r)
+uint8_t samcoupe_state::sam_bank1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (sam_bank_read_ptr[0])
 		return sam_bank_read_ptr[0][offset];
@@ -30,14 +30,14 @@ READ8_MEMBER(samcoupe_state::sam_bank1_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::sam_bank1_w)
+void samcoupe_state::sam_bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (sam_bank_write_ptr[0])
 		sam_bank_write_ptr[0][offset] = data;
 }
 
 
-READ8_MEMBER(samcoupe_state::sam_bank2_r)
+uint8_t samcoupe_state::sam_bank2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (sam_bank_read_ptr[1])
 		return sam_bank_read_ptr[1][offset];
@@ -45,14 +45,14 @@ READ8_MEMBER(samcoupe_state::sam_bank2_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::sam_bank2_w)
+void samcoupe_state::sam_bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (sam_bank_write_ptr[1])
 		sam_bank_write_ptr[1][offset] = data;
 }
 
 
-READ8_MEMBER(samcoupe_state::sam_bank3_r)
+uint8_t samcoupe_state::sam_bank3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (sam_bank_read_ptr[2])
 		return sam_bank_read_ptr[2][offset];
@@ -60,14 +60,14 @@ READ8_MEMBER(samcoupe_state::sam_bank3_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::sam_bank3_w)
+void samcoupe_state::sam_bank3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (sam_bank_write_ptr[2])
 		sam_bank_write_ptr[2][offset] = data;
 }
 
 
-READ8_MEMBER(samcoupe_state::sam_bank4_r)
+uint8_t samcoupe_state::sam_bank4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (sam_bank_read_ptr[3])
 		return sam_bank_read_ptr[3][offset];
@@ -75,7 +75,7 @@ READ8_MEMBER(samcoupe_state::sam_bank4_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::sam_bank4_w)
+void samcoupe_state::sam_bank4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (sam_bank_write_ptr[3])
 		sam_bank_write_ptr[3][offset] = data;
@@ -202,7 +202,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 }
 
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
+void samcoupe_state::samcoupe_ext_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_program = m_maincpu->space(AS_PROGRAM);
 
@@ -223,14 +223,14 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_ext_mem_w)
     REAL TIME CLOCK
 ***************************************************************************/
 
-READ8_MEMBER(samcoupe_state::samcoupe_rtc_r)
+uint8_t samcoupe_state::samcoupe_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &spaceio = m_maincpu->space(AS_IO);
 	return m_rtc->read(spaceio, offset >> 12);
 }
 
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_rtc_w)
+void samcoupe_state::samcoupe_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &spaceio = m_maincpu->space(AS_IO);
 	m_rtc->write(spaceio, offset >> 12, data);

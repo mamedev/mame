@@ -637,7 +637,7 @@ void lk201_device::update_interrupts()
 	}
 }
 
-READ8_MEMBER( lk201_device::timer_r )
+uint8_t lk201_device::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint16_t count;
 
@@ -662,7 +662,7 @@ READ8_MEMBER( lk201_device::timer_r )
 	return ret;
 }
 
-WRITE8_MEMBER( lk201_device::timer_w )
+void lk201_device::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint16_t count;
 	static int save_tsr;
@@ -686,12 +686,12 @@ WRITE8_MEMBER( lk201_device::timer_w )
 	}
 }
 
-READ8_MEMBER( lk201_device::ddr_r )
+uint8_t lk201_device::ddr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( lk201_device::ddr_w )
+void lk201_device::ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
@@ -700,7 +700,7 @@ WRITE8_MEMBER( lk201_device::ddr_w )
 	send_port(space, offset, ports[offset] & olddata);
 }
 
-READ8_MEMBER( lk201_device::ports_r )
+uint8_t lk201_device::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t incoming = 0;
 
@@ -714,7 +714,7 @@ READ8_MEMBER( lk201_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::ports_w )
+void lk201_device::ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t olddata = ports[offset];
 	ports[offset] = data;            //   "port writes are independent of DDRC"
@@ -815,7 +815,7 @@ void lk201_device::send_port(address_space &space, uint8_t offset, uint8_t oldda
 		} // outer switch
 }
 
-READ8_MEMBER( lk201_device::sci_r )
+uint8_t lk201_device::sci_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t incoming = 0;
 
@@ -848,7 +848,7 @@ READ8_MEMBER( lk201_device::sci_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::sci_w )
+void lk201_device::sci_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -878,7 +878,7 @@ WRITE8_MEMBER( lk201_device::sci_w )
 //  printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }
 
-READ8_MEMBER( lk201_device::spi_r )
+uint8_t lk201_device::spi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t incoming = 0;
 
@@ -902,7 +902,7 @@ READ8_MEMBER( lk201_device::spi_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( lk201_device::spi_w )
+void lk201_device::spi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

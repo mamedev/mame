@@ -110,21 +110,21 @@ class jrpacman_state : public pacman_state
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
-	DECLARE_WRITE8_MEMBER(jrpacman_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	void jrpacman_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jrpacman();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
 
-WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
+void jrpacman_state::jrpacman_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line_vector(0, data);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jrpacman_state::irq_mask_w)
+void jrpacman_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

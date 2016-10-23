@@ -34,10 +34,10 @@ public:
 	h8_dtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_info(const char *intc, int irq);
 
-	DECLARE_READ8_MEMBER(dtcer_r);
-	DECLARE_WRITE8_MEMBER(dtcer_w);
-	DECLARE_READ8_MEMBER(dtvecr_r);
-	DECLARE_WRITE8_MEMBER(dtvecr_w);
+	uint8_t dtcer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dtcer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dtvecr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dtvecr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool trigger_dtc(int vector);
 	void count_done(int id);

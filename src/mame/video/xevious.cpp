@@ -162,31 +162,31 @@ void xevious_state::video_start_xevious()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( xevious_state::xevious_fg_videoram_w )
+void xevious_state::xevious_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_fg_colorram_w )
+void xevious_state::xevious_fg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_fg_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_videoram_w )
+void xevious_state::xevious_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_bg_colorram_w )
+void xevious_state::xevious_bg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bg_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
+void xevious_state::xevious_vh_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -218,12 +218,12 @@ WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 
 
 /* emulation for schematic 9B */
-WRITE8_MEMBER( xevious_state::xevious_bs_w )
+void xevious_state::xevious_bs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xevious_bs[offset & 1] = data;
 }
 
-READ8_MEMBER( xevious_state::xevious_bb_r )
+uint8_t xevious_state::xevious_bb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom2a = memregion("gfx4")->base();
 	uint8_t *rom2b = rom2a+0x1000;

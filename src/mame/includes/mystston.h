@@ -44,9 +44,9 @@ public:
 	required_shared_ptr<uint8_t> m_paletteram;
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_video_control;
-	DECLARE_WRITE8_MEMBER(irq_clear_w);
-	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
-	DECLARE_WRITE8_MEMBER(mystston_video_control_w);
+	void irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mystston_ay8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mystston_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

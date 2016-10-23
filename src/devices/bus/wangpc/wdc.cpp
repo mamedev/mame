@@ -299,7 +299,7 @@ bool wangpc_wdc_device::wangpcbus_have_dack(int line)
 //  port_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_wdc_device::port_r )
+uint8_t wangpc_wdc_device::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -324,7 +324,7 @@ READ8_MEMBER( wangpc_wdc_device::port_r )
 //  status_w - status register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_wdc_device::status_w )
+void wangpc_wdc_device::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("WDC status %02x\n", data);
 
@@ -332,11 +332,11 @@ WRITE8_MEMBER( wangpc_wdc_device::status_w )
 }
 
 
-READ8_MEMBER( wangpc_wdc_device::ctc_ch0_r ) { return m_ctc->read(space, 0); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch0_w ) { m_ctc->write(space, 0, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch1_r ) { return m_ctc->read(space, 1); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch1_w ) { m_ctc->write(space, 1, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch2_r ) { return m_ctc->read(space, 2); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch2_w ) { m_ctc->write(space, 2, data); }
-READ8_MEMBER( wangpc_wdc_device::ctc_ch3_r ) { return m_ctc->read(space, 3); }
-WRITE8_MEMBER( wangpc_wdc_device::ctc_ch3_w ) { m_ctc->write(space, 3, data); }
+uint8_t wangpc_wdc_device::ctc_ch0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_ctc->read(space, 0); }
+void wangpc_wdc_device::ctc_ch0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_ctc->write(space, 0, data); }
+uint8_t wangpc_wdc_device::ctc_ch1_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_ctc->read(space, 1); }
+void wangpc_wdc_device::ctc_ch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_ctc->write(space, 1, data); }
+uint8_t wangpc_wdc_device::ctc_ch2_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_ctc->read(space, 2); }
+void wangpc_wdc_device::ctc_ch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_ctc->write(space, 2, data); }
+uint8_t wangpc_wdc_device::ctc_ch3_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_ctc->read(space, 3); }
+void wangpc_wdc_device::ctc_ch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_ctc->write(space, 3, data); }

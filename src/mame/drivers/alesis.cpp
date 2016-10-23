@@ -17,12 +17,12 @@
 #include "sr16.lh"
 
 
-WRITE8_MEMBER( alesis_state::kb_matrix_w )
+void alesis_state::kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( alesis_state::kb_r )
+uint8_t alesis_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -42,7 +42,7 @@ READ8_MEMBER( alesis_state::kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::led_w )
+void alesis_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("patt_led",  data & 0x01 ? 1 : 0);
 	output().set_value("song_led",  data & 0x01 ? 0 : 1);
@@ -55,7 +55,7 @@ WRITE8_MEMBER( alesis_state::led_w )
 	output().set_value("midi_led",  data & 0x80 ? 0 : 1);
 }
 
-READ8_MEMBER( alesis_state::p3_r )
+uint8_t alesis_state::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -64,17 +64,17 @@ READ8_MEMBER( alesis_state::p3_r )
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::p3_w )
+void alesis_state::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->output(data & 0x04 ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER( alesis_state::sr16_lcd_w )
+void alesis_state::sr16_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcdc->write(space, BIT(m_kb_matrix,7), data);
 }
 
-WRITE8_MEMBER( alesis_state::mmt8_led_w )
+void alesis_state::mmt8_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("play_led", data & 0x01 ? 0 : 1);
 	output().set_value("record_led" , data & 0x02 ? 0 : 1);
@@ -87,18 +87,18 @@ WRITE8_MEMBER( alesis_state::mmt8_led_w )
 	m_leds = data;
 }
 
-READ8_MEMBER( alesis_state::mmt8_led_r )
+uint8_t alesis_state::mmt8_led_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_leds;
 }
 
-WRITE8_MEMBER( alesis_state::track_led_w )
+void alesis_state::track_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int i=0; i<8; i++)
 		output().set_indexed_value("track_led", i + 1, BIT(data, i));
 }
 
-READ8_MEMBER( alesis_state::mmt8_p3_r )
+uint8_t alesis_state::mmt8_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ---- -x--   Tape in
 	// ---- x---   Start/Stop input
@@ -109,7 +109,7 @@ READ8_MEMBER( alesis_state::mmt8_p3_r )
 	return data;
 }
 
-WRITE8_MEMBER( alesis_state::mmt8_p3_w )
+void alesis_state::mmt8_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ---x ----   Tape out
 	// --x- ----   Click out

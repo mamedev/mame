@@ -351,7 +351,7 @@ static uint8_t rtc_get_reg(running_machine &machine, int reg)
 	}
 }
 
-READ32_MEMBER(model3_state::rtc72421_r)
+uint32_t model3_state::rtc72421_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int reg = offset;
 	uint32_t data;
@@ -360,6 +360,6 @@ READ32_MEMBER(model3_state::rtc72421_r)
 	return data;
 }
 
-WRITE32_MEMBER(model3_state::rtc72421_w)
+void model3_state::rtc72421_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }

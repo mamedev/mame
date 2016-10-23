@@ -37,19 +37,19 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beeper;
-	DECLARE_WRITE8_MEMBER(multi8_6845_w);
-	DECLARE_READ8_MEMBER(key_input_r);
-	DECLARE_READ8_MEMBER(key_status_r);
-	DECLARE_READ8_MEMBER(multi8_vram_r);
-	DECLARE_WRITE8_MEMBER(multi8_vram_w);
-	DECLARE_READ8_MEMBER(pal_r);
-	DECLARE_WRITE8_MEMBER(pal_w);
-	DECLARE_READ8_MEMBER(multi8_kanji_r);
-	DECLARE_WRITE8_MEMBER(multi8_kanji_w);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_WRITE8_MEMBER(ym2203_porta_w);
+	void multi8_6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t key_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t multi8_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void multi8_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t multi8_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void multi8_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2203_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t *m_p_vram;
 	uint8_t *m_p_wram;
 	uint8_t *m_p_kanji;
@@ -64,8 +64,8 @@ public:
 	uint8_t m_pen_clut[8];
 	uint8_t m_bw_mode;
 	uint16_t m_knj_addr;
-	DECLARE_READ8_MEMBER(ay8912_0_r);
-	DECLARE_READ8_MEMBER(ay8912_1_r);
+	uint8_t ay8912_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ay8912_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -215,7 +215,7 @@ uint32_t multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER( multi8_state::multi8_6845_w )
+void multi8_state::multi8_6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!offset)
 	{
@@ -229,7 +229,7 @@ WRITE8_MEMBER( multi8_state::multi8_6845_w )
 	}
 }
 
-READ8_MEMBER( multi8_state::key_input_r )
+uint8_t multi8_state::key_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mcu_init == 0)
 	{
@@ -242,7 +242,7 @@ READ8_MEMBER( multi8_state::key_input_r )
 	return m_keyb_press;
 }
 
-READ8_MEMBER( multi8_state::key_status_r )
+uint8_t multi8_state::key_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mcu_init == 0)
 		return 1;
@@ -262,7 +262,7 @@ READ8_MEMBER( multi8_state::key_status_r )
 	return m_keyb_press_flag | (m_shift_press_flag << 7);
 }
 
-READ8_MEMBER( multi8_state::multi8_vram_r )
+uint8_t multi8_state::multi8_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -286,7 +286,7 @@ READ8_MEMBER( multi8_state::multi8_vram_r )
 	return res;
 }
 
-WRITE8_MEMBER( multi8_state::multi8_vram_w )
+void multi8_state::multi8_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(m_vram_bank, 4)) //select plain work ram
 	{
@@ -307,12 +307,12 @@ WRITE8_MEMBER( multi8_state::multi8_vram_w )
 		m_p_vram[offset | 0xc000] = data;
 }
 
-READ8_MEMBER( multi8_state::pal_r )
+uint8_t multi8_state::pal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pen_clut[offset];
 }
 
-WRITE8_MEMBER( multi8_state::pal_w )
+void multi8_state::pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pen_clut[offset] = data;
 
@@ -328,15 +328,15 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return machine().device<ay8910_device>("aysnd")->data_r(space, 0); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return machine().device<ay8910_device>("aysnd")->data_r(space, 1); }
+uint8_t multi8_state::ay8912_0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return machine().device<ay8910_device>("aysnd")->data_r(space, 0); }
+uint8_t multi8_state::ay8912_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return machine().device<ay8910_device>("aysnd")->data_r(space, 1); }
 
-READ8_MEMBER( multi8_state::multi8_kanji_r )
+uint8_t multi8_state::multi8_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_kanji[(m_knj_addr << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER( multi8_state::multi8_kanji_w )
+void multi8_state::multi8_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_knj_addr = (offset == 0) ? (m_knj_addr & 0xff00) | (data & 0xff) : (m_knj_addr & 0x00ff) | (data << 8);
 }
@@ -559,7 +559,7 @@ static GFXDECODE_START( multi8 )
 GFXDECODE_END
 
 
-READ8_MEMBER( multi8_state::porta_r )
+uint8_t multi8_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
 	/*
@@ -572,7 +572,7 @@ READ8_MEMBER( multi8_state::porta_r )
 }
 
 
-WRITE8_MEMBER( multi8_state::portb_w )
+void multi8_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    x--- ---- color mode
@@ -584,7 +584,7 @@ WRITE8_MEMBER( multi8_state::portb_w )
 	m_display_reg = data;
 }
 
-WRITE8_MEMBER( multi8_state::portc_w )
+void multi8_state::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("Port C w = %02x\n",data);
 	m_vram_bank = data & 0x1f;
@@ -595,7 +595,7 @@ WRITE8_MEMBER( multi8_state::portc_w )
 }
 
 
-WRITE8_MEMBER( multi8_state::ym2203_porta_w )
+void multi8_state::ym2203_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beeper->set_state((data & 0x08));
 }

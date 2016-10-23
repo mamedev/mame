@@ -33,10 +33,10 @@ public:
 	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual DECLARE_READ16_MEMBER(read_cs0) override;
-	virtual DECLARE_READ16_MEMBER(read_cs1) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
+	virtual uint16_t read_cs0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_cs1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_cs1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type IDE_CONTROLLER;
@@ -56,10 +56,10 @@ public:
 	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual DECLARE_READ32_MEMBER(read_cs0);
-	virtual DECLARE_READ32_MEMBER(read_cs1);
-	virtual DECLARE_WRITE32_MEMBER(write_cs0);
-	virtual DECLARE_WRITE32_MEMBER(write_cs1);
+	virtual uint32_t read_cs0(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_cs1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual void write_cs0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	virtual void write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 private:
 	using ide_controller_device::read_cs0;
@@ -88,8 +88,8 @@ public:
 	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	static void set_bus_master_space(device_t &device, const char *bmcpu, uint32_t bmspace) {bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
 
-	DECLARE_READ32_MEMBER( bmdma_r );
-	DECLARE_WRITE32_MEMBER( bmdma_w );
+	uint32_t bmdma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void bmdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_start() override;

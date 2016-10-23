@@ -35,15 +35,15 @@ public:
 	required_device<pic8259_device> m_pic;
 	required_device<am9517a_device> m_dma;
 	required_device<mc6845_device> m_crtc;
-	DECLARE_READ8_MEMBER(paso1600_pcg_r);
-	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_address_w);
-	DECLARE_WRITE8_MEMBER(paso1600_6845_data_w);
-	DECLARE_READ8_MEMBER(paso1600_6845_data_r);
-	DECLARE_READ8_MEMBER(paso1600_6845_status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ16_MEMBER(test_hi_r);
+	uint8_t paso1600_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paso1600_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paso1600_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paso1600_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t paso1600_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t paso1600_6845_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t test_hi_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	uint8_t *m_p_chargen;
 	uint8_t *m_p_pcg;
@@ -54,8 +54,8 @@ public:
 	struct{
 		uint8_t portb;
 	}m_keyb;
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	uint8_t pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -168,40 +168,40 @@ uint32_t paso1600_state::screen_update_paso1600(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER( paso1600_state::paso1600_pcg_r )
+uint8_t paso1600_state::paso1600_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_pcg[offset];
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_pcg_w )
+void paso1600_state::paso1600_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_pcg[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 3);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_address_w )
+void paso1600_state::paso1600_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER( paso1600_state::paso1600_6845_data_w )
+void paso1600_state::paso1600_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
 }
 
-READ8_MEMBER( paso1600_state::paso1600_6845_data_r )
+uint8_t paso1600_state::paso1600_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_crtc->register_r(space, offset);
 }
 
-READ8_MEMBER( paso1600_state::paso1600_6845_status_r )
+uint8_t paso1600_state::paso1600_6845_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_crtc->status_r(space, offset);
 }
 
-READ8_MEMBER( paso1600_state::key_r )
+uint8_t paso1600_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -213,7 +213,7 @@ READ8_MEMBER( paso1600_state::key_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( paso1600_state::key_w )
+void paso1600_state::key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -221,7 +221,7 @@ WRITE8_MEMBER( paso1600_state::key_w )
 	}
 }
 
-READ16_MEMBER( paso1600_state::test_hi_r )
+uint16_t paso1600_state::test_hi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
@@ -279,7 +279,7 @@ void paso1600_state::machine_reset()
 {
 }
 
-READ8_MEMBER(paso1600_state::pc_dma_read_byte)
+uint8_t paso1600_state::pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
@@ -288,7 +288,7 @@ READ8_MEMBER(paso1600_state::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
+void paso1600_state::pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;

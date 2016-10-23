@@ -40,8 +40,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER(bob85_keyboard_r);
-	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
+	uint8_t bob85_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bob85_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 	uint8_t m_prev_key;
@@ -56,7 +56,7 @@ protected:
 
 
 
-READ8_MEMBER(bob85_state::bob85_keyboard_r)
+uint8_t bob85_state::bob85_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0;
 	uint8_t line0 = m_line0->read();
@@ -135,7 +135,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(bob85_state::bob85_7seg_w)
+void bob85_state::bob85_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
 }

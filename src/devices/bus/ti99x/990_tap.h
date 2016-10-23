@@ -24,8 +24,8 @@ public:
 		return downcast<tap_990_device &>(device).m_int_line.set_callback(object);
 	}
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void set_tape(int id, device_image_interface *img, bool bot, bool eot, bool wp)
 	{

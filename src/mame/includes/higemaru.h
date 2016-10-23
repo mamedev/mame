@@ -25,9 +25,9 @@ public:
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(higemaru_videoram_w);
-	DECLARE_WRITE8_MEMBER(higemaru_colorram_w);
-	DECLARE_WRITE8_MEMBER(higemaru_c800_w);
+	void higemaru_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void higemaru_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void higemaru_c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(higemaru);

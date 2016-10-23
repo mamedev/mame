@@ -27,12 +27,12 @@ void patinho_feio_state::init_patinho_feio()
 	m_prev_RC = 0;
 }
 
-READ16_MEMBER(patinho_feio_state::rc_r)
+uint16_t patinho_feio_state::rc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("RC")->read();
 }
 
-READ16_MEMBER(patinho_feio_state::buttons_r)
+uint16_t patinho_feio_state::buttons_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("BUTTONS")->read();
 }
@@ -93,7 +93,7 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 	m_prev_FLAGS = FLAGS;
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_data_w)
+void patinho_feio_state::decwriter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_decwriter->write(space, 0, data);
 
@@ -116,12 +116,12 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
 	m_decwriter_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::decwriter_kbd_input)
+void patinho_feio_state::decwriter_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->transfer_byte_from_external_device(0xA, ~data);
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_data_w)
+void patinho_feio_state::teletype_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tty->write(space, 0, data);
 
@@ -139,7 +139,7 @@ TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
 	m_teletype_timer->enable(0); //stop the timer
 }
 
-WRITE8_MEMBER(patinho_feio_state::teletype_kbd_input)
+void patinho_feio_state::teletype_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//I figured out that the data is provided inverted (2's complement)
 	//based on a comment in the source code listing of the HEXAM program.

@@ -58,18 +58,18 @@ public:
 	uint8_t to_ay_data;
 	uint8_t m_display_data;
 
-	DECLARE_WRITE8_MEMBER(io_00_w);
-	DECLARE_READ8_MEMBER(io_00_r);
-	DECLARE_WRITE8_MEMBER(io_02_w);
-	DECLARE_READ8_MEMBER(io_02_r);
-	DECLARE_WRITE8_MEMBER(io_04_w);
-	DECLARE_READ8_MEMBER(io_04_r);
-	DECLARE_WRITE8_MEMBER(io_06_w);
-	DECLARE_READ8_MEMBER(io_06_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p3_r);
-	DECLARE_WRITE8_MEMBER(p3_w);
+	void io_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_06_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 protected:
@@ -90,7 +90,7 @@ private:
 ****************************/
 
 
-READ8_MEMBER(fireball_state::io_00_r)
+uint8_t fireball_state::io_00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tmp=0;
 
@@ -101,7 +101,7 @@ READ8_MEMBER(fireball_state::io_00_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_00_w)
+void fireball_state::io_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_display_data= m_display_data&0x7f;
 	if (LOG_DISPLAY)
@@ -128,7 +128,7 @@ WRITE8_MEMBER(fireball_state::io_00_w)
 	output().set_value("Hopper3", BIT(data, 6));
 }
 
-READ8_MEMBER(fireball_state::io_02_r)
+uint8_t fireball_state::io_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tmp=0;
 
@@ -139,7 +139,7 @@ READ8_MEMBER(fireball_state::io_02_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_02_w)
+void fireball_state::io_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_OUTPUT)
 		logerror("write to 0x00 IO (X7-X9) %02X\n",data);
@@ -154,7 +154,7 @@ WRITE8_MEMBER(fireball_state::io_02_w)
 	output().set_value("RV", BIT(data, 7));
 }
 
-READ8_MEMBER(fireball_state::io_04_r)
+uint8_t fireball_state::io_04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {   //contraves per mod prog
 	uint8_t tmp=0;
 
@@ -165,7 +165,7 @@ READ8_MEMBER(fireball_state::io_04_r)
 	return tmp;
 }
 
-WRITE8_MEMBER(fireball_state::io_04_w)
+void fireball_state::io_04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {//display data
 	if (LOG_DISPLAY)
 		logerror("display datat write %02X\n",data);
@@ -174,7 +174,7 @@ WRITE8_MEMBER(fireball_state::io_04_w)
 
 
 
-READ8_MEMBER(fireball_state::io_06_r)
+uint8_t fireball_state::io_06_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_AY8912)
 		logerror("read from 0x06 IO\n");
@@ -184,7 +184,7 @@ READ8_MEMBER(fireball_state::io_06_r)
 				//bit 0x40 is used to detect is the unit is powerd up!!! related to eeprom store?
 }
 
-WRITE8_MEMBER(fireball_state::io_06_w)
+void fireball_state::io_06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_AY8912)
 		logerror("write to 0x06 data =%02X\n",data);
@@ -198,7 +198,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p1_r)
+	uint8_t fireball_state::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 	uint8_t tmp=0;
 	tmp=(m_p1_data&0xfe)|(m_eeprom->do_read());
@@ -207,7 +207,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 	return tmp;
 	}
 
-	WRITE8_MEMBER(fireball_state::p1_w)
+	void fireball_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 	//eeprom x24c44/ay8912/system stuff...
 	//bit0 goes to eeprom pin 3 and 4  (0x01) Data_in and Data_out
@@ -266,7 +266,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 }
 
 
-	READ8_MEMBER(fireball_state::p3_r)
+	uint8_t fireball_state::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 	uint8_t ret = 0xfb | ((int_data&1)<<2);
 	if (LOG_P3)
@@ -274,7 +274,7 @@ WRITE8_MEMBER(fireball_state::io_06_w)
 	return ret;
 	}
 
-WRITE8_MEMBER(fireball_state::p3_w)
+void fireball_state::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 	if (LOG_P3)
 		logerror("write to P3 port data=%02X\n",data);

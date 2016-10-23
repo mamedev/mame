@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-WRITE16_MEMBER(inufuku_state::inufuku_palettereg_w)
+void inufuku_state::inufuku_palettereg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -37,7 +37,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_palettereg_w)
 	}
 }
 
-WRITE16_MEMBER(inufuku_state::inufuku_scrollreg_w)
+void inufuku_state::inufuku_scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -80,23 +80,23 @@ TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_tx_tile_info)
 			0);
 }
 
-READ16_MEMBER(inufuku_state::inufuku_bg_videoram_r)
+uint16_t inufuku_state::inufuku_bg_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bg_videoram[offset];
 }
 
-WRITE16_MEMBER(inufuku_state::inufuku_bg_videoram_w)
+void inufuku_state::inufuku_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(inufuku_state::inufuku_tx_videoram_r)
+uint16_t inufuku_state::inufuku_tx_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tx_videoram[offset];
 }
 
-WRITE16_MEMBER(inufuku_state::inufuku_tx_videoram_w)
+void inufuku_state::inufuku_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);

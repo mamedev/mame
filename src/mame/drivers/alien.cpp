@@ -29,7 +29,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ64_MEMBER(test_r);
+	uint64_t test_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -52,7 +52,7 @@ uint32_t alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-READ64_MEMBER( alien_state::test_r )
+uint64_t alien_state::test_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return machine().rand();
 }

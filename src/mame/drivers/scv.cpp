@@ -27,10 +27,10 @@ public:
 		m_pc0(*this, "PC0"),
 		m_charrom(*this, "charrom") { }
 
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(upd1771_ack_w);
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t m_porta;
@@ -169,13 +169,13 @@ static INPUT_PORTS_START( scv )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( scv_state::porta_w )
+void scv_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
 
-READ8_MEMBER( scv_state::portb_r )
+uint8_t scv_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -189,7 +189,7 @@ READ8_MEMBER( scv_state::portb_r )
 }
 
 
-READ8_MEMBER( scv_state::portc_r )
+uint8_t scv_state::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_portc;
 
@@ -199,7 +199,7 @@ READ8_MEMBER( scv_state::portc_r )
 }
 
 
-WRITE8_MEMBER( scv_state::portc_w )
+void scv_state::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: scv_portc_w: data = 0x%02x\n", m_maincpu->pc(), data );
 	m_portc = data;

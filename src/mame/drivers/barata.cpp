@@ -47,10 +47,10 @@ public:
 	barata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
-	DECLARE_WRITE8_MEMBER(fpga_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(port2_r);
+	void fpga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fpga_send(unsigned char cmd);
 
 	required_device<cpu_device> m_maincpu;
@@ -258,7 +258,7 @@ void barata_state::fpga_send(unsigned char cmd)
 	}
 }
 
-WRITE8_MEMBER(barata_state::fpga_w)
+void barata_state::fpga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static unsigned char old_data = 0;
 	if (!BIT(old_data, 5) && BIT(data, 5)){
@@ -268,17 +268,17 @@ WRITE8_MEMBER(barata_state::fpga_w)
 	old_data = data;
 }
 
-WRITE8_MEMBER(barata_state::port0_w)
+void barata_state::port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	row_selection = data;
 }
 
-WRITE8_MEMBER(barata_state::port2_w)
+void barata_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* why does it write to PORT2 ? */
 }
 
-READ8_MEMBER(barata_state::port2_r)
+uint8_t barata_state::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(row_selection, 0)) return ioport("PLAYER1_ROW1")->read();
 	if (!BIT(row_selection, 1)) return ioport("PLAYER1_ROW2")->read();

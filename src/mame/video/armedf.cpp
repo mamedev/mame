@@ -162,41 +162,41 @@ void armedf_state::video_start_armedf()
 
 ***************************************************************************/
 
-READ8_MEMBER(armedf_state::nb1414m4_text_videoram_r)
+uint8_t armedf_state::nb1414m4_text_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_text_videoram[offset];
 }
 
-WRITE8_MEMBER(armedf_state::nb1414m4_text_videoram_w)
+void armedf_state::nb1414m4_text_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(armedf_state::armedf_text_videoram_r)
+uint8_t armedf_state::armedf_text_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_text_videoram[offset];
 }
 
-WRITE8_MEMBER(armedf_state::armedf_text_videoram_w)
+void armedf_state::armedf_text_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_fg_videoram_w)
+void armedf_state::armedf_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_videoram_w)
+void armedf_state::armedf_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scrolly_w)
+void armedf_state::terraf_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -205,7 +205,7 @@ WRITE16_MEMBER(armedf_state::terraf_fg_scrolly_w)
 	}
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scrollx_w)
+void armedf_state::terraf_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -221,29 +221,29 @@ WRITE16_MEMBER(armedf_state::terraf_fg_scrollx_w)
 	}
 }
 
-WRITE16_MEMBER(armedf_state::terraf_fg_scroll_msb_arm_w)
+void armedf_state::terraf_fg_scroll_msb_arm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_waiting_msb = 0;
 }
 
-WRITE16_MEMBER(armedf_state::armedf_fg_scrollx_w)
+void armedf_state::armedf_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scrollx);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_fg_scrolly_w)
+void armedf_state::armedf_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_scrolly);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_scrollx_w)
+void armedf_state::armedf_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scrollx);
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx);
 }
 
-WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
+void armedf_state::armedf_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_scrolly);
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);

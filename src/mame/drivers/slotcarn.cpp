@@ -48,8 +48,8 @@ public:
 	required_shared_ptr<uint8_t> m_ram_attr;
 	required_shared_ptr<uint8_t> m_ram_video;
 	std::unique_ptr<uint8_t[]> m_ram_palette;
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
+	uint8_t palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -69,7 +69,7 @@ public:
 
 */
 
-READ8_MEMBER(slotcarn_state::palette_r)
+uint8_t slotcarn_state::palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int co;
 
@@ -77,7 +77,7 @@ READ8_MEMBER(slotcarn_state::palette_r)
 	return m_ram_palette[co];
 }
 
-WRITE8_MEMBER(slotcarn_state::palette_w)
+void slotcarn_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int co;
 

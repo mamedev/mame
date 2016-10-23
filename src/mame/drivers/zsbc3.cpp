@@ -50,9 +50,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(zsbc3_28_r);
-	DECLARE_READ8_MEMBER(zsbc3_2a_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t zsbc3_28_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zsbc3_2a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -61,14 +61,14 @@ private:
 };
 
 
-READ8_MEMBER( zsbc3_state::zsbc3_28_r )
+uint8_t zsbc3_state::zsbc3_28_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( zsbc3_state::zsbc3_2a_r )
+uint8_t zsbc3_state::zsbc3_2a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 5 : 4;
 }
@@ -95,7 +95,7 @@ void zsbc3_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( zsbc3_state::kbd_put )
+void zsbc3_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

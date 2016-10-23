@@ -110,7 +110,7 @@ unsigned fgoal_state::video_ram_address( )
 }
 
 
-READ8_MEMBER(fgoal_state::analog_r)
+uint8_t fgoal_state::analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(m_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
 }
@@ -123,7 +123,7 @@ CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
 	return ret;
 }
 
-READ8_MEMBER(fgoal_state::nmi_reset_r)
+uint8_t fgoal_state::nmi_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
@@ -131,7 +131,7 @@ READ8_MEMBER(fgoal_state::nmi_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::irq_reset_r)
+uint8_t fgoal_state::irq_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 
@@ -139,42 +139,42 @@ READ8_MEMBER(fgoal_state::irq_reset_r)
 }
 
 
-READ8_MEMBER(fgoal_state::row_r)
+uint8_t fgoal_state::row_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_row;
 }
 
 
-WRITE8_MEMBER(fgoal_state::row_w)
+void fgoal_state::row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row = data;
 	m_mb14241->shift_data_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(fgoal_state::col_w)
+void fgoal_state::col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_col = data;
 	m_mb14241->shift_count_w(space, 0, data);
 }
 
-READ8_MEMBER(fgoal_state::address_hi_r)
+uint8_t fgoal_state::address_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return video_ram_address() >> 8;
 }
 
-READ8_MEMBER(fgoal_state::address_lo_r)
+uint8_t fgoal_state::address_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return video_ram_address() & 0xff;
 }
 
-READ8_MEMBER(fgoal_state::shifter_r)
+uint8_t fgoal_state::shifter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-READ8_MEMBER(fgoal_state::shifter_reverse_r)
+uint8_t fgoal_state::shifter_reverse_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t v = m_mb14241->shift_result_r(space, 0);
 
@@ -182,7 +182,7 @@ READ8_MEMBER(fgoal_state::shifter_reverse_r)
 }
 
 
-WRITE8_MEMBER(fgoal_state::sound1_w)
+void fgoal_state::sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => SX2 */
 	/* BIT1 => SX1 */
@@ -195,7 +195,7 @@ WRITE8_MEMBER(fgoal_state::sound1_w)
 }
 
 
-WRITE8_MEMBER(fgoal_state::sound2_w)
+void fgoal_state::sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => CX0 */
 	/* BIT1 => SX6 */

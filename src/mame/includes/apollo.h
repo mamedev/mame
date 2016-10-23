@@ -142,53 +142,53 @@ public:
 	required_device<apollo_ni> m_node_id;
 	required_device<isa16_device> m_isa;
 
-	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
-	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
-	DECLARE_WRITE16_MEMBER(apollo_csr_control_register_w);
-	DECLARE_READ16_MEMBER(apollo_csr_control_register_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_1_w);
-	DECLARE_READ8_MEMBER(apollo_dma_1_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_2_w);
-	DECLARE_READ8_MEMBER(apollo_dma_2_r);
-	DECLARE_WRITE8_MEMBER(apollo_dma_page_register_w);
-	DECLARE_READ8_MEMBER(apollo_dma_page_register_r);
-	DECLARE_WRITE16_MEMBER(apollo_address_translation_map_w);
-	DECLARE_READ16_MEMBER(apollo_address_translation_map_r);
-	DECLARE_READ8_MEMBER(apollo_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_byte);
-	DECLARE_READ8_MEMBER(apollo_dma_read_word);
-	DECLARE_WRITE8_MEMBER(apollo_dma_write_word);
-	DECLARE_WRITE8_MEMBER(apollo_rtc_w);
-	DECLARE_READ8_MEMBER(apollo_rtc_r);
-	DECLARE_WRITE8_MEMBER(cache_control_register_w);
-	DECLARE_READ8_MEMBER(cache_status_register_r);
-	DECLARE_WRITE8_MEMBER(task_alias_register_w);
-	DECLARE_READ8_MEMBER(task_alias_register_r);
-	DECLARE_WRITE16_MEMBER(latch_page_on_parity_error_register_w);
-	DECLARE_READ16_MEMBER(latch_page_on_parity_error_register_r);
-	DECLARE_WRITE8_MEMBER(master_req_register_w);
-	DECLARE_READ8_MEMBER(master_req_register_r);
-	DECLARE_WRITE16_MEMBER(selective_clear_locations_w);
-	DECLARE_READ16_MEMBER(selective_clear_locations_r);
-	DECLARE_READ32_MEMBER(ram_with_parity_r);
-	DECLARE_WRITE32_MEMBER(ram_with_parity_w);
-	DECLARE_READ32_MEMBER(apollo_unmapped_r);
-	DECLARE_WRITE32_MEMBER(apollo_unmapped_w);
-	DECLARE_WRITE32_MEMBER(apollo_rom_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_io_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_io_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_memory_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_memory_w);
-	DECLARE_READ16_MEMBER(apollo_atbus_unmap_io_r);
-	DECLARE_WRITE16_MEMBER(apollo_atbus_unmap_io_w);
-	DECLARE_READ8_MEMBER(apollo_atbus_unmap_r);
-	DECLARE_WRITE8_MEMBER(apollo_atbus_unmap_w);
-	DECLARE_WRITE8_MEMBER(dn5500_memory_present_register_w);
-	DECLARE_READ8_MEMBER(dn5500_memory_present_register_r);
-	DECLARE_WRITE8_MEMBER(dn5500_11500_w);
-	DECLARE_READ8_MEMBER(dn5500_11500_r);
-	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
-	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
+	void apollo_csr_status_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t apollo_csr_status_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_csr_control_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t apollo_csr_control_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_dma_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apollo_dma_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_dma_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apollo_dma_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_dma_page_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apollo_dma_page_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_address_translation_map_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t apollo_address_translation_map_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t apollo_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apollo_dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apollo_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t apollo_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cache_control_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cache_status_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void task_alias_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t task_alias_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void latch_page_on_parity_error_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t latch_page_on_parity_error_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void master_req_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t master_req_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void selective_clear_locations_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t selective_clear_locations_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t ram_with_parity_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_with_parity_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t apollo_unmapped_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void apollo_unmapped_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void apollo_rom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t apollo_atbus_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_atbus_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t apollo_atbus_memory_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_atbus_memory_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t apollo_atbus_unmap_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_atbus_unmap_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t apollo_atbus_unmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_atbus_unmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dn5500_memory_present_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dn5500_memory_present_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dn5500_11500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dn5500_11500_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dn5500_io_protection_map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dn5500_io_protection_map_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_dsp3000();
 	void init_dsp5500();
 	void init_dn3500();
@@ -212,26 +212,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
 	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
-	DECLARE_WRITE8_MEMBER( sio_output );
+	void sio_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
 	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
-	DECLARE_READ8_MEMBER( apollo_pic8259_get_slave_ack );
+	uint8_t apollo_pic8259_get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(pc_dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(pc_dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(pc_dma8237_7_dack_w);
+	uint8_t pc_dma8237_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_5_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_6_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_7_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_5_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_6_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_7_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
@@ -246,7 +246,7 @@ public:
 	void select_dma_channel(int channel, bool state);
 
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
-	DECLARE_READ32_MEMBER(apollo_instruction_hook);
+	uint32_t apollo_instruction_hook(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 private:
 	uint32_t ptm_counter;
@@ -329,8 +329,8 @@ public:
 	apollo_sio(const machine_config &mconfig, const char *tag,
 			device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_reset() override;
@@ -365,8 +365,8 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return "ani,bin"; }
 
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -403,22 +403,22 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// monochrome control
-	DECLARE_READ8_MEMBER( apollo_mcr_r );
-	DECLARE_WRITE8_MEMBER( apollo_mcr_w );
+	uint8_t apollo_mcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_mcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// monochrome and color memory
-	DECLARE_READ16_MEMBER( apollo_mem_r );
-	DECLARE_WRITE16_MEMBER( apollo_mem_w );
+	uint16_t apollo_mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// color control
-	DECLARE_READ8_MEMBER( apollo_ccr_r );
-	DECLARE_WRITE8_MEMBER( apollo_ccr_w );
+	uint8_t apollo_ccr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apollo_ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER( apollo_mgm_r );
-	DECLARE_WRITE16_MEMBER( apollo_mgm_w );
+	uint16_t apollo_mgm_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_mgm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( apollo_cgm_r );
-	DECLARE_WRITE16_MEMBER( apollo_cgm_w );
+	uint16_t apollo_cgm_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void apollo_cgm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void vblank_state_changed(screen_device &screen, bool vblank_state);
 

@@ -38,12 +38,12 @@ void pc1403_state::video_start()
 	}
 }
 
-READ8_MEMBER(pc1403_state::pc1403_lcd_read)
+uint8_t pc1403_state::pc1403_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_reg[offset];
 }
 
-WRITE8_MEMBER(pc1403_state::pc1403_lcd_write)
+void pc1403_state::pc1403_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg[offset]=data;
 }

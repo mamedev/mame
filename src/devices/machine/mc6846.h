@@ -45,8 +45,8 @@ public:
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc6846_device &>(device).m_irq_cb.set_callback(object); }
 
 	/* interface to CPU via address/data bus*/
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* asynchronous write from outside world into interrupt-generating pins */
 	void set_input_cp1(int data);

@@ -42,10 +42,10 @@ public:
 	uint8_t           m_playfield_color_bank;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE8_MEMBER(sound_ctl_w);
-	DECLARE_WRITE8_MEMBER(mixer_w);
+	void sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t switch_6502_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mixer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void swap_memory(void *ptr1, void *ptr2, int bytes);
 	void common_init(int vindctr2);
 	void init_gauntlet();
@@ -56,8 +56,8 @@ public:
 	void machine_reset_gauntlet();
 	void video_start_gauntlet();
 	uint32_t screen_update_gauntlet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER( gauntlet_xscroll_w );
-	DECLARE_WRITE16_MEMBER( gauntlet_yscroll_w );
+	void gauntlet_xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gauntlet_yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static const atari_motion_objects_config s_mob_config;
 };

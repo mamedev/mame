@@ -161,7 +161,7 @@ PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
 	}
 }
 
-READ8_MEMBER(apple2gs_state::apple2gs_adc_read)
+uint8_t apple2gs_state::apple2gs_adc_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;
 }
@@ -191,12 +191,12 @@ ADDRESS_MAP_END
 // http://www.llx.com/~nparker/a2/adb.html
 
 #if RUN_ADB_MICRO
-READ8_MEMBER(apple2gs_state::adbmicro_p0_in)
+uint8_t apple2gs_state::adbmicro_p0_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_glu_bus;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
+uint8_t apple2gs_state::adbmicro_p1_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_is_rom3)
 	{
@@ -206,7 +206,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p1_in)
 	return 0xff;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
+uint8_t apple2gs_state::adbmicro_p2_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t rv = 0;
 
@@ -216,21 +216,21 @@ READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
 	return rv;
 }
 
-READ8_MEMBER(apple2gs_state::adbmicro_p3_in)
+uint8_t apple2gs_state::adbmicro_p3_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7;     // don't press IIE capslock/ctrl/shift
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p0_out)
+void apple2gs_state::adbmicro_p0_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_glu_bus = data;
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p1_out)
+void apple2gs_state::adbmicro_p1_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p2_out)
+void apple2gs_state::adbmicro_p2_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x10))
 	{
@@ -245,7 +245,7 @@ WRITE8_MEMBER(apple2gs_state::adbmicro_p2_out)
 	}
 }
 
-WRITE8_MEMBER(apple2gs_state::adbmicro_p3_out)
+void apple2gs_state::adbmicro_p3_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (((data & 0x08) == 0x08) != m_adb_line)
 	{

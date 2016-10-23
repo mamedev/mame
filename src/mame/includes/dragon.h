@@ -62,8 +62,8 @@ public:
 	required_device<mos6551_device> m_acia;
 
 protected:
-	virtual DECLARE_READ8_MEMBER( ff00_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff00_write ) override;
+	virtual uint8_t ff00_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void ff00_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pia1_pb_changed(uint8_t data) override;
 	void page_rom(bool romswitch);

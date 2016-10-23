@@ -114,21 +114,21 @@ void pci_device::unmapped_w(offs_t offset, uint32_t data, uint32_t mem_mask, int
 	logerror("%s: unmapped write to %08x = %08x & %08x (%s)\n", machine().describe_context(), offset*4, data, mem_mask, bank_infos[bank].map.name());
 }
 
-READ32_MEMBER(pci_device::unmapped0_r) { return unmapped_r(offset, mem_mask, 0); }
-WRITE32_MEMBER(pci_device::unmapped0_w) { return unmapped_w(offset, data, mem_mask, 0); }
-READ32_MEMBER(pci_device::unmapped1_r) { return unmapped_r(offset, mem_mask, 1); }
-WRITE32_MEMBER(pci_device::unmapped1_w) { return unmapped_w(offset, data, mem_mask, 1); }
-READ32_MEMBER(pci_device::unmapped2_r) { return unmapped_r(offset, mem_mask, 2); }
-WRITE32_MEMBER(pci_device::unmapped2_w) { return unmapped_w(offset, data, mem_mask, 2); }
-READ32_MEMBER(pci_device::unmapped3_r) { return unmapped_r(offset, mem_mask, 3); }
-WRITE32_MEMBER(pci_device::unmapped3_w) { return unmapped_w(offset, data, mem_mask, 3); }
-READ32_MEMBER(pci_device::unmapped4_r) { return unmapped_r(offset, mem_mask, 4); }
-WRITE32_MEMBER(pci_device::unmapped4_w) { return unmapped_w(offset, data, mem_mask, 4); }
-READ32_MEMBER(pci_device::unmapped5_r) { return unmapped_r(offset, mem_mask, 5); }
-WRITE32_MEMBER(pci_device::unmapped5_w) { return unmapped_w(offset, data, mem_mask, 5); }
+uint32_t pci_device::unmapped0_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 0); }
+void pci_device::unmapped0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 0); }
+uint32_t pci_device::unmapped1_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 1); }
+void pci_device::unmapped1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 1); }
+uint32_t pci_device::unmapped2_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 2); }
+void pci_device::unmapped2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 2); }
+uint32_t pci_device::unmapped3_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 3); }
+void pci_device::unmapped3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 3); }
+uint32_t pci_device::unmapped4_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 4); }
+void pci_device::unmapped4_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 4); }
+uint32_t pci_device::unmapped5_r(address_space &space, offs_t offset, uint32_t mem_mask) { return unmapped_r(offset, mem_mask, 5); }
+void pci_device::unmapped5_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { return unmapped_w(offset, data, mem_mask, 5); }
 
 
-READ32_MEMBER(pci_device::address_base_r)
+uint32_t pci_device::address_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(bank_reg_infos[offset].bank == -1)
 		return 0;
@@ -139,7 +139,7 @@ READ32_MEMBER(pci_device::address_base_r)
 	return (bank_infos[bid].adr & ~(bank_infos[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
 }
 
-WRITE32_MEMBER(pci_device::address_base_w)
+void pci_device::address_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(bank_reg_infos[offset].bank == -1) {
 		logerror("write to address base (%d, %08x) not linked to any bank\n", offset, data);
@@ -155,44 +155,44 @@ WRITE32_MEMBER(pci_device::address_base_w)
 	remap_cb();
 }
 
-READ16_MEMBER(pci_device::vendor_r)
+uint16_t pci_device::vendor_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return main_id >> 16;
 }
 
-READ16_MEMBER(pci_device::device_r)
+uint16_t pci_device::device_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return main_id;
 }
 
-READ16_MEMBER(pci_device::command_r)
+uint16_t pci_device::command_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return command;
 }
 
-WRITE16_MEMBER(pci_device::command_w)
+void pci_device::command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
 	logerror("command = %04x\n", command);
 }
 
-READ16_MEMBER(pci_device::status_r)
+uint16_t pci_device::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return status;
 }
 
-READ32_MEMBER(pci_device::class_rev_r)
+uint32_t pci_device::class_rev_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (pclass << 8) | revision;
 }
 
-READ8_MEMBER(pci_device::cache_line_size_r)
+uint8_t pci_device::cache_line_size_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(pci_device::latency_timer_r)
+uint8_t pci_device::latency_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -202,33 +202,33 @@ void pci_device::set_multifunction_device(bool enable)
 	is_multifunction_device = enable;
 }
 
-READ8_MEMBER(pci_device::header_type_r)
+uint8_t pci_device::header_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return is_multifunction_device ? 0x80 : 0x00;
 }
 
-READ8_MEMBER(pci_device::bist_r)
+uint8_t pci_device::bist_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ16_MEMBER(pci_device::subvendor_r)
+uint16_t pci_device::subvendor_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return subsystem_id >> 16;
 }
 
-READ16_MEMBER(pci_device::subsystem_r)
+uint16_t pci_device::subsystem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return subsystem_id;
 }
 
-READ32_MEMBER(pci_device::expansion_base_r)
+uint32_t pci_device::expansion_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return expansion_rom_base;
 }
 
 
-WRITE32_MEMBER(pci_device::expansion_base_w)
+void pci_device::expansion_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&expansion_rom_base);
 	if(!expansion_rom_size)
@@ -240,7 +240,7 @@ WRITE32_MEMBER(pci_device::expansion_base_w)
 	remap_cb();
 }
 
-READ8_MEMBER(pci_device::capptr_r)
+uint8_t pci_device::capptr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -405,7 +405,7 @@ pci_bridge_device::pci_bridge_device(const machine_config &mconfig, device_type 
 {
 }
 
-READ8_MEMBER(pci_bridge_device::header_type_r)
+uint8_t pci_bridge_device::header_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x01;
 }
@@ -569,213 +569,213 @@ void pci_bridge_device::config_write(uint8_t bus, uint8_t device, uint16_t reg, 
 		propagate_config_write(bus, device, reg, data, mem_mask);
 }
 
-READ32_MEMBER (pci_bridge_device::b_address_base_r)
+uint32_t pci_bridge_device::b_address_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("b_address_base_r %d\n", offset);
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(pci_bridge_device::b_address_base_w)
+void pci_bridge_device::b_address_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("b_address_base_w %d, %08x\n", offset, data);
 }
 
-READ8_MEMBER  (pci_bridge_device::primary_bus_r)
+uint8_t pci_bridge_device::primary_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("primary_bus_r\n");
 	return primary_bus;
 }
 
-WRITE8_MEMBER (pci_bridge_device::primary_bus_w)
+void pci_bridge_device::primary_bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	primary_bus = data;
 	logerror("primary_bus_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::secondary_bus_r)
+uint8_t pci_bridge_device::secondary_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("secondary_bus_r\n");
 	return secondary_bus;
 }
 
-WRITE8_MEMBER (pci_bridge_device::secondary_bus_w)
+void pci_bridge_device::secondary_bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	secondary_bus = data;
 	logerror("secondary_bus_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::subordinate_bus_r)
+uint8_t pci_bridge_device::subordinate_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("subordinate_bus_r\n");
 	return subordinate_bus;
 }
 
-WRITE8_MEMBER (pci_bridge_device::subordinate_bus_w)
+void pci_bridge_device::subordinate_bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	subordinate_bus = data;
 	logerror("subordinate_bus_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::secondary_latency_r)
+uint8_t pci_bridge_device::secondary_latency_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("secondary_latency_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER (pci_bridge_device::secondary_latency_w)
+void pci_bridge_device::secondary_latency_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("secondary_latency_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::iobase_r)
+uint8_t pci_bridge_device::iobase_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return iobase;
 }
 
-WRITE8_MEMBER (pci_bridge_device::iobase_w)
+void pci_bridge_device::iobase_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	iobase = data;
 	logerror("iobase_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::iolimit_r)
+uint8_t pci_bridge_device::iolimit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return iolimit;
 }
 
-WRITE8_MEMBER (pci_bridge_device::iolimit_w)
+void pci_bridge_device::iolimit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	iolimit = data;
 	logerror("iolimit_w %02x\n", data);
 }
 
-READ16_MEMBER (pci_bridge_device::secondary_status_r)
+uint16_t pci_bridge_device::secondary_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("secondary_status_r\n");
 	return 0xffff;
 }
 
-WRITE16_MEMBER(pci_bridge_device::secondary_status_w)
+void pci_bridge_device::secondary_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("secondary_status_w %04x\n", data);
 }
 
-READ16_MEMBER (pci_bridge_device::memory_base_r)
+uint16_t pci_bridge_device::memory_base_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return memory_base;
 }
 
-WRITE16_MEMBER(pci_bridge_device::memory_base_w)
+void pci_bridge_device::memory_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&memory_base);
 	logerror("memory_base_w %04x\n", memory_base);
 }
 
-READ16_MEMBER (pci_bridge_device::memory_limit_r)
+uint16_t pci_bridge_device::memory_limit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return memory_limit;
 }
 
-WRITE16_MEMBER(pci_bridge_device::memory_limit_w)
+void pci_bridge_device::memory_limit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&memory_limit);
 	logerror("memory_limit_w %04x\n", memory_limit);
 }
 
-READ16_MEMBER (pci_bridge_device::prefetch_base_r)
+uint16_t pci_bridge_device::prefetch_base_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return prefetch_base;
 }
 
-WRITE16_MEMBER(pci_bridge_device::prefetch_base_w)
+void pci_bridge_device::prefetch_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&prefetch_base);
 	logerror("prefetch_base_w %04x\n", prefetch_base);
 }
 
-READ16_MEMBER (pci_bridge_device::prefetch_limit_r)
+uint16_t pci_bridge_device::prefetch_limit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return prefetch_limit;
 }
 
-WRITE16_MEMBER(pci_bridge_device::prefetch_limit_w)
+void pci_bridge_device::prefetch_limit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&prefetch_limit);
 	logerror("prefetch_limit_w %04x\n", prefetch_limit);
 }
 
-READ32_MEMBER (pci_bridge_device::prefetch_baseu_r)
+uint32_t pci_bridge_device::prefetch_baseu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return prefetch_baseu;
 }
 
-WRITE32_MEMBER(pci_bridge_device::prefetch_baseu_w)
+void pci_bridge_device::prefetch_baseu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&prefetch_baseu);
 	logerror("prefetch_baseu_w %08x\n", prefetch_baseu);
 }
 
-READ32_MEMBER (pci_bridge_device::prefetch_limitu_r)
+uint32_t pci_bridge_device::prefetch_limitu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return prefetch_limitu;
 }
 
-WRITE32_MEMBER(pci_bridge_device::prefetch_limitu_w)
+void pci_bridge_device::prefetch_limitu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&prefetch_limitu);
 	logerror("prefetch_limitu_w %08x\n", prefetch_limitu);
 }
 
-READ16_MEMBER (pci_bridge_device::iobaseu_r)
+uint16_t pci_bridge_device::iobaseu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return iobaseu;
 }
 
-WRITE16_MEMBER(pci_bridge_device::iobaseu_w)
+void pci_bridge_device::iobaseu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&iobaseu);
 	logerror("iobaseu_w %04x\n", iobaseu);
 }
 
-READ16_MEMBER (pci_bridge_device::iolimitu_r)
+uint16_t pci_bridge_device::iolimitu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return iolimitu;
 }
 
-WRITE16_MEMBER(pci_bridge_device::iolimitu_w)
+void pci_bridge_device::iolimitu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&iolimitu);
 	logerror("iolimitu_w %04x\n", iolimitu);
 }
 
-READ8_MEMBER  (pci_bridge_device::interrupt_line_r)
+uint8_t pci_bridge_device::interrupt_line_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("interrupt_line_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER (pci_bridge_device::interrupt_line_w)
+void pci_bridge_device::interrupt_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("interrupt_line_w %02x\n", data);
 }
 
-READ8_MEMBER  (pci_bridge_device::interrupt_pin_r)
+uint8_t pci_bridge_device::interrupt_pin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("interrupt_pin_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER (pci_bridge_device::interrupt_pin_w)
+void pci_bridge_device::interrupt_pin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("interrupt_pin_w %02x\n", data);
 }
 
-READ16_MEMBER (pci_bridge_device::bridge_control_r)
+uint16_t pci_bridge_device::bridge_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return bridge_control;
 }
 
-WRITE16_MEMBER(pci_bridge_device::bridge_control_w)
+void pci_bridge_device::bridge_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&bridge_control);
 	logerror("bridge_control_w %04x\n", bridge_control);
@@ -846,22 +846,22 @@ void pci_host_device::regenerate_mapping()
 				io_window_start, io_window_end, io_offset, io_space);
 }
 
-READ32_MEMBER(pci_host_device::config_address_r)
+uint32_t pci_host_device::config_address_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return config_address;
 }
 
-WRITE32_MEMBER(pci_host_device::config_address_w)
+void pci_host_device::config_address_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&config_address);
 }
 
-READ32_MEMBER(pci_host_device::config_data_r)
+uint32_t pci_host_device::config_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return config_address & 0x80000000 ? root_config_read((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, mem_mask) : 0xffffffff;
 }
 
-WRITE32_MEMBER(pci_host_device::config_data_w)
+void pci_host_device::config_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(config_address & 0x80000000)
 		root_config_write((config_address >> 16) & 0xff, (config_address >> 8) & 0xff, config_address & 0xfc, data, mem_mask);

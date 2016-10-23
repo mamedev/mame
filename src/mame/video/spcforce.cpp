@@ -12,7 +12,7 @@
 #include "includes/spcforce.h"
 
 
-WRITE8_MEMBER(spcforce_state::flip_screen_w)
+void spcforce_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 0x01);
 }

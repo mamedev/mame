@@ -126,17 +126,17 @@ ADDRESS_MAP_END
 //  I8255A 0 interface
 //-------------------------------------------------
 
-READ8_MEMBER( hardbox_device::ppi0_pa_r )
+uint8_t hardbox_device::ppi0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bus->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( hardbox_device::ppi0_pb_w )
+void hardbox_device::ppi0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus->dio_w(this, data ^ 0xff);
 }
 
-READ8_MEMBER( hardbox_device::ppi0_pc_r )
+uint8_t hardbox_device::ppi0_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("SW1")->read();
 
@@ -151,7 +151,7 @@ READ8_MEMBER( hardbox_device::ppi0_pc_r )
 //  I8255A 1 interface
 //-------------------------------------------------
 
-READ8_MEMBER( hardbox_device::ppi1_pa_r )
+uint8_t hardbox_device::ppi1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -182,7 +182,7 @@ READ8_MEMBER( hardbox_device::ppi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( hardbox_device::ppi1_pb_w )
+void hardbox_device::ppi1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -211,7 +211,7 @@ WRITE8_MEMBER( hardbox_device::ppi1_pb_w )
 	m_bus->ren_w(this, !BIT(data, 6));
 }
 
-READ8_MEMBER( hardbox_device::ppi1_pc_r )
+uint8_t hardbox_device::ppi1_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -237,7 +237,7 @@ READ8_MEMBER( hardbox_device::ppi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
+void hardbox_device::ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

@@ -232,25 +232,25 @@ public:
 	int m_cde_qchannel_offset;
 	cdrom_toc m_cde_toc;
 	CDE_DMA m_cde_dma[2];
-	DECLARE_READ64_MEMBER(irq_enable_r);
-	DECLARE_WRITE64_MEMBER(irq_enable_w);
-	DECLARE_READ64_MEMBER(irq_active_r);
-	DECLARE_READ64_MEMBER(unk1_r);
-	DECLARE_READ64_MEMBER(unk3_r);
-	DECLARE_READ64_MEMBER(unk4_r);
-	DECLARE_WRITE64_MEMBER(unk4_w);
-	DECLARE_READ64_MEMBER(unk30000_r);
-	DECLARE_READ64_MEMBER(unk30030_r);
-	DECLARE_WRITE64_MEMBER(video_w);
-	DECLARE_WRITE64_MEMBER(video_irq_ack_w);
-	DECLARE_READ64_MEMBER(unk4000280_r);
-	DECLARE_WRITE64_MEMBER(unk4000010_w);
-	DECLARE_WRITE64_MEMBER(unk4000418_w);
-	DECLARE_WRITE64_MEMBER(reset_w);
-	DECLARE_READ64_MEMBER(cde_r);
-	DECLARE_WRITE64_MEMBER(cde_w);
-	DECLARE_READ64_MEMBER(device2_r);
-	DECLARE_READ64_MEMBER(cpu_r);
+	uint64_t irq_enable_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void irq_enable_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t irq_active_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk1_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk3_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk4_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void unk4_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk30000_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk30030_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void video_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void video_irq_ack_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk4000280_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void unk4000010_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void unk4000418_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void reset_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t cde_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void cde_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t device2_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t cpu_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void init_m2();
 	virtual void video_start() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -298,7 +298,7 @@ uint32_t konamim2_state::screen_update_m2(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ64_MEMBER(konamim2_state::irq_enable_r)
+uint64_t konamim2_state::irq_enable_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -310,7 +310,7 @@ READ64_MEMBER(konamim2_state::irq_enable_r)
 	return r;
 }
 
-WRITE64_MEMBER(konamim2_state::irq_enable_w)
+void konamim2_state::irq_enable_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -318,7 +318,7 @@ WRITE64_MEMBER(konamim2_state::irq_enable_w)
 	}
 }
 
-READ64_MEMBER(konamim2_state::irq_active_r)
+uint64_t konamim2_state::irq_active_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -332,14 +332,14 @@ READ64_MEMBER(konamim2_state::irq_active_r)
 
 
 
-READ64_MEMBER(konamim2_state::unk1_r)
+uint64_t konamim2_state::unk1_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return U64(0xffffffffffffffff);
 	//return 0;
 }
 
 #ifdef UNUSED_FUNCTION
-READ64_MEMBER(konamim2_state::unk2_r)
+uint64_t konamim2_state::unk2_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -349,13 +349,13 @@ READ64_MEMBER(konamim2_state::unk2_r)
 }
 #endif
 
-READ64_MEMBER(konamim2_state::unk3_r)
+uint64_t konamim2_state::unk3_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	//return U64(0xffffffffffffffff);
 	return m_unk3;
 }
 
-READ64_MEMBER(konamim2_state::unk4_r)
+uint64_t konamim2_state::unk4_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 //  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
@@ -372,7 +372,7 @@ READ64_MEMBER(konamim2_state::unk4_r)
 	return r;
 }
 
-WRITE64_MEMBER(konamim2_state::unk4_w)
+void konamim2_state::unk4_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data),
 //      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
@@ -390,13 +390,13 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 	}
 }
 
-READ64_MEMBER(konamim2_state::unk30000_r)
+uint64_t konamim2_state::unk30000_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	m_counter1++;
 	return (uint64_t)(m_counter1 & 0x7f) << 32;
 }
 
-READ64_MEMBER(konamim2_state::unk30030_r)
+uint64_t konamim2_state::unk30030_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 	{
@@ -405,7 +405,7 @@ READ64_MEMBER(konamim2_state::unk30030_r)
 	return 0;
 }
 
-WRITE64_MEMBER(konamim2_state::video_w)
+void konamim2_state::video_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -417,7 +417,7 @@ WRITE64_MEMBER(konamim2_state::video_w)
 	}
 }
 
-WRITE64_MEMBER(konamim2_state::video_irq_ack_w)
+void konamim2_state::video_irq_ack_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -430,7 +430,7 @@ WRITE64_MEMBER(konamim2_state::video_irq_ack_w)
 
 
 
-READ64_MEMBER(konamim2_state::unk4000280_r)
+uint64_t konamim2_state::unk4000280_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	// SysCfg
 
@@ -454,7 +454,7 @@ READ64_MEMBER(konamim2_state::unk4000280_r)
 
 }
 
-WRITE64_MEMBER(konamim2_state::unk4000010_w)
+void konamim2_state::unk4000010_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if ((data & 0xff) == 0xd)
 	{
@@ -466,11 +466,11 @@ WRITE64_MEMBER(konamim2_state::unk4000010_w)
 	}
 }
 
-WRITE64_MEMBER(konamim2_state::unk4000418_w)
+void konamim2_state::unk4000418_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 }
 
-WRITE64_MEMBER(konamim2_state::reset_w)
+void konamim2_state::reset_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -849,7 +849,7 @@ void konamim2_state::cde_dma_transfer(address_space &space, int channel, int nex
 	}
 }
 
-READ64_MEMBER(konamim2_state::cde_r)
+uint64_t konamim2_state::cde_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint32_t r = 0;
 	int reg = offset * 2;
@@ -924,7 +924,7 @@ READ64_MEMBER(konamim2_state::cde_r)
 	}
 }
 
-WRITE64_MEMBER(konamim2_state::cde_w)
+void konamim2_state::cde_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg = offset * 2;
 	uint32_t d;
@@ -1077,7 +1077,7 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 	}
 }
 
-READ64_MEMBER(konamim2_state::device2_r)
+uint64_t konamim2_state::device2_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint32_t r = 0;
 	int reg = offset * 2;
@@ -1108,7 +1108,7 @@ READ64_MEMBER(konamim2_state::device2_r)
 	}
 }
 
-READ64_MEMBER(konamim2_state::cpu_r)
+uint64_t konamim2_state::cpu_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 

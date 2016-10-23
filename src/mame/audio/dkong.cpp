@@ -1199,7 +1199,7 @@ Addresses found at @0x510, cpu2
 
 */
 
-WRITE8_MEMBER(dkong_state::M58817_command_w)
+void dkong_state::M58817_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m58817_device *m58817 = machine().device<m58817_device>("tms");
 	m58817->ctl_w(space, 0, data & 0x0f);
@@ -1207,7 +1207,7 @@ WRITE8_MEMBER(dkong_state::M58817_command_w)
 	/* FIXME 0x20 is CS */
 }
 
-READ8_MEMBER(dkong_state::M58817_status_r)
+uint8_t dkong_state::M58817_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m58817_device *m58817 = machine().device<m58817_device>("tms");
 	return m58817->status_r(space, offset, mem_mask);
@@ -1220,7 +1220,7 @@ READ8_MEMBER(dkong_state::M58817_status_r)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_voice_w)
+void dkong_state::dkong_voice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1228,7 +1228,7 @@ WRITE8_MEMBER(dkong_state::dkong_voice_w)
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
-READ8_MEMBER(dkong_state::dkong_voice_status_r)
+uint8_t dkong_state::dkong_voice_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* only provided for documentation purposes
 	 * not actually used
@@ -1236,7 +1236,7 @@ READ8_MEMBER(dkong_state::dkong_voice_status_r)
 	return 0;
 }
 
-READ8_MEMBER(dkong_state::dkong_tune_r)
+uint8_t dkong_state::dkong_tune_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	latch8_device *m_ls175_3d = machine().device<latch8_device>("ls175.3d");
 	uint8_t page = m_dev_vp2->read(space, 0) & 0x47;
@@ -1252,7 +1252,7 @@ READ8_MEMBER(dkong_state::dkong_tune_r)
 	}
 }
 
-WRITE8_MEMBER(dkong_state::dkong_p1_w)
+void dkong_state::dkong_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space,DS_DAC,data);
 }
@@ -1264,7 +1264,7 @@ WRITE8_MEMBER(dkong_state::dkong_p1_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
+void dkong_state::dkong_audio_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		m_soundcpu->set_input_line(0, ASSERT_LINE);

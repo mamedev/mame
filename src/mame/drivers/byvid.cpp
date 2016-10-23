@@ -74,26 +74,26 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_READ8_MEMBER(m6803_port2_r);
-	DECLARE_WRITE8_MEMBER(m6803_port2_w);
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(video_test);
 	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_READ8_MEMBER(u7_a_r);
-	DECLARE_WRITE8_MEMBER(u7_a_w);
-	DECLARE_READ8_MEMBER(u7_b_r);
-	DECLARE_WRITE8_MEMBER(u7_b_w);
-	DECLARE_READ8_MEMBER(u10_a_r);
-	DECLARE_WRITE8_MEMBER(u10_a_w);
-	DECLARE_READ8_MEMBER(u10_b_r);
-	DECLARE_WRITE8_MEMBER(u10_b_w);
-	DECLARE_READ8_MEMBER(u11_a_r);
-	DECLARE_WRITE8_MEMBER(u11_a_w);
-	DECLARE_READ8_MEMBER(u11_b_r);
-	DECLARE_WRITE8_MEMBER(u11_b_w);
+	uint8_t u7_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u7_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u7_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u7_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u11_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
@@ -102,7 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	DECLARE_WRITE8_MEMBER(granny_crtc_w);
+	void granny_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	uint8_t m_mpu_to_vid;
@@ -527,7 +527,7 @@ static INPUT_PORTS_START( granny )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( by133_state::granny_crtc_w )
+void by133_state::granny_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -541,23 +541,23 @@ WRITE8_MEMBER( by133_state::granny_crtc_w )
 	}
 }
 
-READ8_MEMBER( by133_state::sound_data_r )
+uint8_t by133_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mpu_to_vid;
 }
 
-WRITE8_MEMBER( by133_state::sound_data_w )
+void by133_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vid_to_mpu = data;
 }
 
-READ8_MEMBER( by133_state::m6803_port2_r )
+uint8_t by133_state::m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//machine().scheduler().synchronize();
 	return (m_u7_b << 1) | 0;
 }
 
-WRITE8_MEMBER( by133_state::m6803_port2_w )
+void by133_state::m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_u7_b = data >> 1;
 	m_beep->set_clock(600);
@@ -597,17 +597,17 @@ WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
 	// solenoid-sound selector
 }
 
-READ8_MEMBER( by133_state::u7_a_r )
+uint8_t by133_state::u7_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u7_a;
 }
 
-WRITE8_MEMBER( by133_state::u7_a_w )
+void by133_state::u7_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u7_a = data;
 }
 
-READ8_MEMBER( by133_state::u7_b_r )
+uint8_t by133_state::u7_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_u7_a, 7)) // bits 6 and 7 work; pinmame uses 7
 		m_u7_b |= m_io_joy->read();
@@ -618,25 +618,25 @@ READ8_MEMBER( by133_state::u7_b_r )
 	return m_u7_b;
 }
 
-WRITE8_MEMBER( by133_state::u7_b_w )
+void by133_state::u7_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//machine().scheduler().synchronize();
 	m_u7_b = data;
 }
 
-READ8_MEMBER( by133_state::u10_a_r )
+uint8_t by133_state::u10_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u10_a;
 }
 
-WRITE8_MEMBER( by133_state::u10_a_w )
+void by133_state::u10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u10_a = data;
 	if (BIT(m_u11_a, 2) == 0)
 		m_mpu_to_vid = data ^ 0x0f;
 }
 
-READ8_MEMBER( by133_state::u10_b_r )
+uint8_t by133_state::u10_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_u11_a, 3) == 0)
 		return ~m_u7_a & 0x03;
@@ -676,29 +676,29 @@ READ8_MEMBER( by133_state::u10_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( by133_state::u10_b_w )
+void by133_state::u10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u10_b = data;
 }
 
-READ8_MEMBER( by133_state::u11_a_r )
+uint8_t by133_state::u11_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u11_a;
 }
 
-WRITE8_MEMBER( by133_state::u11_a_w )
+void by133_state::u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u11_a = data;
 	m_pia_u7->ca1_w(BIT(data, 1));
 	m_pia_u7->ca2_w(BIT(data, 2));
 }
 
-READ8_MEMBER( by133_state::u11_b_r )
+uint8_t by133_state::u11_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u11_b;
 }
 
-WRITE8_MEMBER( by133_state::u11_b_w )
+void by133_state::u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u11_b = data;
 }

@@ -13,7 +13,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(sshangha_state::sshangha_video_w)
+void sshangha_state::sshangha_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 0x4: Special video mode, other bits unknown */
 	m_video_control=data;

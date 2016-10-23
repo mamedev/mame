@@ -51,16 +51,16 @@ public:
 
 	emu_timer* m_scanline_timer;
 	bitmap_rgb32 m_starfire_screen;
-	DECLARE_WRITE8_MEMBER(starfire_scratch_w);
-	DECLARE_READ8_MEMBER(starfire_scratch_r);
-	DECLARE_READ8_MEMBER(starfire_input_r);
-	DECLARE_READ8_MEMBER(fireone_input_r);
-	DECLARE_WRITE8_MEMBER(starfire_sound_w);
-	DECLARE_WRITE8_MEMBER(fireone_sound_w);
-	DECLARE_WRITE8_MEMBER(starfire_colorram_w);
-	DECLARE_READ8_MEMBER(starfire_colorram_r);
-	DECLARE_WRITE8_MEMBER(starfire_videoram_w);
-	DECLARE_READ8_MEMBER(starfire_videoram_r);
+	void starfire_scratch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t starfire_scratch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t starfire_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fireone_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void starfire_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fireone_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starfire_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t starfire_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void starfire_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t starfire_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_starfire();
 	void init_fireone();
 	virtual void video_start() override;

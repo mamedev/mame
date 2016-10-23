@@ -196,7 +196,7 @@ osd_printf_debug("Up scroll\n");
 }
 
 
-WRITE8_MEMBER( tms9927_device::write )
+void tms9927_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -225,7 +225,7 @@ osd_printf_debug("Cursor address changed\n");
 }
 
 
-READ8_MEMBER( tms9927_device::read )
+uint8_t tms9927_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{

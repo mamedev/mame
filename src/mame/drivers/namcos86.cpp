@@ -181,7 +181,7 @@ TODO:
 #include "sound/n63701x.h"
 #include "includes/namcos86.h"
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_w)
+void namcos86_state::bankswitch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
@@ -191,7 +191,7 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
+void namcos86_state::bankswitch1_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_user1_ptr)
 		return;
@@ -199,13 +199,13 @@ WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(namcos86_state::bankswitch2_w)
+void namcos86_state::bankswitch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x03);
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
-READ8_MEMBER(namcos86_state::dsw0_r)
+uint8_t namcos86_state::dsw0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rhi, rlo;
 
@@ -221,7 +221,7 @@ READ8_MEMBER(namcos86_state::dsw0_r)
 	return rhi | rlo;
 }
 
-READ8_MEMBER(namcos86_state::dsw1_r)
+uint8_t namcos86_state::dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rhi, rlo;
 
@@ -239,18 +239,18 @@ READ8_MEMBER(namcos86_state::dsw1_r)
 }
 
 
-WRITE8_MEMBER(namcos86_state::int_ack1_w)
+void namcos86_state::int_ack1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu1->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(namcos86_state::int_ack2_w)
+void namcos86_state::int_ack2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu2->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(namcos86_state::watchdog1_w)
+void namcos86_state::watchdog1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wdog |= 1;
 	if (m_wdog == 3)
@@ -260,7 +260,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	}
 }
 
-WRITE8_MEMBER(namcos86_state::watchdog2_w)
+void namcos86_state::watchdog2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wdog |= 2;
 	if (m_wdog == 3)
@@ -271,21 +271,21 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 }
 
 
-WRITE8_MEMBER(namcos86_state::coin_w)
+void namcos86_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	machine().bookkeeping().coin_counter_w(0,~data & 2);
 	machine().bookkeeping().coin_counter_w(1,~data & 4);
 }
 
-WRITE8_MEMBER(namcos86_state::led_w)
+void namcos86_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,data & 0x08);
 	output().set_led_value(1,data & 0x10);
 }
 
 
-WRITE8_MEMBER(namcos86_state::cus115_w)
+void namcos86_state::cus115_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* make sure the expansion board is present */
 	if (!m_user1_ptr)
@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( wndrmomo_mcu_map, AS_PROGRAM, 8, namcos86_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(namcos86_state::readFF)
+uint8_t namcos86_state::readFF(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

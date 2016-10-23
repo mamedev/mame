@@ -107,13 +107,13 @@ void dynax_state::sprtmtch_update_irq()
 	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-WRITE8_MEMBER(dynax_state::dynax_vblank_ack_w)
+void dynax_state::dynax_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vblank_irq = 0;
 	sprtmtch_update_irq();
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blitter_ack_w)
+void dynax_state::dynax_blitter_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter_irq = 0;
 	sprtmtch_update_irq();
@@ -143,19 +143,19 @@ void dynax_state::jantouki_update_irq()
 	m_maincpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_vblank_ack_w)
+void dynax_state::jantouki_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vblank_irq = 0;
 	jantouki_update_irq();
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_blitter_ack_w)
+void dynax_state::jantouki_blitter_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter_irq = data;
 	jantouki_update_irq();
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_blitter2_ack_w)
+void dynax_state::jantouki_blitter2_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter2_irq = data;
 	jantouki_update_irq();
@@ -184,7 +184,7 @@ INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
 	jantouki_sound_update_irq();
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
+void dynax_state::jantouki_sound_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_vblank_irq = 0;
 	jantouki_sound_update_irq();
@@ -209,23 +209,23 @@ WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
                                 Sports Match
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::dynax_coincounter_0_w)
+void dynax_state::dynax_coincounter_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }
 
-WRITE8_MEMBER(dynax_state::dynax_coincounter_1_w)
+void dynax_state::dynax_coincounter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data);
 }
 
-READ8_MEMBER(dynax_state::ret_ff)
+uint8_t dynax_state::ret_ff(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
 
-READ8_MEMBER(dynax_state::hanamai_keyboard_0_r)
+uint8_t dynax_state::hanamai_keyboard_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f;
 
@@ -239,7 +239,7 @@ READ8_MEMBER(dynax_state::hanamai_keyboard_0_r)
 	return res;
 }
 
-READ8_MEMBER(dynax_state::hanamai_keyboard_1_r)
+uint8_t dynax_state::hanamai_keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f;
 
@@ -253,24 +253,24 @@ READ8_MEMBER(dynax_state::hanamai_keyboard_1_r)
 	return res;
 }
 
-WRITE8_MEMBER(dynax_state::hanamai_keyboard_w)
+void dynax_state::hanamai_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb = data;
 }
 
 
-WRITE8_MEMBER(dynax_state::dynax_rombank_w)
+void dynax_state::dynax_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_sound_rombank_w)
+void dynax_state::jantouki_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data);
 }
 
 
-WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
+void dynax_state::hnoridur_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
@@ -283,13 +283,13 @@ WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 }
 
 
-WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
+void dynax_state::hnoridur_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palbank = data & 0x0f;
 	dynax_blit_palbank_w(space, 0, data);
 }
 
-WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
+void dynax_state::hnoridur_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_hnoridur_bank)
 	{
@@ -327,7 +327,7 @@ WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_palette_w)
+void dynax_state::yarunara_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addr = 512 * m_palbank + offset;
 
@@ -358,7 +358,7 @@ WRITE8_MEMBER(dynax_state::yarunara_palette_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::nanajign_palette_w)
+void dynax_state::nanajign_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_hnoridur_bank)
 	{
@@ -414,12 +414,12 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 }
 
 
-WRITE8_MEMBER(dynax_state::adpcm_data_w)
+void dynax_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(dynax_state::adpcm_reset_w)
+void dynax_state::adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_resetkludge = data & 1;
 	m_msm->reset_w(~data & 1);
@@ -432,12 +432,12 @@ void dynax_state::machine_reset_adpcm()
 	m_msm->reset_w(1);
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_layer_half_w)
+void dynax_state::yarunara_layer_half_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hanamai_layer_half_w(space, 0, data >> 1);
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_layer_half2_w)
+void dynax_state::yarunara_layer_half2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hnoridur_layer_half2_w(space, 0, data >> 1);
 }
@@ -593,17 +593,17 @@ ADDRESS_MAP_END
                                 Hana Jingi
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::hjingi_bank_w)
+void dynax_state::hjingi_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hnoridur_bank = data;
 }
 
-WRITE8_MEMBER(dynax_state::hjingi_lockout_w)
+void dynax_state::hjingi_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x01);
 }
 
-WRITE8_MEMBER(dynax_state::hjingi_hopper_w)
+void dynax_state::hjingi_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hopper = data & 0x01;
 }
@@ -613,12 +613,12 @@ uint8_t dynax_state::hjingi_hopper_bit()
 	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : (1 << 6);
 }
 
-READ8_MEMBER(dynax_state::hjingi_keyboard_0_r)
+uint8_t dynax_state::hjingi_keyboard_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hanamai_keyboard_0_r(space, 0) | hjingi_hopper_bit();
 }
 
-READ8_MEMBER(dynax_state::hjingi_keyboard_1_r)
+uint8_t dynax_state::hjingi_keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hanamai_keyboard_1_r(space, 0) | ioport("BET")->read();
 }
@@ -688,7 +688,7 @@ ADDRESS_MAP_END
                     Yarunara / Quiz TV Q&Q / Mahjong Angels
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::yarunara_input_w)
+void dynax_state::yarunara_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -701,7 +701,7 @@ WRITE8_MEMBER(dynax_state::yarunara_input_w)
 
 }
 
-READ8_MEMBER(dynax_state::yarunara_input_r)
+uint8_t dynax_state::yarunara_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -745,7 +745,7 @@ READ8_MEMBER(dynax_state::yarunara_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
+void dynax_state::yarunara_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
@@ -757,17 +757,17 @@ WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 		m_hnoridur_bank = data;
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_flipscreen_w)
+void dynax_state::yarunara_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dynax_flipscreen_w(space, 0, BIT(data, 1));
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_flipscreen_inv_w)
+void dynax_state::yarunara_flipscreen_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dynax_flipscreen_w(space, 0, !BIT(data, 1));
 }
 
-WRITE8_MEMBER(dynax_state::yarunara_blit_romregion_w)
+void dynax_state::yarunara_blit_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data)
 	{
@@ -945,12 +945,12 @@ ADDRESS_MAP_END
                             Jantouki - Main CPU
 ***************************************************************************/
 
-READ8_MEMBER(dynax_state::jantouki_soundlatch_ack_r)
+uint8_t dynax_state::jantouki_soundlatch_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_soundlatch_ack) ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
+void dynax_state::jantouki_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch_ack = 1;
 	m_soundlatch_full = 1;
@@ -959,12 +959,12 @@ WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
 	jantouki_sound_update_irq();
 }
 
-READ8_MEMBER(dynax_state::jantouki_blitter_busy_r)
+uint8_t dynax_state::jantouki_blitter_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;   // bit 0 & 1
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_rombank_w)
+void dynax_state::jantouki_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 	output().set_led_value(0, data & 0x10);  // maybe
@@ -1007,20 +1007,20 @@ ADDRESS_MAP_END
                             Jantouki - Sound CPU
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::jantouki_soundlatch_ack_w)
+void dynax_state::jantouki_soundlatch_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch_ack = data;
 	m_soundlatch_irq = 0;
 	jantouki_sound_update_irq();
 }
 
-READ8_MEMBER(dynax_state::jantouki_soundlatch_r)
+uint8_t dynax_state::jantouki_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch_full = 0;
 	return m_latch;
 }
 
-READ8_MEMBER(dynax_state::jantouki_soundlatch_status_r)
+uint8_t dynax_state::jantouki_soundlatch_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_soundlatch_full) ? 0 : 0x80;
 }
@@ -1045,12 +1045,12 @@ ADDRESS_MAP_END
                             Mahjong Electron Base
 ***************************************************************************/
 
-READ8_MEMBER(dynax_state::mjelctrn_keyboard_1_r)
+uint8_t dynax_state::mjelctrn_keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (ioport("FAKE")->read() ? 0x40 : 0);
 }
 
-READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
+uint8_t dynax_state::mjelctrn_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int dsw = (m_keyb & 0xc0) >> 6;
 	static const char *const dswnames[] = { "DSW0", "DSW1", "DSW2", "DSW3" };
@@ -1058,7 +1058,7 @@ READ8_MEMBER(dynax_state::mjelctrn_dsw_r)
 	return ioport(dswnames[dsw])->read();
 }
 
-WRITE8_MEMBER(dynax_state::mjelctrn_blitter_ack_w)
+void dynax_state::mjelctrn_blitter_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter_irq = 0;
 }
@@ -1139,7 +1139,7 @@ ADDRESS_MAP_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::tenkai_ipsel_w)
+void dynax_state::tenkai_ipsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1152,7 +1152,7 @@ WRITE8_MEMBER(dynax_state::tenkai_ipsel_w)
 
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_ip_w)
+void dynax_state::tenkai_ip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -1172,7 +1172,7 @@ WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", space.device().safe_pc(), m_input_sel, data);
 }
 
-READ8_MEMBER(dynax_state::tenkai_ip_r)
+uint8_t dynax_state::tenkai_ip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -1221,12 +1221,12 @@ READ8_MEMBER(dynax_state::tenkai_ip_r)
 }
 
 
-WRITE8_MEMBER(dynax_state::tenkai_dswsel_w)
+void dynax_state::tenkai_dswsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(dynax_state::tenkai_dsw_r)
+uint8_t dynax_state::tenkai_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
@@ -1238,12 +1238,12 @@ READ8_MEMBER(dynax_state::tenkai_dsw_r)
 	return 0xff;
 }
 
-READ8_MEMBER(dynax_state::tenkai_palette_r)
+uint8_t dynax_state::tenkai_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette_ram[512 * m_palbank + offset];
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_palette_w)
+void dynax_state::tenkai_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addr = 512 * m_palbank + offset;
 	m_palette_ram[addr] = data;
@@ -1264,28 +1264,28 @@ void dynax_state::tenkai_update_rombank()
 //  logerror("rombank = %02x\n", m_rombank);
 }
 
-READ8_MEMBER(dynax_state::tenkai_p3_r)
+uint8_t dynax_state::tenkai_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p3_w)
+void dynax_state::tenkai_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = ((data & 0x04) << 1) | (m_rombank & 0x07);
 	tenkai_update_rombank();
 }
-WRITE8_MEMBER(dynax_state::tenkai_p4_w)
+void dynax_state::tenkai_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0x08) | ((data & 0x0e) >> 1);
 	tenkai_update_rombank();
 }
 
-READ8_MEMBER(dynax_state::tenkai_p5_r)
+uint8_t dynax_state::tenkai_p5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tenkai_p5_val;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p6_w)
+void dynax_state::tenkai_p6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tenkai_p5_val &= 0x0f;
 
@@ -1293,7 +1293,7 @@ WRITE8_MEMBER(dynax_state::tenkai_p6_w)
 		m_tenkai_p5_val |= (1 << 4);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p7_w)
+void dynax_state::tenkai_p7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tenkai_p5_val &= 0xf0;
 
@@ -1301,18 +1301,18 @@ WRITE8_MEMBER(dynax_state::tenkai_p7_w)
 		m_tenkai_p5_val |= (1 << 3);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_p8_w)
+void dynax_state::tenkai_p8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = ((data & 0x08) << 1) | (m_rombank & 0x0f);
 	tenkai_update_rombank();
 }
 
-READ8_MEMBER(dynax_state::tenkai_p8_r)
+uint8_t dynax_state::tenkai_p8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(dynax_state::tenkai_8000_r)
+uint8_t dynax_state::tenkai_8000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_rombank < 0x10)
 		return m_romptr[offset];
@@ -1327,7 +1327,7 @@ READ8_MEMBER(dynax_state::tenkai_8000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_8000_w)
+void dynax_state::tenkai_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_rombank == 0x10) && (offset < 0x10))
 	{
@@ -1348,19 +1348,19 @@ void dynax_state::tenkai_show_6c()
 //    popmessage("%02x %02x", m_tenkai_6c, m_tenkai_70);
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_6c_w)
+void dynax_state::tenkai_6c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tenkai_6c = data;
 	tenkai_show_6c();
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_70_w)
+void dynax_state::tenkai_70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tenkai_70 = data;
 	tenkai_show_6c();
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_romregion_w)
+void dynax_state::tenkai_blit_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -1412,7 +1412,7 @@ ADDRESS_MAP_END
                                 Mahjong Gekisha
 ***************************************************************************/
 
-READ8_MEMBER(dynax_state::gekisha_keyboard_0_r)
+uint8_t dynax_state::gekisha_keyboard_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f;
 
@@ -1424,7 +1424,7 @@ READ8_MEMBER(dynax_state::gekisha_keyboard_0_r)
 
 	return res;
 }
-READ8_MEMBER(dynax_state::gekisha_keyboard_1_r)
+uint8_t dynax_state::gekisha_keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f;
 
@@ -1442,7 +1442,7 @@ READ8_MEMBER(dynax_state::gekisha_keyboard_1_r)
 	return res;
 }
 
-WRITE8_MEMBER(dynax_state::gekisha_hopper_w)
+void dynax_state::gekisha_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gekisha_val[offset] = data;
 //  popmessage("%02x %02x", gekisha_val[0], gekisha_val[1]);
@@ -1454,13 +1454,13 @@ void dynax_state::gekisha_set_rombank( uint8_t data )
 	m_romptr = memregion("maincpu")->base() + 0x8000 + m_rombank * 0x8000;
 }
 
-WRITE8_MEMBER(dynax_state::gekisha_p4_w)
+void dynax_state::gekisha_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gekisha_rom_enable = !BIT(data, 3);
 	gekisha_set_rombank(BIT(data, 2));
 }
 
-READ8_MEMBER(dynax_state::gekisha_8000_r)
+uint8_t dynax_state::gekisha_8000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_gekisha_rom_enable)
 		return m_romptr[offset];
@@ -1480,7 +1480,7 @@ READ8_MEMBER(dynax_state::gekisha_8000_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(dynax_state::gekisha_8000_w)
+void dynax_state::gekisha_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_gekisha_rom_enable)
 	{
@@ -1550,7 +1550,7 @@ ADDRESS_MAP_END
                                 Castle Of Dracula
 ***************************************************************************/
 
-WRITE8_MEMBER(dynax_state::cdracula_sound_rombank_w)
+void dynax_state::cdracula_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%s: sound bank = %02x\n", machine().describe_context(), data);
 

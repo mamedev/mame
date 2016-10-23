@@ -108,47 +108,47 @@ public:
 	int m_signature_answer;
 	int m_signature_pos;
 	uint8_t m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
-	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
-	DECLARE_READ8_MEMBER(catchall);
-	DECLARE_WRITE8_MEMBER(banksel_main_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_1_w);
-	DECLARE_WRITE8_MEMBER(banksel_1_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_2_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_3_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_4_2_w);
-	DECLARE_WRITE8_MEMBER(banksel_5_2_w);
-	DECLARE_WRITE8_MEMBER(geimulti_bank_w);
-	DECLARE_READ8_MEMBER(banksel_1_r);
-	DECLARE_READ8_MEMBER(banksel_2_r);
-	DECLARE_READ8_MEMBER(banksel_3_r);
-	DECLARE_READ8_MEMBER(banksel_4_r);
-	DECLARE_READ8_MEMBER(banksel_5_r);
-	DECLARE_READ8_MEMBER(signature_r);
-	DECLARE_WRITE8_MEMBER(signature_w);
-	DECLARE_WRITE8_MEMBER(signature2_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_READ8_MEMBER(portC_r);
+	void gei_drawctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gei_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t catchall(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void banksel_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_1_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_2_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_3_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_4_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_5_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_1_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_2_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_3_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_4_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_5_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void geimulti_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t banksel_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banksel_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banksel_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banksel_4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banksel_5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t signature_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void signature_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void signature2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portC_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_geimulti();
 	void init_setbank();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
-WRITE8_MEMBER(gei_state::gei_drawctrl_w)
+void gei_state::gei_drawctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_drawctrl[offset] = data;
 	if (offset == 2)
@@ -159,7 +159,7 @@ WRITE8_MEMBER(gei_state::gei_drawctrl_w)
 	}
 }
 
-WRITE8_MEMBER(gei_state::gei_bitmap_w)
+void gei_state::gei_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx,sy;
 	int i;
@@ -187,7 +187,7 @@ uint32_t gei_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER(gei_state::lamps_w)
+void gei_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 5 button lamps */
 	output().set_led_value(0,data & 0x01);
@@ -203,7 +203,7 @@ WRITE8_MEMBER(gei_state::lamps_w)
 	output().set_led_value(6,data & 0x80);
 }
 
-WRITE8_MEMBER(gei_state::sound_w)
+void gei_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
@@ -220,7 +220,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::sound2_w)
+void gei_state::sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x08);
@@ -237,13 +237,13 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER(gei_state::lamps2_w)
+void gei_state::lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
 	output().set_led_value(8,data & 0x10);
 }
 
-WRITE8_MEMBER(gei_state::nmi_w)
+void gei_state::nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	output().set_led_value(8,data & 0x10);
@@ -252,7 +252,7 @@ WRITE8_MEMBER(gei_state::nmi_w)
 	m_nmi_mask = data & 0x40;
 }
 
-READ8_MEMBER(gei_state::catchall)
+uint8_t gei_state::catchall(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -262,78 +262,78 @@ READ8_MEMBER(gei_state::catchall)
 	return 0xff;
 }
 
-READ8_MEMBER(gei_state::portC_r)
+uint8_t gei_state::portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 4;
 }
 
-WRITE8_MEMBER(gei_state::banksel_main_w)
+void gei_state::banksel_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x8000);
 }
-WRITE8_MEMBER(gei_state::banksel_1_w)
+void gei_state::banksel_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 }
-WRITE8_MEMBER(gei_state::banksel_2_w)
+void gei_state::banksel_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x18000);
 }
-WRITE8_MEMBER(gei_state::banksel_3_w)
+void gei_state::banksel_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x20000);
 }
-WRITE8_MEMBER(gei_state::banksel_4_w)
+void gei_state::banksel_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x28000);
 }
-WRITE8_MEMBER(gei_state::banksel_5_w)
+void gei_state::banksel_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x30000);
 }
 
-WRITE8_MEMBER(gei_state::banksel_1_1_w)
+void gei_state::banksel_1_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 }
-WRITE8_MEMBER(gei_state::banksel_2_1_w)
+void gei_state::banksel_2_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x14000);
 }
-WRITE8_MEMBER(gei_state::banksel_3_1_w)
+void gei_state::banksel_3_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x18000);
 }
-WRITE8_MEMBER(gei_state::banksel_4_1_w)
+void gei_state::banksel_4_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1c000);
 }
-WRITE8_MEMBER(gei_state::banksel_5_1_w)
+void gei_state::banksel_5_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x20000);
 }
-WRITE8_MEMBER(gei_state::banksel_1_2_w)
+void gei_state::banksel_1_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x12000);
 }
-WRITE8_MEMBER(gei_state::banksel_2_2_w)
+void gei_state::banksel_2_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x16000);
 }
-WRITE8_MEMBER(gei_state::banksel_3_2_w)
+void gei_state::banksel_3_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1a000);
 }
-WRITE8_MEMBER(gei_state::banksel_4_2_w)
+void gei_state::banksel_4_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1e000);
 }
-WRITE8_MEMBER(gei_state::banksel_5_2_w)
+void gei_state::banksel_5_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x22000);
 }
 
-WRITE8_MEMBER(gei_state::geimulti_bank_w)
+void gei_state::geimulti_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = -1;
 
@@ -361,31 +361,31 @@ WRITE8_MEMBER(gei_state::geimulti_bank_w)
 		membank("bank1")->set_base(memregion("bank")->base() + bank*0x8000);
 }
 
-READ8_MEMBER(gei_state::banksel_1_r)
+uint8_t gei_state::banksel_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 	return 0x03;
 }
 
-READ8_MEMBER(gei_state::banksel_2_r)
+uint8_t gei_state::banksel_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x18000);
 	return 0x03;
 }
 
-READ8_MEMBER(gei_state::banksel_3_r)
+uint8_t gei_state::banksel_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x20000);
 	return 0x03;
 }
 
-READ8_MEMBER(gei_state::banksel_4_r)
+uint8_t gei_state::banksel_4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x28000);
 	return 0x03;
 }
 
-READ8_MEMBER(gei_state::banksel_5_r)
+uint8_t gei_state::banksel_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x30000);
 	return 0x03;
@@ -393,12 +393,12 @@ READ8_MEMBER(gei_state::banksel_5_r)
 
 /* This signature is used to validate the ROMs in sportauth. Simple protection check? */
 
-READ8_MEMBER(gei_state::signature_r)
+uint8_t gei_state::signature_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_signature_answer;
 }
 
-WRITE8_MEMBER(gei_state::signature_w)
+void gei_state::signature_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0) m_signature_pos = 0;
 	else
@@ -411,7 +411,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	}
 }
 
-WRITE8_MEMBER(gei_state::signature2_w)
+void gei_state::signature2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0) m_signature_pos = 0;
 	else

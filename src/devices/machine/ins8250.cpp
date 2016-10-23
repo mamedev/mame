@@ -204,7 +204,7 @@ void ins8250_uart_device::clear_int(int flag)
 	update_interrupt();
 }
 
-WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
+void ins8250_uart_device::ins8250_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tmp;
 
@@ -344,7 +344,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 	}
 }
 
-READ8_MEMBER( ins8250_uart_device::ins8250_r )
+uint8_t ins8250_uart_device::ins8250_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0x0ff;
 

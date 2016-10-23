@@ -169,7 +169,7 @@ void system1_state::video_start_system2()
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::system1_videomode_w)
+void system1_state::system1_videomode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x6e) logerror("videomode = %02x\n",data);
 
@@ -188,21 +188,21 @@ WRITE8_MEMBER(system1_state::system1_videomode_w)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::system1_mixer_collision_r)
+uint8_t system1_state::system1_mixer_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	return m_mix_collide[offset & 0x3f] | 0x7e | (m_mix_collide_summary << 7);
 }
 
-WRITE8_MEMBER(system1_state::system1_mixer_collision_w)
+void system1_state::system1_mixer_collision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_mix_collide[offset & 0x3f] = 0;
 }
 
-WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
+void system1_state::system1_mixer_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -217,21 +217,21 @@ WRITE8_MEMBER(system1_state::system1_mixer_collision_reset_w)
  *
  *************************************/
 
-READ8_MEMBER(system1_state::system1_sprite_collision_r)
+uint8_t system1_state::system1_sprite_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	return m_sprite_collide[offset & 0x3ff] | 0x7e | (m_sprite_collide_summary << 7);
 }
 
-WRITE8_MEMBER(system1_state::system1_sprite_collision_w)
+void system1_state::system1_sprite_collision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_sprite_collide[offset & 0x3ff] = 0;
 }
 
-WRITE8_MEMBER(system1_state::system1_sprite_collision_reset_w)
+void system1_state::system1_sprite_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -261,7 +261,7 @@ inline void system1_state::videoram_wait_states(cpu_device *cpu)
 	cpu->adjust_icount(-cycles_until_next_fixst);
 }
 
-READ8_MEMBER(system1_state::system1_videoram_r)
+uint8_t system1_state::system1_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram.get();
 	videoram_wait_states(m_maincpu);
@@ -269,7 +269,7 @@ READ8_MEMBER(system1_state::system1_videoram_r)
 	return videoram[offset];
 }
 
-WRITE8_MEMBER(system1_state::system1_videoram_w)
+void system1_state::system1_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram.get();
 	videoram_wait_states(m_maincpu);
@@ -286,7 +286,7 @@ WRITE8_MEMBER(system1_state::system1_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(system1_state::system1_videoram_bank_w)
+void system1_state::system1_videoram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_bank = data;
 }
@@ -299,7 +299,7 @@ WRITE8_MEMBER(system1_state::system1_videoram_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(system1_state::system1_paletteram_w)
+void system1_state::system1_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  There are two kind of color handling: in the System 1 games, values in the

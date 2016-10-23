@@ -103,7 +103,7 @@ public:
 	void configure_bank(int bank, read8_delegate rhandler, write8_delegate whandler);
 
 	// typically called by VDG
-	ATTR_FORCE_INLINE DECLARE_READ8_MEMBER( display_read )
+	ATTR_FORCE_INLINE uint8_t display_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		if (offset == (offs_t) ~0)
 		{
@@ -197,8 +197,8 @@ private:
 	uint8_t                       m_dummy[0x8000];
 
 	// typically called by CPU
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// called when there is a carry out of bit 3 on the counter
 	ATTR_FORCE_INLINE void counter_carry_bit3(void)

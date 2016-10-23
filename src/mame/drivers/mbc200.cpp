@@ -71,12 +71,12 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_READ8_MEMBER(p2_porta_r);
-	DECLARE_WRITE8_MEMBER(p1_portc_w);
-	DECLARE_WRITE8_MEMBER(pm_porta_w);
-	DECLARE_WRITE8_MEMBER(pm_portb_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t p2_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pm_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pm_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(update_row);
 	required_device<palette_device> m_palette;
 
@@ -103,19 +103,19 @@ static ADDRESS_MAP_START(mbc200_mem, AS_PROGRAM, 8, mbc200_state)
 	AM_RANGE( 0x1000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( mbc200_state::p1_portc_w )
+void mbc200_state::p1_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data,4)); // used by beep command in basic
 }
 
-WRITE8_MEMBER( mbc200_state::pm_porta_w )
+void mbc200_state::pm_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // force resync
 	//printf("A %02x %c\n",data,data);
 	m_comm_latch = data; // to slave CPU
 }
 
-WRITE8_MEMBER( mbc200_state::pm_portb_w )
+void mbc200_state::pm_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START(mbc200_sub_mem, AS_PROGRAM, 8, mbc200_state)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(mbc200_state::p2_porta_r)
+uint8_t mbc200_state::p2_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // force resync
 	uint8_t tmp = m_comm_latch;
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mbc200 )
 INPUT_PORTS_END
 
-READ8_MEMBER( mbc200_state::keyboard_r )
+uint8_t mbc200_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	if (offset)
@@ -205,7 +205,7 @@ READ8_MEMBER( mbc200_state::keyboard_r )
 }
 
 // convert standard control keys to expected code;
-WRITE8_MEMBER( mbc200_state::kbd_put )
+void mbc200_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{

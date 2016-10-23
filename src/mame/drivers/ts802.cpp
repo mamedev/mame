@@ -44,19 +44,19 @@ public:
 
 	void init_ts802();
 	void machine_reset_ts802();
-	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
-	DECLARE_READ8_MEMBER(port0c_r) { return 1; };
-	DECLARE_READ8_MEMBER(port0e_r) { return 0; };
-	DECLARE_READ8_MEMBER(port0f_r) { return (m_term_data) ? 5 : 4; };
-	DECLARE_READ8_MEMBER(port0d_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0x80; };
+	uint8_t port0c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 1; };
+	uint8_t port0e_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0; };
+	uint8_t port0f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_term_data) ? 5 : 4; };
+	uint8_t port0d_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	address_space *m_mem;
@@ -103,35 +103,35 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ts802 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ts802_state::port04_w )
+void ts802_state::port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1);
 }
 
-WRITE8_MEMBER( ts802_state::port18_w )
+void ts802_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( ts802_state::port80_w )
+void ts802_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( ts802_state::memory_read_byte )
+uint8_t ts802_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::memory_write_byte )
+void ts802_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( ts802_state::io_read_byte )
+uint8_t ts802_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( ts802_state::io_write_byte )
+void ts802_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io->write_byte(offset, data);
 }
@@ -146,14 +146,14 @@ void ts802_state::machine_reset_ts802()
 	membank("bankw0")->set_entry(0); // always write to ram
 }
 
-READ8_MEMBER( ts802_state::port0d_r )
+uint8_t ts802_state::port0d_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( ts802_state::kbd_put )
+void ts802_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

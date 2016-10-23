@@ -14,25 +14,25 @@
 #include "sound/volt_reg.h"
 
 
-READ8_MEMBER(spacefb_state::audio_p2_r)
+uint8_t spacefb_state::audio_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_sound_latch & 0x18) << 1;
 }
 
 
-READ8_MEMBER(spacefb_state::audio_t0_r)
+uint8_t spacefb_state::audio_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_latch & 0x20;
 }
 
 
-READ8_MEMBER(spacefb_state::audio_t1_r)
+uint8_t spacefb_state::audio_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_latch & 0x04;
 }
 
 
-WRITE8_MEMBER(spacefb_state::port_1_w)
+void spacefb_state::port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 

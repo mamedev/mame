@@ -105,7 +105,7 @@ const tiny_rom_entry *intv_voice_device::device_rom_region() const
  read_audio
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_voice_device::read_speech)
+uint16_t intv_voice_device::read_speech(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_speech->spb640_r(space, offset, mem_mask);
@@ -117,7 +117,7 @@ READ16_MEMBER(intv_voice_device::read_speech)
  write_audio
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_voice_device::write_speech)
+void intv_voice_device::write_speech(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_speech->spb640_w(space, offset, data, mem_mask);

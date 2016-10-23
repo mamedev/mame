@@ -35,34 +35,34 @@ static ADDRESS_MAP_START( tmp68301_regs, AS_0, 16, tmp68301_device )
 ADDRESS_MAP_END
 
 // IRQ Mask register, 0x94
-READ16_MEMBER(tmp68301_device::imr_r)
+uint16_t tmp68301_device::imr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_imr;
 }
 
-WRITE16_MEMBER(tmp68301_device::imr_w)
+void tmp68301_device::imr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_imr);
 }
 
 // IRQ In-Service Register
-READ16_MEMBER(tmp68301_device::iisr_r)
+uint16_t tmp68301_device::iisr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_iisr;
 }
 
-WRITE16_MEMBER(tmp68301_device::iisr_w)
+void tmp68301_device::iisr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_iisr);
 }
 
 // Serial Control Register (TODO: 8-bit wide)
-READ16_MEMBER(tmp68301_device::scr_r)
+uint16_t tmp68301_device::scr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scr;
 }
 
-WRITE16_MEMBER(tmp68301_device::scr_w)
+void tmp68301_device::scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    *--- ---- CKSE
@@ -75,22 +75,22 @@ WRITE16_MEMBER(tmp68301_device::scr_w)
 }
 
 /* Parallel direction: 1 = output, 0 = input */
-READ16_MEMBER(tmp68301_device::pdir_r)
+uint16_t tmp68301_device::pdir_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pdir;
 }
 
-WRITE16_MEMBER(tmp68301_device::pdir_w)
+void tmp68301_device::pdir_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pdir);
 }
 
-READ16_MEMBER(tmp68301_device::pdr_r)
+uint16_t tmp68301_device::pdr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_in_parallel_cb(0) & ~m_pdir) | (m_pdr & m_pdir);
 }
 
-WRITE16_MEMBER(tmp68301_device::pdr_w)
+void tmp68301_device::pdr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_pdr;
 	COMBINE_DATA(&m_pdr);
@@ -302,12 +302,12 @@ void tmp68301_device::update_irq_state()
 	}
 }
 
-READ16_MEMBER( tmp68301_device::regs_r )
+uint16_t tmp68301_device::regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( tmp68301_device::regs_w )
+void tmp68301_device::regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 

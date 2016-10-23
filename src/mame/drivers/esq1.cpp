@@ -399,20 +399,20 @@ public:
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<midi_port_device> m_mdout;
 
-	DECLARE_READ8_MEMBER(wd1772_r);
-	DECLARE_WRITE8_MEMBER(wd1772_w);
-	DECLARE_READ8_MEMBER(seqdosram_r);
-	DECLARE_WRITE8_MEMBER(seqdosram_w);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_WRITE8_MEMBER(analog_w);
+	uint8_t wd1772_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd1772_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seqdosram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void seqdosram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void analog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(esq1_doc_irq);
-	DECLARE_READ8_MEMBER(esq1_adc_read);
+	uint8_t esq1_adc_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	int m_mapper_state;
 	int m_seq_bank;
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
 {
 }
 
-READ8_MEMBER(esq1_state::esq1_adc_read)
+uint8_t esq1_state::esq1_adc_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -443,24 +443,24 @@ void esq1_state::machine_reset()
 	m_seq_bank = 0;
 }
 
-READ8_MEMBER(esq1_state::wd1772_r)
+uint8_t esq1_state::wd1772_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->read(space, offset&3);
 }
 
-WRITE8_MEMBER(esq1_state::wd1772_w)
+void esq1_state::wd1772_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->write(space, offset&3, data);
 }
 
-WRITE8_MEMBER(esq1_state::mapper_w)
+void esq1_state::mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mapper_state = (data & 1) ^ 1;
 
 //    printf("mapper_state = %d\n", data ^ 1);
 }
 
-WRITE8_MEMBER(esq1_state::analog_w)
+void esq1_state::analog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(offset & 8))
 		m_filters->set_vfc(offset & 7, data);
@@ -472,7 +472,7 @@ WRITE8_MEMBER(esq1_state::analog_w)
 		m_filters->set_vca(offset & 7, data);
 }
 
-READ8_MEMBER(esq1_state::seqdosram_r)
+uint8_t esq1_state::seqdosram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mapper_state)
 	{
@@ -484,7 +484,7 @@ READ8_MEMBER(esq1_state::seqdosram_r)
 	}
 }
 
-WRITE8_MEMBER(esq1_state::seqdosram_w)
+void esq1_state::seqdosram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_mapper_state)
 	{
@@ -539,7 +539,7 @@ WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE8_MEMBER(esq1_state::duart_output)
+void esq1_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = ((data >> 1) & 0x7);
 //  printf("DP [%02x]: %d mlo %d mhi %d tape %d\n", data, data&1, (data>>4)&1, (data>>5)&1, (data>>6)&3);

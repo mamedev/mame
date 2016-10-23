@@ -32,8 +32,8 @@ public:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
+	uint16_t reg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 private:
 	// Interface state

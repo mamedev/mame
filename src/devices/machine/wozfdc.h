@@ -35,8 +35,8 @@ public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;
@@ -99,8 +99,8 @@ public:
 
 	void set_floppies_4(floppy_connector *f0, floppy_connector *f1, floppy_connector *f2, floppy_connector *f3);
 
-	DECLARE_READ8_MEMBER(read_c0dx);
-	DECLARE_WRITE8_MEMBER(write_c0dx);
+	uint8_t read_c0dx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_c0dx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	void control_dx(int offset);

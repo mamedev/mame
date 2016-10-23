@@ -42,27 +42,27 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
-	DECLARE_READ8_MEMBER(hncholms_prot_r);
-	DECLARE_READ8_MEMBER(scramble_soundram_r);
-	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(mars_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
-	DECLARE_READ8_MEMBER(scramble_portB_r);
-	DECLARE_READ8_MEMBER(hustler_portB_r);
-	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(hotshock_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(scramble_filter_w);
-	DECLARE_WRITE8_MEMBER(frogger_filter_w);
-	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(ad2083_tms5110_ctrl_w);
+	uint8_t hncholms_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scramble_soundram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mars_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mars_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scramble_soundram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scramble_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hustler_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hotshock_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hotshock_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scramble_filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void frogger_filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mars_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mars_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ad2083_tms5110_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// harem
-	DECLARE_WRITE8_MEMBER(harem_decrypt_bit_w);
-	DECLARE_WRITE8_MEMBER(harem_decrypt_clk_w);
-	DECLARE_WRITE8_MEMBER(harem_decrypt_rst_w);
-	DECLARE_READ8_MEMBER(harem_digitalker_intr_r);
-	DECLARE_WRITE8_MEMBER(harem_digitalker_control_w);
+	void harem_decrypt_bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void harem_decrypt_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void harem_decrypt_rst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t harem_digitalker_intr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void harem_digitalker_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_cavelon();
 	void init_mariner();
@@ -94,17 +94,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 	void cavelon_banksw();
 	inline int bit(int i,int n);
-	DECLARE_READ8_MEMBER( mariner_protection_1_r );
-	DECLARE_READ8_MEMBER( mariner_protection_2_r );
-	DECLARE_READ8_MEMBER( triplep_pip_r );
-	DECLARE_READ8_MEMBER( triplep_pap_r );
-	DECLARE_READ8_MEMBER( cavelon_banksw_r );
-	DECLARE_WRITE8_MEMBER( cavelon_banksw_w );
-	DECLARE_READ8_MEMBER( hunchbks_mirror_r );
-	DECLARE_WRITE8_MEMBER( hunchbks_mirror_w );
+	uint8_t mariner_protection_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mariner_protection_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t triplep_pip_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t triplep_pap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cavelon_banksw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cavelon_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hunchbks_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hunchbks_mirror_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sh_init();
-	DECLARE_WRITE8_MEMBER( scramble_sh_irqtrigger_w );
-	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
+	void scramble_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrkougar_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 };
 

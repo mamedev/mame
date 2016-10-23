@@ -64,12 +64,12 @@ public:
 	emu_timer      *m_dial_timer;
 	emu_timer      *m_frame_timer;
 
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(cursor_load_w);
-	DECLARE_WRITE8_MEMBER(interrupt_ack_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cursor_load_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -215,7 +215,7 @@ void destroyr_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(destroyr_state::misc_w)
+void destroyr_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 to 2 connect to the sound circuits */
 	m_attract = data & 0x01;
@@ -230,20 +230,20 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 }
 
 
-WRITE8_MEMBER(destroyr_state::cursor_load_w)
+void destroyr_state::cursor_load_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cursor = data;
 	m_watchdog->reset_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(destroyr_state::interrupt_ack_w)
+void destroyr_state::interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(destroyr_state::output_w)
+void destroyr_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 8) misc_w(space, 8, data);
 
@@ -277,7 +277,7 @@ WRITE8_MEMBER(destroyr_state::output_w)
 }
 
 
-READ8_MEMBER(destroyr_state::input_r)
+uint8_t destroyr_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -298,7 +298,7 @@ READ8_MEMBER(destroyr_state::input_r)
 }
 
 
-READ8_MEMBER(destroyr_state::scanline_r)
+uint8_t destroyr_state::scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos();
 }

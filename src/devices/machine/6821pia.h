@@ -97,15 +97,15 @@ public:
 	template<class _Object> static devcb_base &set_irqa_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_irqa_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_irqb_handler(device_t &device, _Object object) { return downcast<pia6821_device &>(device).m_irqb_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read ) { return reg_r(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { reg_w(offset, data); }
-	DECLARE_READ8_MEMBER( read_alt ) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
-	DECLARE_WRITE8_MEMBER( write_alt ) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return reg_r(offset); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { reg_w(offset, data); }
+	uint8_t read_alt(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01)); }
+	void write_alt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data); }
 
 	uint8_t port_b_z_mask() const { return ~m_ddr_b; }          // see first note in .c
 	void set_port_a_z_mask(uint8_t data) { m_port_a_z_mask = data; }// see second note in .c
 
-	DECLARE_WRITE8_MEMBER( porta_w ) { porta_w(data); }
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { porta_w(data); }
 	void porta_w(uint8_t data);
 	void set_a_input(uint8_t data, uint8_t z_mask);
 	uint8_t a_output();
@@ -116,7 +116,7 @@ public:
 	int ca2_output();
 	int ca2_output_z();
 
-	DECLARE_WRITE8_MEMBER( portb_w ) { portb_w(data); }
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { portb_w(data); }
 	void portb_w(uint8_t data);
 	uint8_t b_output();
 

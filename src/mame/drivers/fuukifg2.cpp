@@ -61,7 +61,7 @@ To Do:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(fuuki16_state::vregs_w)
+void fuuki16_state::vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_vregs[offset];
 	uint16_t new_data = COMBINE_DATA(&m_vregs[offset]);
@@ -73,7 +73,7 @@ WRITE16_MEMBER(fuuki16_state::vregs_w)
 	}
 }
 
-WRITE16_MEMBER(fuuki16_state::sound_command_w)
+void fuuki16_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
+void fuuki16_state::sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data <= 2)
 		membank("bank1")->set_entry(data);
@@ -119,7 +119,7 @@ WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
 		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", space.device().safe_pc(), data);
 }
 
-WRITE8_MEMBER(fuuki16_state::oki_banking_w)
+void fuuki16_state::oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    data & 0x06 is always equals to data & 0x60

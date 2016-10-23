@@ -38,16 +38,16 @@ public:
 	uint8_t m_reg[0x1000];
 	uint32_t screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(pc1350_outa);
-	DECLARE_WRITE8_MEMBER(pc1350_outb);
-	DECLARE_WRITE8_MEMBER(pc1350_outc);
+	void pc1350_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc1350_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc1350_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_READ_LINE_MEMBER(pc1350_brk);
-	DECLARE_READ8_MEMBER(pc1350_ina);
-	DECLARE_READ8_MEMBER(pc1350_inb);
-	DECLARE_READ8_MEMBER(pc1350_lcd_read);
-	DECLARE_WRITE8_MEMBER(pc1350_lcd_write);
-	DECLARE_READ8_MEMBER(pc1350_keyboard_line_r);
+	uint8_t pc1350_ina(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc1350_inb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc1350_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc1350_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc1350_keyboard_line_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	required_device<sc61860_device> m_maincpu;

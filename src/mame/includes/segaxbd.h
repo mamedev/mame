@@ -31,31 +31,31 @@ public:
 	void sound_data_w(uint8_t data);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( adc_r );
-	DECLARE_WRITE16_MEMBER( adc_w );
+	uint16_t adc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void adc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t iochip_r(int which, int port, int inputval);
-	DECLARE_READ16_MEMBER( iochip_0_r );
-	DECLARE_WRITE16_MEMBER( iochip_0_w );
-	DECLARE_READ16_MEMBER( iochip_1_r );
-	DECLARE_WRITE16_MEMBER( iochip_1_w );
-	DECLARE_WRITE16_MEMBER( iocontrol_w );
+	uint16_t iochip_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void iochip_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t iochip_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void iochip_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void iocontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// game-specific main CPU read/write handlers
-	DECLARE_WRITE16_MEMBER( loffire_sync0_w );
-	DECLARE_READ16_MEMBER( rascot_excs_r );
-	DECLARE_WRITE16_MEMBER( rascot_excs_w );
-	DECLARE_READ16_MEMBER( smgp_excs_r );
-	DECLARE_WRITE16_MEMBER( smgp_excs_w );
+	void loffire_sync0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rascot_excs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rascot_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t smgp_excs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void smgp_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// sound Z80 CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// palette helpers
-	DECLARE_WRITE16_MEMBER( paletteram_w );
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void install_aburner2(void);
 	void install_lastsurv(void);

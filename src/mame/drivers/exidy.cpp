@@ -185,7 +185,7 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy_state::fax_bank_select_w)
+void exidy_state::fax_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 

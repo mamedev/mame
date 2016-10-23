@@ -38,12 +38,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::sh_irqtrigger_w)
+void ironhors_state::sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(ironhors_state::filter_w)
+void ironhors_state::filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	discrete_device *m_disc_ih = machine().device<discrete_device>("disc_ih");
 	m_disc_ih->write(space, NODE_11, (data & 0x04) >> 2);
@@ -417,7 +417,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 	}
 }
 
-READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
+uint8_t ironhors_state::farwest_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
 }

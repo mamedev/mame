@@ -30,16 +30,16 @@ public:
 	uint8_t m_flash[0x8000];
 
 
-	DECLARE_READ32_MEMBER(arm_E01FC088_r);
-	DECLARE_READ32_MEMBER(flash_r);
-	DECLARE_WRITE32_MEMBER(flash_w);
+	uint32_t arm_E01FC088_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t flash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// timer 0 / 1
-	DECLARE_READ32_MEMBER(timer0_r) { return read_timer(space, 0, offset, mem_mask); }
-	DECLARE_WRITE32_MEMBER(timer0_w) { write_timer(space, 0, offset, data, mem_mask); }
+	uint32_t timer0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return read_timer(space, 0, offset, mem_mask); }
+	void timer0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) { write_timer(space, 0, offset, data, mem_mask); }
 
-	DECLARE_READ32_MEMBER(timer1_r) { return read_timer(space, 1, offset, mem_mask); }
-	DECLARE_WRITE32_MEMBER(timer1_w) { write_timer(space, 1, offset, data, mem_mask); }
+	uint32_t timer1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return read_timer(space, 1, offset, mem_mask); }
+	void timer1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) { write_timer(space, 1, offset, data, mem_mask); }
 
 	void write_timer(address_space &space, int timer, int offset, uint32_t data, uint32_t mem_mask);
 	uint32_t read_timer(address_space &space, int timer, int offset, uint32_t mem_mask);
@@ -47,32 +47,32 @@ public:
 	uint32_t m_TxPR[2];
 
 	// VIC
-	DECLARE_READ32_MEMBER(vic_r);
-	DECLARE_WRITE32_MEMBER(vic_w);
+	uint32_t vic_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// PIN select block
-	DECLARE_READ32_MEMBER(pin_r);
-	DECLARE_WRITE32_MEMBER(pin_w);
+	uint32_t pin_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pin_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	//PLL Phase Locked Loop
-	DECLARE_READ32_MEMBER(pll_r);
-	DECLARE_WRITE32_MEMBER(pll_w);
+	uint32_t pll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	//MAM memory controller
-	DECLARE_READ32_MEMBER(mam_r);
-	DECLARE_WRITE32_MEMBER(mam_w);
+	uint32_t mam_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	//APB divider
-	DECLARE_READ32_MEMBER(apbdiv_r);
-	DECLARE_WRITE32_MEMBER(apbdiv_w);
+	uint32_t apbdiv_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void apbdiv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	//syscon misc
-	DECLARE_READ32_MEMBER(scs_r);
-	DECLARE_WRITE32_MEMBER(scs_w);
+	uint32_t scs_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void scs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// fio
-	DECLARE_READ32_MEMBER(fio_r);
-	DECLARE_WRITE32_MEMBER(fio_w);
+	uint32_t fio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void fio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

@@ -124,8 +124,8 @@ public:
 
 	std::unique_ptr<uint16_t[]> m_lineram16;
 
-	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
-	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
+	uint16_t lineram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_lineram16[offset]; }
+	void lineram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_lineram16[offset]); }
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -138,11 +138,11 @@ public:
 
 	/* misc */
 	int      m_protindex;
-	DECLARE_WRITE32_MEMBER(dreamwld_bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(dreamwld_bg2_videoram_w);
-	DECLARE_READ32_MEMBER(dreamwld_protdata_r);
-	DECLARE_WRITE32_MEMBER(dreamwld_6295_0_bank_w);
-	DECLARE_WRITE32_MEMBER(dreamwld_6295_1_bank_w);
+	void dreamwld_bg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dreamwld_bg2_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dreamwld_protdata_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dreamwld_6295_0_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dreamwld_6295_1_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
 	virtual void machine_start() override;
@@ -226,7 +226,7 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
+void dreamwld_state::dreamwld_bg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset * 2);
@@ -243,7 +243,7 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg_tile_info)
 }
 
 
-WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
+void dreamwld_state::dreamwld_bg2_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2_videoram[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset * 2);
@@ -406,7 +406,7 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
+uint32_t dreamwld_state::dreamwld_protdata_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//static int count = 0;
 
@@ -433,7 +433,7 @@ static ADDRESS_MAP_START( oki2_map, AS_0, 8, dreamwld_state )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
 ADDRESS_MAP_END
 
-WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
+void dreamwld_state::dreamwld_6295_0_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		membank("oki1bank")->set_entry(data&3);
@@ -441,7 +441,7 @@ WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
+void dreamwld_state::dreamwld_6295_1_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		membank("oki2bank")->set_entry(data&3);

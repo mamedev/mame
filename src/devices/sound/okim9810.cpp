@@ -208,7 +208,7 @@ uint8_t okim9810_device::read_status()
 //  read - memory interface for reading the active status
 //-------------------------------------------------
 
-READ8_MEMBER( okim9810_device::read )
+uint8_t okim9810_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_status();
 }
@@ -383,7 +383,7 @@ void okim9810_device::write_command(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( okim9810_device::write )
+void okim9810_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_command(data);
 }
@@ -399,7 +399,7 @@ void okim9810_device::write_TMP_register(uint8_t data)
 	m_TMP_register = data;
 }
 
-WRITE8_MEMBER( okim9810_device::write_TMP_register )
+void okim9810_device::write_TMP_register(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_TMP_register(data);
 }

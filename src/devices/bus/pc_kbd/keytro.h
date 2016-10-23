@@ -34,14 +34,14 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
 
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
+	uint8_t internal_data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void internal_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

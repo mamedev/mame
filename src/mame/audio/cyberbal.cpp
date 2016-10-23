@@ -29,7 +29,7 @@ void cyberbal_state::cyberbal_sound_reset()
  *
  *************************************/
 
-READ8_MEMBER(cyberbal_state::special_port3_r)
+uint8_t cyberbal_state::special_port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int temp = ioport("jsa:JSAII")->read();
 	if (!(ioport("IN0")->read() & 0x8000)) temp ^= 0x80;
@@ -39,7 +39,7 @@ READ8_MEMBER(cyberbal_state::special_port3_r)
 }
 
 
-READ8_MEMBER(cyberbal_state::sound_6502_stat_r)
+uint8_t cyberbal_state::sound_6502_stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int temp = 0xff;
 	if (m_sound_data_from_6502_ready) temp ^= 0x80;
@@ -48,7 +48,7 @@ READ8_MEMBER(cyberbal_state::sound_6502_stat_r)
 }
 
 
-WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
+void cyberbal_state::sound_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry((data >> 6) & 3);
 	machine().bookkeeping().coin_counter_w(1, (data >> 5) & 1);
@@ -58,14 +58,14 @@ WRITE8_MEMBER(cyberbal_state::sound_bank_select_w)
 }
 
 
-READ8_MEMBER(cyberbal_state::sound_68k_6502_r)
+uint8_t cyberbal_state::sound_68k_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_data_from_68k_ready = 0;
 	return m_sound_data_from_68k;
 }
 
 
-WRITE8_MEMBER(cyberbal_state::sound_68k_6502_w)
+void cyberbal_state::sound_68k_6502_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data_from_6502 = data;
 	m_sound_data_from_6502_ready = 1;
@@ -102,7 +102,7 @@ INTERRUPT_GEN_MEMBER(cyberbal_state::sound_68k_irq_gen)
 }
 
 
-WRITE16_MEMBER(cyberbal_state::io_68k_irq_ack_w)
+void cyberbal_state::io_68k_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_io_68k_int)
 	{
@@ -112,7 +112,7 @@ WRITE16_MEMBER(cyberbal_state::io_68k_irq_ack_w)
 }
 
 
-READ16_MEMBER(cyberbal_state::sound_68k_r)
+uint16_t cyberbal_state::sound_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = (m_sound_data_from_6502 << 8) | 0xff;
 
@@ -124,7 +124,7 @@ READ16_MEMBER(cyberbal_state::sound_68k_r)
 }
 
 
-WRITE16_MEMBER(cyberbal_state::sound_68k_w)
+void cyberbal_state::sound_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -134,7 +134,7 @@ WRITE16_MEMBER(cyberbal_state::sound_68k_w)
 }
 
 
-WRITE16_MEMBER(cyberbal_state::sound_68k_dac_w)
+void cyberbal_state::sound_68k_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//int clip = BIT(data, 15);
 	//int off0b = BIT(data, 13) | BIT(data, 14);

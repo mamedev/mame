@@ -97,18 +97,18 @@ void blktiger_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(blktiger_state::blktiger_txvideoram_w)
+void blktiger_state::blktiger_txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(blktiger_state::blktiger_bgvideoram_r)
+uint8_t blktiger_state::blktiger_bgvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scroll_ram[offset + m_scroll_bank];
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_w)
+void blktiger_state::blktiger_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += m_scroll_bank;
 
@@ -117,13 +117,13 @@ WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_w)
 	m_bg_tilemap4x8->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_bgvideoram_bank_w)
+void blktiger_state::blktiger_bgvideoram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_bank = (data % BGRAM_BANKS) * BGRAM_BANK_SIZE;
 }
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_scrolly_w)
+void blktiger_state::blktiger_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scrolly;
 
@@ -133,7 +133,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_scrolly_w)
 	m_bg_tilemap4x8->set_scrolly(0, scrolly);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
+void blktiger_state::blktiger_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scrollx;
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_scrollx_w)
 }
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
+void blktiger_state::blktiger_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -160,7 +160,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 	m_chon = ~data & 0x80;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
+void blktiger_state::blktiger_video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* not sure which is which, but I think that bit 1 and 2 enable background and sprites */
 	/* bit 1 enables bg ? */
@@ -170,7 +170,7 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
 	m_objon = ~data & 0x04;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_screen_layout_w)
+void blktiger_state::blktiger_screen_layout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen_layout = data;
 	m_bg_tilemap8x4->enable(m_screen_layout);

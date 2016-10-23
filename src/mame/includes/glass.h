@@ -41,13 +41,13 @@ public:
 	int         m_cause_interrupt;
 	int         m_blitter_serial_buffer[5];
 
-	DECLARE_WRITE16_MEMBER(clr_int_w);
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
-	DECLARE_WRITE16_MEMBER(blitter_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(mainram_r);
-	DECLARE_WRITE16_MEMBER(mainram_w);
+	void clr_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mainram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_glass();
 	void init_glassp();

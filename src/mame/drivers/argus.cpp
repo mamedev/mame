@@ -166,7 +166,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(argus_state::bankselect_w)
+void argus_state::bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data & 7);   /* Select 8 banks of 16k */
 }

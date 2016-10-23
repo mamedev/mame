@@ -80,15 +80,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(othunder_tc0220ioc_w);
-	DECLARE_READ16_MEMBER(othunder_tc0220ioc_r);
-	DECLARE_READ16_MEMBER(othunder_lightgun_r);
-	DECLARE_WRITE16_MEMBER(othunder_lightgun_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(othunder_sound_w);
-	DECLARE_READ16_MEMBER(othunder_sound_r);
-	DECLARE_WRITE8_MEMBER(othunder_TC0310FAM_w);
+	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void othunder_tc0220ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t othunder_tc0220ioc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t othunder_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void othunder_lightgun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void othunder_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t othunder_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void othunder_TC0310FAM_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

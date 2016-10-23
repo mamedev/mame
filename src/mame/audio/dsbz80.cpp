@@ -93,7 +93,7 @@ void dsbz80_device::device_reset()
 	mp_state = 0;
 }
 
-WRITE8_MEMBER(dsbz80_device::latch_w)
+void dsbz80_device::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_dsb_latch = data;
@@ -101,7 +101,7 @@ WRITE8_MEMBER(dsbz80_device::latch_w)
 //  printf("%02x to DSB latch\n", data);
 }
 
-READ8_MEMBER(dsbz80_device::latch_r)
+uint8_t dsbz80_device::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 //  printf("DSB Z80 read %02x\n", m_dsb_latch);
@@ -109,7 +109,7 @@ READ8_MEMBER(dsbz80_device::latch_r)
 	return m_dsb_latch;
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
+void dsbz80_device::mpeg_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mp_state = data;
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_trigger_w)
 	}
 }
 
-READ8_MEMBER(dsbz80_device::mpeg_pos_r)
+uint8_t dsbz80_device::mpeg_pos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int mp_prg = mp_pos >> 3;
 
@@ -152,7 +152,7 @@ READ8_MEMBER(dsbz80_device::mpeg_pos_r)
    (song #16 is a good example)
 */
 
-WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
+void dsbz80_device::mpeg_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(dsbz80_device::mpeg_start_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
+void dsbz80_device::mpeg_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -218,17 +218,17 @@ WRITE8_MEMBER(dsbz80_device::mpeg_end_w)
 	}
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_volume_w)
+void dsbz80_device::mpeg_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mp_vol = 0x7f - data;
 }
 
-WRITE8_MEMBER(dsbz80_device::mpeg_stereo_w)
+void dsbz80_device::mpeg_stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mp_pan = data & 3;  // 0 = stereo, 1 = left on both channels, 2 = right on both channels
 }
 
-READ8_MEMBER(dsbz80_device::status_r)
+uint8_t dsbz80_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 0 = ??? (must be 1 for most games)
 	// bit 1 = command is pending (used by SWA instead of IRQ)

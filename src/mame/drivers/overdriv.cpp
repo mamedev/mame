@@ -56,7 +56,7 @@ static const uint16_t overdriv_default_eeprom[64] =
 };
 
 
-WRITE16_MEMBER(overdriv_state::eeprom_w)
+void overdriv_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //logerror("%06x: write %04x to eeprom_w\n",space.device().safe_pc(),data);
 	if (ACCESSING_BITS_0_7)
@@ -97,7 +97,7 @@ INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 }
 #endif
 
-WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
+void overdriv_state::cpuA_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -114,12 +114,12 @@ WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 	}
 }
 
-READ16_MEMBER(overdriv_state::cpuB_ctrl_r)
+uint16_t overdriv_state::cpuB_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cpuB_ctrl;
 }
 
-WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
+void overdriv_state::cpuB_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cpuB_ctrl);
 
@@ -134,7 +134,7 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
+void overdriv_state::overdriv_soundirq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
@@ -142,13 +142,13 @@ WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 
 
 
-WRITE16_MEMBER(overdriv_state::slave_irq4_assert_w)
+void overdriv_state::slave_irq4_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// used in-game
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(overdriv_state::slave_irq5_assert_w)
+void overdriv_state::slave_irq5_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// tests GFX ROMs with this irq (indeed enabled only in test mode)
 	m_subcpu->set_input_line(5, HOLD_LINE);
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 ADDRESS_MAP_END
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER( overdriv_state::overdriv_k053246_word_w )
+void overdriv_state::overdriv_k053246_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_k053246->k053246_word_w(space,offset,data,mem_mask);
 
@@ -211,7 +211,7 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
 	m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
-WRITE16_MEMBER(overdriv_state::objdma_w)
+void overdriv_state::objdma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data & 0x10)
 		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(overdriv_state::objdma_end_cb), this));
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x220000, 0x221fff) AM_DEVREAD("k053250_2", k053250_device, rom_r)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(overdriv_state::sound_ack_w)
+void overdriv_state::sound_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }

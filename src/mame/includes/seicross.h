@@ -42,10 +42,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_READ8_MEMBER(portB_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -62,5 +62,5 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_WRITE8_MEMBER(dac_w);
+	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

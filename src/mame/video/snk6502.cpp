@@ -76,26 +76,26 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::videoram_w)
+void snk6502_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::videoram2_w)
+void snk6502_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::colorram_w)
+void snk6502_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(snk6502_state::charram_w)
+void snk6502_state::charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charram[offset] != data)
 	{
@@ -105,7 +105,7 @@ WRITE8_MEMBER(snk6502_state::charram_w)
 }
 
 
-WRITE8_MEMBER(snk6502_state::flipscreen_w)
+void snk6502_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select background color */
 
@@ -136,12 +136,12 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::scrollx_w)
+void snk6502_state::scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(snk6502_state::scrolly_w)
+void snk6502_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
@@ -249,7 +249,7 @@ PALETTE_INIT_MEMBER(snk6502_state,satansat)
 	}
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_b002_w)
+void snk6502_state::satansat_b002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 flips screen */
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
+void snk6502_state::satansat_backcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-1 select background color. Other bits unused. */
 

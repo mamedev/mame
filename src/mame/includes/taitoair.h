@@ -80,43 +80,43 @@ public:
 	int16_t m_dsp_test_or_clip, m_dsp_test_and_clip;
 	int16_t m_dsp_test_x, m_dsp_test_y, m_dsp_test_z;
 
-	DECLARE_WRITE16_MEMBER(dsp_test_start_w);
-	DECLARE_WRITE16_MEMBER(dsp_test_x_w);
-	DECLARE_WRITE16_MEMBER(dsp_test_y_w);
-	DECLARE_WRITE16_MEMBER(dsp_test_z_w);
-	DECLARE_READ16_MEMBER(dsp_test_point_r);
-	DECLARE_READ16_MEMBER(dsp_test_or_clip_r);
-	DECLARE_READ16_MEMBER(dsp_test_and_clip_r);
+	void dsp_test_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_test_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_test_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_test_z_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_test_point_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_test_or_clip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_test_and_clip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	int16_t m_dsp_muldiv_a_1, m_dsp_muldiv_b_1, m_dsp_muldiv_c_1;
 
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_1_w);
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_1_w);
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_c_1_w);
-	DECLARE_READ16_MEMBER(dsp_muldiv_1_r);
+	void dsp_muldiv_a_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_muldiv_b_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_muldiv_c_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_muldiv_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	int16_t m_dsp_muldiv_a_2, m_dsp_muldiv_b_2, m_dsp_muldiv_c_2;
 
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_a_2_w);
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_b_2_w);
-	DECLARE_WRITE16_MEMBER(dsp_muldiv_c_2_w);
-	DECLARE_READ16_MEMBER(dsp_muldiv_2_r);
+	void dsp_muldiv_a_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_muldiv_b_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_muldiv_c_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_muldiv_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	//bitmap_ind16 *m_buffer3d;
-	DECLARE_WRITE16_MEMBER(system_control_w);
-	DECLARE_READ16_MEMBER(lineram_r);
-	DECLARE_WRITE16_MEMBER(lineram_w);
-	DECLARE_READ16_MEMBER(dspram_r);
-	DECLARE_WRITE16_MEMBER(dspram_w);
-	DECLARE_READ16_MEMBER(dsp_HOLD_signal_r);
-	DECLARE_WRITE16_MEMBER(dsp_HOLDA_signal_w);
-	DECLARE_WRITE16_MEMBER(airsys_paletteram16_w);
-	DECLARE_WRITE16_MEMBER(airsys_gradram_w);
-	DECLARE_READ16_MEMBER(stick_input_r);
-	DECLARE_READ16_MEMBER(stick2_input_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(dsp_flags_w);
-	DECLARE_WRITE16_MEMBER(dma_regs_w);
+	void system_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lineram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dspram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dspram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_HOLD_signal_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp_HOLDA_signal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void airsys_paletteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void airsys_gradram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t stick_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t stick2_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dsp_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dma_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -63,8 +63,8 @@ public:
 	static void set_ext_tag(device_t &device, const char *tag) { downcast<gime_base_device &>(device).m_ext_tag = tag; }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read ) { return read(offset); }
-	DECLARE_WRITE8_MEMBER( write ) { write(offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(offset); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(offset, data); }
 
 	// used to turn on/off reading/writing to $FF40-$FF5F
 	bool spare_chip_select_enabled(void) { return m_gime_registers[0] & 0x04 ? true : false; }

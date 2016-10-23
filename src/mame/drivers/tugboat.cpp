@@ -61,11 +61,11 @@ public:
 	int m_ctrl;
 	emu_timer *m_interrupt_timer;
 
-	DECLARE_WRITE8_MEMBER(hd46505_0_w);
-	DECLARE_WRITE8_MEMBER(hd46505_1_w);
-	DECLARE_WRITE8_MEMBER(score_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void hd46505_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hd46505_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void score_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -123,19 +123,19 @@ PALETTE_INIT_MEMBER(tugboat_state, tugboat)
 
 /* see mc6845.c. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
-WRITE8_MEMBER(tugboat_state::hd46505_0_w)
+void tugboat_state::hd46505_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0) m_reg0 = data & 0x0f;
 	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
 }
-WRITE8_MEMBER(tugboat_state::hd46505_1_w)
+void tugboat_state::hd46505_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0) m_reg1 = data & 0x0f;
 	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
 }
 
 
-WRITE8_MEMBER(tugboat_state::score_w)
+void tugboat_state::score_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
 		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
@@ -191,7 +191,7 @@ uint32_t tugboat_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 
 
-READ8_MEMBER(tugboat_state::input_r)
+uint8_t tugboat_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_ctrl & 0x80)
 		return ioport("IN0")->read();
@@ -205,7 +205,7 @@ READ8_MEMBER(tugboat_state::input_r)
 		return ioport("IN4")->read();
 }
 
-WRITE8_MEMBER(tugboat_state::ctrl_w)
+void tugboat_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctrl = data;
 }

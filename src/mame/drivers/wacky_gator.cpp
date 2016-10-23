@@ -51,23 +51,23 @@ public:
 	void machine_reset() override;
 
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE8_MEMBER(sample_ctrl_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(alligators_ctrl2_w);
+	void sample_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alligators_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alligators_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
 
 	void set_lamps(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(status_lamps_w);
-	DECLARE_WRITE8_MEMBER(timing_lamps_0_w)     { set_lamps(8 , data); }
-	DECLARE_WRITE8_MEMBER(timing_lamps_1_w)     { set_lamps(16, data); }
-	DECLARE_WRITE8_MEMBER(timing_lamps_2_w)     { set_lamps(24, data); }
+	void status_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timing_lamps_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)     { set_lamps(8 , data); }
+	void timing_lamps_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)     { set_lamps(16, data); }
+	void timing_lamps_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)     { set_lamps(24, data); }
 
 	void set_digits(int p, uint8_t value);
-	DECLARE_WRITE8_MEMBER(disp0_w)              { set_digits(0, data); }
-	DECLARE_WRITE8_MEMBER(disp1_w)              { set_digits(2, data); }
-	DECLARE_WRITE8_MEMBER(disp2_w)              { set_digits(4, data); }
-	DECLARE_WRITE8_MEMBER(disp3_w)              { set_digits(6, data); }
+	void disp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)              { set_digits(0, data); }
+	void disp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)              { set_digits(2, data); }
+	void disp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)              { set_digits(4, data); }
+	void disp3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)              { set_digits(6, data); }
 
 	void pmm8713_ck(int i, int state);
 	DECLARE_WRITE_LINE_MEMBER(alligator0_ck)    { pmm8713_ck(0, state); }
@@ -76,8 +76,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(alligator3_ck)    { pmm8713_ck(3, state); }
 	DECLARE_WRITE_LINE_MEMBER(alligator4_ck)    { pmm8713_ck(4, state); }
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
-	DECLARE_WRITE8_MEMBER(firq_ack_w)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	void firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
@@ -95,7 +95,7 @@ void wackygtr_state::init_wackygtr()
 {
 }
 
-WRITE8_MEMBER(wackygtr_state::status_lamps_w)
+void wackygtr_state::status_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    ---x xxxx   status lamps
@@ -110,7 +110,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 	m_ticket->write(space, 0, data & 0x80);
 }
 
-WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
+void wackygtr_state::sample_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    --xx xxxx    sample index
@@ -124,7 +124,7 @@ WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
 	m_msm->reset_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
+void wackygtr_state::alligators_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit8253_0->write_gate0(BIT(data, 0));
 	m_pit8253_0->write_gate1(BIT(data, 1));
@@ -135,7 +135,7 @@ WRITE8_MEMBER(wackygtr_state::alligators_ctrl1_w)
 	machine().bookkeeping().coin_lockout_w(0, data & 0x40 ? 0 : 1);
 }
 
-WRITE8_MEMBER(wackygtr_state::alligators_ctrl2_w)
+void wackygtr_state::alligators_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    ---- ---x    PMM8713 0 U/D

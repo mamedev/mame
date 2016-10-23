@@ -1302,7 +1302,7 @@ void m6800_cpu_device::set_os3(int state)
 	m_out_sc2_func(state);
 }
 
-READ8_MEMBER( m6800_cpu_device::m6801_io_r )
+uint8_t m6800_cpu_device::m6801_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -1512,7 +1512,7 @@ READ8_MEMBER( m6800_cpu_device::m6801_io_r )
 	return data;
 }
 
-WRITE8_MEMBER( m6800_cpu_device::m6801_io_w )
+void m6800_cpu_device::m6801_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

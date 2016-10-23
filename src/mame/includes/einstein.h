@@ -105,16 +105,16 @@ public:
 	int m_centronics_fault;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
-	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
-	DECLARE_READ8_MEMBER(einstein_80col_state_r);
-	DECLARE_WRITE8_MEMBER(einstein_keyboard_line_write);
-	DECLARE_READ8_MEMBER(einstein_keyboard_data_read);
-	DECLARE_WRITE8_MEMBER(einstein_rom_w);
-	DECLARE_READ8_MEMBER(einstein_kybintmsk_r);
-	DECLARE_WRITE8_MEMBER(einstein_kybintmsk_w);
-	DECLARE_WRITE8_MEMBER(einstein_adcintmsk_w);
-	DECLARE_WRITE8_MEMBER(einstein_fire_int_w);
+	void einstein_80col_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t einstein_80col_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t einstein_80col_state_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void einstein_keyboard_line_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t einstein_keyboard_data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void einstein_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t einstein_kybintmsk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void einstein_kybintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void einstein_adcintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void einstein_fire_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
@@ -126,7 +126,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
 	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
-	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
+	void einstein_drsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);

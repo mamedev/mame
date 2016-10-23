@@ -123,20 +123,20 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
+void mermaid_state::mermaid_ay8910_write_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay8910_enable[0]) m_ay1->data_w(space, offset, data);
 	if (m_ay8910_enable[1]) m_ay2->data_w(space, offset, data);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
+void mermaid_state::mermaid_ay8910_control_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay8910_enable[0]) m_ay1->address_w(space, offset, data);
 	if (m_ay8910_enable[1]) m_ay2->address_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(mermaid_state::nmi_mask_w)
+void mermaid_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -172,17 +172,17 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
+void mermaid_state::rougien_sample_rom_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_rom_sel = (data & 1) | (m_adpcm_rom_sel & 2);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
+void mermaid_state::rougien_sample_rom_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_rom_sel = ((data & 1)<<1) | (m_adpcm_rom_sel & 1);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
+void mermaid_state::rougien_sample_playback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((m_adpcm_play_reg & 1) && ((data & 1) == 0))
 	{

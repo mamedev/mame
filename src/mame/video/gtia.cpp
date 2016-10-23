@@ -313,7 +313,7 @@ void gtia_device::button_interrupt(int button_count, uint8_t button_port)
  *
  **************************************************************/
 
-READ8_MEMBER( gtia_device::read )
+uint8_t gtia_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 31)
 	{
@@ -507,7 +507,7 @@ void gtia_device::recalc_m3()
 
 
 
-WRITE8_MEMBER( gtia_device::write )
+void gtia_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* used for mixing hue/lum of different colors */
 //  static uint8_t lumpm0=0,lumpm1=0,lumpm2=0,lumpm3=0,lumpm4=0;

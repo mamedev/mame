@@ -68,7 +68,7 @@
  *
  *************************************/
 
-READ8_MEMBER(mcr68_state::zwackery_port_2_r)
+uint8_t mcr68_state::zwackery_port_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = ioport("IN2")->read();
 	int wheel = ioport("IN5")->read();
@@ -77,7 +77,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_2_r)
 }
 
 
-READ16_MEMBER(mcr68_state::zwackery_6840_r)
+uint16_t mcr68_state::zwackery_6840_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Zwackery does a timer test:                          */
 	/* It loads $1388 into one of the timers clocked by E   */
@@ -99,7 +99,7 @@ READ16_MEMBER(mcr68_state::zwackery_6840_r)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
+void mcr68_state::xenophobe_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
@@ -114,7 +114,7 @@ WRITE16_MEMBER(mcr68_state::xenophobe_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::blasted_control_w)
+void mcr68_state::blasted_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 /*  m_sounds_good->reset_write(~m_control_word & 0x0020);*/
@@ -129,7 +129,7 @@ WRITE16_MEMBER(mcr68_state::blasted_control_w)
  *
  *************************************/
 
-READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
+uint16_t mcr68_state::spyhunt2_port_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
 	int result = ioport("IN0")->read();
@@ -140,14 +140,14 @@ READ16_MEMBER(mcr68_state::spyhunt2_port_0_r)
 }
 
 
-READ16_MEMBER(mcr68_state::spyhunt2_port_1_r)
+uint16_t mcr68_state::spyhunt2_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("IN1")->read();
 	return result | ((m_turbo_chip_squeak->read(space, 0) & 1) << 7);
 }
 
 
-WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
+void mcr68_state::spyhunt2_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 
@@ -193,7 +193,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
 
 static const uint8_t translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
-READ16_MEMBER(mcr68_state::archrivl_port_1_r)
+uint16_t mcr68_state::archrivl_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (translate49[ioport("49WAYY2")->read() >> 4] << 12) |
 			(translate49[ioport("49WAYX2")->read() >> 4] << 8) |
@@ -202,7 +202,7 @@ READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 }
 
 
-WRITE16_MEMBER(mcr68_state::archrivl_control_w)
+void mcr68_state::archrivl_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_control_word);
 	m_cvsd_sound->reset_write(~m_control_word & 0x0400);
@@ -217,7 +217,7 @@ WRITE16_MEMBER(mcr68_state::archrivl_control_w)
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
+void mcr68_state::pigskin_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* ignore upper-byte only */
 	if (ACCESSING_BITS_0_7)
@@ -234,7 +234,7 @@ WRITE16_MEMBER(mcr68_state::pigskin_protection_w)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_protection_r)
+uint16_t mcr68_state::pigskin_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* based on the last 5 bytes return a value */
 	if (m_protection_data[4] == 0xe3 && m_protection_data[3] == 0x94)
@@ -254,7 +254,7 @@ READ16_MEMBER(mcr68_state::pigskin_protection_r)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_port_1_r)
+uint16_t mcr68_state::pigskin_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
 	return ioport("IN1")->read() |
@@ -263,7 +263,7 @@ READ16_MEMBER(mcr68_state::pigskin_port_1_r)
 }
 
 
-READ16_MEMBER(mcr68_state::pigskin_port_2_r)
+uint16_t mcr68_state::pigskin_port_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
 	return ioport("DSW")->read() |
@@ -279,7 +279,7 @@ READ16_MEMBER(mcr68_state::pigskin_port_2_r)
  *
  *************************************/
 
-READ16_MEMBER(mcr68_state::trisport_port_1_r)
+uint16_t mcr68_state::trisport_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int xaxis = (int8_t)ioport("AN1")->read();
 	int yaxis = (int8_t)ioport("AN2")->read();
@@ -1782,7 +1782,7 @@ void mcr68_state::init_archrivl()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
 }
 
-READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
+uint16_t mcr68_state::archrivlb_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN1")->read();
 }

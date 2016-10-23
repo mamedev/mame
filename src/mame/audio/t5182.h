@@ -25,18 +25,18 @@ public:
 		SETIRQ_CB
 	};
 
-	DECLARE_WRITE8_MEMBER(sound_irq_w );
-	DECLARE_READ8_MEMBER(sharedram_semaphore_snd_r);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_acquire_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_main_release_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_snd_acquire_w);
-	DECLARE_WRITE8_MEMBER(sharedram_semaphore_snd_release_w);
-	DECLARE_READ8_MEMBER(sharedram_semaphore_main_r);
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
+	void sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sharedram_semaphore_snd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram_semaphore_main_acquire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sharedram_semaphore_main_release_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sharedram_semaphore_snd_acquire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sharedram_semaphore_snd_release_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sharedram_semaphore_main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_handler);
-	DECLARE_WRITE8_MEMBER(ym2151_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(cpu_irq_ack_w);
+	void ym2151_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpu_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

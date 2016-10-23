@@ -10,7 +10,7 @@
 #include "includes/rohga.h"
 
 
-WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
+void rohga_state::rohga_buffer_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Spriteram seems to be triple buffered (no sprite lag on real pcb, but there
 	// is on driver with only double buffering)

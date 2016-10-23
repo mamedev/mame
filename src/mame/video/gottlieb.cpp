@@ -16,7 +16,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
+void gottlieb_state::gottlieb_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, a, val;
 
@@ -44,7 +44,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
+void gottlieb_state::gottlieb_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 controls foreground/background priority */
 	if (m_background_priority != (data & 0x01))
@@ -59,7 +59,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
+void gottlieb_state::gottlieb_laserdisc_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(space, offset, data & 0x01);
@@ -85,7 +85,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
+void gottlieb_state::gottlieb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -93,7 +93,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
+void gottlieb_state::gottlieb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charram[offset] != data)
 	{

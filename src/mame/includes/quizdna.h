@@ -27,16 +27,16 @@ public:
 	int m_video_enable;
 
 	// common
-	DECLARE_WRITE8_MEMBER(bg_ram_w);
-	DECLARE_WRITE8_MEMBER(fg_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_yscroll_w);
-	DECLARE_WRITE8_MEMBER(bg_xscroll_w);
-	DECLARE_WRITE8_MEMBER(screen_ctrl_w);
-	DECLARE_WRITE8_MEMBER(paletteram_xBGR_RRRR_GGGG_BBBB_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void screen_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_xBGR_RRRR_GGGG_BBBB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// game specific
-	DECLARE_WRITE8_MEMBER(gekiretu_rombank_w);
+	void gekiretu_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

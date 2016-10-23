@@ -64,7 +64,7 @@ TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::vram_w)
+void m107_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int laynum;
 
@@ -76,7 +76,7 @@ WRITE16_MEMBER(m107_state::vram_w)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::control_w)
+void m107_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_control[offset];
 	pf_layer_info *layer;
@@ -375,7 +375,7 @@ void m107_state::screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::spritebuffer_w)
+void m107_state::spritebuffer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		/*

@@ -51,15 +51,15 @@ public:
 	required_device<vsystem_spr_device> m_spr;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);
-	DECLARE_WRITE16_MEMBER(inufuku_palettereg_w);
-	DECLARE_WRITE16_MEMBER(inufuku_scrollreg_w);
-	DECLARE_READ16_MEMBER(inufuku_bg_videoram_r);
-	DECLARE_WRITE16_MEMBER(inufuku_bg_videoram_w);
-	DECLARE_READ16_MEMBER(inufuku_tx_videoram_r);
-	DECLARE_WRITE16_MEMBER(inufuku_tx_videoram_w);
+	void inufuku_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void inufuku_soundrombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void inufuku_palettereg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void inufuku_scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t inufuku_bg_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void inufuku_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t inufuku_tx_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void inufuku_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	TILE_GET_INFO_MEMBER(get_inufuku_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_inufuku_tx_tile_info);

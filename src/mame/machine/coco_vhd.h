@@ -39,8 +39,8 @@ public:
 	virtual const char *file_extensions() const override { return "vhd"; }
 
 	// specific implementation
-	DECLARE_READ8_MEMBER(read) { return read(offset); }
-	DECLARE_WRITE8_MEMBER(write) { write(offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(offset); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(offset, data); }
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 

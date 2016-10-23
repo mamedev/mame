@@ -92,20 +92,20 @@ public:
 
 	void init_gts1();
 
-	DECLARE_READ8_MEMBER (gts1_solenoid_r);
-	DECLARE_WRITE8_MEMBER(gts1_solenoid_w);
-	DECLARE_READ8_MEMBER (gts1_switches_r);
-	DECLARE_WRITE8_MEMBER(gts1_switches_w);
-	DECLARE_WRITE8_MEMBER(gts1_display_w);
-	DECLARE_READ8_MEMBER (gts1_lamp_apm_r);
-	DECLARE_WRITE8_MEMBER(gts1_lamp_apm_w);
-	DECLARE_READ8_MEMBER (gts1_nvram_r);
-	DECLARE_WRITE8_MEMBER(gts1_nvram_w);
-	DECLARE_READ8_MEMBER (gts1_io_r);
-	DECLARE_WRITE8_MEMBER(gts1_io_w);
-	DECLARE_READ8_MEMBER (gts1_pa_r);
-	DECLARE_WRITE8_MEMBER(gts1_pa_w);
-	DECLARE_WRITE8_MEMBER(gts1_pb_w);
+	uint8_t gts1_solenoid_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gts1_switches_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_switches_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gts1_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gts1_lamp_apm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_lamp_apm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gts1_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gts1_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gts1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gts1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gts1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -340,14 +340,14 @@ void gts1_state::init_gts1()
 {
 }
 
-READ8_MEMBER (gts1_state::gts1_solenoid_r)
+uint8_t gts1_state::gts1_solenoid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	LOG(("%s: solenoid[%02x] -> %x\n", __FUNCTION__, offset, data));
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
+void gts1_state::gts1_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -395,7 +395,7 @@ WRITE8_MEMBER(gts1_state::gts1_solenoid_w)
 	}
 }
 
-READ8_MEMBER (gts1_state::gts1_switches_r)
+uint8_t gts1_state::gts1_switches_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 1;
 	if (offset >= 8 && offset < 16) {
@@ -410,7 +410,7 @@ READ8_MEMBER (gts1_state::gts1_switches_r)
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_switches_w)
+void gts1_state::gts1_switches_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s: switches[%x] <- %x\n", __FUNCTION__, offset, data));
 	if (offset < 5) {
@@ -424,7 +424,7 @@ WRITE8_MEMBER(gts1_state::gts1_switches_w)
  * @param offset digit number 0 .. 19
  * @param data 4-bit value to display
  */
-WRITE8_MEMBER(gts1_state::gts1_display_w)
+void gts1_state::gts1_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 * The 7448 is modified to be disabled through RI/RBO
@@ -491,7 +491,7 @@ WRITE8_MEMBER(gts1_state::gts1_display_w)
  * @param offset 0 ... 2 = group
  * @return 4-bit value read from the group
  */
-READ8_MEMBER (gts1_state::gts1_nvram_r)
+uint8_t gts1_state::gts1_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x0f;
 	switch (offset)
@@ -518,7 +518,7 @@ READ8_MEMBER (gts1_state::gts1_nvram_r)
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-WRITE8_MEMBER(gts1_state::gts1_nvram_w)
+void gts1_state::gts1_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -544,7 +544,7 @@ WRITE8_MEMBER(gts1_state::gts1_nvram_w)
  * @param offset 0 ... 2 = group
  * @return 4-bit value read from the group
  */
-READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
+uint8_t gts1_state::gts1_lamp_apm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x0f;
 	switch (offset) {
@@ -633,7 +633,7 @@ READ8_MEMBER (gts1_state::gts1_lamp_apm_r)
  * @param offset 0 ... 2 = group
  * @param data 4 bit value to write
  */
-WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
+void gts1_state::gts1_lamp_apm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset) {
 		case 0: // LD1-LD4 on jumper J5
@@ -648,19 +648,19 @@ WRITE8_MEMBER(gts1_state::gts1_lamp_apm_w)
 	}
 }
 
-READ8_MEMBER (gts1_state::gts1_io_r)
+uint8_t gts1_state::gts1_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t data = 0x0f;
 	LOG(("%s: unmapped io[%02x] -> %x\n", __FUNCTION__, offset, data));
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_io_w)
+void gts1_state::gts1_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s: unmapped io[%02x] <- %x\n", __FUNCTION__, offset, data));
 }
 
-READ8_MEMBER (gts1_state::gts1_pa_r)
+uint8_t gts1_state::gts1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// return ROM nibble
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -669,14 +669,14 @@ READ8_MEMBER (gts1_state::gts1_pa_r)
 	return data;
 }
 
-WRITE8_MEMBER(gts1_state::gts1_pa_w)
+void gts1_state::gts1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write address lines 7-4
 	m_6351_addr = (m_6351_addr & 0x0f) | ((data & 0x0f) << 4);
 	LOG(("%s: ROM hi:%x addr:%02x\n", __FUNCTION__, data & 0x0f, m_6351_addr));
 }
 
-WRITE8_MEMBER(gts1_state::gts1_pb_w)
+void gts1_state::gts1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write address lines 3-0
 	m_6351_addr = (m_6351_addr & 0xf0) | (data & 0x0f);

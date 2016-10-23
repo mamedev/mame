@@ -84,9 +84,9 @@ public:
 	uint8_t       m_port_last2;
 	int         m_enabled_sound;
 	int         m_sound3_counter;
-	DECLARE_WRITE8_MEMBER(dai3wksi_audio_1_w);
-	DECLARE_WRITE8_MEMBER(dai3wksi_audio_2_w);
-	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
+	void dai3wksi_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dai3wksi_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dai3wksi_audio_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* i/o ports */
 	required_ioport m_in2;
@@ -205,7 +205,7 @@ uint32_t dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rg
 
 
 #if (USE_SAMPLES)
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
+void dai3wksi_state::dai3wksi_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_port_last1;
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 	m_port_last1 = data;
 }
 
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
+void dai3wksi_state::dai3wksi_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_port_last2;
 
@@ -251,7 +251,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 	m_port_last2 = data;
 }
 
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
+void dai3wksi_state::dai3wksi_audio_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_enabled_sound)
 	{
@@ -280,7 +280,7 @@ static const char *const dai3wksi_sample_names[] =
 
 #else
 
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
+void dai3wksi_state::dai3wksi_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(data & 0x80);
 
@@ -288,7 +288,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 	m_ic79->envelope_1_w((~data >> 2) & 0x01);    /* invader movement envelope control*/
 }
 
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
+void dai3wksi_state::dai3wksi_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dai3wksi_flipscreen =  data & 0x10;
 	m_dai3wksi_redscreen  = ~data & 0x20;
@@ -300,7 +300,7 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 	m_ic80->enable_w((~data >> 3) & 0x01);    /* planet explosion */
 }
 
-WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
+void dai3wksi_state::dai3wksi_audio_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ic81->enable_w((~data >> 2) & 0x01);    /* player shoot enable */
 	m_ic81->vco_w((~data >> 3) & 0x01);       /* player shoot vco control */

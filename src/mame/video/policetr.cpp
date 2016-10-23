@@ -139,7 +139,7 @@ void policetr_state::render_display_list(offs_t offset)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::policetr_video_w)
+void policetr_state::policetr_video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* we assume 4-byte accesses */
 	if (mem_mask)
@@ -256,7 +256,7 @@ WRITE32_MEMBER(policetr_state::policetr_video_w)
  *
  *************************************/
 
-READ32_MEMBER(policetr_state::policetr_video_r)
+uint32_t policetr_state::policetr_video_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int inputval;
 	int width = m_screen->width();
@@ -313,7 +313,7 @@ READ32_MEMBER(policetr_state::policetr_video_r)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::policetr_palette_offset_w)
+void policetr_state::policetr_palette_offset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -323,7 +323,7 @@ WRITE32_MEMBER(policetr_state::policetr_palette_offset_w)
 }
 
 
-WRITE32_MEMBER(policetr_state::policetr_palette_data_w)
+void policetr_state::policetr_palette_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{

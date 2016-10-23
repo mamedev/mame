@@ -48,12 +48,12 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	uint8_t k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(sound_irq_w);
+	void sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void machine_start() override;
@@ -136,7 +136,7 @@ uint32_t blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind1
 }
 
 // special handlers to combine 052109 & 051960
-READ8_MEMBER( blockhl_state::k052109_051960_r )
+uint8_t blockhl_state::k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -151,7 +151,7 @@ READ8_MEMBER( blockhl_state::k052109_051960_r )
 		return m_k052109->read(space, offset);
 }
 
-WRITE8_MEMBER( blockhl_state::k052109_051960_w )
+void blockhl_state::k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(space, offset - 0x3800, data);
@@ -166,7 +166,7 @@ WRITE8_MEMBER( blockhl_state::k052109_051960_w )
 //  AUDIO EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( blockhl_state::sound_irq_w )
+void blockhl_state::sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
@@ -182,7 +182,7 @@ void blockhl_state::machine_start()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x2000);
 }
 
-WRITE8_MEMBER( blockhl_state::banking_callback )
+void blockhl_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 0-1 = ROM bank
 	m_rombank->set_entry(data & 0x03);

@@ -29,11 +29,11 @@ public:
 	uint8_t m_h8_irq5_enabled;
 	int m_p8;
 
-	DECLARE_READ16_MEMBER(mcu_p7_read);
-	DECLARE_READ16_MEMBER(mcu_pa_read);
-	DECLARE_WRITE16_MEMBER(mcu_pa_write);
-	DECLARE_READ16_MEMBER(cuskey_r);
-	DECLARE_WRITE16_MEMBER(cuskey_w);
+	uint16_t mcu_p7_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mcu_pa_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mcu_pa_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cuskey_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cuskey_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

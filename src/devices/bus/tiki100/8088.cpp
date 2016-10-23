@@ -158,7 +158,7 @@ void tiki100_8088_t::iorq_w(address_space &space, offs_t offset, uint8_t data)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( tiki100_8088_t::read )
+uint8_t tiki100_8088_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_busak << 4 | m_data;
 }
@@ -168,7 +168,7 @@ READ8_MEMBER( tiki100_8088_t::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_8088_t::write )
+void tiki100_8088_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data = data & 0x0f;
 

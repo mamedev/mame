@@ -225,7 +225,7 @@ uint32_t nubus_m2video_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2video_device::m2video_w )
+void nubus_m2video_device::m2video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	switch (offset)
@@ -287,7 +287,7 @@ WRITE32_MEMBER( nubus_m2video_device::m2video_w )
 	}
 }
 
-READ32_MEMBER( nubus_m2video_device::m2video_r )
+uint32_t nubus_m2video_device::m2video_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0x50000/4)    // bit 0 is VBL status
 	{
@@ -302,13 +302,13 @@ READ32_MEMBER( nubus_m2video_device::m2video_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2video_device::vram_w )
+void nubus_m2video_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_m2video_device::vram_r )
+uint32_t nubus_m2video_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

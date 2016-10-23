@@ -125,7 +125,7 @@ CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
 	return ret;
 }
 
-READ32_MEMBER(psikyo_state::sngkace_input_r)
+uint32_t psikyo_state::sngkace_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -137,7 +137,7 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 	}
 }
 
-READ32_MEMBER(psikyo_state::gunbird_input_r)
+uint32_t psikyo_state::gunbird_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -156,7 +156,7 @@ TIMER_CALLBACK_MEMBER(psikyo_state::psikyo_soundlatch_callback)
 	m_z80_nmi = 1;
 }
 
-WRITE32_MEMBER(psikyo_state::psikyo_soundlatch_w)
+void psikyo_state::psikyo_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(psikyo_state::psikyo_soundlatch_callback),this), data & 0xff);
@@ -166,7 +166,7 @@ WRITE32_MEMBER(psikyo_state::psikyo_soundlatch_w)
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-WRITE32_MEMBER(psikyo_state::s1945_soundlatch_w)
+void psikyo_state::s1945_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(psikyo_state::psikyo_soundlatch_callback),this), (data >> 16) & 0xff);
@@ -190,7 +190,7 @@ static const uint8_t s1945j_table[256] = {
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
 };
 
-WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
+void psikyo_state::s1945_mcu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Accesses are always bytes, so resolve it
 	int suboff;
@@ -260,7 +260,7 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 	}
 }
 
-READ32_MEMBER(psikyo_state::s1945_mcu_r)
+uint32_t psikyo_state::s1945_mcu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -286,7 +286,7 @@ READ32_MEMBER(psikyo_state::s1945_mcu_r)
 	return 0;
 }
 
-READ32_MEMBER(psikyo_state::s1945_input_r)
+uint32_t psikyo_state::s1945_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -320,13 +320,13 @@ static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM                                                     // RAM
 ADDRESS_MAP_END
 
-READ32_MEMBER(psikyo_state::s1945bl_oki_r)
+uint32_t psikyo_state::s1945bl_oki_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t dat = m_oki->read(space, 0);
 	return dat << 24;
 }
 
-WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
+void psikyo_state::s1945bl_oki_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -380,12 +380,12 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-READ8_MEMBER(psikyo_state::psikyo_soundlatch_r)
+uint8_t psikyo_state::psikyo_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch;
 }
 
-WRITE8_MEMBER(psikyo_state::psikyo_clear_nmi_w)
+void psikyo_state::psikyo_clear_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_z80_nmi = 0;
@@ -396,7 +396,7 @@ WRITE8_MEMBER(psikyo_state::psikyo_clear_nmi_w)
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
+void psikyo_state::sngkace_sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -420,7 +420,7 @@ ADDRESS_MAP_END
                                 Gun Bird
 ***************************************************************************/
 
-WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
+void psikyo_state::gunbird_sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry((data >> 4) & 0x03);
 }

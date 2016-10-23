@@ -17,12 +17,12 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void el2_3c503_irq_w(int state);
-	DECLARE_READ8_MEMBER(el2_3c503_mem_read);
-	DECLARE_WRITE8_MEMBER(el2_3c503_mem_write);
-	DECLARE_READ8_MEMBER(el2_3c503_loport_r);
-	DECLARE_WRITE8_MEMBER(el2_3c503_loport_w);
-	DECLARE_READ8_MEMBER(el2_3c503_hiport_r);
-	DECLARE_WRITE8_MEMBER(el2_3c503_hiport_w);
+	uint8_t el2_3c503_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void el2_3c503_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t el2_3c503_loport_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void el2_3c503_loport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t el2_3c503_hiport_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void el2_3c503_hiport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void eop_w(int state) override;
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;

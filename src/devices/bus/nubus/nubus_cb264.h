@@ -33,10 +33,10 @@ protected:
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
-		DECLARE_READ32_MEMBER(cb264_r);
-		DECLARE_WRITE32_MEMBER(cb264_w);
-		DECLARE_READ32_MEMBER(cb264_ramdac_r);
-		DECLARE_WRITE32_MEMBER(cb264_ramdac_w);
+		uint32_t cb264_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void cb264_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t cb264_ramdac_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void cb264_ramdac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 public:
 		std::vector<uint8_t> m_vram;

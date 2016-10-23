@@ -198,14 +198,14 @@ void galivan_state::video_start_ninjemak()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galivan_state::galivan_videoram_w)
+void galivan_state::galivan_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 /* Written through port 40 */
-WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
+void galivan_state::galivan_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -220,7 +220,7 @@ WRITE8_MEMBER(galivan_state::galivan_gfxbank_w)
 	/*  logerror("Address: %04X - port 40 = %02x\n", space.device().safe_pc(), data); */
 }
 
-WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
+void galivan_state::ninjemak_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 1);
@@ -256,7 +256,7 @@ WRITE8_MEMBER(galivan_state::ninjemak_gfxbank_w)
 
 
 /* Written through port 41-42 */
-WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
+void galivan_state::galivan_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -272,7 +272,7 @@ WRITE8_MEMBER(galivan_state::galivan_scrollx_w)
 }
 
 /* Written through port 43-44 */
-WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
+void galivan_state::galivan_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_galivan_scrolly[offset] = data;
 }

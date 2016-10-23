@@ -40,10 +40,10 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ16_MEMBER( cs4031_ior );
-	DECLARE_WRITE16_MEMBER( cs4031_iow );
+	uint16_t cs4031_ior(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cs4031_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
-	DECLARE_WRITE8_MEMBER( cs4031_tc ) { m_isabus->eop_w(offset, data); }
+	void cs4031_tc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
 };
 
@@ -56,7 +56,7 @@ void ct486_state::machine_start()
 {
 }
 
-READ16_MEMBER( ct486_state::cs4031_ior )
+uint16_t ct486_state::cs4031_ior(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 4)
 		return m_isabus->dack_r(offset);
@@ -64,7 +64,7 @@ READ16_MEMBER( ct486_state::cs4031_ior )
 		return m_isabus->dack16_r(offset);
 }
 
-WRITE16_MEMBER( ct486_state::cs4031_iow )
+void ct486_state::cs4031_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 4)
 		m_isabus->dack_w(offset, data);

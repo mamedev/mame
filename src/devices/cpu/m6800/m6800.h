@@ -84,8 +84,8 @@ public:
 	template<class _Object> static devcb_base &set_out_sc2_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sc2_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_sertx_func(device_t &device, _Object object) { return downcast<m6800_cpu_device &>(device).m_out_sertx_func.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( m6801_io_r );
-	DECLARE_WRITE8_MEMBER( m6801_io_w );
+	uint8_t m6801_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6801_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

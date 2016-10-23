@@ -83,7 +83,7 @@ void r10696_device::device_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( r10696_device::io_w )
+void r10696_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset < 16);
 	const uint8_t io_a = m_io_a;
@@ -131,7 +131,7 @@ WRITE8_MEMBER( r10696_device::io_w )
 }
 
 
-READ8_MEMBER( r10696_device::io_r )
+uint8_t r10696_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	assert(offset < 16);
 	uint8_t io_a, io_b, io_c;

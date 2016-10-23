@@ -164,7 +164,7 @@ void neogeo_ctrl_edge_port_device::device_start()
 }
 
 
-READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
+uint8_t neogeo_ctrl_edge_port_device::in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	if (m_device)
@@ -172,7 +172,7 @@ READ8_MEMBER(neogeo_ctrl_edge_port_device::in0_r)
 	return data;
 }
 
-READ8_MEMBER(neogeo_ctrl_edge_port_device::in1_r)
+uint8_t neogeo_ctrl_edge_port_device::in1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	if (m_device)

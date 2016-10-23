@@ -109,8 +109,8 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_int_func(device_t &device, _Object object) { return downcast<jaguar_cpu_device &>(device).m_cpu_interrupt.set_callback(object); }
 
-	virtual DECLARE_WRITE32_MEMBER(ctrl_w) { assert(0); }
-	virtual DECLARE_READ32_MEMBER(ctrl_r) { assert(0); return 0; }
+	virtual void ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) { assert(0); }
+	virtual uint32_t ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { assert(0); return 0; }
 
 protected:
 	// device-level overrides
@@ -253,8 +253,8 @@ public:
 	// construction/destruction
 	jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w) override;
-	DECLARE_READ32_MEMBER(ctrl_r) override;
+	void ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
+	uint32_t ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
 
 protected:
 	virtual void execute_run() override;
@@ -268,8 +268,8 @@ public:
 	// construction/destruction
 	jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE32_MEMBER(ctrl_w) override;
-	DECLARE_READ32_MEMBER(ctrl_r) override;
+	void ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
+	uint32_t ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
 
 protected:
 	virtual uint32_t execute_input_lines() const override { return 6; }

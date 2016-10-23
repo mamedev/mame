@@ -39,40 +39,40 @@ static int instruction_hook(device_t &device, offs_t curpc);
 
 /* 8255 Configuration */
 
-READ8_MEMBER( mbc55x_state::ppi8255_r )
+uint8_t mbc55x_state::ppi8255_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, offset>>1);
 }
 
-WRITE8_MEMBER( mbc55x_state::ppi8255_w )
+void mbc55x_state::ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, offset>>1, data);
 }
 
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_porta_r )
+uint8_t mbc55x_state::mbc55x_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_portb_r )
+uint8_t mbc55x_state::mbc55x_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mbc55x_state::mbc55x_ppi_portc_r )
+uint8_t mbc55x_state::mbc55x_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_porta_w )
+void mbc55x_state::mbc55x_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portb_w )
+void mbc55x_state::mbc55x_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
+void mbc55x_state::mbc55x_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -95,33 +95,33 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_ppi_portc_w )
 
 /* Serial port USART, unimplemented as yet */
 
-READ8_MEMBER( mbc55x_state::mbc55x_usart_r )
+uint8_t mbc55x_state::mbc55x_usart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( mbc55x_state::mbc55x_usart_w )
+void mbc55x_state::mbc55x_usart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /* PIC 8259 Configuration */
 
-READ8_MEMBER(mbc55x_state::mbcpic8259_r)
+uint8_t mbc55x_state::mbcpic8259_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pic->read(space, offset>>1);
 }
 
-WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
+void mbc55x_state::mbcpic8259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pic->write(space, offset>>1, data);
 }
 
-READ8_MEMBER(mbc55x_state::mbcpit8253_r)
+uint8_t mbc55x_state::mbcpit8253_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pit->read(space, offset >> 1);
 }
 
-WRITE8_MEMBER(mbc55x_state::mbcpit8253_w)
+void mbc55x_state::mbcpit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit->write(space, offset >> 1, data);
 }
@@ -134,24 +134,24 @@ WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
 
 /* Video ram page register */
 
-READ8_MEMBER( mbc55x_state::vram_page_r )
+uint8_t mbc55x_state::vram_page_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram_page;
 }
 
-WRITE8_MEMBER( mbc55x_state::vram_page_w )
+void mbc55x_state::vram_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s : set vram page to %02X\n", machine().describe_context(),data);
 
 	m_vram_page=data;
 }
 
-READ8_MEMBER(mbc55x_state::mbc55x_disk_r)
+uint8_t mbc55x_state::mbc55x_disk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->read(space, offset>>1);
 }
 
-WRITE8_MEMBER(mbc55x_state::mbc55x_disk_w)
+void mbc55x_state::mbc55x_disk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->write(space, offset>>1, data);
 }
@@ -242,7 +242,7 @@ TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 	scan_keyboard();
 }
 
-READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
+uint8_t mbc55x_state::mbc55x_kb_usart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 	offset>>=1;
@@ -263,7 +263,7 @@ READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 	return result;
 }
 
-WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
+void mbc55x_state::mbc55x_kb_usart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset>>=1;
 

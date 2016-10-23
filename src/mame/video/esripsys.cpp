@@ -182,7 +182,7 @@ uint32_t esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE8_MEMBER(esripsys_state::esripsys_bg_intensity_w)
+void esripsys_state::esripsys_bg_intensity_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_intensity = data & 0xf;
 }

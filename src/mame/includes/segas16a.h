@@ -55,31 +55,31 @@ public:
 	{ }
 
 	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( misc_control_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
+	void misc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tilemap_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( standard_io_r );
-	DECLARE_WRITE16_MEMBER( standard_io_w );
-	DECLARE_READ16_MEMBER( misc_io_r );
-	DECLARE_WRITE16_MEMBER( misc_io_w );
+	uint16_t standard_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void standard_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_WRITE8_MEMBER( n7751_command_w );
-	DECLARE_WRITE8_MEMBER( n7751_control_w );
-	DECLARE_WRITE8_MEMBER( n7751_rom_offset_w );
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void n7751_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void n7751_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void n7751_rom_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// N7751 sound generator CPU read/write handlers
-	DECLARE_READ8_MEMBER( n7751_rom_r );
-	DECLARE_READ8_MEMBER( n7751_p2_r );
-	DECLARE_WRITE8_MEMBER( n7751_p2_w );
-	DECLARE_READ8_MEMBER( n7751_t1_r );
+	uint8_t n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t n7751_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void n7751_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// I8751 MCU read/write handlers
-	DECLARE_WRITE8_MEMBER( mcu_control_w );
-	DECLARE_WRITE8_MEMBER( mcu_io_w );
-	DECLARE_READ8_MEMBER( mcu_io_r );
+	void mcu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// I8751-related VBLANK interrupt handlers
 	INTERRUPT_GEN_MEMBER( mcu_irq_assert );
@@ -121,11 +121,11 @@ protected:
 	void quartet_i8751_sim();
 
 	// custom I/O handlers
-	DECLARE_READ16_MEMBER( aceattaca_custom_io_r );
-	DECLARE_READ16_MEMBER( mjleague_custom_io_r );
-	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
-	DECLARE_READ16_MEMBER( sdi_custom_io_r );
-	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
+	uint16_t aceattaca_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mjleague_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t passsht16a_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sdi_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sjryuko_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval);
 
 	// devices

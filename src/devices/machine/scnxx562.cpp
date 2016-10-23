@@ -393,7 +393,7 @@ void duscc_device::z80daisy_irq_reti()
 	}
 }
 
-READ8_MEMBER( duscc_device::iack )
+uint8_t duscc_device::iack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOGINT(("%s %s - returning vector:%02x\n",tag(), FUNCNAME, m_ivrm));
 	int vec = z80daisy_irq_ack();
@@ -530,7 +530,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 	check_interrupts();
 }
 
-READ8_MEMBER( duscc_device::read )
+uint8_t duscc_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset & 0x20 )
 		return m_chanB->read(offset);
@@ -538,7 +538,7 @@ READ8_MEMBER( duscc_device::read )
 		return m_chanA->read(offset);
 }
 
-WRITE8_MEMBER( duscc_device::write )
+void duscc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( offset & 0x20 )
 		m_chanB->write(data, offset);

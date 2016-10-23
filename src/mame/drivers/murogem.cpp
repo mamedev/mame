@@ -131,14 +131,14 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_WRITE8_MEMBER(outport_w);
+	void outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(murogem);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-WRITE8_MEMBER(murogem_state::outport_w)
+void murogem_state::outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
    It's a Delta-Sigma DAC (1-bit/Bitstream)

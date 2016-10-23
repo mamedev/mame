@@ -112,13 +112,13 @@ void concept_state::concept_set_interrupt(int level, int state)
     6: DCD1 (I)
     7: IOX (O)
 */
-READ8_MEMBER(concept_state::via_in_a)
+uint8_t concept_state::via_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("via_in_a: VIA port A (Omninet and COMM port status) read\n"));
 	return 1;       /* omninet ready always 1 */
 }
 
-WRITE8_MEMBER(concept_state::via_out_a)
+void concept_state::via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("via_out_a: VIA port A status written: data=0x%2.2x\n", data));
 	/*iox = (data & 0x80) != 0;*/
@@ -136,7 +136,7 @@ WRITE8_MEMBER(concept_state::via_out_a)
     6: boot switch 0 (I)
     7: boot switch 1 (I)
 */
-READ8_MEMBER(concept_state::via_in_b)
+uint8_t concept_state::via_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t status;
 
@@ -145,7 +145,7 @@ READ8_MEMBER(concept_state::via_in_b)
 	return status;
 }
 
-WRITE8_MEMBER(concept_state::via_out_b)
+void concept_state::via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	VLOG(("via_out_b: VIA port B (Video Control and COMM rate select) written: data=0x%2.2x\n", data));
 }
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(concept_state::via_irq_func)
 	concept_set_interrupt(TIMINT_level, state);
 }
 
-READ16_MEMBER(concept_state::concept_io_r)
+uint16_t concept_state::concept_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (! ACCESSING_BITS_0_7)
 		return 0;
@@ -280,7 +280,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 	return 0;
 }
 
-WRITE16_MEMBER(concept_state::concept_io_w)
+void concept_state::concept_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (! ACCESSING_BITS_0_7)
 		return;

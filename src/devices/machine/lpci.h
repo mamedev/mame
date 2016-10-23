@@ -26,11 +26,11 @@ public:
 	// construction/destruction
 	pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ64_MEMBER( read_64be );
-	DECLARE_WRITE64_MEMBER( write_64be );
+	uint64_t read_64be(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void write_64be(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	void set_busnum(int busnum) { m_busnum = busnum; }
 	void set_father(const char *father) { m_father = father; }

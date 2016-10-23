@@ -405,19 +405,19 @@ public:
 	void snes_init_ram();
 
 	// input related
-	virtual DECLARE_WRITE8_MEMBER(io_read);
+	virtual void io_read(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual uint8_t oldjoy1_read(int latched);
 	virtual uint8_t oldjoy2_read(int latched);
 
-	DECLARE_READ8_MEMBER(snes_r_io);
-	DECLARE_WRITE8_MEMBER(snes_w_io);
-	DECLARE_READ8_MEMBER(snes_io_dma_r);
-	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
-	DECLARE_READ8_MEMBER(snes_r_bank1);
-	DECLARE_READ8_MEMBER(snes_r_bank2);
-	DECLARE_WRITE8_MEMBER(snes_w_bank1);
-	DECLARE_WRITE8_MEMBER(snes_w_bank2);
-	DECLARE_READ8_MEMBER(snes_open_bus_r);
+	uint8_t snes_r_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_w_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_io_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_io_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_r_bank1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snes_r_bank2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snes_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snes_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snes_open_bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);

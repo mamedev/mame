@@ -120,12 +120,12 @@ WRITE_LINE_MEMBER(tms6100_device::rck_w)
 	m_rck = (state) ? 1 : 0;
 }
 
-WRITE8_MEMBER(tms6100_device::add_w)
+void tms6100_device::add_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_add = data & 0xf;
 }
 
-READ8_MEMBER(tms6100_device::data_r)
+uint8_t tms6100_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data & 0xf;
 }

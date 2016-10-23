@@ -137,13 +137,13 @@ public:
 
 	memory_region *m_cart_rom;
 
-	DECLARE_READ8_MEMBER( bankswitch_r );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_WRITE8_MEMBER( kb_w );
-	DECLARE_READ8_MEMBER( mouse_r );
-	DECLARE_WRITE8_MEMBER( mouse_w );
-	DECLARE_WRITE8_MEMBER( lcdc_w );
+	uint8_t bankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mouse_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mouse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lcdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(prestige);
 	DECLARE_PALETTE_INIT(glcolor);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
@@ -151,12 +151,12 @@ public:
 };
 
 
-READ8_MEMBER( prestige_state::bankswitch_r )
+uint8_t prestige_state::bankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank[offset];
 }
 
-WRITE8_MEMBER( prestige_state::bankswitch_w )
+void prestige_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -223,7 +223,7 @@ WRITE8_MEMBER( prestige_state::bankswitch_w )
 	m_bank[offset] = data;
 }
 
-READ8_MEMBER( prestige_state::kb_r )
+uint8_t prestige_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -234,12 +234,12 @@ READ8_MEMBER( prestige_state::kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( prestige_state::kb_w )
+void prestige_state::kb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( prestige_state::mouse_r )
+uint8_t prestige_state::mouse_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int16_t data = 0;
 
@@ -259,7 +259,7 @@ READ8_MEMBER( prestige_state::mouse_r )
 	return 0x80 + data;
 }
 
-WRITE8_MEMBER( prestige_state::mouse_w )
+void prestige_state::mouse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -272,7 +272,7 @@ WRITE8_MEMBER( prestige_state::mouse_w )
 	}
 }
 
-WRITE8_MEMBER( prestige_state::lcdc_w )
+void prestige_state::lcdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

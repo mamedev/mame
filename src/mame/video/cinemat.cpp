@@ -69,7 +69,7 @@ void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, 
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
+void cinemat_state::cinemat_vector_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, i;
 	cpu_device *cpu = m_maincpu;

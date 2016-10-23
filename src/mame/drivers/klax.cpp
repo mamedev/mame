@@ -48,7 +48,7 @@ void klax_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-WRITE16_MEMBER(klax_state::interrupt_ack_w)
+void klax_state::interrupt_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scanline_int_ack_w(space, offset, data, mem_mask);
 	video_int_ack_w(space, offset, data, mem_mask);

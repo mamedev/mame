@@ -65,7 +65,7 @@ PALETTE_INIT_MEMBER(canyon_state, canyon)
  *
  *************************************/
 
-READ8_MEMBER(canyon_state::canyon_switches_r)
+uint8_t canyon_state::canyon_switches_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -79,7 +79,7 @@ READ8_MEMBER(canyon_state::canyon_switches_r)
 }
 
 
-READ8_MEMBER(canyon_state::canyon_options_r)
+uint8_t canyon_state::canyon_options_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read() >> (2 * (~offset & 3))) & 3;
 }
@@ -93,7 +93,7 @@ READ8_MEMBER(canyon_state::canyon_options_r)
  *
  *************************************/
 
-WRITE8_MEMBER(canyon_state::canyon_led_w)
+void canyon_state::canyon_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset & 0x01, offset & 0x02);
 }

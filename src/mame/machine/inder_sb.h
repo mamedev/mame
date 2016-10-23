@@ -30,28 +30,28 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<z80ctc_device> m_ctc;
 
-	DECLARE_READ8_MEMBER(megaphx_sound_sent_r);
-	DECLARE_READ8_MEMBER(megaphx_sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(megaphx_sound_to_68k_w);
+	uint8_t megaphx_sound_sent_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t megaphx_sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void megaphx_sound_to_68k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(dac0_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac1_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac2_rombank_write);
-	DECLARE_WRITE8_MEMBER(dac3_rombank_write);
+	void dac0_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac1_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac2_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac3_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
 
-	DECLARE_READ8_MEMBER(megaphx_02cc_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_02e6_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_0309_hack_r);
-	DECLARE_READ8_MEMBER(megaphx_0323_hack_r);
+	uint8_t megaphx_02cc_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t megaphx_02e6_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t megaphx_0309_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t megaphx_0323_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
-	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
+	uint16_t megaphx_0x050002_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void megaphx_0x050000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint8_t m_soundbank[4];
 

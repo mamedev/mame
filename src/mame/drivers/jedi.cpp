@@ -142,7 +142,7 @@ TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
 }
 
 
-WRITE8_MEMBER(jedi_state::main_irq_ack_w)
+void jedi_state::main_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -191,7 +191,7 @@ void jedi_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::rom_banksel_w)
+void jedi_state::rom_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01) membank("bank1")->set_entry(0);
 	if (data & 0x02) membank("bank1")->set_entry(1);
@@ -206,7 +206,7 @@ WRITE8_MEMBER(jedi_state::rom_banksel_w)
  *
  *************************************/
 
-READ8_MEMBER(jedi_state::a2d_data_r)
+uint8_t jedi_state::a2d_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -220,13 +220,13 @@ READ8_MEMBER(jedi_state::a2d_data_r)
 }
 
 
-WRITE8_MEMBER(jedi_state::a2d_select_w)
+void jedi_state::a2d_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_a2d_select = offset;
 }
 
 
-WRITE8_MEMBER(jedi_state::jedi_coin_counter_w)
+void jedi_state::jedi_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
@@ -239,14 +239,14 @@ WRITE8_MEMBER(jedi_state::jedi_coin_counter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::nvram_data_w)
+void jedi_state::nvram_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_nvram_enabled)
 		m_nvram[offset] = data;
 }
 
 
-WRITE8_MEMBER(jedi_state::nvram_enable_w)
+void jedi_state::nvram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_enabled = ~offset & 1;
 }

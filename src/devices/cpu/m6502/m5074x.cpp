@@ -333,7 +333,7 @@ uint8_t m5074x_device::read_port(uint8_t offset)
 	return incoming;
 }
 
-READ8_MEMBER(m5074x_device::ports_r)
+uint8_t m5074x_device::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -365,7 +365,7 @@ READ8_MEMBER(m5074x_device::ports_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m5074x_device::ports_w)
+void m5074x_device::ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -411,7 +411,7 @@ WRITE8_MEMBER(m5074x_device::ports_w)
 	}
 }
 
-READ8_MEMBER(m5074x_device::tmrirq_r)
+uint8_t m5074x_device::tmrirq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -440,7 +440,7 @@ READ8_MEMBER(m5074x_device::tmrirq_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m5074x_device::tmrirq_w)
+void m5074x_device::tmrirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to tmrirq @ %d\n", data, offset);
 

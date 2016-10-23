@@ -16,8 +16,8 @@ public:
 	static void set_devicecpu_tag(device_t &device, const char *tag) { downcast<c6280_device &>(device).m_cpudevice.set_tag(tag); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( c6280_r );
-	DECLARE_WRITE8_MEMBER( c6280_w );
+	uint8_t c6280_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c6280_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

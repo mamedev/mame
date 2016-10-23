@@ -72,14 +72,14 @@ public:
 	uint32_t m_blitter_src_y;
 	uint32_t m_blitter_src_dy;
 
-	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
-	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
-	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
-	DECLARE_READ32_MEMBER(unk_r);
-	DECLARE_READ32_MEMBER(skimaxx_unk1_r);
-	DECLARE_WRITE32_MEMBER(skimaxx_unk1_w);
-	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
-	DECLARE_READ32_MEMBER(skimaxx_analog_r);
+	void skimaxx_blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t skimaxx_blitter_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void skimaxx_fpga_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t unk_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t skimaxx_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void skimaxx_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void skimaxx_sub_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t skimaxx_analog_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
@@ -98,7 +98,7 @@ public:
  *************************************/
 
 // Set up blit parameters
-WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
+void skimaxx_state::skimaxx_blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
@@ -129,7 +129,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 }
 
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
-READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
+uint32_t skimaxx_state::skimaxx_blitter_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
 	uint16_t *src = m_blitter_gfx + (penaddr % m_blitter_gfx_len);
@@ -241,7 +241,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(skimaxx_state::scanline_update)
   bit 0: bit banging data
 */
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
+void skimaxx_state::skimaxx_fpga_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t newdata = COMBINE_DATA( m_fpga_ctrl );
 
@@ -258,22 +258,22 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 }
 
 // 0x2000004c: bit 7, bit 0
-READ32_MEMBER(skimaxx_state::unk_r)
+uint32_t skimaxx_state::unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (*m_fpga_ctrl & 0x20) ? 0x80 : 0x00;
 }
 
 // 0x20000023
-READ32_MEMBER(skimaxx_state::skimaxx_unk1_r)
+uint32_t skimaxx_state::skimaxx_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_unk1_w)
+void skimaxx_state::skimaxx_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
+void skimaxx_state::skimaxx_sub_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
@@ -292,7 +292,7 @@ WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
     ..
     1f      left max
 */
-READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
+uint32_t skimaxx_state::skimaxx_analog_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return BITSWAP8(ioport(offset ? "Y" : "X")->read(), 0,1,2,3,4,5,6,7);
 }

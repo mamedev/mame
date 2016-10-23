@@ -45,10 +45,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255;
-	DECLARE_READ8_MEMBER(savia84_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(savia84_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(savia84_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(savia84_8255_portc_w);
+	uint8_t savia84_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void savia84_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void savia84_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void savia84_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;
@@ -128,14 +128,14 @@ void savia84_state::machine_reset()
 	m_digit_last = 0;
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_porta_w ) // OUT F8 - output segments on the selected digit
+void savia84_state::savia84_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // OUT F8 - output segments on the selected digit
 {
 	m_segment = ~data & 0x7f;
 	if (m_digit && (m_digit != m_digit_last)) output().set_digit_value(m_digit, m_segment);
 	m_digit_last = m_digit;
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 leds down the left side
+void savia84_state::savia84_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // OUT F9 - light the 8 leds down the left side
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -145,7 +145,7 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portb_w ) // OUT F9 - light the 8 led
 	}
 }
 
-WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard scanning row; set digit to display
+void savia84_state::savia84_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // OUT FA - set keyboard scanning row; set digit to display
 {
 	m_digit = 0;
 	m_kbd = data & 15;
@@ -156,7 +156,7 @@ WRITE8_MEMBER( savia84_state::savia84_8255_portc_w ) // OUT FA - set keyboard sc
 		m_digit = m_kbd;
 }
 
-READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
+uint8_t savia84_state::savia84_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask) // IN FA - read keyboard
 {
 	if (m_kbd < 9)
 	{

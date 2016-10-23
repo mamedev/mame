@@ -124,7 +124,7 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6581_device::read )
+uint8_t mos6581_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -151,7 +151,7 @@ READ8_MEMBER( mos6581_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6581_device::write )
+void mos6581_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sid6581_port_w(m_token, offset, data);
 }

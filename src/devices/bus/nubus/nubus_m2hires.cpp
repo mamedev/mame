@@ -224,7 +224,7 @@ uint32_t nubus_m2hires_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
+void nubus_m2hires_device::m2hires_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 
@@ -287,7 +287,7 @@ WRITE32_MEMBER( nubus_m2hires_device::m2hires_w )
 	}
 }
 
-READ32_MEMBER( nubus_m2hires_device::m2hires_r )
+uint32_t nubus_m2hires_device::m2hires_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0x10010/4)
 	{
@@ -302,13 +302,13 @@ READ32_MEMBER( nubus_m2hires_device::m2hires_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_m2hires_device::vram_w )
+void nubus_m2hires_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_m2hires_device::vram_r )
+uint32_t nubus_m2hires_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

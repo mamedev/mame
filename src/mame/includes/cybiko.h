@@ -47,22 +47,22 @@ public:
 		, m_input(*this, "A.%u", 0)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(serflash_w);
-	DECLARE_READ16_MEMBER(clock_r);
-	DECLARE_WRITE16_MEMBER(clock_w);
-	DECLARE_READ16_MEMBER(xtclock_r);
-	DECLARE_WRITE16_MEMBER(xtclock_w);
-	DECLARE_READ16_MEMBER(xtpower_r);
-	DECLARE_READ16_MEMBER(adc1_r);
-	DECLARE_READ16_MEMBER(adc2_r);
-	DECLARE_READ16_MEMBER(port0_r);
+	void serflash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t xtclock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void xtclock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t xtpower_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t port0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(cybiko_lcd_r);
-	DECLARE_WRITE16_MEMBER(cybiko_lcd_w);
-	DECLARE_READ16_MEMBER(cybikov1_key_r);
-	DECLARE_READ16_MEMBER(cybikov2_key_r);
-	DECLARE_READ16_MEMBER(cybikoxt_key_r);
-	DECLARE_WRITE16_MEMBER(cybiko_usb_w);
+	uint16_t cybiko_lcd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cybiko_lcd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cybikov1_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cybikov2_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cybikoxt_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cybiko_usb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	int cybiko_key_r( offs_t offset, int mem_mask);
 
 	required_device<cpu_device> m_maincpu;

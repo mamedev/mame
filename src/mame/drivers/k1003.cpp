@@ -53,11 +53,11 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(disp_1_w);
-	DECLARE_WRITE8_MEMBER(disp_2_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void disp_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_disp_1;
 	uint8_t m_disp_2;
 	uint8_t bit_to_dec(uint8_t val);
@@ -75,23 +75,23 @@ static ADDRESS_MAP_START( k1003_mem, AS_PROGRAM, 8, k1003_state )
 	AM_RANGE(0x3000,0x3aff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER( k1003_state::port2_r )
+uint8_t k1003_state::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER( k1003_state::key_r )
+uint8_t k1003_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
 
-WRITE8_MEMBER( k1003_state::disp_1_w )
+void k1003_state::disp_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_disp_1 = data;
 }
 
-WRITE8_MEMBER( k1003_state::disp_2_w )
+void k1003_state::disp_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_disp_2 = data;
 }
@@ -109,7 +109,7 @@ uint8_t k1003_state::bit_to_dec(uint8_t val)
 	return 0;
 }
 
-WRITE8_MEMBER( k1003_state::disp_w )
+void k1003_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(bit_to_dec(data)*2,   m_disp_1);
 	output().set_digit_value(bit_to_dec(data)*2+1, m_disp_2);

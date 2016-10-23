@@ -33,51 +33,51 @@ public:
 	required_device<pc_joy_device> m_joy;
 	required_device<cpu_device> m_cpu;
 
-	READ8_MEMBER( mpu401_r );
-	WRITE8_MEMBER( mpu401_w );
+	uint8_t mpu401_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void mpu401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	// mcu ports
-	DECLARE_READ8_MEMBER( dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dsp_data_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_WRITE8_MEMBER( rate_w );
-	DECLARE_READ8_MEMBER( dma8_r );
-	DECLARE_WRITE8_MEMBER( dma8_w );
-	DECLARE_READ8_MEMBER( ctrl8_r );
-	DECLARE_WRITE8_MEMBER( ctrl8_w );
-	DECLARE_READ8_MEMBER( ctrl16_r );
-	DECLARE_WRITE8_MEMBER( ctrl16_w );
-	DECLARE_READ8_MEMBER( dac_ctrl_r );
-	DECLARE_WRITE8_MEMBER( dac_ctrl_w );
-	DECLARE_READ8_MEMBER( dac_fifo_ctrl_r );
-	DECLARE_WRITE8_MEMBER( dac_fifo_ctrl_w );
-	DECLARE_READ8_MEMBER( adc_fifo_ctrl_r );
-	DECLARE_WRITE8_MEMBER( adc_fifo_ctrl_w );
-	DECLARE_READ8_MEMBER( dma_stat_r );
-	DECLARE_WRITE8_MEMBER( dac_data_w );
-	DECLARE_READ8_MEMBER( adc_data_r );
-	DECLARE_READ8_MEMBER( dma8_ready_r );
-	DECLARE_READ8_MEMBER( adc_data_ready_r );
-	DECLARE_READ8_MEMBER( dma8_cnt_lo_r );
-	DECLARE_READ8_MEMBER( dma8_cnt_hi_r );
-	DECLARE_WRITE8_MEMBER( dma8_len_lo_w );
-	DECLARE_WRITE8_MEMBER( dma8_len_hi_w );
-	DECLARE_WRITE8_MEMBER( dma16_len_lo_w );
-	DECLARE_WRITE8_MEMBER( dma16_len_hi_w );
-	DECLARE_READ8_MEMBER( mode_r );
-	DECLARE_WRITE8_MEMBER( mode_w );
+	uint8_t dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctrl8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctrl16_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dac_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dac_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dac_fifo_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dac_fifo_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_fifo_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adc_fifo_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dac_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t adc_data_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8_cnt_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8_cnt_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma8_len_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8_len_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma16_len_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma16_len_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// host ports
-	DECLARE_READ8_MEMBER( host_data_r );
-	DECLARE_WRITE8_MEMBER( host_cmd_w );
-	DECLARE_WRITE8_MEMBER( dsp_reset_w );
-	DECLARE_READ8_MEMBER( dsp_wbuf_status_r );
-	DECLARE_READ8_MEMBER( dsp_rbuf_status_r );
-	DECLARE_READ8_MEMBER( invalid_r );
-	DECLARE_WRITE8_MEMBER( invalid_w );
+	uint8_t host_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void host_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t invalid_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void invalid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

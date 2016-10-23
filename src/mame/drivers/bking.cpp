@@ -27,18 +27,18 @@ DIP Locations verified for:
 #include "sound/volt_reg.h"
 
 
-READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
+uint8_t bking_state::bking_sndnmi_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 	return 0;
 }
 
-WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
+void bking_state::bking_sndnmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 }
 
-WRITE8_MEMBER(bking_state::bking_soundlatch_w)
+void bking_state::bking_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i, code = 0;
 
@@ -51,29 +51,29 @@ WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(bking_state::bking3_addr_l_w)
+void bking_state::bking3_addr_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_addr_l = data;
 }
 
-WRITE8_MEMBER(bking_state::bking3_addr_h_w)
+void bking_state::bking3_addr_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_addr_h = data;
 }
 
-READ8_MEMBER(bking_state::bking3_extrarom_r)
+uint8_t bking_state::bking3_extrarom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("user2")->base();
 	return rom[m_addr_h * 256 + m_addr_l];
 }
 
-WRITE8_MEMBER(bking_state::unk_w)
+void bking_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0 = finished reading extra rom
 	// 1 = started reading extra rom
 }
 
-READ8_MEMBER(bking_state::bking3_ext_check_r)
+uint8_t bking_state::bking3_ext_check_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x31; //no "bad rom.", no "bad ext."
 }
@@ -141,29 +141,29 @@ static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
 ADDRESS_MAP_END
 
 #if 0
-READ8_MEMBER(bking_state::bking3_68705_port_a_r)
+uint8_t bking_state::bking3_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("port_a_r = %02X\n",(m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a));
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(bking_state::bking3_68705_port_a_w)
+void bking_state::bking3_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_out = data;
 //  printf("port_a_out = %02X\n",data);
 }
 
-WRITE8_MEMBER(bking_state::bking3_68705_ddr_a_w)
+void bking_state::bking3_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(bking_state::bking3_68705_port_b_r)
+uint8_t bking_state::bking3_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(bking_state::bking3_68705_port_b_w)
+void bking_state::bking3_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if(data != 0xff)
 //      printf("port_b_out = %02X\n",data);
@@ -188,12 +188,12 @@ WRITE8_MEMBER(bking_state::bking3_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(bking_state::bking3_68705_ddr_b_w)
+void bking_state::bking3_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
-READ8_MEMBER(bking_state::bking3_68705_port_c_r)
+uint8_t bking_state::bking3_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int port_c_in = 0;
 	if (main_sent) port_c_in |= 0x01;
@@ -373,7 +373,7 @@ static GFXDECODE_START( bking )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(bking_state::port_b_w)
+void bking_state::port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* don't know what this is... could be a filter */
 	if (data != 0x00)

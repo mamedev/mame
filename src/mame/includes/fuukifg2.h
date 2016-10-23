@@ -55,14 +55,14 @@ public:
 	emu_timer   *m_vblank_interrupt_timer;
 	emu_timer   *m_raster_interrupt_timer;
 
-	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(sound_rombank_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_WRITE16_MEMBER(vram_3_w);
-	DECLARE_WRITE8_MEMBER(oki_banking_w);
+	void vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

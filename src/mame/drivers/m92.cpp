@@ -288,14 +288,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 
 /*****************************************************************************/
 
-READ16_MEMBER(m92_state::m92_eeprom_r)
+uint16_t m92_state::m92_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM RE %04x\n",space.device().safe_pc(),offset);
 	return RAM[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(m92_state::m92_eeprom_w)
+void m92_state::m92_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *RAM = memregion("eeprom")->base();
 //  logerror("%05x: EEPROM WR %04x\n",space.device().safe_pc(),offset);
@@ -303,7 +303,7 @@ WRITE16_MEMBER(m92_state::m92_eeprom_w)
 		RAM[offset] = data;
 }
 
-WRITE16_MEMBER(m92_state::m92_coincounter_w)
+void m92_state::m92_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -315,7 +315,7 @@ WRITE16_MEMBER(m92_state::m92_coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m92_state::m92_bankswitch_w)
+void m92_state::m92_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -332,7 +332,7 @@ CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m92_state::m92_soundlatch_w)
+void m92_state::m92_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
@@ -340,13 +340,13 @@ WRITE16_MEMBER(m92_state::m92_soundlatch_w)
 	m_soundlatch->write(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(m92_state::m92_sound_status_r)
+uint16_t m92_state::m92_sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //logerror("%06x: read sound status\n",space.device().safe_pc());
 	return m_sound_status;
 }
 
-READ16_MEMBER(m92_state::m92_soundlatch_r)
+uint16_t m92_state::m92_soundlatch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
@@ -354,20 +354,20 @@ READ16_MEMBER(m92_state::m92_soundlatch_r)
 	return m_soundlatch->read(space, offset) | 0xff00;
 }
 
-WRITE16_MEMBER(m92_state::m92_sound_irq_ack_w)
+void m92_state::m92_sound_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(m92_state::m92_sound_status_w)
+void m92_state::m92_sound_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sound_status);
 	M92_TRIGGER_IRQ3
 
 }
 
-WRITE16_MEMBER(m92_state::m92_sound_reset_w)
+void m92_state::m92_sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_soundcpu)
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( m92_portmap, AS_IO, 16, m92_state )
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(m92_sound_reset_w)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(m92_state::oki_bank_w)
+void m92_state::oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank((data+1) & 0x3); // +1?
 }

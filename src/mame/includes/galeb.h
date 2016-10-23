@@ -27,11 +27,11 @@ public:
 	}
 
 	required_shared_ptr<uint8_t> m_video_ram;
-	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(tape_status_r);
-	DECLARE_READ8_MEMBER(tape_data_r);
-	DECLARE_WRITE8_MEMBER(tape_data_w);
+	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tape_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tape_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tape_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	uint32_t screen_update_galeb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

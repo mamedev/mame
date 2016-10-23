@@ -225,7 +225,7 @@ uint32_t nick_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //  vram_r - video RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( nick_device::vram_r )
+uint8_t nick_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return this->space().read_byte(offset);
 }
@@ -235,7 +235,7 @@ READ8_MEMBER( nick_device::vram_r )
 //  vram_w - video RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( nick_device::vram_w )
+void nick_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	this->space().write_byte(offset, data);
 }
@@ -245,7 +245,7 @@ WRITE8_MEMBER( nick_device::vram_w )
 //  fixbias_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( nick_device::fixbias_w )
+void nick_device::fixbias_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_FIXBIAS = data;
 }
@@ -255,7 +255,7 @@ WRITE8_MEMBER( nick_device::fixbias_w )
 //  border_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( nick_device::border_w )
+void nick_device::border_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_BORDER = data;
 }
@@ -265,7 +265,7 @@ WRITE8_MEMBER( nick_device::border_w )
 //  lpl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( nick_device::lpl_w )
+void nick_device::lpl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_LPL = m_reg[2] = data;
 
@@ -277,7 +277,7 @@ WRITE8_MEMBER( nick_device::lpl_w )
 //  lph_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( nick_device::lph_w )
+void nick_device::lph_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_LPH = m_reg[3] = data;
 

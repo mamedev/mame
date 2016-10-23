@@ -46,12 +46,12 @@ public:
 	static void static_set_pixel_update_cb(device_t &device, hd44780_pixel_update_delegate callback) { downcast<hd44780_device &>(device).m_pixel_update_cb = callback; }
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(control_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t control_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	const uint8_t *render();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

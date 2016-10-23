@@ -57,30 +57,30 @@ public:
 
 	void SetExtLinescroll();    /* Lethal Enforcers */
 
-	DECLARE_READ16_MEMBER( ram_word_r );
-	DECLARE_WRITE16_MEMBER( ram_word_w );
-	DECLARE_READ16_MEMBER( ram_half_word_r );
-	DECLARE_WRITE16_MEMBER( ram_half_word_w );
-	DECLARE_READ16_MEMBER( k_5bpp_rom_word_r );
-	DECLARE_READ32_MEMBER( k_5bpp_rom_long_r );
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
-	DECLARE_READ16_MEMBER( rom_word_r );
-	DECLARE_READ16_MEMBER( mw_rom_word_r );
-	DECLARE_READ16_MEMBER( bishi_rom_word_r );
-	DECLARE_READ16_MEMBER( old_rom_word_r );
-	DECLARE_READ16_MEMBER( rom_word_8000_r );
-	DECLARE_WRITE16_MEMBER( word_w ); // "VRAM" registers
-	DECLARE_WRITE16_MEMBER( b_word_w );
-	DECLARE_READ8_MEMBER( ram_code_lo_r );
-	DECLARE_READ8_MEMBER( ram_code_hi_r );
-	DECLARE_READ8_MEMBER( ram_attr_lo_r );
-	DECLARE_READ8_MEMBER( ram_attr_hi_r );
-	DECLARE_WRITE8_MEMBER( ram_code_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_code_hi_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_lo_w );
-	DECLARE_WRITE8_MEMBER( ram_attr_hi_w );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( b_w );
+	uint16_t ram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ram_half_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_half_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t k_5bpp_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t k_5bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t k_6bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mw_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bishi_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t old_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rom_word_8000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff); // "VRAM" registers
+	void b_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t ram_code_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ram_code_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ram_attr_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ram_attr_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_code_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_code_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_attr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_attr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, uint32_t flags, uint32_t priority);
@@ -100,17 +100,17 @@ public:
 
 	int get_gfx_num() const { return m_gfx_num; }
 
-	DECLARE_READ32_MEMBER( ram_long_r );
-	DECLARE_READ32_MEMBER( rom_long_r );
-	DECLARE_WRITE32_MEMBER( ram_long_w );
-	DECLARE_READ32_MEMBER( unpaged_ram_long_r );
-	DECLARE_WRITE32_MEMBER( unpaged_ram_long_w );
-	DECLARE_WRITE32_MEMBER( long_w );
-	DECLARE_WRITE32_MEMBER( b_long_w );
+	uint32_t ram_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t unpaged_ram_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void unpaged_ram_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void b_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ16_MEMBER( word_r );        // VACSET
-	DECLARE_READ16_MEMBER( b_word_r );      // VSCCS  (board dependent)
-	DECLARE_READ32_MEMBER( long_r );        // VACSET
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);        // VACSET
+	uint16_t b_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);      // VSCCS  (board dependent)
+	uint32_t long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);        // VACSET
 
 
 protected:

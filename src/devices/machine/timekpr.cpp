@@ -328,7 +328,7 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-WRITE8_MEMBER( timekeeper_device::write )
+void timekeeper_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( offset == m_offset_control )
 	{
@@ -351,7 +351,7 @@ WRITE8_MEMBER( timekeeper_device::write )
 	m_data[ offset ] = data;
 }
 
-READ8_MEMBER( timekeeper_device::read )
+uint8_t timekeeper_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_data[ offset ];
 	if( offset == m_offset_date && type() == M48T58 )

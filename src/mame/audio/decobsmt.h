@@ -24,12 +24,12 @@ public:
 		// construction/destruction
 		decobsmt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		DECLARE_WRITE8_MEMBER(bsmt_reset_w);
-		DECLARE_READ8_MEMBER(bsmt_status_r);
-		DECLARE_WRITE8_MEMBER(bsmt0_w);
-		DECLARE_WRITE8_MEMBER(bsmt1_w);
-		DECLARE_READ8_MEMBER(bsmt_comms_r);
-		DECLARE_WRITE8_MEMBER(bsmt_comms_w);
+		void bsmt_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t bsmt_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void bsmt0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		void bsmt1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t bsmt_comms_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void bsmt_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 		DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
 

@@ -38,8 +38,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

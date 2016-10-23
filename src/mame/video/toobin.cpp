@@ -94,7 +94,7 @@ void toobin_state::video_start_toobin()
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::paletteram_w )
+void toobin_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int newword;
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER( toobin_state::paletteram_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::intensity_w )
+void toobin_state::intensity_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -141,7 +141,7 @@ WRITE16_MEMBER( toobin_state::intensity_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::xscroll_w )
+void toobin_state::xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_xscroll;
 	uint16_t newscroll = oldscroll;
@@ -160,7 +160,7 @@ WRITE16_MEMBER( toobin_state::xscroll_w )
 }
 
 
-WRITE16_MEMBER( toobin_state::yscroll_w )
+void toobin_state::yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldscroll = *m_yscroll;
 	uint16_t newscroll = oldscroll;
@@ -186,7 +186,7 @@ WRITE16_MEMBER( toobin_state::yscroll_w )
  *
  *************************************/
 
-WRITE16_MEMBER( toobin_state::slip_w )
+void toobin_state::slip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldslip = m_mob->slipram(offset);
 	uint16_t newslip = oldslip;

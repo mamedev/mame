@@ -104,21 +104,21 @@ mb89363b_device::mb89363b_device(const machine_config &mconfig, const char *tag,
 }
 
 
-READ8_MEMBER(mb89363b_device::i8255_a_port_a_r) { return m_in_a_pa_cb(space, offset); }
-READ8_MEMBER(mb89363b_device::i8255_a_port_b_r) { return m_in_a_pb_cb(space, offset); }
-READ8_MEMBER(mb89363b_device::i8255_a_port_c_r) { return m_in_a_pc_cb(space, offset); }
-WRITE8_MEMBER(mb89363b_device::i8255_a_port_a_w) { m_out_a_pa_cb(space, offset, data); }
-WRITE8_MEMBER(mb89363b_device::i8255_a_port_b_w) { m_out_a_pb_cb(space, offset, data); }
-WRITE8_MEMBER(mb89363b_device::i8255_a_port_c_w) { m_out_a_pc_cb(space, offset, data); }
-READ8_MEMBER(mb89363b_device::i8255_b_port_a_r) { return m_in_b_pa_cb(space, offset); }
-READ8_MEMBER(mb89363b_device::i8255_b_port_b_r) { return m_in_b_pb_cb(space, offset); }
-READ8_MEMBER(mb89363b_device::i8255_b_port_c_r) { return m_in_b_pc_cb(space, offset); }
-WRITE8_MEMBER(mb89363b_device::i8255_b_port_a_w) { m_out_b_pa_cb(space, offset, data); }
-WRITE8_MEMBER(mb89363b_device::i8255_b_port_b_w) { m_out_b_pb_cb(space, offset, data); }
-WRITE8_MEMBER(mb89363b_device::i8255_b_port_c_w) { m_out_b_pc_cb(space, offset, data); }
+uint8_t mb89363b_device::i8255_a_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_a_pa_cb(space, offset); }
+uint8_t mb89363b_device::i8255_a_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_a_pb_cb(space, offset); }
+uint8_t mb89363b_device::i8255_a_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_a_pc_cb(space, offset); }
+void mb89363b_device::i8255_a_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_a_pa_cb(space, offset, data); }
+void mb89363b_device::i8255_a_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_a_pb_cb(space, offset, data); }
+void mb89363b_device::i8255_a_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_a_pc_cb(space, offset, data); }
+uint8_t mb89363b_device::i8255_b_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_b_pa_cb(space, offset); }
+uint8_t mb89363b_device::i8255_b_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_b_pb_cb(space, offset); }
+uint8_t mb89363b_device::i8255_b_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_in_b_pc_cb(space, offset); }
+void mb89363b_device::i8255_b_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_b_pa_cb(space, offset, data); }
+void mb89363b_device::i8255_b_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_b_pb_cb(space, offset, data); }
+void mb89363b_device::i8255_b_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_out_b_pc_cb(space, offset, data); }
 
 
-READ8_MEMBER( mb89363b_device::read )
+uint8_t mb89363b_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 4)
 		return m_i8255_b->read(space, offset & 3);
@@ -126,7 +126,7 @@ READ8_MEMBER( mb89363b_device::read )
 		return m_i8255_a->read(space, offset & 3);
 }
 
-WRITE8_MEMBER( mb89363b_device::write )
+void mb89363b_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 4)
 		m_i8255_b->write(space, offset & 3, data);

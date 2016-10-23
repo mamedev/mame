@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t *m_p_chargen;
 	required_device<via6522_device> m_via_0;
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ec65_state::kbd_put )
+void ec65_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{

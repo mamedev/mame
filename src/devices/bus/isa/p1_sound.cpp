@@ -100,42 +100,42 @@ p1_sound_device::p1_sound_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-READ8_MEMBER( p1_sound_device::d14_r )
+uint8_t p1_sound_device::d14_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_d14->read(space, offset>>1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d14_w )
+void p1_sound_device::d14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_d14->write(space, offset>>1, data);
 }
 
-READ8_MEMBER( p1_sound_device::d16_r )
+uint8_t p1_sound_device::d16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_d16->read(space, offset>>1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d16_w )
+void p1_sound_device::d16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_d16->write(space, offset>>1, data);
 }
 
-READ8_MEMBER( p1_sound_device::d17_r )
+uint8_t p1_sound_device::d17_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_d17->read(space, offset>>1);
 }
 
-WRITE8_MEMBER( p1_sound_device::d17_w )
+void p1_sound_device::d17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_d17->write(space, offset>>1, data);
 }
 
-READ8_MEMBER( p1_sound_device::adc_r )
+uint8_t p1_sound_device::adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( p1_sound_device::dac_w )
+void p1_sound_device::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("DAC write: %02x <- %02x\n", offset>>1, data);
 	m_dac_data[offset>>1] = data;

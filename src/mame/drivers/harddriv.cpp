@@ -5026,12 +5026,12 @@ void harddriv_state::init_racedrivb1(void)
 	init_racedriv();
 }
 
-READ32_MEMBER(harddriv_state::rddsp_unmap_r)
+uint32_t harddriv_state::rddsp_unmap_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-READ16_MEMBER(harddriv_state::steeltal_dummy_r)
+uint16_t harddriv_state::steeltal_dummy_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* this is required so that INT 4 is recongized as a sound INT */
 	return ~0;

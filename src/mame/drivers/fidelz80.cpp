@@ -532,39 +532,39 @@ public:
 
 	// CC10 and VCC/UVC
 	void vcc_prepare_display();
-	DECLARE_READ8_MEMBER(vcc_speech_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portb_w);
-	DECLARE_READ8_MEMBER(vcc_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
+	uint8_t vcc_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vcc_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vcc_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vcc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vcc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vcc_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cc10_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
 	void machine_start_vcc();
 
 	// BCC
-	DECLARE_READ8_MEMBER(bcc_input_r);
-	DECLARE_WRITE8_MEMBER(bcc_control_w);
+	uint8_t bcc_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bcc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// VSC
 	void vsc_prepare_display();
-	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
-	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_porta_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(vsc_ppi_portc_w);
-	DECLARE_READ8_MEMBER(vsc_pio_porta_r);
-	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
-	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
+	uint8_t vsc_io_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vsc_io_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vsc_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vsc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vsc_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vsc_pio_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vsc_pio_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vsc_pio_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// VBRC
 	void vbrc_prepare_display();
-	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
-	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t0_r);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t1_r);
-	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
-	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
+	void vbrc_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vbrc_mcu_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vbrc_mcu_t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vbrc_mcu_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vbrc_mcu_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vbrc_ioexp_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
@@ -774,7 +774,7 @@ void fidelz80_state::vcc_prepare_display()
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
-READ8_MEMBER(fidelz80_state::vcc_speech_r)
+uint8_t fidelz80_state::vcc_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
@@ -791,7 +791,7 @@ void fidelz80_state::machine_start_vcc()
 
 // I8255 PPI
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
+void fidelz80_state::vcc_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pull output low during reset (see TODO)
 	if (machine().phase() == MACHINE_PHASE_RESET)
@@ -815,13 +815,13 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 	}
 }
 
-READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
+uint8_t fidelz80_state::vcc_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d7: TSI BUSY line
 	return (m_speech->busy_r()) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
+void fidelz80_state::vcc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pull output low during reset (see TODO)
 	if (machine().phase() == MACHINE_PHASE_RESET)
@@ -833,14 +833,14 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 	vcc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
+uint8_t fidelz80_state::vcc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d3: multiplexed inputs (active low), also language switches
 	uint8_t lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
-WRITE8_MEMBER(fidelz80_state::vcc_ppi_portc_w)
+void fidelz80_state::vcc_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d4-d7: input mux (inverted)
 	m_inp_mux = ~data >> 4 & 0xf;
@@ -854,7 +854,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::beeper_off_callback)
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
+void fidelz80_state::cc10_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d7: enable beeper on falling edge
 	if (m_beeper && ~data & m_7seg_data & 0x80)
@@ -876,7 +876,7 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 
 // TTL
 
-WRITE8_MEMBER(fidelz80_state::bcc_control_w)
+void fidelz80_state::bcc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0-a2,d7: digit segment data via NE591, Q7 is speaker out
 	uint8_t mask = 1 << (offset & 7);
@@ -890,7 +890,7 @@ WRITE8_MEMBER(fidelz80_state::bcc_control_w)
 	m_inp_mux = data & 0xf;
 }
 
-READ8_MEMBER(fidelz80_state::bcc_input_r)
+uint8_t fidelz80_state::bcc_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d3: multiplexed inputs
 	return read_inputs(4);
@@ -914,7 +914,7 @@ void fidelz80_state::vsc_prepare_display()
 
 // I8255 PPI
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
+void fidelz80_state::vsc_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d5: TSI C0-C5
 	m_speech->data_w(space, 0, data & 0x3f);
@@ -924,14 +924,14 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_porta_w)
 	vsc_prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_portb_w)
+void fidelz80_state::vsc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d7: led row data
 	m_led_data = data;
 	vsc_prepare_display();
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
+void fidelz80_state::vsc_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: select digits
 	// d0-d7: select leds, input mux low bits
@@ -943,13 +943,13 @@ WRITE8_MEMBER(fidelz80_state::vsc_ppi_portc_w)
 
 // Z80 PIO
 
-READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
+uint8_t fidelz80_state::vsc_pio_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d7: multiplexed inputs
 	return read_inputs(11);
 }
 
-READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
+uint8_t fidelz80_state::vsc_pio_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -959,7 +959,7 @@ READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 	return data;
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
+void fidelz80_state::vsc_pio_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
@@ -992,7 +992,7 @@ void fidelz80_state::vbrc_prepare_display()
 	display_matrix(16, 8, outdata, m_led_select);
 }
 
-WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
+void fidelz80_state::vbrc_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speech->data_w(space, 0, data & 0x3f);
 	m_speech->start_w(1);
@@ -1002,7 +1002,7 @@ WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
 
 // I8243 I/O expander
 
-WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
+void fidelz80_state::vbrc_ioexp_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// P4-P7: digit segment data
 	m_7seg_data = (m_7seg_data & ~(0xf << (4*offset))) | ((data & 0xf) << (4*offset));
@@ -1012,27 +1012,27 @@ WRITE8_MEMBER(fidelz80_state::vbrc_ioexp_port_w)
 
 // I8041 MCU
 
-WRITE8_MEMBER(fidelz80_state::vbrc_mcu_p1_w)
+void fidelz80_state::vbrc_mcu_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d7: select digits, input mux
 	m_inp_mux = m_led_select = data;
 	vbrc_prepare_display();
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
+uint8_t fidelz80_state::vbrc_mcu_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d3: I8243 P2
 	// d4-d7: multiplexed inputs (active low)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
+uint8_t fidelz80_state::vbrc_mcu_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T0: card scanner?
 	return 0;
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
+uint8_t fidelz80_state::vbrc_mcu_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T1: ? (locks up on const 0 or 1)
 	return rand() & 1;
@@ -1091,7 +1091,7 @@ static ADDRESS_MAP_START( vsc_map, AS_PROGRAM, 8, fidelz80_state )
 ADDRESS_MAP_END
 
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
-READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
+uint8_t fidelz80_state::vsc_io_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff; // open bus
 	if (~offset & 4)
@@ -1102,7 +1102,7 @@ READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 	return data;
 }
 
-WRITE8_MEMBER(fidelz80_state::vsc_io_trampoline_w)
+void fidelz80_state::vsc_io_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~offset & 4)
 		m_ppi8255->write(space, offset & 3, data);

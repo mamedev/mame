@@ -243,7 +243,7 @@ uint32_t nubus_procolor816_device::screen_update(screen_device &screen, bitmap_r
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
+void nubus_procolor816_device::procolor816_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -320,7 +320,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 	}
 }
 
-READ32_MEMBER( nubus_procolor816_device::procolor816_r )
+uint32_t nubus_procolor816_device::procolor816_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0x3dc00)
 	{
@@ -339,12 +339,12 @@ READ32_MEMBER( nubus_procolor816_device::procolor816_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_procolor816_device::vram_w )
+void nubus_procolor816_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_procolor816_device::vram_r )
+uint32_t nubus_procolor816_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

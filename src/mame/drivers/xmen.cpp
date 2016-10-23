@@ -32,7 +32,7 @@ likewise a 2 screen game
 
 ***************************************************************************/
 
-WRITE16_MEMBER(xmen_state::eeprom_w)
+void xmen_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x: write %04x to 108000\n",space.device().safe_pc(),data);
 	if (ACCESSING_BITS_0_7)
@@ -55,12 +55,12 @@ WRITE16_MEMBER(xmen_state::eeprom_w)
 	}
 }
 
-READ16_MEMBER(xmen_state::sound_status_r)
+uint16_t xmen_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundlatch2->read(space, 0);
 }
 
-WRITE16_MEMBER(xmen_state::sound_cmd_w)
+void xmen_state::sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -69,12 +69,12 @@ WRITE16_MEMBER(xmen_state::sound_cmd_w)
 	}
 }
 
-WRITE16_MEMBER(xmen_state::sound_irq_w)
+void xmen_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
+void xmen_state::xmen_18fa00_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -83,7 +83,7 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 	}
 }
 
-WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
+void xmen_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80bank->set_entry(data & 0x07);
 }

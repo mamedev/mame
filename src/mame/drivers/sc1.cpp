@@ -55,9 +55,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_WRITE8_MEMBER( matrix_w );
-	DECLARE_WRITE8_MEMBER( pio_port_a_w );
-	DECLARE_READ8_MEMBER( pio_port_b_r );
+	void matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t m_matrix;
 };
@@ -68,7 +68,7 @@ public:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( sc1_state::pio_port_a_w )
+void sc1_state::pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
 
@@ -89,12 +89,12 @@ WRITE8_MEMBER( sc1_state::pio_port_a_w )
 
 ***************************************************************************/
 
-WRITE8_MEMBER( sc1_state::matrix_w )
+void sc1_state::matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix = data;
 }
 
-READ8_MEMBER( sc1_state::pio_port_b_r )
+uint8_t sc1_state::pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 

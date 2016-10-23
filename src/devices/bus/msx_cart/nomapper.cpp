@@ -84,7 +84,7 @@ void msx_cart_nomapper::initialize_cartridge()
 	m_end_address = std::min<uint32_t>(m_start_address + size, 0x10000);
 }
 
-READ8_MEMBER(msx_cart_nomapper::read_cart)
+uint8_t msx_cart_nomapper::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{

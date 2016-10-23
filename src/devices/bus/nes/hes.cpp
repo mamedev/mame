@@ -73,7 +73,7 @@ void nes_hes_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_hes_device::write_l)
+void nes_hes_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("hes write_l, offset: %04x, data: %02x\n", offset, data));
 

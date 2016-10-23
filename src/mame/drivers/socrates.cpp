@@ -135,20 +135,20 @@ public:
 	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
 	uint8_t m_speech_load_address_count; // number of times load address has happened
 	uint8_t m_speech_load_settings_count; // number of times load settings has happened
-	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
-	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
-	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
-	DECLARE_READ8_MEMBER(read_f3);
-	DECLARE_WRITE8_MEMBER(kbmcu_strobe);
-	DECLARE_READ8_MEMBER(status_and_speech);
-	DECLARE_WRITE8_MEMBER(speech_command);
-	DECLARE_READ8_MEMBER(socrates_keyboard_low_r);
-	DECLARE_READ8_MEMBER(socrates_keyboard_high_r);
-	DECLARE_WRITE8_MEMBER(socrates_keyboard_clear);
-	DECLARE_WRITE8_MEMBER(reset_speech);
-	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
-	DECLARE_WRITE8_MEMBER(socrates_sound_w);
+	uint8_t socrates_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void socrates_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t socrates_ram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void socrates_ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_f3(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbmcu_strobe(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_and_speech(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void speech_command(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t socrates_keyboard_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t socrates_keyboard_high_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void socrates_keyboard_clear(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reset_speech(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void socrates_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void socrates_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_socrates();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -185,16 +185,16 @@ public:
 	required_memory_bank m_bank4;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER( colors_w );
-	DECLARE_READ8_MEMBER( rombank_r );
-	DECLARE_WRITE8_MEMBER( rombank_w );
-	DECLARE_READ8_MEMBER( rambank_r );
-	DECLARE_WRITE8_MEMBER( rambank_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_clear );
-	DECLARE_READ8_MEMBER( video_regs_r );
-	DECLARE_WRITE8_MEMBER( video_regs_w );
-	DECLARE_READ8_MEMBER( status_r );
+	void colors_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rambank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_clear(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_regs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( send_input );
 
 protected:
@@ -347,34 +347,34 @@ void socrates_state::init_socrates()
 	m_maincpu->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-READ8_MEMBER(socrates_state::socrates_rom_bank_r)
+uint8_t socrates_state::socrates_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
+void socrates_state::socrates_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = data;
 	socrates_set_rom_bank();
 }
 
-READ8_MEMBER(socrates_state::socrates_ram_bank_r)
+uint8_t socrates_state::socrates_ram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_bank;
 }
 
-WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
+void socrates_state::socrates_ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = data&0xF;
 	socrates_set_ram_bank();
 }
 
-READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+uint8_t socrates_state::read_f3(address_space &space, offs_t offset, uint8_t mem_mask)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
 	return 0xF3;
 }
 
-WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
+void socrates_state::kbmcu_strobe(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // strobe the keyboard MCU
 {
 	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->pc(), data); //if (m_maincpu->pc() != 0x31D)
 	// if two writes happen within one frame, reset the keyboard latches
@@ -389,7 +389,7 @@ WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
 	}
 }
 
-READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
+uint8_t socrates_state::status_and_speech(address_space &space, offs_t offset, uint8_t mem_mask)// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
@@ -443,7 +443,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
 	m_speech_load_settings_count = 0;
 }
 
-WRITE8_MEMBER(socrates_state::speech_command) // write 0x4x
+void socrates_state::speech_command(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // write 0x4x
 {
 	/*
 	 * 76543210
@@ -550,21 +550,21 @@ SEL 5 4 3 2 1 0
 	m_io40_latch = data;
 }
 
-READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
+uint8_t socrates_state::socrates_keyboard_low_r(address_space &space, offs_t offset, uint8_t mem_mask)// keyboard code low
 {
 	socrates_update_kb();
 	socrates_check_kb_latch();
 	return m_kb_latch_low[0];
 }
 
-READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
+uint8_t socrates_state::socrates_keyboard_high_r(address_space &space, offs_t offset, uint8_t mem_mask)// keyboard code high
 {
 	socrates_update_kb();
 	socrates_check_kb_latch();
 	return m_kb_latch_high[0];
 }
 
-WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/clear
+void socrates_state::socrates_keyboard_clear(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)// keyboard latch shift/clear
 {
 	m_kb_latch_low[0] = m_kb_latch_low[1];
 	m_kb_latch_high[0] = m_kb_latch_high[1];
@@ -572,7 +572,7 @@ WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/cl
 	m_kb_latch_high[1] = 1;
 }
 
-WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
+void socrates_state::reset_speech(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)// i/o 60: reset speech synth
 {
 	m_speech_running = 0;
 	m_speech_address = 0;
@@ -586,7 +586,7 @@ logerror("write to i/o 0x60 of %x\n",data);
 
 /* stuff below belongs in video/nc.c */
 
-WRITE8_MEMBER(socrates_state::socrates_scroll_w)
+void socrates_state::socrates_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	m_scroll_offset = (m_scroll_offset&0x100) | data;
@@ -752,7 +752,7 @@ uint32_t socrates_state::screen_update_socrates(screen_device &screen, bitmap_in
 
 /* below belongs in sound/nc.c */
 
-WRITE8_MEMBER(socrates_state::socrates_sound_w)
+void socrates_state::socrates_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -849,7 +849,7 @@ uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER( iqunlim_state::status_r )
+uint8_t iqunlim_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ---x ----    main battery status
 	// --x- ----    backup battery status
@@ -857,12 +857,12 @@ READ8_MEMBER( iqunlim_state::status_r )
 	return 0x30;
 }
 
-READ8_MEMBER( iqunlim_state::video_regs_r )
+uint8_t iqunlim_state::video_regs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_regs[offset];
 }
 
-WRITE8_MEMBER( iqunlim_state::video_regs_w )
+void iqunlim_state::video_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 2 && ((m_video_regs[offset] ^ data) & 0x02))
 	{
@@ -912,12 +912,12 @@ void iqunlim_state::machine_reset()
 	m_bank4->set_entry(0x00);
 }
 
-READ8_MEMBER( iqunlim_state::rombank_r )
+uint8_t iqunlim_state::rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rombank[offset];
 }
 
-WRITE8_MEMBER( iqunlim_state::rombank_w )
+void iqunlim_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	memory_bank *bank = offset ? m_bank1 : m_bank2;
 	bank->set_entry(data & 0x3f);
@@ -925,19 +925,19 @@ WRITE8_MEMBER( iqunlim_state::rombank_w )
 	m_rombank[offset] = data;
 }
 
-READ8_MEMBER( iqunlim_state::rambank_r )
+uint8_t iqunlim_state::rambank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rambank;
 }
 
-WRITE8_MEMBER( iqunlim_state::rambank_w )
+void iqunlim_state::rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank3->set_entry(((data>>2) & 0x0c) | ((data>>0) & 0x03));
 	m_bank4->set_entry(((data>>4) & 0x0c) | ((data>>2) & 0x03));
 	m_rambank = data;
 }
 
-WRITE8_MEMBER( iqunlim_state::colors_w )
+void iqunlim_state::colors_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colors[offset] = data;
 }
@@ -956,13 +956,13 @@ INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
 	}
 }
 
-WRITE8_MEMBER( iqunlim_state::keyboard_clear )
+void iqunlim_state::keyboard_clear(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_kb_queue.head != m_kb_queue.tail)
 		m_kb_queue.head = (m_kb_queue.head + 1) % sizeof(m_kb_queue.buffer);
 }
 
-READ8_MEMBER( iqunlim_state::keyboard_r )
+uint8_t iqunlim_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 

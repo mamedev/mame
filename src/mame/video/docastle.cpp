@@ -63,25 +63,25 @@ PALETTE_INIT_MEMBER(docastle_state, docastle)
 	}
 }
 
-WRITE8_MEMBER(docastle_state::docastle_videoram_w)
+void docastle_state::docastle_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(docastle_state::docastle_colorram_w)
+void docastle_state::docastle_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(docastle_state::flipscreen_r)
+uint8_t docastle_state::flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 	return (offset ? 1 : 0); // is this really needed?
 }
 
-WRITE8_MEMBER(docastle_state::flipscreen_w)
+void docastle_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 }

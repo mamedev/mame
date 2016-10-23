@@ -60,17 +60,17 @@ Press one of the start buttons to exit.
 #include "includes/wc90.h"
 
 
-WRITE8_MEMBER(wc90_state::bankswitch_w)
+void wc90_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90_state::bankswitch1_w)
+void wc90_state::bankswitch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90_state::sound_command_w)
+void wc90_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

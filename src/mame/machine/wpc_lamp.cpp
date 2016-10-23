@@ -30,13 +30,13 @@ void wpc_lamp_device::update()
 					state[(j<<3)|i] |= 0x80;
 }
 
-WRITE8_MEMBER(wpc_lamp_device::row_w)
+void wpc_lamp_device::row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	row = data;
 	update();
 }
 
-WRITE8_MEMBER(wpc_lamp_device::col_w)
+void wpc_lamp_device::col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	col = data;
 	update();

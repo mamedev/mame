@@ -280,7 +280,7 @@ DISCRETE_SOUND_START(astdelux)
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
+void asteroid_state::asteroid_explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);                // Volume
 	/* We will modify the pitch data to send the divider value. */
@@ -302,24 +302,24 @@ WRITE8_MEMBER(asteroid_state::asteroid_explode_w)
 	m_discrete->write(space, ASTEROID_EXPLODE_PITCH, data);
 }
 
-WRITE8_MEMBER(asteroid_state::asteroid_thump_w)
+void asteroid_state::asteroid_thump_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ASTEROID_THUMP_EN,   data & 0x10);
 	m_discrete->write(space, ASTEROID_THUMP_DATA, data & 0x0f);
 }
 
-WRITE8_MEMBER(asteroid_state::asteroid_sounds_w)
+void asteroid_state::asteroid_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_RELATIVE(ASTEROID_SAUCER_SND_EN, offset), data & 0x80);
 }
 
-WRITE8_MEMBER(asteroid_state::astdelux_sounds_w)
+void asteroid_state::astdelux_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Only ever activates the thrusters in Astdelux */
 	m_discrete->write(space, ASTEROID_THRUST_EN, data & 0x80);
 }
 
-WRITE8_MEMBER(asteroid_state::asteroid_noise_reset_w)
+void asteroid_state::asteroid_noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ASTEROID_NOISE_RESET, 0);
 }

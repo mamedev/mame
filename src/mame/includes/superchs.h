@@ -39,15 +39,15 @@ public:
 	std::unique_ptr<schs_tempsprite[]> m_spritelist;
 	uint32_t m_mem[2];
 
-	DECLARE_READ16_MEMBER(shared_ram_r);
-	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_WRITE32_MEMBER(cpua_ctrl_w);
-	DECLARE_READ32_MEMBER(superchs_input_r);
-	DECLARE_WRITE32_MEMBER(superchs_input_w);
-	DECLARE_READ32_MEMBER(superchs_stick_r);
-	DECLARE_WRITE32_MEMBER(superchs_stick_w);
-	DECLARE_READ32_MEMBER(main_cycle_r);
-	DECLARE_READ16_MEMBER(sub_cycle_r);
+	uint16_t shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cpua_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t superchs_input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void superchs_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t superchs_stick_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void superchs_stick_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t sub_cycle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_superchs();
 	virtual void video_start() override;
 	uint32_t screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

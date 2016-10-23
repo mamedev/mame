@@ -96,7 +96,7 @@ void joystick_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( joystick_interface_device::joystick_r )
+uint8_t joystick_interface_device::joystick_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

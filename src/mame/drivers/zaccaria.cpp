@@ -58,7 +58,7 @@ void zaccaria_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
+void zaccaria_state::dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data & 0xf0)
 	{
@@ -80,7 +80,7 @@ WRITE8_MEMBER(zaccaria_state::dsw_sel_w)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::dsw_r)
+uint8_t zaccaria_state::dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dsw_port[m_dsw_sel]->read();
 }
@@ -88,7 +88,7 @@ READ8_MEMBER(zaccaria_state::dsw_r)
 
 GAME_EXTERN(monymony);
 
-READ8_MEMBER(zaccaria_state::prot1_r)
+uint8_t zaccaria_state::prot1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -108,7 +108,7 @@ READ8_MEMBER(zaccaria_state::prot1_r)
 	}
 }
 
-READ8_MEMBER(zaccaria_state::prot2_r)
+uint8_t zaccaria_state::prot2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -130,12 +130,12 @@ READ8_MEMBER(zaccaria_state::prot2_r)
 }
 
 
-WRITE8_MEMBER(zaccaria_state::coin_w)
+void zaccaria_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 }
 
-WRITE8_MEMBER(zaccaria_state::nmi_mask_w)
+void zaccaria_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(zaccaria_state::ressound_w)
+void zaccaria_state::ressound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiopcb->ressound_w(data & 0x01);
 }

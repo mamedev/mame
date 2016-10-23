@@ -21,8 +21,8 @@ protected:
 	uint16_t m_p3;
 
 public:
-	virtual DECLARE_READ16_MEMBER( read ) = 0;
-	virtual DECLARE_WRITE16_MEMBER( write ) = 0;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) = 0;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 };
 
 /* tekken 2 */
@@ -32,8 +32,8 @@ class keycus_c406_device : public ns11_keycus_device
 public:
 	keycus_c406_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C406;
@@ -45,8 +45,8 @@ class keycus_c409_device : public ns11_keycus_device
 public:
 	keycus_c409_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C409;
@@ -58,8 +58,8 @@ class keycus_c410_device : public ns11_keycus_device
 public:
 	keycus_c410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C410;
@@ -71,8 +71,8 @@ class keycus_c411_device : public ns11_keycus_device
 public:
 	keycus_c411_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C411;
@@ -84,8 +84,8 @@ class keycus_c430_device : public ns11_keycus_device
 public:
 	keycus_c430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C430;
@@ -97,8 +97,8 @@ class keycus_c431_device : public ns11_keycus_device
 public:
 	keycus_c431_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C431;
@@ -110,8 +110,8 @@ class keycus_c432_device : public ns11_keycus_device
 public:
 	keycus_c432_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C432;
@@ -123,8 +123,8 @@ class keycus_c442_device : public ns11_keycus_device
 public:
 	keycus_c442_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C442;
@@ -136,8 +136,8 @@ class keycus_c443_device : public ns11_keycus_device
 public:
 	keycus_c443_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER( read ) override;
-	virtual DECLARE_WRITE16_MEMBER( write ) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 extern const device_type KEYCUS_C443;

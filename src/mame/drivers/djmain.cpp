@@ -91,7 +91,7 @@ void djmain_state::sndram_set_bank()
 	m_sndram = memregion("shared")->base() + 0x80000 * m_sndram_bank;
 }
 
-WRITE32_MEMBER(djmain_state::sndram_bank_w)
+void djmain_state::sndram_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -100,7 +100,7 @@ WRITE32_MEMBER(djmain_state::sndram_bank_w)
 	}
 }
 
-READ32_MEMBER(djmain_state::sndram_r)
+uint32_t djmain_state::sndram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 
@@ -119,7 +119,7 @@ READ32_MEMBER(djmain_state::sndram_r)
 	return data;
 }
 
-WRITE32_MEMBER(djmain_state::sndram_w)
+void djmain_state::sndram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 		m_sndram[offset * 4] = data >> 24;
@@ -137,7 +137,7 @@ WRITE32_MEMBER(djmain_state::sndram_w)
 
 //---------
 
-READ32_MEMBER(djmain_state::obj_ctrl_r)
+uint32_t djmain_state::obj_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// read m_obj_regs[0x0c/4]: unknown
 	// read m_obj_regs[0x24/4]: unknown
@@ -145,14 +145,14 @@ READ32_MEMBER(djmain_state::obj_ctrl_r)
 	return m_obj_regs[offset];
 }
 
-WRITE32_MEMBER(djmain_state::obj_ctrl_w)
+void djmain_state::obj_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// write m_obj_regs[0x28/4]: bank for rom readthrough
 
 	COMBINE_DATA(&m_obj_regs[offset]);
 }
 
-READ32_MEMBER(djmain_state::obj_rom_r)
+uint32_t djmain_state::obj_rom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t *mem8 = memregion("gfx1")->base();
 	int bank = m_obj_regs[0x28/4] >> 16;
@@ -172,7 +172,7 @@ READ32_MEMBER(djmain_state::obj_rom_r)
 
 //---------
 
-WRITE32_MEMBER(djmain_state::v_ctrl_w)
+void djmain_state::v_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -188,7 +188,7 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 	}
 }
 
-READ32_MEMBER(djmain_state::v_rom_r)
+uint32_t djmain_state::v_rom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t *mem8 = memregion("gfx2")->base();
 	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
@@ -209,19 +209,19 @@ READ32_MEMBER(djmain_state::v_rom_r)
 
 //---------
 
-READ8_MEMBER(djmain_state::inp1_r)
+uint8_t djmain_state::inp1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "DSW3", "BTN3", "BTN2", "BTN1" };
 	return ioport(portnames[ offset & 0x03 ])->read();
 }
 
-READ8_MEMBER(djmain_state::inp2_r)
+uint8_t djmain_state::inp2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "DSW1", "DSW2", "UNK2", "UNK1" };
 	return ioport(portnames[ offset & 0x03 ])->read();
 }
 
-READ32_MEMBER(djmain_state::turntable_r)
+uint32_t djmain_state::turntable_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -246,7 +246,7 @@ READ32_MEMBER(djmain_state::turntable_r)
 	return result;
 }
 
-WRITE32_MEMBER(djmain_state::turntable_select_w)
+void djmain_state::turntable_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 		m_turntable_select = (data >> 19) & 1;
@@ -286,7 +286,7 @@ WRITE32_MEMBER(djmain_state::turntable_select_w)
        15: not used?        (always low)
 */
 
-WRITE32_MEMBER(djmain_state::light_ctrl_1_w)
+void djmain_state::light_ctrl_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -297,7 +297,7 @@ WRITE32_MEMBER(djmain_state::light_ctrl_1_w)
 	}
 }
 
-WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
+void djmain_state::light_ctrl_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -314,17 +314,17 @@ WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 
 // unknown ports :-(
 
-WRITE32_MEMBER(djmain_state::unknown590000_w)
+void djmain_state::unknown590000_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(djmain_state::unknown802000_w)
+void djmain_state::unknown802000_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(djmain_state::unknownc02000_w)
+void djmain_state::unknownc02000_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", space.device().safe_pcbase(), offset, data, mem_mask);
 }

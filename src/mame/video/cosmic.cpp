@@ -12,7 +12,7 @@
 #include "includes/cosmic.h"
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
+void cosmic_state::cosmic_color_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_registers[offset] = data ? 1 : 0;
 }
@@ -228,7 +228,7 @@ PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
+void cosmic_state::cosmic_background_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_background_enable = data;
 }

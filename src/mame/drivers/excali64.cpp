@@ -66,26 +66,26 @@ public:
 	{ }
 
 	DECLARE_PALETTE_INIT(excali64);
-	DECLARE_WRITE8_MEMBER(ppib_w);
-	DECLARE_READ8_MEMBER(ppic_r);
-	DECLARE_WRITE8_MEMBER(ppic_w);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port50_r);
-	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE8_MEMBER(porte4_w);
-	DECLARE_READ8_MEMBER(porte8_r);
-	DECLARE_WRITE8_MEMBER(portec_w);
+	void ppib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port50_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void porte4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t porte8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
-	DECLARE_WRITE8_MEMBER(motor_w);
+	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_excali64();
 	required_device<palette_device> m_palette;
 
@@ -235,19 +235,19 @@ static SLOT_INTERFACE_START( excali64_floppies )
 SLOT_INTERFACE_END
 
 // pulses from port E4 bit 5 restart the 74123. After 3.6 secs without a pulse, the motor gets turned off.
-WRITE8_MEMBER( excali64_state::motor_w )
+void excali64_state::motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_motor = BIT(data, 0);
 	m_floppy1->get_device()->mon_w(!m_motor);
 	m_floppy0->get_device()->mon_w(!m_motor);
 }
 
-READ8_MEMBER( excali64_state::porte8_r )
+uint8_t excali64_state::porte8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfc | (uint8_t)m_motor;
 }
 
-WRITE8_MEMBER( excali64_state::porte4_w )
+void excali64_state::porte4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 0))
@@ -268,7 +268,7 @@ d0 = precomp (selectable by jumper)
 d1 = size select (we only support 13cm)
 d2 = density select (0 = double)
 */
-WRITE8_MEMBER( excali64_state::portec_w )
+void excali64_state::portec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->dden_w(BIT(data, 2));
 }
@@ -280,36 +280,36 @@ WRITE_LINE_MEMBER( excali64_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( excali64_state::memory_read_byte )
+uint8_t excali64_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( excali64_state::memory_write_byte )
+void excali64_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( excali64_state::io_read_byte )
+uint8_t excali64_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( excali64_state::io_write_byte )
+void excali64_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
 }
 
-WRITE8_MEMBER( excali64_state::ppib_w )
+void excali64_state::ppib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( excali64_state::ppic_r )
+uint8_t excali64_state::ppic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xf4; // READY line must be low to print
 	data |= (uint8_t)m_centronics_busy;
@@ -317,13 +317,13 @@ READ8_MEMBER( excali64_state::ppic_r )
 	return data;
 }
 
-WRITE8_MEMBER( excali64_state::ppic_w )
+void excali64_state::ppic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 	m_centronics->write_strobe(BIT(data, 4));
 }
 
-READ8_MEMBER( excali64_state::port00_r )
+uint8_t excali64_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -344,7 +344,7 @@ d3 : 2nd colour set (previously, dispen, which is a mistake in hardware and sche
 d4 : vsync
 d5 : rombank
 */
-READ8_MEMBER( excali64_state::port50_r )
+uint8_t excali64_state::port50_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_sys_status & 0x2f;
 	bool csync = m_crtc_hs | m_crtc_vs;
@@ -356,7 +356,7 @@ READ8_MEMBER( excali64_state::port50_r )
 d0,1,2,3,5 : same as port50
 (schematic wrongly says d7 used for 2nd colour set)
 */
-WRITE8_MEMBER( excali64_state::port70_w )
+void excali64_state::port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sys_status = data;
 	m_crtc->set_unscaled_clock(BIT(data, 2) ? 2e6 : 1e6);

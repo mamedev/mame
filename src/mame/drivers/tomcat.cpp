@@ -56,32 +56,32 @@ public:
 	uint8_t m_nvram[0x800];
 	int m_dsp_BIO;
 	int m_dsp_idle;
-	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
-	DECLARE_READ16_MEMBER(tomcat_adcread_r);
-	DECLARE_READ16_MEMBER(tomcat_inputs_r);
-	DECLARE_WRITE16_MEMBER(tomcat_led1on_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led2on_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led2off_w);
-	DECLARE_WRITE16_MEMBER(tomcat_led1off_w);
-	DECLARE_WRITE16_MEMBER(tomcat_lnkmodel_w);
-	DECLARE_WRITE16_MEMBER(tomcat_errl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_errh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_ackl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_ackh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_lnkmodeh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_txbuffl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_txbuffh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_sndresl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_sndresh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_mresl_w);
-	DECLARE_WRITE16_MEMBER(tomcat_mresh_w);
-	DECLARE_WRITE16_MEMBER(tomcat_irqclr_w);
-	DECLARE_READ16_MEMBER(tomcat_inputs2_r);
-	DECLARE_READ16_MEMBER(tomcat_320bio_r);
-	DECLARE_READ8_MEMBER(tomcat_nvram_r);
-	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
+	void tomcat_adcon_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tomcat_adcread_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tomcat_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tomcat_led1on_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_led2on_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_led2off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_led1off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_lnkmodel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_errl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_errh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_ackl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_ackh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_lnkmodeh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_txbuffl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_txbuffh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_sndresl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_sndresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_mresl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_mresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tomcat_irqclr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tomcat_inputs2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tomcat_320bio_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t tomcat_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tomcat_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
-	DECLARE_WRITE8_MEMBER(soundlatches_w);
+	void soundlatches_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
@@ -89,12 +89,12 @@ public:
 
 
 
-WRITE16_MEMBER(tomcat_state::tomcat_adcon_w)
+void tomcat_state::tomcat_adcon_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_control_num = data;
 }
 
-READ16_MEMBER(tomcat_state::tomcat_adcread_r)
+uint16_t tomcat_state::tomcat_adcread_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( m_control_num )
 	{
@@ -104,7 +104,7 @@ READ16_MEMBER(tomcat_state::tomcat_adcread_r)
 	}
 }
 
-READ16_MEMBER(tomcat_state::tomcat_inputs_r)
+uint16_t tomcat_state::tomcat_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0;
 	if (ACCESSING_BITS_8_15)
@@ -113,88 +113,88 @@ READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 	return result;
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led1on_w)
+void tomcat_state::tomcat_led1on_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_led_value(1, 1);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led2on_w)
+void tomcat_state::tomcat_led2on_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_led_value(2, 1);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led2off_w)
+void tomcat_state::tomcat_led2off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_led_value(2, 0);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_led1off_w)
+void tomcat_state::tomcat_led1off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_led_value(1, 0);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_lnkmodel_w)
+void tomcat_state::tomcat_lnkmodel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Mode Low (address strobe)
 	// Master does not respond to Interrupts
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_errl_w)
+void tomcat_state::tomcat_errl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Error Flag Low (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_errh_w)
+void tomcat_state::tomcat_errh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Error Flag High (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_ackl_w)
+void tomcat_state::tomcat_ackl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link ACK Flag Low (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_ackh_w)
+void tomcat_state::tomcat_ackh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link ACK Flag High (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_lnkmodeh_w)
+void tomcat_state::tomcat_lnkmodeh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Mode high (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_txbuffl_w)
+void tomcat_state::tomcat_txbuffl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Buffer Control (address strobe)
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_txbuffh_w)
+void tomcat_state::tomcat_txbuffh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Link Buffer Control high (address strobe)
 	// Turn off TX (Link) Buffer
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_sndresl_w)
+void tomcat_state::tomcat_sndresl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Sound Reset Low       (Address Strobe)
 	// Reset Sound System
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_sndresh_w)
+void tomcat_state::tomcat_sndresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Sound Reset high      (Address Strobe)
 	// Release reset of sound system
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_mresl_w)
+void tomcat_state::tomcat_mresl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
+void tomcat_state::tomcat_mresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
@@ -202,13 +202,13 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)
+void tomcat_state::tomcat_irqclr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Clear IRQ Latch          (Address Strobe)
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
+uint16_t tomcat_state::tomcat_inputs2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 /*
 *       D15 LNKFLAG     (Game Link)
@@ -223,7 +223,7 @@ READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
 	return m_dsp_idle ? 0 : (1 << 9);
 }
 
-READ16_MEMBER(tomcat_state::tomcat_320bio_r)
+uint16_t tomcat_state::tomcat_320bio_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_dsp_BIO = 1;
 	m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
@@ -262,12 +262,12 @@ READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
 	}
 }
 
-READ8_MEMBER(tomcat_state::tomcat_nvram_r)
+uint8_t tomcat_state::tomcat_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(tomcat_state::tomcat_nvram_w)
+void tomcat_state::tomcat_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset] = data;
 }
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tomcat_state::soundlatches_w)
+void tomcat_state::soundlatches_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

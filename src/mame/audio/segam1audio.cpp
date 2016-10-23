@@ -112,7 +112,7 @@ void segam1audio_device::device_reset()
 	memset(m_to_68k, 0, sizeof(m_to_68k));
 }
 
-READ16_MEMBER(segam1audio_device::m1_snd_68k_latch_r)
+uint16_t segam1audio_device::m1_snd_68k_latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retval;
 
@@ -124,30 +124,30 @@ READ16_MEMBER(segam1audio_device::m1_snd_68k_latch_r)
 	return retval;
 }
 
-READ16_MEMBER(segam1audio_device::m1_snd_v60_ready_r)
+uint16_t segam1audio_device::m1_snd_v60_ready_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 1;
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk1_w)
+void segam1audio_device::m1_snd_mpcm_bnk1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_multipcm_1->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk2_w)
+void segam1audio_device::m1_snd_mpcm_bnk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_multipcm_2->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_68k_latch1_w)
+void segam1audio_device::m1_snd_68k_latch1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER(segam1audio_device::m1_snd_68k_latch2_w)
+void segam1audio_device::m1_snd_68k_latch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER(segam1audio_device::ready_r)
+uint16_t segam1audio_device::ready_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int sr = m_audiocpu->state_int(M68K_SR);
 

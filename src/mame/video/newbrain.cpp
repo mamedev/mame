@@ -26,7 +26,7 @@ void newbrain_state::tvl(uint8_t data, int a6)
 	if (LOG) logerror("%s %s TVL %04x\n", machine().time().as_string(), machine().describe_context(), m_tvl);
 }
 
-WRITE8_MEMBER( newbrain_state::tvtl_w )
+void newbrain_state::tvtl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

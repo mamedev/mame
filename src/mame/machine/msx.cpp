@@ -225,7 +225,7 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 */
 
 
-READ8_MEMBER(msx_state::msx_psg_port_a_r)
+uint8_t msx_state::msx_psg_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -273,16 +273,16 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	return data;
 }
 
-READ8_MEMBER(msx_state::msx_psg_port_b_r)
+uint8_t msx_state::msx_psg_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_psg_b;
 }
 
-WRITE8_MEMBER(msx_state::msx_psg_port_a_w)
+void msx_state::msx_psg_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
+void msx_state::msx_psg_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Arabic or kana mode led */
 	if ( (data ^ m_psg_b) & 0x80)
@@ -305,17 +305,17 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 ** RTC functions
 */
 
-WRITE8_MEMBER( msx_state::msx_rtc_latch_w )
+void msx_state::msx_rtc_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc_latch = data & 15;
 }
 
-WRITE8_MEMBER( msx_state::msx_rtc_reg_w )
+void msx_state::msx_rtc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, m_rtc_latch, data);
 }
 
-READ8_MEMBER( msx_state::msx_rtc_reg_r )
+uint8_t msx_state::msx_rtc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->read(space, m_rtc_latch);
 }
@@ -325,7 +325,7 @@ READ8_MEMBER( msx_state::msx_rtc_reg_r )
 ** The PPI functions
 */
 
-WRITE8_MEMBER( msx_state::msx_ppi_port_a_w )
+void msx_state::msx_ppi_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_primary_slot = data;
 
@@ -334,7 +334,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_a_w )
 	msx_memory_map_all ();
 }
 
-WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
+void msx_state::msx_ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data & 0x0f;
 
@@ -357,7 +357,7 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 	m_port_c_old = data;
 }
 
-READ8_MEMBER( msx_state::msx_ppi_port_b_r )
+uint8_t msx_state::msx_ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 	int row, data;
@@ -447,17 +447,17 @@ void msx_state::msx_memory_map_all ()
 		msx_memory_map_page (i);
 }
 
-READ8_MEMBER( msx_state::msx_mem_read )
+uint8_t msx_state::msx_mem_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_current_page[offset >> 14]->read(space, offset);
 }
 
-WRITE8_MEMBER( msx_state::msx_mem_write )
+void msx_state::msx_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_current_page[offset >> 14]->write(space, offset, data);
 }
 
-WRITE8_MEMBER( msx_state::msx_sec_slot_w )
+void msx_state::msx_sec_slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slot = m_primary_slot >> 6;
 	if (m_slot_expanded[slot])
@@ -472,7 +472,7 @@ WRITE8_MEMBER( msx_state::msx_sec_slot_w )
 		m_current_page[3]->write(space, 0xffff, data);
 }
 
-READ8_MEMBER( msx_state::msx_sec_slot_r )
+uint8_t msx_state::msx_sec_slot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slot = m_primary_slot >> 6;
 
@@ -486,7 +486,7 @@ READ8_MEMBER( msx_state::msx_sec_slot_r )
 	}
 }
 
-READ8_MEMBER( msx_state::msx_kanji_r )
+uint8_t msx_state::msx_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -501,7 +501,7 @@ READ8_MEMBER( msx_state::msx_kanji_r )
 	return result;
 }
 
-WRITE8_MEMBER( msx_state::msx_kanji_w )
+void msx_state::msx_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		m_kanji_latch = (m_kanji_latch & 0x007E0) | ((data & 0x3f) << 11);
@@ -509,13 +509,13 @@ WRITE8_MEMBER( msx_state::msx_kanji_w )
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-READ8_MEMBER( msx_state::msx_switched_r )
+uint8_t msx_state::msx_switched_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read from selected switched device
 	return this->space().read_byte( (m_current_switched_device << 8) | offset );
 }
 
-WRITE8_MEMBER( msx_state::msx_switched_w )
+void msx_state::msx_switched_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{

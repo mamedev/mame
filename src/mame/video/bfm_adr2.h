@@ -13,25 +13,25 @@ public:
 	TILE_GET_INFO_MEMBER( get_tile1_info );
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER( adder2_vbl );
-	DECLARE_READ8_MEMBER( screen_ram_r );
-	DECLARE_WRITE8_MEMBER( screen_ram_w );
-	DECLARE_READ8_MEMBER( normal_ram_r );
-	DECLARE_WRITE8_MEMBER( normal_ram_w );
-	DECLARE_WRITE8_MEMBER( adder2_rom_page_w );
-	DECLARE_WRITE8_MEMBER( adder2_c001_w );
-	DECLARE_WRITE8_MEMBER( adder2_screen_page_w );
-	DECLARE_READ8_MEMBER( adder2_vbl_ctrl_r );
-	DECLARE_WRITE8_MEMBER( adder2_vbl_ctrl_w );
-	DECLARE_READ8_MEMBER( adder2_uart_ctrl_r );
-	DECLARE_WRITE8_MEMBER( adder2_uart_ctrl_w );
-	DECLARE_READ8_MEMBER( adder2_uart_rx_r );
-	DECLARE_WRITE8_MEMBER( adder2_uart_tx_w );
-	DECLARE_READ8_MEMBER( adder2_irq_r );
+	uint8_t screen_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void screen_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t normal_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void normal_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adder2_rom_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adder2_c001_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adder2_screen_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adder2_vbl_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adder2_vbl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adder2_uart_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adder2_uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adder2_uart_rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adder2_uart_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adder2_irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(vid_uart_tx_w);
-	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
-	DECLARE_READ8_MEMBER(vid_uart_rx_r);
-	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
+	void vid_uart_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vid_uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vid_uart_rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vid_uart_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void adder2_decode_char_roms();
 

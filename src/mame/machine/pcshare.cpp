@@ -30,7 +30,7 @@ WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
 }
 
 
-READ8_MEMBER(pcat_base_state::pc_dma_read_byte)
+uint8_t pcat_base_state::pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 
@@ -41,7 +41,7 @@ READ8_MEMBER(pcat_base_state::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(pcat_base_state::pc_dma_write_byte)
+void pcat_base_state::pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
@@ -50,7 +50,7 @@ WRITE8_MEMBER(pcat_base_state::pc_dma_write_byte)
 	prog_space.write_byte(page_offset + offset, data);
 }
 
-READ8_MEMBER(pcat_base_state::dma_page_select_r)
+uint8_t pcat_base_state::dma_page_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_at_pages[offset % 0x10];
 
@@ -73,7 +73,7 @@ READ8_MEMBER(pcat_base_state::dma_page_select_r)
 }
 
 
-WRITE8_MEMBER(pcat_base_state::dma_page_select_w)
+void pcat_base_state::dma_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_at_pages[offset % 0x10] = data;
 
@@ -108,7 +108,7 @@ WRITE_LINE_MEMBER( pcat_base_state::pc_dack3_w ) { set_dma_channel(3, state); }
 8259 IRQ controller
 ******************/
 
-READ8_MEMBER( pcat_base_state::get_slave_ack )
+uint8_t pcat_base_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==2) { // IRQ = 2
 		return m_pic8259_2->acknowledge();

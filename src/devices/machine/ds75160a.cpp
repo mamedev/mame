@@ -58,7 +58,7 @@ void ds75160a_device::device_start()
 //  read - read data bus
 //-------------------------------------------------
 
-READ8_MEMBER( ds75160a_device::read )
+uint8_t ds75160a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -75,7 +75,7 @@ READ8_MEMBER( ds75160a_device::read )
 //  write - write data bus
 //-------------------------------------------------
 
-WRITE8_MEMBER( ds75160a_device::write )
+void ds75160a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data = data;
 

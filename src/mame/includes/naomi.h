@@ -69,16 +69,16 @@ class naomi_state : public dc_state
 	void init_hotd2();
 	void init_naomi_mp();
 
-	DECLARE_READ64_MEMBER( naomi_arm_r );
-	DECLARE_WRITE64_MEMBER( naomi_arm_w );
-	DECLARE_READ64_MEMBER( naomi_unknown1_r );
-	DECLARE_WRITE64_MEMBER( naomi_unknown1_w );
-	DECLARE_READ64_MEMBER( eeprom_93c46a_r );
-	DECLARE_WRITE64_MEMBER( eeprom_93c46a_w );
-	DECLARE_READ64_MEMBER( aw_flash_r );
-	DECLARE_WRITE64_MEMBER( aw_flash_w );
-	DECLARE_READ64_MEMBER( aw_modem_r );
-	DECLARE_WRITE64_MEMBER( aw_modem_w );
+	uint64_t naomi_arm_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void naomi_arm_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomi_unknown1_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void naomi_unknown1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t eeprom_93c46a_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void eeprom_93c46a_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t aw_flash_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void aw_flash_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t aw_modem_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void aw_modem_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	uint8_t m_mp_mux;
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
@@ -91,15 +91,15 @@ class naomi_state : public dc_state
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
 
-	DECLARE_READ64_MEMBER( naomi_biose_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomi_biosh_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomi2_biose_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxxsla_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxx_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_ggxxrl_idle_skip_r );
-	DECLARE_READ64_MEMBER( naomigd_sfz3ugd_idle_skip_r );
-	DECLARE_READ64_MEMBER( hotd2_idle_skip_r );
-	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
+	uint64_t naomi_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomi_biosh_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomi2_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomigd_ggxxsla_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomigd_ggxx_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomigd_ggxxrl_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t naomigd_sfz3ugd_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t hotd2_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t xtrmhnt2_hack_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 };
 
 MACHINE_CONFIG_EXTERN(naomi_aw_base);

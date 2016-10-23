@@ -180,12 +180,12 @@ void bbc_weddb3_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_weddb2_device::wd177xl_read)
+uint8_t bbc_weddb2_device::wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_weddb2_device::wd177xl_write)
+void bbc_weddb2_device::wd177xl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -208,12 +208,12 @@ WRITE8_MEMBER(bbc_weddb2_device::wd177xl_write)
 	if (!BIT(data, 3)) m_fdc->soft_reset();
 }
 
-READ8_MEMBER(bbc_weddb3_device::wd177xl_read)
+uint8_t bbc_weddb3_device::wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_weddb3_device::wd177xl_write)
+void bbc_weddb3_device::wd177xl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

@@ -28,7 +28,7 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start() override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+		virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 private:
 		// internal state
 		required_device<dac_byte_interface> m_ldac;

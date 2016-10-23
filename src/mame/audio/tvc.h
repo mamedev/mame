@@ -29,7 +29,7 @@ public:
 
 	template<class _Object> static devcb_base &set_sndint_wr_callback(device_t &device, _Object object) { return downcast<tvc_sound_device &>(device).m_write_sndint.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void reset_divider();
 
 protected:

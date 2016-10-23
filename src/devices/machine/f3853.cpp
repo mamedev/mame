@@ -155,7 +155,7 @@ void f3853_device::set_priority_in_line(int level)
 }
 
 
-READ8_MEMBER(f3853_device::read)
+uint8_t f3853_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -178,7 +178,7 @@ READ8_MEMBER(f3853_device::read)
 }
 
 
-WRITE8_MEMBER(f3853_device::write)
+void f3853_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

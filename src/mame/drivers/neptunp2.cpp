@@ -21,7 +21,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(test_r);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -44,7 +44,7 @@ uint32_t neptunp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER( neptunp2_state::test_r )
+uint8_t neptunp2_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

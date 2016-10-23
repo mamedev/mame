@@ -320,7 +320,7 @@ TIMER_CALLBACK_MEMBER( mc68681_device::duart_timer_callback )
 
 }
 
-READ8_MEMBER( mc68681_device::read )
+uint8_t mc68681_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0xff;
 
@@ -424,7 +424,7 @@ READ8_MEMBER( mc68681_device::read )
 	return r;
 }
 
-WRITE8_MEMBER( mc68681_device::write )
+void mc68681_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x0f;
 	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", tag(), offset, duart68681_reg_write_names[offset], data ));

@@ -228,7 +228,7 @@ const address_space_config *sed1330_device::memory_space_config(address_spacenum
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( sed1330_device::status_r )
+uint8_t sed1330_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("SED1330 '%s' Status Read: %s\n", tag(), m_bf ? "busy" : "ready");
 
@@ -240,7 +240,7 @@ READ8_MEMBER( sed1330_device::status_r )
 //  command_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sed1330_device::command_w )
+void sed1330_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ir = data;
 	m_pbc = 0;
@@ -276,7 +276,7 @@ WRITE8_MEMBER( sed1330_device::command_w )
 //  data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( sed1330_device::data_r )
+uint8_t sed1330_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = readbyte(m_csr);
 
@@ -292,7 +292,7 @@ READ8_MEMBER( sed1330_device::data_r )
 //  data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sed1330_device::data_w )
+void sed1330_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_ir)
 	{

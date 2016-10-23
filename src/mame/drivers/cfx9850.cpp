@@ -44,10 +44,10 @@ public:
 		m_ko12(*this, "KO12") ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
-	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
-	DECLARE_READ8_MEMBER(cfx9850_ki_r);
-	DECLARE_READ8_MEMBER(cfx9850_battery_level_r);
+	void cfx9850_kol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cfx9850_koh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cfx9850_ki_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cfx9850_battery_level_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_display_ram;
 	uint16_t m_ko;                /* KO lines KO1 - KO14 */
@@ -83,18 +83,18 @@ static ADDRESS_MAP_START( cfx9850, AS_PROGRAM, 8, cfx9850_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( cfx9850_state::cfx9850_kol_w )
+void cfx9850_state::cfx9850_kol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ko = ( m_ko & 0xff00 ) | data;
 }
 
-WRITE8_MEMBER( cfx9850_state::cfx9850_koh_w )
+void cfx9850_state::cfx9850_koh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ko = ( m_ko & 0x00ff ) | ( data << 8 );
 }
 
 
-READ8_MEMBER( cfx9850_state::cfx9850_ki_r )
+uint8_t cfx9850_state::cfx9850_ki_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -115,7 +115,7 @@ READ8_MEMBER( cfx9850_state::cfx9850_ki_r )
 }
 
 
-READ8_MEMBER( cfx9850_state::cfx9850_battery_level_r )
+uint8_t cfx9850_state::cfx9850_battery_level_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x30;
 }

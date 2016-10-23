@@ -1186,7 +1186,7 @@
 // Main CPU
 
 /* SCI, prelim! */
-READ32_MEMBER(namcos22_state::namcos22_sci_r)
+uint32_t namcos22_state::namcos22_sci_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1199,7 +1199,7 @@ READ32_MEMBER(namcos22_state::namcos22_sci_r)
 }
 
 #if 0
-WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
+void namcos22_state::namcos22_sci_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sci_regs[offset]);
 	/*
@@ -1271,7 +1271,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_sci_w)
 
 0x1c: dsp control
 */
-WRITE8_MEMBER(namcos22_state::namcos22s_system_controller_w)
+void namcos22_state::namcos22s_system_controller_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1414,7 +1414,7 @@ INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
 0x1a: 0 or 1 or 0xff -> DSP control
 0x1b: ?
 */
-WRITE8_MEMBER(namcos22_state::namcos22_system_controller_w)
+void namcos22_state::namcos22_system_controller_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1569,18 +1569,18 @@ INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
 	}
 }
 
-READ8_MEMBER(namcos22_state::namcos22_system_controller_r)
+uint8_t namcos22_state::namcos22_system_controller_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_syscontrol[offset];
 }
 
 
-READ32_MEMBER(namcos22_state::namcos22_dspram_r)
+uint32_t namcos22_state::namcos22_dspram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_polygonram[offset] | 0xff000000; // only d0-23 are connected
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
+void namcos22_state::namcos22_dspram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1592,7 +1592,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 }
 
 
-READ16_MEMBER(namcos22_state::namcos22_keycus_r)
+uint16_t namcos22_state::namcos22_keycus_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Like other Namco hardware, this chip is used for protection as well as
 	// reading random values in some games for example in timecris to determine
@@ -1657,7 +1657,7 @@ READ16_MEMBER(namcos22_state::namcos22_keycus_r)
 	return m_keycus_rng;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
+void namcos22_state::namcos22_keycus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// for obfuscating keycus and/or random seed?
 }
@@ -1677,24 +1677,24 @@ WRITE16_MEMBER(namcos22_state::namcos22_keycus_w)
  * Other values seem to be digital versions of analog ports, for example "the gas pedal is
  * pressed" as a boolean flag.  IO RAM supplies it as an analog value.
  */
-READ16_MEMBER(namcos22_state::namcos22_portbit_r)
+uint16_t namcos22_state::namcos22_portbit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_portbits[offset] & 1;
 	m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
 	return ret;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_portbit_w)
+void namcos22_state::namcos22_portbit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_portbits[offset] = ((offset == 0) ? m_p1 : m_p2).read_safe(0xffff);
 }
 
-READ16_MEMBER(namcos22_state::namcos22_dipswitch_r)
+uint16_t namcos22_state::namcos22_dipswitch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("DSW0")->read();
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
+void namcos22_state::namcos22_cpuleds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 8 leds on cpu board, 0=on 1=off
 	// on system 22: two rows of 4 red leds
@@ -1703,7 +1703,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_cpuleds_w)
 		output().set_lamp_value(i, (~data << i & 0x80) ? 0 : 1);
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
+void namcos22_state::namcos22s_chipselect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// assume that this register is for chip enable/disable
 	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
@@ -1953,7 +1953,7 @@ ADDRESS_MAP_END
 
 
 // Time Crisis gun
-READ32_MEMBER(namcos22_state::namcos22_gun_r)
+uint32_t namcos22_state::namcos22_gun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t xpos = ioport("LIGHTX")->read();
 	uint16_t ypos = ioport("LIGHTY")->read();
@@ -1980,12 +1980,12 @@ ADDRESS_MAP_END
 
 
 // Alpine Surfer protection
-READ32_MEMBER(namcos22_state::alpinesa_prot_r)
+uint32_t namcos22_state::alpinesa_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_alpinesa_protection;
 }
 
-WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
+void namcos22_state::alpinesa_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (data)
 	{
@@ -2036,7 +2036,7 @@ void namcos22_state::slave_enable()
 }
 
 
-READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
+uint16_t namcos22_state::namcos22_dspram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t value = m_polygonram[offset];
 
@@ -2062,7 +2062,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 	return (uint16_t)value;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
+void namcos22_state::namcos22_dspram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t value = m_polygonram[offset];
 	uint16_t lo = value & 0xffff;
@@ -2090,7 +2090,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 	m_polygonram[offset] = (hi << 16) | lo;
 }
 
-WRITE16_MEMBER(namcos22_state::namcos22_dspram16_bank_w)
+void namcos22_state::namcos22_dspram16_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dspram_bank);
 }
@@ -2140,35 +2140,35 @@ int32_t namcos22_state::point_read(int32_t addr)
 }
 
 
-WRITE16_MEMBER(namcos22_state::point_address_w)
+void namcos22_state::point_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_point_address <<= 16;
 	m_point_address |= data;
 }
 
-WRITE16_MEMBER(namcos22_state::point_loword_iw)
+void namcos22_state::point_loword_iw(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_point_data |= data;
 	point_write(m_point_address++, m_point_data);
 }
 
-WRITE16_MEMBER(namcos22_state::point_hiword_w)
+void namcos22_state::point_hiword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_point_data = data << 16;
 }
 
-READ16_MEMBER(namcos22_state::point_loword_r)
+uint16_t namcos22_state::point_loword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return point_read(m_point_address & 0x00ffffff) & 0xffff;
 }
 
-READ16_MEMBER(namcos22_state::point_hiword_ir)
+uint16_t namcos22_state::point_hiword_ir(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return point_read(m_point_address++ & 0x00ffffff) >> 16 & 0xffff;
 }
 
 
-READ16_MEMBER(namcos22_state::pdp_status_r)
+uint16_t namcos22_state::pdp_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_master_bioz;
 }
@@ -2183,7 +2183,7 @@ void namcos22_state::pdp_polygonram_write(offs_t offs, uint32_t data)
 	m_polygonram[offs & 0x7fff] = data;
 }
 
-READ16_MEMBER(namcos22_state::pdp_begin_r)
+uint16_t namcos22_state::pdp_begin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* this feature appears to be only used on Super System22 hardware */
 	if (m_is_ss22)
@@ -2302,33 +2302,33 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos22_state::slave_external_ram_r)
+uint16_t namcos22_state::slave_external_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pSlaveExternalRAM[offset];
 }
 
-WRITE16_MEMBER(namcos22_state::slave_external_ram_w)
+void namcos22_state::slave_external_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pSlaveExternalRAM[offset]);
 }
 
-READ16_MEMBER(namcos22_state::dsp_hold_signal_r)
+uint16_t namcos22_state::dsp_hold_signal_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* STUB */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_hold_ack_w)
+void namcos22_state::dsp_hold_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* STUB */
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_xf_output_w)
+void namcos22_state::dsp_xf_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* STUB */
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
+void namcos22_state::dsp_unk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/**
 	* Used by Ridge Racer (Japan) to specify baseaddr
@@ -2339,14 +2339,14 @@ WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
 	*/
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
+uint16_t namcos22_state::dsp_unk_port3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_dsp_master_bioz = 0;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
+void namcos22_state::upload_code_to_slave_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (m_dsp_upload_state)
 	{
@@ -2400,41 +2400,41 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 	}
 }
 
-READ16_MEMBER(namcos22_state::dsp_unk8_r)
+uint16_t namcos22_state::dsp_unk8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 0x0001 is busy signal */
 	return 0x0000;
 }
 
-READ16_MEMBER(namcos22_state::custom_ic_status_r)
+uint16_t namcos22_state::custom_ic_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 0x0001 signals completion */
 	return 0x0063;
 }
 
-READ16_MEMBER(namcos22_state::dsp_upload_status_r)
+uint16_t namcos22_state::dsp_upload_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 0x0001 is polled to confirm that code/data has been successfully uploaded to the slave dsp via port 0x7. */
 	return 0x0000;
 }
 
-READ16_MEMBER(namcos22_state::master_external_ram_r)
+uint16_t namcos22_state::master_external_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pMasterExternalRAM[offset];
 }
 
-WRITE16_MEMBER(namcos22_state::master_external_ram_w)
+void namcos22_state::master_external_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pMasterExternalRAM[offset]);
 }
 
-WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
+void namcos22_state::slave_serial_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_SerialDataSlaveToMasterNext = data;
 	logerror("slave_serial_io_w(%04x)\n", data);
 }
 
-READ16_MEMBER(namcos22_state::master_serial_io_r)
+uint16_t namcos22_state::master_serial_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("master_serial_io_r() == %04x\n", m_SerialDataSlaveToMasterCurrent);
 	return m_SerialDataSlaveToMasterCurrent;
@@ -2474,11 +2474,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
 	}
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_unk_porta_w)
+void namcos22_state::dsp_unk_porta_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_led_w)
+void namcos22_state::dsp_led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* I believe this port controls diagnostic LEDs on the DSP PCB. */
 }
@@ -2519,12 +2519,12 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
  * 0x0075 0xf205 // sx,sy
  * 0x602b 0x93e8 // i,zpos
  */
-WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
+void namcos22_state::dsp_unk8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_RenderBufSize = 0;
 }
 
-WRITE16_MEMBER(namcos22_state::master_render_device_w)
+void namcos22_state::master_render_device_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_RenderBufSize < NAMCOS22_MAX_RENDER_CMD_SEQ)
 	{
@@ -2565,24 +2565,24 @@ static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(namcos22_state::dsp_bioz_r)
+uint16_t namcos22_state::dsp_bioz_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* STUB */
 	return 1;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
+uint16_t namcos22_state::dsp_slave_port3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0010; /* ? */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
+uint16_t namcos22_state::dsp_slave_port4_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 //  return ReadDataFromSlaveBuf();
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
+uint16_t namcos22_state::dsp_slave_port5_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #if 0
 	int numWords = SlaveBufSize();
@@ -2592,32 +2592,32 @@ READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port6_r)
+uint16_t namcos22_state::dsp_slave_port6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 0x9 indicates whether device at port2 is ready to receive data */
 	/* bit 0xd indicates whether data is available from port4 */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portc_w)
+void namcos22_state::dsp_slave_portc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Unknown; used before transmitting a command sequence. */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_port8_r)
+uint16_t namcos22_state::dsp_slave_port8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* This reports  status of the device mapped at port 0xb. */
 	/* The slave dsp waits for bit 0x0001 to be zero before writing a new command sequence. */
 	return 0; /* status */
 }
 
-READ16_MEMBER(namcos22_state::dsp_slave_portb_r)
+uint16_t namcos22_state::dsp_slave_portb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* The slave DSP reads before transmitting a command sequence. */
 	return 0;
 }
 
-WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
+void namcos22_state::dsp_slave_portb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
@@ -2678,25 +2678,25 @@ ADDRESS_MAP_END
 
 // System 22 37702
 
-READ16_MEMBER(namcos22_state::s22mcu_shared_r)
+uint16_t namcos22_state::s22mcu_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *share16 = (uint16_t *)m_shareram.target();
 	return share16[BYTE_XOR_BE(offset)];
 }
 
-WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
+void namcos22_state::s22mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *share16 = (uint16_t *)m_shareram.target();
 	COMBINE_DATA(&share16[BYTE_XOR_BE(offset)]);
 }
 
-READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
+uint8_t namcos22_state::mcu_port4_s22_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 	return 0x10;
 }
 
-READ8_MEMBER(namcos22_state::iomcu_port4_s22_r)
+uint8_t namcos22_state::iomcu_port4_s22_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 	return 0x00;
@@ -2742,22 +2742,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 }
 
 
-WRITE8_MEMBER(namcos22_state::mcu_port4_w)
+void namcos22_state::mcu_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p4 = data;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port4_r)
+uint8_t namcos22_state::mcu_port4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p4;
 }
 
-WRITE8_MEMBER(namcos22_state::mcu_port5_w)
+void namcos22_state::mcu_port5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port5_r)
+uint8_t namcos22_state::mcu_port5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_p4 & 8)
 		return m_mcup5a.read_safe(0xff);
@@ -2765,27 +2765,27 @@ READ8_MEMBER(namcos22_state::mcu_port5_r)
 		return m_mcup5b.read_safe(0xff);
 }
 
-WRITE8_MEMBER(namcos22_state::mcu_port6_w)
+void namcos22_state::mcu_port6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port6_r)
+uint8_t namcos22_state::mcu_port6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(namcos22_state::mcu_port7_w)
+void namcos22_state::mcu_port7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	;
 }
 
-READ8_MEMBER(namcos22_state::mcu_port7_r)
+uint8_t namcos22_state::mcu_port7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
+uint8_t namcos22_state::namcos22s_mcu_adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t adc = m_adc_ports[offset >> 1 & 7].read_safe(0) << 2;
 	return (offset & 1) ? adc >> 8 : adc;
@@ -2928,7 +2928,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
 	m_motor_status = param;
 }
 
-WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
+void namcos22_state::alpine_mcu_port5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 1+2 are steplock motor outputs
 	if ((data & 6) == 6)
@@ -2959,7 +2959,7 @@ ADDRESS_MAP_END
 
 // Prop Cycle
 
-WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
+void namcos22_state::propcycle_mcu_port5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// prop cycle outputs:
 	// bit 1 = fan
@@ -5399,7 +5399,7 @@ ROM_END
 // MCU speed cheats (every bit helps with these games)
 
 // for MCU BIOS v1.41
-READ16_MEMBER(namcos22_state::mcu141_speedup_r)
+uint16_t namcos22_state::mcu141_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ((space.device().safe_pc() == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
@@ -5409,13 +5409,13 @@ READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 	return m_su_82;
 }
 
-WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
+void namcos22_state::mcu_speedup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_su_82);
 }
 
 // for MCU BIOS v1.20/v1.30
-READ16_MEMBER(namcos22_state::mcu130_speedup_r)
+uint16_t namcos22_state::mcu130_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ((space.device().safe_pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
@@ -5426,7 +5426,7 @@ READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 }
 
 // for NSTX7702 v1.00 (C74)
-READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
+uint16_t namcos22_state::mcuc74_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (((space.device().safe_pc() == 0xc0df) || (space.device().safe_pc() == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{

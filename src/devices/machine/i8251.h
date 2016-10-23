@@ -54,12 +54,12 @@ public:
 	template<class _Object> static devcb_base &set_txempty_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txempty_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_syndet_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(mode_w);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 	DECLARE_WRITE_LINE_MEMBER( write_cts );

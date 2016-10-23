@@ -317,7 +317,7 @@ void ti99_datamux_device::debugger_write(address_space& space, uint16_t addr, ui
 
     mem_mask is always ffff on TMS processors (cannot control bus width)
 */
-READ16_MEMBER( ti99_datamux_device::read )
+uint16_t ti99_datamux_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t value = 0;
 
@@ -369,7 +369,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 /*
     Write access.
 */
-WRITE16_MEMBER( ti99_datamux_device::write )
+void ti99_datamux_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -413,7 +413,7 @@ WRITE16_MEMBER( ti99_datamux_device::write )
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_datamux_device::setoffset )
+void ti99_datamux_device::setoffset(address_space &space, offs_t offset)
 {
 	m_addr_buf = offset << 1;
 	m_waitcount = 0;

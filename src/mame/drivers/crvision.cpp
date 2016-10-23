@@ -471,7 +471,7 @@ INPUT_PORTS_END
     DEVICE CONFIGURATION
 ***************************************************************************/
 
-WRITE8_MEMBER( crvision_state::pia_pa_w )
+void crvision_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -522,7 +522,7 @@ uint8_t crvision_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( crvision_state::pia_pa_r )
+uint8_t crvision_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    PA0     Keyboard raster player 1 output (joystick)
@@ -542,7 +542,7 @@ READ8_MEMBER( crvision_state::pia_pa_r )
 	return data;
 }
 
-READ8_MEMBER( crvision_state::pia_pb_r )
+uint8_t crvision_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -566,7 +566,7 @@ READ8_MEMBER( crvision_state::pia_pb_r )
 	return data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pa_r )
+uint8_t laser2001_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -590,7 +590,7 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pa_w )
+void laser2001_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    PA0     Joystick player 1 output 0
@@ -606,7 +606,7 @@ WRITE8_MEMBER( laser2001_state::pia_pa_w )
 	m_joylatch = data;
 }
 
-READ8_MEMBER( laser2001_state::pia_pb_r )
+uint8_t laser2001_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -617,7 +617,7 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( laser2001_state::pia_pb_w )
+void laser2001_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description

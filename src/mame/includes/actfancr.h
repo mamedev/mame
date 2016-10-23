@@ -39,10 +39,10 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(triothep_control_select_w);
-	DECLARE_READ8_MEMBER(triothep_control_r);
-	DECLARE_WRITE8_MEMBER(actfancr_sound_w);
-	DECLARE_WRITE8_MEMBER(actfancr_buffer_spriteram_w);
+	void triothep_control_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t triothep_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void actfancr_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void actfancr_buffer_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_triothep();
 	void machine_reset_triothep();
 	uint32_t screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

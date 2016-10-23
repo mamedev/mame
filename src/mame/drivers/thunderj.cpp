@@ -78,7 +78,7 @@ void thunderj_state::machine_reset_thunderj()
  *
  *************************************/
 
-READ16_MEMBER(thunderj_state::special_port2_r)
+uint16_t thunderj_state::special_port2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("260012")->read();
 	result ^= 0x0010;
@@ -86,7 +86,7 @@ READ16_MEMBER(thunderj_state::special_port2_r)
 }
 
 
-WRITE16_MEMBER(thunderj_state::latch_w)
+void thunderj_state::latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)

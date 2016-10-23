@@ -56,11 +56,11 @@ public:
 	uint16_t        m_irq_reg;
 
 	/* devices */
-	DECLARE_READ16_MEMBER(drill_io_r);
-	DECLARE_WRITE16_MEMBER(drill_io_w);
-	DECLARE_WRITE16_MEMBER(sensors_w);
-	DECLARE_READ16_MEMBER(drill_irq_r);
-	DECLARE_WRITE16_MEMBER(drill_irq_w);
+	uint16_t drill_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void drill_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sensors_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t drill_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void drill_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_drill();
 	void machine_start_drill();
 	void machine_reset_drill();
@@ -81,7 +81,7 @@ protected:
 };
 
 
-READ16_MEMBER(_2mindril_state::drill_io_r)
+uint16_t _2mindril_state::drill_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  if (offset * 2 == 0x4)
 	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
@@ -109,7 +109,7 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_io_w)
+void _2mindril_state::drill_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_iodata[offset]);
 
@@ -158,7 +158,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 #endif
 
-WRITE16_MEMBER(_2mindril_state::sensors_w)
+void _2mindril_state::sensors_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
@@ -185,12 +185,12 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 	}
 }
 
-READ16_MEMBER(_2mindril_state::drill_irq_r)
+uint16_t _2mindril_state::drill_irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_irq_reg;
 }
 
-WRITE16_MEMBER(_2mindril_state::drill_irq_w)
+void _2mindril_state::drill_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	(note: could rather be irq mask)

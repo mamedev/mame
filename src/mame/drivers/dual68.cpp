@@ -28,8 +28,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dual68_terminal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	//uint8_t m_term_data;
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
@@ -37,7 +37,7 @@ public:
 
 
 
-WRITE16_MEMBER( dual68_state::dual68_terminal_w )
+void dual68_state::dual68_terminal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_terminal->write(space, 0, data >> 8);
 }
@@ -74,7 +74,7 @@ void dual68_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dual68_state::kbd_put )
+void dual68_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_term_data = data;
 }

@@ -45,21 +45,21 @@ public:
 	uint8_t    m_nmi_mask;
 	int      m_sprbank;
 
-	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
-	DECLARE_READ8_MEMBER(avengers_adpcm_r);
-	DECLARE_WRITE8_MEMBER(lwings_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(avengers_protection_w);
-	DECLARE_WRITE8_MEMBER(avengers_prot_bank_w);
-	DECLARE_READ8_MEMBER(avengers_protection_r);
-	DECLARE_READ8_MEMBER(avengers_soundlatch2_r);
-	DECLARE_WRITE8_MEMBER(lwings_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrollx_w);
-	DECLARE_WRITE8_MEMBER(lwings_bg1_scrolly_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
-	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
-	DECLARE_WRITE8_MEMBER(fball_oki_bank_w);
+	void avengers_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t avengers_adpcm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lwings_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avengers_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avengers_prot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t avengers_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t avengers_soundlatch2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lwings_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lwings_bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lwings_bg1_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lwings_bg1_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trojan_bg2_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trojan_bg2_image_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fball_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

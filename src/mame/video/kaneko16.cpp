@@ -12,7 +12,7 @@
 #include "includes/kaneko16.h"
 
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_display_enable)
+void kaneko16_state::kaneko16_display_enable(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_disp_enable);
 }
@@ -167,21 +167,21 @@ void kaneko16_berlwall_state::video_start_berlwall()
 
 
 /* Select the high color background image (out of 32 in the ROMs) */
-READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_r)
+uint16_t kaneko16_berlwall_state::kaneko16_bg15_select_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bg15_select[0];
 }
-WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_select_w)
+void kaneko16_berlwall_state::kaneko16_bg15_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg15_select[0]);
 }
 
 /* Brightness (00-ff) */
-READ16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_r)
+uint16_t kaneko16_berlwall_state::kaneko16_bg15_bright_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bg15_bright[0];
 }
-WRITE16_MEMBER(kaneko16_berlwall_state::kaneko16_bg15_bright_w)
+void kaneko16_berlwall_state::kaneko16_bg15_bright_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg15_bright[0]);
 	double brt1 = data & 0xff;

@@ -50,11 +50,11 @@ Dip locations and factory settings verified with US manual
 
 /* Read/Write Handlers */
 
-READ16_MEMBER(deadang_state::ghunter_trackball_low_r)
+uint16_t deadang_state::ghunter_trackball_low_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKX")->read() & 0xff) | ((ioport("TRACKY")->read() & 0xff) << 8);
 }
-READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
+uint16_t deadang_state::ghunter_trackball_high_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("TRACKX")->read() & 0x0f00) >> 4) | (ioport("TRACKY")->read() & 0x0f00);
 }

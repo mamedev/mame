@@ -17,8 +17,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(dxrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { dxrom_write(space, offset, data, mem_mask); }
+	virtual void dxrom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { dxrom_write(space, offset, data, mem_mask); }
 
 	virtual void pcb_reset() override;
 
@@ -37,7 +37,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -56,7 +56,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -78,12 +78,12 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_READ8_MEMBER(n340_loread);
-	virtual DECLARE_WRITE8_MEMBER(n340_lowrite);
-	virtual DECLARE_WRITE8_MEMBER(n340_hiwrite);
-	virtual DECLARE_READ8_MEMBER(read_l) override { return n340_loread(space, offset, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_l) override { n340_lowrite(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { n340_hiwrite(space, offset, data, mem_mask); }
+	virtual uint8_t n340_loread(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void n340_lowrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void n340_hiwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { return n340_loread(space, offset, mem_mask); }
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { n340_lowrite(space, offset, data, mem_mask); }
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { n340_hiwrite(space, offset, data, mem_mask); }
 
 	virtual void pcb_reset() override;
 
@@ -110,9 +110,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -131,15 +131,15 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	// we have to overwrite these to allow CIRAM to be used for VRAM, even if it's not clear which game(s) use this
-	virtual DECLARE_READ8_MEMBER(chr_r) override;
-	virtual DECLARE_WRITE8_MEMBER(chr_w) override;
+	virtual uint8_t chr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 

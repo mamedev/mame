@@ -417,7 +417,7 @@ uint16_t zsg2_device::control_r(int reg)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(zsg2_device::write)
+void zsg2_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// we only support full 16-bit accesses
 	if (mem_mask != 0xffff)
@@ -441,7 +441,7 @@ WRITE16_MEMBER(zsg2_device::write)
 	}
 }
 
-READ16_MEMBER(zsg2_device::read)
+uint16_t zsg2_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// we only support full 16-bit accesses
 	if (mem_mask != 0xffff)

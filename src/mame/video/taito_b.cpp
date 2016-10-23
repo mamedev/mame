@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/taito_b.h"
 
-WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
+void taitob_state::hitice_pixelram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 9;
 	int sx = offset & 0x1ff;
@@ -18,7 +18,7 @@ WRITE16_MEMBER(taitob_state::hitice_pixelram_w)
 	}
 }
 
-WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
+void taitob_state::hitice_pixel_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pixel_scroll[offset]);
 }
@@ -32,7 +32,7 @@ void taitob_state::hitice_clear_pixel_bitmap(  )
 		hitice_pixelram_w(space, i, 0, 0xffff);
 }
 
-WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
+void taitob_state::realpunc_video_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_realpunc_video_ctrl);
 }
@@ -106,7 +106,7 @@ void taitob_state::video_start_realpunc()
 }
 
 
-READ16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_r)
+uint16_t taitob_state::tc0180vcu_framebuffer_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);
@@ -114,7 +114,7 @@ READ16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_r)
 	return (m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 0) << 8) | m_framebuffer[sy >> 8]->pix16(sy & 0xff, sx + 1);
 }
 
-WRITE16_MEMBER(taitob_state::tc0180vcu_framebuffer_word_w)
+void taitob_state::tc0180vcu_framebuffer_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sy = offset >> 8;
 	int sx = 2 * (offset & 0xff);

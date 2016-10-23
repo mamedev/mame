@@ -101,12 +101,12 @@ public:
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
 
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(t5182shared_r);
-	DECLARE_WRITE8_MEMBER(t5182shared_w);
+	uint8_t collision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t5182shared_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void t5182shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
@@ -341,7 +341,7 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 ***************************************************************************/
 
-READ8_MEMBER(panicr_state::collision_r)
+uint8_t panicr_state::collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// re-render the collision data here
 	// collisions are based on 2 bits from the tile data, relative to a page of tiles
@@ -384,19 +384,19 @@ READ8_MEMBER(panicr_state::collision_r)
 }
 
 
-WRITE8_MEMBER(panicr_state::scrollx_lo_w)
+void panicr_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("scrollx_lo_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff00) | (data << 1 & 0xfe) | (data >> 7 & 0x01);
 }
 
-WRITE8_MEMBER(panicr_state::scrollx_hi_w)
+void panicr_state::scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("scrollx_hi_w %02x\n", data);
 	m_scrollx = (m_scrollx & 0xff) | ((data &0xf0) << 4) | ((data & 0x0f) << 12);
 }
 
-WRITE8_MEMBER(panicr_state::output_w)
+void panicr_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d6, d7: play counter? (it only triggers on 1st coin)
 	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0);
@@ -407,7 +407,7 @@ WRITE8_MEMBER(panicr_state::output_w)
 	// other bits: ?
 }
 
-READ8_MEMBER(panicr_state::t5182shared_r)
+uint8_t panicr_state::t5182shared_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		return m_t5182->sharedram_r(space, offset/2);
@@ -415,7 +415,7 @@ READ8_MEMBER(panicr_state::t5182shared_r)
 		return 0;
 }
 
-WRITE8_MEMBER(panicr_state::t5182shared_w)
+void panicr_state::t5182shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		m_t5182->sharedram_w(space, offset/2, data);

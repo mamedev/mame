@@ -526,7 +526,7 @@ if (++reps % 100 == 99)
 	g_profiler.stop();
 }
 
-READ32_MEMBER( jaguar_state::blitter_r )
+uint32_t jaguar_state::blitter_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -540,7 +540,7 @@ READ32_MEMBER( jaguar_state::blitter_r )
 }
 
 
-WRITE32_MEMBER( jaguar_state::blitter_w )
+void jaguar_state::blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
 	if ((offset == B_CMD) && ACCESSING_BITS_0_15)
@@ -564,7 +564,7 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
  *
  *************************************/
 
-READ16_MEMBER( jaguar_state::tom_regs_r )
+uint16_t jaguar_state::tom_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
 		logerror("%08X:TOM read register @ F00%03X\n", space.device().safe_pcbase(), offset * 2);
@@ -593,7 +593,7 @@ READ16_MEMBER( jaguar_state::tom_regs_r )
 	return m_gpu_regs[offset];
 }
 
-WRITE16_MEMBER( jaguar_state::tom_regs_w )
+void jaguar_state::tom_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t reg_store = m_gpu_regs[offset];
 	attotime sample_period;
@@ -677,7 +677,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
  *
  *************************************/
 
-READ32_MEMBER( jaguar_state::cojag_gun_input_r )
+uint32_t jaguar_state::cojag_gun_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int beamx, beamy;
 

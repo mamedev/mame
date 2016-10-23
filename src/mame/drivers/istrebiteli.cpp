@@ -134,15 +134,15 @@ public:
 	}
 
 	DECLARE_PALETTE_INIT(istrebiteli);
-	DECLARE_READ8_MEMBER(ppi0_r);
-	DECLARE_WRITE8_MEMBER(ppi0_w);
-	DECLARE_READ8_MEMBER(ppi1_r);
-	DECLARE_WRITE8_MEMBER(ppi1_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(spr0_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(spr_xy_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
+	uint8_t ppi0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr0_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spr_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
@@ -244,31 +244,31 @@ uint32_t istrebiteli_state::screen_update(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::tileram_w)
+void istrebiteli_state::tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset ^= 15;
 	m_tileram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(istrebiteli_state::ppi0_r)
+uint8_t istrebiteli_state::ppi0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi0->read(space, offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi0_w)
+void istrebiteli_state::ppi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi0->write(space, offset ^ 3, data ^ 0xff);
 }
-READ8_MEMBER(istrebiteli_state::ppi1_r)
+uint8_t istrebiteli_state::ppi1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi1->read(space, offset ^ 3) ^ 0xff;
 }
-WRITE8_MEMBER(istrebiteli_state::ppi1_w)
+void istrebiteli_state::ppi1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi1->write(space, offset ^ 3, data ^ 0xff);
 }
 
-WRITE8_MEMBER(istrebiteli_state::sound_w)
+void istrebiteli_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	if (data & 1)
@@ -276,21 +276,21 @@ WRITE8_MEMBER(istrebiteli_state::sound_w)
 	m_sound_dev->sound_w(data);
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr0_ctrl_w)
+void istrebiteli_state::spr0_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_ctrl[0] = data;
 	if (data & 0x80)
 		m_spr_collision[0] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr1_ctrl_w)
+void istrebiteli_state::spr1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_ctrl[1] = data;
 	if (data & 0x80)
 		m_spr_collision[1] = 0;
 }
 
-WRITE8_MEMBER(istrebiteli_state::spr_xy_w)
+void istrebiteli_state::spr_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spr_xy[offset ^ 7] = data;
 }

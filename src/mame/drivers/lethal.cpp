@@ -265,7 +265,7 @@ static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIG
 #define GUNX( a ) (( ( ioport(gunnames[2 * (a - 1)])->read() * 287 ) / 0xff ) + 16)
 #define GUNY( a ) (( ( ioport(gunnames[2 * (a - 1) + 1])->read() * 223 ) / 0xff ) + 10)
 
-WRITE8_MEMBER(lethal_state::control2_w)
+void lethal_state::control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is data */
 	/* bit 1 is cs (active low) */
@@ -288,22 +288,22 @@ INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(lethal_state::sound_irq_w)
+void lethal_state::sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(lethal_state::sound_status_r)
+uint8_t lethal_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf;
 }
 
-WRITE8_MEMBER(lethal_state::le_bankswitch_w)
+void lethal_state::le_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-READ8_MEMBER(lethal_state::guns_r)
+uint8_t lethal_state::guns_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -326,7 +326,7 @@ READ8_MEMBER(lethal_state::guns_r)
 	return 0;
 }
 
-READ8_MEMBER(lethal_state::gunsaux_r)
+uint8_t lethal_state::gunsaux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0;
 

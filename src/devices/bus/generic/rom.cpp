@@ -62,7 +62,7 @@ generic_romram_plain_device::generic_romram_plain_device(const machine_config &m
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(generic_rom_plain_device::read_rom)
+uint8_t generic_rom_plain_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -70,7 +70,7 @@ READ8_MEMBER(generic_rom_plain_device::read_rom)
 		return 0xff;
 }
 
-READ16_MEMBER(generic_rom_plain_device::read16_rom)
+uint16_t generic_rom_plain_device::read16_rom(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *ROM = (uint16_t *)m_rom;
 	if (offset < m_rom_size/2)
@@ -79,7 +79,7 @@ READ16_MEMBER(generic_rom_plain_device::read16_rom)
 		return 0xffff;
 }
 
-READ32_MEMBER(generic_rom_plain_device::read32_rom)
+uint32_t generic_rom_plain_device::read32_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)m_rom;
 	if (offset < m_rom_size/4)
@@ -89,25 +89,25 @@ READ32_MEMBER(generic_rom_plain_device::read32_rom)
 }
 
 
-READ8_MEMBER(generic_rom_linear_device::read_rom)
+uint8_t generic_rom_linear_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset % m_rom_size];
 }
 
-READ16_MEMBER(generic_rom_linear_device::read16_rom)
+uint16_t generic_rom_linear_device::read16_rom(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *ROM = (uint16_t *)m_rom;
 	return ROM[offset % (m_rom_size/2)];
 }
 
-READ32_MEMBER(generic_rom_linear_device::read32_rom)
+uint32_t generic_rom_linear_device::read32_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)m_rom;
 	return ROM[offset % (m_rom_size/4)];
 }
 
 
-READ8_MEMBER(generic_romram_plain_device::read_ram)
+uint8_t generic_romram_plain_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_ram.size())
 		return m_ram[offset];
@@ -115,7 +115,7 @@ READ8_MEMBER(generic_romram_plain_device::read_ram)
 		return 0xff;
 }
 
-WRITE8_MEMBER(generic_romram_plain_device::write_ram)
+void generic_romram_plain_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < m_ram.size())
 		m_ram[offset] = data;

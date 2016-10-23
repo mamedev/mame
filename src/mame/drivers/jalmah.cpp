@@ -172,28 +172,28 @@ public:
 	uint8_t m_oki_rom;
 	uint8_t m_oki_bank;
 	uint8_t m_oki_za;
-	DECLARE_WRITE16_MEMBER(sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(sc1_vram_w);
-	DECLARE_WRITE16_MEMBER(sc2_vram_w);
-	DECLARE_WRITE16_MEMBER(jalmah_tilebank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_scroll_w);
-	DECLARE_WRITE16_MEMBER(urashima_bank_w);
-	DECLARE_WRITE16_MEMBER(urashima_sc0_vram_w);
-	DECLARE_WRITE16_MEMBER(urashima_sc3_vram_w);
-	DECLARE_WRITE16_MEMBER(urashima_vregs_w);
-	DECLARE_WRITE16_MEMBER(urashima_dma_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okirom_w);
-	DECLARE_WRITE16_MEMBER(jalmah_okibank_w);
-	DECLARE_WRITE16_MEMBER(jalmah_flip_screen_w);
-	DECLARE_READ16_MEMBER(urashima_mcu_r);
-	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
-	DECLARE_READ16_MEMBER(daireika_mcu_r);
-	DECLARE_WRITE16_MEMBER(daireika_mcu_w);
-	DECLARE_READ16_MEMBER(mjzoomin_mcu_r);
-	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
-	DECLARE_READ16_MEMBER(kakumei_mcu_r);
-	DECLARE_READ16_MEMBER(suchipi_mcu_r);
+	void sc0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sc3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sc1_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sc2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jalmah_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jalmah_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void urashima_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void urashima_sc0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void urashima_sc3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void urashima_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void urashima_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jalmah_okirom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jalmah_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jalmah_flip_screen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t urashima_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void urashima_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t daireika_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void daireika_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mjzoomin_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mjzoomin_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t kakumei_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t suchipi_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_suchipi();
 	void init_kakumei();
 	void init_urashima();
@@ -527,7 +527,7 @@ uint32_t jalmah_state::screen_update_urashima(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE16_MEMBER(jalmah_state::sc0_vram_w)
+void jalmah_state::sc0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	/*2048x256 tilemap*/
@@ -540,7 +540,7 @@ WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 	m_sc0_tilemap_3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::sc3_vram_w)
+void jalmah_state::sc3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	/*2048x256 tilemap*/
@@ -551,7 +551,7 @@ WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 	m_sc3_tilemap_3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::sc1_vram_w)
+void jalmah_state::sc1_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	/*2048x256 tilemap*/
@@ -564,7 +564,7 @@ WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 	m_sc1_tilemap_3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::sc2_vram_w)
+void jalmah_state::sc2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	/*2048x256 tilemap*/
@@ -577,7 +577,7 @@ WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 	m_sc2_tilemap_3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
+void jalmah_state::jalmah_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 xxxx ---- fg bank (used by suchipi)
@@ -599,7 +599,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
+void jalmah_state::jalmah_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *jm_scrollram = m_jm_scrollram.get();
 	uint16_t *jm_vregs = m_jm_vregs.get();
@@ -628,7 +628,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_bank_w)
+void jalmah_state::urashima_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -642,20 +642,20 @@ WRITE16_MEMBER(jalmah_state::urashima_bank_w)
 	}
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_sc0_vram_w)
+void jalmah_state::urashima_sc0_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap_0->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
+void jalmah_state::urashima_sc3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap_0->mark_tile_dirty(offset);
 }
 
 /*Urashima Mahjong uses a bigger (and mostly unused/wasted) video register ram.*/
-WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
+void jalmah_state::urashima_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *jm_scrollram = m_jm_scrollram.get();
 	uint16_t *jm_vregs = m_jm_vregs.get();
@@ -730,7 +730,7 @@ if((0xffff - ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_;
 /*Funky "DMA" / protection thing*/
 /*---- -x-- "DMA" execute.*/
 /*---- ---x used too very often,I don't have any clue of what it is,it might just be the source or the destination address.*/
-WRITE16_MEMBER(jalmah_state::urashima_dma_w)
+void jalmah_state::urashima_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data & 4)
 	{
@@ -967,7 +967,7 @@ Basic driver start
 ******************************************************************************************/
 
 
-WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
+void jalmah_state::jalmah_okirom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -984,7 +984,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",space.device().safe_pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
+void jalmah_state::jalmah_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -998,7 +998,7 @@ WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 	//popmessage("PC=%06x %02x %02x %02x %08x",space.device().safe_pc(),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
+void jalmah_state::jalmah_flip_screen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*---- ----x flip screen*/
 	flip_screen_set(data & 1);
@@ -1751,7 +1751,7 @@ MCU code snippets
 
 ******************************************************************************************/
 
-READ16_MEMBER(jalmah_state::urashima_mcu_r)
+uint16_t jalmah_state::urashima_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1776,7 +1776,7 @@ READ16_MEMBER(jalmah_state::urashima_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
+void jalmah_state::urashima_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
 	uint16_t *jm_mcu_code = m_jm_mcu_code;
@@ -1969,7 +1969,7 @@ WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::daireika_mcu_r)
+uint16_t jalmah_state::daireika_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] = { 0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -1997,7 +1997,7 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 static const uint16_t dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
 											0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
 
-WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
+void jalmah_state::daireika_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
 	uint16_t *jm_mcu_code = m_jm_mcu_code;
@@ -2249,7 +2249,7 @@ WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
+uint16_t jalmah_state::mjzoomin_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] = { 0x9c, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
@@ -2273,7 +2273,7 @@ READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
+void jalmah_state::mjzoomin_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *jm_shared_ram = m_jm_shared_ram;
 	uint16_t *jm_mcu_code = m_jm_mcu_code;
@@ -2386,7 +2386,7 @@ WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 	}
 }
 
-READ16_MEMBER(jalmah_state::kakumei_mcu_r)
+uint16_t jalmah_state::kakumei_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
@@ -2407,7 +2407,7 @@ READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 	return res;
 }
 
-READ16_MEMBER(jalmah_state::suchipi_mcu_r)
+uint16_t jalmah_state::suchipi_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] = { 0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,

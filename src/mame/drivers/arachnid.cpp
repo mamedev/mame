@@ -91,18 +91,18 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_u4_pa_r );
-	DECLARE_READ8_MEMBER( pia_u4_pb_r );
+	uint8_t pia_u4_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_u4_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia_u4_pca_r );
 	DECLARE_READ_LINE_MEMBER( pia_u4_pcb_r );
-	DECLARE_WRITE8_MEMBER( pia_u4_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_u4_pb_w );
+	void pia_u4_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_u4_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pca_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_u4_pcb_w );
 
-	DECLARE_READ8_MEMBER( pia_u17_pa_r );
+	uint8_t pia_u17_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia_u17_pca_r );
-	DECLARE_WRITE8_MEMBER( pia_u17_pb_w );
+	void pia_u17_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_u17_pcb_w );
 
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
@@ -280,7 +280,7 @@ uint8_t arachnid_state::read_keyboard(int pa)
 	return 0xff;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pa_r )
+uint8_t arachnid_state::pia_u4_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Pulses from Switch Matrix Part I
 	// PA0 - G
@@ -298,7 +298,7 @@ READ8_MEMBER( arachnid_state::pia_u4_pa_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u4_pb_r )
+uint8_t arachnid_state::pia_u4_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Pulses from Switch Matrix Part II
 	// PB0 - J
@@ -336,7 +336,7 @@ READ_LINE_MEMBER( arachnid_state::pia_u4_pcb_r )
 	return data;
 }
 
-READ8_MEMBER( arachnid_state::pia_u17_pa_r )
+uint8_t arachnid_state::pia_u17_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// PA0 - Select
 	// PA1 - Player Change
@@ -359,12 +359,12 @@ READ_LINE_MEMBER( arachnid_state::pia_u17_pca_r )
 	return data;
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pa_w )
+void arachnid_state::pia_u4_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part I
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u4_pb_w )
+void arachnid_state::pia_u4_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PA0 thru PA7 Pulses to Switch Matrix Part II
 }
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER( arachnid_state::pia_u4_pcb_w )
 	// CB2 - Throw Darts Lamp
 }
 
-WRITE8_MEMBER( arachnid_state::pia_u17_pb_w )
+void arachnid_state::pia_u17_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PB0 - Select Lamp
 	// PB1 - Player Change Lamp

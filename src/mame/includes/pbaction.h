@@ -48,15 +48,15 @@ public:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	uint8_t      m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(pbaction_sh_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_READ8_MEMBER(pbactio3_prot_kludge_r);
-	DECLARE_WRITE8_MEMBER(pbaction_videoram_w);
-	DECLARE_WRITE8_MEMBER(pbaction_colorram_w);
-	DECLARE_WRITE8_MEMBER(pbaction_videoram2_w);
-	DECLARE_WRITE8_MEMBER(pbaction_colorram2_w);
-	DECLARE_WRITE8_MEMBER(pbaction_scroll_w);
-	DECLARE_WRITE8_MEMBER(pbaction_flipscreen_w);
+	void pbaction_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pbactio3_prot_kludge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pbaction_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pbaction_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pbaction_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pbaction_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pbaction_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pbaction_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_pbactio3();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

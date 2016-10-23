@@ -69,13 +69,13 @@ protected:
 
 public:
 	// internal TMS I/O callbacks
-	DECLARE_READ16_MEMBER( tms_register_r );
-	DECLARE_READ16_MEMBER( tms_data_r );
-	DECLARE_READ16_MEMBER( tms_rom_r );
-	DECLARE_WRITE16_MEMBER( tms_rom_addr_w );
-	DECLARE_WRITE16_MEMBER( tms_rom_bank_w );
-	DECLARE_WRITE16_MEMBER( tms_left_w );
-	DECLARE_WRITE16_MEMBER( tms_right_w );
+	uint16_t tms_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tms_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tms_rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms_rom_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tms_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tms_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tms_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
 
 private:

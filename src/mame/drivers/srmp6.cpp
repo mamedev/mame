@@ -99,15 +99,15 @@ public:
 	unsigned short m_lastb;
 	unsigned short m_lastb2;
 	int m_destl;
-	DECLARE_WRITE16_MEMBER(srmp6_input_select_w);
-	DECLARE_READ16_MEMBER(srmp6_inputs_r);
-	DECLARE_WRITE16_MEMBER(video_regs_w);
-	DECLARE_READ16_MEMBER(video_regs_r);
-	DECLARE_WRITE16_MEMBER(srmp6_dma_w);
-	DECLARE_READ16_MEMBER(tileram_r);
-	DECLARE_WRITE16_MEMBER(tileram_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(srmp6_irq_ack_r);
+	void srmp6_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t srmp6_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t video_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void srmp6_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tileram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t srmp6_irq_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_INIT();
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -314,12 +314,12 @@ void srmp6_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("nile")->base(), 0x200000);
 }
 
-WRITE16_MEMBER(srmp6_state::srmp6_input_select_w)
+void srmp6_state::srmp6_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_input_select = data & 0x0f;
 }
 
-READ16_MEMBER(srmp6_state::srmp6_inputs_r)
+uint16_t srmp6_state::srmp6_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0) // DSW
 		return ioport("DSW")->read();
@@ -336,7 +336,7 @@ READ16_MEMBER(srmp6_state::srmp6_inputs_r)
 }
 
 
-WRITE16_MEMBER(srmp6_state::video_regs_w)
+void srmp6_state::video_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -374,7 +374,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 	COMBINE_DATA(&m_video_regs[offset]);
 }
 
-READ16_MEMBER(srmp6_state::video_regs_r)
+uint16_t srmp6_state::video_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("video_regs_r (PC=%06X): %04x\n", space.device().safe_pcbase(), offset*2);
 	return m_video_regs[offset];
@@ -417,7 +417,7 @@ uint32_t srmp6_state::process(uint8_t b,uint32_t dst_offset)
 }
 
 
-WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
+void srmp6_state::srmp6_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t* dmaram = m_dmaram;
 
@@ -490,12 +490,12 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 }
 
 /* if tileram is actually bigger than the mapped area, how do we access the rest? */
-READ16_MEMBER(srmp6_state::tileram_r)
+uint16_t srmp6_state::tileram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_chrram[offset];
 }
 
-WRITE16_MEMBER(srmp6_state::tileram_w)
+void srmp6_state::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//uint16_t tmp;
 	COMBINE_DATA(&m_chrram[offset]);
@@ -508,7 +508,7 @@ WRITE16_MEMBER(srmp6_state::tileram_w)
 	}
 }
 
-WRITE16_MEMBER(srmp6_state::paletteram_w)
+void srmp6_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int8_t r, g, b;
 	int brg = m_brightness - 0x60;
@@ -542,7 +542,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 	}
 }
 
-READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
+uint16_t srmp6_state::srmp6_irq_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0; // value read doesn't matter

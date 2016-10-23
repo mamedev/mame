@@ -43,12 +43,12 @@ public:
 	/* misc */
 	uint16_t    m_priority[2];
 
-	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
-	DECLARE_READ16_MEMBER(vaportra_control_r);
-	DECLARE_READ8_MEMBER(vaportra_soundlatch_r);
-	DECLARE_WRITE16_MEMBER(vaportra_priority_w);
-	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_rg_w);
-	DECLARE_WRITE16_MEMBER(vaportra_palette_24bit_b_w);
+	void vaportra_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vaportra_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t vaportra_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vaportra_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vaportra_palette_24bit_rg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vaportra_palette_24bit_b_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_vaportra();
 	virtual void machine_start() override;

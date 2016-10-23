@@ -33,9 +33,9 @@ public:
 	required_shared_ptr<uint32_t> m_workram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ32_MEMBER(eeprom_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(int_ack_w);
+	uint32_t eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void int_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -77,13 +77,13 @@ uint32_t ultrsprt_state::screen_update_ultrsprt(screen_device &screen, bitmap_in
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(ultrsprt_state::int_ack_w)
+void ultrsprt_state::int_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 
-READ32_MEMBER(ultrsprt_state::eeprom_r)
+uint32_t ultrsprt_state::eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -93,7 +93,7 @@ READ32_MEMBER(ultrsprt_state::eeprom_r)
 	return r;
 }
 
-WRITE32_MEMBER(ultrsprt_state::eeprom_w)
+void ultrsprt_state::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{

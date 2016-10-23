@@ -108,35 +108,35 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 
 	// IO
-	virtual DECLARE_READ8_MEMBER( ff00_read );
-	virtual DECLARE_WRITE8_MEMBER( ff00_write );
-	virtual DECLARE_READ8_MEMBER( ff20_read );
-	virtual DECLARE_WRITE8_MEMBER( ff20_write );
-	virtual DECLARE_READ8_MEMBER( ff40_read );
-	virtual DECLARE_WRITE8_MEMBER( ff40_write );
-	DECLARE_READ8_MEMBER( ff60_read );
-	DECLARE_WRITE8_MEMBER( ff60_write );
+	virtual uint8_t ff00_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void ff00_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t ff20_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void ff20_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t ff40_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void ff40_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ff60_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ff60_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// PIA0
-	DECLARE_WRITE8_MEMBER( pia0_pa_w );
-	DECLARE_WRITE8_MEMBER( pia0_pb_w );
+	void pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
 	// PIA1
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
-	DECLARE_WRITE8_MEMBER( pia1_pb_w );
+	uint8_t pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
 
 	// floating bus
-	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
+	uint8_t floating_bus_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)   { return floating_bus_read(); }
 
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 

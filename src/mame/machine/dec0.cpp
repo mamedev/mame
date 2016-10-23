@@ -23,7 +23,7 @@ void dec0_state::machine_start()
 	save_item(NAME(m_i8751_ports));
 }
 
-READ16_MEMBER(dec0_state::dec0_controls_r)
+uint16_t dec0_state::dec0_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{
@@ -47,7 +47,7 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 
 /******************************************************************************/
 
-READ16_MEMBER(dec0_state::dec0_rotary_r)
+uint16_t dec0_state::dec0_rotary_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{
@@ -66,7 +66,7 @@ READ16_MEMBER(dec0_state::dec0_rotary_r)
 
 /******************************************************************************/
 
-READ16_MEMBER(dec0_state::midres_controls_r)
+uint16_t dec0_state::midres_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{
@@ -98,7 +98,7 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 /******************************************************************************/
 
 
-READ8_MEMBER(dec0_state::hippodrm_prot_r)
+uint8_t dec0_state::hippodrm_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //logerror("6280 PC %06x - Read %06x\n",cpu_getpc(),offset+0x1d0000);
 	if (m_hippodrm_lsb==0x45) return 0x4e;
@@ -106,7 +106,7 @@ READ8_MEMBER(dec0_state::hippodrm_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
+void dec0_state::hippodrm_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset) {
 		case 4: m_hippodrm_msb=data; break;
@@ -115,13 +115,13 @@ WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 //logerror("6280 PC %06x - Wrote %06x to %04x\n",cpu_getpc(),data,offset+0x1d0000);
 }
 
-READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
+uint16_t dec0_state::hippodrm_68000_share_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset==0) space.device().execute().yield(); /* A wee helper */
 	return m_hippodrm_shared_ram[offset]&0xff;
 }
 
-WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
+void dec0_state::hippodrm_68000_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_hippodrm_shared_ram[offset]=data&0xff;
 }
@@ -163,7 +163,7 @@ WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 */
 
 
-READ8_MEMBER(dec0_state::dec0_mcu_port_r)
+uint8_t dec0_state::dec0_mcu_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int latchEnable=m_i8751_ports[2]>>4;
 
@@ -183,7 +183,7 @@ READ8_MEMBER(dec0_state::dec0_mcu_port_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
+void dec0_state::dec0_mcu_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8751_ports[offset]=data;
 
@@ -317,21 +317,21 @@ void dec0_state::dec0_i8751_reset()
 
 /******************************************************************************/
 
-WRITE16_MEMBER(dec0_state::sprite_mirror_w)
+void dec0_state::sprite_mirror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(dec0_state::robocop_68000_share_r)
+uint16_t dec0_state::robocop_68000_share_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //logerror("%08x: Share read %04x\n",space.device().safe_pc(),offset);
 
 	return m_robocop_shared_ram[offset];
 }
 
-WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
+void dec0_state::robocop_68000_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("%08x: Share write %04x %04x\n",space.device().safe_pc(),offset,data);
 

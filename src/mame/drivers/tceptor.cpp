@@ -24,12 +24,12 @@
 /*******************************************************************/
 
 
-READ8_MEMBER(tceptor_state::m68k_shared_r)
+uint8_t tceptor_state::m68k_shared_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_m68k_shared_ram[offset];
 }
 
-WRITE8_MEMBER(tceptor_state::m68k_shared_w)
+void tceptor_state::m68k_shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m68k_shared_ram[offset] = data;
 }
@@ -45,12 +45,12 @@ INTERRUPT_GEN_MEMBER(tceptor_state::m6809_vb_interrupt)
 		m_m6809_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
+void tceptor_state::m6809_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m6809_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
+void tceptor_state::m6809_irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m6809_irq_enable = 0;
 }
@@ -62,7 +62,7 @@ INTERRUPT_GEN_MEMBER(tceptor_state::m68k_vb_interrupt)
 		device.execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
 }
 
-WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
+void tceptor_state::m68k_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_m68k_irq_enable = data;
 }
@@ -76,12 +76,12 @@ INTERRUPT_GEN_MEMBER(tceptor_state::mcu_vb_interrupt)
 		m_mcu_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
+void tceptor_state::mcu_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_irq_enable = 1;
 }
 
-WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
+void tceptor_state::mcu_irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_irq_enable = 0;
 }
@@ -120,27 +120,27 @@ uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 	return r;
 }
 
-READ8_MEMBER(tceptor_state::dsw0_r)
+uint8_t tceptor_state::dsw0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::dsw1_r)
+uint8_t tceptor_state::dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-READ8_MEMBER(tceptor_state::input0_r)
+uint8_t tceptor_state::input0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-READ8_MEMBER(tceptor_state::input1_r)
+uint8_t tceptor_state::input1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-READ8_MEMBER(tceptor_state::readFF)
+uint8_t tceptor_state::readFF(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

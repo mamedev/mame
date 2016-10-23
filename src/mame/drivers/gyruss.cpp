@@ -108,18 +108,18 @@ static const int gyruss_timer[10] =
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
 };
 
-READ8_MEMBER(gyruss_state::gyruss_portA_r)
+uint8_t gyruss_state::gyruss_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gyruss_timer[(m_audiocpu->total_cycles() / 1024) % 10];
 }
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_dac_w)
+void gyruss_state::gyruss_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE(16), data);
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
+void gyruss_state::gyruss_irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu_2->set_input_line(0, CLEAR_LINE);
 }
@@ -136,36 +136,36 @@ void gyruss_state::filter_w(address_space &space, int chip, int data )
 	}
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_filter0_w)
+void gyruss_state::gyruss_filter0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_w(space, 0, data);
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_filter1_w)
+void gyruss_state::gyruss_filter1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_w(space, 1, data);
 }
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_sh_irqtrigger_w)
+void gyruss_state::gyruss_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing to this register triggers IRQ on the sound CPU */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
+void gyruss_state::gyruss_i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu_2->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
+void gyruss_state::master_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_master_nmi_mask = data & 1;
 	if (!m_master_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
+void gyruss_state::slave_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave_irq_mask = data & 1;
 	if (!m_slave_irq_mask)

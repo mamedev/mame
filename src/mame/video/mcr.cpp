@@ -167,7 +167,7 @@ void mcr_state::journey_set_color(int index, int data)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
+void mcr_state::mcr_paletteram9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// palette RAM is actually 9 bit (a 93419 SRAM)
 	// however, there is no way for the CPU to read back
@@ -185,7 +185,7 @@ WRITE8_MEMBER(mcr_state::mcr_paletteram9_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
+void mcr_state::mcr_90009_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -193,7 +193,7 @@ WRITE8_MEMBER(mcr_state::mcr_90009_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
+void mcr_state::mcr_90010_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 }
 
 
-READ8_MEMBER(mcr_state::twotiger_videoram_r)
+uint8_t mcr_state::twotiger_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
@@ -218,7 +218,7 @@ READ8_MEMBER(mcr_state::twotiger_videoram_r)
 	return videoram[effoffs];
 }
 
-WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
+void mcr_state::twotiger_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* Two Tigers swizzles the address bits on videoram */
@@ -233,7 +233,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
+void mcr_state::mcr_91490_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

@@ -17,8 +17,8 @@ public:
 	pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
-	DECLARE_READ8_MEMBER(detect_r);
-	DECLARE_WRITE8_MEMBER(detect_w);
+	uint8_t detect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void detect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(pcdx);
 
 protected:
@@ -34,12 +34,12 @@ public:
 	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) override;
-	DECLARE_WRITE8_MEMBER(vram_sw_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p2_w);
+	void vram_sw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
@@ -80,18 +80,18 @@ public:
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 16) override;
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_WRITE8_MEMBER(term_w);
-	DECLARE_READ8_MEMBER(term_mcu_r);
-	DECLARE_WRITE8_MEMBER(term_mcu_w);
-	DECLARE_READ8_MEMBER(rx_callback);
-	DECLARE_WRITE8_MEMBER(tx_callback);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_latch_r);
-	DECLARE_WRITE8_MEMBER(vram_latch_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void term_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t term_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void term_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rx_callback(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;

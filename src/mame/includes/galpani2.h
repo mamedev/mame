@@ -49,15 +49,15 @@ public:
 	uint16_t m_old_mcu_nmi1;
 	uint16_t m_old_mcu_nmi2;
 
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_init_w);
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi1_w);
-	DECLARE_WRITE8_MEMBER(galpani2_mcu_nmi2_w);
-	DECLARE_WRITE8_MEMBER(galpani2_coin_lockout_w);
-	DECLARE_READ16_MEMBER(galpani2_eeprom_r);
-	DECLARE_WRITE16_MEMBER(galpani2_eeprom_w);
-	DECLARE_WRITE8_MEMBER(galpani2_oki1_bank_w);
-	DECLARE_WRITE8_MEMBER(galpani2_oki2_bank_w);
-	DECLARE_WRITE16_MEMBER(subdatabank_select_w);
+	void galpani2_mcu_init_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galpani2_mcu_nmi1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galpani2_mcu_nmi2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galpani2_coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t galpani2_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galpani2_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galpani2_oki1_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galpani2_oki2_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subdatabank_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

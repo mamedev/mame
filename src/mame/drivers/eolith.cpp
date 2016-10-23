@@ -114,7 +114,7 @@
  *
  *************************************/
 
-READ32_MEMBER(eolith_state::eolith_custom_r)
+uint32_t eolith_state::eolith_custom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	    bit 3 = eeprom bit
@@ -129,7 +129,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 	return (m_in0->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
-WRITE32_MEMBER(eolith_state::systemcontrol_w)
+void eolith_state::systemcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_buffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & m_coin_counter_bit);
@@ -140,7 +140,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 	// bit 0x100 and 0x040 ?
 }
 
-READ32_MEMBER(eolith_state::hidctch3_pen1_r)
+uint32_t eolith_state::hidctch3_pen1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//320 x 240
 	int xpos = m_penx1port->read();
@@ -149,7 +149,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 	return xpos + (ypos*168*2);
 }
 
-READ32_MEMBER(eolith_state::hidctch3_pen2_r)
+uint32_t eolith_state::hidctch3_pen2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//320 x 240
 	int xpos = m_penx2port->read();
@@ -158,7 +158,7 @@ READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 	return xpos + (ypos*168*2);
 }
 
-WRITE32_MEMBER( eolith_state::sound_w )
+void eolith_state::sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("CPU Command: %x\n", m_sound_data);
 	m_sound_data = data;
@@ -174,13 +174,13 @@ WRITE32_MEMBER( eolith_state::sound_w )
  *
  *************************************/
 
-READ8_MEMBER( eolith_state::sound_cmd_r )
+uint8_t eolith_state::sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( eolith_state::sound_p1_w )
+void eolith_state::sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... xxxx - Data ROM bank (32kB)
 	// ...x .... - Unknown (Usually 1?)
@@ -207,13 +207,13 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
     P37 (O) RDB      (/RD)
 */
 
-READ8_MEMBER( eolith_state::qs1000_p1_r )
+uint8_t eolith_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Sound banking? (must be 1)
 	return 1;
 }
 
-WRITE8_MEMBER( eolith_state::qs1000_p1_w )
+void eolith_state::qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *
  *************************************/
 
-WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
+void eolith_state::soundcpu_to_qs1000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_qs1000->serial_in(data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));

@@ -126,7 +126,7 @@ INTERRUPT_GEN_MEMBER(grchamp_state::cpu1_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
+void grchamp_state::cpu0_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_cpu0_out[offset];
 	m_cpu0_out[offset] = data;
@@ -207,7 +207,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 }
 
 
-WRITE8_MEMBER(grchamp_state::led_board_w)
+void grchamp_state::led_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -251,7 +251,7 @@ WRITE8_MEMBER(grchamp_state::led_board_w)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
+void grchamp_state::cpu1_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_cpu1_out[offset];
 	m_cpu1_out[offset] = data;
@@ -359,25 +359,25 @@ uint8_t grchamp_state::get_pc3259_bits(int offs)
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_0_r)
+uint8_t grchamp_state::pc3259_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_pc3259_bits(0);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_1_r)
+uint8_t grchamp_state::pc3259_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_pc3259_bits(1);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_2_r)
+uint8_t grchamp_state::pc3259_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_pc3259_bits(2);
 }
 
 
-READ8_MEMBER(grchamp_state::pc3259_3_r)
+uint8_t grchamp_state::pc3259_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_pc3259_bits(3);
 }
@@ -390,7 +390,7 @@ READ8_MEMBER(grchamp_state::pc3259_3_r)
  *
  *************************************/
 
-READ8_MEMBER(grchamp_state::sub_to_main_comm_r)
+uint8_t grchamp_state::sub_to_main_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_comm_latch;
 }
@@ -403,13 +403,13 @@ TIMER_CALLBACK_MEMBER(grchamp_state::main_to_sub_comm_sync_w)
 }
 
 
-WRITE8_MEMBER(grchamp_state::main_to_sub_comm_w)
+void grchamp_state::main_to_sub_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(grchamp_state::main_to_sub_comm_sync_w),this), data | (offset << 8));
 }
 
 
-READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
+uint8_t grchamp_state::main_to_sub_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_comm_latch2[offset];
 }
@@ -422,22 +422,22 @@ READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
  *
  *************************************/
 
-WRITE8_MEMBER(grchamp_state::portA_0_w)
+void grchamp_state::portA_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, GRCHAMP_A_DATA, data);
 }
 
-WRITE8_MEMBER(grchamp_state::portB_0_w)
+void grchamp_state::portB_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, GRCHAMP_B_DATA, 255-data);
 }
 
-WRITE8_MEMBER(grchamp_state::portA_2_w)
+void grchamp_state::portA_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* A0/A1 modify the output of AY8910 #2 */
 	/* A7 contributes to the discrete logic hanging off of AY8910 #0 */
 }
-WRITE8_MEMBER(grchamp_state::portB_2_w)
+void grchamp_state::portB_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* B0 connects elsewhere */
 }

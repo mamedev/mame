@@ -62,15 +62,15 @@ public:
 
 	uint16_t m_mux_data;
 
-	DECLARE_READ16_MEMBER(csplayh5_mux_r);
-	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
-	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
-	DECLARE_READ8_MEMBER(csplayh5_sound_r);
-	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
+	uint16_t csplayh5_mux_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void csplayh5_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void csplayh5_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t csplayh5_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void csplayh5_soundclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(soundcpu_portd_r);
-	DECLARE_WRITE8_MEMBER(soundcpu_porta_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_porte_w);
+	uint8_t soundcpu_portd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void soundcpu_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcpu_porte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_mjmania();
 	void init_csplayh5();
@@ -100,7 +100,7 @@ WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
 	   interrupts seem to be fired quite randomly */
 }
 
-READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
+uint16_t csplayh5_state::csplayh5_mux_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -114,12 +114,12 @@ READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
+void csplayh5_state::csplayh5_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mux_data = (~data & 0x1f);
 }
 
-WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
+void csplayh5_state::csplayh5_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, ((data >> 8) & 0xff));
 }
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 ADDRESS_MAP_END
 
 #if USE_H8
-READ16_MEMBER(csplayh5_state::test_r)
+uint16_t csplayh5_state::test_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
@@ -175,28 +175,28 @@ void csplayh5_state::soundbank_w(int data)
 	m_bank1->set_base(m_region_audiocpu->base() + 0x08000 + (0x8000 * (data & 0x03)));
 }
 
-READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
+uint8_t csplayh5_state::csplayh5_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
+void csplayh5_state::csplayh5_soundclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->clear_w(space, 0, 0);
 }
 
 
-READ8_MEMBER(csplayh5_state::soundcpu_portd_r)
+uint8_t csplayh5_state::soundcpu_portd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return csplayh5_sound_r(space, 0);
 }
 
-WRITE8_MEMBER(csplayh5_state::soundcpu_porta_w)
+void csplayh5_state::soundcpu_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	soundbank_w(data & 0x03);
 }
 
-WRITE8_MEMBER(csplayh5_state::soundcpu_porte_w)
+void csplayh5_state::soundcpu_porte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x01)) csplayh5_soundclr_w(space, 0, 0);
 }

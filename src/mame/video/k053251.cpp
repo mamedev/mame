@@ -181,7 +181,7 @@ void k053251_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( k053251_device::write )
+void k053251_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i, newind;
 
@@ -225,13 +225,13 @@ WRITE8_MEMBER( k053251_device::write )
 	}
 }
 
-WRITE16_MEMBER( k053251_device::lsb_w )
+void k053251_device::lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		write(space, offset, data & 0xff);
 }
 
-WRITE16_MEMBER( k053251_device::msb_w )
+void k053251_device::msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		write(space, offset, (data >> 8) & 0xff);
@@ -270,12 +270,12 @@ void k053251_device::reset_indexes()
 
 // debug handlers
 
-READ16_MEMBER( k053251_device::lsb_r )
+uint16_t k053251_device::lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(m_ram[offset]);
 }       // PCU1
 
-READ16_MEMBER( k053251_device::msb_r )
+uint16_t k053251_device::msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(m_ram[offset] << 8);
 }       // PCU1

@@ -239,7 +239,7 @@ ToDo:
 
 /* A read_byte or write_byte to unmapped memory crashes MESS, and UNMAP doesnt fix it.
     This makes the H and E monitor commands show FF */
-READ8_MEMBER( super80_state::super80_read_ff ) { return 0xff; }
+uint8_t super80_state::super80_read_ff(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xff; }
 
 static ADDRESS_MAP_START( super80_map, AS_PROGRAM, 8, super80_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
@@ -649,25 +649,25 @@ WRITE_LINE_MEMBER( super80_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER(super80_state::memory_read_byte)
+uint8_t super80_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80_state::memory_write_byte)
+void super80_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super80_state::io_read_byte)
+uint8_t super80_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super80_state::io_write_byte)
+void super80_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

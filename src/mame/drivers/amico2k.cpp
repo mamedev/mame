@@ -45,10 +45,10 @@ public:
 
 	void machine_start() override;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_ls145_p;
 	uint8_t m_segment;
@@ -110,7 +110,7 @@ TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
 	}
 }
 
-READ8_MEMBER( amico2k_state::ppi_pa_r )
+uint8_t amico2k_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -136,7 +136,7 @@ READ8_MEMBER( amico2k_state::ppi_pa_r )
 	}
 }
 
-WRITE8_MEMBER( amico2k_state::ppi_pa_w )
+void amico2k_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -157,7 +157,7 @@ WRITE8_MEMBER( amico2k_state::ppi_pa_w )
 	m_led_refresh_timer->adjust(attotime::from_usec(70));
 }
 
-READ8_MEMBER( amico2k_state::ppi_pb_r )
+uint8_t amico2k_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -177,7 +177,7 @@ READ8_MEMBER( amico2k_state::ppi_pb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( amico2k_state::ppi_pb_w )
+void amico2k_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

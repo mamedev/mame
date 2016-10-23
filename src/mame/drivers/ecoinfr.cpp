@@ -79,31 +79,31 @@ public:
 	uint8_t port16_value;
 	uint8_t port17_value;
 
-	DECLARE_WRITE8_MEMBER(ec_port00_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port01_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port02_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port03_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port04_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port05_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port06_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port07_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port08_out_bank_strobe_w);
-	DECLARE_WRITE8_MEMBER(ec_port09_out_reelen_w);
-	DECLARE_WRITE8_MEMBER(ec_port0a_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0b_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0c_out_cred_strobe_w);
-	DECLARE_WRITE8_MEMBER(ec_port0d_out_cred_data_w);
-	DECLARE_WRITE8_MEMBER(ec_port0e_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0f_out_bank_segdata_w);
-	DECLARE_WRITE8_MEMBER(ec_port10_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port11_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port12_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port13_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port14_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port15_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port16_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port17_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port18_out_w);
+	void ec_port00_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port01_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port02_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port03_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port04_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port05_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port06_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port07_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port08_out_bank_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port09_out_reelen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0a_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0b_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0c_out_cred_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0d_out_cred_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0e_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port0f_out_bank_segdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port10_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port11_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port12_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port13_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port14_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port15_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port16_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port17_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec_port18_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
@@ -158,7 +158,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 }
 
 
-WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
+void ecoinfr_state::ec_port00_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data&0x70) // lots of games set 0x80
 	{
@@ -170,7 +170,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 	awp_draw_reel(machine(),"reel1", *m_reel0);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
+void ecoinfr_state::ec_port01_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data&0xf0)
 	{
@@ -182,7 +182,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
+void ecoinfr_state::ec_port02_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data&0xf0)
 	{
@@ -196,27 +196,27 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 
 
 
-WRITE8_MEMBER(ecoinfr_state::ec_port03_out_w)
+void ecoinfr_state::ec_port03_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port04_out_w)
+void ecoinfr_state::ec_port04_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port05_out_w)
+void ecoinfr_state::ec_port05_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port06_out_w)
+void ecoinfr_state::ec_port06_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port07_out_w)
+void ecoinfr_state::ec_port07_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port08_out_bank_strobe_w)
+void ecoinfr_state::ec_port08_out_bank_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -259,7 +259,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port08_out_bank_strobe_w)
 // we could do the same thing here with input ports configured to outputs, however
 // I've done it with handlers for now as it allows greater flexibility while the driver
 // is developed
-WRITE8_MEMBER(ecoinfr_state::ec_port09_out_reelen_w)
+void ecoinfr_state::ec_port09_out_reelen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port09_value = port09_value;
 	port09_value = data;
@@ -274,16 +274,16 @@ WRITE8_MEMBER(ecoinfr_state::ec_port09_out_reelen_w)
 	if ((port09_value&0x80) != (old_port09_value&0x80)) printf("port09 0x80 changed %02x\n", port09_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0a_out_w)
+void ecoinfr_state::ec_port0a_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0b_out_w)
+void ecoinfr_state::ec_port0b_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_cred_strobe_w)
+void ecoinfr_state::ec_port0c_out_cred_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -318,7 +318,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_cred_strobe_w)
 	}
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
+void ecoinfr_state::ec_port0d_out_cred_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_credsel!=0xff)
 	{
@@ -327,11 +327,11 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 	}
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0e_out_w)
+void ecoinfr_state::ec_port0e_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
+void ecoinfr_state::ec_port0f_out_bank_segdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_banksel!=0xff)
 	{
@@ -340,7 +340,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 	}
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
+void ecoinfr_state::ec_port10_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port10_value = port10_value;
 	port10_value = data;
@@ -355,7 +355,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
 	if ((port10_value&0x80) != (old_port10_value&0x80)) printf("port10 0x80 changed %02x\n", port10_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port11_out_w)
+void ecoinfr_state::ec_port11_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port11_value = port11_value;
 	port11_value = data;
@@ -370,7 +370,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port11_out_w)
 	if ((port11_value&0x80) != (old_port11_value&0x80)) printf("port11 0x80 changed %02x\n", port11_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port12_out_w)
+void ecoinfr_state::ec_port12_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port12_value = port12_value;
 	port12_value = data;
@@ -385,7 +385,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port12_out_w)
 	if ((port12_value&0x80) != (old_port12_value&0x80)) printf("port12 0x80 changed %02x\n", port12_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port13_out_w)
+void ecoinfr_state::ec_port13_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port13_value = port13_value;
 	port13_value = data;
@@ -400,7 +400,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port13_out_w)
 	if ((port13_value&0x80) != (old_port13_value&0x80)) printf("port13 0x80 changed %02x\n", port13_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port14_out_w)
+void ecoinfr_state::ec_port14_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port14_value = port14_value;
 	port14_value = data;
@@ -415,7 +415,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port14_out_w)
 	if ((port14_value&0x80) != (old_port14_value&0x80)) printf("port14 0x80 changed %02x\n", port14_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port15_out_w)
+void ecoinfr_state::ec_port15_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port15_value = port15_value;
 	port15_value = data;
@@ -433,7 +433,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port15_out_w)
 	//  printf("ec_port15_out_w data %02x - VDF reset %02x clock %02x\n", data, data & 0x80, data & 0x40);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port16_out_w)
+void ecoinfr_state::ec_port16_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port16_value = port16_value;
 	port16_value = data;
@@ -448,7 +448,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port16_out_w)
 	if ((port16_value&0x80) != (old_port16_value&0x80)) printf("port16 0x80 changed %02x\n", port16_value&0x80);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port17_out_w)
+void ecoinfr_state::ec_port17_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int old_port17_value = port17_value;
 	port17_value = data;
@@ -466,7 +466,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port17_out_w)
 	//  printf("ec_port17_out_w data %02x - VDF data %02x\n", data, data & 0x40);
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port18_out_w)
+void ecoinfr_state::ec_port18_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Kick Me (Watchdog)
 }

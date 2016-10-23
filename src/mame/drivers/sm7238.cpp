@@ -84,8 +84,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(text_control_w);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void text_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
@@ -160,13 +160,13 @@ void sm7238_state::video_start()
 	m_tmpbmp.allocate(KSM_DISP_HORZ, KSM_DISP_VERT);
 }
 
-WRITE8_MEMBER(sm7238_state::control_w)
+void sm7238_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"Control Write", ("%02xh: lut %d nvram %d c2 %d iack %d\n",
 		data, BIT(data, 0), BIT(data, 2), BIT(data, 3), BIT(data, 5)));
 }
 
-WRITE8_MEMBER(sm7238_state::text_control_w)
+void sm7238_state::text_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data ^ m_video.control)
 	DBG_LOG(1,"Text Control Write", ("%02xh: 80/132 %d dma %d clr %d dlt %d inv %d ?? %d\n",

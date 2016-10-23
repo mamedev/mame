@@ -342,7 +342,7 @@ void msm5232_device::init(int clock, int rate)
 }
 
 
-WRITE8_MEMBER( msm5232_device::write )
+void msm5232_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset > 0x0d)
 		return;

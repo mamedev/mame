@@ -145,79 +145,79 @@ void k573dio_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 }
 
-READ16_MEMBER(k573dio_device::a00_r)
+uint16_t k573dio_device::a00_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a00_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a02_r)
+uint16_t k573dio_device::a02_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a02_r (%s)\n", tag(), machine().describe_context());
 	return 0x0001;
 }
 
-READ16_MEMBER(k573dio_device::a04_r)
+uint16_t k573dio_device::a04_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a04_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a06_r)
+uint16_t k573dio_device::a06_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a06_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a0a_r)
+uint16_t k573dio_device::a0a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a0a_r (%s)\n", tag(), machine().describe_context());
 	return 0x0000;
 }
 
-READ16_MEMBER(k573dio_device::a80_r)
+uint16_t k573dio_device::a80_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: a80_r (%s)\n", tag(), machine().describe_context());
 	return 0x1234;
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_start_adr_high_w)
+void k573dio_device::mpeg_start_adr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG start address high %04x\n", data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_start_adr_low_w)
+void k573dio_device::mpeg_start_adr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG start address low %04x\n", data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_end_adr_high_w)
+void k573dio_device::mpeg_end_adr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG end address high %04x\n", data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_end_adr_low_w)
+void k573dio_device::mpeg_end_adr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG end address low %04x\n", data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_1_w)
+void k573dio_device::mpeg_key_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG key 1/3 %04x\n", data);
 }
 
-READ16_MEMBER(k573dio_device::mas_i2c_r)
+uint16_t k573dio_device::mas_i2c_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (mas3507d->i2c_scl_r() << 13) | (mas3507d->i2c_sda_r() << 12);
 }
 
-WRITE16_MEMBER(k573dio_device::mas_i2c_w)
+void k573dio_device::mas_i2c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mas3507d->i2c_scl_w(data & 0x2000);
 	mas3507d->i2c_sda_w(data & 0x1000);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
+void k573dio_device::mpeg_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG control %c%c%c\n",
 				data & 0x8000 ? '#' : '.',
@@ -225,84 +225,84 @@ WRITE16_MEMBER(k573dio_device::mpeg_ctrl_w)
 				data & 0x2000 ? '#' : '.');
 }
 
-WRITE16_MEMBER(k573dio_device::ram_write_adr_high_w)
+void k573dio_device::ram_write_adr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// read and write address are shared
 	ram_adr = (ram_adr & 0x0000ffff) | (data << 16);
 }
 
-WRITE16_MEMBER(k573dio_device::ram_write_adr_low_w)
+void k573dio_device::ram_write_adr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// read and write address are shared
 	ram_adr = (ram_adr & 0xffff0000) | data;
 }
 
-READ16_MEMBER(k573dio_device::ram_r)
+uint16_t k573dio_device::ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = ram[ram_adr >> 1];
 	ram_adr += 2;
 	return res;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_w)
+void k573dio_device::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	ram[ram_adr >> 1] = data;
 	ram_adr += 2;
 }
 
-WRITE16_MEMBER(k573dio_device::ram_read_adr_high_w)
+void k573dio_device::ram_read_adr_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// read and write address are shared
 	ram_adr = (ram_adr & 0x0000ffff) | (data << 16);
 }
 
-WRITE16_MEMBER(k573dio_device::ram_read_adr_low_w)
+void k573dio_device::ram_read_adr_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// read and write address are shared
 	ram_adr = (ram_adr & 0xffff0000) | data;
 }
 
-WRITE16_MEMBER(k573dio_device::output_1_w)
+void k573dio_device::output_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(1, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_0_w)
+void k573dio_device::output_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(0, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_3_w)
+void k573dio_device::output_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(3, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_7_w)
+void k573dio_device::output_7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(7, data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_2_w)
+void k573dio_device::mpeg_key_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG key 2/3 %04x\n", data);
 }
 
-WRITE16_MEMBER(k573dio_device::mpeg_key_3_w)
+void k573dio_device::mpeg_key_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("FPGA MPEG key 3/3 %04x\n", data);
 }
 
-READ16_MEMBER(k573dio_device::digital_id_r)
+uint16_t k573dio_device::digital_id_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return digital_id->read() << 12;
 }
 
-WRITE16_MEMBER(k573dio_device::digital_id_w)
+void k573dio_device::digital_id_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	digital_id->write( !( ( data >> 12 ) & 1 ) );
 }
 
-READ16_MEMBER(k573dio_device::fpga_status_r)
+uint16_t k573dio_device::fpga_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%s: fpga_status_r (%s)\n", tag(), machine().describe_context());
 
@@ -318,22 +318,22 @@ READ16_MEMBER(k573dio_device::fpga_status_r)
 	return 0x8000 | 0x2000 | 0x1000;
 }
 
-WRITE16_MEMBER(k573dio_device::fpga_firmware_w)
+void k573dio_device::fpga_firmware_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Firmware bits in bit 15, always the same firmware
 }
 
-WRITE16_MEMBER(k573dio_device::output_4_w)
+void k573dio_device::output_4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(4, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_5_w)
+void k573dio_device::output_5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(5, data);
 }
 
-WRITE16_MEMBER(k573dio_device::output_2_w)
+void k573dio_device::output_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output(2, data);
 }

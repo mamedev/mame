@@ -37,16 +37,16 @@ public:
 	// Optional information overrides
 	virtual machine_config_constructor  device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(d14_r);
-	DECLARE_READ8_MEMBER(d16_r);
-	DECLARE_READ8_MEMBER(d17_r);
-	DECLARE_WRITE8_MEMBER(d14_w);
-	DECLARE_WRITE8_MEMBER(d16_w);
-	DECLARE_WRITE8_MEMBER(d17_w);
+	uint8_t d14_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t d16_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t d17_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void d14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void d16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void d17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(sampler_sync);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
+	uint8_t adc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

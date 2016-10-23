@@ -47,10 +47,10 @@ public:
 	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_writehandler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(i8243_p2_r);
-	DECLARE_WRITE8_MEMBER(i8243_p2_w);
+	uint8_t i8243_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8243_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(i8243_prog_w);
+	void i8243_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -26,10 +26,10 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_DIRECT_UPDATE_MEMBER(scorpion_direct);
-	DECLARE_WRITE8_MEMBER(scorpion_0000_w);
-	DECLARE_WRITE8_MEMBER(scorpion_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(scorpion_port_1ffd_w);
+	offs_t scorpion_direct(direct_read_data &direct, offs_t address);
+	void scorpion_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scorpion_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scorpion_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_scorpion();
 	void machine_reset_scorpion();
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
@@ -98,7 +98,7 @@ void scorpion_state::scorpion_update_memory()
 	}
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
+void scorpion_state::scorpion_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ! m_ram_0000 )
 		return;
@@ -111,7 +111,7 @@ WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 }
 
 
-DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
+offs_t scorpion_state::scorpion_direct(direct_read_data &direct, offs_t address)
 {
 	uint16_t pc = m_maincpu->device_t::safe_pcbase(); // works, but...
 
@@ -151,7 +151,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 	}
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
+void scorpion_state::scorpion_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -164,7 +164,7 @@ WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
 	scorpion_update_memory();
 }
 
-WRITE8_MEMBER(scorpion_state::scorpion_port_1ffd_w)
+void scorpion_state::scorpion_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_1ffd_data = data;
 	scorpion_update_memory();

@@ -26,13 +26,13 @@ static MACHINE_CONFIG_FRAGMENT( cpc_mface2 )
 	MCFG_CPC_EXPANSION_SLOT_OUT_ROMDIS_CB(DEVWRITELINE("^", cpc_expansion_slot_device, romdis_w))  // ROMDIS
 MACHINE_CONFIG_END
 
-DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_default )
+offs_t cpc_multiface2_device::amstrad_default(direct_read_data &direct, offs_t address)
 {
 	return address;
 }
 
 /* used to setup computer if a snapshot was specified */
-DIRECT_UPDATE_MEMBER( cpc_multiface2_device::amstrad_multiface_directoverride )
+offs_t cpc_multiface2_device::amstrad_multiface_directoverride(direct_read_data &direct, offs_t address)
 {
 		int pc;
 

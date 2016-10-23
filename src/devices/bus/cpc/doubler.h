@@ -26,7 +26,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(ext_tape_r);
+	uint8_t ext_tape_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

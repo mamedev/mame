@@ -27,35 +27,35 @@ public:
 
 	// actual ECS accesses
 	// paged ROMs
-	virtual DECLARE_READ16_MEMBER(read_rom20) override;
-	virtual DECLARE_READ16_MEMBER(read_rom70) override;
-	virtual DECLARE_READ16_MEMBER(read_rome0) override;
-	virtual DECLARE_READ16_MEMBER(read_romf0) override;
+	virtual uint16_t read_rom20(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_rom70(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_rome0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_romf0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 	// RAM
-	virtual DECLARE_READ16_MEMBER(read_ram) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
-	virtual DECLARE_WRITE16_MEMBER(write_ram) override { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
+	virtual uint16_t read_ram(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return (int)m_ram[offset & (m_ram.size() - 1)]; }
+	virtual void write_ram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { m_ram[offset & (m_ram.size() - 1)] = data & 0xff; }
 	// AY8914
-	virtual DECLARE_READ16_MEMBER(read_ay) override;
-	virtual DECLARE_WRITE16_MEMBER(write_ay) override;
+	virtual uint16_t read_ay(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_ay(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 	// passthru accesses
-	virtual DECLARE_READ16_MEMBER(read_rom04) override { return m_subslot->read_rom04(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_rom40) override { return m_subslot->read_rom40(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_rom48) override { return m_subslot->read_rom48(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_rom50) override { return m_subslot->read_rom50(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_rom60) override { return m_subslot->read_rom60(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_rom80) override
+	virtual uint16_t read_rom04(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom04(space, offset, mem_mask); }
+	virtual uint16_t read_rom40(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom40(space, offset, mem_mask); }
+	virtual uint16_t read_rom48(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom48(space, offset, mem_mask); }
+	virtual uint16_t read_rom50(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom50(space, offset, mem_mask); }
+	virtual uint16_t read_rom60(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom60(space, offset, mem_mask); }
+	virtual uint16_t read_rom80(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override
 	{
 		if (m_ram88_enabled && offset >= 0x800)
 			return m_subslot->read_ram(space, offset & 0x7ff, mem_mask);
 		else
 			return m_subslot->read_rom80(space, offset, mem_mask);
 	}
-	virtual DECLARE_READ16_MEMBER(read_rom90) override { return m_subslot->read_rom90(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_roma0) override { return m_subslot->read_roma0(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_romb0) override { return m_subslot->read_romb0(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_romc0) override { return m_subslot->read_romc0(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(read_romd0) override
+	virtual uint16_t read_rom90(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_rom90(space, offset, mem_mask); }
+	virtual uint16_t read_roma0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_roma0(space, offset, mem_mask); }
+	virtual uint16_t read_romb0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_romb0(space, offset, mem_mask); }
+	virtual uint16_t read_romc0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_subslot->read_romc0(space, offset, mem_mask); }
+	virtual uint16_t read_romd0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override
 	{
 		if (m_ramd0_enabled && offset < 0x800)
 			return m_subslot->read_ram(space, offset, mem_mask);
@@ -64,7 +64,7 @@ public:
 	}
 
 	// paged ROM banking
-	virtual DECLARE_WRITE16_MEMBER(write_rom20) override
+	virtual void write_rom20(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override
 	{
 		if (offset == 0xfff)
 		{
@@ -74,7 +74,7 @@ public:
 				m_bank_base[2] = 1;
 		}
 	}
-	virtual DECLARE_WRITE16_MEMBER(write_rom70) override
+	virtual void write_rom70(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override
 	{
 		if (offset == 0xfff)
 		{
@@ -84,7 +84,7 @@ public:
 				m_bank_base[7] = 1;
 		}
 	}
-	virtual DECLARE_WRITE16_MEMBER(write_rome0) override
+	virtual void write_rome0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override
 	{
 		if (offset == 0xfff)
 		{
@@ -94,7 +94,7 @@ public:
 				m_bank_base[14] = 1;
 		}
 	}
-	virtual DECLARE_WRITE16_MEMBER(write_romf0) override
+	virtual void write_romf0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override
 	{
 		if (offset == 0xfff)
 		{
@@ -105,11 +105,11 @@ public:
 		}
 	}
 	// RAM passthru write
-	virtual DECLARE_WRITE16_MEMBER(write_88) override { if (m_ram88_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(write_d0) override { if (m_ramd0_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
+	virtual void write_88(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { if (m_ram88_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
+	virtual void write_d0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { if (m_ramd0_enabled) m_subslot->write_ram(space, offset, data, mem_mask); }
 	// IntelliVoice passthru
-	virtual DECLARE_READ16_MEMBER(read_speech) override { if (m_voice_enabled) return m_subslot->read_speech(space, offset, mem_mask); else return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_speech) override { if (m_voice_enabled) m_subslot->write_speech(space, offset, data, mem_mask); }
+	virtual uint16_t read_speech(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { if (m_voice_enabled) return m_subslot->read_speech(space, offset, mem_mask); else return 0xffff; }
+	virtual void write_speech(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { if (m_voice_enabled) m_subslot->write_speech(space, offset, data, mem_mask); }
 
 	virtual void late_subslot_setup() override;
 

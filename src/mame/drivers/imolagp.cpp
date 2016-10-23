@@ -111,15 +111,15 @@ public:
 	uint8_t m_steerlatch;
 	uint8_t m_draw_mode;
 
-	DECLARE_WRITE8_MEMBER(transmit_data_w);
-	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
-	DECLARE_READ8_MEMBER(receive_data_r);
-	DECLARE_WRITE8_MEMBER(imola_led_board_w);
-	DECLARE_READ8_MEMBER(vreg_data_r);
-	DECLARE_WRITE8_MEMBER(screenram_w);
-	DECLARE_READ8_MEMBER(imola_draw_mode_r);
-	DECLARE_WRITE8_MEMBER(vreg_control_w);
-	DECLARE_WRITE8_MEMBER(vreg_data_w);
+	void transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t trigger_slave_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void imola_led_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vreg_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void screenram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t imola_draw_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vreg_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vreg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
@@ -239,24 +239,24 @@ INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
  * Handling the NMI takes more time than triggering the NMI, implying that the slave CPU either runs at
  * a higher clock, or has a way to force the main CPU to wait.
  */
-WRITE8_MEMBER(imolagp_state::transmit_data_w)
+void imolagp_state::transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_comms_latch[offset] = data;
 }
 
-READ8_MEMBER(imolagp_state::receive_data_r)
+uint8_t imolagp_state::receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_comms_latch[offset];
 }
 
-READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
+uint8_t imolagp_state::trigger_slave_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
 
-WRITE8_MEMBER(imolagp_state::imola_led_board_w)
+void imolagp_state::imola_led_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// not sure what chip is used here, this is copied from turbo.c
 	static const uint8_t ls48_map[16] =
@@ -277,12 +277,12 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 }
 
 
-WRITE8_MEMBER(imolagp_state::vreg_control_w)
+void imolagp_state::vreg_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vcontrol = data & 0xf;
 }
 
-READ8_MEMBER(imolagp_state::vreg_data_r)
+uint8_t imolagp_state::vreg_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// auto-steer related
 	return 0;
@@ -290,7 +290,7 @@ READ8_MEMBER(imolagp_state::vreg_data_r)
 	//return 0x17; // it checks for this too
 }
 
-WRITE8_MEMBER(imolagp_state::vreg_data_w)
+void imolagp_state::vreg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// $07: always $ff?
 	// $0e: x scroll
@@ -299,7 +299,7 @@ WRITE8_MEMBER(imolagp_state::vreg_data_w)
 }
 
 
-WRITE8_MEMBER(imolagp_state::screenram_w)
+void imolagp_state::screenram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// when in tunnel: $81/$82 -> sprite ram?
 	if (m_draw_mode & 0x80)
@@ -314,7 +314,7 @@ WRITE8_MEMBER(imolagp_state::screenram_w)
 		m_videoram[0][offset] = data;
 }
 
-READ8_MEMBER(imolagp_state::imola_draw_mode_r)
+uint8_t imolagp_state::imola_draw_mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// the game reads a port before and after writing to screen ram
 	m_draw_mode = offset;

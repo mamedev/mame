@@ -41,10 +41,10 @@ public:
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_tx_handler.set_callback(wr); }
 	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object wr) { return downcast<ms7004_device &>(device).m_rts_handler.set_callback(wr); }
 
-	DECLARE_WRITE8_MEMBER( p1_w );
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( t1_r );
-	DECLARE_WRITE8_MEMBER( i8243_port_w );
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8243_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_rxd );
 

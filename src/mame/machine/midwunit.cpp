@@ -36,13 +36,13 @@ void midwunit_state::register_state_saving()
  *
  *************************************/
 
-WRITE16_MEMBER(midwunit_state::midwunit_cmos_enable_w)
+void midwunit_state::midwunit_cmos_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cmos_write_enable = 1;
 }
 
 
-WRITE16_MEMBER(midwunit_state::midwunit_cmos_w)
+void midwunit_state::midwunit_cmos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cmos_write_enable)
 	{
@@ -58,7 +58,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_cmos_w)
 
 
 
-READ16_MEMBER(midwunit_state::midwunit_cmos_r)
+uint16_t midwunit_state::midwunit_cmos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_nvram[offset];
 }
@@ -71,7 +71,7 @@ READ16_MEMBER(midwunit_state::midwunit_cmos_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midwunit_state::midwunit_io_w)
+void midwunit_state::midwunit_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword, newword;
 
@@ -113,7 +113,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_io_w)
  *
  *************************************/
 
-READ16_MEMBER(midwunit_state::midwunit_io_r)
+uint16_t midwunit_state::midwunit_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* apply I/O shuffling */
 	offset = m_ioshuffle[offset % 16];
@@ -164,7 +164,7 @@ void midwunit_state::init_wunit_generic()
 /********************** Mortal Kombat 3 **********************/
 
 
-WRITE16_MEMBER(midwunit_state::umk3_palette_hack_w)
+void midwunit_state::umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    UMK3 uses a circular buffer to hold pending palette changes; the buffer holds 17 entries
@@ -254,7 +254,7 @@ void midwunit_state::init_nbahangt()
 
 /********************** WWF Wrestlemania **********************/
 
-WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
+void midwunit_state::wwfmania_io_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -355,13 +355,13 @@ void midwunit_state::machine_reset_midwunit()
  *
  *************************************/
 
-READ16_MEMBER(midwunit_state::midwunit_security_r)
+uint16_t midwunit_state::midwunit_security_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_midway_serial_pic->read(space,0);
 }
 
 
-WRITE16_MEMBER(midwunit_state::midwunit_security_w)
+void midwunit_state::midwunit_security_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
 		m_midway_serial_pic->write(space, 0, data);
@@ -375,7 +375,7 @@ WRITE16_MEMBER(midwunit_state::midwunit_security_w)
  *
  *************************************/
 
-READ16_MEMBER(midwunit_state::midwunit_sound_r)
+uint16_t midwunit_state::midwunit_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%08X:Sound read\n", space.device().safe_pc());
 
@@ -383,13 +383,13 @@ READ16_MEMBER(midwunit_state::midwunit_sound_r)
 }
 
 
-READ16_MEMBER(midwunit_state::midwunit_sound_state_r)
+uint16_t midwunit_state::midwunit_sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dcs->control_r();
 }
 
 
-WRITE16_MEMBER(midwunit_state::midwunit_sound_w)
+void midwunit_state::midwunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* check for out-of-bounds accesses */
 	if (offset)

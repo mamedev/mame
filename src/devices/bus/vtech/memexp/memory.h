@@ -75,7 +75,7 @@ public:
 	// construction/destruction
 	laser_64k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

@@ -68,9 +68,9 @@ public:
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_READ8_MEMBER(zx_r);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	void init_bcs3a();
@@ -95,7 +95,7 @@ private:
 	required_ioport_array<10> m_io_keyboard;
 };
 
-READ8_MEMBER( bcs3_state::keyboard_r )
+uint8_t bcs3_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i, data = 0;
 
@@ -112,7 +112,7 @@ READ8_MEMBER( bcs3_state::keyboard_r )
 }
 
 // 00-7F = NUL, 0xE0 = end of line.
-READ8_MEMBER( bcs3_state::video_r )
+uint8_t bcs3_state::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p_videoram[offset];
 	return BIT(data, 7) ? data : 0;
@@ -120,7 +120,7 @@ READ8_MEMBER( bcs3_state::video_r )
 
 // Unsure of how this works.
 // 00-7F = NUL, 0xFF = end of line, 0xF7 = finish.
-READ8_MEMBER( bcs3_state::zx_r )
+uint8_t bcs3_state::zx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf7;
 }

@@ -91,7 +91,7 @@ void atarigt_state::machine_reset_atarigt()
  *
  *************************************/
 
-WRITE8_MEMBER(atarigt_state::cage_irq_callback)
+void atarigt_state::cage_irq_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		sound_int_gen(*m_maincpu);
@@ -105,7 +105,7 @@ WRITE8_MEMBER(atarigt_state::cage_irq_callback)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::special_port2_r)
+uint32_t atarigt_state::special_port2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("SERVICE")->read();
 	temp ^= 0x0001;     /* /A2DRDY always high for now */
@@ -114,7 +114,7 @@ READ32_MEMBER(atarigt_state::special_port2_r)
 }
 
 
-READ32_MEMBER(atarigt_state::special_port3_r)
+uint32_t atarigt_state::special_port3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("COIN")->read();
 	if (m_video_int_state) temp ^= 0x0001;
@@ -156,7 +156,7 @@ inline void atarigt_state::compute_fake_pots(int *pots)
 }
 
 
-READ32_MEMBER(atarigt_state::analog_port0_r)
+uint32_t atarigt_state::analog_port0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 #if (HACK_TMEK_CONTROLS)
 	int pots[4];
@@ -168,7 +168,7 @@ READ32_MEMBER(atarigt_state::analog_port0_r)
 }
 
 
-READ32_MEMBER(atarigt_state::analog_port1_r)
+uint32_t atarigt_state::analog_port1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 #if (HACK_TMEK_CONTROLS)
 	int pots[4];
@@ -187,7 +187,7 @@ READ32_MEMBER(atarigt_state::analog_port1_r)
  *
  *************************************/
 
-WRITE32_MEMBER(atarigt_state::latch_w)
+void atarigt_state::latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    D13 = 68.DISA
@@ -216,7 +216,7 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 }
 
 
-WRITE32_MEMBER(atarigt_state::mo_command_w)
+void atarigt_state::mo_command_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
@@ -224,7 +224,7 @@ WRITE32_MEMBER(atarigt_state::mo_command_w)
 }
 
 
-WRITE32_MEMBER(atarigt_state::led_w)
+void atarigt_state::led_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  logerror("LED = %08X & %08X\n", data, mem_mask);
 }
@@ -237,7 +237,7 @@ WRITE32_MEMBER(atarigt_state::led_w)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::sound_data_r)
+uint32_t atarigt_state::sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -249,7 +249,7 @@ READ32_MEMBER(atarigt_state::sound_data_r)
 }
 
 
-WRITE32_MEMBER(atarigt_state::sound_data_w)
+void atarigt_state::sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_cage->control_w(data);
@@ -547,7 +547,7 @@ if (LOG_PROTECTION)
  *
  *************************************/
 
-READ32_MEMBER(atarigt_state::colorram_protection_r)
+uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t address = 0xd80000 + offset * 4;
 	uint32_t result32 = 0;
@@ -570,7 +570,7 @@ READ32_MEMBER(atarigt_state::colorram_protection_r)
 }
 
 
-WRITE32_MEMBER(atarigt_state::colorram_protection_w)
+void atarigt_state::colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t address = 0xd80000 + offset * 4;
 
@@ -1284,7 +1284,7 @@ ROM_END
  *
  *************************************/
 
-WRITE32_MEMBER(atarigt_state::tmek_pf_w)
+void atarigt_state::tmek_pf_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t pc = space.device().safe_pc();
 

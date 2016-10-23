@@ -91,7 +91,7 @@ void ide_pci_device::device_reset()
 		m_config_data[0x10 / 4] |= 0x0C40;
 }
 
-READ32_MEMBER(ide_pci_device::ide_read_cs1)
+uint32_t ide_pci_device::ide_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	uint32_t data = 0;
@@ -101,13 +101,13 @@ READ32_MEMBER(ide_pci_device::ide_read_cs1)
 	return data;
 }
 
-WRITE32_MEMBER(ide_pci_device::ide_write_cs1)
+void ide_pci_device::ide_write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x3f4, idectrl expects 0x3f0
 	m_ide->write_cs1(space, ++offset, data, mem_mask);
 }
 
-READ32_MEMBER(ide_pci_device::ide2_read_cs1)
+uint32_t ide_pci_device::ide2_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	uint32_t data = 0;
@@ -115,7 +115,7 @@ READ32_MEMBER(ide_pci_device::ide2_read_cs1)
 	return data;
 }
 
-WRITE32_MEMBER(ide_pci_device::ide2_write_cs1)
+void ide_pci_device::ide2_write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// PCI offset starts at 0x374, idectrl expects 0x370
 	m_ide2->write_cs1(space, ++offset, data, mem_mask);
@@ -141,12 +141,12 @@ WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
 		logerror("%s:ide_interrupt %i set to %i\n", machine().describe_context(), m_irq_num, state);
 }
 
-READ32_MEMBER(ide_pci_device::pcictrl_r)
+uint32_t ide_pci_device::pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_config_data[offset];
 }
 
-WRITE32_MEMBER(ide_pci_device::pcictrl_w)
+void ide_pci_device::pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_config_data[offset]);
 	// PCI646U2 Offset 0x50 is interrupt status
@@ -157,7 +157,7 @@ WRITE32_MEMBER(ide_pci_device::pcictrl_w)
 	}
 }
 
-WRITE32_MEMBER(ide_pci_device::address_base_w)
+void ide_pci_device::address_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// data==0xffffffff is used to identify required memory space
 	if (data != 0xffffffff) {

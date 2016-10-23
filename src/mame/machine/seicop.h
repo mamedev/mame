@@ -11,19 +11,19 @@ class seibu_cop_bootleg_device : public device_t,
 public:
 	seibu_cop_bootleg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( copdxbl_0_r );
-	DECLARE_WRITE16_MEMBER( copdxbl_0_w );
+	uint16_t copdxbl_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void copdxbl_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( reg_lo_addr_r );
-	DECLARE_READ16_MEMBER( reg_hi_addr_r );
-	DECLARE_READ16_MEMBER( status_r );
-	DECLARE_READ16_MEMBER( dist_r );
-	DECLARE_READ16_MEMBER( angle_r );
-	DECLARE_WRITE16_MEMBER( reg_lo_addr_w );
-	DECLARE_WRITE16_MEMBER( reg_hi_addr_w );
-	DECLARE_WRITE16_MEMBER( cmd_trigger_w );
-	DECLARE_READ16_MEMBER( d104_move_r );
-	DECLARE_WRITE16_MEMBER( d104_move_w );
+	uint16_t reg_lo_addr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t reg_hi_addr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dist_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t angle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reg_lo_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reg_hi_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cmd_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t d104_move_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void d104_move_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

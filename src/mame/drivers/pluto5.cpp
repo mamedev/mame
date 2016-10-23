@@ -191,8 +191,8 @@ public:
 	uint32_t* m_cpuregion;
 	std::unique_ptr<uint32_t[]> m_mainram;
 
-	DECLARE_READ32_MEMBER(pluto5_mem_r);
-	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
+	uint32_t pluto5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pluto5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 
@@ -203,7 +203,7 @@ public:
 	virtual void machine_start() override;
 };
 
-READ32_MEMBER(pluto5_state::pluto5_mem_r)
+uint32_t pluto5_state::pluto5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);
@@ -221,7 +221,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
+void pluto5_state::pluto5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);

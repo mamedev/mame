@@ -79,7 +79,7 @@ void spc1000_vdp_exp_device::device_reset()
 /*-------------------------------------------------
     read
 -------------------------------------------------*/
-READ8_MEMBER(spc1000_vdp_exp_device::read)
+uint8_t spc1000_vdp_exp_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!(offset & 0x800))
 		return 0xff;
@@ -94,7 +94,7 @@ READ8_MEMBER(spc1000_vdp_exp_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(spc1000_vdp_exp_device::write)
+void spc1000_vdp_exp_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x800)
 	{

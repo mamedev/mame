@@ -193,7 +193,7 @@ void taitosj_state::video_start()
 
 
 
-READ8_MEMBER(taitosj_state::taitosj_gfxrom_r)
+uint8_t taitosj_state::taitosj_gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -214,7 +214,7 @@ READ8_MEMBER(taitosj_state::taitosj_gfxrom_r)
 
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_characterram_w)
+void taitosj_state::taitosj_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_characterram[offset] != data)
 	{
@@ -233,13 +233,13 @@ WRITE8_MEMBER(taitosj_state::taitosj_characterram_w)
 	}
 }
 
-WRITE8_MEMBER(taitosj_state::junglhbr_characterram_w)
+void taitosj_state::junglhbr_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	taitosj_characterram_w(space, offset, data ^ 0xfc);
 }
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_collision_reg_clear_w)
+void taitosj_state::taitosj_collision_reg_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision_reg[0] = 0;
 	m_collision_reg[1] = 0;

@@ -53,10 +53,10 @@ public:
 	virtual ~device_a800_cart_interface();
 
 	// memory accessor
-	virtual DECLARE_READ8_MEMBER(read_80xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_d5xx) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_80xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) {}
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_d5xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_80xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -117,10 +117,10 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_80xx);
-	virtual DECLARE_READ8_MEMBER(read_d5xx);
-	virtual DECLARE_WRITE8_MEMBER(write_80xx);
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_d5xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_80xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	device_a800_cart_interface*       m_cart;

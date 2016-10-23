@@ -204,7 +204,7 @@ uint16_t atari_xga_device::decipher(uint8_t k, uint16_t c)
  *
  *************************************/
 
-WRITE32_MEMBER(atari_xga_device::write)
+void atari_xga_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (m_mode)
 	{
@@ -235,7 +235,7 @@ WRITE32_MEMBER(atari_xga_device::write)
 	}
 }
 
-READ32_MEMBER(atari_xga_device::read)
+uint32_t atari_xga_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset << 2)
 	{

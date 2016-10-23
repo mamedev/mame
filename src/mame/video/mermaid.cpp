@@ -61,57 +61,57 @@ PALETTE_INIT_MEMBER(mermaid_state,rougien)
 }
 
 
-WRITE8_MEMBER(mermaid_state::mermaid_videoram2_w)
+void mermaid_state::mermaid_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_videoram_w)
+void mermaid_state::mermaid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_colorram_w)
+void mermaid_state::mermaid_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_x_w)
+void mermaid_state::mermaid_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(data & 0x01);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_flip_screen_y_w)
+void mermaid_state::mermaid_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(data & 0x01);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_bg_scroll_w)
+void mermaid_state::mermaid_bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scrollram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(mermaid_state::mermaid_fg_scroll_w)
+void mermaid_state::mermaid_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrollram[offset] = data;
 	m_fg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch1_w)
+void mermaid_state::rougien_gfxbankswitch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rougien_gfxbank1 = data & 0x01;
 }
 
-WRITE8_MEMBER(mermaid_state::rougien_gfxbankswitch2_w)
+void mermaid_state::rougien_gfxbankswitch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rougien_gfxbank2 = data & 0x01;
 }
 
-READ8_MEMBER(mermaid_state::mermaid_collision_r)
+uint8_t mermaid_state::mermaid_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    collision register active LOW:

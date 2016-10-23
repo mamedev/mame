@@ -39,10 +39,10 @@ public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k053260_device() { }
 
-	DECLARE_READ8_MEMBER( main_read );
-	DECLARE_WRITE8_MEMBER( main_write );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t main_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

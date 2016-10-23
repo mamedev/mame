@@ -46,19 +46,19 @@ public:
 	const uint8_t *m_scale_table_ptr;
 	uint8_t m_scale_line_count;
 
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_status_w);
-	DECLARE_WRITE16_MEMBER(sound_cpu_w);
-	DECLARE_READ16_MEMBER(eprom_r);
-	DECLARE_READ16_MEMBER(control_3_r);
-	DECLARE_WRITE16_MEMBER(gun_select_w);
-	DECLARE_WRITE16_MEMBER(two_gun_output_w);
-	DECLARE_WRITE16_MEMBER(three_gun_output_w);
-	DECLARE_READ16_MEMBER(kludge_r);
-	DECLARE_READ16_MEMBER(mechatt_gun_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_WRITE16_MEMBER(pf1_w);
-	DECLARE_WRITE16_MEMBER(pf2_w);
+	uint16_t sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t eprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t control_3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gun_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void two_gun_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void three_gun_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t kludge_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mechatt_gun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pf1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pf2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);

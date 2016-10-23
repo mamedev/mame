@@ -61,13 +61,13 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_WRITE8_MEMBER(port31_w);
-	DECLARE_WRITE8_MEMBER(port33_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
+	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port33_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port43_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
 	void init_fc100();
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( fc100 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( fc100_state::port00_r )
+uint8_t fc100_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard[offset]->read();
 }
@@ -320,7 +320,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
 
 //********************* AUDIO **********************************
 #if 0
-WRITE8_MEMBER( fc100_state::ay_port_a_w )
+void fc100_state::ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ag = BIT(data, 4);
 	m_gm2 = BIT(data, 6);
@@ -339,7 +339,7 @@ WRITE8_MEMBER( fc100_state::ay_port_a_w )
 
 //******************** VIDEO **********************************
 
-READ8_MEMBER( fc100_state::mc6847_videoram_r )
+uint8_t fc100_state::mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 
@@ -390,7 +390,7 @@ GFXDECODE_END
 
 //********************** CENTRONICS PRINTER ***********************************
 
-WRITE8_MEMBER( fc100_state::port43_w )
+void fc100_state::port43_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(BIT(data, 2));
 	m_centronics->write_init(BIT(data, 3));
@@ -398,13 +398,13 @@ WRITE8_MEMBER( fc100_state::port43_w )
 
 //********************** UART/CASSETTE ***********************************
 
-WRITE8_MEMBER( fc100_state::port31_w )
+void fc100_state::port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 8)
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( fc100_state::port33_w )
+void fc100_state::port33_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0)
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -488,13 +488,13 @@ void fc100_state::machine_reset()
 	membank("bankw")->set_entry(0);
 }
 
-WRITE8_MEMBER( fc100_state::port60_w )
+void fc100_state::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_banksw_unlocked)
 		membank("bankr")->set_entry(offset);
 }
 
-WRITE8_MEMBER( fc100_state::port70_w )
+void fc100_state::port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_banksw_unlocked = (bool)offset;
 }

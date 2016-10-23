@@ -47,7 +47,7 @@ void pgm_asic3_state::asic3_compute_hold(int y, int z)
 		break;
 	}
 }
-READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
+uint16_t pgm_asic3_state::pgm_asic3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_asic3_reg)
 	{
@@ -93,7 +93,7 @@ READ16_MEMBER(pgm_asic3_state::pgm_asic3_r)
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w)
+void pgm_asic3_state::pgm_asic3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0) {
 		m_asic3_reg = data;

@@ -109,7 +109,7 @@
 
 /***************************************************************************/
 
-READ32_MEMBER(deco_mlc_state::test2_r)
+uint32_t deco_mlc_state::test2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if (offset==0)
 //      return ioport("IN0")->read(); //0xffffffff;
@@ -117,12 +117,12 @@ READ32_MEMBER(deco_mlc_state::test2_r)
 	return machine().rand(); //0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_440008_r)
+uint32_t deco_mlc_state::mlc_440008_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
+uint32_t deco_mlc_state::mlc_44001c_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 /*
     test3 7 - vbl loop on 0x10 0000 at end of IRQ
@@ -135,11 +135,11 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
+void deco_mlc_state::mlc_44001c_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200070_r)
+uint32_t deco_mlc_state::mlc_200070_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_vbl_i ^=0xffffffff;
 //logerror("vbl r %08x\n", space.device().safe_pc());
@@ -147,29 +147,29 @@ READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 	return m_vbl_i;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200000_r)
+uint32_t deco_mlc_state::mlc_200000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_200004_r)
+uint32_t deco_mlc_state::mlc_200004_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_20007c_r)
+uint32_t deco_mlc_state::mlc_20007c_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
+uint32_t deco_mlc_state::mlc_scanline_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  logerror("read scanline counter (%d)\n", m_screen->vpos());
 	return m_screen->vpos();
 }
 
 
-WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
+void deco_mlc_state::avengrs_eprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15) {
 		uint8_t ebyte=(data>>8)&0xff;
@@ -188,7 +188,7 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 		logerror("%s:  eprom_w %08x mask %08x\n",machine().describe_context(),data,mem_mask);
 }
 
-WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
+void deco_mlc_state::avengrs_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	/* x bbbbb ggggg rrrrr */
@@ -202,7 +202,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
-WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
+void deco_mlc_state::mlc_irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  int scanline=m_screen->vpos();
 	COMBINE_DATA(&m_irq_ram[offset]);
@@ -230,14 +230,14 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 
 
 
-READ32_MEMBER(deco_mlc_state::mlc_vram_r)
+uint32_t deco_mlc_state::mlc_vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_mlc_vram[offset]&0xffff;
 }
 
 
 
-READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
+uint32_t deco_mlc_state::mlc_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retdata = 0;
 
@@ -255,7 +255,7 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 }
 
 
-WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
+void deco_mlc_state::mlc_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -268,7 +268,7 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 	}
 }
 
-READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
+uint16_t deco_mlc_state::sh96_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -277,7 +277,7 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
+void deco_mlc_state::sh96_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -869,7 +869,7 @@ void deco_mlc_state::descramble_sound(  )
 	memcpy(rom,&buf1[0],length);
 }
 
-READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
+uint32_t deco_mlc_state::avengrgs_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t a=m_mlc_ram[0x89a0/4];
 	uint32_t p=space.device().safe_pc();

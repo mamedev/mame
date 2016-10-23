@@ -286,20 +286,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
 	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
-	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
+	uint8_t pia_ic5_porta_track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
-	DECLARE_READ16_MEMBER( mpu4_vid_vidram_r );
-	DECLARE_WRITE16_MEMBER( mpu4_vid_vidram_w );
-	DECLARE_WRITE8_MEMBER( ef9369_w );
-	DECLARE_READ8_MEMBER( ef9369_r );
-	DECLARE_WRITE8_MEMBER( bt471_w );
-	DECLARE_READ8_MEMBER( bt471_r );
-	DECLARE_WRITE8_MEMBER( vidcharacteriser_w );
-	DECLARE_READ8_MEMBER( vidcharacteriser_r );
+	uint16_t mpu4_vid_vidram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mpu4_vid_vidram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ef9369_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ef9369_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bt471_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bt471_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vidcharacteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vidcharacteriser_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
-	DECLARE_WRITE8_MEMBER( vram_w );
-	DECLARE_READ8_MEMBER( vram_r );
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 /*************************************
@@ -386,12 +386,12 @@ static const gfx_layout mpu4_vid_char_8x8_layout =
 	8*32
 };
 
-WRITE8_MEMBER(mpu4vid_state::vram_w)
+void mpu4vid_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vid_mainram[offset] = data | (m_vid_mainram[offset] & 0xff00);
 }
 
-READ8_MEMBER(mpu4vid_state::vram_r)
+uint8_t mpu4vid_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vid_mainram[offset];
 }
@@ -413,13 +413,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 }
 
 
-READ16_MEMBER(mpu4vid_state::mpu4_vid_vidram_r )
+uint16_t mpu4vid_state::mpu4_vid_vidram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vid_vidram[offset];
 }
 
 
-WRITE16_MEMBER(mpu4vid_state::mpu4_vid_vidram_w )
+void mpu4vid_state::mpu4_vid_vidram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vid_vidram[offset]);
 	offset <<= 1;
@@ -454,7 +454,7 @@ void mpu4vid_state::video_start_mpu4_vid()
 
 /* Non-multiplexed mode */
 
-WRITE8_MEMBER(mpu4vid_state::ef9369_w )
+void mpu4vid_state::ef9369_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct ef9369_t &pal = m_pal;
 
@@ -494,7 +494,7 @@ WRITE8_MEMBER(mpu4vid_state::ef9369_w )
 }
 
 
-READ8_MEMBER(mpu4vid_state::ef9369_r )
+uint8_t mpu4vid_state::ef9369_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct ef9369_t &pal = m_pal;
 	if ((offset & 1) == 0)
@@ -533,7 +533,7 @@ READ8_MEMBER(mpu4vid_state::ef9369_r )
  *  1 0 1    Overlay register
  */
 
-WRITE8_MEMBER(mpu4vid_state::bt471_w )
+void mpu4vid_state::bt471_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct bt471_t &bt471 = m_bt471;
 
@@ -575,7 +575,7 @@ WRITE8_MEMBER(mpu4vid_state::bt471_w )
 	}
 }
 
-READ8_MEMBER(mpu4vid_state::bt471_r )
+uint8_t mpu4vid_state::bt471_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("Bt471: Unhandled read access (offset:%x)", offset);
 	return 0;
@@ -588,7 +588,7 @@ READ8_MEMBER(mpu4vid_state::bt471_r )
  *
  *************************************/
 
-READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
+uint8_t mpu4vid_state::pia_ic5_porta_track_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
 	mainboard. As per usual, they've taken the cheap route here, reading and processing the
@@ -1454,7 +1454,7 @@ Characteriser (CHR)
  the 'challenge' part of the startup check is always the same
 */
 
-WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
+void mpu4vid_state::vidcharacteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x;
 	int call=(data&0xff);
@@ -1485,7 +1485,7 @@ WRITE8_MEMBER(mpu4vid_state::vidcharacteriser_w )
 }
 
 
-READ8_MEMBER(mpu4vid_state::vidcharacteriser_r )
+uint8_t mpu4vid_state::vidcharacteriser_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", space.device().safe_pcbase(),offset,m_current_chr_table[m_prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));

@@ -29,11 +29,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(print_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
-	DECLARE_READ8_MEMBER(print_r);
-	DECLARE_READ8_MEMBER(scroll_r);
+	void print_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t print_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scroll_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_scroll;
 
 	required_device<cpu_device> m_maincpu;
@@ -83,28 +83,28 @@ uint32_t tim011_state::screen_update_tim011(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(tim011_state::fdc_dma_w)
+void tim011_state::fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("fdc_dma_w :%02x\n",data);
 }
 
-WRITE8_MEMBER(tim011_state::print_w)
+void tim011_state::print_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("print_w :%02x\n",data);
 }
 
-READ8_MEMBER(tim011_state::print_r)
+uint8_t tim011_state::print_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("print_r\n");
 	return 0;
 }
 
-WRITE8_MEMBER(tim011_state::scroll_w)
+void tim011_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = data;
 }
 
-READ8_MEMBER(tim011_state::scroll_r)
+uint8_t tim011_state::scroll_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scroll;
 }

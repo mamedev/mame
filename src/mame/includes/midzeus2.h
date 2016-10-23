@@ -17,8 +17,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
 	void video_start_midzeus2();
 	uint32_t screen_update_midzeus2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER( zeus2_r );
-	DECLARE_WRITE32_MEMBER( zeus2_w );
+	uint32_t zeus2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void zeus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 private:
 	TIMER_CALLBACK_MEMBER(int_timer_callback);
 	void exit_handler2();

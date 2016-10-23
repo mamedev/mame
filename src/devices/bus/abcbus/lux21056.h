@@ -38,23 +38,23 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER( sasi_status_r );
-	DECLARE_WRITE8_MEMBER( stat_w );
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_READ8_MEMBER( sasi_data_r );
-	DECLARE_WRITE8_MEMBER( sasi_data_w );
-	DECLARE_READ8_MEMBER( rdy_reset_r );
-	DECLARE_WRITE8_MEMBER( rdy_reset_w );
-	DECLARE_READ8_MEMBER( sasi_sel_r );
-	DECLARE_WRITE8_MEMBER( sasi_sel_w );
-	DECLARE_READ8_MEMBER( sasi_rst_r );
-	DECLARE_WRITE8_MEMBER( sasi_rst_w );
+	uint8_t sasi_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t out_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void inp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sasi_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sasi_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rdy_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rdy_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sasi_sel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sasi_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sasi_rst_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sasi_rst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( memory_read_byte );
-	DECLARE_WRITE8_MEMBER( memory_write_byte );
-	DECLARE_READ8_MEMBER( io_read_byte );
-	DECLARE_WRITE8_MEMBER( io_write_byte );
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
 	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );

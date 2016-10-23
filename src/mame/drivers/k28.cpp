@@ -77,12 +77,12 @@ public:
 	uint64_t m_vfd_shiftreg_out;
 	int m_vfd_shiftcount;
 
-	DECLARE_WRITE8_MEMBER(mcu_p0_w);
-	DECLARE_READ8_MEMBER(mcu_p1_r);
-	DECLARE_READ8_MEMBER(mcu_p2_r);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
-	DECLARE_WRITE8_MEMBER(mcu_prog_w);
-	DECLARE_READ8_MEMBER(mcu_t1_r);
+	void mcu_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_on);
 	void power_off();
@@ -268,7 +268,7 @@ void k28_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety,
 
 ***************************************************************************/
 
-WRITE8_MEMBER(k28_state::mcu_p0_w)
+void k28_state::mcu_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0,d1: phoneme high bits
 	// d0-d2: input mux high bits
@@ -296,7 +296,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	m_tms6100->clk_w(0);
 }
 
-READ8_MEMBER(k28_state::mcu_p1_r)
+uint8_t k28_state::mcu_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -314,13 +314,13 @@ READ8_MEMBER(k28_state::mcu_p1_r)
 	return data ^ 0xff;
 }
 
-READ8_MEMBER(k28_state::mcu_p2_r)
+uint8_t k28_state::mcu_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d3: VSM data
 	return (m_tms6100->data_line_r()) ? 8 : 0;
 }
 
-WRITE8_MEMBER(k28_state::mcu_p2_w)
+void k28_state::mcu_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: VFD driver serial data
 	m_vfd_data_in = data & 1;
@@ -333,7 +333,7 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	m_phoneme = (m_phoneme & ~0xf) | (data & 0xf);
 }
 
-WRITE8_MEMBER(k28_state::mcu_prog_w)
+void k28_state::mcu_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 8021 PROG: clock VFD driver
 	int state = (data) ? 1 : 0;
@@ -374,7 +374,7 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 	}
 }
 
-READ8_MEMBER(k28_state::mcu_t1_r)
+uint8_t k28_state::mcu_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// 8021 T1: SC-01 A/R pin
 	return m_speech->request();

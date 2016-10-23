@@ -15,7 +15,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
-	DECLARE_READ16_MEMBER(actel_id_r);
+	uint16_t actel_id_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

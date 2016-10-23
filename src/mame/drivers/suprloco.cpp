@@ -27,7 +27,7 @@ Sega PCB 834-5137
 #include "sound/sn76496.h"
 #include "includes/suprloco.h"
 
-WRITE8_MEMBER(suprloco_state::soundport_w)
+void suprloco_state::soundport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

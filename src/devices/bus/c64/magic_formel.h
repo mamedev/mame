@@ -37,8 +37,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( freeze );
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 protected:

@@ -510,7 +510,7 @@ void abc77_device::txd_w(int state)
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::p1_r )
+uint8_t abc77_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -545,7 +545,7 @@ READ8_MEMBER( abc77_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::p2_w )
+void abc77_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -590,7 +590,7 @@ WRITE8_MEMBER( abc77_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc77_device::t1_r )
+uint8_t abc77_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_clock;
 }
@@ -600,7 +600,7 @@ READ8_MEMBER( abc77_device::t1_r )
 //  prog_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::prog_w )
+void abc77_device::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stb = BIT(data, 0);
 }
@@ -610,7 +610,7 @@ WRITE8_MEMBER( abc77_device::prog_w )
 //  j3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc77_device::j3_w )
+void abc77_device::j3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_j3 = data;
 }

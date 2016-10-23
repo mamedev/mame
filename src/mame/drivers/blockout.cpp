@@ -76,7 +76,7 @@
 #define MAIN_CLOCK XTAL_10MHz
 #define AUDIO_CLOCK XTAL_3_579545MHz
 
-WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
+void blockout_state::blockout_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -85,12 +85,12 @@ WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
+void blockout_state::blockout_irq6_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
+void blockout_state::blockout_irq5_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }

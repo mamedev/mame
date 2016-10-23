@@ -119,19 +119,19 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_wram_r)
+uint8_t sprint2_state::sprint2_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_ram[0x380 + offset % 0x80];
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_dip_r)
+uint8_t sprint2_state::sprint2_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read() << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_input_A_r)
+uint8_t sprint2_state::sprint2_input_A_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = ioport("INA")->read();
 
@@ -149,7 +149,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_input_B_r)
+uint8_t sprint2_state::sprint2_input_B_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = ioport("INB")->read();
 
@@ -164,7 +164,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_sync_r)
+uint8_t sprint2_state::sprint2_sync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -184,33 +184,33 @@ READ8_MEMBER(sprint2_state::sprint2_sync_r)
 }
 
 
-READ8_MEMBER(sprint2_state::sprint2_steering1_r)
+uint8_t sprint2_state::sprint2_steering1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_steering[0];
 }
-READ8_MEMBER(sprint2_state::sprint2_steering2_r)
+uint8_t sprint2_state::sprint2_steering2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_steering[1];
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_steering_reset1_w)
+void sprint2_state::sprint2_steering_reset1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_steering[0] |= 0x80;
 }
-WRITE8_MEMBER(sprint2_state::sprint2_steering_reset2_w)
+void sprint2_state::sprint2_steering_reset2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_steering[1] |= 0x80;
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
+void sprint2_state::sprint2_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[0x380 + offset % 0x80] = data;
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
+void sprint2_state::sprint2_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attract = offset & 1;
 
@@ -219,38 +219,38 @@ WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
+void sprint2_state::sprint2_noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT2_NOISE_RESET, 0);
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_skid1_w)
+void sprint2_state::sprint2_skid1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// also DOMINOS_TUMBLE_EN
 	m_discrete->write(space, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
-WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
+void sprint2_state::sprint2_skid2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 
-WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
+void sprint2_state::sprint2_lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset & 1);
 }
-WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
+void sprint2_state::sprint2_lamp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, offset & 1);
 }
 
-WRITE8_MEMBER(sprint2_state::dominos4_lamp3_w)
+void sprint2_state::dominos4_lamp3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(2, offset & 1);
 }
-WRITE8_MEMBER(sprint2_state::dominos4_lamp4_w)
+void sprint2_state::dominos4_lamp4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(3, offset & 1);
 }

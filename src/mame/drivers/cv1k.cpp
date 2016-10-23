@@ -207,18 +207,18 @@ public:
 	required_shared_ptr<uint64_t> m_ram;
 	required_shared_ptr<uint64_t> m_rombase;
 
-	DECLARE_READ8_MEMBER(flash_io_r);
-	DECLARE_WRITE8_MEMBER(flash_io_w);
-	DECLARE_READ8_MEMBER(serial_rtc_eeprom_r);
-	DECLARE_WRITE8_MEMBER(serial_rtc_eeprom_w);
-	DECLARE_READ64_MEMBER(flash_port_e_r);
+	uint8_t flash_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flash_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_rtc_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_rtc_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint64_t flash_port_e_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
 
 	/* game specific */
-	DECLARE_READ64_MEMBER(speedup_r);
+	uint64_t speedup_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void init_mushisam();
 	void init_ibara();
 	void init_espgal2();
@@ -249,13 +249,13 @@ uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 // FLASH interface
 
-READ64_MEMBER( cv1k_state::flash_port_e_r )
+uint64_t cv1k_state::flash_port_e_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return ((m_serflash->flash_ready_r(space, offset) ? 0x20 : 0x00)) | 0xdf;
 }
 
 
-READ8_MEMBER( cv1k_state::flash_io_r )
+uint8_t cv1k_state::flash_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -276,7 +276,7 @@ READ8_MEMBER( cv1k_state::flash_io_r )
 	}
 }
 
-WRITE8_MEMBER( cv1k_state::flash_io_w )
+void cv1k_state::flash_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -303,7 +303,7 @@ WRITE8_MEMBER( cv1k_state::flash_io_w )
 
 // ibarablk uses the rtc to render the clock in the first attract demo
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
-READ8_MEMBER( cv1k_state::serial_rtc_eeprom_r )
+uint8_t cv1k_state::serial_rtc_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -315,7 +315,7 @@ READ8_MEMBER( cv1k_state::serial_rtc_eeprom_r )
 	}
 }
 
-WRITE8_MEMBER( cv1k_state::serial_rtc_eeprom_w )
+void cv1k_state::serial_rtc_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -829,7 +829,7 @@ ROM_START( dfkbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
 ROM_END
 
-READ64_MEMBER( cv1k_state::speedup_r )
+uint64_t cv1k_state::speedup_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (m_maincpu->pc()== m_idlepc ) m_maincpu->spin_until_time( attotime::from_usec(10));
 	return m_ram[m_idleramoffs/8];

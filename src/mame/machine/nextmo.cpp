@@ -36,13 +36,13 @@ void nextmo_device::device_reset()
 {
 }
 
-READ8_MEMBER(nextmo_device::r4_r)
+uint8_t nextmo_device::r4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r4_r %02x (%08x)\n", r4, space.device().safe_pc());
 	return r4;
 }
 
-WRITE8_MEMBER(nextmo_device::r4_w)
+void nextmo_device::r4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(r4 & 1)
 		device_reset();
@@ -50,37 +50,37 @@ WRITE8_MEMBER(nextmo_device::r4_w)
 	logerror("nextmo: r4_w %02x (%08x)\n", r4, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::r5_r)
+uint8_t nextmo_device::r5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r5_r %02x (%08x)\n", r5, space.device().safe_pc());
 	return r5;
 }
 
-WRITE8_MEMBER(nextmo_device::r5_w)
+void nextmo_device::r5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	r5 = data;
 	logerror("nextmo: r5_w %02x (%08x)\n", r5, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::r6_r)
+uint8_t nextmo_device::r6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r6_r %02x (%08x)\n", r6, space.device().safe_pc());
 	return r6;
 }
 
-WRITE8_MEMBER(nextmo_device::r6_w)
+void nextmo_device::r6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	r6 = data;
 	logerror("nextmo: r6_w %02x (%08x)\n", r6, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::r7_r)
+uint8_t nextmo_device::r7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r7_r %02x (%08x)\n", r7, space.device().safe_pc());
 	return r7;
 }
 
-WRITE8_MEMBER(nextmo_device::r7_w)
+void nextmo_device::r7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	r7 = data;
 	logerror("nextmo: r7_w %02x (%08x)\n", r7, space.device().safe_pc());
@@ -129,57 +129,57 @@ void nextmo_device::check_dma_end()
 	}
 }
 
-READ8_MEMBER(nextmo_device::r8_r)
+uint8_t nextmo_device::r8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r8_r (%08x)\n", space.device().safe_pc());
 	return 0x00;
 }
 
-WRITE8_MEMBER(nextmo_device::r8_w)
+void nextmo_device::r8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nextmo: r8_w %02x (%08x)\n", data, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::r9_r)
+uint8_t nextmo_device::r9_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r9_r (%08x)\n", space.device().safe_pc());
 	return 0x00;
 }
 
-WRITE8_MEMBER(nextmo_device::r9_w)
+void nextmo_device::r9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nextmo: r9_w %02x (%08x)\n", data, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::ra_r)
+uint8_t nextmo_device::ra_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: ra_r (%08x)\n", space.device().safe_pc());
 	return 0x00;
 }
 
-WRITE8_MEMBER(nextmo_device::ra_w)
+void nextmo_device::ra_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nextmo: ra_w %02x (%08x)\n", data, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::rb_r)
+uint8_t nextmo_device::rb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: rb_r (%08x)\n", space.device().safe_pc());
 	return 0x24;
 }
 
-WRITE8_MEMBER(nextmo_device::rb_w)
+void nextmo_device::rb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nextmo: rb_w %02x (%08x)\n", data, space.device().safe_pc());
 }
 
-READ8_MEMBER(nextmo_device::r10_r)
+uint8_t nextmo_device::r10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("nextmo: r10_r %d (%08x)\n", offset, space.device().safe_pc());
 	return 0x00;
 }
 
-WRITE8_MEMBER(nextmo_device::r10_w)
+void nextmo_device::r10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nextmo: r10_w %d, %02x (%08x)\n", offset, data, space.device().safe_pc());
 }

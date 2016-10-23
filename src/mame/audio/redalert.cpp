@@ -41,7 +41,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(redalert_state::redalert_analog_w)
+void redalert_state::redalert_analog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* this port triggers analog sounds
 	   D0 = Formation Aircraft?
@@ -63,7 +63,7 @@ WRITE8_MEMBER(redalert_state::redalert_analog_w)
  *
  *************************************/
 
-WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
+void redalert_state::redalert_audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(space, 0, data);
@@ -75,7 +75,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 }
 
 
-WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
+void redalert_state::redalert_AY8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
@@ -101,13 +101,13 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 }
 
 
-READ8_MEMBER(redalert_state::redalert_ay8910_latch_1_r)
+uint8_t redalert_state::redalert_ay8910_latch_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ay8910_latch_1;
 }
 
 
-WRITE8_MEMBER(redalert_state::redalert_ay8910_latch_2_w)
+void redalert_state::redalert_ay8910_latch_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay8910_latch_2 = data;
 }
@@ -140,7 +140,7 @@ void redalert_state::sound_start_redalert()
  *
  *************************************/
 
-WRITE8_MEMBER(redalert_state::redalert_voice_command_w)
+void redalert_state::redalert_voice_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, (data & 0x78) >> 3);
 	machine().device("voice")->execute().set_input_line(I8085_RST75_LINE, (~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -250,7 +250,7 @@ MACHINE_CONFIG_END
  *************************************/
 
 
-WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
+void redalert_state::demoneye_audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the byte is connected to port A of the AY8910 */
 	m_soundlatch->write(space, 0, data);
@@ -258,19 +258,19 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 }
 
 
-WRITE8_MEMBER(redalert_state::demoneye_ay8910_latch_1_w)
+void redalert_state::demoneye_ay8910_latch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay8910_latch_1 = data;
 }
 
 
-READ8_MEMBER(redalert_state::demoneye_ay8910_latch_2_r)
+uint8_t redalert_state::demoneye_ay8910_latch_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ay8910_latch_2;
 }
 
 
-WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
+void redalert_state::demoneye_ay8910_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
 	ay8910_device *ay2 = machine().device<ay8910_device>("ay2");

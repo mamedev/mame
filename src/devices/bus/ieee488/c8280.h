@@ -39,14 +39,14 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( dio_r );
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( riot1_pa_r );
-	DECLARE_WRITE8_MEMBER( riot1_pa_w );
-	DECLARE_READ8_MEMBER( riot1_pb_r );
-	DECLARE_WRITE8_MEMBER( riot1_pb_w );
-	DECLARE_READ8_MEMBER( fk5_r );
-	DECLARE_WRITE8_MEMBER( fk5_w );
+	uint8_t dio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t riot1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t riot1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fk5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fk5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

@@ -52,8 +52,8 @@ public:
 	template<class _Object> static devcb_base &set_out_ca_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_ca_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_cb_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_cb_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( i0_w );
 	DECLARE_WRITE_LINE_MEMBER( i1_w );
@@ -61,12 +61,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i3_w );
 	DECLARE_WRITE_LINE_MEMBER( i4_w );
 
-	DECLARE_READ8_MEMBER( pa_r );
-	DECLARE_READ8_MEMBER( pb_r );
-	DECLARE_READ8_MEMBER( pc_r );
-	DECLARE_WRITE8_MEMBER( pa_w );
-	DECLARE_WRITE8_MEMBER( pb_w );
-	DECLARE_WRITE8_MEMBER( pc_w );
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	WRITE_LINE_MEMBER( pb0_w ) { port_line_w(m_in_b, 0, state); }
 	WRITE_LINE_MEMBER( pb1_w ) { port_line_w(m_in_b, 1, state); }

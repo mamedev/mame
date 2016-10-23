@@ -39,10 +39,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(ff_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 
 	required_shared_ptr<uint8_t> m_p_videoram;

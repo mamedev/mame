@@ -48,14 +48,14 @@ atari_vg_earom_device::atari_vg_earom_device(const machine_config &mconfig, cons
 }
 
 // Activate the output buffer (LS244)'s /G1 and /G2 lines to read whatever is on the EAROM's output bus
-READ8_MEMBER( atari_vg_earom_device::read )
+uint8_t atari_vg_earom_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("read from earom output: %02x(%02x):%02x\n", m_in_offset, offset, m_out_data);
 	return (m_out_data);
 }
 
 // Write to the address input (LS174) and data input (LS374) latches respectively
-WRITE8_MEMBER( atari_vg_earom_device::write )
+void atari_vg_earom_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("write to earom buffers: offset:data of %02x:%02x\n", offset, data);
 	m_in_offset = offset;
@@ -65,7 +65,7 @@ WRITE8_MEMBER( atari_vg_earom_device::write )
 /* CTRL controls the CTRL latch (LS175):
 See top of file: there are two possible wirings!
  */
-WRITE8_MEMBER( atari_vg_earom_device::ctrl_w )
+void atari_vg_earom_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const er2055_State[5] = { "IDLE", "RD_WAIT", "RD_OUTPUT", "WRITE", "ERASE" };
 	logerror("EAROM_CTRL written with %02x: ", data);

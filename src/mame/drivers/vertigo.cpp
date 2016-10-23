@@ -26,12 +26,12 @@
  *
  *************************************/
 
-READ16_MEMBER(vertigo_state::vertigo_pit8254_lsb_r)
+uint16_t vertigo_state::vertigo_pit8254_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pit->read(space, offset);
 }
 
-WRITE16_MEMBER(vertigo_state::vertigo_pit8254_lsb_w)
+void vertigo_state::vertigo_pit8254_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_pit->write(space, offset, data);

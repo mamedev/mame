@@ -15,7 +15,7 @@ class igs025_device : public device_t
 public:
 	igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
+	uint16_t killbld_igs025_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	// use setters instead of making public?
 	const uint8_t (*m_kb_source_data)[0xec];
 	uint32_t m_kb_game_id;
@@ -25,9 +25,9 @@ public:
 	igs025_execute_external m_execute_external;
 	static void set_external_cb(device_t &device,igs025_execute_external newcb);
 
-	DECLARE_WRITE16_MEMBER( olds_w );
-	DECLARE_WRITE16_MEMBER( drgw2_d80000_protection_w );
-	DECLARE_WRITE16_MEMBER( killbld_igs025_prot_w);
+	void olds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void drgw2_d80000_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void killbld_igs025_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 protected:

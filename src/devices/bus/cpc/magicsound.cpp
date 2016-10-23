@@ -116,17 +116,17 @@ void al_magicsound_device::device_reset()
 	set_timer_gate(false);
 }
 
-READ8_MEMBER(al_magicsound_device::dmac_r)
+uint8_t al_magicsound_device::dmac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmac->read(space,offset);
 }
 
-WRITE8_MEMBER(al_magicsound_device::dmac_w)
+void al_magicsound_device::dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmac->write(space,offset,data);
 }
 
-WRITE8_MEMBER(al_magicsound_device::timer_w)
+void al_magicsound_device::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// can both PITs be selected at the same time?
 	if(offset & 0x08)
@@ -135,12 +135,12 @@ WRITE8_MEMBER(al_magicsound_device::timer_w)
 		m_timer2->write(space,offset & 0x03,data);
 }
 
-WRITE8_MEMBER(al_magicsound_device::volume_w)
+void al_magicsound_device::volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_volume[offset & 0x03] = data & 0x3f;
 }
 
-WRITE8_MEMBER(al_magicsound_device::mapper_w)
+void al_magicsound_device::mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t channel = (offset & 0x0c) >> 2;
 	uint8_t page = offset & 0x03;
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER(al_magicsound_device::sam1_w) { m_current_channel = 1; if(m_da
 WRITE_LINE_MEMBER(al_magicsound_device::sam2_w) { m_current_channel = 2; if(m_dack[2] && state) m_dmac->dreq2_w(1); }
 WRITE_LINE_MEMBER(al_magicsound_device::sam3_w) { m_current_channel = 3; if(m_dack[3] && state) m_dmac->dreq3_w(1); }
 
-READ8_MEMBER(al_magicsound_device::dma_read_byte)
+uint8_t al_magicsound_device::dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 	uint8_t page = (offset & 0xc000) >> 14;
@@ -175,7 +175,7 @@ READ8_MEMBER(al_magicsound_device::dma_read_byte)
 	return ret;
 }
 
-WRITE8_MEMBER(al_magicsound_device::dma_write_byte)
+void al_magicsound_device::dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_output[m_current_channel] = data;
 }

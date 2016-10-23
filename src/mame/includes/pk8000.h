@@ -7,21 +7,21 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(pk8000_video_color_r);
-	DECLARE_WRITE8_MEMBER(pk8000_video_color_w);
-	DECLARE_READ8_MEMBER(pk8000_text_start_r);
-	DECLARE_WRITE8_MEMBER(pk8000_text_start_w);
-	DECLARE_READ8_MEMBER(pk8000_chargen_start_r);
-	DECLARE_WRITE8_MEMBER(pk8000_chargen_start_w);
-	DECLARE_READ8_MEMBER(pk8000_video_start_r);
-	DECLARE_WRITE8_MEMBER(pk8000_video_start_w);
-	DECLARE_READ8_MEMBER(pk8000_color_start_r);
-	DECLARE_WRITE8_MEMBER(pk8000_color_start_w);
-	DECLARE_READ8_MEMBER(pk8000_color_r);
-	DECLARE_WRITE8_MEMBER(pk8000_color_w);
-	DECLARE_READ8_MEMBER(pk8000_84_porta_r);
-	DECLARE_WRITE8_MEMBER(pk8000_84_porta_w);
-	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
+	uint8_t pk8000_video_color_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_video_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_text_start_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_text_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_chargen_start_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_chargen_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_video_start_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_video_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_color_start_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_color_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_color_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_84_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_84_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pk8000_84_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT(pk8000);
 

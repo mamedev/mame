@@ -193,20 +193,20 @@ void lasso_state::video_start_pinbo()
  *
  *************************************/
 
-WRITE8_MEMBER(lasso_state::lasso_videoram_w)
+void lasso_state::lasso_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lasso_state::lasso_colorram_w)
+void lasso_state::lasso_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
+void lasso_state::lasso_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* don't know which is which, but they are always set together */
 	flip_screen_x_set(data & 0x01);
@@ -216,7 +216,7 @@ WRITE8_MEMBER(lasso_state::lasso_flip_screen_w)
 }
 
 
-WRITE8_MEMBER(lasso_state::lasso_video_control_w)
+void lasso_state::lasso_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = (data & 0x04) >> 2;
 
@@ -229,7 +229,7 @@ WRITE8_MEMBER(lasso_state::lasso_video_control_w)
 	lasso_flip_screen_w(space, offset, data);
 }
 
-WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
+void lasso_state::wwjgtin_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = ((data & 0x04) ? 0 : 1) + ((data & 0x10) ? 2 : 0);
 	m_track_enable = data & 0x08;
@@ -243,7 +243,7 @@ WRITE8_MEMBER(lasso_state::wwjgtin_video_control_w)
 	lasso_flip_screen_w(space, offset, data);
 }
 
-WRITE8_MEMBER(lasso_state::pinbo_video_control_w)
+void lasso_state::pinbo_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* no need to dirty the tilemap -- only the sprites use the global bank */
 	m_gfxbank = (data & 0x0c) >> 2;

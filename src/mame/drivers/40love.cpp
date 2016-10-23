@@ -244,18 +244,18 @@ void fortyl_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE8_MEMBER(fortyl_state::sound_command_w)
+void fortyl_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	synchronize(TIMER_NMI_CALLBACK, data);
 }
 
-WRITE8_MEMBER(fortyl_state::nmi_disable_w)
+void fortyl_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(fortyl_state::nmi_enable_w)
+void fortyl_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -268,14 +268,14 @@ WRITE8_MEMBER(fortyl_state::nmi_enable_w)
 
 
 #if 0
-WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
+void fortyl_state::fortyl_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
 #endif
 
 
-WRITE8_MEMBER(fortyl_state::bank_select_w)
+void fortyl_state::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data != 0x02) && (data != 0xfd))
 	{
@@ -286,7 +286,7 @@ WRITE8_MEMBER(fortyl_state::bank_select_w)
 	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(fortyl_state::pix1_w)
+void fortyl_state::pix1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
@@ -294,7 +294,7 @@ WRITE8_MEMBER(fortyl_state::pix1_w)
 	m_pix1 = data;
 }
 
-WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
+void fortyl_state::pix1_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
@@ -302,7 +302,7 @@ WRITE8_MEMBER(fortyl_state::pix1_mcu_w)
 	m_pix1 = data;
 }
 
-WRITE8_MEMBER(fortyl_state::pix2_w)
+void fortyl_state::pix2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if ((data!=0x00) && (data != 0xff))
 //      logerror("pix2 = %2x\n", data);
@@ -312,13 +312,13 @@ WRITE8_MEMBER(fortyl_state::pix2_w)
 }
 
 #if 0
-READ8_MEMBER(fortyl_state::pix1_r)
+uint8_t fortyl_state::pix1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pix1;
 }
 #endif
 
-READ8_MEMBER(fortyl_state::pix2_r)
+uint8_t fortyl_state::pix2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 	int d1 = m_pix1 & 7;
@@ -395,7 +395,7 @@ static const uint8_t mcu_data2[0x80] =
 };
 
 
-WRITE8_MEMBER(fortyl_state::undoukai_mcu_w)
+void fortyl_state::undoukai_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ram_adr = m_mcu_ram[0x1b5] * 0x100 + m_mcu_ram[0x1b4];
 
@@ -554,14 +554,14 @@ WRITE8_MEMBER(fortyl_state::undoukai_mcu_w)
 	}
 }
 
-READ8_MEMBER(fortyl_state::undoukai_mcu_r)
+uint8_t fortyl_state::undoukai_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  logerror("mcu_r %02x\n", m_from_mcu);
 
 	return m_from_mcu;
 }
 
-READ8_MEMBER(fortyl_state::undoukai_mcu_status_r)
+uint8_t fortyl_state::undoukai_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 3;
 
@@ -606,18 +606,18 @@ void fortyl_state::init_40love()
 
 /***************************************************************************/
 
-READ8_MEMBER(fortyl_state::from_snd_r)
+uint8_t fortyl_state::from_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_snd_flag = 0;
 	return m_snd_data;
 }
 
-READ8_MEMBER(fortyl_state::snd_flag_r)
+uint8_t fortyl_state::snd_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_flag | 0xfd;
 }
 
-WRITE8_MEMBER(fortyl_state::to_main_w)
+void fortyl_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_data = data;
 	m_snd_flag = 2;
@@ -700,7 +700,7 @@ void fortyl_state::machine_reset_ta7630()
 */
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_0_w)
+void fortyl_state::sound_control_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -712,7 +712,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_0_w)
 	m_msm->set_output_gain(3, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group1 from msm5232 */
 
 }
-WRITE8_MEMBER(fortyl_state::sound_control_1_w)
+void fortyl_state::sound_control_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
@@ -722,7 +722,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_1_w)
 	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl1 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_2_w)
+void fortyl_state::sound_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("aysnd");
 	int i;
@@ -735,7 +735,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_2_w)
 		sound->set_output_gain(i, m_vol_ctrl[(m_snd_ctrl2 >> 4) & 15] / 100.0); /* ym2149f all */
 }
 
-WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
+void fortyl_state::sound_control_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* unknown */
 {
 	m_snd_ctrl3 = data & 0xff;
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);

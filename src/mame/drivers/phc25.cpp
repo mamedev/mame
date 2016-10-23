@@ -41,7 +41,7 @@ RUN
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( phc25_state::port40_r )
+uint8_t phc25_state::port40_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -75,7 +75,7 @@ READ8_MEMBER( phc25_state::port40_r )
 	return data;
 }
 
-WRITE8_MEMBER( phc25_state::port40_w )
+void phc25_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ8_MEMBER( phc25_state::video_ram_r )
+uint8_t phc25_state::video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_port40, 7)) // graphics
 	{

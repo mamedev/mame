@@ -51,16 +51,16 @@ public:
 			m_soundram(*this, "soundram") { }
 
 	optional_shared_ptr<uint8_t> m_soundram;
-	DECLARE_READ8_MEMBER(scobra_soundram_r);
-	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_1_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_0_r);
-	DECLARE_READ8_MEMBER(hustler_ppi8255_1_r);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(scobra_type2_ppi8255_1_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_0_w);
-	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
+	uint8_t scobra_soundram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scobra_soundram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scobra_type2_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scobra_type2_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hustler_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hustler_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scobra_type2_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scobra_type2_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hustler_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hustler_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
 };
 
@@ -96,15 +96,15 @@ static GFXDECODE_START( scobra )
 GFXDECODE_END
 
 
-READ8_MEMBER(scobra_state::scobra_type2_ppi8255_0_r){ return m_ppi8255_0->read(space, offset >> 2); }
-READ8_MEMBER(scobra_state::scobra_type2_ppi8255_1_r){ return m_ppi8255_1->read(space, offset >> 2); }
-WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 2, data); }
-WRITE8_MEMBER(scobra_state::scobra_type2_ppi8255_1_w){ m_ppi8255_1->write(space, offset >> 2, data); }
+uint8_t scobra_state::scobra_type2_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return m_ppi8255_0->read(space, offset >> 2); }
+uint8_t scobra_state::scobra_type2_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return m_ppi8255_1->read(space, offset >> 2); }
+void scobra_state::scobra_type2_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_ppi8255_0->write(space, offset >> 2, data); }
+void scobra_state::scobra_type2_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_ppi8255_1->write(space, offset >> 2, data); }
 
-READ8_MEMBER(scobra_state::hustler_ppi8255_0_r){ return m_ppi8255_0->read(space, offset >> 3); }
-READ8_MEMBER(scobra_state::hustler_ppi8255_1_r){ return m_ppi8255_1->read(space, offset >> 3); }
-WRITE8_MEMBER(scobra_state::hustler_ppi8255_0_w){ m_ppi8255_0->write(space, offset >> 3, data); }
-WRITE8_MEMBER(scobra_state::hustler_ppi8255_1_w){ m_ppi8255_1->write(space, offset >> 3, data); }
+uint8_t scobra_state::hustler_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return m_ppi8255_0->read(space, offset >> 3); }
+uint8_t scobra_state::hustler_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return m_ppi8255_1->read(space, offset >> 3); }
+void scobra_state::hustler_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_ppi8255_0->write(space, offset >> 3, data); }
+void scobra_state::hustler_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_ppi8255_1->write(space, offset >> 3, data); }
 
 static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -269,12 +269,12 @@ static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(scobra_state::scobra_soundram_r)
+uint8_t scobra_state::scobra_soundram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundram[offset & 0x03ff];
 }
 
-WRITE8_MEMBER(scobra_state::scobra_soundram_w)
+void scobra_state::scobra_soundram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundram[offset & 0x03ff] = data;
 }

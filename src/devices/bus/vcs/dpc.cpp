@@ -114,7 +114,7 @@ void dpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 //  Read / Write accesses
 //-------------------------------------------------
 
-READ8_MEMBER(dpc_device::read)
+uint8_t dpc_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t dpc_amplitude[8] = { 0x00, 0x04, 0x05, 0x09, 0x06, 0x0a, 0x0b, 0x0f };
 	uint8_t   data_fetcher = offset & 0x07;
@@ -183,7 +183,7 @@ READ8_MEMBER(dpc_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(dpc_device::write)
+void dpc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t data_fetcher = offset & 0x07;
 
@@ -276,7 +276,7 @@ machine_config_constructor a26_rom_dpc_device::device_mconfig_additions() const
 }
 
 
-READ8_MEMBER(a26_rom_dpc_device::read_rom)
+uint8_t a26_rom_dpc_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x40)
 		return m_dpc->read(space, offset);
@@ -284,7 +284,7 @@ READ8_MEMBER(a26_rom_dpc_device::read_rom)
 		return a26_rom_f8_device::read_rom(space, offset);
 }
 
-WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
+void a26_rom_dpc_device::write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x40 && offset < 0x80)
 		m_dpc->write(space, offset, data);
@@ -292,7 +292,7 @@ WRITE8_MEMBER(a26_rom_dpc_device::write_bank)
 		a26_rom_f8_device::write_bank(space, offset, data);
 }
 
-DIRECT_UPDATE_MEMBER(a26_rom_dpc_device::cart_opbase)
+offs_t a26_rom_dpc_device::cart_opbase(direct_read_data &direct, offs_t address)
 {
 	if (!direct.space().debugger_access())
 	{

@@ -41,9 +41,9 @@ public:
 	emu_timer *m_int_timer;
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(cball_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(cball_state::vram_w)
+void cball_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -146,13 +146,13 @@ PALETTE_INIT_MEMBER(cball_state, cball)
 }
 
 
-READ8_MEMBER(cball_state::wram_r)
+uint8_t cball_state::wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_ram[0x380 + offset];
 }
 
 
-WRITE8_MEMBER(cball_state::wram_w)
+void cball_state::wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[0x380 + offset] = data;
 }

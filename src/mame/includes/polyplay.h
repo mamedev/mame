@@ -38,10 +38,10 @@ public:
 	timer_device* m_timer;
 	int m_last;
 
-	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
-	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
-	DECLARE_READ8_MEMBER(polyplay_random_read);
-	DECLARE_WRITE8_MEMBER(polyplay_characterram_w);
+	void polyplay_sound_channel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void polyplay_start_timer2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t polyplay_random_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void polyplay_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	SAMPLES_START_CB_MEMBER(sh_start);
 	void set_channel1(int active);
 	void set_channel2(int active);

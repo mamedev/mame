@@ -342,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_adc_cb)
 
 /****************************************************************************/
 
-WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
+void namconb1_state::namconb1_cpureg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/**
 	 * 400000 0x00
@@ -429,7 +429,7 @@ WRITE8_MEMBER(namconb1_state::namconb1_cpureg_w)
 }
 
 
-WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
+void namconb1_state::namconb2_cpureg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/**
 	 * f00000 VBL IRQ enable/level
@@ -517,7 +517,7 @@ WRITE8_MEMBER(namconb1_state::namconb2_cpureg_w)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
+uint8_t namconb1_state::namconb1_cpureg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// 16: Watchdog
 	if (ENABLE_LOGGING)
@@ -530,7 +530,7 @@ READ8_MEMBER(namconb1_state::namconb1_cpureg_r)
 }
 
 
-READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
+uint8_t namconb1_state::namconb2_cpureg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// 14: Watchdog
 	if (ENABLE_LOGGING)
@@ -545,7 +545,7 @@ READ8_MEMBER(namconb1_state::namconb2_cpureg_r)
 
 /****************************************************************************/
 
-READ32_MEMBER(namconb1_state::custom_key_r)
+uint32_t namconb1_state::custom_key_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t old_count = m_count;
 
@@ -646,7 +646,7 @@ READ32_MEMBER(namconb1_state::custom_key_r)
 /***************************************************************/
 
 
-READ32_MEMBER(namconb1_state::gunbulet_gun_r)
+uint32_t namconb1_state::gunbulet_gun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int result = 0;
 
@@ -660,12 +660,12 @@ READ32_MEMBER(namconb1_state::gunbulet_gun_r)
 	return result<<24;
 } /* gunbulet_gun_r */
 
-READ32_MEMBER(namconb1_state::randgen_r)
+uint32_t namconb1_state::randgen_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 } /* randgen_r */
 
-WRITE32_MEMBER(namconb1_state::srand_w)
+void namconb1_state::srand_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/**
 	 * Used to seed the hardware random number generator.
@@ -673,12 +673,12 @@ WRITE32_MEMBER(namconb1_state::srand_w)
 	 */
 } /* srand_w */
 
-READ32_MEMBER(namconb1_state::share_r)
+uint32_t namconb1_state::share_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_namconb_shareram[offset*2] << 16) | m_namconb_shareram[offset*2+1];
 }
 
-WRITE32_MEMBER(namconb1_state::share_w)
+void namconb1_state::share_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_namconb_shareram+offset*2+1);
 	data >>= 16;
@@ -727,7 +727,7 @@ static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE8(namconb1_cpureg_r, namconb2_cpureg_w, 0xffffffff)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(namconb1_state::mcu_shared_w)
+void namconb1_state::mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -755,17 +755,17 @@ static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namconb1_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(namconb1_state::port6_r)
+uint8_t namconb1_state::port6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port6;
 }
 
-WRITE8_MEMBER(namconb1_state::port6_w)
+void namconb1_state::port6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port6 = data;
 }
 
-READ8_MEMBER(namconb1_state::port7_r)
+uint8_t namconb1_state::port7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_port6 & 0xf0)
 	{
@@ -791,42 +791,42 @@ READ8_MEMBER(namconb1_state::port7_r)
 // Is this madness?  No, this is Namco.  They didn't have enough digital ports for all 4 players,
 // so the 8 bits of player 3 got routed to the 8 analog inputs.  +5V on the analog input will
 // register full scale, so it works...
-READ8_MEMBER(namconb1_state::dac7_r)// bit 7
+uint8_t namconb1_state::dac7_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 7
 {
 	return m_p3.read_safe(0xff)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac6_r)// bit 3
+uint8_t namconb1_state::dac6_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 3
 {
 	return (m_p3.read_safe(0xff)<<1)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac5_r)// bit 2
+uint8_t namconb1_state::dac5_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 2
 {
 	return (m_p3.read_safe(0xff)<<2)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac4_r)// bit 1
+uint8_t namconb1_state::dac4_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 1
 {
 	return (m_p3.read_safe(0xff)<<3)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac3_r)// bit 0
+uint8_t namconb1_state::dac3_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 0
 {
 	return (m_p3.read_safe(0xff)<<4)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac2_r)// bit 4
+uint8_t namconb1_state::dac2_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 4
 {
 	return (m_p3.read_safe(0xff)<<5)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac1_r)// bit 5
+uint8_t namconb1_state::dac1_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 5
 {
 	return (m_p3.read_safe(0xff)<<6)&0x80;
 }
 
-READ8_MEMBER(namconb1_state::dac0_r)// bit 6
+uint8_t namconb1_state::dac0_r(address_space &space, offs_t offset, uint8_t mem_mask)// bit 6
 {
 	return (m_p3.read_safe(0xff)<<7)&0x80;
 }

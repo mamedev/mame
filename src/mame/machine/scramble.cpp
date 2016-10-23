@@ -50,18 +50,18 @@ CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
 /* state of the security PAL (6J) */
 
 
-READ8_MEMBER(scramble_state::mariner_protection_1_r )
+uint8_t scramble_state::mariner_protection_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 7;
 }
 
-READ8_MEMBER(scramble_state::mariner_protection_2_r )
+uint8_t scramble_state::mariner_protection_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 3;
 }
 
 
-READ8_MEMBER(scramble_state::triplep_pip_r )
+uint8_t scramble_state::triplep_pip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PC %04x: triplep read port 2\n",space.device().safe_pc());
 	if (space.device().safe_pc() == 0x015a) return 0xff;
@@ -69,7 +69,7 @@ READ8_MEMBER(scramble_state::triplep_pip_r )
 	else return 0;
 }
 
-READ8_MEMBER(scramble_state::triplep_pap_r )
+uint8_t scramble_state::triplep_pap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PC %04x: triplep read port 3\n",space.device().safe_pc());
 	if (space.device().safe_pc() == 0x015d) return 0x04;
@@ -88,7 +88,7 @@ void scramble_state::cavelon_banksw()
 	membank("bank1")->set_entry(m_cavelon_bank);
 }
 
-READ8_MEMBER(scramble_state::cavelon_banksw_r )
+uint8_t scramble_state::cavelon_banksw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	cavelon_banksw();
 
@@ -100,7 +100,7 @@ READ8_MEMBER(scramble_state::cavelon_banksw_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
+void scramble_state::cavelon_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cavelon_banksw();
 
@@ -111,12 +111,12 @@ WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 }
 
 
-READ8_MEMBER(scramble_state::hunchbks_mirror_r )
+uint8_t scramble_state::hunchbks_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.read_byte(0x1000+offset);
 }
 
-WRITE8_MEMBER(scramble_state::hunchbks_mirror_w )
+void scramble_state::hunchbks_mirror_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.write_byte(0x1000+offset,data);
 }
@@ -593,12 +593,12 @@ void scramble_state::init_ad2083()
  Harem run-time decryption
 *************************************************************/
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_bit_w)
+void scramble_state::harem_decrypt_bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_harem_decrypt_bit = data;
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
+void scramble_state::harem_decrypt_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 1) && !(m_harem_decrypt_clk & 1))
 	{
@@ -633,7 +633,7 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 	}
 }
 
-WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
+void scramble_state::harem_decrypt_rst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_harem_decrypt_mode = 0;
 	m_harem_decrypt_count = 0;

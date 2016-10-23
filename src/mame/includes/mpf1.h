@@ -56,13 +56,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpf1_direct_update_handler);
+	offs_t mpf1_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	int m_break;
 	int m_m1;

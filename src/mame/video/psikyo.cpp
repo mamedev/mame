@@ -92,7 +92,7 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
 }
 
 
-WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
+void psikyo_state::psikyo_vram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
@@ -112,7 +112,7 @@ WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 	}
 }
 
-WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
+void psikyo_state::psikyo_vram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)

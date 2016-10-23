@@ -46,14 +46,14 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(segment_w );
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_digit;
 	uint8_t m_digit_last;
 };
 
-WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
+void cvicny_state::segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // output segments on the selected digit
 {
 	if (m_digit != m_digit_last)
 		output().set_digit_value(m_digit, data);
@@ -61,12 +61,12 @@ WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digi
 	m_digit_last = m_digit;
 }
 
-WRITE8_MEMBER( cvicny_state::digit_w ) // set keyboard scanning row; set digit to display
+void cvicny_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // set keyboard scanning row; set digit to display
 {
 	m_digit = data & 7;
 }
 
-READ8_MEMBER( cvicny_state::key_r )
+uint8_t cvicny_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	char kbdrow[6];

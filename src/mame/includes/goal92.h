@@ -52,15 +52,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(goal92_sound_command_w);
-	DECLARE_READ16_MEMBER(goal92_inputs_r);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_READ16_MEMBER(goal92_fg_bank_r);
-	DECLARE_WRITE16_MEMBER(goal92_fg_bank_w);
-	DECLARE_WRITE16_MEMBER(goal92_text_w);
-	DECLARE_WRITE16_MEMBER(goal92_background_w);
-	DECLARE_WRITE16_MEMBER(goal92_foreground_w);
-	DECLARE_WRITE8_MEMBER(adpcm_control_w);
+	void goal92_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t goal92_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t goal92_fg_bank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void goal92_fg_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void goal92_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void goal92_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void goal92_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);

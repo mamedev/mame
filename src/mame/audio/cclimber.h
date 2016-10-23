@@ -37,10 +37,10 @@ public:
 	// construction/destruction
 	cclimber_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sample_trigger_w );
-	DECLARE_WRITE8_MEMBER( sample_rate_w );
-	DECLARE_WRITE8_MEMBER( sample_volume_w );
-	DECLARE_WRITE8_MEMBER( sample_select_w );
+	void sample_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sample_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sample_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sample_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	SAMPLES_START_CB_MEMBER( sh_start );
 

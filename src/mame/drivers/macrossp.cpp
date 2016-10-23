@@ -290,7 +290,7 @@ Notes:
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
 
-READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
+uint32_t macrossp_state::macrossp_soundstatus_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
 
@@ -302,7 +302,7 @@ READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 	return (m_sndpending << 1) | m_snd_toggle;
 }
 
-WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
+void macrossp_state::macrossp_soundcmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -315,14 +315,14 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 	}
 }
 
-READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
+uint16_t macrossp_state::macrossp_soundcmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
 	m_sndpending = 0;
 	return m_soundlatch->read(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(macrossp_state::palette_fade_w)
+void macrossp_state::palette_fade_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 0xff is written a few times on startup
 	if (data >> 8 != 0xff)
@@ -687,7 +687,7 @@ ROM_END
 
 
 
-WRITE32_MEMBER(macrossp_state::macrossp_speedup_w)
+void macrossp_state::macrossp_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
 PC :00018104 018104: addq.w  #1, $f1015a.l
@@ -700,7 +700,7 @@ PC :00018110 018110: beq     18104
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
+void macrossp_state::quizmoon_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
 	if (space.device().safe_pc() == 0x1cc) space.device().execute().spin_until_interrupt();

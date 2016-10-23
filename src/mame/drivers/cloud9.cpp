@@ -204,7 +204,7 @@ void cloud9_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::irq_ack_w)
+void cloud9_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_irq_state)
 	{
@@ -214,19 +214,19 @@ WRITE8_MEMBER(cloud9_state::irq_ack_w)
 }
 
 
-WRITE8_MEMBER(cloud9_state::cloud9_led_w)
+void cloud9_state::cloud9_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 0x80);
 }
 
 
-WRITE8_MEMBER(cloud9_state::cloud9_coin_counter_w)
+void cloud9_state::cloud9_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x80);
 }
 
 
-READ8_MEMBER(cloud9_state::leta_r)
+uint8_t cloud9_state::leta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(offset ? "TRACKX" : "TRACKY")->read();
 }
@@ -239,7 +239,7 @@ READ8_MEMBER(cloud9_state::leta_r)
  *
  *************************************/
 
-WRITE8_MEMBER(cloud9_state::nvram_recall_w)
+void cloud9_state::nvram_recall_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram->recall(0);
 	m_nvram->recall(1);
@@ -247,7 +247,7 @@ WRITE8_MEMBER(cloud9_state::nvram_recall_w)
 }
 
 
-WRITE8_MEMBER(cloud9_state::nvram_store_w)
+void cloud9_state::nvram_store_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram->store(0);
 	m_nvram->store(1);

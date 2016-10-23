@@ -12,7 +12,7 @@
 
 /***************************************************************************/
 
-WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
+void rastan_state::rastan_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bits 5-7 are the sprite palette bank */
 	m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);

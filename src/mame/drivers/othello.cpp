@@ -88,23 +88,23 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(unk_87_r);
-	DECLARE_WRITE8_MEMBER(unk_8a_w);
-	DECLARE_WRITE8_MEMBER(unk_8c_w);
-	DECLARE_READ8_MEMBER(unk_8c_r);
-	DECLARE_READ8_MEMBER(sound_ack_r);
-	DECLARE_WRITE8_MEMBER(unk_8f_w);
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(ay_select_w);
-	DECLARE_WRITE8_MEMBER(ack_w);
-	DECLARE_WRITE8_MEMBER(ay_address_w);
-	DECLARE_WRITE8_MEMBER(ay_data_w);
-	DECLARE_READ8_MEMBER(n7751_rom_r);
-	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
-	DECLARE_WRITE8_MEMBER(n7751_p2_w);
-	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
+	uint8_t unk_87_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unk_8a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_8c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_8c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unk_8f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t n7751_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void n7751_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void n7751_rom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(othello);
@@ -159,13 +159,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(othello_state::unk_87_r)
+uint8_t othello_state::unk_87_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
 	return machine().rand();
 }
 
-WRITE8_MEMBER(othello_state::unk_8a_w)
+void othello_state::unk_8a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -179,27 +179,27 @@ WRITE8_MEMBER(othello_state::unk_8a_w)
 	logerror("8a -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::unk_8c_w)
+void othello_state::unk_8c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("8c -> %x\n", data);
 }
 
-READ8_MEMBER(othello_state::unk_8c_r)
+uint8_t othello_state::unk_8c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(othello_state::sound_ack_r)
+uint8_t othello_state::sound_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ack_data;
 }
 
-WRITE8_MEMBER(othello_state::unk_8f_w)
+void othello_state::unk_8f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("8f -> %x\n", data);
 }
 
-WRITE8_MEMBER(othello_state::tilebank_w)
+void othello_state::tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_bank = (data == 0x0f) ? 0x100 : 0x00;
 	logerror("tilebank -> %x\n", data);
@@ -220,30 +220,30 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(othello_state::latch_r)
+uint8_t othello_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int retval = m_soundlatch->read(space, 0);
 	m_soundlatch->clear_w(space, 0, 0);
 	return retval;
 }
 
-WRITE8_MEMBER(othello_state::ay_select_w)
+void othello_state::ay_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay_select = data;
 }
 
-WRITE8_MEMBER(othello_state::ack_w)
+void othello_state::ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ack_data = data;
 }
 
-WRITE8_MEMBER(othello_state::ay_address_w)
+void othello_state::ay_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay_select & 1) m_ay1->address_w(space, 0, data);
 	if (m_ay_select & 2) m_ay2->address_w(space, 0, data);
 }
 
-WRITE8_MEMBER(othello_state::ay_data_w)
+void othello_state::ay_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay_select & 1) m_ay1->data_w(space, 0, data);
 	if (m_ay_select & 2) m_ay2->data_w(space, 0, data);
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x08, 0x08) AM_WRITE(ay_select_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(othello_state::n7751_rom_control_w)
+void othello_state::n7751_rom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
@@ -295,17 +295,17 @@ WRITE8_MEMBER(othello_state::n7751_rom_control_w)
 	}
 }
 
-READ8_MEMBER(othello_state::n7751_rom_r)
+uint8_t othello_state::n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("n7751data")->base()[m_sound_addr];
 }
 
-READ8_MEMBER(othello_state::n7751_command_r)
+uint8_t othello_state::n7751_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
-WRITE8_MEMBER(othello_state::n7751_p2_w)
+void othello_state::n7751_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	i8243_device *device = machine().device<i8243_device>("n7751_8243");
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER(othello_state::n7751_p2_w)
 	m_n7751_busy = data;
 }
 
-READ8_MEMBER(othello_state::n7751_t1_r)
+uint8_t othello_state::n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* T1 - labelled as "TEST", connected to ground */
 	return 0;

@@ -411,7 +411,7 @@ void exidy_sound_device::r6532_irq(int state)
 }
 
 
-WRITE8_MEMBER( exidy_sound_device::r6532_porta_w )
+void exidy_sound_device::r6532_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cvsd != nullptr)
 		space.machine().device("cvsdcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -423,7 +423,7 @@ WRITE8_MEMBER( exidy_sound_device::r6532_porta_w )
 	}
 }
 
-READ8_MEMBER( exidy_sound_device::r6532_porta_r )
+uint8_t exidy_sound_device::r6532_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_tms != nullptr)
 	{
@@ -434,7 +434,7 @@ READ8_MEMBER( exidy_sound_device::r6532_porta_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( exidy_sound_device::r6532_portb_w )
+void exidy_sound_device::r6532_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tms != nullptr)
 	{
@@ -444,7 +444,7 @@ WRITE8_MEMBER( exidy_sound_device::r6532_portb_w )
 }
 
 
-READ8_MEMBER( exidy_sound_device::r6532_portb_r )
+uint8_t exidy_sound_device::r6532_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t newdata = m_riot->portb_in_get();
 	if (m_tms != nullptr)
@@ -489,7 +489,7 @@ void exidy_sound_device::sh8253_register_state_globals()
  *
  *************************************/
 
-WRITE8_MEMBER( exidy_sound_device::sh8253_w )
+void exidy_sound_device::sh8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int chan;
 
@@ -525,7 +525,7 @@ WRITE8_MEMBER( exidy_sound_device::sh8253_w )
 }
 
 
-READ8_MEMBER( exidy_sound_device::sh8253_r )
+uint8_t exidy_sound_device::sh8253_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("8253(R): %x\n",offset);
 
@@ -540,7 +540,7 @@ READ8_MEMBER( exidy_sound_device::sh8253_r )
  *
  *************************************/
 
-READ8_MEMBER( exidy_sound_device::sh6840_r )
+uint8_t exidy_sound_device::sh6840_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* force an update of the stream */
 	m_stream->update();
@@ -565,7 +565,7 @@ READ8_MEMBER( exidy_sound_device::sh6840_r )
 }
 
 
-WRITE8_MEMBER( exidy_sound_device::sh6840_w )
+void exidy_sound_device::sh6840_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
 
@@ -627,7 +627,7 @@ WRITE8_MEMBER( exidy_sound_device::sh6840_w )
  *
  *************************************/
 
-WRITE8_MEMBER( exidy_sound_device::sfxctrl_w )
+void exidy_sound_device::sfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 
@@ -653,7 +653,7 @@ WRITE8_MEMBER( exidy_sound_device::sfxctrl_w )
  *
  *************************************/
 
-WRITE8_MEMBER( venture_sound_device::filter_w )
+void venture_sound_device::filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("exidy_sound_filter_w = %02X\n", data);
 }
@@ -794,7 +794,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER( venture_sound_device::mtrap_voiceio_w )
+void venture_sound_device::mtrap_voiceio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(offset & 0x10))
 		m_cvsd->digit_w(data & 1);
@@ -804,7 +804,7 @@ WRITE8_MEMBER( venture_sound_device::mtrap_voiceio_w )
 }
 
 
-READ8_MEMBER( venture_sound_device::mtrap_voiceio_r )
+uint8_t venture_sound_device::mtrap_voiceio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!(offset & 0x80))
 	{
@@ -858,7 +858,7 @@ MACHINE_CONFIG_END
 
 
 
-READ8_MEMBER( victory_sound_device::response_r )
+uint8_t victory_sound_device::response_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_pia1->b_output();
 
@@ -871,7 +871,7 @@ READ8_MEMBER( victory_sound_device::response_r )
 }
 
 
-READ8_MEMBER( victory_sound_device::status_r )
+uint8_t victory_sound_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = (m_pia1_ca1 << 7) | (m_pia1_cb1 << 6);
 
@@ -888,7 +888,7 @@ TIMER_CALLBACK_MEMBER( victory_sound_device::delayed_command_w )
 	m_pia1->ca1_w(m_pia1_ca1);
 }
 
-WRITE8_MEMBER( victory_sound_device::command_w )
+void victory_sound_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", m_maincpu->pcbase(), data);
 

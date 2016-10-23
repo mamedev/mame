@@ -282,7 +282,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::mac_autovector_w )
+void mac_state::mac_autovector_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_w: offset=0x%08x data=0x%04x\n", offset, data);
@@ -292,7 +292,7 @@ WRITE16_MEMBER ( mac_state::mac_autovector_w )
 	/* Not yet implemented */
 }
 
-READ16_MEMBER ( mac_state::mac_autovector_r )
+uint16_t mac_state::mac_autovector_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (LOG_GENERAL)
 		logerror("mac_autovector_r: offset=0x%08x\n", offset);
@@ -487,7 +487,7 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
-READ32_MEMBER(mac_state::rom_switch_r)
+uint32_t mac_state::rom_switch_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t ROM_size = memregion("bootrom")->bytes();
 	uint32_t *ROM_data = (uint32_t *)memregion("bootrom")->base();
@@ -943,7 +943,7 @@ Note:  Asserting the DACK signal applies only to write operations to
   scsiRd+sRESET       $580070    Reset Parity/Interrupt
              */
 
-READ16_MEMBER ( mac_state::macplus_scsi_r )
+uint16_t mac_state::macplus_scsi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -957,7 +957,7 @@ READ16_MEMBER ( mac_state::macplus_scsi_r )
 	return m_ncr5380->ncr5380_read_reg(reg)<<8;
 }
 
-READ32_MEMBER (mac_state::macii_scsi_drq_r)
+uint32_t mac_state::macii_scsi_drq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -977,7 +977,7 @@ READ32_MEMBER (mac_state::macii_scsi_drq_r)
 	return 0;
 }
 
-WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
+void mac_state::macii_scsi_drq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1003,7 +1003,7 @@ WRITE32_MEMBER (mac_state::macii_scsi_drq_w)
 	}
 }
 
-WRITE16_MEMBER ( mac_state::macplus_scsi_w )
+void mac_state::macplus_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1017,7 +1017,7 @@ WRITE16_MEMBER ( mac_state::macplus_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data);
 }
 
-WRITE16_MEMBER ( mac_state::macii_scsi_w )
+void mac_state::macii_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = (offset>>3) & 0xf;
 
@@ -1164,7 +1164,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 
 
-READ16_MEMBER ( mac_state::mac_scc_r )
+uint16_t mac_state::mac_scc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	uint16_t result;
@@ -1175,13 +1175,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 
 
-WRITE16_MEMBER ( mac_state::mac_scc_w )
+void mac_state::mac_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
-WRITE16_MEMBER ( mac_state::mac_scc_2_w )
+void mac_state::mac_scc_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
@@ -1191,7 +1191,7 @@ WRITE16_MEMBER ( mac_state::mac_scc_2_w )
  * IWM Code specific to the Mac Plus  *
  * ********************************** */
 
-READ16_MEMBER ( mac_state::mac_iwm_r )
+uint16_t mac_state::mac_iwm_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* The first time this is called is in a floppy test, which goes from
 	 * $400104 to $400126.  After that, all access to the floppy goes through
@@ -1212,7 +1212,7 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( mac_state::mac_iwm_w )
+void mac_state::mac_iwm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
 
@@ -1281,7 +1281,7 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 #define PA2 0x04
 #define PA1 0x02
 
-READ8_MEMBER(mac_state::mac_via_in_a)
+uint8_t mac_state::mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1336,7 +1336,7 @@ READ8_MEMBER(mac_state::mac_via_in_a)
 	}
 }
 
-READ8_MEMBER(mac_state::mac_via_in_a_pmu)
+uint8_t mac_state::mac_via_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1346,7 +1346,7 @@ READ8_MEMBER(mac_state::mac_via_in_a_pmu)
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b)
+uint8_t mac_state::mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	/* video beam in display (! VBLANK && ! HBLANK basically) */
@@ -1392,7 +1392,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
+uint8_t mac_state::mac_via_in_b_via2pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	// TODO: is this valid for VIA2 PMU machines?
@@ -1408,7 +1408,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_via2pmu)
 	return val;
 }
 
-READ8_MEMBER(mac_state::mac_via_in_b_pmu)
+uint8_t mac_state::mac_via_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 //  printf("Read VIA B: PM_ACK %x\n", m_pm_ack);
@@ -1419,7 +1419,7 @@ READ8_MEMBER(mac_state::mac_via_in_b_pmu)
 	return val;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a)
+void mac_state::mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *fdc = machine().device("fdc");
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
@@ -1452,7 +1452,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
+void mac_state::mac_via_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1463,7 +1463,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a_pmu)
 	return;
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b)
+void mac_state::mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1498,7 +1498,7 @@ void mac_state::update_volume(void)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
+void mac_state::mac_via_out_b_bbadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1528,7 +1528,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 	m_rtc->clk_w((data >> 1) & 0x01);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
+void mac_state::mac_via_out_b_egadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1539,7 +1539,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
+void mac_state::mac_via_out_b_cdadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1550,12 +1550,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_via2pmu)
+void mac_state::mac_via_out_b_via2pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 }
 
-WRITE8_MEMBER(mac_state::mac_via_out_b_pmu)
+void mac_state::mac_via_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1626,7 +1626,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via_r )
+uint16_t mac_state::mac_via_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -1642,7 +1642,7 @@ READ16_MEMBER ( mac_state::mac_via_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via_w )
+void mac_state::mac_via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1667,7 +1667,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
 	set_via2_interrupt(state);
 }
 
-READ16_MEMBER ( mac_state::mac_via2_r )
+uint16_t mac_state::mac_via2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data;
 
@@ -1682,7 +1682,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	return (data & 0xff) | (data << 8);
 }
 
-WRITE16_MEMBER ( mac_state::mac_via2_w )
+void mac_state::mac_via2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -1697,7 +1697,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 }
 
 
-READ8_MEMBER(mac_state::mac_via2_in_a)
+uint8_t mac_state::mac_via2_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -1713,12 +1713,12 @@ READ8_MEMBER(mac_state::mac_via2_in_a)
 	return result;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_a_pmu)
+uint8_t mac_state::mac_via2_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pm_data_recv;
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b)
+uint8_t mac_state::mac_via2_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1735,7 +1735,7 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 	return 0xcf;        // indicate no NuBus transaction error
 }
 
-READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
+uint8_t mac_state::mac_via2_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
 
@@ -1749,18 +1749,18 @@ READ8_MEMBER(mac_state::mac_via2_in_b_pmu)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a)
+void mac_state::mac_via2_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_a_pmu)
+void mac_state::mac_via2_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 	m_pm_data_send = data;
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b)
+void mac_state::mac_via2_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
@@ -1774,7 +1774,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_b)
 	}
 }
 
-WRITE8_MEMBER(mac_state::mac_via2_out_b_pmu)
+void mac_state::mac_via2_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("VIA2 OUT B PMU: %02x (PC %x)\n", data, m_maincpu->pc());
 
@@ -2047,7 +2047,7 @@ TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
 	m_overlay_timeout->adjust(attotime::never);
 }
 
-READ32_MEMBER(mac_state::mac_read_id)
+uint32_t mac_state::mac_read_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //    printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 

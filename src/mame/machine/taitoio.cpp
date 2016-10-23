@@ -114,7 +114,7 @@ machine_config_constructor tc0220ioc_device::device_mconfig_additions() const
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0220ioc_device::read )
+uint8_t tc0220ioc_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -142,7 +142,7 @@ READ8_MEMBER( tc0220ioc_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0220ioc_device::write )
+void tc0220ioc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 	switch (offset)
@@ -169,22 +169,22 @@ WRITE8_MEMBER( tc0220ioc_device::write )
 	}
 }
 
-READ8_MEMBER( tc0220ioc_device::port_r )
+uint8_t tc0220ioc_device::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port;
 }
 
-WRITE8_MEMBER( tc0220ioc_device::port_w )
+void tc0220ioc_device::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port = data;
 }
 
-READ8_MEMBER( tc0220ioc_device::portreg_r )
+uint8_t tc0220ioc_device::portreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read(space, m_port);
 }
 
-WRITE8_MEMBER( tc0220ioc_device::portreg_w )
+void tc0220ioc_device::portreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write(space, m_port, data);
 }
@@ -248,7 +248,7 @@ machine_config_constructor tc0510nio_device::device_mconfig_additions() const
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0510nio_device::read )
+uint8_t tc0510nio_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -276,7 +276,7 @@ READ8_MEMBER( tc0510nio_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0510nio_device::write )
+void tc0510nio_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 
@@ -299,12 +299,12 @@ WRITE8_MEMBER( tc0510nio_device::write )
 	}
 }
 
-READ16_MEMBER( tc0510nio_device::halfword_r )
+uint16_t tc0510nio_device::halfword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read(space, offset);
 }
 
-WRITE16_MEMBER( tc0510nio_device::halfword_w )
+void tc0510nio_device::halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		write(space, offset, data & 0xff);
@@ -316,12 +316,12 @@ WRITE16_MEMBER( tc0510nio_device::halfword_w )
 	}
 }
 
-READ16_MEMBER( tc0510nio_device::halfword_wordswap_r )
+uint16_t tc0510nio_device::halfword_wordswap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return halfword_r(space, offset ^ 1, mem_mask);
 }
 
-WRITE16_MEMBER( tc0510nio_device::halfword_wordswap_w )
+void tc0510nio_device::halfword_wordswap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	halfword_w(space, offset ^ 1,data, mem_mask);
 }
@@ -387,7 +387,7 @@ machine_config_constructor tc0640fio_device::device_mconfig_additions() const
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( tc0640fio_device::read )
+uint8_t tc0640fio_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -415,7 +415,7 @@ READ8_MEMBER( tc0640fio_device::read )
 	}
 }
 
-WRITE8_MEMBER( tc0640fio_device::write )
+void tc0640fio_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 	switch (offset)
@@ -437,12 +437,12 @@ WRITE8_MEMBER( tc0640fio_device::write )
 	}
 }
 
-READ16_MEMBER( tc0640fio_device::halfword_r )
+uint16_t tc0640fio_device::halfword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read(space, offset);
 }
 
-WRITE16_MEMBER( tc0640fio_device::halfword_w )
+void tc0640fio_device::halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		write(space, offset, data & 0xff);
@@ -453,12 +453,12 @@ WRITE16_MEMBER( tc0640fio_device::halfword_w )
 	}
 }
 
-READ16_MEMBER( tc0640fio_device::halfword_byteswap_r )
+uint16_t tc0640fio_device::halfword_byteswap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return halfword_r(space, offset, mem_mask) << 8;
 }
 
-WRITE16_MEMBER( tc0640fio_device::halfword_byteswap_w )
+void tc0640fio_device::halfword_byteswap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		write(space, offset, (data >> 8) & 0xff);

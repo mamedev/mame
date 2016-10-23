@@ -43,7 +43,7 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
+uint16_t oneshot_state::oneshot_in0_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = ioport("DSW1")->read();
 
@@ -66,7 +66,7 @@ READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 	return data;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
+uint16_t oneshot_state::oneshot_gun_x_p1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* shots must be in a different location to register */
 	m_p1_wobble ^= 1;
@@ -74,12 +74,12 @@ READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
 	return m_gun_x_p1 ^ m_p1_wobble;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_y_p1_r)
+uint16_t oneshot_state::oneshot_gun_y_p1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun_y_p1;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
+uint16_t oneshot_state::oneshot_gun_x_p2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* shots must be in a different location to register */
 	m_p2_wobble ^= 1;
@@ -87,12 +87,12 @@ READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
 	return m_gun_x_p2 ^ m_p2_wobble;
 }
 
-READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
+uint16_t oneshot_state::oneshot_gun_y_p2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gun_y_p2;
 }
 
-WRITE16_MEMBER(oneshot_state::soundbank_w)
+void oneshot_state::soundbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

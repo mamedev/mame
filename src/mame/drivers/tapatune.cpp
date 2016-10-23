@@ -84,23 +84,23 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_READ16_MEMBER(read_from_z80);
-	DECLARE_WRITE16_MEMBER(write_to_z80);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_from_z80(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_to_z80(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER(sound_irq_clear);
-	DECLARE_WRITE8_MEMBER(controls_mux);
-	DECLARE_READ8_MEMBER(controls_r);
-	DECLARE_WRITE8_MEMBER(write_index_to_68k);
-	DECLARE_WRITE8_MEMBER(write_data_to_68k);
-	DECLARE_READ8_MEMBER(read_index_from_68k);
-	DECLARE_READ8_MEMBER(read_data_from_68k);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(bsmt_data_lo_w);
-	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
-	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
-	DECLARE_READ8_MEMBER(special_r);
+	uint8_t sound_irq_clear(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void controls_mux(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t controls_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_index_to_68k(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_data_to_68k(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_index_from_68k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_data_from_68k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bsmt_data_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bsmt_data_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bsmt_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t special_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -180,7 +180,7 @@ MC6845_UPDATE_ROW( tapatune_state::crtc_update_row )
 }
 
 
-WRITE16_MEMBER(tapatune_state::palette_w)
+void tapatune_state::palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("Palette write: offset = %02x, data = %04x, mask = %04x\n", offset, data, mem_mask );
 	switch(offset)
@@ -209,14 +209,14 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
  *
  *************************************/
 
-READ16_MEMBER(tapatune_state::read_from_z80)
+uint16_t tapatune_state::read_from_z80(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_z80_data_available = 0;
 	return ((uint16_t)m_z80_to_68k_data << 8) | (m_z80_to_68k_index);
 }
 
 
-WRITE16_MEMBER(tapatune_state::write_to_z80)
+void tapatune_state::write_to_z80(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_68k_to_z80_index = data & 0xff;
 	m_68k_to_z80_data = (data >> 8) & 0xff;
@@ -235,13 +235,13 @@ WRITE16_MEMBER(tapatune_state::write_to_z80)
  *
  *************************************/
 
-WRITE8_MEMBER(tapatune_state::write_index_to_68k)
+void tapatune_state::write_index_to_68k(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80_to_68k_index = data;
 }
 
 
-WRITE8_MEMBER(tapatune_state::write_data_to_68k)
+void tapatune_state::write_data_to_68k(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// todo, use callback as this will hook up elsewhere on non-video games
 	if (m_videocpu)
@@ -253,13 +253,13 @@ WRITE8_MEMBER(tapatune_state::write_data_to_68k)
 }
 
 
-READ8_MEMBER(tapatune_state::read_index_from_68k)
+uint8_t tapatune_state::read_index_from_68k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_68k_to_z80_index;
 }
 
 
-READ8_MEMBER(tapatune_state::read_data_from_68k)
+uint8_t tapatune_state::read_data_from_68k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_68k_data_available = 0;
 
@@ -316,14 +316,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-READ8_MEMBER(tapatune_state::sound_irq_clear)
+uint8_t tapatune_state::sound_irq_clear(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
 
-WRITE8_MEMBER(tapatune_state::controls_mux)
+void tapatune_state::controls_mux(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Input multiplexer select and outputs:
@@ -343,7 +343,7 @@ WRITE8_MEMBER(tapatune_state::controls_mux)
 }
 
 
-READ8_MEMBER(tapatune_state::controls_r)
+uint8_t tapatune_state::controls_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_controls_mux & 0xf)
 	{
@@ -356,7 +356,7 @@ READ8_MEMBER(tapatune_state::controls_r)
 }
 
 
-READ8_MEMBER(tapatune_state::special_r)
+uint8_t tapatune_state::special_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Not sure if this is actually correct
 	if (m_z80_data_available)
@@ -366,7 +366,7 @@ READ8_MEMBER(tapatune_state::special_r)
 }
 
 
-WRITE8_MEMBER(tapatune_state::lamps_w)
+void tapatune_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Button Lamps:
@@ -390,19 +390,19 @@ WRITE8_MEMBER(tapatune_state::lamps_w)
  *
  *************************************/
 
-READ8_MEMBER(tapatune_state::status_r)
+uint8_t tapatune_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return !m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_data_lo_w)
+void tapatune_state::bsmt_data_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt_data_l = data;
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_data_hi_w)
+void tapatune_state::bsmt_data_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt_data_h = data;
 
@@ -414,7 +414,7 @@ WRITE8_MEMBER(tapatune_state::bsmt_data_hi_w)
 }
 
 
-WRITE8_MEMBER(tapatune_state::bsmt_reg_w)
+void tapatune_state::bsmt_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt->write_reg(data);
 	m_bsmt->write_data((m_bsmt_data_h << 8) | m_bsmt_data_l);

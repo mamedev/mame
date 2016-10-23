@@ -759,8 +759,8 @@ public:
 	void ppc4xx_set_dcr_read_handler(read32_delegate dcr_read_func);
 	void ppc4xx_set_dcr_write_handler(write32_delegate dcr_write_func);
 
-	DECLARE_READ8_MEMBER( ppc4xx_spu_r );
-	DECLARE_WRITE8_MEMBER( ppc4xx_spu_w );
+	uint8_t ppc4xx_spu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppc4xx_spu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual uint32_t execute_input_lines() const override { return 5; }

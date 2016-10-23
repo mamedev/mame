@@ -59,12 +59,12 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
 /******* MC6821 PIA on MPID Board *******/
 /* Read/Write handlers for pia */
 
-READ8_MEMBER( swtpc09_state::pia0_a_r )
+uint8_t swtpc09_state::pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia_counter;
 }
 
-READ8_MEMBER( swtpc09_state::pia0_ca1_r )
+uint8_t swtpc09_state::pia0_ca1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -102,12 +102,12 @@ WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
 /*********************************************************************/
 
 /* DMF2 dma extended address register */
-READ8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_r )
+uint8_t swtpc09_state::dmf2_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc_dma_address_reg;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
+void swtpc09_state::dmf2_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_dma_address_reg = data;
 
@@ -119,13 +119,13 @@ WRITE8_MEMBER ( swtpc09_state::dmf2_dma_address_reg_w )
 }
 
 /* DMF2 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmf2_control_reg_r )
+uint8_t swtpc09_state::dmf2_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("swtpc09_dmf2_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf2_control_reg_w )
+void swtpc09_state::dmf2_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dmf2_control_reg_w $%02X\n", data));
 
@@ -304,17 +304,17 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
 /*********************************************************************/
 
 /* via on dmf3 board */
-READ8_MEMBER( swtpc09_state::dmf3_via_read_porta )
+uint8_t swtpc09_state::dmf3_via_read_porta(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmf3_via_porta;
 }
 
-READ8_MEMBER( swtpc09_state::dmf3_via_read_portb )
+uint8_t swtpc09_state::dmf3_via_read_portb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( swtpc09_state::dmf3_via_write_porta )
+void swtpc09_state::dmf3_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmf3_via_porta &= data;
 }
@@ -335,25 +335,25 @@ WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_irq )
 }
 
 /* DMF3 dma extended address register */
-READ8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_r )
+uint8_t swtpc09_state::dmf3_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc_dma_address_reg;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf3_dma_address_reg_w )
+void swtpc09_state::dmf3_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_dma_address_reg = data;
 	LOG(("swtpc09_dmf3_dma_address_reg_w %02X\n", data));
 }
 
 /* DMF3 fdc control register */
-READ8_MEMBER ( swtpc09_state::dmf3_control_reg_r )
+uint8_t swtpc09_state::dmf3_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//LOG(("swtpc09_dmf3_control_reg_r $%02X\n", m_fdc_status));
 	return m_fdc_status;
 }
 
-WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
+void swtpc09_state::dmf3_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dmf3_control_reg_w $%02X\n", data));
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER ( swtpc09_state::dmf3_control_reg_w )
 
 // DC4 drive select
 
-WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
+void swtpc09_state::dc4_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("swtpc09_dc4_control_reg_w $%02X\n", data));
 
@@ -396,22 +396,22 @@ WRITE8_MEMBER ( swtpc09_state::dc4_control_reg_w )
 /* Read/Write handlers for pia ide */
 /* TODO: update and finish this off */
 
-READ8_MEMBER( swtpc09_state::piaide_a_r )
+uint8_t swtpc09_state::piaide_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_piaide_porta;
 }
 
-READ8_MEMBER( swtpc09_state::piaide_b_r )
+uint8_t swtpc09_state::piaide_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_piaide_portb;
 }
 
-WRITE8_MEMBER( swtpc09_state::piaide_a_w )
+void swtpc09_state::piaide_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_piaide_porta = data;
 }
 
-WRITE8_MEMBER( swtpc09_state::piaide_b_w )
+void swtpc09_state::piaide_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tempidedata;
 
@@ -453,7 +453,7 @@ WRITE8_MEMBER( swtpc09_state::piaide_b_w )
 /* memory map is created based on system_type flag       */
 /* this is accommodate the different cards installed     */
 
-WRITE8_MEMBER(swtpc09_state::dat_w)
+void swtpc09_state::dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t a16_to_a19, a12_to_a15;
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -579,7 +579,7 @@ WRITE8_MEMBER(swtpc09_state::dat_w)
 
 /*  MC6844 DMA controller I/O */
 
-READ8_MEMBER( swtpc09_state::m6844_r )
+uint8_t swtpc09_state::m6844_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -667,7 +667,7 @@ READ8_MEMBER( swtpc09_state::m6844_r )
 }
 
 
-WRITE8_MEMBER( swtpc09_state::m6844_w )
+void swtpc09_state::m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 

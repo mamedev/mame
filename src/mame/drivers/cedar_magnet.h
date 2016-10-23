@@ -62,37 +62,37 @@ public:
 	required_device<z80pio_device> m_ic48_pio;
 	required_device<z80pio_device> m_ic49_pio;
 
-	DECLARE_READ8_MEMBER(ic48_pio_pa_r);
-	DECLARE_WRITE8_MEMBER(ic48_pio_pa_w);
+	uint8_t ic48_pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ic48_pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ic48_pio_pb_r);
-	DECLARE_WRITE8_MEMBER(ic48_pio_pb_w);
+	uint8_t ic48_pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ic48_pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ic49_pio_pb_r);
-	DECLARE_WRITE8_MEMBER(ic49_pio_pb_w);
+	uint8_t ic49_pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ic49_pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// 1x range ports
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port19_w);
-	DECLARE_WRITE8_MEMBER(port1b_w);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port19_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(port18_r);
-	DECLARE_READ8_MEMBER(port19_r);
-	DECLARE_READ8_MEMBER(port1a_r);
+	uint8_t port18_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port19_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port1a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// 7x range ports
-	DECLARE_WRITE8_MEMBER(rambank_palbank_w);
-	DECLARE_WRITE8_MEMBER(palupload_w);
-	DECLARE_WRITE8_MEMBER(paladdr_w);
-	DECLARE_READ8_MEMBER(watchdog_r);
-	DECLARE_READ8_MEMBER(port7c_r);
+	void rambank_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palupload_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paladdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port7c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// other ports
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	void soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t portff_data;
 
-	DECLARE_READ8_MEMBER(other_cpu_r);
-	DECLARE_WRITE8_MEMBER(other_cpu_w);
+	uint8_t other_cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void other_cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_paladdr;
 	int m_palbank;
@@ -102,9 +102,9 @@ public:
 	uint8_t m_ic49_pio_pb_val;
 
 	void set_palette(int offset);
-	DECLARE_WRITE8_MEMBER(palette_r_w);
-	DECLARE_WRITE8_MEMBER(palette_g_w);
-	DECLARE_WRITE8_MEMBER(palette_b_w);
+	void palette_r_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_device* dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);

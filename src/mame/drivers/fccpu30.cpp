@@ -228,8 +228,8 @@ fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	uint32_t bootvect_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void bootvect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	/* Interrupt  support */
 	//  IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
@@ -239,22 +239,22 @@ fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	int fga_irq_level;
 
 	/* Rotary switch PIT input */
-	DECLARE_READ8_MEMBER (rotary_rd);
-	DECLARE_READ8_MEMBER (flop_dmac_r);
-	DECLARE_WRITE8_MEMBER (flop_dmac_w);
-	DECLARE_READ8_MEMBER (pit1c_r);
-	DECLARE_WRITE8_MEMBER (pit1c_w);
-	DECLARE_READ8_MEMBER (pit2a_r);
-	DECLARE_WRITE8_MEMBER (pit2a_w);
-	DECLARE_READ8_MEMBER (board_mem_id_rd);
-	DECLARE_READ8_MEMBER (pit2c_r);
-	DECLARE_WRITE8_MEMBER (pit2c_w);
+	uint8_t rotary_rd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t flop_dmac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flop_dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pit1c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pit1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pit2a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pit2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t board_mem_id_rd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pit2c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pit2c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* VME bus accesses */
-	//DECLARE_READ16_MEMBER (vme_a24_r);
-	//DECLARE_WRITE16_MEMBER (vme_a24_w);
-	//DECLARE_READ16_MEMBER (vme_a16_r);
-	//DECLARE_WRITE16_MEMBER (vme_a16_w);
+	//uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 protected:
@@ -320,11 +320,11 @@ void fccpu30_state::machine_reset ()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (fccpu30_state::bootvect_r){
+uint32_t fccpu30_state::bootvect_r(address_space &space, offs_t offset, uint32_t mem_mask){
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (fccpu30_state::bootvect_w){
+void fccpu30_state::bootvect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
@@ -384,40 +384,40 @@ WRITE32_MEMBER (fccpu30_state::bootvect_w){
  *
  * "To start VMEPROM, the rotary switches must both be set to 'F':" Hmm...
  */
-READ8_MEMBER (fccpu30_state::rotary_rd){
+uint8_t fccpu30_state::rotary_rd(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return 0xff; // TODO: make this configurable from commandline or artwork
 }
 
 // PIT#1 Port B TODO: implement floppy and dma control
-READ8_MEMBER (fccpu30_state::flop_dmac_r){
+uint8_t fccpu30_state::flop_dmac_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return 0xff;
 }
 
-WRITE8_MEMBER (fccpu30_state::flop_dmac_w){
+void fccpu30_state::flop_dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 }
 
 // PIT#1 Port C TODO: implement timer+port interrupts and 68882 sense
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
-READ8_MEMBER (fccpu30_state::pit1c_r){
+uint8_t fccpu30_state::pit1c_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return 0xff;
 }
 
-WRITE8_MEMBER (fccpu30_state::pit1c_w){
+void fccpu30_state::pit1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 }
 
 // PIT#2 Port A TODO: Connect to B5 and /or P2 connector
-READ8_MEMBER (fccpu30_state::pit2a_r){
+uint8_t fccpu30_state::pit2a_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER (fccpu30_state::pit2a_w){
+void fccpu30_state::pit2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 }
@@ -436,7 +436,7 @@ WRITE8_MEMBER (fccpu30_state::pit2a_w){
  *                      contain the same identification number. In the case of the CPU-30 R4, the
  *                      number is ten ("10" decimal or 0A16 hexadecimal "01010" binary).
  */
-READ8_MEMBER (fccpu30_state::board_mem_id_rd){
+uint8_t fccpu30_state::board_mem_id_rd(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	//  return 0x6A; // CPU-30 R4 with 4Mb of shared RAM. TODO: make this configurable from commandline or artwork
 	//  return 0x57; // blankt 53 56
@@ -446,32 +446,32 @@ READ8_MEMBER (fccpu30_state::board_mem_id_rd){
 }
 
 // PIT#2 Port C TODO: implement timer interrupt, DMA i/o, memory control and Hardware ID
-READ8_MEMBER (fccpu30_state::pit2c_r){
+uint8_t fccpu30_state::pit2c_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return 0xff;
 }
 
-WRITE8_MEMBER (fccpu30_state::pit2c_w){
+void fccpu30_state::pit2c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (fccpu30_state::vme_a24_r){
+uint16_t fccpu30_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG (logerror ("vme_a24_r\n"));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (fccpu30_state::vme_a24_w){
+void fccpu30_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (logerror ("vme_a24_w\n"));
 }
 
-READ16_MEMBER (fccpu30_state::vme_a16_r){
+uint16_t fccpu30_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG (logerror ("vme_16_r\n"));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (fccpu30_state::vme_a16_w){
+void fccpu30_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (logerror ("vme_a16_w\n"));
 }
 #endif

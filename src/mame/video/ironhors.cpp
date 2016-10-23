@@ -78,19 +78,19 @@ PALETTE_INIT_MEMBER(ironhors_state, ironhors)
 	}
 }
 
-WRITE8_MEMBER(ironhors_state::videoram_w)
+void ironhors_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::colorram_w)
+void ironhors_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ironhors_state::charbank_w)
+void ironhors_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 0x03))
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER(ironhors_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(ironhors_state::palettebank_w)
+void ironhors_state::palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != (data & 0x07))
 	{
@@ -120,7 +120,7 @@ WRITE8_MEMBER(ironhors_state::palettebank_w)
 		popmessage("palettebank_w %02x",data);
 }
 
-WRITE8_MEMBER(ironhors_state::flipscreen_w)
+void ironhors_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (~data & 0x08))
 	{

@@ -23,7 +23,7 @@
 #include "includes/gatron.h"
 
 
-WRITE8_MEMBER(gatron_state::gat_videoram_w)
+void gatron_state::gat_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

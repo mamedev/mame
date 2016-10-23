@@ -53,7 +53,7 @@ int pastelg_state::pastelg_blitter_src_addr_r()
 	return m_blitter_src_addr;
 }
 
-WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
+void pastelg_state::pastelg_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -76,19 +76,19 @@ WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
 }
 
 
-WRITE8_MEMBER(pastelg_state::threeds_romsel_w)
+void pastelg_state::threeds_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data&0xfc) printf("%02x\n",data);
 	m_gfxrom = (data & 0x3);
 }
 
-WRITE8_MEMBER(pastelg_state::threeds_output_w)
+void pastelg_state::threeds_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palbank = ((data & 0x10) >> 4);
 
 }
 
-READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
+uint8_t pastelg_state::threeds_rom_readback_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *GFX = memregion("gfx1")->base();
 
@@ -96,7 +96,7 @@ READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
 }
 
 
-WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
+void pastelg_state::pastelg_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = ((data & 0xc0) >> 6);

@@ -236,48 +236,48 @@ public:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	DECLARE_READ32_MEMBER(hng64_com_r);
-	DECLARE_WRITE32_MEMBER(hng64_com_w);
-	DECLARE_WRITE8_MEMBER(hng64_com_share_w);
-	DECLARE_READ8_MEMBER(hng64_com_share_r);
-	DECLARE_WRITE8_MEMBER(hng64_com_share_mips_w);
-	DECLARE_READ8_MEMBER(hng64_com_share_mips_r);
-	DECLARE_READ32_MEMBER(hng64_sysregs_r);
-	DECLARE_WRITE32_MEMBER(hng64_sysregs_w);
-	DECLARE_READ32_MEMBER(fight_io_r);
-	DECLARE_READ32_MEMBER(samsho_io_r);
-	DECLARE_READ32_MEMBER(shoot_io_r);
-	DECLARE_READ32_MEMBER(racing_io_r);
-	DECLARE_READ32_MEMBER(hng64_dualport_r);
-	DECLARE_WRITE32_MEMBER(hng64_dualport_w);
-	DECLARE_READ32_MEMBER(hng64_3d_1_r);
-	DECLARE_READ32_MEMBER(hng64_3d_2_r);
-	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
-	DECLARE_WRITE32_MEMBER(hng64_3d_2_w);
-	DECLARE_WRITE16_MEMBER(dl_w);
-	//DECLARE_READ32_MEMBER(dl_r);
-	DECLARE_WRITE32_MEMBER(dl_control_w);
-	DECLARE_WRITE32_MEMBER(dl_upload_w);
-	DECLARE_WRITE32_MEMBER(tcram_w);
-	DECLARE_READ32_MEMBER(tcram_r);
-	DECLARE_READ32_MEMBER(unk_vreg_r);
-	DECLARE_WRITE32_MEMBER(hng64_soundram_w);
-	DECLARE_READ32_MEMBER(hng64_soundram_r);
-	DECLARE_WRITE32_MEMBER(hng64_vregs_w);
+	uint32_t hng64_com_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_com_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hng64_com_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hng64_com_share_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hng64_com_share_mips_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hng64_com_share_mips_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t hng64_sysregs_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_sysregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t fight_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t samsho_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t shoot_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t racing_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t hng64_dualport_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_dualport_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hng64_3d_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t hng64_3d_2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_3d_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hng64_3d_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//uint32_t dl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dl_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dl_upload_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tcram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t tcram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t unk_vreg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_soundram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hng64_soundram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hng64_vregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// not actually used, but left in code so you can turn it and see the (possibly undesired?) behavior, see notes in memory map
-	DECLARE_WRITE32_MEMBER(hng64_soundram2_w);
-	DECLARE_READ32_MEMBER(hng64_soundram2_r);
+	void hng64_soundram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hng64_soundram2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(hng64_soundcpu_enable_w);
+	void hng64_soundcpu_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_even_w);
-	DECLARE_WRITE32_MEMBER(hng64_sprite_clear_odd_w);
-	DECLARE_WRITE32_MEMBER(hng64_videoram_w);
-	DECLARE_READ8_MEMBER(hng64_comm_space_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_space_w);
-	DECLARE_READ8_MEMBER(hng64_comm_mmu_r);
-	DECLARE_WRITE8_MEMBER(hng64_comm_mmu_w);
+	void hng64_sprite_clear_even_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hng64_sprite_clear_odd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hng64_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t hng64_comm_space_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hng64_comm_space_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hng64_comm_mmu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hng64_comm_mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_hng64_race();
 	void init_fatfurwa();
 	void init_buriki();
@@ -365,27 +365,27 @@ public:
 	void reset_net();
 
 	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
-	DECLARE_READ8_MEMBER(dma_memr_cb);
-	DECLARE_WRITE8_MEMBER(dma_iow3_cb);
+	uint8_t dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_iow3_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
 	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
 
 
 
-	DECLARE_READ16_MEMBER(hng64_sound_port_0008_r);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0008_w);
+	uint16_t hng64_sound_port_0008_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hng64_sound_port_0008_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_000a_w);
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_000c_w);
+	void hng64_sound_port_000a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hng64_sound_port_000c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_port_0080_w);
+	void hng64_sound_port_0080_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(hng64_sound_bank_w);
-	DECLARE_READ16_MEMBER(main_sound_comms_r);
-	DECLARE_WRITE16_MEMBER(main_sound_comms_w);
-	DECLARE_READ16_MEMBER(sound_comms_r);
-	DECLARE_WRITE16_MEMBER(sound_comms_w);
+	void hng64_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t main_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void main_sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t main_latch[2];
 	uint16_t sound_latch[2];
 };

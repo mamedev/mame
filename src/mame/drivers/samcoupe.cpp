@@ -72,7 +72,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
     I/O PORTS
 ***************************************************************************/
 
-READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
+uint8_t samcoupe_state::samcoupe_disk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
@@ -94,7 +94,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_disk_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
+void samcoupe_state::samcoupe_disk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* drive and side is encoded into bit 5 and 3 */
 	floppy_connector *con = (BIT(offset, 4) ? m_wd1772_1 : m_wd1772_0);
@@ -114,7 +114,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 	}
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
+uint8_t samcoupe_state::samcoupe_pen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	screen_device *scr = machine().first_screen();
 	uint8_t data;
@@ -138,12 +138,12 @@ READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 	return data;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_clut_w)
+void samcoupe_state::samcoupe_clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_status_r)
+uint8_t samcoupe_state::samcoupe_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xe0;
 
@@ -163,17 +163,17 @@ READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 	return data;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_line_int_w)
+void samcoupe_state::samcoupe_line_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_line_int = data;
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_lmpr_r)
+uint8_t samcoupe_state::samcoupe_lmpr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lmpr;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_lmpr_w)
+void samcoupe_state::samcoupe_lmpr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_program = m_maincpu->space(AS_PROGRAM);
 
@@ -181,12 +181,12 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_lmpr_w)
 	samcoupe_update_memory(space_program);
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_hmpr_r)
+uint8_t samcoupe_state::samcoupe_hmpr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hmpr;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_hmpr_w)
+void samcoupe_state::samcoupe_hmpr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_program = m_maincpu->space(AS_PROGRAM);
 
@@ -194,12 +194,12 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_hmpr_w)
 	samcoupe_update_memory(space_program);
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_vmpr_r)
+uint8_t samcoupe_state::samcoupe_vmpr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vmpr;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_vmpr_w)
+void samcoupe_state::samcoupe_vmpr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_program = m_maincpu->space(AS_PROGRAM);
 
@@ -207,18 +207,18 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_vmpr_w)
 	samcoupe_update_memory(space_program);
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_midi_r)
+uint8_t samcoupe_state::samcoupe_midi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: read from midi port\n", machine().describe_context());
 	return 0xff;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_midi_w)
+void samcoupe_state::samcoupe_midi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: write to midi port: 0x%02x\n", machine().describe_context(), data);
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
+uint8_t samcoupe_state::samcoupe_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x1f;
 
@@ -253,7 +253,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	return data;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
+void samcoupe_state::samcoupe_border_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_border = data;
 
@@ -264,7 +264,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
 	m_speaker->level_w(BIT(data, 4));
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_attributes_r)
+uint8_t samcoupe_state::samcoupe_attributes_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_attribute;
 }
@@ -274,12 +274,12 @@ WRITE_LINE_MEMBER(samcoupe_state::write_lpt1_busy)
 	m_lpt1_busy = state;
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_lpt1_busy_r)
+uint8_t samcoupe_state::samcoupe_lpt1_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lpt1_busy;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_lpt1_strobe_w)
+void samcoupe_state::samcoupe_lpt1_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lpt1->write_strobe(data & 1);
 }
@@ -289,12 +289,12 @@ DECLARE_WRITE_LINE_MEMBER(samcoupe_state::write_lpt2_busy)
 	m_lpt2_busy = state;
 }
 
-READ8_MEMBER(samcoupe_state::samcoupe_lpt2_busy_r)
+uint8_t samcoupe_state::samcoupe_lpt2_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lpt2_busy;
 }
 
-WRITE8_MEMBER(samcoupe_state::samcoupe_lpt2_strobe_w)
+void samcoupe_state::samcoupe_lpt2_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lpt2->write_strobe(data & 1);
 }

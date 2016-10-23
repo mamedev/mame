@@ -96,7 +96,7 @@ sticker from Jan 95 and factory sticker 94*41.
 
 ***************************************************************************/
 
-WRITE8_MEMBER(paradise_state::rombank_w)
+void paradise_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data;
 	int bank_n = memregion("maincpu")->bytes() / 0x4000;
@@ -110,7 +110,7 @@ WRITE8_MEMBER(paradise_state::rombank_w)
 	membank("prgbank")->set_entry(bank);
 }
 
-WRITE8_MEMBER(paradise_state::paradise_okibank_w)
+void paradise_state::paradise_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x02)
 		logerror("%s: unknown oki bank bits %02X\n", machine().describe_context(), data);
@@ -118,7 +118,7 @@ WRITE8_MEMBER(paradise_state::paradise_okibank_w)
 	m_oki2->set_rom_bank((data & 0x02) >> 1);
 }
 
-WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
+void paradise_state::torus_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data ^ 0xff);
 }

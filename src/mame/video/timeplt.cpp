@@ -152,31 +152,31 @@ void timeplt_state::video_start_chkun()
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_state::videoram_w)
+void timeplt_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::colorram_w)
+void timeplt_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(timeplt_state::flipscreen_w)
+void timeplt_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
 
-WRITE8_MEMBER(timeplt_state::video_enable_w)
+void timeplt_state::video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_enable = data & 1;
 }
 
-READ8_MEMBER(timeplt_state::scanline_r)
+uint8_t timeplt_state::scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos();
 }

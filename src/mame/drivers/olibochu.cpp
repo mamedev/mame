@@ -89,10 +89,10 @@ public:
 
 	/* misc */
 	int m_cmd;
-	DECLARE_WRITE8_MEMBER(olibochu_videoram_w);
-	DECLARE_WRITE8_MEMBER(olibochu_colorram_w);
-	DECLARE_WRITE8_MEMBER(olibochu_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
+	void olibochu_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void olibochu_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void olibochu_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -143,19 +143,19 @@ PALETTE_INIT_MEMBER(olibochu_state, olibochu)
 	}
 }
 
-WRITE8_MEMBER(olibochu_state::olibochu_videoram_w)
+void olibochu_state::olibochu_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(olibochu_state::olibochu_colorram_w)
+void olibochu_state::olibochu_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(olibochu_state::olibochu_flipscreen_w)
+void olibochu_state::olibochu_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x80))
 	{
@@ -248,7 +248,7 @@ uint32_t olibochu_state::screen_update_olibochu(screen_device &screen, bitmap_in
 }
 
 
-WRITE8_MEMBER(olibochu_state::sound_command_w)
+void olibochu_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int c;
 

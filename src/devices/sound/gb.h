@@ -12,10 +12,10 @@ public:
 	gameboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	gameboy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER(sound_r);
-	virtual DECLARE_READ8_MEMBER(wave_r) = 0;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) = 0;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) = 0;
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t wave_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) = 0;
+	virtual void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
+	virtual void wave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 
 protected:
 	// device-level overrides
@@ -164,9 +164,9 @@ class dmg_apu_device : public gameboy_sound_device
 public:
 	dmg_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(wave_r) override;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) override;
+	virtual uint8_t wave_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void wave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	virtual void apu_power_off() override;
@@ -180,9 +180,9 @@ class cgb04_apu_device : public gameboy_sound_device
 public:
 	cgb04_apu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(wave_r) override;
-	virtual DECLARE_WRITE8_MEMBER(wave_w) override;
-	virtual DECLARE_WRITE8_MEMBER(sound_w) override;
+	virtual uint8_t wave_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void wave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	virtual void device_reset() override;

@@ -103,22 +103,22 @@ public:
 		void *update_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *videoram, uint16_t ma, uint8_t ra, uint8_t stride);
 	} m_video;
 
-	DECLARE_READ8_MEMBER(p1_trap_r);
-	DECLARE_WRITE8_MEMBER(p1_trap_w);
-	DECLARE_READ8_MEMBER(p1_cga_r);
-	DECLARE_WRITE8_MEMBER(p1_cga_w);
-	DECLARE_WRITE8_MEMBER(p1_vram_w);
+	uint8_t p1_trap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_trap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_cga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_cga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(p1_ppi_r);
-	DECLARE_WRITE8_MEMBER(p1_ppi_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi_porta_w);
-	DECLARE_READ8_MEMBER(p1_ppi_porta_r);
-	DECLARE_READ8_MEMBER(p1_ppi_portb_r);
-	DECLARE_READ8_MEMBER(p1_ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(p1_ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi2_porta_w);
-	DECLARE_WRITE8_MEMBER(p1_ppi2_portb_w);
-	DECLARE_READ8_MEMBER(p1_ppi2_portc_r);
+	uint8_t p1_ppi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_ppi2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_ppi2_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_ppi2_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	const char *m_cputag;
 };
 
@@ -135,7 +135,7 @@ public:
  * Port 2AH (offset 2) -- data
  */
 
-READ8_MEMBER(p1_state::p1_trap_r)
+uint8_t p1_state::p1_trap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_video.trap[offset];
 	DBG_LOG(1,"trap",("R %.2x $%02x\n", 0x28+offset, data));
@@ -144,12 +144,12 @@ READ8_MEMBER(p1_state::p1_trap_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_state::p1_trap_w)
+void p1_state::p1_trap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"trap",("W %.2x $%02x\n", 0x28+offset, data));
 }
 
-READ8_MEMBER(p1_state::p1_cga_r)
+uint8_t p1_state::p1_cga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t port = offset + 0x3d0;
 
@@ -160,7 +160,7 @@ READ8_MEMBER(p1_state::p1_cga_r)
 	return 0;
 }
 
-WRITE8_MEMBER(p1_state::p1_cga_w)
+void p1_state::p1_cga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t port = offset + 0x3d0;
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER(p1_state::p1_cga_w)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(p1_state::p1_vram_w)
+void p1_state::p1_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"vram",("W %.4x $%02x\n", offset, data));
 	if (m_video.videoram_base)
@@ -192,7 +192,7 @@ WRITE8_MEMBER(p1_state::p1_vram_w)
         7   HIRES       1: 640x200  0: 320x200
 */
 
-WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
+void p1_state::p1_ppi2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(p1_state::p1_ppi2_porta_w)
         7   Enable/Disable D7H/D7L
 */
 
-WRITE8_MEMBER(p1_state::p1_ppi_portc_w)
+void p1_state::p1_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"mode_control_6a",("W $%02x\n", data));
 
@@ -440,13 +440,13 @@ WRITE_LINE_MEMBER( p1_state::p1_pit8253_out2_changed )
 
 // Keyboard (via PPI)
 
-WRITE8_MEMBER(p1_state::p1_ppi_porta_w)
+void p1_state::p1_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbpoll_mask = data;
 	DBG_LOG(2,"p1_ppi_porta_w",("( %02X -> %02X )\n", data, m_kbpoll_mask));
 }
 
-READ8_MEMBER(p1_state::p1_ppi_porta_r)
+uint8_t p1_state::p1_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -455,7 +455,7 @@ READ8_MEMBER(p1_state::p1_ppi_porta_r)
 	return ret;
 }
 
-READ8_MEMBER(p1_state::p1_ppi_portb_r)
+uint8_t p1_state::p1_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
@@ -473,7 +473,7 @@ READ8_MEMBER(p1_state::p1_ppi_portb_r)
 	return ret;
 }
 
-READ8_MEMBER(p1_state::p1_ppi_portc_r)
+uint8_t p1_state::p1_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t key = 0xffff;
 	uint8_t ret = 0;
@@ -493,7 +493,7 @@ READ8_MEMBER(p1_state::p1_ppi_portc_r)
 
 // XXX
 
-READ8_MEMBER(p1_state::p1_ppi2_portc_r)
+uint8_t p1_state::p1_ppi2_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	double tap_val = m_cassette->input();
@@ -505,13 +505,13 @@ READ8_MEMBER(p1_state::p1_ppi2_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_state::p1_ppi2_portb_w)
+void p1_state::p1_ppi2_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit8253->write_gate2(BIT(data, 0));
 	p1_speaker_set_spkrdata( data & 0x02 );
 }
 
-READ8_MEMBER(p1_state::p1_ppi_r)
+uint8_t p1_state::p1_ppi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  DBG_LOG(1,"p1ppi",("R %.2x\n", 0x60+offset));
 	switch (offset) {
@@ -533,7 +533,7 @@ READ8_MEMBER(p1_state::p1_ppi_r)
 	}
 }
 
-WRITE8_MEMBER(p1_state::p1_ppi_w)
+void p1_state::p1_ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  DBG_LOG(1,"p1ppi",("W %.2x $%02x\n", 0x60+offset, data));
 	switch (offset) {

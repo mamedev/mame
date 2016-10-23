@@ -1041,7 +1041,7 @@ void omti8621_device::set_data(uint16_t data)
  OMTI8621 Disk Controller-AT Registers
 ***************************************************************************/
 
-WRITE16_MEMBER(omti8621_device::write)
+void omti8621_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1059,7 +1059,7 @@ WRITE16_MEMBER(omti8621_device::write)
 	}
 }
 
-WRITE8_MEMBER(omti8621_device::write8)
+void omti8621_device::write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1153,7 +1153,7 @@ WRITE8_MEMBER(omti8621_device::write8)
 	}
 }
 
-READ16_MEMBER(omti8621_device::read)
+uint16_t omti8621_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (mem_mask)
 	{
@@ -1166,7 +1166,7 @@ READ16_MEMBER(omti8621_device::read)
 	}
 }
 
-READ8_MEMBER(omti8621_device::read8)
+uint8_t omti8621_device::read8(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	static uint8_t last_data = 0xff;

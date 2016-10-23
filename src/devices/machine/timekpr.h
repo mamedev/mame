@@ -62,8 +62,8 @@ protected:
 	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size);
 
 public:
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

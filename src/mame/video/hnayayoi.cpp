@@ -99,7 +99,7 @@ up blit_src for the second call.
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_param_w)
+void hnayayoi_state::dynax_blitter_rev1_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -126,7 +126,7 @@ void hnayayoi_state::copy_pixel( int x, int y, int pen )
 	}
 }
 
-WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_start_w)
+void hnayayoi_state::dynax_blitter_rev1_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("gfx1")->base();
 	int romlen = memregion("gfx1")->bytes();
@@ -201,7 +201,7 @@ WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_start_w)
 	popmessage("GFXROM OVER %06x", m_blit_src);
 }
 
-WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_clear_w)
+void hnayayoi_state::dynax_blitter_rev1_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pen = data >> 4;
 	int i;
@@ -214,7 +214,7 @@ WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_clear_w)
 }
 
 
-WRITE8_MEMBER(hnayayoi_state::hnayayoi_palbank_w)
+void hnayayoi_state::hnayayoi_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset *= 8;
 	m_palbank = (m_palbank & (0xff00 >> offset)) | (data << offset);

@@ -112,7 +112,7 @@ void nes_state::machine_start()
 //  INPUTS
 //-------------------------------------------------
 
-READ8_MEMBER(nes_state::nes_in0_r)
+uint8_t nes_state::nes_in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl1->read_bit0();
@@ -120,7 +120,7 @@ READ8_MEMBER(nes_state::nes_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_state::nes_in1_r)
+uint8_t nes_state::nes_in1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x40;
 	ret |= m_ctrl2->read_bit0();
@@ -128,14 +128,14 @@ READ8_MEMBER(nes_state::nes_in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_state::nes_in0_w)
+void nes_state::nes_in0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctrl1->write(data);
 	m_ctrl2->write(data);
 }
 
 
-READ8_MEMBER(nes_state::fc_in0_r)
+uint8_t nes_state::fc_in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x40;
 	// bit 0 to controller port
@@ -156,7 +156,7 @@ READ8_MEMBER(nes_state::fc_in0_r)
 	return ret;
 }
 
-READ8_MEMBER(nes_state::fc_in1_r)
+uint8_t nes_state::fc_in1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x40;
 	// bit 0 to controller port
@@ -174,7 +174,7 @@ READ8_MEMBER(nes_state::fc_in1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(nes_state::fc_in0_w)
+void nes_state::fc_in0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctrl1->write(data);
 	m_ctrl2->write(data);

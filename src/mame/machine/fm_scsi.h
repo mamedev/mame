@@ -55,8 +55,8 @@ public:
 	void fmscsi_data_w(uint8_t data);
 	uint8_t fmscsi_status_r(void);
 	void fmscsi_control_w(uint8_t data);
-	DECLARE_READ8_MEMBER( fmscsi_r );
-	DECLARE_WRITE8_MEMBER( fmscsi_w );
+	uint8_t fmscsi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fmscsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_phase(int phase);
 	int get_phase(void);

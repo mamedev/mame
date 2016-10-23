@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
  *
  *************************************/
 
-WRITE32_MEMBER(midzeus_state::cmos_w)
+void midzeus_state::cmos_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (bitlatch[2] && !cmos_protected)
 		COMBINE_DATA(&m_nvram[offset]);
@@ -150,13 +150,13 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 }
 
 
-READ32_MEMBER(midzeus_state::cmos_r)
+uint32_t midzeus_state::cmos_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_nvram[offset] | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(midzeus_state::cmos_protect_w)
+void midzeus_state::cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	cmos_protected = false;
 }
@@ -170,12 +170,12 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::zeus2_timekeeper_r)
+uint32_t midzeus_state::zeus2_timekeeper_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_m48t35->read(space, offset, 0xff) | 0xffffff00;
 }
 
-WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
+void midzeus_state::zeus2_timekeeper_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (bitlatch[2] && !cmos_protected)
 		m_m48t35->write(space, offset, data, 0xff);
@@ -185,13 +185,13 @@ WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 }
 
 
-READ32_MEMBER(midzeus_state::zpram_r)
+uint32_t midzeus_state::zpram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_nvram[offset] | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(midzeus_state::zpram_w)
+void midzeus_state::zpram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (bitlatch[2])
 		COMBINE_DATA(&m_nvram[offset]);
@@ -207,7 +207,7 @@ WRITE32_MEMBER(midzeus_state::zpram_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::bitlatches_r)
+uint32_t midzeus_state::bitlatches_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -244,7 +244,7 @@ READ32_MEMBER(midzeus_state::bitlatches_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::bitlatches_w)
+void midzeus_state::bitlatches_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldval = bitlatch[offset];
 	bitlatch[offset] = data;
@@ -312,14 +312,14 @@ WRITE32_MEMBER(midzeus_state::bitlatches_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::crusnexo_leds_r)
+uint32_t midzeus_state::crusnexo_leds_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* reads appear to just be for synchronization */
 	return ~0;
 }
 
 
-WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
+void midzeus_state::crusnexo_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int bit, led;
 
@@ -363,7 +363,7 @@ WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 // read 8d0003, check bit 1, skip some stuff if 0
 // write junk to 9e0000
 
-READ32_MEMBER(midzeus_state::linkram_r)
+uint32_t midzeus_state::linkram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("%06X:unknown_8a000_r(%02X)\n", space.device().safe_pc(), offset);
 	if (offset == 0)
@@ -379,7 +379,7 @@ READ32_MEMBER(midzeus_state::linkram_r)
 	return m_linkram[offset];
 }
 
-WRITE32_MEMBER(midzeus_state::linkram_w)
+void midzeus_state::linkram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", space.device().safe_pc(),  offset, data);
 	COMBINE_DATA(&m_linkram[offset]);
@@ -393,7 +393,7 @@ WRITE32_MEMBER(midzeus_state::linkram_w)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::tms32031_control_r)
+uint32_t midzeus_state::tms32031_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
@@ -412,7 +412,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::tms32031_control_w)
+void midzeus_state::tms32031_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms32031_control[offset]);
 
@@ -448,7 +448,7 @@ CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::keypad_select_w)
+void midzeus_state::keypad_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 1)
 		keypad_select = data;
@@ -475,7 +475,7 @@ CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::analog_r)
+uint32_t midzeus_state::analog_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
@@ -484,7 +484,7 @@ READ32_MEMBER(midzeus_state::analog_r)
 }
 
 
-WRITE32_MEMBER(midzeus_state::analog_w)
+void midzeus_state::analog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* 16 writes to the location before a read */
 }
@@ -523,7 +523,7 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 }
 
 
-WRITE32_MEMBER(midzeus_state::invasn_gun_w)
+void midzeus_state::invasn_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_control = gun_control;
 	int player;
@@ -554,7 +554,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 }
 
 
-READ32_MEMBER(midzeus_state::invasn_gun_r)
+uint32_t midzeus_state::invasn_gun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int beamx = m_screen->hpos();
 	int beamy = m_screen->vpos();

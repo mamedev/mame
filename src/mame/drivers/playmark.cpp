@@ -70,7 +70,7 @@ TODO:
 #include "machine/nvram.h"
 
 
-WRITE16_MEMBER(playmark_state::coinctrl_w)
+void playmark_state::coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -88,7 +88,7 @@ WRITE16_MEMBER(playmark_state::coinctrl_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
+void playmark_state::wbeachvl_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -105,7 +105,7 @@ WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
+void playmark_state::hotmind_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -133,7 +133,7 @@ WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
+void playmark_state::luckboomh_dispenser_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -157,13 +157,13 @@ WRITE16_MEMBER(playmark_state::luckboomh_dispenser_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_coin_w)
+void playmark_state::hrdtimes_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
+void playmark_state::playmark_snd_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -175,7 +175,7 @@ WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 	}
 }
 
-READ8_MEMBER(playmark_state::playmark_snd_command_r)
+uint8_t playmark_state::playmark_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -193,7 +193,7 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(playmark_state::playmark_snd_flag_r)
+uint8_t playmark_state::playmark_snd_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_snd_flag)
 	{
@@ -205,7 +205,7 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 }
 
 
-WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
+void playmark_state::playmark_oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PC$%03x Writing %02x to PortA  (OKI bank select) previous bank was %02x\n",space.device().safe_pcbase(),data,m_old_oki_bank);
 
@@ -220,12 +220,12 @@ WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 	}
 }
 
-WRITE8_MEMBER(playmark_state::playmark_oki_w)
+void playmark_state::playmark_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
+void playmark_state::playmark_snd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  This port controls communications to and from the 68K and the OKI device.
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 	}
 }
 
-WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
+void playmark_state::hrdtimes_snd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  This port controls communications to and from the 68K and the OKI device. See playmark_snd_control_w above. OKI banking is also handled here. */
 

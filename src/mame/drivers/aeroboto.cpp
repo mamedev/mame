@@ -31,7 +31,7 @@ Revisions:
 #include "includes/aeroboto.h"
 
 
-READ8_MEMBER(aeroboto_state::aeroboto_201_r)
+uint8_t aeroboto_state::aeroboto_201_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* if you keep a button pressed during boot, the game will expect this */
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
@@ -50,19 +50,19 @@ INTERRUPT_GEN_MEMBER(aeroboto_state::aeroboto_interrupt)
 		m_disable_irq--;
 }
 
-READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
+uint8_t aeroboto_state::aeroboto_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
-READ8_MEMBER(aeroboto_state::aeroboto_2973_r)
+uint8_t aeroboto_state::aeroboto_2973_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mainram[0x02be] = 0;
 	return 0xff;
 }
 
-WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
+void aeroboto_state::aeroboto_1a2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mainram[0x01a2] = data;
 	if (data)

@@ -336,7 +336,7 @@ std::string msx_slot_cartridge_device::get_default_card_software()
 }
 
 
-READ8_MEMBER(msx_slot_cartridge_device::read)
+uint8_t msx_slot_cartridge_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_cartridge )
 	{
@@ -346,7 +346,7 @@ READ8_MEMBER(msx_slot_cartridge_device::read)
 }
 
 
-WRITE8_MEMBER(msx_slot_cartridge_device::write)
+void msx_slot_cartridge_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_cartridge )
 	{

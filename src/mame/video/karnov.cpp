@@ -143,13 +143,13 @@ TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(karnov_state::karnov_videoram_w)
+void karnov_state::karnov_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(karnov_state::karnov_playfield_swap_w)
+void karnov_state::karnov_playfield_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
 	COMBINE_DATA(&m_pf_data[offset]);

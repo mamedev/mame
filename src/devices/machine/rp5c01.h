@@ -57,8 +57,8 @@ public:
 	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c01_device &>(device).m_out_alarm_cb.set_callback(object); }
 	static void remove_battery(device_t &device) { downcast<rp5c01_device &>(device).m_battery_backed = false; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( alarm_r ) { return m_alarm; }
 	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
 

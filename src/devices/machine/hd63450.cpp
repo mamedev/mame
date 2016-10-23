@@ -73,7 +73,7 @@ void hd63450_device::device_reset()
 	m_drq_state[0] = m_drq_state[1] = m_drq_state[2] = m_drq_state[3] = 0;
 }
 
-READ16_MEMBER(hd63450_device::read)
+uint16_t hd63450_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int channel,reg;
 
@@ -122,7 +122,7 @@ READ16_MEMBER(hd63450_device::read)
 	return 0xff;
 }
 
-WRITE16_MEMBER(hd63450_device::write)
+void hd63450_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int channel,reg;
 

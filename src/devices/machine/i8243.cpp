@@ -56,7 +56,7 @@ void i8243_device::device_reset()
     i8243_p2_r - handle a read from port 2
 -------------------------------------------------*/
 
-READ8_MEMBER(i8243_device::i8243_p2_r)
+uint8_t i8243_device::i8243_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2out;
 }
@@ -66,7 +66,7 @@ READ8_MEMBER(i8243_device::i8243_p2_r)
     i8243_p2_r - handle a write to port 2
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8243_device::i8243_p2_w)
+void i8243_device::i8243_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data & 0x0f;
 }
@@ -77,7 +77,7 @@ WRITE8_MEMBER(i8243_device::i8243_p2_w)
     line state
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8243_device::i8243_prog_w)
+void i8243_device::i8243_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only care about low bit */
 	data &= 1;

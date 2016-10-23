@@ -43,14 +43,14 @@ Notes:
 #include "includes/drgnmst.h"
 
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
+void drgnmst_state::drgnmst_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x100);
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
+void drgnmst_state::drgnmst_snd_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -59,7 +59,7 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 	}
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_snd_flag_w)
+void drgnmst_state::drgnmst_snd_flag_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
 	if (ACCESSING_BITS_0_7)
@@ -67,12 +67,12 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_snd_flag_w)
 }
 
 
-READ8_MEMBER(drgnmst_state::pic16c5x_port0_r)
+uint8_t drgnmst_state::pic16c5x_port0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pic16c5x_port0;
 }
 
-READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
+uint8_t drgnmst_state::drgnmst_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -88,7 +88,7 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
 	return data;
 }
 
-READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
+uint8_t drgnmst_state::drgnmst_snd_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_snd_flag)
 	{
@@ -99,7 +99,7 @@ READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_pcm_banksel_w)
+void drgnmst_state::drgnmst_pcm_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  This is a 4 bit port.
 	    Each pair of bits is used in part of the OKI PCM ROM bank selectors.
@@ -109,12 +109,12 @@ WRITE8_MEMBER(drgnmst_state::drgnmst_pcm_banksel_w)
 	m_pic16c5x_port0 = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_oki_w)
+void drgnmst_state::drgnmst_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki_command = data;
 }
 
-WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
+void drgnmst_state::drgnmst_snd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  This port controls communications to and from the 68K, both OKI
 	    devices, and part of the OKI PCM ROM bank selection.

@@ -206,8 +206,8 @@ public:
 	// public interface
 	uint8_t read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, uint8_t data) { write_full(offset, data); }
-	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
-	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read_full(offset); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write_full(offset, data); }
 
 	uint8_t read_raw(offs_t offset) { return m_data[offset]; }
 	void write_raw(offs_t offset, uint8_t data) { m_data[offset] = data; }
@@ -226,8 +226,8 @@ public:
 	// public interface
 	uint16_t read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, uint16_t data) { write_full(offset, data); }
-	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
-	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return read_full(offset); }
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { write_full(offset, data); }
 
 	uint16_t read_raw(offs_t offset) { return m_data[offset*2] | (m_data[offset*2+1] << 8); }
 	void write_raw(offs_t offset, uint16_t data) { m_data[offset*2] = data; m_data[offset*2+1] = data >> 8; }

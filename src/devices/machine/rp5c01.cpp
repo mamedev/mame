@@ -303,7 +303,7 @@ void rp5c01_device::nvram_write(emu_file &file)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( rp5c01_device::read )
+uint8_t rp5c01_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	offset &= 0x0f;
@@ -348,7 +348,7 @@ READ8_MEMBER( rp5c01_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( rp5c01_device::write )
+void rp5c01_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 	offset &= 0x0f;

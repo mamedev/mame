@@ -38,15 +38,15 @@ public:
 	DECLARE_ADDRESS_MAP(amap32, 32);
 	DECLARE_ADDRESS_MAP(amap64, 64);
 
-	DECLARE_WRITE8_MEMBER(write8);
-	DECLARE_WRITE16_MEMBER(write16);
-	DECLARE_WRITE32_MEMBER(write32);
-	DECLARE_WRITE64_MEMBER(write64);
+	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write64(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_READ16_MEMBER(read16);
-	DECLARE_READ32_MEMBER(read32);
-	DECLARE_READ64_MEMBER(read64);
+	uint8_t read8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t read16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t read32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint64_t read64(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	void set_bank(offs_t offset);
 

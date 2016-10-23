@@ -29,9 +29,9 @@ public:
 	virtual ~device_vboy_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_cart) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_eeprom) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_eeprom) {}
+	virtual uint32_t read_cart(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual uint32_t read_eeprom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual void write_eeprom(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void eeprom_alloc(uint32_t size);
@@ -88,9 +88,9 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_cart);
-	virtual DECLARE_READ32_MEMBER(read_eeprom);
-	virtual DECLARE_WRITE32_MEMBER(write_eeprom);
+	virtual uint32_t read_cart(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_eeprom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual void write_eeprom(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 

@@ -81,8 +81,8 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { write_pa(0, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { write_pa(1, state); }
@@ -92,7 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { write_pa(5, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { write_pa(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { write_pa(7, state); }
-	DECLARE_WRITE8_MEMBER( write_pa );
+	void write_pa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
 	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
 
@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { write_pb(5, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { write_pb(6, state); }
 	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { write_pb(7, state); }
-	DECLARE_WRITE8_MEMBER( write_pb );
+	void write_pb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
 

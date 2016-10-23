@@ -54,10 +54,10 @@ public:
 
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
-	DECLARE_WRITE8_MEMBER( vismac_register_w );
-	DECLARE_WRITE8_MEMBER( vismac_data_w );
-	DECLARE_WRITE8_MEMBER( page_ram_w );
+	void keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vismac_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vismac_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );

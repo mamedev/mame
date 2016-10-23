@@ -30,14 +30,14 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_READ8_MEMBER(tc_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(i8255_b_w);
-	DECLARE_READ8_MEMBER(i8255_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_c_w);
+	uint8_t tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	// internal state

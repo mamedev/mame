@@ -130,7 +130,7 @@ INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::control_w)
+void policetr_state::control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_control_data;
 
@@ -171,7 +171,7 @@ WRITE32_MEMBER(policetr_state::control_w)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
+void policetr_state::policetr_bsmt2000_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_control_data & 0x80000000)
 		machine().device<bsmt2000_device>("bsmt")->write_data(data);
@@ -180,7 +180,7 @@ WRITE32_MEMBER(policetr_state::policetr_bsmt2000_reg_w)
 }
 
 
-WRITE32_MEMBER(policetr_state::policetr_bsmt2000_data_w)
+void policetr_state::policetr_bsmt2000_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().device<bsmt2000_device>("bsmt")->write_reg(data);
 	COMBINE_DATA(&m_bsmt_data_bank);
@@ -193,7 +193,7 @@ CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
 }
 
 
-READ32_MEMBER(policetr_state::bsmt2000_data_r)
+uint32_t policetr_state::bsmt2000_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return memregion("bsmt")->base()[m_bsmt_data_bank * 0x10000 + m_bsmt_data_offset] << 8;
 }
@@ -206,7 +206,7 @@ READ32_MEMBER(policetr_state::bsmt2000_data_r)
  *
  *************************************/
 
-WRITE32_MEMBER(policetr_state::speedup_w)
+void policetr_state::speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_speedup_data);
 

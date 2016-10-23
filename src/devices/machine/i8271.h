@@ -34,13 +34,13 @@ public:
 	template<class _Object> static devcb_base &set_hdl_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).hdl_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_opt_wr_callback(device_t &device, _Object object) { return downcast<i8271_device &>(device).opt_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER (sr_r);
-	DECLARE_READ8_MEMBER (rr_r);
-	DECLARE_WRITE8_MEMBER(reset_w) { if(data == 1) soft_reset(); }
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(param_w);
-	DECLARE_READ8_MEMBER (data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t sr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(data == 1) soft_reset(); }
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_ADDRESS_MAP(map, 8);
 
 	void ready_w(bool val);

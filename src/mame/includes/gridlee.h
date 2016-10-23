@@ -51,14 +51,14 @@ public:
 	std::unique_ptr<uint8_t[]> m_local_videoram;
 	uint8_t m_palettebank_vis;
 
-	DECLARE_READ8_MEMBER(analog_port_r);
-	DECLARE_READ8_MEMBER(random_num_r);
-	DECLARE_WRITE8_MEMBER(led_0_w);
-	DECLARE_WRITE8_MEMBER(led_1_w);
-	DECLARE_WRITE8_MEMBER(gridlee_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
-	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
-	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
+	uint8_t analog_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t random_num_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridlee_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridlee_cocktail_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridlee_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gridlee_palette_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -90,7 +90,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( gridlee_sound_w );
+	void gridlee_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	/* tone variables */

@@ -51,25 +51,25 @@ void h8_dtc_device::device_reset()
 	cur_active_vector = -1;
 }
 
-READ8_MEMBER(h8_dtc_device::dtcer_r)
+uint8_t h8_dtc_device::dtcer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(V>=2) logerror("dtcer_r %x, %02x\n", offset, dtcer[offset]);
 	return dtcer[offset];
 }
 
-WRITE8_MEMBER(h8_dtc_device::dtcer_w)
+void h8_dtc_device::dtcer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dtcer[offset] = data;
 	if(V>=2) logerror("dtcer_w %x, %02x\n", offset, data);
 }
 
-READ8_MEMBER(h8_dtc_device::dtvecr_r)
+uint8_t h8_dtc_device::dtvecr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(V>=2) logerror("dtvecr_r %02x\n", dtvecr);
 	return dtvecr;
 }
 
-WRITE8_MEMBER(h8_dtc_device::dtvecr_w)
+void h8_dtc_device::dtvecr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dtvecr = data;
 	if(V>=2) logerror("dtvecr_w %02x\n", data);

@@ -177,23 +177,23 @@ public:
 	optional_device<samples_device> m_samples;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(m63_videoram_w);
-	DECLARE_WRITE8_MEMBER(m63_colorram_w);
-	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
-	DECLARE_WRITE8_MEMBER(m63_palbank_w);
-	DECLARE_WRITE8_MEMBER(m63_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(fghtbskt_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(snd_irq_w);
-	DECLARE_WRITE8_MEMBER(snddata_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(snd_status_r);
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_READ8_MEMBER(snddata_r);
-	DECLARE_WRITE8_MEMBER(fghtbskt_samples_w);
+	void m63_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m63_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m63_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m63_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m63_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fghtbskt_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snddata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snddata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fghtbskt_samples_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	SAMPLES_START_CB_MEMBER(fghtbskt_sh_start);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_wilytowr();
 	void init_fghtbskt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -265,25 +265,25 @@ PALETTE_INIT_MEMBER(m63_state,m63)
 	}
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram_w)
+void m63_state::m63_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_colorram_w)
+void m63_state::m63_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_videoram2_w)
+void m63_state::m63_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m63_state::m63_palbank_w)
+void m63_state::m63_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pal_bank != (data & 0x01))
 	{
@@ -292,7 +292,7 @@ WRITE8_MEMBER(m63_state::m63_palbank_w)
 	}
 }
 
-WRITE8_MEMBER(m63_state::m63_flipscreen_w)
+void m63_state::m63_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (~data & 0x01))
 	{
@@ -301,7 +301,7 @@ WRITE8_MEMBER(m63_state::m63_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(m63_state::fghtbskt_flipscreen_w)
+void m63_state::fghtbskt_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 	m_fg_flag = flip_screen() ? TILE_FLIPX : 0;
@@ -386,18 +386,18 @@ uint32_t m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE8_MEMBER(m63_state::coin_w)
+void m63_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE8_MEMBER(m63_state::snd_irq_w)
+void m63_state::snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	machine().scheduler().synchronize();
 }
 
-WRITE8_MEMBER(m63_state::snddata_w)
+void m63_state::snddata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
 		m_ay1->address_w(space, 0, offset);
@@ -411,12 +411,12 @@ WRITE8_MEMBER(m63_state::snddata_w)
 		m_sound_status = offset;
 }
 
-WRITE8_MEMBER(m63_state::p1_w)
+void m63_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 }
 
-WRITE8_MEMBER(m63_state::p2_w)
+void m63_state::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 	if((m_p2 & 0xf0) == 0x50)
@@ -425,12 +425,12 @@ WRITE8_MEMBER(m63_state::p2_w)
 	}
 }
 
-READ8_MEMBER(m63_state::snd_status_r)
+uint8_t m63_state::snd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_status;
 }
 
-READ8_MEMBER(m63_state::irq_r)
+uint8_t m63_state::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_sound_irq)
 	{
@@ -440,7 +440,7 @@ READ8_MEMBER(m63_state::irq_r)
 	return 0;
 }
 
-READ8_MEMBER(m63_state::snddata_r)
+uint8_t m63_state::snddata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_p2 & 0xf0)
 	{
@@ -450,13 +450,13 @@ READ8_MEMBER(m63_state::snddata_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m63_state::fghtbskt_samples_w)
+void m63_state::fghtbskt_samples_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 1)
 		m_samples->start_raw(0, m_samplebuf.get() + ((data & 0xf0) << 8), 0x2000, 8000);
 }
 
-WRITE8_MEMBER(m63_state::nmi_mask_w)
+void m63_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

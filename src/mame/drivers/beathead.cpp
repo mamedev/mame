@@ -191,7 +191,7 @@ void beathead_state::update_interrupts()
 }
 
 
-WRITE32_MEMBER( beathead_state::interrupt_control_w )
+void beathead_state::interrupt_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int irq = offset & 3;
 	int control = (offset >> 2) & 1;
@@ -209,7 +209,7 @@ WRITE32_MEMBER( beathead_state::interrupt_control_w )
 }
 
 
-READ32_MEMBER( beathead_state::interrupt_control_r )
+uint32_t beathead_state::interrupt_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* return the enables as a bitfield */
 	return (m_irq_enable[0]) | (m_irq_enable[1] << 1) | (m_irq_enable[2] << 2);
@@ -223,7 +223,7 @@ READ32_MEMBER( beathead_state::interrupt_control_r )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::eeprom_data_w )
+void beathead_state::eeprom_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_eeprom_enabled)
 	{
@@ -234,7 +234,7 @@ WRITE32_MEMBER( beathead_state::eeprom_data_w )
 }
 
 
-WRITE32_MEMBER( beathead_state::eeprom_enable_w )
+void beathead_state::eeprom_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_eeprom_enabled = 1;
 }
@@ -247,7 +247,7 @@ WRITE32_MEMBER( beathead_state::eeprom_enable_w )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::sound_reset_w )
+void beathead_state::sound_reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Sound reset = %d\n", !offset);
 	m_jsa->soundcpu().set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
@@ -261,7 +261,7 @@ WRITE32_MEMBER( beathead_state::sound_reset_w )
  *
  *************************************/
 
-WRITE32_MEMBER( beathead_state::coin_count_w )
+void beathead_state::coin_count_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, !offset);
 }
@@ -435,7 +435,7 @@ ROM_END
 */
 
 
-READ32_MEMBER( beathead_state::speedup_r )
+uint32_t beathead_state::speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = *m_speedup_data;
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x006f0 && result == space.device().state().state_int(ASAP_R3))
@@ -444,7 +444,7 @@ READ32_MEMBER( beathead_state::speedup_r )
 }
 
 
-READ32_MEMBER( beathead_state::movie_speedup_r )
+uint32_t beathead_state::movie_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int result = *m_movie_speedup_data;
 	if ((space.device().safe_pcbase() & 0xfffff) == 0x00a88 && (space.device().state().state_int(ASAP_R28) & 0xfffff) == 0x397c0 &&

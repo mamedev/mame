@@ -346,27 +346,27 @@ C - uses sub board with support for player 3 and 4 controls
 
 /**********************************************************************/
 
-WRITE8_MEMBER(namcos1_state::irq_ack_w)
+void namcos1_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.device().execute().set_input_line(0, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(namcos1_state::dsw_r)
+uint8_t namcos1_state::dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = m_io_dipsw->read();
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
 
-WRITE8_MEMBER(namcos1_state::coin_w)
+void namcos1_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 	machine().bookkeeping().coin_counter_w(0, data & 2);
 	machine().bookkeeping().coin_counter_w(1, data & 4);
 }
 
-WRITE8_MEMBER(namcos1_state::dac_gain_w)
+void namcos1_state::dac_gain_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DAC0 (GAIN0 = bit0, GAIN1 = bit2) */
 	int dac0_gain = (BIT(data, 2) << 1) | BIT(data, 0);

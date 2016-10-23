@@ -13,31 +13,31 @@
 
 /* General */
 
-WRITE8_MEMBER(sauro_state::videoram_w)
+void sauro_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::colorram_w)
+void sauro_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::sauro_videoram2_w)
+void sauro_state::sauro_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::sauro_colorram2_w)
+void sauro_state::sauro_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sauro_state::scroll_bg_w)
+void sauro_state::scroll_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
@@ -65,13 +65,13 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
 static const int scroll2_map[8] = {2, 1, 4, 3, 6, 5, 0, 7};
 static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
-WRITE8_MEMBER(sauro_state::sauro_palette_bank_w)
+void sauro_state::sauro_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = (data & 0x03) << 4;
 	machine().tilemap().mark_all_dirty();
 }
 
-WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
+void sauro_state::sauro_scroll_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int *map = (flip_screen() ? scroll2_map_flip : scroll2_map);
 	int scroll = (data & 0xf8) | map[data & 7];

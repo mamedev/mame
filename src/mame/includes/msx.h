@@ -168,20 +168,20 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_ADDRESS_MAP(switched_device_map, 8);
-	DECLARE_WRITE8_MEMBER(msx_sec_slot_w);
-	DECLARE_READ8_MEMBER(msx_sec_slot_r);
-	DECLARE_READ8_MEMBER(msx_kanji_r);
-	DECLARE_WRITE8_MEMBER(msx_kanji_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_ppi_port_c_w);
-	DECLARE_READ8_MEMBER(msx_ppi_port_b_r);
-	DECLARE_READ8_MEMBER(msx_rtc_reg_r);
-	DECLARE_WRITE8_MEMBER(msx_rtc_reg_w);
-	DECLARE_WRITE8_MEMBER(msx_rtc_latch_w);
-	DECLARE_READ8_MEMBER(msx_mem_read);
-	DECLARE_WRITE8_MEMBER(msx_mem_write);
-	DECLARE_READ8_MEMBER(msx_switched_r);
-	DECLARE_WRITE8_MEMBER(msx_switched_w);
+	void msx_sec_slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t msx_sec_slot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t msx_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msx_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msx_ppi_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msx_ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t msx_ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t msx_rtc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msx_rtc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msx_rtc_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t msx_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msx_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t msx_switched_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msx_switched_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(turbo_w);
 
 	void msx_memory_map_all();
@@ -190,12 +190,12 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
-	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
-	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	uint8_t msx_psg_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t msx_psg_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msx_psg_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msx_psg_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
-	DECLARE_WRITE8_MEMBER(msx_ay8910_w);
+	void msx_ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msx_memory_init();
 	void post_load();
 

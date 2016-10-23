@@ -48,11 +48,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(unk_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	required_device<mcs51_cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(from_term);
+	uint8_t from_term(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -80,18 +80,18 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(basic52_state::from_term)
+uint8_t basic52_state::from_term(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_term_data;
 }
 
-READ8_MEMBER( basic52_state::unk_r)
+uint8_t basic52_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_term_data; // won't boot without this
 }
 
 
-WRITE8_MEMBER( basic52_state::kbd_put )
+void basic52_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);

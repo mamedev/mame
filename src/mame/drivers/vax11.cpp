@@ -84,32 +84,32 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( term_r );
-	DECLARE_READ16_MEMBER( term_tx_status_r );
-	DECLARE_READ16_MEMBER( term_rx_status_r );
-	DECLARE_WRITE16_MEMBER( term_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint16_t term_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t term_tx_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t term_rx_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void term_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint16_t m_term_status;
 };
 
-WRITE16_MEMBER(vax11_state::term_w)
+void vax11_state::term_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_terminal->write(space, 0, data);
 }
 
-READ16_MEMBER(vax11_state::term_r)
+uint16_t vax11_state::term_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_term_status = 0x0000;
 	return m_term_data;
 }
 
-READ16_MEMBER(vax11_state::term_tx_status_r)
+uint16_t vax11_state::term_tx_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {   // always ready
 	return 0xffff;
 }
 
-READ16_MEMBER(vax11_state::term_rx_status_r)
+uint16_t vax11_state::term_rx_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_term_status;
 }
@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vax11 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( vax11_state::kbd_put )
+void vax11_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_term_status = 0xffff;

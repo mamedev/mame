@@ -245,43 +245,43 @@ void playmark_state::video_start_hrdtimes()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(playmark_state::wbeachvl_txvideoram_w)
+void playmark_state::wbeachvl_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_fgvideoram_w)
+void playmark_state::wbeachvl_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_bgvideoram_w)
+void playmark_state::wbeachvl_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_txvideoram_w)
+void playmark_state::hrdtimes_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_fgvideoram_w)
+void playmark_state::hrdtimes_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
+void playmark_state::hrdtimes_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
+void playmark_state::bigtwin_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -299,7 +299,7 @@ WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
+void playmark_state::wbeachvl_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -316,7 +316,7 @@ WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
+void playmark_state::excelsr_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -334,7 +334,7 @@ WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
+void playmark_state::hrdtimes_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 

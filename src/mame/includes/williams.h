@@ -58,16 +58,16 @@ public:
 	uint8_t m_blitter_remap_index;
 	const uint8_t *m_blitter_remap;
 	std::unique_ptr<uint8_t[]> m_blitter_remap_lookup;
-	DECLARE_WRITE8_MEMBER(williams_vram_select_w);
-	DECLARE_WRITE8_MEMBER(williams_cmos_w);
-	DECLARE_WRITE8_MEMBER(bubbles_cmos_w);
-	DECLARE_WRITE8_MEMBER(williams_watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(defender_video_control_w);
-	DECLARE_WRITE8_MEMBER(defender_bank_select_w);
-	DECLARE_READ8_MEMBER(mayday_protection_r);
-	DECLARE_WRITE8_MEMBER(sinistar_vram_select_w);
-	DECLARE_READ8_MEMBER(williams_video_counter_r);
-	DECLARE_WRITE8_MEMBER(williams_blitter_w);
+	void williams_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bubbles_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void defender_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void defender_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mayday_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sinistar_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t williams_video_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void williams_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
 	void init_sinistar();
 	void init_stargate();
@@ -95,11 +95,11 @@ public:
 	TIMER_CALLBACK_MEMBER(williams_deferred_snd_cmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams_count240_callback);
-	DECLARE_WRITE8_MEMBER(williams_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(playball_snd_cmd_w);
+	void williams_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void playball_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(williams_port_select_w);
-	DECLARE_READ8_MEMBER(williams_49way_port_0_r);
-	DECLARE_READ8_MEMBER(williams_input_port_49way_0_5_r);
+	uint8_t williams_49way_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t williams_input_port_49way_0_5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(lottofun_coin_lock_w);
 
 	void state_save_register();
@@ -140,12 +140,12 @@ public:
 	uint8_t m_vram_bank;
 	uint8_t m_rom_bank;
 
-	DECLARE_WRITE8_MEMBER(blaster_vram_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_bank_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_remap_select_w);
-	DECLARE_WRITE8_MEMBER(blaster_video_control_w);
+	void blaster_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blaster_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blaster_remap_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blaster_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(blaster_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(blaster_snd_cmd_w);
+	void blaster_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(williams_snd_irq_b);
 
 	void init_blaster();
@@ -177,26 +177,26 @@ public:
 	uint8_t m_williams2_tilemap_config;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	DECLARE_WRITE8_MEMBER(williams2_bank_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(williams2_7segment_w);
-	DECLARE_WRITE8_MEMBER(williams2_paletteram_w);
-	DECLARE_WRITE8_MEMBER(williams2_fg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_bg_select_w);
-	DECLARE_WRITE8_MEMBER(williams2_tileram_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_low_w);
-	DECLARE_WRITE8_MEMBER(williams2_xscroll_high_w);
-	DECLARE_WRITE8_MEMBER(williams2_blit_window_enable_w);
+	void williams2_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_7segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_fg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_bg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_xscroll_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_xscroll_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void williams2_blit_window_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(williams2_endscreen_off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_va11_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(williams2_endscreen_callback);
 	TIMER_CALLBACK_MEMBER(williams2_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(williams2_snd_cmd_w);
+	void williams2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(mysticm_main_irq);
 	DECLARE_WRITE_LINE_MEMBER(tshoot_main_irq);
-	DECLARE_READ8_MEMBER(tshoot_input_port_0_3_r);
+	uint8_t tshoot_input_port_0_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(tshoot_maxvol_w);
-	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
+	void tshoot_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_mysticm();
 	void init_tshoot();
@@ -222,7 +222,7 @@ public:
 	void machine_start_joust2();
 	void machine_reset_joust2();
 	TIMER_CALLBACK_MEMBER(joust2_deferred_snd_cmd_w);
-	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
+	void joust2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(joust2_pia_3_cb1_w);
 };
 

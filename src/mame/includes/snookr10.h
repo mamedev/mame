@@ -21,12 +21,12 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(dsw_port_1_r);
-	DECLARE_READ8_MEMBER(port2000_8_r);
-	DECLARE_WRITE8_MEMBER(output_port_0_w);
-	DECLARE_WRITE8_MEMBER(output_port_1_w);
-	DECLARE_WRITE8_MEMBER(snookr10_videoram_w);
-	DECLARE_WRITE8_MEMBER(snookr10_colorram_w);
+	uint8_t dsw_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port2000_8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snookr10_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snookr10_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(apple10_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(crystalc_get_bg_tile_info);

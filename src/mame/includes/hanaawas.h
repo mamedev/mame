@@ -25,18 +25,18 @@ public:
 
 	/* misc */
 	int        m_mux;
-	DECLARE_READ8_MEMBER(hanaawas_input_port_0_r);
-	DECLARE_WRITE8_MEMBER(hanaawas_inputs_mux_w);
-	DECLARE_WRITE8_MEMBER(hanaawas_videoram_w);
-	DECLARE_WRITE8_MEMBER(hanaawas_colorram_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	uint8_t hanaawas_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hanaawas_inputs_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanaawas_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanaawas_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(hanaawas);
 	uint32_t screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(hanaawas_portB_w);
+	void hanaawas_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };

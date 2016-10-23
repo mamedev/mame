@@ -20,7 +20,7 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -36,8 +36,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_80xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_banks[2];
@@ -56,8 +56,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -76,8 +76,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -96,7 +96,7 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -112,8 +112,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -128,10 +128,10 @@ public:
 	// construction/destruction
 	a800_rom_telelink2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
-	virtual DECLARE_READ8_MEMBER(read_d5xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_80xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_d5xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -147,8 +147,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -167,8 +167,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_d5xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_d5xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -183,7 +183,7 @@ public:
 	// construction/destruction
 	a5200_rom_2chips_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -199,8 +199,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read_80xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_80xx) override;
+	virtual uint8_t read_80xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_80xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_banks[2];

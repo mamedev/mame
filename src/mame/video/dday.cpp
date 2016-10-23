@@ -20,7 +20,7 @@
 
   Thanks Zwaxy for the timer info. */
 
-READ8_MEMBER(dday_state::dday_countdown_timer_r)
+uint8_t dday_state::dday_countdown_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_timer_value / 10) << 4) | (m_timer_value % 10);
 }
@@ -219,26 +219,26 @@ void dday_state::video_start()
 	start_countdown_timer();
 }
 
-WRITE8_MEMBER(dday_state::dday_bgvideoram_w)
+void dday_state::dday_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dday_state::dday_fgvideoram_w)
+void dday_state::dday_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset ^ 0x1f);  /* for flipx case */
 }
 
-WRITE8_MEMBER(dday_state::dday_textvideoram_w)
+void dday_state::dday_textvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textvideoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(dday_state::dday_colorram_w)
+void dday_state::dday_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -250,13 +250,13 @@ WRITE8_MEMBER(dday_state::dday_colorram_w)
 		m_fg_tilemap->mark_tile_dirty(offset + i);
 }
 
-READ8_MEMBER(dday_state::dday_colorram_r)
+uint8_t dday_state::dday_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_colorram[offset & 0x03e0];
 }
 
 
-WRITE8_MEMBER(dday_state::dday_sl_control_w)
+void dday_state::dday_sl_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sl_image != data)
 	{
@@ -266,7 +266,7 @@ WRITE8_MEMBER(dday_state::dday_sl_control_w)
 }
 
 
-WRITE8_MEMBER(dday_state::dday_control_w)
+void dday_state::dday_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if (data & 0xac)  logerror("Control = %02X\n", data & 0xac);
 

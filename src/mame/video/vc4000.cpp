@@ -76,7 +76,7 @@ inline uint8_t vc4000_state::vc4000_joystick_return_to_centre(uint8_t joy)
 	return data;
 }
 
-READ8_MEMBER( vc4000_state::vc4000_video_r )
+uint8_t vc4000_state::vc4000_video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	if (offset > 0xcf) offset &= 0xcf;  // c0-cf is mirrored at d0-df, e0-ef, f0-ff
@@ -287,7 +287,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 	return data;
 }
 
-WRITE8_MEMBER( vc4000_state::vc4000_video_w )
+void vc4000_state::vc4000_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_video.reg.data[offset]=data;
 	if (offset > 0xcf) offset &= 0xcf;  // c0-cf is mirrored at d0-df, e0-ef, f0-ff
@@ -348,7 +348,7 @@ WRITE8_MEMBER( vc4000_state::vc4000_video_w )
 }
 
 
-READ8_MEMBER( vc4000_state::vc4000_vsync_r )
+uint8_t vc4000_state::vc4000_vsync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video.line >= VC4000_END_LINE ? 0x80 : 0;
 }

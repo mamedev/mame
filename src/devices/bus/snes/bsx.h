@@ -43,12 +43,12 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	// base regs
 	std::unique_ptr<BSX_base> m_base_unit;
@@ -83,8 +83,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
 private:
 	required_device<sns_bsx_cart_slot_device> m_slot;
@@ -103,8 +103,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
 private:
 	required_device<sns_bsx_cart_slot_device> m_slot;
@@ -124,12 +124,12 @@ public:
 	virtual void device_reset() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
-//  virtual DECLARE_WRITE8_MEMBER(write_h);
-//  virtual DECLARE_READ8_MEMBER(chip_read);
-//  virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+//  virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// flash regs
 	uint32_t m_command;

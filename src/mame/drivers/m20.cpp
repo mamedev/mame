@@ -90,10 +90,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(m20_i8259_r);
-	DECLARE_WRITE16_MEMBER(m20_i8259_w);
-	DECLARE_READ16_MEMBER(port21_r);
-	DECLARE_WRITE16_MEMBER(port21_w);
+	uint16_t m20_i8259_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m20_i8259_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t port21_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void port21_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_tick_w);
@@ -157,13 +157,13 @@ port21      =   0x21        !TTL latch
 !   B7  See B3 input                0 => colour card present
 */
 
-READ16_MEMBER(m20_state::port21_r)
+uint16_t m20_state::port21_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("port21 read: offset 0x%x\n", offset);
 	return m_port21;
 }
 
-WRITE16_MEMBER(m20_state::port21_w)
+void m20_state::port21_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
@@ -190,12 +190,12 @@ WRITE16_MEMBER(m20_state::port21_w)
 	m_fd1797->dden_w(data & 8);
 }
 
-READ16_MEMBER(m20_state::m20_i8259_r)
+uint16_t m20_state::m20_i8259_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_i8259->read(space, offset)<<1;
 }
 
-WRITE16_MEMBER(m20_state::m20_i8259_w)
+void m20_state::m20_i8259_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_i8259->write(space, offset, (data>>1));
 }

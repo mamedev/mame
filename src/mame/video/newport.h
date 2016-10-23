@@ -117,8 +117,8 @@ public:
 	~newport_video_device() {}
 
 
-	DECLARE_READ32_MEMBER( rex3_r );
-	DECLARE_WRITE32_MEMBER( rex3_w );
+	uint32_t rex3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void rex3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -131,15 +131,15 @@ protected:
 private:
 	// internal state
 
-	DECLARE_READ32_MEMBER( cmap0_r );
-	DECLARE_WRITE32_MEMBER( cmap0_w );
-	DECLARE_READ32_MEMBER( cmap1_r );
-	DECLARE_READ32_MEMBER( xmap0_r );
-	DECLARE_WRITE32_MEMBER( xmap0_w );
-	DECLARE_READ32_MEMBER( xmap1_r );
-	DECLARE_WRITE32_MEMBER( xmap1_w );
-	DECLARE_READ32_MEMBER( vc2_r );
-	DECLARE_WRITE32_MEMBER( vc2_w );
+	uint32_t cmap0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cmap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cmap1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t xmap0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void xmap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t xmap1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void xmap1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t vc2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vc2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void DoREX3Command();
 
 	VC2_t  m_VC2;

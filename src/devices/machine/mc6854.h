@@ -51,8 +51,8 @@ public:
 	template<class _Object> static devcb_base &set_out_dtr_callback(device_t &device, _Object object) { return downcast<mc6854_device &>(device).m_out_dtr_cb.set_callback(object); }
 
 	/* interface to CPU via address/data bus*/
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* low-level, bit-based interface */
 	DECLARE_WRITE_LINE_MEMBER( set_rx );

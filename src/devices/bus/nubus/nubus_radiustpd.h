@@ -35,10 +35,10 @@ protected:
 		virtual void device_reset() override;
 		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-		DECLARE_READ32_MEMBER(radiustpd_r);
-		DECLARE_WRITE32_MEMBER(radiustpd_w);
-		DECLARE_READ32_MEMBER(vram_r);
-		DECLARE_WRITE32_MEMBER(vram_w);
+		uint32_t radiustpd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void radiustpd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 public:
 		std::vector<uint8_t> m_vram;

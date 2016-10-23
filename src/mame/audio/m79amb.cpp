@@ -322,7 +322,7 @@ DISCRETE_SOUND_END
 /* the ports are guessed from operation */
 /* the schematics do not show the actual hookup */
 
-WRITE8_MEMBER(m79amb_state::m79amb_8000_w)
+void m79amb_state::m79amb_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* these values are not latched */
 	/* they are pulsed when the port is addressed */
@@ -332,7 +332,7 @@ WRITE8_MEMBER(m79amb_state::m79amb_8000_w)
 	m_discrete->write(space, M79AMB_THUD_EN, data & 0x04);
 }
 
-WRITE8_MEMBER(m79amb_state::m79amb_8003_w)
+void m79amb_state::m79amb_8003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Self Test goes low on reset and lights LED */
 	/* LED goes off on pass */

@@ -45,19 +45,19 @@ public:
 	int m_last_val_1;
 	int m_last_val_2;
 
-	DECLARE_WRITE8_MEMBER(steer_reset_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(options_r);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_WRITE8_MEMBER(lamp2_w);
-	DECLARE_WRITE8_MEMBER(invert1_w);
-	DECLARE_WRITE8_MEMBER(invert2_w);
-	DECLARE_WRITE8_MEMBER(sonar1_w);
-	DECLARE_WRITE8_MEMBER(sonar2_w);
-	DECLARE_WRITE8_MEMBER(crash_w);
-	DECLARE_WRITE8_MEMBER(explode_w);
-	DECLARE_WRITE8_MEMBER(noise_reset_w);
+	void steer_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t options_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void invert1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void invert2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sonar1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sonar2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

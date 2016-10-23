@@ -24,16 +24,16 @@ public:
 	k053251_set_tilemaps() to indicate which tilemap is associated with each index.
 	*/
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE16_MEMBER( lsb_w );
-	DECLARE_WRITE16_MEMBER( msb_w );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	int get_priority(int ci);
 	int get_palette_index(int ci);
 	int get_tmap_dirty(int tmap_num);
 	void set_tmap_dirty(int tmap_num, int data);
 
-	DECLARE_READ16_MEMBER( lsb_r );         // PCU1
-	DECLARE_READ16_MEMBER( msb_r );         // PCU1
+	uint16_t lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);         // PCU1
+	uint16_t msb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);         // PCU1
 
 protected:
 	// device-level overrides

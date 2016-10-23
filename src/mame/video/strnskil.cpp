@@ -41,13 +41,13 @@ PALETTE_INIT_MEMBER(strnskil_state, strnskil)
 }
 
 
-WRITE8_MEMBER(strnskil_state::strnskil_videoram_w)
+void strnskil_state::strnskil_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(strnskil_state::strnskil_scrl_ctrl_w)
+void strnskil_state::strnskil_scrl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrl_ctrl = data >> 5;
 

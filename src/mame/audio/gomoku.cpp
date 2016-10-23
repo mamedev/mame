@@ -198,7 +198,7 @@ void gomoku_sound_device::make_mixer_table(int voices, int gain)
 
 /********************************************************************************/
 
-WRITE8_MEMBER( gomoku_sound_device::sound1_w )
+void gomoku_sound_device::sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gomoku_sound_channel *voice;
 	int base;
@@ -220,7 +220,7 @@ WRITE8_MEMBER( gomoku_sound_device::sound1_w )
 	}
 }
 
-WRITE8_MEMBER( gomoku_sound_device::sound2_w )
+void gomoku_sound_device::sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gomoku_sound_channel *voice;
 	int base;

@@ -47,19 +47,19 @@ void md_base_state::megadriv_z80_bank_w(uint16_t data)
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-WRITE16_MEMBER(md_base_state::megadriv_68k_z80_bank_write )
+void md_base_state::megadriv_68k_z80_bank_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06x: 68k writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
 	megadriv_z80_bank_w(data & 0x01);
 }
 
-WRITE8_MEMBER(md_base_state::megadriv_z80_z80_bank_w)
+void md_base_state::megadriv_z80_z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: z80 writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
 	megadriv_z80_bank_w(data & 0x01);
 }
 
-READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
+uint8_t md_base_state::megadriv_68k_YM2612_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//osd_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
@@ -77,7 +77,7 @@ READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 }
 
 
-WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
+void md_base_state::megadriv_68k_YM2612_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//osd_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
@@ -203,7 +203,7 @@ void md_base_state::megadrive_reset_io()
 }
 
 /************* 6 buttons version **************************/
-READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
+uint8_t md_base_state::megadrive_io_read_data_port_6button(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int portnum = offset;
 	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
@@ -254,7 +254,7 @@ READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 
 
 /************* 3 buttons version **************************/
-READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
+uint8_t md_base_state::megadrive_io_read_data_port_3button(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int portnum = offset;
 	uint8_t retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
@@ -303,7 +303,7 @@ uint8_t md_base_state::megadrive_io_read_sctrl_port(int portnum)
 }
 
 
-READ16_MEMBER(md_base_state::megadriv_68k_io_read )
+uint16_t md_base_state::megadriv_68k_io_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t retdata;
 
@@ -362,7 +362,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 }
 
 
-WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_3button)
+void md_base_state::megadrive_io_write_data_port_3button(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int portnum = offset;
 	m_megadrive_io_data_regs[portnum] = data;
@@ -373,7 +373,7 @@ WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_3button)
 
 /****************************** 6 buttons version*****************************/
 
-WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_6button)
+void md_base_state::megadrive_io_write_data_port_6button(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int portnum = offset;
 	if (m_megadrive_io_ctrl_regs[portnum]&0x40)
@@ -414,7 +414,7 @@ void md_base_state::megadrive_io_write_sctrl_port(int portnum, uint16_t data)
 }
 
 
-WRITE16_MEMBER(md_base_state::megadriv_68k_io_write )
+void md_base_state::megadriv_68k_io_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
 
@@ -489,7 +489,7 @@ ADDRESS_MAP_END
 /* z80 sounds/sub CPU */
 
 
-READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
+uint16_t md_base_state::megadriv_68k_read_z80_ram(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//osd_printf_debug("read z80 ram %04x\n",mem_mask);
 
@@ -504,7 +504,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
 	}
 }
 
-WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
+void md_base_state::megadriv_68k_write_z80_ram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("write z80 ram\n");
 
@@ -530,7 +530,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
 }
 
 
-READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
+uint16_t md_base_state::megadriv_68k_check_z80_bus(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retvalue;
 
@@ -594,7 +594,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 }
 
 
-WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
+void md_base_state::megadriv_68k_req_z80_bus(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Request the Z80 bus, allows 68k to read/write Z80 address space */
 	if (!ACCESSING_BITS_0_7) // byte access
@@ -642,7 +642,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
 		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
 }
 
-WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
+void md_base_state::megadriv_68k_req_z80_reset(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!ACCESSING_BITS_0_7) // byte access
 	{
@@ -691,21 +691,21 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 // add-on hardware which changes the cpu mapping like the 32x and SegaCD.
 // - we might need to add exceptions for example, z80 reading / writing the
 //   z80 area of the 68k if games misbehave
-READ8_MEMBER(md_base_state::z80_read_68k_banked_data )
+uint8_t md_base_state::z80_read_68k_banked_data(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &space68k = m_maincpu->space();
 	uint8_t ret = space68k.read_byte(m_genz80.z80_bank_addr+offset);
 	return ret;
 }
 
-WRITE8_MEMBER(md_base_state::z80_write_68k_banked_data )
+void md_base_state::z80_write_68k_banked_data(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space68k = m_maincpu->space();
 	space68k.write_byte(m_genz80.z80_bank_addr+offset,data);
 }
 
 
-WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
+void md_base_state::megadriv_z80_vdp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -725,13 +725,13 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 
 
 
-READ8_MEMBER(md_base_state::megadriv_z80_vdp_read )
+uint8_t md_base_state::megadriv_z80_vdp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	osd_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
 	return space.machine().rand();
 }
 
-READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
+uint8_t md_base_state::megadriv_z80_unmapped_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -986,7 +986,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 MACHINE_CONFIG_END
 
 
-WRITE8_MEMBER(md_base_state::megadriv_tas_callback)
+void md_base_state::megadriv_tas_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return; // writeback not allowed
 }

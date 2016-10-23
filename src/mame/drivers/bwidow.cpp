@@ -257,7 +257,7 @@ Typically, only the high 2 bits are read.
 
 */
 
-READ8_MEMBER(bwidow_state::spacduel_IN3_r)
+uint8_t bwidow_state::spacduel_IN3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 	int res1;
@@ -313,7 +313,7 @@ CUSTOM_INPUT_MEMBER(bwidow_state::clock_r)
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
-READ8_MEMBER(bwidow_state::bwidowp_in_r)
+uint8_t bwidow_state::bwidowp_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_in4->read() & 0x0f) | ((m_in3->read() & 0x0f) << 4);
 }
@@ -324,7 +324,7 @@ READ8_MEMBER(bwidow_state::bwidowp_in_r)
  *
  *************************************/
 
-WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
+void bwidow_state::bwidow_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    0x10 = p1 led
@@ -341,7 +341,7 @@ WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 	m_lastdata = data;
 }
 
-WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
+void bwidow_state::spacduel_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == m_lastdata) return;
 	output().set_led_value(0, !BIT(data,5)); // start lamp
@@ -361,7 +361,7 @@ WRITE8_MEMBER(bwidow_state::spacduel_coin_counter_w)
  *
  *************************************/
 
-WRITE8_MEMBER(bwidow_state::irq_ack_w)
+void bwidow_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

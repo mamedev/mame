@@ -73,16 +73,16 @@ public:
 	template<class _dma_request> void set_dma_request_callback(_dma_request dma_request) { m_write_dma_request.set_callback(dma_request); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ16_MEMBER( pcs3_r ) { return m_card ? m_card->pcs3_r(space, offset) : 0xff; }
-	DECLARE_WRITE16_MEMBER( pcs3_w ) { if (m_card) m_card->pcs3_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( pcs6_6_r ) { return m_card ? m_card->pcs6_6_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( pcs6_6_w ) { if (m_card) m_card->pcs6_6_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( dma_ack_r ) { return m_card ? m_card->dma_ack_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( dma_ack_w ) { if (m_card) m_card->dma_ack_w(space, offset, data); }
+	uint8_t mcs0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
+	void mcs0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->mcs0_w(space, offset, data); }
+	uint8_t mcs1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
+	void mcs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->mcs1_w(space, offset, data); }
+	uint16_t pcs3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_card ? m_card->pcs3_r(space, offset) : 0xff; }
+	void pcs3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { if (m_card) m_card->pcs3_w(space, offset, data); }
+	uint8_t pcs6_6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->pcs6_6_r(space, offset) : 0xff; }
+	void pcs6_6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->pcs6_6_w(space, offset, data); }
+	uint8_t dma_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->dma_ack_r(space, offset) : 0xff; }
+	void dma_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->dma_ack_w(space, offset, data); }
 
 	// card interface
 	DECLARE_WRITE_LINE_MEMBER( dma_request_w ) { m_write_dma_request(state); }

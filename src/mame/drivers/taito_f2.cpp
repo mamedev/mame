@@ -280,7 +280,7 @@ Notes:
                         GAME INPUTS
 **********************************************************/
 
-WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
+void taitof2_state::growl_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -291,7 +291,7 @@ WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 	}
 }
 
-WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
+void taitof2_state::taitof2_4p_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -306,7 +306,7 @@ WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
 	}
 }
 
-WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
+void taitof2_state::ninjak_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -321,7 +321,7 @@ WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
 	}
 }
 
-READ16_MEMBER(taitof2_state::ninjak_input_r)
+uint16_t taitof2_state::ninjak_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -355,7 +355,7 @@ READ16_MEMBER(taitof2_state::ninjak_input_r)
 	return 0xff;
 }
 
-READ16_MEMBER(taitof2_state::cameltry_paddle_r)
+uint16_t taitof2_state::cameltry_paddle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int curr, res = 0xff;
 
@@ -379,7 +379,7 @@ READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 	return 0;
 }
 
-READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
+uint16_t taitof2_state::mjnquest_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -399,7 +399,7 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 	return 0xff;
 }
 
-READ16_MEMBER(taitof2_state::mjnquest_input_r)
+uint16_t taitof2_state::mjnquest_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_mjnquest_input)
 	{
@@ -425,7 +425,7 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(taitof2_state::mjnquest_inputselect_w)
+void taitof2_state::mjnquest_inputselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mjnquest_input = (data >> 6);
 }
@@ -597,7 +597,7 @@ INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
                             SOUND
 ****************************************************************/
 
-WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
+void taitof2_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry((data - 1) & 7);
 
@@ -608,7 +608,7 @@ WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
 }
 
 
-READ8_MEMBER(taitof2_state::driveout_sound_command_r)
+uint8_t taitof2_state::driveout_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", m_driveout_sound_latch);
@@ -621,7 +621,7 @@ void taitof2_state::reset_driveout_sound_region()
 	m_oki->set_rom_bank(m_oki_bank);
 }
 
-WRITE8_MEMBER(taitof2_state::oki_bank_w)
+void taitof2_state::oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 4) && (m_oki_bank != (data & 3)) )
 	{
@@ -631,7 +631,7 @@ WRITE8_MEMBER(taitof2_state::oki_bank_w)
 	reset_driveout_sound_region();
 }
 
-WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
+void taitof2_state::driveout_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -665,14 +665,14 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(taitof2_state::cchip2_word_w)
+void taitof2_state::cchip2_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", space.device().safe_pc(), offset, data);
 
 	COMBINE_DATA(&m_cchip2_ram[offset]);
 }
 
-READ16_MEMBER(taitof2_state::cchip2_word_r)
+uint16_t taitof2_state::cchip2_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* C-Chip ID */
 	if (offset == 0x401)
@@ -2827,7 +2827,7 @@ static GFXDECODE_START( footchmpbl )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
+void taitof2_state::cameltrya_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Implement //
 }

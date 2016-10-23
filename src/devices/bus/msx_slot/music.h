@@ -26,9 +26,9 @@ public:
 
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE8_MEMBER(write_ym2413);
+	void write_ym2413(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	ym2413_device *m_ym2413;

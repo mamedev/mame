@@ -93,11 +93,11 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
-	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
-	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(testa_w);
-	DECLARE_WRITE8_MEMBER(testb_w);
+	void jokrwild_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jokrwild_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void testa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void testb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jokrwild();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
@@ -112,13 +112,13 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
+void jokrwild_state::jokrwild_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
+void jokrwild_state::jokrwild_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -159,7 +159,7 @@ PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
 *    Read/Write  Handlers    *
 *****************************/
 
-READ8_MEMBER(jokrwild_state::rng_r)
+uint8_t jokrwild_state::rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(space.device().safe_pc() == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
@@ -386,12 +386,12 @@ GFXDECODE_END
 *    PIA Interfaces    *
 ***********************/
 
-WRITE8_MEMBER(jokrwild_state::testa_w)
+void jokrwild_state::testa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x A\n",data);
 }
 
-WRITE8_MEMBER(jokrwild_state::testb_w)
+void jokrwild_state::testb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x B\n",data);
 }

@@ -102,27 +102,27 @@ public:
 
 	/////////////////////////////////////////////////////////
 
-	DECLARE_READ8_MEMBER( tmpz84c011_pa_r ) { return (m_inportsa() & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]); }
-	DECLARE_READ8_MEMBER( tmpz84c011_pb_r ) { return (m_inportsb() & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]); }
-	DECLARE_READ8_MEMBER( tmpz84c011_pc_r ) { return (m_inportsc() & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]); }
-	DECLARE_READ8_MEMBER( tmpz84c011_pd_r ) { return (m_inportsd() & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]); }
-	DECLARE_READ8_MEMBER( tmpz84c011_pe_r ) { return (m_inportse() & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]); }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_pa_w ) { m_pio_latch[0] = data; m_outportsa(data & m_pio_dir[0]); }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_pb_w ) { m_pio_latch[1] = data; m_outportsb(data & m_pio_dir[1]); }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_pc_w ) { m_pio_latch[2] = data; m_outportsc(data & m_pio_dir[2]); }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_pd_w ) { m_pio_latch[3] = data; m_outportsd(data & m_pio_dir[3]); }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_pe_w ) { m_pio_latch[4] = data; m_outportse(data & m_pio_dir[4]); }
+	uint8_t tmpz84c011_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_inportsa() & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]); }
+	uint8_t tmpz84c011_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_inportsb() & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]); }
+	uint8_t tmpz84c011_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_inportsc() & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]); }
+	uint8_t tmpz84c011_pd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_inportsd() & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]); }
+	uint8_t tmpz84c011_pe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_inportse() & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]); }
+	void tmpz84c011_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_latch[0] = data; m_outportsa(data & m_pio_dir[0]); }
+	void tmpz84c011_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_latch[1] = data; m_outportsb(data & m_pio_dir[1]); }
+	void tmpz84c011_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_latch[2] = data; m_outportsc(data & m_pio_dir[2]); }
+	void tmpz84c011_pd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_latch[3] = data; m_outportsd(data & m_pio_dir[3]); }
+	void tmpz84c011_pe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_latch[4] = data; m_outportse(data & m_pio_dir[4]); }
 
-	DECLARE_READ8_MEMBER( tmpz84c011_dir_pa_r ) { return m_pio_dir[0]; }
-	DECLARE_READ8_MEMBER( tmpz84c011_dir_pb_r ) { return m_pio_dir[1]; }
-	DECLARE_READ8_MEMBER( tmpz84c011_dir_pc_r ) { return m_pio_dir[2]; }
-	DECLARE_READ8_MEMBER( tmpz84c011_dir_pd_r ) { return m_pio_dir[3]; }
-	DECLARE_READ8_MEMBER( tmpz84c011_dir_pe_r ) { return m_pio_dir[4]; }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pa_w ) { m_pio_dir[0] = data; }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pb_w ) { m_pio_dir[1] = data; }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pc_w ) { m_pio_dir[2] = data; }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pd_w ) { m_pio_dir[3] = data; }
-	DECLARE_WRITE8_MEMBER( tmpz84c011_dir_pe_w ) { m_pio_dir[4] = data; }
+	uint8_t tmpz84c011_dir_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio_dir[0]; }
+	uint8_t tmpz84c011_dir_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio_dir[1]; }
+	uint8_t tmpz84c011_dir_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio_dir[2]; }
+	uint8_t tmpz84c011_dir_pd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio_dir[3]; }
+	uint8_t tmpz84c011_dir_pe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio_dir[4]; }
+	void tmpz84c011_dir_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[0] = data; }
+	void tmpz84c011_dir_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[1] = data; }
+	void tmpz84c011_dir_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[2] = data; }
+	void tmpz84c011_dir_pd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[3] = data; }
+	void tmpz84c011_dir_pe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[4] = data; }
 
 	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }

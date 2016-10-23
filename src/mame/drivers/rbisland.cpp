@@ -330,7 +330,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 
 
-WRITE16_MEMBER(rbisland_state::jumping_sound_w)
+void rbisland_state::jumping_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -395,12 +395,12 @@ ADDRESS_MAP_END
               Jumping uses two YM2203's
 ***********************************************************/
 
-WRITE8_MEMBER(rbisland_state::bankswitch_w)
+void rbisland_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
 
-READ8_MEMBER(rbisland_state::jumping_latch_r)
+uint8_t rbisland_state::jumping_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_jumping_latch;
 }

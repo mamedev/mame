@@ -114,18 +114,18 @@ public:
 	template<class _Object> static devcb_base &set_port_a_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_a_write_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_port_b_write_callback(device_t &device, _Object object) { return downcast<ay8910_device &>(device).m_port_b_write_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( address_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* /RES */
-	DECLARE_WRITE8_MEMBER( reset_w );
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
-	DECLARE_WRITE8_MEMBER( data_address_w );
+	void data_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
-	DECLARE_WRITE8_MEMBER( address_data_w );
+	void address_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_volume(int channel,int volume);
 	void ay_set_clock(int clock);
@@ -227,8 +227,8 @@ public:
 	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* AY8914 handlers needed due to different register map */
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 extern const device_type AY8914;

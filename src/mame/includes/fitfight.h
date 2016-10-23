@@ -40,21 +40,21 @@ public:
 	/* misc */
 	int      m_bbprot_kludge;
 	uint16_t   m_fof_700000_data;
-	DECLARE_READ16_MEMBER(fitfight_700000_r);
-	DECLARE_READ16_MEMBER(histryma_700000_r);
-	DECLARE_READ16_MEMBER(bbprot_700000_r);
-	DECLARE_WRITE16_MEMBER(fitfight_700000_w);
-	DECLARE_READ8_MEMBER(snd_porta_r);
-	DECLARE_READ8_MEMBER(snd_portb_r);
-	DECLARE_READ8_MEMBER(snd_portc_r);
-	DECLARE_WRITE8_MEMBER(snd_porta_w);
-	DECLARE_WRITE8_MEMBER(snd_portb_w);
-	DECLARE_WRITE8_MEMBER(snd_portc_w);
-	DECLARE_WRITE16_MEMBER(fof_bak_tileram_w);
-	DECLARE_WRITE16_MEMBER(fof_mid_tileram_w);
-	DECLARE_WRITE16_MEMBER(fof_txt_tileram_w);
+	uint16_t fitfight_700000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t histryma_700000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bbprot_700000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fitfight_700000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t snd_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snd_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snd_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snd_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fof_bak_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fof_mid_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fof_txt_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( hotmindff_unk_r );
+	uint16_t hotmindff_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_hotmindff();
 	void init_fitfight();
 	void init_histryma();

@@ -192,8 +192,8 @@ public:
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 1; }
 
-	virtual DECLARE_READ16_MEMBER(ram_r) override { return m_ram[offset]; }
-	virtual DECLARE_WRITE16_MEMBER(ram_w) override { COMBINE_DATA(&m_ram[offset]); }
+	virtual uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_ram[offset]; }
+	virtual void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { COMBINE_DATA(&m_ram[offset]); }
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

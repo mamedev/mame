@@ -157,19 +157,19 @@ void microtan_state::microtan_set_irq_line()
 /**************************************************************
  * VIA callback functions for VIA #0
  **************************************************************/
-READ8_MEMBER(microtan_state::via_0_in_a)
+uint8_t microtan_state::via_0_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = ioport("JOY")->read();
 	LOG(("microtan_via_0_in_a %02X\n", data));
 	return data;
 }
 
-WRITE8_MEMBER(microtan_state::via_0_out_a)
+void microtan_state::via_0_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_0_out_a %02X\n", data));
 }
 
-WRITE8_MEMBER(microtan_state::via_0_out_b)
+void microtan_state::via_0_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_0_out_b %02X\n", data));
 	/* bit #7 is the cassette output signal */
@@ -197,12 +197,12 @@ WRITE_LINE_MEMBER(microtan_state::via_0_irq)
  * VIA callback functions for VIA #1
  **************************************************************/
 
-WRITE8_MEMBER(microtan_state::via_1_out_a)
+void microtan_state::via_1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_1_out_a %02X\n", data));
 }
 
-WRITE8_MEMBER(microtan_state::via_1_out_b)
+void microtan_state::via_1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_via_1_out_b %02X\n", data));
 }
@@ -251,20 +251,20 @@ TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
 		m_via6522_0->write_cb2(1);
 }
 
-READ8_MEMBER(microtan_state::microtan_sound_r)
+uint8_t microtan_state::microtan_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	LOG(("microtan_sound_r: -> %02x\n", data));
 	return data;
 }
 
-WRITE8_MEMBER(microtan_state::microtan_sound_w)
+void microtan_state::microtan_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("microtan_sound_w: <- %02x\n", data));
 }
 
 
-READ8_MEMBER(microtan_state::microtan_bffx_r)
+uint8_t microtan_state::microtan_bffx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	switch( offset & 3 )
@@ -293,7 +293,7 @@ TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(microtan_state::microtan_bffx_w)
+void microtan_state::microtan_bffx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset & 3 )
 	{

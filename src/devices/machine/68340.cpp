@@ -43,7 +43,7 @@ uint16_t m68340cpu_device::get_cs(offs_t address)
 
 /* 68340 specifics - MOVE */
 
-READ32_MEMBER( m68340cpu_device::m68340_internal_base_r )
+uint32_t m68340cpu_device::m68340_internal_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m68340cpu_device *m68k = this;
 	int pc = space.device().safe_pc();
@@ -51,7 +51,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_base_r )
 	return m68k->m68340_base;
 }
 
-WRITE32_MEMBER( m68340cpu_device::m68340_internal_base_w )
+void m68340cpu_device::m68340_internal_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m68340cpu_device *m68k = this;
 

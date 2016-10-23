@@ -41,12 +41,12 @@ public:
 	uint8_t m_in_math;
 	uint8_t m_math_param;
 
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
-	DECLARE_READ8_MEMBER(i8751_r);
-	DECLARE_WRITE8_MEMBER(i8751_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8751_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_sidepckt();
 	void init_sidepcktj();

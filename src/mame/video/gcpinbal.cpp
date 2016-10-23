@@ -71,12 +71,12 @@ void gcpinbal_state::video_start()
                    TILEMAP READ AND WRITE HANDLERS
 *******************************************************************/
 
-READ16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_r)
+uint16_t gcpinbal_state::gcpinbal_tilemaps_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tilemapram[offset];
 }
 
-WRITE16_MEMBER(gcpinbal_state::gcpinbal_tilemaps_word_w)
+void gcpinbal_state::gcpinbal_tilemaps_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tilemapram[offset]);
 

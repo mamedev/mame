@@ -57,10 +57,10 @@ public:
 
 	uint64_t internal_update(uint64_t current_time);
 
-	DECLARE_READ16_MEMBER(wd_r);
-	DECLARE_WRITE16_MEMBER(wd_w);
-	DECLARE_READ16_MEMBER(rst_r);
-	DECLARE_WRITE16_MEMBER(rst_w);
+	uint16_t wd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rst_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

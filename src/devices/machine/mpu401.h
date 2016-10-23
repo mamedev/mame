@@ -37,19 +37,19 @@ public:
 
 	devcb_write_line write_irq;
 
-	DECLARE_READ8_MEMBER(regs_mode2_r);
-	DECLARE_WRITE8_MEMBER(regs_mode2_w);
-	DECLARE_READ8_MEMBER(asic_r);
-	DECLARE_WRITE8_MEMBER(asic_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
+	uint8_t regs_mode2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void regs_mode2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t asic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void asic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
-	DECLARE_READ8_MEMBER(mpu_r);
-	DECLARE_WRITE8_MEMBER(mpu_w);
+	uint8_t mpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

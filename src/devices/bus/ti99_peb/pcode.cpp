@@ -194,7 +194,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
     Write a byte in P-Code ROM space. This is only used for setting the
     GROM address.
 */
-WRITE8_MEMBER( ti_pcode_card_device::write )
+void ti_pcode_card_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 	if (m_active && m_isgrom && m_selected)
@@ -245,7 +245,7 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
     A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
     bit 7 would be 0x1f86 but it is not used.
 */
-WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
+void ti_pcode_card_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==CRU_BASE)
 	{

@@ -16,7 +16,7 @@ XX Mission (c) 1986 UPL
 #include "includes/xxmissio.h"
 
 
-WRITE8_MEMBER(xxmissio_state::bank_sel_w)
+void xxmissio_state::bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 7);
 }
@@ -27,7 +27,7 @@ CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
 	return (m_status & bit_mask) ? 1 : 0;
 }
 
-WRITE8_MEMBER(xxmissio_state::status_m_w)
+void xxmissio_state::status_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -46,7 +46,7 @@ WRITE8_MEMBER(xxmissio_state::status_m_w)
 	}
 }
 
-WRITE8_MEMBER(xxmissio_state::status_s_w)
+void xxmissio_state::status_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{

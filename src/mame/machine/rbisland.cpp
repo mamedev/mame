@@ -770,17 +770,17 @@ TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
  *
  *************************************/
 
-WRITE16_MEMBER(rbisland_state::rbisland_cchip_ctrl_w)
+void rbisland_state::rbisland_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER(rbisland_state::rbisland_cchip_bank_w)
+void rbisland_state::rbisland_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(rbisland_state::rbisland_cchip_ram_w)
+void rbisland_state::rbisland_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -793,7 +793,7 @@ WRITE16_MEMBER(rbisland_state::rbisland_cchip_ram_w)
  *
  *************************************/
 
-READ16_MEMBER(rbisland_state::rbisland_cchip_ctrl_r)
+uint16_t rbisland_state::rbisland_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    Bit 2 = Error signal
@@ -802,7 +802,7 @@ READ16_MEMBER(rbisland_state::rbisland_cchip_ctrl_r)
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER(rbisland_state::rbisland_cchip_ram_r)
+uint16_t rbisland_state::rbisland_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_CRAM[m_current_bank][offset];
 }

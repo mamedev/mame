@@ -990,7 +990,7 @@ void z8536_device::z80daisy_irq_reti()
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( z8536_device::read )
+uint8_t z8536_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -1037,7 +1037,7 @@ READ8_MEMBER( z8536_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z8536_device::write )
+void z8536_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_state == STATE_RESET)
 	{

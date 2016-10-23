@@ -103,7 +103,7 @@ TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
 	m_CK_signal++;
 }
 
-WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
+void hec2hrp_state::minidisc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -122,7 +122,7 @@ WRITE8_MEMBER( hec2hrp_state::minidisc_control_w )
 	membank("bank2")->set_entry(BIT(data, 5) ? HECTOR_BANK_BASE : HECTOR_BANK_DISC);
 }
 
-WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
+void hec2hrp_state::hector_switch_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset==0x00)   {   /* 0x800 et 0x000=> video page, HR*/
 							if (isHectoreXtend())
@@ -165,12 +165,12 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 						}
 }
 
-WRITE8_MEMBER(hec2hrp_state::hector_keyboard_w)
+void hec2hrp_state::hector_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*nothing to do => read function manage the value*/
 }
 
-READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
+uint8_t hec2hrp_state::hector_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -238,17 +238,17 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 	return m_keyboard[offset]->read();
 }
 
-WRITE8_MEMBER(hec2hrp_state::hector_sn_2000_w)
+void hec2hrp_state::hector_sn_2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	Mise_A_Jour_Etat(0x2000+ offset, data);
 	Update_Sound(space, data);
 }
-WRITE8_MEMBER(hec2hrp_state::hector_sn_2800_w)
+void hec2hrp_state::hector_sn_2800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	Mise_A_Jour_Etat(0x2800+ offset, data);
 	Update_Sound(space, data);
 }
-READ8_MEMBER(hec2hrp_state::hector_cassette_r)
+uint8_t hec2hrp_state::hector_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double level;
 	uint8_t value=0;
@@ -291,7 +291,7 @@ READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 	}
 	return value;
 }
-WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
+void hec2hrp_state::hector_sn_3000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_state3000 = data & 0xf8; /* except bit 0 to 2*/
 	if ((data & 7) != m_oldstate3000 )
@@ -304,7 +304,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
 }
 
 /* Color Interface */
-WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
+void hec2hrp_state::hector_color_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x40)
 	{
@@ -352,7 +352,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 	m_oldstate1000=data; /* For next step*/
 }
 
-WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
+void hec2hrp_state::hector_color_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	discrete_device *discrete = machine().device<discrete_device>("discrete");
 	m_hector_color[1] =  data        & 0x07;
@@ -371,7 +371,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 ********************************************************************************/
 
 /*******************  READ PIO 8255 *******************/
-READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
+uint8_t hec2hrp_state::hector_io_8255_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* 8255 in mode 0 */
 	uint8_t data =0;
@@ -418,7 +418,7 @@ READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 
 /*******************  WRITE PIO 8255 *******************/
 
-WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
+void hec2hrp_state::hector_io_8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 8255 in mode 0 */
 	if ((offset & 0x3) == 0x0) /* Port A => to printer or Disc II*/
@@ -485,7 +485,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_io_8255_w)
 
 
 /*******************  Ecriture PIO specifique machine MX40 *******************/
-WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
+void hec2hrp_state::hector_mx40_io_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Bank switching on several address */
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
@@ -502,7 +502,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_mx40_io_port_w)
 }
 
 /*******************  Ecriture PIO specifique machine MX80 *******************/
-WRITE8_MEMBER(hec2hrp_state::hector_mx80_io_port_w)
+void hec2hrp_state::hector_mx80_io_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset &0x0ff) == 0x40) /* Port page 0*/
 		membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
@@ -890,54 +890,54 @@ void hec2hrp_state::hector_disc2_reset()
 /*****************************************************************************/
 /********************  Port handling of the Z80 Disc II unit *****************/
 /*****************************************************************************/
-READ8_MEMBER( hec2hrp_state::hector_disc2_io00_port_r)
+uint8_t hec2hrp_state::hector_disc2_io00_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Switch Disc 2 to RAM to let full RAM acces */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::hector_disc2_io00_port_w)
+void hec2hrp_state::hector_disc2_io00_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Switch Disc 2 to RAM to let full RAM acces */
 	membank("bank3")->set_entry(DISCII_BANK_RAM);
 }
-READ8_MEMBER( hec2hrp_state::hector_disc2_io20_port_r)
+uint8_t hec2hrp_state::hector_disc2_io20_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// You can implemente the 8251 chip communication here !
 	return 0;
 }
-WRITE8_MEMBER( hec2hrp_state::hector_disc2_io20_port_w)
+void hec2hrp_state::hector_disc2_io20_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// You can implemente the 8251 chip communication here !
 }
-READ8_MEMBER( hec2hrp_state::hector_disc2_io30_port_r)
+uint8_t hec2hrp_state::hector_disc2_io30_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hector_disc2_data_r_ready;
 }
-WRITE8_MEMBER( hec2hrp_state::hector_disc2_io30_port_w)
+void hec2hrp_state::hector_disc2_io30_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Nothing here !
 }
 
-READ8_MEMBER( hec2hrp_state::hector_disc2_io40_port_r)
+uint8_t hec2hrp_state::hector_disc2_io40_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Read data send by Hector, by Disc2*/
 	m_hector_disc2_data_r_ready = 0x00;  /* Clear memory info read ready*/
 	return m_hector_disc2_data_read;     /* send the data !*/
 }
 
-WRITE8_MEMBER( hec2hrp_state::hector_disc2_io40_port_w)   /* Write data send by Disc2, to Hector*/
+void hec2hrp_state::hector_disc2_io40_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)   /* Write data send by Disc2, to Hector*/
 {
 	m_hector_disc2_data_write = data;        /* Memorization data*/
 	m_hector_disc2_data_w_ready = 0x80;  /* Memorization data write ready in D7*/
 }
 
-READ8_MEMBER( hec2hrp_state::hector_disc2_io50_port_r)    /*Read memory info write ready*/
+uint8_t hec2hrp_state::hector_disc2_io50_port_r(address_space &space, offs_t offset, uint8_t mem_mask)    /*Read memory info write ready*/
 {
 	return m_hector_disc2_data_w_ready;
 }
 
-WRITE8_MEMBER( hec2hrp_state::hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
+void hec2hrp_state::hector_disc2_io50_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) /* I/O Port to the stuff of Disc2*/
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 

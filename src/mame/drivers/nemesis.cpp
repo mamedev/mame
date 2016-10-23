@@ -101,7 +101,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
 }
 
 
-WRITE16_MEMBER(nemesis_state::gx400_irq1_enable_word_w)
+void nemesis_state::gx400_irq1_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq1_on = data & 0x0001;
@@ -110,7 +110,7 @@ WRITE16_MEMBER(nemesis_state::gx400_irq1_enable_word_w)
 		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
+void nemesis_state::gx400_irq2_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq2_on = data & 0x0001;
@@ -119,13 +119,13 @@ WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
 		machine().bookkeeping().coin_lockout_w(0, data & 0x0100);
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_irq4_enable_word_w)
+void nemesis_state::gx400_irq4_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_irq4_on = data & 0x0100;
 }
 
-WRITE16_MEMBER(nemesis_state::nemesis_irq_enable_word_w)
+void nemesis_state::nemesis_irq_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq_on = data & 0xff;
@@ -134,7 +134,7 @@ WRITE16_MEMBER(nemesis_state::nemesis_irq_enable_word_w)
 		machine().bookkeeping().coin_lockout_global_w(data & 0x0100);
 }
 
-WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
+void nemesis_state::konamigt_irq_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq_on = data & 0xff;
@@ -143,7 +143,7 @@ WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
 		machine().bookkeeping().coin_lockout_w(1, data & 0x0100);
 }
 
-WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
+void nemesis_state::konamigt_irq2_enable_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq2_on = data & 0xff;
@@ -153,19 +153,19 @@ WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
 }
 
 
-READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
+uint16_t nemesis_state::gx400_sharedram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gx400_shared_ram[offset];
 }
 
-WRITE16_MEMBER(nemesis_state::gx400_sharedram_word_w)
+void nemesis_state::gx400_sharedram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_gx400_shared_ram[offset] = data;
 }
 
 
-READ16_MEMBER(nemesis_state::konamigt_input_word_r)
+uint16_t nemesis_state::konamigt_input_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 /*
     bit 0-7:   steering
@@ -192,13 +192,13 @@ READ16_MEMBER(nemesis_state::konamigt_input_word_r)
 	return ret;
 }
 
-WRITE16_MEMBER(nemesis_state::selected_ip_word_w)
+void nemesis_state::selected_ip_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_selected_ip = data & 0xff;    // latch the value
 }
 
-READ16_MEMBER(nemesis_state::selected_ip_word_r)
+uint16_t nemesis_state::selected_ip_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_selected_ip & 0xf)
 	{                                               // From WEC Le Mans Schems:
@@ -212,7 +212,7 @@ READ16_MEMBER(nemesis_state::selected_ip_word_r)
 }
 
 
-WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
+void nemesis_state::nemesis_filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int C1 = /* offset & 0x1000 ? 4700 : */ 0; // is this right? 4.7uF seems too large
 	int C2 = offset & 0x0800 ? 33 : 0;         // 0.033uF = 33 nF
@@ -224,19 +224,19 @@ WRITE8_MEMBER(nemesis_state::nemesis_filter_w)
 	// konamigt also uses bits 0x0018, what are they for?
 }
 
-WRITE8_MEMBER(nemesis_state::gx400_speech_start_w)
+void nemesis_state::gx400_speech_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm->st(1);
 	m_vlm->st(0);
 }
 
-WRITE8_MEMBER(nemesis_state::salamand_speech_start_w)
+void nemesis_state::salamand_speech_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm->st(1);
 	m_vlm->st(0);
 }
 
-READ8_MEMBER(nemesis_state::nemesis_portA_r)
+uint8_t nemesis_state::nemesis_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
    bit 0-3:   timer
@@ -254,7 +254,7 @@ READ8_MEMBER(nemesis_state::nemesis_portA_r)
 	return res;
 }
 
-WRITE8_MEMBER(nemesis_state::city_sound_bank_w)
+void nemesis_state::city_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x310f80, 0x310fff) AM_SHARE("yscroll1")
 ADDRESS_MAP_END
 
-READ8_MEMBER(nemesis_state::wd_r)
+uint8_t nemesis_state::wd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_frame_counter ^= 1;
 	return m_frame_counter;
@@ -1445,7 +1445,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE8_MEMBER(nemesis_state::volume_callback)
+void nemesis_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

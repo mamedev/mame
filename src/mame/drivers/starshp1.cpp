@@ -23,7 +23,7 @@ INTERRUPT_GEN_MEMBER(starshp1_state::starshp1_interrupt)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
+void starshp1_state::starshp1_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 
@@ -59,7 +59,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_audio_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_collision_reset_w)
+void starshp1_state::starshp1_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision_latch = 0;
 }
@@ -95,13 +95,13 @@ CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_in_w)
+void starshp1_state::starshp1_analog_in_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_analog_in_select = offset & 3;
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
+void starshp1_state::starshp1_analog_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -130,7 +130,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_analog_out_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_misc_w)
+void starshp1_state::starshp1_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 

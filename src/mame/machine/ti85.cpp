@@ -271,7 +271,7 @@ void ti85_state::machine_reset_ti85()
 	m_PCR = 0xc0;
 }
 
-DIRECT_UPDATE_MEMBER(ti85_state::ti83p_direct_update_handler)
+offs_t ti85_state::ti83p_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_booting)
 	{
@@ -455,12 +455,12 @@ void ti85_state::machine_start_ti86()
 
 /* I/O ports handlers */
 
-READ8_MEMBER(ti85_state::ti85_port_0000_r)
+uint8_t ti85_state::ti85_port_0000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(ti85_state::ti8x_keypad_r)
+uint8_t ti85_state::ti8x_keypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	int port;
@@ -482,12 +482,12 @@ READ8_MEMBER(ti85_state::ti8x_keypad_r)
 	return data;
 }
 
-	READ8_MEMBER(ti85_state::ti85_port_0002_r )
+	uint8_t ti85_state::ti85_port_0002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-	READ8_MEMBER(ti85_state::ti85_port_0003_r )
+	uint8_t ti85_state::ti85_port_0003_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -504,22 +504,22 @@ READ8_MEMBER(ti85_state::ti8x_keypad_r)
 	return data;
 }
 
-	READ8_MEMBER(ti85_state::ti85_port_0004_r )
+	uint8_t ti85_state::ti85_port_0004_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-	READ8_MEMBER(ti85_state::ti85_port_0005_r )
+	uint8_t ti85_state::ti85_port_0005_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_memory_page_1;
 }
 
-READ8_MEMBER(ti85_state::ti85_port_0006_r)
+uint8_t ti85_state::ti85_port_0006_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_power_mode;
 }
 
-READ8_MEMBER(ti85_state::ti8x_serial_r)
+uint8_t ti85_state::ti8x_serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//ti85_update_serial(m_serial);
 	return (m_white_out<<3)
@@ -530,37 +530,37 @@ READ8_MEMBER(ti85_state::ti8x_serial_r)
 		| m_PCR;
 }
 
-READ8_MEMBER(ti85_state::ti82_port_0002_r )
+uint8_t ti85_state::ti82_port_0002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_port2;
 }
 
-READ8_MEMBER(ti85_state::ti86_port_0005_r)
+uint8_t ti85_state::ti86_port_0005_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_memory_page_1;
 }
 
-READ8_MEMBER(ti85_state::ti86_port_0006_r )
+uint8_t ti85_state::ti86_port_0006_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_memory_page_2;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_port_0005_r )
+uint8_t ti85_state::ti83pse_port_0005_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_memory_page_3;
 }
 
-READ8_MEMBER(ti85_state::ti83_port_0000_r)
+uint8_t ti85_state::ti83_port_0000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_ti8x_memory_page_1 & 0x08) << 1) | 0x0C;
 }
 
-READ8_MEMBER(ti85_state::ti83_port_0002_r )
+uint8_t ti85_state::ti83_port_0002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_port2;
 }
 
-READ8_MEMBER(ti85_state::ti83_port_0003_r )
+uint8_t ti85_state::ti83_port_0003_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -574,7 +574,7 @@ READ8_MEMBER(ti85_state::ti83_port_0003_r )
 	return data;
 }
 
-READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
+uint8_t ti85_state::ti8x_plus_serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//ti85_update_serial(m_serial);
 	return (m_white_out<<3)
@@ -585,12 +585,12 @@ READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 		| m_PCR;
 }
 
-READ8_MEMBER(ti85_state::ti83p_port_0002_r )
+uint8_t ti85_state::ti83p_port_0002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti8x_port2|3;
 }
 
-READ8_MEMBER(ti85_state::ti83p_port_0004_r )
+uint8_t ti85_state::ti83p_port_0004_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -618,43 +618,43 @@ READ8_MEMBER(ti85_state::ti83p_port_0004_r )
 // bit 6 - Indicates if Link Assist is available
 // bit 7 - SE or Basic
 
-READ8_MEMBER(ti85_state::ti83pse_port_0002_r )
+uint8_t ti85_state::ti83pse_port_0002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xC3 | (m_flash_unlocked << 2);
 }
 
-READ8_MEMBER(ti85_state::ti83pse_port_0009_r )
+uint8_t ti85_state::ti83pse_port_0009_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_port_0015_r )
+uint8_t ti85_state::ti83pse_port_0015_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x33;
 }
 
 
-WRITE8_MEMBER(ti85_state::ti81_port_0007_w)
+void ti85_state::ti81_port_0007_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti81_port_7_data = data;
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0000_w)
+void ti85_state::ti85_port_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_LCD_memory_base = data;
 }
 
-WRITE8_MEMBER(ti85_state::ti8x_keypad_w)
+void ti85_state::ti8x_keypad_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keypad_mask = data&0x7f;
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0002_w)
+void ti85_state::ti85_port_0002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_LCD_contrast = data&0x1f;
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0003_w)
+void ti85_state::ti85_port_0003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
 	m_ON_interrupt_mask = data&0x01;
@@ -663,25 +663,25 @@ WRITE8_MEMBER(ti85_state::ti85_port_0003_w)
 	m_LCD_status = data&0x08;
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0004_w)
+void ti85_state::ti85_port_0004_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_buffer_width = (data>>3)&0x03;
 	m_interrupt_speed = (data>>1)&0x03;
 	m_port4_bit0 = data&0x01;
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0005_w)
+void ti85_state::ti85_port_0005_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = data;
 	update_ti85_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
+void ti85_state::ti85_port_0006_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_power_mode = data;
 }
 
-WRITE8_MEMBER(ti85_state::ti8x_serial_w)
+void ti85_state::ti8x_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 2) | BIT(data, 3));
 	m_red_out = BIT(data, 2);
@@ -692,39 +692,39 @@ WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 	m_PCR = data & 0xf0;
 }
 
-WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
+void ti85_state::ti86_port_0005_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
 	update_ti86_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti86_port_0006_w)
+void ti85_state::ti86_port_0006_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
 	update_ti86_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti82_port_0002_w)
+void ti85_state::ti82_port_0002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = (data & 0x07);
 	update_ti85_memory();
 	m_ti8x_port2 = data;
 }
 
-WRITE8_MEMBER(ti85_state::ti83_port_0000_w)
+void ti85_state::ti83_port_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
 	update_ti85_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
+void ti85_state::ti83_port_0002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 8) | (data & 7);
 	update_ti85_memory();
 	m_ti8x_port2 = data;
 }
 
-WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
+void ti85_state::ti83_port_0003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		if (m_LCD_status && !(data&0x08))   m_timer_interrupt_mask = 0;
 		m_ON_interrupt_mask = data&0x01;
@@ -733,7 +733,7 @@ WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 		m_LCD_status = data&0x08;
 }
 
-WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
+void ti85_state::ti8x_plus_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 0) | BIT(data, 1));
 	m_red_out = BIT(data, 0);
@@ -744,14 +744,14 @@ WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 	m_PCR = data & 0xf0;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_int_ack_w)
+void ti85_state::ti83pse_int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//Lets ignore this for now, I think it'll be fine.
 	m_ON_interrupt_status = data & 1;
 	m_timer_interrupt_status = data & 0x06;
 }
 
-WRITE8_MEMBER(ti85_state::ti83p_int_mask_w)
+void ti85_state::ti83p_int_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_LCD_mask = (data&0x08) >> 2;
 	m_ON_interrupt_mask = data & 0x01;
@@ -762,37 +762,37 @@ WRITE8_MEMBER(ti85_state::ti83p_int_mask_w)
 	m_timer_interrupt_status &= m_timer_interrupt_mask;
 }
 
-WRITE8_MEMBER(ti85_state::ti83p_port_0004_w)
+void ti85_state::ti83p_port_0004_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti83p_port4 = data | 0xe0;
 	update_ti83p_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83p_port_0006_w)
+void ti85_state::ti83p_port_0006_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
 	update_ti83p_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83p_port_0007_w)
+void ti85_state::ti83p_port_0007_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
 	update_ti83p_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0004_w)
+void ti85_state::ti83pse_port_0004_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti83p_port4 = data;
 	update_ti83pse_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0005_w)
+void ti85_state::ti83pse_port_0005_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti8x_memory_page_3 = data & 0x07;
 	update_ti83pse_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0006_w)
+void ti85_state::ti83pse_port_0006_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_model == TI84P) && (data < 0x80))
 	{
@@ -805,7 +805,7 @@ WRITE8_MEMBER(ti85_state::ti83pse_port_0006_w)
 	update_ti83pse_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0007_w)
+void ti85_state::ti83pse_port_0007_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_model == TI84P) && (data < 0x80))
 	{
@@ -818,13 +818,13 @@ WRITE8_MEMBER(ti85_state::ti83pse_port_0007_w)
 	update_ti83pse_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83p_port_0014_w)
+void ti85_state::ti83p_port_0014_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash_unlocked = data;
 	update_ti83pse_memory();
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0020_w)
+void ti85_state::ti83pse_port_0020_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu_speed = data;
 	if(data)
@@ -837,27 +837,27 @@ WRITE8_MEMBER(ti85_state::ti83pse_port_0020_w)
 	}
 }
 
-READ8_MEMBER(ti85_state::ti83pse_port_0020_r)
+uint8_t ti85_state::ti83pse_port_0020_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cpu_speed;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_port_0021_w)
+void ti85_state::ti83pse_port_0021_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ti83pse_port21 = data & 0x0f;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_port_0021_r)
+uint8_t ti85_state::ti83pse_port_0021_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ti83pse_port21;
 }
 
-READ8_MEMBER(ti85_state::ti84pse_port_0055_r)
+uint8_t ti85_state::ti84pse_port_0055_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x1f;
 }
 
-READ8_MEMBER(ti85_state::ti84pse_port_0056_r)
+uint8_t ti85_state::ti84pse_port_0056_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -917,34 +917,34 @@ void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 }
 
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer1_setup_r)
+uint8_t ti85_state::ti83pse_ctimer1_setup_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER1].setup;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer1_setup_w)
+void ti85_state::ti83pse_ctimer1_setup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crystal_timer1->enable(false);
 	m_ctimer[CRYSTAL_TIMER1].setup = data;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer1_loop_r)
+uint8_t ti85_state::ti83pse_ctimer1_loop_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER1].loop;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer1_loop_w)
+void ti85_state::ti83pse_ctimer1_loop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctimer[CRYSTAL_TIMER1].loop = data & 0x03;
 	m_ctimer_interrupt_status = 0;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer1_count_r)
+uint8_t ti85_state::ti83pse_ctimer1_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER1].count;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer1_count_w)
+void ti85_state::ti83pse_ctimer1_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ti83pse_count(CRYSTAL_TIMER1, data);
 
@@ -952,34 +952,34 @@ WRITE8_MEMBER(ti85_state::ti83pse_ctimer1_count_w)
 
 //
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer2_setup_r)
+uint8_t ti85_state::ti83pse_ctimer2_setup_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER2].setup;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer2_setup_w)
+void ti85_state::ti83pse_ctimer2_setup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crystal_timer2->enable(false);
 	m_ctimer[CRYSTAL_TIMER2].setup = data;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer2_loop_r)
+uint8_t ti85_state::ti83pse_ctimer2_loop_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER2].loop;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer2_loop_w)
+void ti85_state::ti83pse_ctimer2_loop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctimer[CRYSTAL_TIMER2].loop = data & 0x03;
 	m_ctimer_interrupt_status = 0;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer2_count_r)
+uint8_t ti85_state::ti83pse_ctimer2_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER2].count;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer2_count_w)
+void ti85_state::ti83pse_ctimer2_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ti83pse_count(CRYSTAL_TIMER2, data);
 
@@ -987,34 +987,34 @@ WRITE8_MEMBER(ti85_state::ti83pse_ctimer2_count_w)
 
 //
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer3_setup_r)
+uint8_t ti85_state::ti83pse_ctimer3_setup_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER3].setup;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer3_setup_w)
+void ti85_state::ti83pse_ctimer3_setup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crystal_timer3->enable(false);
 	m_ctimer[CRYSTAL_TIMER3].setup = data;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer3_loop_r)
+uint8_t ti85_state::ti83pse_ctimer3_loop_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER3].loop;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer3_loop_w)
+void ti85_state::ti83pse_ctimer3_loop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctimer[CRYSTAL_TIMER3].loop = data & 0x03;
 	m_ctimer_interrupt_status = 0;
 }
 
-READ8_MEMBER(ti85_state::ti83pse_ctimer3_count_r)
+uint8_t ti85_state::ti83pse_ctimer3_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctimer[CRYSTAL_TIMER3].count;
 }
 
-WRITE8_MEMBER(ti85_state::ti83pse_ctimer3_count_w)
+void ti85_state::ti83pse_ctimer3_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ti83pse_count(CRYSTAL_TIMER3, data);
 

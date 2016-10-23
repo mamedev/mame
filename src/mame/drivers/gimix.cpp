@@ -97,22 +97,22 @@ public:
 		, m_dma_dip(*this, "dma_s2")
 	{}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(system_w);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_WRITE8_MEMBER(dma_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
+	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_WRITE8_MEMBER(pia_pa_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	DECLARE_WRITE8_MEMBER(pia_pb_w);
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
 	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
@@ -226,19 +226,19 @@ static INPUT_PORTS_START( gimix )
 
 INPUT_PORTS_END
 
-READ8_MEMBER( gimix_state::keyin_r )
+uint8_t gimix_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( gimix_state::status_r )
+uint8_t gimix_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 2;
 }
 
-WRITE8_MEMBER( gimix_state::kbd_put )
+void gimix_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
@@ -255,7 +255,7 @@ void gimix_state::refresh_memory()
 	}
 }
 
-WRITE8_MEMBER( gimix_state::system_w )
+void gimix_state::system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0x7f)  // task register
 	{
@@ -288,7 +288,7 @@ WRITE8_MEMBER( gimix_state::system_w )
 	}
 }
 
-READ8_MEMBER(gimix_state::dma_r)
+uint8_t gimix_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -310,7 +310,7 @@ READ8_MEMBER(gimix_state::dma_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(gimix_state::dma_w)
+void gimix_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -376,7 +376,7 @@ WRITE8_MEMBER(gimix_state::dma_w)
 	}
 }
 
-READ8_MEMBER(gimix_state::fdc_r)
+uint8_t gimix_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// motors are switched on on FDC access
 	if(m_selected_drive == 1 && m_floppy0_ready == false)
@@ -394,7 +394,7 @@ READ8_MEMBER(gimix_state::fdc_r)
 	return m_fdc->read(space,offset);
 }
 
-WRITE8_MEMBER(gimix_state::fdc_w)
+void gimix_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// motors are switched on on FDC access
 	if(m_selected_drive == 1)
@@ -404,23 +404,23 @@ WRITE8_MEMBER(gimix_state::fdc_w)
 	m_fdc->write(space,offset,data);
 }
 
-READ8_MEMBER(gimix_state::pia_pa_r)
+uint8_t gimix_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia1_pa;
 }
 
-WRITE8_MEMBER(gimix_state::pia_pa_w)
+void gimix_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia1_pa = data;
 	logerror("PIA: Port A write %02x\n",data);
 }
 
-READ8_MEMBER(gimix_state::pia_pb_r)
+uint8_t gimix_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia1_pb;
 }
 
-WRITE8_MEMBER(gimix_state::pia_pb_w)
+void gimix_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia1_pb = data;
 	logerror("PIA: Port B write %02x\n",data);

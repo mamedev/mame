@@ -70,7 +70,7 @@ isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mco
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa16_svga_tgui9680_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+uint8_t isa16_svga_tgui9680_device::input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
 void isa16_svga_tgui9680_device::device_start()
 {

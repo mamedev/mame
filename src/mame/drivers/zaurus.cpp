@@ -1425,12 +1425,12 @@ public:
 	required_shared_ptr<uint32_t> m_ram;
 
 	uint8_t m_rtc_tick;
-	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
-	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
-	DECLARE_READ32_MEMBER(pxa255_rtc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_rtc_w);
-	DECLARE_READ32_MEMBER(pxa255_intc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_intc_w);
+	uint32_t pxa255_ostimer_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_ostimer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_intc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	PXA255_OSTMR_Regs m_ostimer_regs;
 	PXA255_INTC_Regs m_intc_regs;
 
@@ -1508,7 +1508,7 @@ void zaurus_state::pxa255_ostimer_irq_check()
 	//pxa255_set_irq_line(PXA255_INT_OSTIMER3, (ostimer_regs->oier & PXA255_OIER_E3) ? ((ostimer_regs->ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
 }
 
-READ32_MEMBER(zaurus_state::pxa255_ostimer_r)
+uint32_t zaurus_state::pxa255_ostimer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
@@ -1547,7 +1547,7 @@ READ32_MEMBER(zaurus_state::pxa255_ostimer_r)
 	return 0;
 }
 
-WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
+void zaurus_state::pxa255_ostimer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
@@ -1630,7 +1630,7 @@ WRITE32_MEMBER(zaurus_state::pxa255_ostimer_w)
 	}
 }
 
-READ32_MEMBER(zaurus_state::pxa255_intc_r)
+uint32_t zaurus_state::pxa255_intc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -1661,7 +1661,7 @@ READ32_MEMBER(zaurus_state::pxa255_intc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(zaurus_state::pxa255_intc_w)
+void zaurus_state::pxa255_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -1694,14 +1694,14 @@ WRITE32_MEMBER(zaurus_state::pxa255_intc_w)
 	}
 }
 
-READ32_MEMBER(zaurus_state::pxa255_rtc_r)
+uint32_t zaurus_state::pxa255_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	printf("%08x\n",offset << 2);
 
 	return 0;
 }
 
-WRITE32_MEMBER(zaurus_state::pxa255_rtc_w)
+void zaurus_state::pxa255_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	printf("%08x %08x\n",offset << 2,data);
 

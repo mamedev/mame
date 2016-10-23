@@ -323,18 +323,18 @@ public:
 	std::unique_ptr<uint8_t[]> m_reel4_ram;
 	std::unique_ptr<uint8_t[]> m_videoram;
 
-	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
-	DECLARE_READ8_MEMBER(sfbonus_2800_r);
-	DECLARE_READ8_MEMBER(sfbonus_2801_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
-	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
-	DECLARE_READ8_MEMBER(sfbonus_3800_r);
-	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
-	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
+	void sfbonus_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfbonus_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sfbonus_2800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sfbonus_2801_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sfbonus_2c00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sfbonus_2c01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sfbonus_3800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sfbonus_1800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfbonus_3800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfbonus_3000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfbonus_2801_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfbonus_2c01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_hldspin2d();
 	void init_ch2000v3();
 	void init_fb5v();
@@ -856,7 +856,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel4_tile_info)
 }
 
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
+void sfbonus_state::sfbonus_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
@@ -1210,7 +1210,7 @@ static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
+void sfbonus_state::sfbonus_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t bank;
@@ -1222,54 +1222,54 @@ WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 
 
 
-READ8_MEMBER(sfbonus_state::sfbonus_2800_r)
+uint8_t sfbonus_state::sfbonus_2800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2801_r)
+uint8_t sfbonus_state::sfbonus_2801_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2c00_r)
+uint8_t sfbonus_state::sfbonus_2c00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_2c01_r)
+uint8_t sfbonus_state::sfbonus_2c01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
+uint8_t sfbonus_state::sfbonus_3800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
 
 // lamps and coin counters
-WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
+void sfbonus_state::sfbonus_1800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_1800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
+void sfbonus_state::sfbonus_3800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_3800_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
+void sfbonus_state::sfbonus_3000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_3000_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
+void sfbonus_state::sfbonus_2801_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_2801_regs[offset] = data;
 }
 
-WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
+void sfbonus_state::sfbonus_2c01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_2c01_regs[offset] = data;
 }

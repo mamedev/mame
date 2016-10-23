@@ -139,7 +139,7 @@ void tceptor_state::tile_mark_dirty(int offset)
 }
 
 
-WRITE8_MEMBER(tceptor_state::tceptor_tile_ram_w)
+void tceptor_state::tceptor_tile_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tile_ram[offset] != data)
 	{
@@ -148,7 +148,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_tile_ram_w)
 	}
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_tile_attr_w)
+void tceptor_state::tceptor_tile_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tile_attr[offset] != data)
 	{
@@ -178,7 +178,7 @@ TILE_GET_INFO_MEMBER(tceptor_state::get_bg2_tile_info)
 	SET_TILE_INFO_MEMBER(m_bg, code, color, 0);
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
+void tceptor_state::tceptor_bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_ram[offset] = data;
 
@@ -189,7 +189,7 @@ WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
 		m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
 }
 
-WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
+void tceptor_state::tceptor_bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

@@ -83,7 +83,7 @@ void taitol_state::video_start_taitol()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
+void taitol_state::horshoes_bankg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_horshoes_gfxbank != data)
 	{
@@ -94,7 +94,7 @@ WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::taitol_bankc_w)
+void taitol_state::taitol_bankc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bankc[offset] != data)
 	{
@@ -106,13 +106,13 @@ WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 	}
 }
 
-READ8_MEMBER(taitol_state::taitol_bankc_r)
+uint8_t taitol_state::taitol_bankc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bankc[offset];
 }
 
 
-WRITE8_MEMBER(taitol_state::taitol_control_w)
+void taitol_state::taitol_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("Control Write %02x (%04x)\n", data, space.device().safe_pc());
 
@@ -132,7 +132,7 @@ WRITE8_MEMBER(taitol_state::taitol_control_w)
 	/* bit 5 display enable - handled in vh_screenrefresh() */
 }
 
-READ8_MEMBER(taitol_state::taitol_control_r)
+uint8_t taitol_state::taitol_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("Control Read %02x (%04x)\n", cur_ctrl, space.device().safe_pc());
 	return m_cur_ctrl;

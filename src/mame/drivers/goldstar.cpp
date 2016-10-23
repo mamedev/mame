@@ -250,13 +250,13 @@
 #include "unkch.lh"
 
 
-WRITE8_MEMBER(goldstar_state::protection_w)
+void goldstar_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x2a)
 		m_dataoffset = 0;
 }
 
-READ8_MEMBER(goldstar_state::protection_r)
+uint8_t goldstar_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
 
@@ -264,7 +264,7 @@ READ8_MEMBER(goldstar_state::protection_r)
 	return data[m_dataoffset++];
 }
 
-WRITE8_MEMBER(goldstar_state::p1_lamps_w)
+void goldstar_state::p1_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  bits
   7654 3210     goldstar                            crazybon                ncb3/cb3a               lucky8/bingowng
@@ -305,7 +305,7 @@ WRITE8_MEMBER(goldstar_state::p1_lamps_w)
 //  popmessage("p1 lamps: %02X", data);
 }
 
-WRITE8_MEMBER(goldstar_state::p2_lamps_w)
+void goldstar_state::p2_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(8 + 0, (data >> 0) & 1);
 	output().set_lamp_value(8 + 1, (data >> 1) & 1);
@@ -391,7 +391,7 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sanghopm_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(sanghopm_state::coincount_w)
+void sanghopm_state::coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
   7654 3210
@@ -410,7 +410,7 @@ WRITE8_MEMBER(sanghopm_state::coincount_w)
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  /* counter5 payout */
 }
 
-WRITE8_MEMBER(sanghopm_state::enable_w)
+void sanghopm_state::enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_enable_reg = data;
 }
@@ -586,7 +586,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
+void goldstar_state::ncb3_port81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (data!=0x00)
 //      popmessage("ncb3_port81_w %02x\n",data);
@@ -761,7 +761,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(goldstar_state::cm_coincount_w)
+void goldstar_state::cm_coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  bits
   7654 3210
@@ -920,7 +920,7 @@ ADDRESS_MAP_END
  at B0C0-B0FF...
 */
 
-WRITE8_MEMBER(wingco_state::magodds_outb850_w)
+void wingco_state::magodds_outb850_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// guess, could be wrong, this might just be lights
 
@@ -936,12 +936,12 @@ WRITE8_MEMBER(wingco_state::magodds_outb850_w)
 
 }
 
-WRITE8_MEMBER(wingco_state::magodds_outb860_w)
+void wingco_state::magodds_outb860_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-WRITE8_MEMBER(wingco_state::fl7w4_outc802_w)
+void wingco_state::fl7w4_outc802_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fl7w4_id->write((data >> 6) & 0x01);
 }
@@ -993,7 +993,7 @@ static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
-//WRITE8_MEMBER(goldstar_state::ladylinr_outport_w)
+//void goldstar_state::ladylinr_outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 /* LAMPS (b840)...
 
@@ -1082,7 +1082,7 @@ static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(unkch_state::coincount_w)
+void unkch_state::coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
   7654 3210
@@ -1104,7 +1104,7 @@ WRITE8_MEMBER(unkch_state::coincount_w)
 	//popmessage("coin counters: %02x", data);
 }
 
-WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
+void unkch_state::unkcm_0x02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  bits
   7654 3210
@@ -1132,7 +1132,7 @@ WRITE8_MEMBER(unkch_state::unkcm_0x02_w)
 	output().set_lamp_value(5, (data >> 5) & 1);  /* Take / Stop 1 */
 }
 
-WRITE8_MEMBER(unkch_state::unkcm_0x03_w)
+void unkch_state::unkcm_0x03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
 
@@ -7823,31 +7823,31 @@ static GFXDECODE_START( cm97 )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(wingco_state::system_outputa_w)
+void wingco_state::system_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("system_outputa_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputb_w)
+void wingco_state::system_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("system_outputb_w %02x",data);
 }
 
 
-WRITE8_MEMBER(wingco_state::system_outputc_w)
+void wingco_state::system_outputc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputa_w)
+void goldstar_state::ay8910_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("ay8910_outputa_w %02x",data);
 }
 
-WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
+void goldstar_state::ay8910_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("ay8910_outputb_w %02x",data);
 }

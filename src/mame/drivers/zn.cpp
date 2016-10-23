@@ -68,41 +68,41 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd( m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout ); }
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
-	DECLARE_READ8_MEMBER(znsecsel_r);
-	DECLARE_WRITE8_MEMBER(znsecsel_w);
-	DECLARE_READ8_MEMBER(boardconfig_r);
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_READ16_MEMBER(capcom_kickharness_r);
-	DECLARE_WRITE8_MEMBER(bank_coh1000c_w);
-	DECLARE_WRITE8_MEMBER(qsound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(zn_qsound_w);
-	DECLARE_WRITE8_MEMBER(bank_coh1000t_w);
-	DECLARE_WRITE8_MEMBER(fx1a_sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(fx1b_fram_w);
-	DECLARE_READ8_MEMBER(fx1b_fram_r);
-	DECLARE_WRITE8_MEMBER(coh1002e_bank_w);
-	DECLARE_WRITE8_MEMBER(coh1002e_sound_irq_w);
-	DECLARE_WRITE16_MEMBER(bam2_mcu_w);
-	DECLARE_READ16_MEMBER(bam2_mcu_r);
-	DECLARE_READ16_MEMBER(bam2_unk_r);
-	DECLARE_WRITE16_MEMBER(acpsx_00_w);
-	DECLARE_WRITE16_MEMBER(acpsx_10_w);
-	DECLARE_WRITE16_MEMBER(nbajamex_bank_w);
-	DECLARE_WRITE16_MEMBER(nbajamex_80_w);
-	DECLARE_READ16_MEMBER(nbajamex_08_r);
-	DECLARE_READ16_MEMBER(nbajamex_80_r);
-	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
-	DECLARE_WRITE16_MEMBER(coh1001l_latch_w);
-	DECLARE_WRITE16_MEMBER(coh1001l_sound_unk_w);
-	DECLARE_WRITE8_MEMBER(coh1002v_bank_w);
-	DECLARE_WRITE8_MEMBER(coh1002m_bank_w);
-	DECLARE_READ8_MEMBER(cbaj_sound_main_status_r);
-	DECLARE_READ8_MEMBER(cbaj_sound_z80_status_r);
-	DECLARE_READ16_MEMBER(vt83c461_16_r);
-	DECLARE_WRITE16_MEMBER(vt83c461_16_w);
-	DECLARE_READ16_MEMBER(vt83c461_32_r);
-	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
+	uint8_t znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void znsecsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t boardconfig_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t unknown_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t capcom_kickharness_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bank_coh1000c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qsound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zn_qsound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_coh1000t_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fx1a_sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fx1b_fram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fx1b_fram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coh1002e_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coh1002e_sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bam2_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bam2_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bam2_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void acpsx_00_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void acpsx_10_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nbajamex_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nbajamex_80_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nbajamex_08_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t nbajamex_80_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void coh1001l_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coh1001l_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coh1001l_sound_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coh1002v_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coh1002m_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cbaj_sound_main_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cbaj_sound_z80_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t vt83c461_16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vt83c461_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vt83c461_32_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vt83c461_32_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_coh1000tb();
 	void machine_reset_coh1000c();
 	void machine_reset_glpracr();
@@ -180,13 +180,13 @@ inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, ui
 	*( (uint16_t *)( (uint8_t *)p_n_psxram + WORD_XOR_LE( n_address ) ) ) = n_data;
 }
 
-READ8_MEMBER(zn_state::znsecsel_r)
+uint8_t zn_state::znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	verboselog(2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
 	return m_n_znsecsel;
 }
 
-WRITE8_MEMBER(zn_state::znsecsel_w)
+void zn_state::znsecsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(zn_state::znsecsel_w)
 	m_n_znsecsel = data;
 }
 
-READ8_MEMBER(zn_state::boardconfig_r)
+uint8_t zn_state::boardconfig_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	------00 mem=4M
@@ -243,13 +243,13 @@ READ8_MEMBER(zn_state::boardconfig_r)
 	return boardconfig;
 }
 
-READ16_MEMBER(zn_state::unknown_r)
+uint16_t zn_state::unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
 	return 0xffff;
 }
 
-WRITE8_MEMBER(zn_state::coin_w)
+void zn_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x01=counter
 	   0x02=coin lock 1
@@ -476,19 +476,19 @@ Notes:
       Unpopulated sockets - 1.3B, 2.2E, 3.3E, 8.2K, 9.3K, 10.4K, 11.5K, 12.6K & 13.7K
 */
 
-READ16_MEMBER(zn_state::capcom_kickharness_r)
+uint16_t zn_state::capcom_kickharness_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* required for buttons 4,5&6 */
 	verboselog(2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
 	return 0xffff;
 }
 
-WRITE8_MEMBER(zn_state::bank_coh1000c_w)
+void zn_state::bank_coh1000c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank( "bankedroms" )->set_base( memregion( "maskroms" )->base() + 0x400000 + ( data * 0x400000 ) );
 }
 
-WRITE8_MEMBER(zn_state::qsound_bankswitch_w)
+void zn_state::qsound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank( "bank10" )->set_base( memregion( "audiocpu" )->base() + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
@@ -498,7 +498,7 @@ INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(zn_state::zn_qsound_w)
+void zn_state::zn_qsound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -954,7 +954,7 @@ Notes:
       FM1208S        - RAMTRON 4096bit Nonvolatile Ferroelectric RAM (512w x 8b)
 */
 
-WRITE8_MEMBER(zn_state::bank_coh1000t_w)
+void zn_state::bank_coh1000t_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
@@ -963,7 +963,7 @@ WRITE8_MEMBER(zn_state::bank_coh1000t_w)
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
-WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
+void zn_state::fx1a_sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank( "bank10" )->set_base( memregion( "audiocpu" )->base() + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
 }
@@ -1018,12 +1018,12 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-WRITE8_MEMBER(zn_state::fx1b_fram_w)
+void zn_state::fx1b_fram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fx1b_fram[offset] = data;
 }
 
-READ8_MEMBER(zn_state::fx1b_fram_r)
+uint8_t zn_state::fx1b_fram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fx1b_fram[offset];
 }
@@ -1235,7 +1235,7 @@ void zn_state::atpsx_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }
 
-READ16_MEMBER(zn_state::vt83c461_16_r)
+uint16_t zn_state::vt83c461_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int shift = (16 * (offset & 1));
 
@@ -1258,7 +1258,7 @@ READ16_MEMBER(zn_state::vt83c461_16_r)
 	}
 }
 
-WRITE16_MEMBER(zn_state::vt83c461_16_w)
+void zn_state::vt83c461_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int shift = (16 * (offset & 1));
 
@@ -1280,7 +1280,7 @@ WRITE16_MEMBER(zn_state::vt83c461_16_w)
 	}
 }
 
-READ16_MEMBER(zn_state::vt83c461_32_r)
+uint16_t zn_state::vt83c461_32_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( offset == 0x1f0/2 )
 	{
@@ -1299,7 +1299,7 @@ READ16_MEMBER(zn_state::vt83c461_32_r)
 	}
 }
 
-WRITE16_MEMBER(zn_state::vt83c461_32_w)
+void zn_state::vt83c461_32_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror( "unhandled 32 bit write %04x %04x %04x\n", offset, data, mem_mask );
 }
@@ -1474,14 +1474,14 @@ Notes:
 
 */
 
-WRITE8_MEMBER(zn_state::coh1002e_bank_w)
+void zn_state::coh1002e_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	znsecsel_w( space, offset, data, mem_mask );
 
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
 
-WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
+void zn_state::coh1002e_sound_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(2, HOLD_LINE); // irq 2 on the 68k
 }
@@ -1577,7 +1577,7 @@ MTR-BAM* - DIP42 32MBit maskROMs
 */
 
 
-WRITE16_MEMBER(zn_state::bam2_mcu_w)
+void zn_state::bam2_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -1592,7 +1592,7 @@ WRITE16_MEMBER(zn_state::bam2_mcu_w)
 	}
 }
 
-READ16_MEMBER(zn_state::bam2_mcu_r)
+uint16_t zn_state::bam2_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1616,7 +1616,7 @@ READ16_MEMBER(zn_state::bam2_mcu_r)
 	return 0;
 }
 
-READ16_MEMBER(zn_state::bam2_unk_r)
+uint16_t zn_state::bam2_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -1846,12 +1846,12 @@ void zn_state::jdredd_vblank(screen_device &screen, bool vblank_state)
 	}
 }
 
-WRITE16_MEMBER(zn_state::acpsx_00_w)
+void zn_state::acpsx_00_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
-WRITE16_MEMBER(zn_state::nbajamex_bank_w)
+void zn_state::nbajamex_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t newbank = 0;
 
@@ -1889,20 +1889,20 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 	}
 }
 
-WRITE16_MEMBER(zn_state::acpsx_10_w)
+void zn_state::acpsx_10_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 }
 
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
-WRITE16_MEMBER(zn_state::nbajamex_80_w)
+void zn_state::nbajamex_80_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
 	psxirq->intin10(1);
 }
 
-READ16_MEMBER(zn_state::nbajamex_08_r)
+uint16_t zn_state::nbajamex_08_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0xffffffff;
 	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -1910,7 +1910,7 @@ READ16_MEMBER(zn_state::nbajamex_08_r)
 }
 
 // possibly a readback from the external soundboard?
-READ16_MEMBER(zn_state::nbajamex_80_r)
+uint16_t zn_state::nbajamex_80_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t data = 0xffffffff;
 	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -2087,19 +2087,19 @@ Notes:
       VSync        - 60Hz
 */
 
-WRITE16_MEMBER(zn_state::coh1001l_sound_unk_w)
+void zn_state::coh1001l_sound_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// irq ack maybe?
 	logerror("coh1001l_sound_unk_w: %04x %04x\n", data, mem_mask);
 }
 
-WRITE16_MEMBER(zn_state::coh1001l_latch_w)
+void zn_state::coh1001l_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch16->write(space, 0, data);
 	m_audiocpu->set_input_line(3, HOLD_LINE);
 }
 
-WRITE8_MEMBER(zn_state::coh1001l_bank_w)
+void zn_state::coh1001l_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( ( data & 3 ) * 0x800000 ) );
 }
@@ -2155,7 +2155,7 @@ Key:    Mother    KN01
 
 */
 
-WRITE8_MEMBER(zn_state::coh1002v_bank_w)
+void zn_state::coh1002v_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + ( data * 0x100000 ) );
 }
@@ -2338,7 +2338,7 @@ Notes:
       for 11 more 32MBit smt SOP44 MASKROMs.
 */
 
-WRITE8_MEMBER(zn_state::coh1002m_bank_w)
+void zn_state::coh1002m_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + (data * 0x800000) );
@@ -2363,7 +2363,7 @@ static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002m)
 MACHINE_CONFIG_END
 
-READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
+uint8_t zn_state::cbaj_sound_main_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d1: fifo empty flag, other bits: unused(?)
 	return m_cbaj_fifo2->ef_r() << 1;
@@ -2377,7 +2377,7 @@ static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(coh1002m_map)
 ADDRESS_MAP_END
 
-READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
+uint8_t zn_state::cbaj_sound_z80_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d1: fifo empty flag, other bits: unused
 	return m_cbaj_fifo1->ef_r() << 1;

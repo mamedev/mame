@@ -122,7 +122,7 @@ void sms_state::sms_get_inputs()
 }
 
 
-WRITE8_MEMBER(sms_state::sms_io_control_w)
+void sms_state::sms_io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool latch_hcount = false;
 	uint8_t ctrl1_port_data = 0xff;
@@ -200,7 +200,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sms_count_r)
+uint8_t sms_state::sms_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 		return m_vdp->hcount_read(*m_space, offset);
@@ -313,7 +313,7 @@ WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dc_r)
+uint8_t sms_state::sms_input_port_dc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_is_mark_iii)
 	{
@@ -360,7 +360,7 @@ READ8_MEMBER(sms_state::sms_input_port_dc_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_input_port_dd_r)
+uint8_t sms_state::sms_input_port_dd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_is_mark_iii)
 	{
@@ -455,7 +455,7 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_audio_control_w)
+void sms_state::smsj_audio_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_smsj_audio_control = data & 0x03;
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 }
 
 
-READ8_MEMBER(sms_state::smsj_audio_control_r)
+uint8_t sms_state::smsj_audio_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -506,32 +506,32 @@ READ8_MEMBER(sms_state::smsj_audio_control_r)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_register_port_w)
+void sms_state::smsj_ym2413_register_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ym->write(space, 0, data & 0x3f);
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_ym2413_data_port_w)
+void sms_state::smsj_ym2413_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("data_port_w %x %x\n", offset, data);
 	m_ym->write(space, 1, data);
 }
 
 
-WRITE8_MEMBER(sms_state::sms_psg_w)
+void sms_state::sms_psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_sms->write(space, offset, data, mem_mask);
 }
 
 
-WRITE8_MEMBER(sms_state::gg_psg_w)
+void sms_state::gg_psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_gg->write(space, offset, data, mem_mask);
 }
 
 
-WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
+void sms_state::gg_psg_stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 		return;
@@ -540,7 +540,7 @@ WRITE8_MEMBER(sms_state::gg_psg_stereo_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_input_port_00_r)
+uint8_t sms_state::gg_input_port_00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 		return 0xff;
@@ -560,7 +560,7 @@ READ8_MEMBER(sms_state::gg_input_port_00_r)
 }
 
 
-READ8_MEMBER(sms_state::sms_sscope_r)
+uint8_t sms_state::sms_sscope_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int sscope = m_port_scope->read();
 
@@ -577,7 +577,7 @@ READ8_MEMBER(sms_state::sms_sscope_r)
 }
 
 
-WRITE8_MEMBER(sms_state::sms_sscope_w)
+void sms_state::sms_sscope_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_ram(space, 0x3ff8 + offset, data);
 
@@ -602,7 +602,7 @@ WRITE8_MEMBER(sms_state::sms_sscope_w)
 }
 
 
-READ8_MEMBER(sms_state::read_ram)
+uint8_t sms_state::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
@@ -624,7 +624,7 @@ READ8_MEMBER(sms_state::read_ram)
 }
 
 
-WRITE8_MEMBER(sms_state::write_ram)
+void sms_state::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_mem_device_enabled & ENABLE_EXT_RAM)
 	{
@@ -642,13 +642,13 @@ WRITE8_MEMBER(sms_state::write_ram)
 }
 
 
-READ8_MEMBER(sms_state::sms_mapper_r)
+uint8_t sms_state::sms_mapper_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_ram(space, 0x3ffc + offset);
 }
 
 
-WRITE8_MEMBER(sms_state::sms_mapper_w)
+void sms_state::sms_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mapper[offset] = data;
 	write_ram(space, 0x3ffc + offset, data);
@@ -743,7 +743,7 @@ uint8_t sms_state::read_bus(address_space &space, unsigned int page, uint16_t ba
 }
 
 
-READ8_MEMBER(sms_state::read_0000)
+uint8_t sms_state::read_0000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x400)
 	{
@@ -755,17 +755,17 @@ READ8_MEMBER(sms_state::read_0000)
 	}
 }
 
-READ8_MEMBER(sms_state::read_4000)
+uint8_t sms_state::read_4000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_bus(space, 1, 0x4000, offset);
 }
 
-READ8_MEMBER(sms_state::read_8000)
+uint8_t sms_state::read_8000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_bus(space, 2, 0x8000, offset);
 }
 
-WRITE8_MEMBER(sms_state::write_cart)
+void sms_state::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_mem_device_enabled & ENABLE_CART)
 		m_cartslot->write_cart(space, offset, data);
@@ -776,7 +776,7 @@ WRITE8_MEMBER(sms_state::write_cart)
 }
 
 
-READ8_MEMBER(smssdisp_state::store_cart_peek)
+uint8_t smssdisp_state::store_cart_peek(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mem_device_enabled != ENABLE_NONE)
 	{
@@ -793,7 +793,7 @@ READ8_MEMBER(smssdisp_state::store_cart_peek)
 	}
 }
 
-WRITE8_MEMBER(sms_state::sms_mem_control_w)
+void sms_state::sms_mem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem_ctrl_reg = data;
 
@@ -803,7 +803,7 @@ WRITE8_MEMBER(sms_state::sms_mem_control_w)
 }
 
 
-READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
+uint8_t sms_state::sg1000m3_peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_readable(offset);
 
@@ -821,7 +821,7 @@ READ8_MEMBER(sms_state::sg1000m3_peripheral_r)
 }
 
 
-WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
+void sms_state::sg1000m3_peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool joy_ports_disabled = m_sgexpslot->is_writeable(offset);
 
@@ -832,7 +832,7 @@ WRITE8_MEMBER(sms_state::sg1000m3_peripheral_w)
 }
 
 
-WRITE8_MEMBER(sms_state::gg_sio_w)
+void sms_state::gg_sio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 		return;
@@ -860,7 +860,7 @@ WRITE8_MEMBER(sms_state::gg_sio_w)
 }
 
 
-READ8_MEMBER(sms_state::gg_sio_r)
+uint8_t sms_state::gg_sio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 		return 0xff;
@@ -1161,13 +1161,13 @@ void sms_state::machine_reset_sms()
 	setup_media_slots();
 }
 
-READ8_MEMBER(smssdisp_state::sms_store_cart_select_r)
+uint8_t smssdisp_state::sms_store_cart_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_store_cart_selection_data;
 }
 
 
-WRITE8_MEMBER(smssdisp_state::sms_store_cart_select_w)
+void smssdisp_state::sms_store_cart_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	store_select_cart(data);
 	m_store_cart_selection_data = data;
@@ -1205,7 +1205,7 @@ void sms_state::store_select_cart(uint8_t data)
 	logerror("switching in part of %s slot #%d\n", slottype ? "card" : "cartridge", slot);
 }
 
-WRITE8_MEMBER(smssdisp_state::sms_store_control_w)
+void smssdisp_state::sms_store_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int led_number = data >> 4;
 	int led_column = led_number / 4;
@@ -1351,7 +1351,7 @@ void sms_state::video_reset_sms1()
 }
 
 
-READ32_MEMBER(sms_state::sms_pixel_color)
+uint32_t sms_state::sms_pixel_color(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
 	int beam_x = m_main_scr->hpos();

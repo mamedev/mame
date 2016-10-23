@@ -74,8 +74,8 @@ class pengo_state : public pacman_state
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag), m_decrypted_opcodes(*this, "decrypted_opcodes") { }
-	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	void pengo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_penta();
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
@@ -112,12 +112,12 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
+void pengo_state::pengo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-WRITE8_MEMBER(pengo_state::irq_mask_w)
+void pengo_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

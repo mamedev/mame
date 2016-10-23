@@ -106,16 +106,16 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_READ8_MEMBER(pia0_porta_r);
-	DECLARE_WRITE8_MEMBER(pia0_portb_w);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_READ8_MEMBER(pia1_porta_r);
-	DECLARE_READ8_MEMBER(pia1_portb_r);
-	DECLARE_WRITE8_MEMBER(pia1_portb_w);
-	DECLARE_WRITE8_MEMBER(apf_dischw_w);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
+	uint8_t pia1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apf_dischw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t m_latch;
@@ -143,7 +143,7 @@ private:
 };
 
 
-READ8_MEMBER( apf_state::videoram_r )
+uint8_t apf_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_pad_data, 7)) // AG line
 	{
@@ -174,7 +174,7 @@ READ8_MEMBER( apf_state::videoram_r )
 	}
 }
 
-READ8_MEMBER( apf_state::pia0_porta_r )
+uint8_t apf_state::pia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -185,7 +185,7 @@ READ8_MEMBER( apf_state::pia0_porta_r )
 	return data;
 }
 
-WRITE8_MEMBER( apf_state::pia0_portb_w )
+void apf_state::pia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7..6 video control */
 	m_crtc->ag_w(BIT(data, 7));
@@ -200,12 +200,12 @@ WRITE_LINE_MEMBER( apf_state::pia0_ca2_w )
 	m_ca2 = state;
 }
 
-READ8_MEMBER( apf_state::pia1_porta_r )
+uint8_t apf_state::pia1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_key[m_keyboard_data]->read();
 }
 
-READ8_MEMBER( apf_state::pia1_portb_r )
+uint8_t apf_state::pia1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_portb;
 
@@ -216,7 +216,7 @@ READ8_MEMBER( apf_state::pia1_portb_r )
 }
 
 
-WRITE8_MEMBER( apf_state::pia1_portb_w )
+void apf_state::pia1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 2..0 = keyboard line */
 	/* bit 3 = cass audio enable */
@@ -274,7 +274,7 @@ void apf_state::machine_reset()
 	}
 }
 
-WRITE8_MEMBER( apf_state::apf_dischw_w)
+void apf_state::apf_dischw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3 is index of drive to select */
 	uint8_t drive = BIT(data, 3);
@@ -295,13 +295,13 @@ WRITE8_MEMBER( apf_state::apf_dischw_w)
 	logerror("disc w %04x %04x\n",offset,data);
 }
 
-READ8_MEMBER( apf_state::serial_r)
+uint8_t apf_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("serial r %04x\n",offset);
 	return 0;
 }
 
-WRITE8_MEMBER( apf_state::serial_w)
+void apf_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("serial w %04x %04x\n",offset,data);
 }

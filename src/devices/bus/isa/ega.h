@@ -29,14 +29,14 @@ public:
 		virtual const tiny_rom_entry *device_rom_region() const override;
 		virtual ioport_constructor device_input_ports() const override;
 
-		DECLARE_READ8_MEMBER(read);
-		DECLARE_WRITE8_MEMBER(write);
-		DECLARE_READ8_MEMBER(pc_ega8_3b0_r);
-		DECLARE_WRITE8_MEMBER(pc_ega8_3b0_w);
-		DECLARE_READ8_MEMBER(pc_ega8_3c0_r);
-		DECLARE_WRITE8_MEMBER(pc_ega8_3c0_w);
-		DECLARE_READ8_MEMBER(pc_ega8_3d0_r);
-		DECLARE_WRITE8_MEMBER(pc_ega8_3d0_w);
+		uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t pc_ega8_3b0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pc_ega8_3b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t pc_ega8_3c0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pc_ega8_3c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t pc_ega8_3d0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pc_ega8_3d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		DECLARE_WRITE_LINE_MEMBER(de_changed);
 		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
@@ -58,8 +58,8 @@ public:
 
 		void install_banks();
 		void change_mode();
-		DECLARE_WRITE8_MEMBER(pc_ega8_3X0_w);
-		DECLARE_READ8_MEMBER(pc_ega8_3X0_r);
+		void pc_ega8_3X0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t pc_ega8_3X0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 		/* Video memory and related variables */
 		memory_region   *m_vram;

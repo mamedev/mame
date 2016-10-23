@@ -96,16 +96,16 @@ public:
 	void machine_start_chinagat();
 	void machine_reset_chinagat();
 	void video_start_chinagat();
-	DECLARE_WRITE8_MEMBER( chinagat_interrupt_w );
-	DECLARE_WRITE8_MEMBER( chinagat_video_ctrl_w );
-	DECLARE_WRITE8_MEMBER( chinagat_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( chinagat_sub_bankswitch_w );
-	DECLARE_READ8_MEMBER( saiyugoub1_mcu_command_r );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_mcu_command_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_rom_addr_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_control_w );
-	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
-	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
+	void chinagat_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chinagat_video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chinagat_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chinagat_sub_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t saiyugoub1_mcu_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void saiyugoub1_mcu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void saiyugoub1_adpcm_rom_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void saiyugoub1_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void saiyugoub1_m5205_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t saiyugoub1_m5205_irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 	optional_device<msm5205_device> m_adpcm;
 };
@@ -159,7 +159,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
 		scanline = 0;
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
+void chinagat_state::chinagat_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -186,7 +186,7 @@ WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
 	}
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
+void chinagat_state::chinagat_video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/***************************
 	---- ---x   X Scroll MSB
@@ -200,17 +200,17 @@ WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
 	flip_screen_set(~data & 0x04);
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_bankswitch_w )
+void chinagat_state::chinagat_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-WRITE8_MEMBER(chinagat_state::chinagat_sub_bankswitch_w )
+void chinagat_state::chinagat_sub_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
+uint8_t chinagat_state::saiyugoub1_mcu_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 #if 0
 	if (m_mcu_command == 0x78)
@@ -221,7 +221,7 @@ READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
 	return m_mcu_command;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
+void chinagat_state::saiyugoub1_mcu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_command = data;
 #if 0
@@ -232,13 +232,13 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
 #endif
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
+void chinagat_state::saiyugoub1_adpcm_rom_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* i8748 Port 1 write */
 	m_i8748_P1 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
+void chinagat_state::saiyugoub1_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* i8748 Port 2 write */
 	uint8_t *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
@@ -284,7 +284,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 	m_i8748_P2 = data;
 }
 
-WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
+void chinagat_state::saiyugoub1_m5205_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* i8748 T0 output clk mode */
 	/* This signal goes through a divide by 8 counter */
@@ -303,7 +303,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
 #endif
 }
 
-READ8_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
+uint8_t chinagat_state::saiyugoub1_m5205_irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_adpcm_sound_irq)
 	{

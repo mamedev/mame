@@ -215,7 +215,7 @@ std::string astrocade_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(astrocade_cart_slot_device::read_rom)
+uint8_t astrocade_cart_slot_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset);

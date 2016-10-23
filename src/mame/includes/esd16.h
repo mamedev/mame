@@ -57,16 +57,16 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
-	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
-	DECLARE_READ16_MEMBER(esd_eeprom_r);
-	DECLARE_WRITE16_MEMBER(esd_eeprom_w);
-	DECLARE_WRITE8_MEMBER(esd16_sound_rombank_w);
-	DECLARE_READ8_MEMBER(esd16_sound_command_r);
-	DECLARE_WRITE16_MEMBER(esd16_vram_0_w);
-	DECLARE_WRITE16_MEMBER(esd16_vram_1_w);
-	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_w);
-	DECLARE_WRITE16_MEMBER(esd16_tilemap0_color_jumppop_w);
+	void esd16_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hedpanic_platform_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t esd_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void esd_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void esd16_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t esd16_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void esd16_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void esd16_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void esd16_tilemap0_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void esd16_tilemap0_color_jumppop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_0_16x16);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

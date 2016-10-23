@@ -70,7 +70,7 @@
     keyboard_r - keyboard data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::keyboard_r )
+uint16_t cgc7900_state::keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 
@@ -102,7 +102,7 @@ READ16_MEMBER( cgc7900_state::keyboard_r )
     keyboard_w - keyboard data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::keyboard_w )
+void cgc7900_state::keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 
@@ -132,7 +132,7 @@ WRITE16_MEMBER( cgc7900_state::keyboard_w )
     interrupt_mask_w - interrupt mask write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
+void cgc7900_state::interrupt_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 
@@ -164,7 +164,7 @@ WRITE16_MEMBER( cgc7900_state::interrupt_mask_w )
     disk_data_r - disk data read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_data_r )
+uint16_t cgc7900_state::disk_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -173,7 +173,7 @@ READ16_MEMBER( cgc7900_state::disk_data_r )
     disk_data_w - disk data write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_data_w )
+void cgc7900_state::disk_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -181,7 +181,7 @@ WRITE16_MEMBER( cgc7900_state::disk_data_w )
     disk_status_r - disk status read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::disk_status_r )
+uint16_t cgc7900_state::disk_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 
@@ -213,7 +213,7 @@ READ16_MEMBER( cgc7900_state::disk_status_r )
     disk_command_w - disk command write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::disk_command_w )
+void cgc7900_state::disk_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 

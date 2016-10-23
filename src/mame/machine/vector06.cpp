@@ -12,7 +12,7 @@
 #include "includes/vector06.h"
 
 
-READ8_MEMBER( vector06_state::vector06_8255_portb_r )
+uint8_t vector06_state::vector06_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0xff;
 	if (BIT(m_keyboard_mask, 0)) key &= m_line[0]->read();
@@ -26,7 +26,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portb_r )
 	return key;
 }
 
-READ8_MEMBER( vector06_state::vector06_8255_portc_r )
+uint8_t vector06_state::vector06_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_line[8]->read();
 
@@ -36,7 +36,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 	return ret;
 }
 
-WRITE8_MEMBER( vector06_state::vector06_8255_porta_w )
+void vector06_state::vector06_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_mask = data ^ 0xff;
 }
@@ -47,7 +47,7 @@ void vector06_state::vector06_set_video_mode(int width)
 	machine().first_screen()->configure(width+64, 256+64, visarea, machine().first_screen()->frame_period().attoseconds());
 }
 
-WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
+void vector06_state::vector06_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_index = data & 0x0f;
 	if ((data & 0x10) != m_video_mode)
@@ -57,7 +57,7 @@ WRITE8_MEMBER( vector06_state::vector06_8255_portb_w )
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_color_set )
+void vector06_state::vector06_color_set(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t r = (data & 7) << 5;
 	uint8_t g = ((data >> 3) & 7) << 5;
@@ -66,7 +66,7 @@ WRITE8_MEMBER( vector06_state::vector06_color_set )
 }
 
 
-READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
+uint8_t vector06_state::vector06_romdisk_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t addr = ((m_romdisk_msb & 0x7f) << 8) | m_romdisk_lsb;
 	if ((m_romdisk_msb & 0x80) && m_cart->exists() && addr < m_cart->get_rom_size())
@@ -75,39 +75,39 @@ READ8_MEMBER( vector06_state::vector06_romdisk_portb_r )
 		return m_ay->ay8910_read_ym();
 }
 
-WRITE8_MEMBER(vector06_state::vector06_romdisk_portb_w)
+void vector06_state::vector06_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_aylatch = data;
 }
 
-WRITE8_MEMBER( vector06_state::vector06_romdisk_porta_w )
+void vector06_state::vector06_romdisk_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER( vector06_state::vector06_romdisk_portc_w )
+void vector06_state::vector06_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 4)
 		m_ay->ay8910_write_ym((data >> 1) & 1, m_aylatch);
 	m_romdisk_msb = data;
 }
 
-READ8_MEMBER( vector06_state::vector06_8255_1_r )
+uint8_t vector06_state::vector06_8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, offset^3);
 }
 
-WRITE8_MEMBER( vector06_state::vector06_8255_1_w )
+void vector06_state::vector06_8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, offset^3, data);
 }
 
-READ8_MEMBER( vector06_state::vector06_8255_2_r )
+uint8_t vector06_state::vector06_8255_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi2->read(space, offset^3);
 }
 
-WRITE8_MEMBER( vector06_state::vector06_8255_2_w )
+void vector06_state::vector06_8255_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi2->write(space, offset^3, data);
 }
@@ -142,7 +142,7 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 	}
 }
 
-WRITE8_MEMBER( vector06_state::vector06_disc_w )
+void vector06_state::vector06_disc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -183,7 +183,7 @@ void vector06_state::update_mem()
 	}
 }
 
-WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
+void vector06_state::vector06_ramdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t oldbank = m_rambank;
 	m_rambank = data;
@@ -191,7 +191,7 @@ WRITE8_MEMBER(vector06_state::vector06_ramdisk_w)
 		update_mem();
 }
 
-WRITE8_MEMBER(vector06_state::vector06_status_callback)
+void vector06_state::vector06_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool oldstate = m_stack_state;
 	m_stack_state = (data & I8085_STATUS_STACK) ? true : false;
@@ -204,12 +204,12 @@ WRITE_LINE_MEMBER(vector06_state::speaker_w)
 	m_speaker->level_w(state);
 }
 
-WRITE8_MEMBER(vector06_state::pit8253_w)
+void vector06_state::pit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit8253->write(space, offset ^ 3, data);
 }
 
-READ8_MEMBER(vector06_state::pit8253_r)
+uint8_t vector06_state::pit8253_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pit8253->read(space,  offset ^ 3);
 }

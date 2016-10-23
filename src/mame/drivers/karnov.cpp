@@ -329,7 +329,7 @@ void karnov_state::chelnov_i8751_w( int data )
  *
  *************************************/
 
-WRITE16_MEMBER(karnov_state::karnov_control_w)
+void karnov_state::karnov_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
@@ -401,7 +401,7 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 	}
 }
 
-READ16_MEMBER(karnov_state::karnov_control_r)
+uint16_t karnov_state::karnov_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{

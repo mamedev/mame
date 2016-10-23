@@ -90,32 +90,32 @@ public:
 	uint8_t *m_btiles;
 	uint8_t m_region;
 
-	DECLARE_WRITE32_MEMBER(hit_w);
-	DECLARE_WRITE32_MEMBER(hit2_w);
-	DECLARE_READ32_MEMBER(hit_r);
-	DECLARE_WRITE32_MEMBER(io_w);
-	DECLARE_WRITE32_MEMBER(v3t_w);
-	DECLARE_WRITE32_MEMBER(pal_regs_w);
-	DECLARE_WRITE32_MEMBER(palette_ram_w);
-	DECLARE_WRITE32_MEMBER(tilemapA_w);
-	DECLARE_WRITE32_MEMBER(tilemapB_w);
-	DECLARE_WRITE32_MEMBER(v3_regs_w);
+	void hit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hit2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hit_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void v3t_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void pal_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void palette_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tilemapA_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void tilemapB_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void v3_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(gutsn_speedup_r);
-	DECLARE_READ32_MEMBER(cyvern_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopj_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopa_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloopu_speedup_r);
-	DECLARE_READ32_MEMBER(puzzloope_speedup_r);
-	DECLARE_READ32_MEMBER(senknow_speedup_r);
-	DECLARE_READ32_MEMBER(teljan_speedup_r);
-	DECLARE_READ32_MEMBER(jjparads_speedup_r);
-	DECLARE_READ32_MEMBER(jjparad2_speedup_r);
-	DECLARE_READ32_MEMBER(ryouran_speedup_r);
-	DECLARE_READ32_MEMBER(galpans2_speedup_r);
-	DECLARE_READ32_MEMBER(panicstr_speedup_r);
-	DECLARE_READ32_MEMBER(sengekis_speedup_r);
-	DECLARE_READ32_MEMBER(sengekij_speedup_r);
+	uint32_t gutsn_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t cyvern_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t puzzloopj_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t puzzloopa_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t puzzloopu_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t puzzloope_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t senknow_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t teljan_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t jjparads_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t jjparad2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ryouran_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t galpans2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t panicstr_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sengekis_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sengekij_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
 

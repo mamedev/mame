@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_txt_tile_info)
 
 }
 
-WRITE16_MEMBER(aquarium_state::aquarium_txt_videoram_w)
+void aquarium_state::aquarium_txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txt_videoram[offset]);
 	m_txt_tilemap->mark_tile_dirty(offset);
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_mid_tile_info)
 	tileinfo.category = (m_mid_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
-WRITE16_MEMBER(aquarium_state::aquarium_mid_videoram_w)
+void aquarium_state::aquarium_mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_videoram[offset]);
 	m_mid_tilemap->mark_tile_dirty(offset / 2);
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_bak_tile_info)
 	tileinfo.category = (m_bak_videoram[tile_index * 2 + 1] & 0x20) >> 5;
 }
 
-WRITE16_MEMBER(aquarium_state::aquarium_bak_videoram_w)
+void aquarium_state::aquarium_bak_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bak_videoram[offset]);
 	m_bak_tilemap->mark_tile_dirty(offset / 2);

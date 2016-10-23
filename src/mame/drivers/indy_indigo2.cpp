@@ -76,8 +76,8 @@ class ioc2_device : public device_t
 public:
 	ioc2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t id);
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_INPUT_CHANGED_MEMBER( power_button );
 	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
@@ -298,7 +298,7 @@ void ioc2_device::lower_local1_irq(uint8_t source_mask)
 	m_int3_local1_status_reg &= ~source_mask;
 }
 
-READ32_MEMBER( ioc2_device::read )
+uint32_t ioc2_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -403,7 +403,7 @@ READ32_MEMBER( ioc2_device::read )
 #define DMA_SEL_CLOCK_SEL_6_67MHz   (0x10)
 #define DMA_SEL_CLOCK_SEL_EXT       (0x20)
 
-WRITE32_MEMBER( ioc2_device::write )
+void ioc2_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -613,21 +613,21 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(hpc3_hd_enet_r);
-	DECLARE_WRITE32_MEMBER(hpc3_hd_enet_w);
-	DECLARE_READ32_MEMBER(hpc3_hd0_r);
-	DECLARE_WRITE32_MEMBER(hpc3_hd0_w);
-	DECLARE_READ32_MEMBER(hpc3_pbus4_r);
-	DECLARE_WRITE32_MEMBER(hpc3_pbus4_w);
-	DECLARE_READ32_MEMBER(hpc3_pbusdma_r);
-	DECLARE_WRITE32_MEMBER(hpc3_pbusdma_w);
-	DECLARE_READ32_MEMBER(hpc3_unkpbus0_r);
-	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
+	uint32_t hpc3_hd_enet_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc3_hd_enet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hpc3_hd0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc3_hd0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hpc3_pbus4_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc3_pbus4_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hpc3_pbusdma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc3_pbusdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hpc3_unkpbus0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc3_unkpbus0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(ip22_write_ram);
+	void ip22_write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(hal2_r);
-	DECLARE_WRITE32_MEMBER(hal2_w);
+	uint32_t hal2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hal2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
@@ -678,7 +678,7 @@ inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_f
 }
 
 
-READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
+uint32_t ip22_state::hpc3_hd_enet_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -700,7 +700,7 @@ READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
 	}
 }
 
-WRITE32_MEMBER(ip22_state::hpc3_hd_enet_w)
+void ip22_state::hpc3_hd_enet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -726,7 +726,7 @@ WRITE32_MEMBER(ip22_state::hpc3_hd_enet_w)
 	}
 }
 
-READ32_MEMBER(ip22_state::hpc3_hd0_r)
+uint32_t ip22_state::hpc3_hd0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -758,7 +758,7 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 	}
 }
 
-WRITE32_MEMBER(ip22_state::hpc3_hd0_w)
+void ip22_state::hpc3_hd0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -785,7 +785,7 @@ WRITE32_MEMBER(ip22_state::hpc3_hd0_w)
 }
 
 
-READ32_MEMBER(ip22_state::hpc3_pbus4_r)
+uint32_t ip22_state::hpc3_pbus4_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -804,7 +804,7 @@ READ32_MEMBER(ip22_state::hpc3_pbus4_r)
 	}
 }
 
-WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
+void ip22_state::hpc3_pbus4_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -827,7 +827,7 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
 }
 
 // a bit hackish, but makes the memory detection work properly and allows a big cleanup of the mapping
-WRITE32_MEMBER(ip22_state::ip22_write_ram)
+void ip22_state::ip22_write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// if banks 2 or 3 are enabled, do nothing, we don't support that much memory
 	if (m_sgi_mc->read(space, 0xc8/4, 0xffffffff) & 0x10001000)
@@ -858,7 +858,7 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 #define H2_ISR_GLOBAL_RESET 0x08
 #define H2_ISR_CODEC_RESET  0x10
 
-READ32_MEMBER(ip22_state::hal2_r)
+uint32_t ip22_state::hal2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -873,7 +873,7 @@ READ32_MEMBER(ip22_state::hal2_r)
 	return 0;
 }
 
-WRITE32_MEMBER(ip22_state::hal2_w)
+void ip22_state::hal2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch( offset )
 	{
@@ -1049,14 +1049,14 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 #endif
 }
 
-READ32_MEMBER(ip22_state::hpc3_pbusdma_r)
+uint32_t ip22_state::hpc3_pbusdma_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//uint32_t channel = offset / (0x2000/4);
 	//verboselog((machine(), 0, "PBUS DMA Channel %d Read: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, mem_mask );
 	return 0;
 }
 
-WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
+void ip22_state::hpc3_pbusdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t channel = offset / (0x2000/4);
 
@@ -1122,14 +1122,14 @@ WRITE32_MEMBER(ip22_state::hpc3_pbusdma_w)
 	//verboselog((machine, 0, "Unknown PBUS DMA Channel %d Write: 0x%08x: 0x%08x (%08x)\n", channel, 0x1fb80000 + offset*4, data, mem_mask );
 }
 
-READ32_MEMBER(ip22_state::hpc3_unkpbus0_r)
+uint32_t ip22_state::hpc3_unkpbus0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 	////verboselog((machine(), 0, "Unknown PBUS Read: 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, mem_mask );
 	//return m_unkpbus0[offset];
 }
 
-WRITE32_MEMBER(ip22_state::hpc3_unkpbus0_w)
+void ip22_state::hpc3_unkpbus0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	////verboselog((machine(), 0, "Unknown PBUS Write: 0x%08x = 0x%08x (%08x)\n", 0x1fbc8000 + offset*4, data, mem_mask );
 	//COMBINE_DATA(&m_unkpbus0[offset]);

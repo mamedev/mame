@@ -20,14 +20,14 @@ public:
 
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	uint16_t m_np_addr;
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_READ8_MEMBER(vram_data_r);
-	DECLARE_WRITE8_MEMBER(vram_data_w);
-	DECLARE_WRITE8_MEMBER(vram_addr_w);
-	DECLARE_READ8_MEMBER(test2_r);
-	DECLARE_WRITE8_MEMBER(mainlamps_w);
-	DECLARE_WRITE8_MEMBER(soundlamps_w);
-	DECLARE_WRITE8_MEMBER(counterlamps_w);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vram_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t test2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mainlamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundlamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counterlamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ssa();
 	void init_enc();
 	void init_deb();

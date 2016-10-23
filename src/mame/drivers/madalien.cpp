@@ -32,12 +32,12 @@ inline uint8_t madalien_state::shift_common(uint8_t hi, uint8_t lo)
 	return table[((hi & 0x07) << 8) | lo];
 }
 
-READ8_MEMBER(madalien_state::shift_r)
+uint8_t madalien_state::shift_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return shift_common(*m_shift_hi, *m_shift_lo);
 }
 
-READ8_MEMBER(madalien_state::shift_rev_r)
+uint8_t madalien_state::shift_rev_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t hi = *m_shift_hi ^ 0x07;
 	uint8_t lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
@@ -48,31 +48,31 @@ READ8_MEMBER(madalien_state::shift_rev_r)
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_output_w)
+void madalien_state::madalien_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* output latch, eight output bits, none connected */
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_sound_command_w)
+void madalien_state::madalien_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 	m_soundlatch->write(space, offset, data);
 }
 
 
-READ8_MEMBER(madalien_state::madalien_sound_command_r)
+uint8_t madalien_state::madalien_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read(space, offset);
 }
 
 
-WRITE8_MEMBER(madalien_state::madalien_portA_w)
+void madalien_state::madalien_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, MADALIEN_8910_PORTA, data);
 }
-WRITE8_MEMBER(madalien_state::madalien_portB_w)
+void madalien_state::madalien_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, MADALIEN_8910_PORTB, data);
 }

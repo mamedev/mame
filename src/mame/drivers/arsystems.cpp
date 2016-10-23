@@ -67,10 +67,10 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(arcadia_multibios_change_game);
+	void arcadia_multibios_change_game(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
-	DECLARE_WRITE8_MEMBER(arcadia_cia_0_portb_w);
+	void arcadia_cia_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_arcadia();
 	void init_xeon();
@@ -106,7 +106,7 @@ protected:
  *
  *************************************/
 
-WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
+void arcadia_amiga_state::arcadia_multibios_change_game(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data == 0)
 		space.install_read_bank(0x800000, 0x97ffff, "bank2");
@@ -132,7 +132,7 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
  *
  *************************************/
 
-WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
+void arcadia_amiga_state::arcadia_cia_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)

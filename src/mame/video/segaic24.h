@@ -32,15 +32,15 @@ public:
 	// static configuration
 	static void static_set_tile_mask(device_t &device, uint16_t tile_mask);
 
-	DECLARE_READ16_MEMBER(tile_r);
-	DECLARE_WRITE16_MEMBER(tile_w);
-	DECLARE_READ16_MEMBER(char_r);
-	DECLARE_WRITE16_MEMBER(char_w);
+	uint16_t tile_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tile_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t char_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void char_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER(tile32_r);
-	DECLARE_WRITE32_MEMBER(tile32_w);
-	DECLARE_READ32_MEMBER(char32_r);
-	DECLARE_WRITE32_MEMBER(char32_w);
+	uint32_t tile32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void tile32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t char32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void char32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int pri, int flags);
@@ -83,8 +83,8 @@ class segas24_sprite : public device_t
 public:
 	segas24_sprite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, const int *spri);
 
@@ -103,8 +103,8 @@ class segas24_mixer : public device_t
 public:
 	segas24_mixer(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint16_t get_reg(int reg);
 

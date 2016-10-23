@@ -320,7 +320,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::v1050_keyboard_tick)
 	scan_keyboard();
 }
 
-READ8_MEMBER( v1050_state::kb_data_r )
+uint8_t v1050_state::kb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_keyavail = 0;
 
@@ -329,7 +329,7 @@ READ8_MEMBER( v1050_state::kb_data_r )
 	return m_keydata;
 }
 
-READ8_MEMBER( v1050_state::kb_status_r )
+uint8_t v1050_state::kb_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_uart_kb->status_r(space, 0);
 
@@ -338,37 +338,37 @@ READ8_MEMBER( v1050_state::kb_status_r )
 
 // Z80 Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::v1050_i8214_w )
+void v1050_state::v1050_i8214_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pic->b_w((data >> 1) & 0x07);
 	m_pic->sgs_w(BIT(data, 4));
 }
 
-READ8_MEMBER( v1050_state::vint_clr_r )
+uint8_t v1050_state::vint_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	set_interrupt(INT_VSYNC, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::vint_clr_w )
+void v1050_state::vint_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_interrupt(INT_VSYNC, 0);
 }
 
-READ8_MEMBER( v1050_state::dint_clr_r )
+uint8_t v1050_state::dint_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	set_interrupt(INT_DISPLAY, 0);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER( v1050_state::dint_clr_w )
+void v1050_state::dint_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_interrupt(INT_DISPLAY, 0);
 }
 
-WRITE8_MEMBER( v1050_state::bank_w )
+void v1050_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank = data;
 
@@ -377,17 +377,17 @@ WRITE8_MEMBER( v1050_state::bank_w )
 
 // SY6502A Read/Write Handlers
 
-WRITE8_MEMBER( v1050_state::dint_w )
+void v1050_state::dint_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_interrupt(INT_DISPLAY, 1);
 }
 
-WRITE8_MEMBER( v1050_state::dvint_clr_w )
+void v1050_state::dvint_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_data_w )
+void v1050_state::sasi_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sasi_data = data;
 
@@ -423,7 +423,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 	m_sasibus->write_rst(0);
 }
 
-WRITE8_MEMBER( v1050_state::sasi_ctrl_w )
+void v1050_state::sasi_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -645,13 +645,13 @@ WRITE_LINE_MEMBER(v1050_state::pic_int_w)
 
 // Display 8255A Interface
 
-WRITE8_MEMBER(v1050_state::disp_ppi_pc_w)
+void v1050_state::disp_ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_6502->pc2_w(BIT(data, 6));
 	m_ppi_6502->pc4_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
+void v1050_state::m6502_ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_disp->pc2_w(BIT(data, 7));
 	m_ppi_disp->pc4_w(BIT(data, 6));
@@ -659,7 +659,7 @@ WRITE8_MEMBER(v1050_state::m6502_ppi_pc_w)
 
 // Miscellanous 8255A Interface
 
-WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
+void v1050_state::misc_ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -706,7 +706,7 @@ WRITE_LINE_MEMBER(v1050_state::write_centronics_perror)
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER(v1050_state::misc_ppi_pc_r)
+uint8_t v1050_state::misc_ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -762,7 +762,7 @@ void v1050_state::set_baud_sel(int baud_sel)
 	}
 }
 
-WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
+void v1050_state::misc_ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -792,7 +792,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 // Real Time Clock 8255A Interface
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
+void v1050_state::rtc_ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -812,12 +812,12 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pb_w )
 	m_int_mask = data;
 }
 
-READ8_MEMBER( v1050_state::rtc_ppi_pa_r )
+uint8_t v1050_state::rtc_ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_ppi_pa;
 }
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pa_w )
+void v1050_state::rtc_ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->d0_w((data >> 0) & 1);
 	m_rtc->d1_w((data >> 1) & 1);
@@ -825,7 +825,7 @@ WRITE8_MEMBER( v1050_state::rtc_ppi_pa_w )
 	m_rtc->d3_w((data >> 3) & 1);
 }
 
-READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
+uint8_t v1050_state::rtc_ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -845,7 +845,7 @@ READ8_MEMBER( v1050_state::rtc_ppi_pc_r )
 	return m_rtc_ppi_pc;
 }
 
-WRITE8_MEMBER( v1050_state::rtc_ppi_pc_w )
+void v1050_state::rtc_ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

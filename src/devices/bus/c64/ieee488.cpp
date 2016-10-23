@@ -29,7 +29,7 @@ const device_type C64_IEEE488 = &device_creator<c64_ieee488_device>;
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
+uint8_t c64_ieee488_device::tpi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -58,7 +58,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
+void c64_ieee488_device::tpi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -83,7 +83,7 @@ WRITE8_MEMBER( c64_ieee488_device::tpi_pa_w )
 	m_bus->nrfd_w(BIT(data, 7));
 }
 
-READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
+uint8_t c64_ieee488_device::tpi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -110,7 +110,7 @@ READ8_MEMBER( c64_ieee488_device::tpi_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c64_ieee488_device::tpi_pc_w )
+void c64_ieee488_device::tpi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

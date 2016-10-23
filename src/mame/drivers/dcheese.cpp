@@ -111,7 +111,7 @@ CUSTOM_INPUT_MEMBER(dcheese_state::sound_latch_state_r)
 }
 
 
-WRITE16_MEMBER(dcheese_state::eeprom_control_w)
+void dcheese_state::eeprom_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
@@ -123,7 +123,7 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 }
 
 
-WRITE16_MEMBER(dcheese_state::sound_command_w)
+void dcheese_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -142,7 +142,7 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
  *
  *************************************/
 
-READ8_MEMBER(dcheese_state::sound_command_r)
+uint8_t dcheese_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
@@ -151,14 +151,14 @@ READ8_MEMBER(dcheese_state::sound_command_r)
 }
 
 
-READ8_MEMBER(dcheese_state::sound_status_r)
+uint8_t dcheese_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* seems to be ready signal on BSMT or latching hardware */
 	return m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER(dcheese_state::sound_control_w)
+void dcheese_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_control;
 	m_sound_control = data;
@@ -172,7 +172,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 }
 
 
-WRITE8_MEMBER(dcheese_state::bsmt_data_w)
+void dcheese_state::bsmt_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)

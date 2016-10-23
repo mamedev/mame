@@ -210,7 +210,7 @@ void psxcd_device::call_unload()
 	send_result(intr_diskerror);
 }
 
-READ8_MEMBER( psxcd_device::read )
+uint8_t psxcd_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	switch (offset & 3)
@@ -267,7 +267,7 @@ READ8_MEMBER( psxcd_device::read )
 	return ret;
 }
 
-WRITE8_MEMBER( psxcd_device::write )
+void psxcd_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(*this, 2, "psxcd: write byte %08x = %02x\n",offset,data);
 

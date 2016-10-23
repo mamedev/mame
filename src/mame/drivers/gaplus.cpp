@@ -159,7 +159,7 @@ TODO:
 #include "includes/gaplus.h"
 
 
-WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
+void gaplus_state::irq_1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit & 1;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(gaplus_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::irq_2_ctrl_w)
+void gaplus_state::irq_2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
@@ -175,7 +175,7 @@ WRITE8_MEMBER(gaplus_state::irq_2_ctrl_w)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::irq_3_ctrl_w)
+void gaplus_state::irq_3_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
@@ -183,7 +183,7 @@ WRITE8_MEMBER(gaplus_state::irq_3_ctrl_w)
 		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(gaplus_state::sreset_w)
+void gaplus_state::sreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -191,7 +191,7 @@ WRITE8_MEMBER(gaplus_state::sreset_w)
 	m_namco_15xx->mappy_sound_enable(bit);
 }
 
-WRITE8_MEMBER(gaplus_state::freset_w)
+void gaplus_state::freset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 
@@ -473,7 +473,7 @@ static const char *const gaplus_sample_names[] =
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::out_lamps0)
+void gaplus_state::out_lamps0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 1);
 	output().set_led_value(1, data & 2);
@@ -481,7 +481,7 @@ WRITE8_MEMBER(gaplus_state::out_lamps0)
 	machine().bookkeeping().coin_counter_w(0, ~data & 8);
 }
 
-WRITE8_MEMBER(gaplus_state::out_lamps1)
+void gaplus_state::out_lamps1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }

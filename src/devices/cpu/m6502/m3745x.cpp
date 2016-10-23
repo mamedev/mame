@@ -299,7 +299,7 @@ uint8_t m3745x_device::read_port(uint8_t offset)
 	return incoming;
 }
 
-READ8_MEMBER(m3745x_device::ports_r)
+uint8_t m3745x_device::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -328,7 +328,7 @@ READ8_MEMBER(m3745x_device::ports_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(m3745x_device::ports_w)
+void m3745x_device::ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -369,7 +369,7 @@ WRITE8_MEMBER(m3745x_device::ports_w)
 	}
 }
 
-READ8_MEMBER(m3745x_device::intregs_r)
+uint8_t m3745x_device::intregs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -391,7 +391,7 @@ READ8_MEMBER(m3745x_device::intregs_r)
 	return 0;
 }
 
-WRITE8_MEMBER(m3745x_device::intregs_w)
+void m3745x_device::intregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -415,7 +415,7 @@ WRITE8_MEMBER(m3745x_device::intregs_w)
 	recalc_irqs();
 }
 
-READ8_MEMBER(m3745x_device::adc_r)
+uint8_t m3745x_device::adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t rv = 0;
 
@@ -468,7 +468,7 @@ READ8_MEMBER(m3745x_device::adc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(m3745x_device::adc_w)
+void m3745x_device::adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

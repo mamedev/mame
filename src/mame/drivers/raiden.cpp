@@ -314,7 +314,7 @@ static MACHINE_CONFIG_DERIVED( raidenu, raidene )
 	MCFG_CPU_PROGRAM_MAP(raidenu_sub_map)
 MACHINE_CONFIG_END
 
-WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
+void raiden_state::raidenb_layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }

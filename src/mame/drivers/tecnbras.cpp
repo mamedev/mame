@@ -31,11 +31,11 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(set_x_position_w);
-	DECLARE_WRITE8_MEMBER(print_column_w);
+	void set_x_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void print_column_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-//  DECLARE_WRITE8_MEMBER(tecnbras_io_w);
-//  DECLARE_READ8_MEMBER(tecnbras_io_r);
+//  void tecnbras_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t tecnbras_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_tecnbras();
 private:
 	int m_xcoord;
@@ -67,12 +67,12 @@ void tecnbras_state::init_tecnbras()
 	}
 }
 
-WRITE8_MEMBER(tecnbras_state::set_x_position_w)
+void tecnbras_state::set_x_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xcoord = offset;
 }
 
-WRITE8_MEMBER(tecnbras_state::print_column_w)
+void tecnbras_state::print_column_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x = m_xcoord + offset;
 	for (int i=0; i<7; i++){

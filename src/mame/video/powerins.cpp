@@ -50,12 +50,12 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(powerins_state::flipscreen_w)
+void powerins_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1 );
 }
 
-WRITE8_MEMBER(powerins_state::tilebank_w)
+void powerins_state::tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != m_tile_bank)
 	{
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
 			0);
 }
 
-WRITE16_MEMBER(powerins_state::vram_0_w)
+void powerins_state::vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
 			0);
 }
 
-WRITE16_MEMBER(powerins_state::vram_1_w)
+void powerins_state::vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);

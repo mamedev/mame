@@ -31,9 +31,9 @@ public:
 
 	/* devices */
 	required_device<msm5205_device> m_msm;
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(pcm_set_w);
-	DECLARE_WRITE8_MEMBER(drmicro_videoram_w);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcm_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void drmicro_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	virtual void machine_start() override;

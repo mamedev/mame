@@ -1085,23 +1085,23 @@ void ay8910_device::device_reset()
  *
  *************************************/
 
-READ8_MEMBER( ay8910_device::data_r )
+uint8_t ay8910_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ay8910_read_ym();
 }
 
-WRITE8_MEMBER( ay8910_device::data_address_w )
+void ay8910_device::data_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* note that directly connecting BC1 to A0 puts data on 0 and address on 1 */
 	ay8910_write_ym(~offset & 1, data);
 }
 
-WRITE8_MEMBER( ay8910_device::address_data_w )
+void ay8910_device::address_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_write_ym(offset & 1, data);
 }
 
-WRITE8_MEMBER( ay8910_device::address_w )
+void ay8910_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if ENABLE_REGISTER_TEST
 	return;
@@ -1110,7 +1110,7 @@ WRITE8_MEMBER( ay8910_device::address_w )
 #endif
 }
 
-WRITE8_MEMBER( ay8910_device::data_w )
+void ay8910_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if ENABLE_REGISTER_TEST
 	return;
@@ -1119,14 +1119,14 @@ WRITE8_MEMBER( ay8910_device::data_w )
 #endif
 }
 
-WRITE8_MEMBER( ay8910_device::reset_w )
+void ay8910_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_reset_ym();
 }
 
 static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
-READ8_MEMBER( ay8914_device::read )
+uint8_t ay8914_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t rv;
 	address_w(space, 0, mapping8914to8910[offset & 0xf]);
@@ -1134,7 +1134,7 @@ READ8_MEMBER( ay8914_device::read )
 	return rv;
 }
 
-WRITE8_MEMBER( ay8914_device::write )
+void ay8914_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_w(space, 0, mapping8914to8910[offset & 0xf]);
 	data_w(space, 0, data & 0xff);

@@ -54,14 +54,14 @@ public:
 	required_device<palette_device> m_palette;
 
 	uint8_t    m_main_irq_mask;
-	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
-	DECLARE_WRITE8_MEMBER(rallyx_bang_w);
-	DECLARE_WRITE8_MEMBER(rallyx_latch_w);
-	DECLARE_WRITE8_MEMBER(locomotn_latch_w);
-	DECLARE_WRITE8_MEMBER(rallyx_videoram_w);
-	DECLARE_WRITE8_MEMBER(rallyx_scrollx_w);
-	DECLARE_WRITE8_MEMBER(rallyx_scrolly_w);
-	DECLARE_WRITE8_MEMBER(tactcian_starson_w);
+	void rallyx_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rallyx_bang_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rallyx_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void locomotn_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rallyx_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rallyx_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rallyx_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tactcian_starson_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(rallyx_bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(rallyx_fg_get_tile_info);

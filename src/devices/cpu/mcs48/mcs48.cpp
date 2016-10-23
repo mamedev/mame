@@ -1188,7 +1188,7 @@ void mcs48_cpu_device::execute_run()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER( upi41_cpu_device::upi41_master_r )
+uint8_t upi41_cpu_device::upi41_master_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* if just reading the status, return it */
 	if ((offset & 1) != 0)
@@ -1233,7 +1233,7 @@ TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
 		m_sts |= STS_F1;
 }
 
-WRITE8_MEMBER( upi41_cpu_device::upi41_master_w )
+void upi41_cpu_device::upi41_master_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(upi41_cpu_device::master_callback), this), (offset << 8) | data);
 }

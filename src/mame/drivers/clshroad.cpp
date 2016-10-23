@@ -30,7 +30,7 @@ void clshroad_state::machine_reset()
 }
 
 
-READ8_MEMBER(clshroad_state::input_r)
+uint8_t clshroad_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return  ((~ioport("P1")->read() & (1 << offset)) ? 1 : 0) |
 			((~ioport("P2")->read() & (1 << offset)) ? 2 : 0) |

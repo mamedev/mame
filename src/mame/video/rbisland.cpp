@@ -13,7 +13,7 @@
 
 /***************************************************************************/
 
-WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
+void rbisland_state::rbisland_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -25,7 +25,7 @@ WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 	}
 }
 
-WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
+void rbisland_state::jumping_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{

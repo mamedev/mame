@@ -318,12 +318,12 @@ public:
 		m_bank0d(*this, "bank0d"),
 		m_bank1d(*this, "bank1d") { }
 
-	DECLARE_WRITE8_MEMBER( bank_write );
+	void bank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ridleofp_port_f8_read );
-	DECLARE_WRITE8_MEMBER( ridleofp_port_fa_write );
-	DECLARE_READ8_MEMBER( hangonjr_port_f8_read );
-	DECLARE_WRITE8_MEMBER( hangonjr_port_fa_write );
+	uint8_t ridleofp_port_f8_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ridleofp_port_fa_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hangonjr_port_f8_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hangonjr_port_fa_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_hangonjr();
 	void init_astrofl();
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( vdp2_map, AS_0, 8, systeme_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( systeme_state::bank_write )
+void systeme_state::bank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("vdp1_bank")->set_entry((data >> 7) & 1);
 	membank("vdp2_bank")->set_entry((data >> 6) & 1);
@@ -456,7 +456,7 @@ void systeme_state::machine_start()
 
 
 /*- Hang On Jr. Specific -*/
-READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
+uint8_t systeme_state::hangonjr_port_f8_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t temp;
 
@@ -471,7 +471,7 @@ READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 	return temp;
 }
 
-WRITE8_MEMBER( systeme_state::hangonjr_port_fa_write)
+void systeme_state::hangonjr_port_fa_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Seems to write the same pattern again and again bits ---- xx-x used */
 	m_port_select = data;
@@ -479,7 +479,7 @@ WRITE8_MEMBER( systeme_state::hangonjr_port_fa_write)
 
 /*- Riddle of Pythagoras Specific -*/
 
-READ8_MEMBER( systeme_state::ridleofp_port_f8_read )
+uint8_t systeme_state::ridleofp_port_f8_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_port_select)
 	{
@@ -491,7 +491,7 @@ READ8_MEMBER( systeme_state::ridleofp_port_f8_read )
 	}
 }
 
-WRITE8_MEMBER( systeme_state::ridleofp_port_fa_write )
+void systeme_state::ridleofp_port_fa_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x10 is written before reading the dial (hold counters?) */
 	/* 0x03 is written after reading the dial (reset counters?) */

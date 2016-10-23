@@ -16,25 +16,25 @@
  *
  *************************************/
 
-WRITE8_MEMBER(canyon_state::canyon_motor_w)
+void canyon_state::canyon_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_RELATIVE(CANYON_MOTOR1_DATA, (offset & 0x01)), data & 0x0f);
 }
 
 
-WRITE8_MEMBER(canyon_state::canyon_explode_w)
+void canyon_state::canyon_explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, CANYON_EXPLODE_DATA, data >> 4);
 }
 
 
-WRITE8_MEMBER(canyon_state::canyon_attract_w)
+void canyon_state::canyon_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_RELATIVE(CANYON_ATTRACT1_EN, (offset & 0x01)), offset & 0x02);
 }
 
 
-WRITE8_MEMBER(canyon_state::canyon_whistle_w)
+void canyon_state::canyon_whistle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_RELATIVE(CANYON_WHISTLE1_EN, (offset & 0x01)), offset & 0x02);
 }

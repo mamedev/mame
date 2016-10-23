@@ -271,7 +271,7 @@ static const int16_t speaker_levels[] = { -32768, 0, 32767, 0 };
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER( grip_device::ppi_pa_r )
+uint8_t grip_device::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -291,7 +291,7 @@ READ8_MEMBER( grip_device::ppi_pa_r )
 	return m_ppi_pa;
 }
 
-WRITE8_MEMBER( grip_device::ppi_pa_w )
+void grip_device::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -311,7 +311,7 @@ WRITE8_MEMBER( grip_device::ppi_pa_w )
 	m_ppi_pa = data;
 }
 
-READ8_MEMBER( grip_device::ppi_pb_r )
+uint8_t grip_device::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -331,7 +331,7 @@ READ8_MEMBER( grip_device::ppi_pb_r )
 	return m_keydata;
 }
 
-WRITE8_MEMBER( grip_device::ppi_pc_w )
+void grip_device::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -372,7 +372,7 @@ WRITE_LINE_MEMBER(grip_device::write_centronics_busy)
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( grip_device::sti_gpio_r )
+uint8_t grip_device::sti_gpio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -431,7 +431,7 @@ static const z80_daisy_config grip_daisy_chain[] =
 //  ASCII_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::kb_w )
+void grip_device::kb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_kbf)
 	{
@@ -686,7 +686,7 @@ void grip_device::device_reset()
 //  vol0_w - volume 0
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::vol0_w )
+void grip_device::vol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vol0 = BIT(data, 7);
 }
@@ -696,7 +696,7 @@ WRITE8_MEMBER( grip_device::vol0_w )
 //  vol1_w - volume 1
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::vol1_w )
+void grip_device::vol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vol1 = BIT(data, 7);
 }
@@ -706,7 +706,7 @@ WRITE8_MEMBER( grip_device::vol1_w )
 //  flash_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::flash_w )
+void grip_device::flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash = BIT(data, 7);
 }
@@ -716,7 +716,7 @@ WRITE8_MEMBER( grip_device::flash_w )
 //  page_w - video page select
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::page_w )
+void grip_device::page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_page = BIT(data, 7);
 
@@ -733,7 +733,7 @@ WRITE_LINE_MEMBER(grip_device::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( grip_device::stat_r )
+uint8_t grip_device::stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -791,7 +791,7 @@ READ8_MEMBER( grip_device::stat_r )
 //  lrs_r -
 //-------------------------------------------------
 
-READ8_MEMBER( grip_device::lrs_r )
+uint8_t grip_device::lrs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_lps = 0;
 
@@ -803,7 +803,7 @@ READ8_MEMBER( grip_device::lrs_r )
 //  lrs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::lrs_w )
+void grip_device::lrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lps = 0;
 }
@@ -813,7 +813,7 @@ WRITE8_MEMBER( grip_device::lrs_w )
 //  cxstb_r - centronics strobe
 //-------------------------------------------------
 
-READ8_MEMBER( grip_device::cxstb_r )
+uint8_t grip_device::cxstb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
@@ -826,7 +826,7 @@ READ8_MEMBER( grip_device::cxstb_r )
 //  cxstb_w - centronics strobe
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip_device::cxstb_w )
+void grip_device::cxstb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
@@ -837,7 +837,7 @@ WRITE8_MEMBER( grip_device::cxstb_w )
 //  eprom_w - EPROM bank select
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip5_state::eprom_w )
+void grip5_state::eprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     membank("eprom")->set_entry(BIT(data, 0));
 }
@@ -847,7 +847,7 @@ WRITE8_MEMBER( grip5_state::eprom_w )
 //  dpage_w - display page select
 //-------------------------------------------------
 
-WRITE8_MEMBER( grip5_state::dpage_w )
+void grip5_state::dpage_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     m_dpage = BIT(data, 7);
 }

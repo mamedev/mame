@@ -10,7 +10,7 @@
 #include "includes/runaway.h"
 
 
-WRITE8_MEMBER(runaway_state::runaway_paletteram_w)
+void runaway_state::runaway_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int R =
 		0x21 * ((~data >> 2) & 1) +
@@ -32,7 +32,7 @@ WRITE8_MEMBER(runaway_state::runaway_paletteram_w)
 
 
 
-WRITE8_MEMBER(runaway_state::runaway_video_ram_w)
+void runaway_state::runaway_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -40,7 +40,7 @@ WRITE8_MEMBER(runaway_state::runaway_video_ram_w)
 
 
 
-WRITE8_MEMBER(runaway_state::runaway_tile_bank_w)
+void runaway_state::runaway_tile_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 1) != m_tile_bank)
 	{

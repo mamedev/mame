@@ -232,28 +232,28 @@ void megasys1_state::video_start_megasys1()
 ***************************************************************************/
 
 
-WRITE16_MEMBER(megasys1_state::active_layers_w)
+void megasys1_state::active_layers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_active_layers);
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_bank_w)
+void megasys1_state::sprite_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite_bank);
 }
 
-READ16_MEMBER(megasys1_state::sprite_flag_r)
+uint16_t megasys1_state::sprite_flag_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sprite_flag;
 }
 
-WRITE16_MEMBER(megasys1_state::sprite_flag_w)
+void megasys1_state::sprite_flag_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite_flag);
 }
 
-WRITE16_MEMBER(megasys1_state::screen_flag_w)
+void megasys1_state::screen_flag_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_screen_flag);
 
@@ -266,26 +266,26 @@ WRITE16_MEMBER(megasys1_state::screen_flag_w)
 	}
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_w)
+void megasys1_state::soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data, mem_mask);
 	m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_z_w)
+void megasys1_state::soundlatch_z_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch_z->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::soundlatch_c_w)
+void megasys1_state::soundlatch_c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Cybattler reads sound latch on irq 2
 	m_soundlatch->write(space, 0, data, mem_mask);
 	m_audiocpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll0_w)
+void megasys1_state::monkelf_scroll0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)
@@ -293,7 +293,7 @@ WRITE16_MEMBER(megasys1_state::monkelf_scroll0_w)
 	m_tmap[0]->scroll_w(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(megasys1_state::monkelf_scroll1_w)
+void megasys1_state::monkelf_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// code in routine $280 does this. protection?
 	if (offset == 0)

@@ -228,7 +228,7 @@ void gb_state::machine_reset_sgb()
 }
 
 
-WRITE8_MEMBER(gb_state::gb_io_w)
+void gb_state::gb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t timer_shifts[4] = {10, 4, 6, 8};
 
@@ -309,7 +309,7 @@ logerror("SIOCONT write, serial clock is %04x\n", m_internal_serial_clock);
 	m_gb_io[offset] = data;
 }
 
-WRITE8_MEMBER(gb_state::gb_io2_w)
+void gb_state::gb_io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x10)
 	{
@@ -358,7 +358,7 @@ static const char *const sgbcmds[32] =
 };
 #endif
 
-WRITE8_MEMBER(gb_state::sgb_io_w)
+void gb_state::sgb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *sgb_data = m_sgb_data;
 
@@ -475,18 +475,18 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 }
 
 /* Interrupt Enable register */
-READ8_MEMBER(gb_state::gb_ie_r)
+uint8_t gb_state::gb_ie_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->get_ie();
 }
 
-WRITE8_MEMBER(gb_state::gb_ie_w)
+void gb_state::gb_ie_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_ie(data);
 }
 
 /* IO read */
-READ8_MEMBER(gb_state::gb_io_r)
+uint8_t gb_state::gb_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -570,7 +570,7 @@ void gb_state::gb_timer_increment()
 }
 
 // This gets called while the cpu is executing instructions to keep the timer state in sync
-WRITE8_MEMBER(gb_state::gb_timer_callback)
+void gb_state::gb_timer_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t old_gb_divcount = m_divcount;
 	uint16_t old_internal_serial_clock = m_internal_serial_clock;
@@ -608,7 +608,7 @@ WRITE8_MEMBER(gb_state::gb_timer_callback)
 }
 
 
-WRITE8_MEMBER(gb_state::gbc_io_w)
+void gb_state::gbc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gb_io_w(space, offset, data);
 
@@ -621,7 +621,7 @@ WRITE8_MEMBER(gb_state::gbc_io_w)
 }
 
 
-WRITE8_MEMBER(gb_state::gbc_io2_w)
+void gb_state::gbc_io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -645,7 +645,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 	m_ppu->video_w(space, offset, data);
 }
 
-READ8_MEMBER(gb_state::gbc_io2_r)
+uint8_t gb_state::gbc_io2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -716,7 +716,7 @@ void megaduck_state::machine_reset_megaduck()
 
  **************/
 
-READ8_MEMBER(megaduck_state::megaduck_video_r)
+uint8_t megaduck_state::megaduck_video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -730,7 +730,7 @@ READ8_MEMBER(megaduck_state::megaduck_video_r)
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
 }
 
-WRITE8_MEMBER(megaduck_state::megaduck_video_w)
+void megaduck_state::megaduck_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!offset)
 	{
@@ -748,7 +748,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 
 static const uint8_t megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
+void megaduck_state::megaduck_sound_w1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset == 0x01) || (offset == 0x07))
 		m_apu->sound_w(space, megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
@@ -756,7 +756,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 		m_apu->sound_w(space, megaduck_sound_offsets[offset], data);
 }
 
-READ8_MEMBER(megaduck_state::megaduck_sound_r1)
+uint8_t megaduck_state::megaduck_sound_r1(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_apu->sound_r(space, megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x07))
@@ -765,7 +765,7 @@ READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 		return data;
 }
 
-WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
+void megaduck_state::megaduck_sound_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset == 0x01) || (offset == 0x02))
 		m_apu->sound_w(space, 0x10 + megaduck_sound_offsets[offset], ((data & 0x0f)<<4) | ((data & 0xf0)>>4));
@@ -773,7 +773,7 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 		m_apu->sound_w(space, 0x10 + megaduck_sound_offsets[offset], data);
 }
 
-READ8_MEMBER(megaduck_state::megaduck_sound_r2)
+uint8_t megaduck_state::megaduck_sound_r2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_apu->sound_r(space, 0x10 + megaduck_sound_offsets[offset]);
 	if ((offset == 0x01) || (offset == 0x02))

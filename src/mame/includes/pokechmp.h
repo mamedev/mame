@@ -19,11 +19,11 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	required_shared_ptr<uint8_t> m_spriteram;
-	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_videoram_w);
-	DECLARE_WRITE8_MEMBER(pokechmp_flipscreen_w);
+	void pokechmp_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pokechmp_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pokechmp_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pokechmp_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pokechmp_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_pokechmp();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

@@ -68,25 +68,25 @@ void sf_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(sf_state::videoram_w)
+void sf_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(sf_state::bg_scroll_w)
+void sf_state::bg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgscroll);
 	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 }
 
-WRITE16_MEMBER(sf_state::fg_scroll_w)
+void sf_state::fg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgscroll);
 	m_fg_tilemap->set_scrollx(0, m_fgscroll);
 }
 
-WRITE16_MEMBER(sf_state::gfxctrl_w)
+void sf_state::gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* b0 = reset, or maybe "set anyway" */
 	/* b1 = pulsed when control6.b6==0 until it's 1 */

@@ -156,14 +156,14 @@ void toaplan2_state::video_start_batrider()
 	m_vdp0->gp9001_gfxrom_is_banked = 1;
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_videoram_w)
+void toaplan2_state::toaplan2_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
+void toaplan2_state::toaplan2_tx_linescroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 	COMBINE_DATA(&m_tx_linescroll[offset]);
@@ -171,7 +171,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_linescroll_w)
 	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
+void toaplan2_state::toaplan2_tx_gfxram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
@@ -184,7 +184,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_tx_gfxram16_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
+void toaplan2_state::batrider_textdata_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
@@ -204,14 +204,14 @@ WRITE16_MEMBER(toaplan2_state::batrider_textdata_dma_w)
 	m_gfxdecode->gfx(0)->mark_all_dirty();
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
+void toaplan2_state::batrider_unknown_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// FIXME: In batrider and bbakraid, the text layer and palette RAM
 	// are probably DMA'd from main RAM by writing here at every vblank,
 	// rather than being directly accessible to the 68K like the other games
 }
 
-WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
+void toaplan2_state::batrider_objectbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

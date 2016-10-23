@@ -26,7 +26,7 @@ public:
 		, m_p_videoram(*this, "videoram")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	required_device<cpu_device> m_maincpu;
@@ -59,7 +59,7 @@ INPUT_PORTS_START( tvgame )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( tvgame_state::speaker_w )
+void tvgame_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 0));
 }

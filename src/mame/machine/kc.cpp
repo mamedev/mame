@@ -77,7 +77,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 
 // The KC85/4 and KC85/3 are "modular systems". These computers can be expanded with modules.
 
-READ8_MEMBER( kc_state::expansion_read )
+uint8_t kc_state::expansion_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -90,7 +90,7 @@ READ8_MEMBER( kc_state::expansion_read )
 	return result;
 }
 
-WRITE8_MEMBER( kc_state::expansion_write )
+void kc_state::expansion_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
@@ -111,7 +111,7 @@ WRITE8_MEMBER( kc_state::expansion_write )
     Id's for known modules are listed above.
 */
 
-READ8_MEMBER( kc_state::expansion_io_read )
+uint8_t kc_state::expansion_io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -136,7 +136,7 @@ READ8_MEMBER( kc_state::expansion_io_read )
 	return result;
 }
 
-WRITE8_MEMBER( kc_state::expansion_io_write )
+void kc_state::expansion_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// assert MEI line of first slot
 	m_expansions[0]->mei_w(ASSERT_LINE);
@@ -158,14 +158,14 @@ WRITE8_MEMBER( kc_state::expansion_io_write )
 }
 
 // module read/write handlers
-READ8_MEMBER ( kc_state::expansion_4000_r ){ return expansion_read(space, offset + 0x4000); }
-WRITE8_MEMBER( kc_state::expansion_4000_w ){ expansion_write(space, offset + 0x4000, data); }
-READ8_MEMBER ( kc_state::expansion_8000_r ){ return expansion_read(space, offset + 0x8000); }
-WRITE8_MEMBER( kc_state::expansion_8000_w ){ expansion_write(space, offset + 0x8000, data); }
-READ8_MEMBER ( kc_state::expansion_c000_r ){ return expansion_read(space, offset + 0xc000); }
-WRITE8_MEMBER( kc_state::expansion_c000_w ){ expansion_write(space, offset + 0xc000, data); }
-READ8_MEMBER ( kc_state::expansion_e000_r ){ return expansion_read(space, offset + 0xe000); }
-WRITE8_MEMBER( kc_state::expansion_e000_w ){ expansion_write(space, offset + 0xe000, data); }
+uint8_t kc_state::expansion_4000_r(address_space &space, offs_t offset, uint8_t mem_mask){ return expansion_read(space, offset + 0x4000); }
+void kc_state::expansion_4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ expansion_write(space, offset + 0x4000, data); }
+uint8_t kc_state::expansion_8000_r(address_space &space, offs_t offset, uint8_t mem_mask){ return expansion_read(space, offset + 0x8000); }
+void kc_state::expansion_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ expansion_write(space, offset + 0x8000, data); }
+uint8_t kc_state::expansion_c000_r(address_space &space, offs_t offset, uint8_t mem_mask){ return expansion_read(space, offset + 0xc000); }
+void kc_state::expansion_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ expansion_write(space, offset + 0xc000, data); }
+uint8_t kc_state::expansion_e000_r(address_space &space, offs_t offset, uint8_t mem_mask){ return expansion_read(space, offset + 0xe000); }
+void kc_state::expansion_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ expansion_write(space, offset + 0xe000, data); }
 
 
 //**************************************************************************
@@ -564,12 +564,12 @@ bit 1: ACCESS RAM 0
 bit 0: CAOS ROM E
 */
 
-READ8_MEMBER( kc_state::pio_porta_r )
+uint8_t kc_state::pio_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio_data[0];
 }
 
-WRITE8_MEMBER( kc_state::pio_porta_w )
+void kc_state::pio_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pio_data[0] != data) // to avoid a severe slowdown during cassette loading
 	{
@@ -595,12 +595,12 @@ bit 2: TONE 2
 bit 1: TONE 1
 bit 0: TRUCK */
 
-READ8_MEMBER( kc_state::pio_portb_r )
+uint8_t kc_state::pio_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio_data[1];
 }
 
-WRITE8_MEMBER( kc_state::pio_portb_w )
+void kc_state::pio_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio_data[1] = data;
 
@@ -624,7 +624,7 @@ bit 1: BLA0 .pixel/color
 bit 0: BILD .display screen 0 or 1
 */
 
-WRITE8_MEMBER( kc85_4_state::kc85_4_84_w )
+void kc85_4_state::kc85_4_84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("0x84 W: %02x\n", data));
 
@@ -635,7 +635,7 @@ WRITE8_MEMBER( kc85_4_state::kc85_4_84_w )
 	update_0x08000();
 }
 
-READ8_MEMBER( kc85_4_state::kc85_4_84_r )
+uint8_t kc85_4_state::kc85_4_84_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_84_data;
 }
@@ -651,7 +651,7 @@ bit 1: WRITE PROTECT RAM 4
 bit 0: ACCESS RAM 4
 */
 
-WRITE8_MEMBER( kc85_4_state::kc85_4_86_w )
+void kc85_4_state::kc85_4_86_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("0x86 W: %02x\n", data));
 
@@ -661,7 +661,7 @@ WRITE8_MEMBER( kc85_4_state::kc85_4_86_w )
 	update_0x04000();
 }
 
-READ8_MEMBER( kc85_4_state::kc85_4_86_r )
+uint8_t kc85_4_state::kc85_4_86_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_86_data;
 }

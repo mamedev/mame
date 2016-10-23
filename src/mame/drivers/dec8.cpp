@@ -57,7 +57,7 @@ To do:
 /******************************************************************************/
 
 
-WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
+void dec8_state::dec8_mxc06_karn_buffer_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
@@ -78,24 +78,24 @@ void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
 	}
 }
 
-READ8_MEMBER(dec8_state::i8751_h_r)
+uint8_t dec8_state::i8751_h_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8751_return >> 8; /* MSB */
 }
 
-READ8_MEMBER(dec8_state::i8751_l_r)
+uint8_t dec8_state::i8751_l_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8751_return & 0xff; /* LSB */
 }
 
-WRITE8_MEMBER(dec8_state::i8751_reset_w)
+void dec8_state::i8751_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8751_return = 0;
 }
 
 /******************************************************************************/
 
-READ8_MEMBER(dec8_state::gondo_player_1_r)
+uint8_t dec8_state::gondo_player_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 1 << ioport("AN0")->read();
 
@@ -109,7 +109,7 @@ READ8_MEMBER(dec8_state::gondo_player_1_r)
 	return 0xff;
 }
 
-READ8_MEMBER(dec8_state::gondo_player_2_r)
+uint8_t dec8_state::gondo_player_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 1 << ioport("AN1")->read();
 
@@ -145,7 +145,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(dec8_state::dec8_i8751_w)
+void dec8_state::dec8_i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -166,7 +166,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 *
 ********************************/
 
-WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
+void dec8_state::lastmisn_i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -235,7 +235,7 @@ WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::shackled_i8751_w)
+void dec8_state::shackled_i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8751_return = 0;
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(dec8_state::shackled_i8751_w)
 																((((m_coin1 / 10) << 4) | (m_coin1 % 10)) << 8);    /* Coins */
 }
 
-WRITE8_MEMBER(dec8_state::csilver_i8751_w)
+void dec8_state::csilver_i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -333,7 +333,7 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 	}
 }
 
-WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
+void dec8_state::srdarwin_i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -444,13 +444,13 @@ bb63           = Square things again
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::dec8_bank_w)
+void dec8_state::dec8_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-WRITE8_MEMBER(dec8_state::ghostb_bank_w)
+void dec8_state::ghostb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
@@ -466,7 +466,7 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 	flip_screen_set(data & 0x08);
 }
 
-WRITE8_MEMBER(dec8_state::csilver_control_w)
+void dec8_state::csilver_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit 0x0f - ROM bank switch.
@@ -478,7 +478,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(dec8_state::dec8_sound_w)
+void dec8_state::dec8_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -494,25 +494,25 @@ WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
 	m_msm5205next <<= 4;
 }
 
-READ8_MEMBER(dec8_state::csilver_adpcm_reset_r)
+uint8_t dec8_state::csilver_adpcm_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 	return 0;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_adpcm_data_w)
+void dec8_state::csilver_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
+void dec8_state::csilver_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank3")->set_entry((data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::oscar_int_w)
+void dec8_state::oscar_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
 	switch (offset)
@@ -533,7 +533,7 @@ WRITE8_MEMBER(dec8_state::oscar_int_w)
 }
 
 /* Used by Shackled, Last Mission, Captain Silver */
-WRITE8_MEMBER(dec8_state::shackled_int_w)
+void dec8_state::shackled_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -556,7 +556,7 @@ WRITE8_MEMBER(dec8_state::shackled_int_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(data); }
+void dec8_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ flip_screen_set(data); }
 
 /******************************************************************************/
 
@@ -902,7 +902,7 @@ ADDRESS_MAP_END
 
 */
 
-READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
+uint8_t dec8_state::dec8_mcu_from_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -919,7 +919,7 @@ READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 	return 0xff; //compile safe.
 }
 
-WRITE8_MEMBER(dec8_state::dec8_mcu_to_main_w)
+void dec8_state::dec8_mcu_to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Outputs P0 and P1 are latched
 	if (offset==0) m_i8751_port0=data;

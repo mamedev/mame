@@ -139,7 +139,7 @@ void gaelco2_state::init_snowboar()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
+void gaelco2_state::gaelco2_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Coin Lockouts */
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
@@ -150,19 +150,19 @@ WRITE16_MEMBER(gaelco2_state::gaelco2_coin_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_coin2_w)
+void gaelco2_state::gaelco2_coin2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* coin counters */
 	machine().bookkeeping().coin_counter_w(offset & 0x01,  data & 0x01);
 }
 
-WRITE16_MEMBER(wrally2_state::wrally2_coin_w)
+void wrally2_state::wrally2_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* coin counters */
 	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01,  data & 0x01);
 }
 
-WRITE16_MEMBER(gaelco2_state::touchgo_coin_w)
+void gaelco2_state::touchgo_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset >> 2) == 0){
 		machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -184,7 +184,7 @@ void bang_state::init_bang()
 	m_clr_gun_int = 0;
 }
 
-WRITE16_MEMBER(bang_state::bang_clr_gun_int_w)
+void bang_state::bang_clr_gun_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_clr_gun_int = 1;
 }
@@ -226,7 +226,7 @@ CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
 }
 
 
-WRITE16_MEMBER(wrally2_state::wrally2_adc_clk)
+void wrally2_state::wrally2_adc_clk(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
 	if (ACCESSING_BITS_0_7)
@@ -242,7 +242,7 @@ WRITE16_MEMBER(wrally2_state::wrally2_adc_clk)
 }
 
 
-WRITE16_MEMBER(wrally2_state::wrally2_adc_cs)
+void wrally2_state::wrally2_adc_cs(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
 	if (ACCESSING_BITS_0_7)
@@ -263,19 +263,19 @@ WRITE16_MEMBER(wrally2_state::wrally2_adc_cs)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_cs_w)
+void gaelco2_state::gaelco2_eeprom_cs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is CS (active low) */
 	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_sk_w)
+void gaelco2_state::gaelco2_eeprom_sk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is SK (active high) */
 	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
+void gaelco2_state::gaelco2_eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is EEPROM data (DIN) */
 	m_eeprom->di_write(data & 0x01);
@@ -351,7 +351,7 @@ uint16_t mangle(uint32_t x)
 	return get_out(((a ^ 0x0010) - (b ^ 0x0024)) ^ 0x5496);
 }
 
-READ16_MEMBER(gaelco2_state::snowboar_protection_r)
+uint16_t gaelco2_state::snowboar_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret  = mangle(snowboard_latch);
 	ret = ((ret & 0xff00) >> 8) | ((ret & 0x00ff) << 8);
@@ -359,7 +359,7 @@ READ16_MEMBER(gaelco2_state::snowboar_protection_r)
 
 }
 
-WRITE16_MEMBER(gaelco2_state::snowboar_protection_w)
+void gaelco2_state::snowboar_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_snowboar_protection[offset]);
 

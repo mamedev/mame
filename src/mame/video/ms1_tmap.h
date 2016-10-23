@@ -54,9 +54,9 @@ public:
 	static void static_set_colorbase(device_t &device, uint16_t colorbase);
 
 	// memory handlers
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(scroll_r);
-	DECLARE_WRITE16_MEMBER(scroll_w);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scroll_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// drawing and layer control
 	void draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority = 0, uint8_t priority_mask = 0xff);

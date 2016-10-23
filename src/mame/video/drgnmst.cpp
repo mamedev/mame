@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_fg_videoram_w)
+void drgnmst_state::drgnmst_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_bg_tile_info)
 	SET_TILE_INFO_MEMBER(3, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_bg_videoram_w)
+void drgnmst_state::drgnmst_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_md_tile_info)
 	SET_TILE_INFO_MEMBER(2, tileno, colour, TILE_FLIPYX(flipyx));
 }
 
-WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
+void drgnmst_state::drgnmst_md_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset / 2);

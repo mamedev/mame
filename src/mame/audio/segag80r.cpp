@@ -256,7 +256,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::astrob_sound_w)
+void segag80r_state::astrob_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const float attack_resistor[10] =
 	{
@@ -451,7 +451,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
+void segag80r_state::sega005_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
@@ -507,7 +507,7 @@ inline void segag80r_state::sega005_update_sound_data()
 }
 
 
-WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
+void segag80r_state::sega005_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	       D6: manual timer clock (0->1)
@@ -606,7 +606,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
+void segag80r_state::spaceod_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;
@@ -741,7 +741,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::monsterb_sound_a_w)
+void segag80r_state::monsterb_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tms36xx_device *tms = machine().device<tms36xx_device>("music");
 	int enable_val;
@@ -762,7 +762,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_sound_a_w)
  *
  *************************************/
 
-WRITE8_MEMBER(segag80r_state::monsterb_sound_b_w)
+void segag80r_state::monsterb_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -784,13 +784,13 @@ WRITE8_MEMBER(segag80r_state::monsterb_sound_b_w)
  *
  *************************************/
 
-READ8_MEMBER(segag80r_state::n7751_status_r)
+uint8_t segag80r_state::n7751_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_n7751_busy << 4;
 }
 
 
-WRITE8_MEMBER(segag80r_state::n7751_command_w)
+void segag80r_state::n7751_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Z80 7751 control port
@@ -804,7 +804,7 @@ WRITE8_MEMBER(segag80r_state::n7751_command_w)
 }
 
 
-WRITE8_MEMBER(segag80r_state::n7751_rom_control_w)
+void segag80r_state::n7751_rom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
@@ -838,14 +838,14 @@ WRITE8_MEMBER(segag80r_state::n7751_rom_control_w)
 }
 
 
-READ8_MEMBER(segag80r_state::n7751_rom_r)
+uint8_t segag80r_state::n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read from BUS */
 	return memregion("n7751")->base()[m_sound_addr];
 }
 
 
-READ8_MEMBER(segag80r_state::n7751_command_r)
+uint8_t segag80r_state::n7751_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
@@ -853,7 +853,7 @@ READ8_MEMBER(segag80r_state::n7751_command_r)
 }
 
 
-WRITE8_MEMBER(segag80r_state::n7751_p2_w)
+void segag80r_state::n7751_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	i8243_device *device = machine().device<i8243_device>("audio_8243");
 	/* write to P2; low 4 bits go to 8243 */
@@ -865,7 +865,7 @@ WRITE8_MEMBER(segag80r_state::n7751_p2_w)
 }
 
 
-READ8_MEMBER(segag80r_state::n7751_t1_r)
+uint8_t segag80r_state::n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* T1 - labelled as "TEST", connected to ground */
 	return 0;

@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(stactics_state,stactics)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::scroll_ram_w)
+void stactics_state::scroll_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -126,7 +126,7 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
  *
  *************************************/
 
-WRITE8_MEMBER(stactics_state::speed_latch_w)
+void stactics_state::speed_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -151,13 +151,13 @@ WRITE8_MEMBER(stactics_state::speed_latch_w)
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_trigger_w)
+void stactics_state::shot_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shot_standby = 0;
 }
 
 
-WRITE8_MEMBER(stactics_state::shot_flag_clear_w)
+void stactics_state::shot_flag_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shot_arrive = 0;
 }

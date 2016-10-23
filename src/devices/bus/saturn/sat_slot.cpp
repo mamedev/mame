@@ -229,7 +229,7 @@ int sat_cart_slot_device::get_cart_type()
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(sat_cart_slot_device::read_rom)
+uint32_t sat_cart_slot_device::read_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset, mem_mask);
@@ -237,7 +237,7 @@ READ32_MEMBER(sat_cart_slot_device::read_rom)
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
+uint32_t sat_cart_slot_device::read_ext_dram0(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ext_dram0(space, offset, mem_mask);
@@ -245,7 +245,7 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
+uint32_t sat_cart_slot_device::read_ext_dram1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ext_dram1(space, offset, mem_mask);
@@ -253,7 +253,7 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
 		return 0xffffffff;
 }
 
-READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
+uint32_t sat_cart_slot_device::read_ext_bram(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ext_bram(space, offset, mem_mask);
@@ -265,19 +265,19 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram0)
+void sat_cart_slot_device::write_ext_dram0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ext_dram0(space, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram1)
+void sat_cart_slot_device::write_ext_dram1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ext_dram1(space, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_bram)
+void sat_cart_slot_device::write_ext_bram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ext_bram(space, offset, data, mem_mask);

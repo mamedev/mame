@@ -153,32 +153,32 @@ void equites_state::video_start_splndrbt()
  *
  *************************************/
 
-READ8_MEMBER(equites_state::equites_fg_videoram_r)
+uint8_t equites_state::equites_fg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// 8-bit
 	return m_fg_videoram[offset];
 }
 
-WRITE8_MEMBER(equites_state::equites_fg_videoram_w)
+void equites_state::equites_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(equites_state::equites_bg_videoram_w)
+void equites_state::equites_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_bg_videoram + offset);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(equites_state::equites_bgcolor_w)
+void equites_state::equites_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bg color register
 	if (offset == 0)
 		m_bgcolor = data;
 }
 
-WRITE16_MEMBER(equites_state::equites_scrollreg_w)
+void equites_state::equites_scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_bg_tilemap->set_scrolly(0, data & 0xff);
@@ -187,7 +187,7 @@ WRITE16_MEMBER(equites_state::equites_scrollreg_w)
 		m_bg_tilemap->set_scrollx(0, data >> 8);
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
+void equites_state::splndrbt_selchar_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// data bit is A16 (offset)
 	data = (offset == 0) ? 0 : 1;
@@ -200,24 +200,24 @@ WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
 	}
 }
 
-WRITE16_MEMBER(equites_state::equites_flipw_w)
+void equites_state::equites_flipw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// data bit is A16 (offset)
 	flip_screen_set(offset != 0);
 }
 
-WRITE8_MEMBER(equites_state::equites_flipb_w)
+void equites_state::equites_flipb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// data bit is A16 (offset)
 	flip_screen_set(offset != 0);
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)
+void equites_state::splndrbt_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_splndrbt_bg_scrollx);
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_bg_scrolly_w)
+void equites_state::splndrbt_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_splndrbt_bg_scrolly);
 }

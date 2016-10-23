@@ -248,23 +248,23 @@ public:
 	void CDD_Process(running_machine& machine, int reason);
 	void CDD_Handle_TOC_Commands(void);
 	bool CDD_Import(running_machine& machine);
-	READ16_MEMBER( segacd_irq_mask_r );
-	WRITE16_MEMBER( segacd_irq_mask_w );
-	READ16_MEMBER( segacd_cdd_ctrl_r );
-	WRITE16_MEMBER( segacd_cdd_ctrl_w );
-	READ8_MEMBER( segacd_cdd_rx_r );
-	WRITE8_MEMBER( segacd_cdd_tx_w );
-	READ16_MEMBER( segacd_cdfader_r );
-	WRITE16_MEMBER( segacd_cdfader_w );
+	uint16_t segacd_irq_mask_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void segacd_irq_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t segacd_cdd_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void segacd_cdd_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint8_t segacd_cdd_rx_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void segacd_cdd_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint16_t segacd_cdfader_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void segacd_cdfader_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	void reset_cd(void);
 
-	WRITE16_MEMBER( segacd_cdc_mode_address_w );
-	READ16_MEMBER( segacd_cdc_mode_address_r );
-	WRITE16_MEMBER( segacd_cdc_data_w );
-	READ16_MEMBER( segacd_cdc_data_r );
-	READ16_MEMBER( cdc_data_sub_r );
-	READ16_MEMBER( cdc_data_main_r );
+	void segacd_cdc_mode_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t segacd_cdc_mode_address_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void segacd_cdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t segacd_cdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t cdc_data_sub_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t cdc_data_main_r(address_space &space, offs_t offset, uint16_t mem_mask);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( segacd_access_timer_callback );
 

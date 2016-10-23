@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER( mb90082_device::set_cs_line )
 }
 
 
-WRITE8_MEMBER( mb90082_device::write )
+void mb90082_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t dat;
 

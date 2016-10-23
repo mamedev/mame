@@ -72,7 +72,7 @@ Notes:
 //  com8116_w - baud rate selection
 //-------------------------------------------------
 
-WRITE8_MEMBER( ob68k1a_state::com8116_w )
+void ob68k1a_state::com8116_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->stt_w(data & 0x0f);
 	m_dbrg->str_w(data >> 4);
@@ -83,7 +83,7 @@ WRITE8_MEMBER( ob68k1a_state::com8116_w )
 //  pia_r - trampoline for PIA odd/even access
 //-------------------------------------------------
 
-READ8_MEMBER( ob68k1a_state::pia_r )
+uint8_t ob68k1a_state::pia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset) {
 		return m_pia1->read(space,0);
@@ -97,7 +97,7 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 //  pia_w - trampoline for PIA odd/even access
 //-------------------------------------------------
 
-WRITE8_MEMBER( ob68k1a_state::pia_w )
+void ob68k1a_state::pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset) {
 		m_pia1->write(space,0,data);

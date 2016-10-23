@@ -49,11 +49,11 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int m_nmi_enable;
 	uint8_t m_out[3];
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(cabaret_nmi_and_coins_w);
+	void bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cabaret_nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void show_out();
 	void init_cabaret();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -76,13 +76,13 @@ public:
 
 
 
-WRITE8_MEMBER(cabaret_state::bg_scroll_w)
+void cabaret_state::bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scroll[offset] = data;
 	m_bg_tilemap->set_scrolly(offset,data);
 }
 
-WRITE8_MEMBER(cabaret_state::bg_tile_w)
+void cabaret_state::bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -101,13 +101,13 @@ TILE_GET_INFO_MEMBER(cabaret_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_tile_w)
+void cabaret_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cabaret_state::fg_color_w)
+void cabaret_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -146,7 +146,7 @@ void cabaret_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
+void cabaret_state::cabaret_nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{

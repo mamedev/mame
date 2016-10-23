@@ -338,12 +338,12 @@ uint32_t scudsp_cpu_device::scudsp_get_mem_source_dma( uint32_t memcode, uint32_
 }
 
 
-READ32_MEMBER( scudsp_cpu_device::program_control_r )
+uint32_t scudsp_cpu_device::program_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_pc & 0xff) | (m_flags & FLAGS_MASK);
 }
 
-WRITE32_MEMBER( scudsp_cpu_device::program_control_w )
+void scudsp_cpu_device::program_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldval, newval;
 
@@ -360,13 +360,13 @@ WRITE32_MEMBER( scudsp_cpu_device::program_control_w )
 	set_input_line(INPUT_LINE_RESET, (EXF) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE32_MEMBER( scudsp_cpu_device::program_w )
+void scudsp_cpu_device::program_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("%02x %08x PRG\n",m_pc,data);
 	scudsp_writeop(m_pc++, data);
 }
 
-WRITE32_MEMBER( scudsp_cpu_device::ram_address_control_w )
+void scudsp_cpu_device::ram_address_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("%02x %08x PRG\n",m_pc,data);
 	m_ra = data & 0xff;
@@ -380,7 +380,7 @@ WRITE32_MEMBER( scudsp_cpu_device::ram_address_control_w )
 	}
 }
 
-READ32_MEMBER( scudsp_cpu_device::ram_address_r )
+uint32_t scudsp_cpu_device::ram_address_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -389,7 +389,7 @@ READ32_MEMBER( scudsp_cpu_device::ram_address_r )
 	return data;
 }
 
-WRITE32_MEMBER( scudsp_cpu_device::ram_address_w )
+void scudsp_cpu_device::ram_address_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	scudsp_set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
 }

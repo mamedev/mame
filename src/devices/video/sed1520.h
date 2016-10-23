@@ -36,12 +36,12 @@ public:
 	static void static_set_screen_update_cb(device_t &device, sed1520_screen_update_func _cb) { downcast<sed1520_device &>(device).m_screen_update_func = _cb; }
 
 	// device interface
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(control_write);
-	virtual DECLARE_READ8_MEMBER(status_read);
-	virtual DECLARE_WRITE8_MEMBER(data_write);
-	virtual DECLARE_READ8_MEMBER(data_read);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t status_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

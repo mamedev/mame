@@ -16,119 +16,119 @@
 const device_type V53 = &device_creator<v53_device>;
 const device_type V53A =&device_creator<v53a_device>;
 
-WRITE8_MEMBER(v53_base_device::BSEL_w)
+void v53_base_device::BSEL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: BSEL_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::BADR_w)
+void v53_base_device::BADR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: BADR_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::BRC_w)
+void v53_base_device::BRC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: BRC_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WMB0_w)
+void v53_base_device::WMB0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WMB0_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WCY1_w)
+void v53_base_device::WCY1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WCY1_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WCY0_w)
+void v53_base_device::WCY0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WCY0_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WAC_w)
+void v53_base_device::WAC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WAC_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::TCKS_w)
+void v53_base_device::TCKS_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: TCKS_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::SBCR_w)
+void v53_base_device::SBCR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: SBCR_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::REFC_w)
+void v53_base_device::REFC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: REFC_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WMB1_w)
+void v53_base_device::WMB1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WMB1_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WCY2_w)
+void v53_base_device::WCY2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WCY2_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WCY3_w)
+void v53_base_device::WCY3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WCY3_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::WCY4_w)
+void v53_base_device::WCY4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: WCY4_w %02x\n", data);
 }
 
-WRITE8_MEMBER(v53_base_device::SULA_w)
+void v53_base_device::SULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: SULA_w %02x\n", data);
 	m_SULA = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::TULA_w)
+void v53_base_device::TULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: TULA_w %02x\n", data);
 	m_TULA = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::IULA_w)
+void v53_base_device::IULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: IULA_w %02x\n", data);
 	m_IULA = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::DULA_w)
+void v53_base_device::DULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: DULA_w %02x\n", data);
 	m_DULA = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::OPHA_w)
+void v53_base_device::OPHA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: OPHA_w %02x\n", data);
 	m_OPHA = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::OPSEL_w)
+void v53_base_device::OPSEL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("v53: OPSEL_w %02x\n", data);
 	m_OPSEL = data;
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(v53_base_device::SCTL_w)
+void v53_base_device::SCTL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7: unused
 	// bit 6: unused
@@ -309,13 +309,13 @@ void v53_base_device::install_peripheral_io()
 /*** SCU ***/
 
 
-READ8_MEMBER(v53_base_device::scu_simk_r)
+uint8_t v53_base_device::scu_simk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("v53: scu_simk_r\n");
 	return m_simk;
 }
 
-WRITE8_MEMBER(v53_base_device::scu_simk_w)
+void v53_base_device::scu_simk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_simk = data;
 	//printf("v53: scu_simk_w %02x\n", data);
@@ -325,15 +325,15 @@ WRITE8_MEMBER(v53_base_device::scu_simk_w)
 
 /*** TCU ***/
 
-WRITE8_MEMBER(v53_base_device::tmu_tct0_w) { m_v53tcu->write(space, 0, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct1_w) { m_v53tcu->write(space, 1, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tct2_w) { m_v53tcu->write(space, 2, data); }
-WRITE8_MEMBER(v53_base_device::tmu_tmd_w)  { m_v53tcu->write(space, 3, data); }
+void v53_base_device::tmu_tct0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_v53tcu->write(space, 0, data); }
+void v53_base_device::tmu_tct1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_v53tcu->write(space, 1, data); }
+void v53_base_device::tmu_tct2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_v53tcu->write(space, 2, data); }
+void v53_base_device::tmu_tmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)  { m_v53tcu->write(space, 3, data); }
 
 
-READ8_MEMBER(v53_base_device::tmu_tst0_r) { return m_v53tcu->read(space, 0); }
-READ8_MEMBER(v53_base_device::tmu_tst1_r) { return m_v53tcu->read(space, 1); }
-READ8_MEMBER(v53_base_device::tmu_tst2_r) { return m_v53tcu->read(space, 2); }
+uint8_t v53_base_device::tmu_tst0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_v53tcu->read(space, 0); }
+uint8_t v53_base_device::tmu_tst1_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_v53tcu->read(space, 1); }
+uint8_t v53_base_device::tmu_tst2_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_v53tcu->read(space, 2); }
 
 
 
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(v53_base_device::get_pic_ack)
+uint8_t v53_base_device::get_pic_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

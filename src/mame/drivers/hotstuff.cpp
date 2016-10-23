@@ -19,10 +19,10 @@ public:
 	{
 		uint8_t index;
 	}m_ioboard;
-	DECLARE_READ8_MEMBER(ioboard_status_r);
-	DECLARE_READ8_MEMBER(ioboard_unk_r);
-	DECLARE_WRITE8_MEMBER(ioboard_data_w);
-	DECLARE_WRITE8_MEMBER(ioboard_reg_w);
+	uint8_t ioboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ioboard_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ioboard_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ioboard_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	uint32_t screen_update_hotstuff(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -77,7 +77,7 @@ uint32_t hotstuff_state::screen_update_hotstuff(screen_device &screen, bitmap_rg
 }
 
 /* TODO: identify this ... */
-READ8_MEMBER(hotstuff_state::ioboard_status_r)
+uint8_t hotstuff_state::ioboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -92,19 +92,19 @@ READ8_MEMBER(hotstuff_state::ioboard_status_r)
 	return res;
 }
 
-READ8_MEMBER(hotstuff_state::ioboard_unk_r)
+uint8_t hotstuff_state::ioboard_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("UNK R\n");
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(hotstuff_state::ioboard_data_w)
+void hotstuff_state::ioboard_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("DATA %02x\n",data);
 }
 
-WRITE8_MEMBER(hotstuff_state::ioboard_reg_w)
+void hotstuff_state::ioboard_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ioboard.index = data;
 	printf("REG %02x\n",data);

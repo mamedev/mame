@@ -17,9 +17,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
-	virtual DECLARE_READ8_MEMBER(nt_r) override;
-	virtual DECLARE_WRITE8_MEMBER(nt_w) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -44,8 +44,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_WRITE8_MEMBER(fcg_write);
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void fcg_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -68,7 +68,7 @@ public:
 	nes_lz93d50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { fcg_write(space, offset, data, mem_mask); }
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { fcg_write(space, offset, data, mem_mask); }
 };
 
 
@@ -84,8 +84,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 
@@ -118,9 +118,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 

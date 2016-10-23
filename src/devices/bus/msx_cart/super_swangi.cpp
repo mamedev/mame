@@ -48,7 +48,7 @@ void msx_cart_super_swangi::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_super_swangi::read_cart)
+uint8_t msx_cart_super_swangi::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -58,7 +58,7 @@ READ8_MEMBER(msx_cart_super_swangi::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_super_swangi::write_cart)
+void msx_cart_super_swangi::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x8000)
 	{

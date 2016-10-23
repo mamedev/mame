@@ -160,7 +160,7 @@ void svision_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 }
 
 
-WRITE8_MEMBER( svision_sound_device::sounddma_w )
+void svision_sound_device::sounddma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
 	m_dma.reg[offset] = data;
@@ -190,7 +190,7 @@ WRITE8_MEMBER( svision_sound_device::sounddma_w )
 }
 
 
-WRITE8_MEMBER( svision_sound_device::noise_w )
+void svision_sound_device::noise_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  logerror("%.6f svision noise write %04x %02x\n",machine.time(),offset+0x28,data);
 	m_noise.reg[offset]=data;

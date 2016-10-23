@@ -49,9 +49,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( term_status_r );
-	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t term_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
@@ -59,19 +59,19 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-READ8_MEMBER( cm1800_state::term_status_r )
+uint8_t cm1800_state::term_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 5 : 4;
 }
 
-READ8_MEMBER( cm1800_state::term_r )
+uint8_t cm1800_state::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( cm1800_state::kbd_put )
+void cm1800_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

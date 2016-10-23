@@ -120,13 +120,13 @@ void vrender0_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 
 
 
-READ32_MEMBER(vrender0_device::vr0_snd_read)
+uint32_t vrender0_device::vr0_snd_read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_SOUNDREGS[offset];
 }
 
 
-WRITE32_MEMBER(vrender0_device::vr0_snd_write)
+void vrender0_device::vr0_snd_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(offset==0x404/4)
 	{

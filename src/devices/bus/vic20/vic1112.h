@@ -39,8 +39,8 @@ public:
 
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
-	DECLARE_READ8_MEMBER( via0_pb_r );
-	DECLARE_WRITE8_MEMBER( via0_pb_w );
+	uint8_t via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 
 protected:

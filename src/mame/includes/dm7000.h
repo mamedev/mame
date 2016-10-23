@@ -22,30 +22,30 @@ public:
 	required_device<ppc4xx_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 
-	DECLARE_WRITE8_MEMBER ( dm7000_iic0_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic0_r );
-	DECLARE_WRITE8_MEMBER ( dm7000_iic1_w );
-	DECLARE_READ8_MEMBER ( dm7000_iic1_r );
+	void dm7000_iic0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dm7000_iic0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dm7000_iic1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dm7000_iic1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER ( dm7000_scc0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scc0_r );
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void dm7000_scc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dm7000_scc0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_scc0_lcr;
 	uint8_t m_scc0_lsr;
 	uint8_t m_term_data;
 
 
-	DECLARE_WRITE8_MEMBER ( dm7000_gpio0_w );
-	DECLARE_READ8_MEMBER ( dm7000_gpio0_r );
+	void dm7000_gpio0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dm7000_gpio0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER ( dm7000_scp0_w );
-	DECLARE_READ8_MEMBER ( dm7000_scp0_r );
+	void dm7000_scp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dm7000_scp0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE16_MEMBER ( dm7000_enet_w );
-	DECLARE_READ16_MEMBER ( dm7000_enet_r );
+	void dm7000_enet_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dm7000_enet_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER( dcr_r );
-	DECLARE_WRITE32_MEMBER( dcr_w );
+	uint32_t dcr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dcr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 
 	uint16_t          m_enet_regs[32];

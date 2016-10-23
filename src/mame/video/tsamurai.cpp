@@ -76,22 +76,22 @@ void tsamurai_state::video_start_m660()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tsamurai_state::scrolly_w)
+void tsamurai_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_background->set_scrolly(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::scrollx_w)
+void tsamurai_state::scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_background->set_scrollx(0, data );
 }
 
-WRITE8_MEMBER(tsamurai_state::bgcolor_w)
+void tsamurai_state::bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgcolor = data;
 }
 
-WRITE8_MEMBER(tsamurai_state::textbank1_w)
+void tsamurai_state::textbank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_textbank1!=data )
 	{
@@ -100,7 +100,7 @@ WRITE8_MEMBER(tsamurai_state::textbank1_w)
 	}
 }
 
-WRITE8_MEMBER(tsamurai_state::m660_textbank2_w)
+void tsamurai_state::m660_textbank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_textbank2!=data )
 	{
@@ -109,18 +109,18 @@ WRITE8_MEMBER(tsamurai_state::m660_textbank2_w)
 	}
 }
 
-WRITE8_MEMBER(tsamurai_state::bg_videoram_w)
+void tsamurai_state::bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset]=data;
 	offset = offset/2;
 	m_background->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::fg_videoram_w)
+void tsamurai_state::fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset]=data;
 	m_foreground->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(tsamurai_state::fg_colorram_w)
+void tsamurai_state::fg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_colorram[offset]!=data )
 	{
@@ -234,7 +234,7 @@ VS Gong Fight runs on older hardware
 ***************************************************************************/
 
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_color_w)
+void tsamurai_state::vsgongf_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_vsgongf_color != data )
 	{

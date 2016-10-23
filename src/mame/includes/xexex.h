@@ -81,16 +81,16 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
 
-	DECLARE_READ16_MEMBER(spriteram_mirror_r);
-	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
-	DECLARE_READ16_MEMBER(xexex_waitskip_r);
-	DECLARE_READ16_MEMBER(control2_r);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint16_t spriteram_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spriteram_mirror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t xexex_waitskip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t control2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_cmd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_cmd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_xexex();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

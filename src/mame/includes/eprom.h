@@ -32,11 +32,11 @@ public:
 	int         m_last_offset;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
-	DECLARE_READ16_MEMBER(special_port1_r);
-	DECLARE_READ16_MEMBER(adc_r);
-	DECLARE_WRITE16_MEMBER(eprom_latch_w);
-	DECLARE_READ16_MEMBER(sync_r);
-	DECLARE_WRITE16_MEMBER(sync_w);
+	uint16_t special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void eprom_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sync_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sync_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_klaxp();
 	void init_guts();
 	void init_eprom();

@@ -43,19 +43,19 @@ public:
 	{ }
 
 	// PPI read/write callbacks
-	DECLARE_WRITE8_MEMBER( video_lamps_w );
-	DECLARE_WRITE8_MEMBER( tilemap_sound_w );
-	DECLARE_WRITE8_MEMBER( sub_control_adc_w );
-	DECLARE_READ8_MEMBER( adc_status_r );
+	void video_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tilemap_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sub_control_adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( hangon_io_r );
-	DECLARE_WRITE16_MEMBER( hangon_io_w );
-	DECLARE_READ16_MEMBER( sharrier_io_r );
-	DECLARE_WRITE16_MEMBER( sharrier_io_w );
+	uint16_t hangon_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hangon_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sharrier_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sharrier_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// I8751-related VBLANK interrupt hanlders
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );

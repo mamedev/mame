@@ -33,7 +33,7 @@ Year   Game                PCB            NOTES
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
+void gaelco_state::bigkarnk_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -42,7 +42,7 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
+void gaelco_state::bigkarnk_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -60,7 +60,7 @@ WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
 	}
 }
 
-WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
+void gaelco_state::OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -70,7 +70,7 @@ WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 
 /*********** Squash Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
+void gaelco_state::gaelco_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -80,7 +80,7 @@ WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 }
 
 
-WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
+void gaelco_state::gaelco_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
@@ -89,7 +89,7 @@ WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
+void gaelco_state::thoop_vram_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
@@ -98,7 +98,7 @@ WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
-WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
+void gaelco_state::thoop_encrypted_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);

@@ -62,19 +62,19 @@ public:
 
 	DECLARE_PALETTE_INIT(mrgame);
 	void init_mrgame();
-	DECLARE_WRITE8_MEMBER(ack1_w);
-	DECLARE_WRITE8_MEMBER(ack2_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(row_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(triple_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-	DECLARE_READ8_MEMBER(col_r);
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_READ8_MEMBER(rsw_r);
+	void ack1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ack2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void triple_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t col_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
@@ -205,13 +205,13 @@ static INPUT_PORTS_START( mrgame )
 	PORT_BIT( 0xe9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ8_MEMBER( mrgame_state::rsw_r )
+uint8_t mrgame_state::rsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
 }
 
 // this is like a keyboard, energise a row and read the column data
-READ8_MEMBER( mrgame_state::col_r )
+uint8_t mrgame_state::col_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_row_data == 0)
 		return m_io_x0->read();
@@ -226,17 +226,17 @@ READ8_MEMBER( mrgame_state::col_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( mrgame_state::row_w )
+void mrgame_state::row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row_data = data & 7;
 }
 
-READ8_MEMBER( mrgame_state::sound_r )
+uint8_t mrgame_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }
 
-WRITE8_MEMBER( mrgame_state::sound_w )
+void mrgame_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 	m_audiocpu1->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -244,18 +244,18 @@ WRITE8_MEMBER( mrgame_state::sound_w )
 }
 
 // this produces 24 outputs from three driver chips to drive lamps & solenoids
-WRITE8_MEMBER( mrgame_state::triple_w )
+void mrgame_state::triple_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x18)==0)
 		m_ackv = BIT(data, 7);
 }
 
-WRITE8_MEMBER( mrgame_state::video_w )
+void mrgame_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_data = data;
 }
 
-WRITE8_MEMBER( mrgame_state::video_ctrl_w )
+void mrgame_state::video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ctrl[offset] = data;
 
@@ -272,28 +272,28 @@ WRITE8_MEMBER( mrgame_state::video_ctrl_w )
 		m_flip = BIT(data, 0);
 }
 
-WRITE8_MEMBER( mrgame_state::ack1_w )
+void mrgame_state::ack1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ack1 = BIT(data, 0);
 }
 
-WRITE8_MEMBER( mrgame_state::ack2_w )
+void mrgame_state::ack2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ack2 = BIT(data, 0);
 }
 
-READ8_MEMBER( mrgame_state::porta_r )
+uint8_t mrgame_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_data;
 }
 
-WRITE8_MEMBER( mrgame_state::portb_w )
+void mrgame_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_status = data;
 	m_ackv = 0;
 }
 
-READ8_MEMBER( mrgame_state::portc_r )
+uint8_t mrgame_state::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
 }

@@ -286,12 +286,12 @@ void ncr5380n_device::delay_cycles(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-READ8_MEMBER(ncr5380n_device::scsidata_r)
+uint8_t ncr5380n_device::scsidata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return scsi_bus->data_r();
 }
 
-WRITE8_MEMBER(ncr5380n_device::outdata_w)
+void ncr5380n_device::outdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outdata = data;
 
@@ -302,12 +302,12 @@ WRITE8_MEMBER(ncr5380n_device::outdata_w)
 	}
 }
 
-READ8_MEMBER(ncr5380n_device::icmd_r)
+uint8_t ncr5380n_device::icmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_icommand;
 }
 
-WRITE8_MEMBER(ncr5380n_device::icmd_w)
+void ncr5380n_device::icmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// asserting to drive the data bus?
 	if ((data & IC_DBUS) && !(m_icommand & IC_DBUS))
@@ -338,12 +338,12 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	delay(2);
 }
 
-READ8_MEMBER(ncr5380n_device::mode_r)
+uint8_t ncr5380n_device::mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mode;
 }
 
-WRITE8_MEMBER(ncr5380n_device::mode_w)
+void ncr5380n_device::mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: mode_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	// arbitration bit being set?
@@ -371,13 +371,13 @@ WRITE8_MEMBER(ncr5380n_device::mode_w)
 	m_mode = data;
 }
 
-READ8_MEMBER(ncr5380n_device::command_r)
+uint8_t ncr5380n_device::command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%s: command_r %02x (%08x)\n", tag(), m_tcommand, space.device().safe_pc());
 	return m_tcommand;
 }
 
-WRITE8_MEMBER(ncr5380n_device::command_w)
+void ncr5380n_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	m_tcommand = data;
@@ -411,7 +411,7 @@ void ncr5380n_device::check_irq()
 	#endif
 }
 
-READ8_MEMBER(ncr5380n_device::status_r)
+uint8_t ncr5380n_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status |
@@ -427,11 +427,11 @@ READ8_MEMBER(ncr5380n_device::status_r)
 	return res;
 }
 
-WRITE8_MEMBER(ncr5380n_device::selenable_w)
+void ncr5380n_device::selenable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(ncr5380n_device::busandstatus_r)
+uint8_t ncr5380n_device::busandstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = m_busstatus |
@@ -443,28 +443,28 @@ READ8_MEMBER(ncr5380n_device::busandstatus_r)
 	return res;
 }
 
-WRITE8_MEMBER(ncr5380n_device::startdmasend_w)
+void ncr5380n_device::startdmasend_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%02x to start dma send\n", data);
 	drq_set();
 }
 
-READ8_MEMBER(ncr5380n_device::indata_r)
+uint8_t ncr5380n_device::indata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dma_r();
 }
 
-WRITE8_MEMBER(ncr5380n_device::startdmatargetrx_w)
+void ncr5380n_device::startdmatargetrx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%02x to start dma target Rx\n", data);
 }
 
-READ8_MEMBER(ncr5380n_device::resetparityirq_r)
+uint8_t ncr5380n_device::resetparityirq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(ncr5380n_device::startdmainitrx_w)
+void ncr5380n_device::startdmainitrx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to start dma initiator Rx\n", data);
 	recv_byte();
@@ -516,7 +516,7 @@ void ncr5380n_device::drq_clear()
 	}
 }
 
-READ8_MEMBER(ncr5380n_device::read)
+uint8_t ncr5380n_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -548,7 +548,7 @@ READ8_MEMBER(ncr5380n_device::read)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ncr5380n_device::write)
+void ncr5380n_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%x to 5380 @ %x\n", data, offset);
 	switch (offset & 7)

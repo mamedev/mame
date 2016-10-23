@@ -12,7 +12,7 @@
 #include "includes/pp01.h"
 
 
-WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
+void pp01_state::pp01_video_write_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_write_mode = data & 0x0f;
 }
@@ -52,28 +52,28 @@ void pp01_state::pp01_video_w(uint8_t block,uint16_t offset,uint8_t data,uint8_t
 	}
 }
 
-WRITE8_MEMBER(pp01_state::pp01_video_r_1_w)
+void pp01_state::pp01_video_r_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(0,offset,data,0);
 }
-WRITE8_MEMBER(pp01_state::pp01_video_g_1_w)
+void pp01_state::pp01_video_g_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(1,offset,data,0);
 }
-WRITE8_MEMBER(pp01_state::pp01_video_b_1_w)
+void pp01_state::pp01_video_b_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(2,offset,data,0);
 }
 
-WRITE8_MEMBER(pp01_state::pp01_video_r_2_w)
+void pp01_state::pp01_video_r_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(0,offset,data,1);
 }
-WRITE8_MEMBER(pp01_state::pp01_video_g_2_w)
+void pp01_state::pp01_video_g_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(1,offset,data,1);
 }
-WRITE8_MEMBER(pp01_state::pp01_video_b_2_w)
+void pp01_state::pp01_video_b_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pp01_video_w(2,offset,data,1);
 }
@@ -137,13 +137,13 @@ void pp01_state::machine_reset()
 	}
 }
 
-WRITE8_MEMBER(pp01_state::pp01_mem_block_w)
+void pp01_state::pp01_mem_block_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_memory_block[offset] = data;
 	pp01_set_memory(offset, data);
 }
 
-READ8_MEMBER(pp01_state::pp01_mem_block_r)
+uint8_t pp01_state::pp01_mem_block_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return  m_memory_block[offset];
 }
@@ -161,16 +161,16 @@ WRITE_LINE_MEMBER(pp01_state::pp01_pit_out1)
 {
 }
 
-READ8_MEMBER(pp01_state::pp01_8255_porta_r)
+uint8_t pp01_state::pp01_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_scroll;
 }
-WRITE8_MEMBER(pp01_state::pp01_8255_porta_w)
+void pp01_state::pp01_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_scroll = data;
 }
 
-READ8_MEMBER(pp01_state::pp01_8255_portb_r)
+uint8_t pp01_state::pp01_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
@@ -179,13 +179,13 @@ READ8_MEMBER(pp01_state::pp01_8255_portb_r)
 
 	return (ioport(keynames[m_key_line])->read() & 0x3F) | (ioport("LINEALL")->read() & 0xC0);
 }
-WRITE8_MEMBER(pp01_state::pp01_8255_portb_w)
+void pp01_state::pp01_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("pp01_8255_portb_w %02x\n",data);
 
 }
 
-WRITE8_MEMBER(pp01_state::pp01_8255_portc_w)
+void pp01_state::pp01_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 4))
 		m_key_line = data & 0x0f;
@@ -193,7 +193,7 @@ WRITE8_MEMBER(pp01_state::pp01_8255_portc_w)
 		m_speaker->level_w(BIT(data, 0));
 }
 
-READ8_MEMBER(pp01_state::pp01_8255_portc_r)
+uint8_t pp01_state::pp01_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

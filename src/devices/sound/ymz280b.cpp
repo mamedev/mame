@@ -908,7 +908,7 @@ int ymz280b_device::compute_status()
 
 ***********************************************************************************************/
 
-READ8_MEMBER( ymz280b_device::read )
+uint8_t ymz280b_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 	{
@@ -926,7 +926,7 @@ READ8_MEMBER( ymz280b_device::read )
 }
 
 
-WRITE8_MEMBER( ymz280b_device::write )
+void ymz280b_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		m_current_register = data;

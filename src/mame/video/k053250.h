@@ -24,11 +24,11 @@ public:
 
 	static void static_set_offsets(device_t &device, int offx, int offy);
 
-	DECLARE_READ16_MEMBER(reg_r);
-	DECLARE_WRITE16_MEMBER(reg_w);
-	DECLARE_READ16_MEMBER(ram_r);
-	DECLARE_WRITE16_MEMBER(ram_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t reg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority );
 

@@ -129,13 +129,13 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 */
 
-WRITE32_MEMBER(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
+void silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
 }
 
-WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
+void silkroad_state::silk_6295_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -145,7 +145,7 @@ WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
 	}
 }
 
-WRITE32_MEMBER(silkroad_state::silk_coin_counter_w)
+void silkroad_state::silk_coin_counter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{

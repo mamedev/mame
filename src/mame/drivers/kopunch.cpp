@@ -94,13 +94,13 @@ ADDRESS_MAP_END
 
 ********************************************************/
 
-READ8_MEMBER(kopunch_state::sensors1_r)
+uint8_t kopunch_state::sensors1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// punch strength low bits
 	return machine().rand();
 }
 
-READ8_MEMBER(kopunch_state::sensors2_r)
+uint8_t kopunch_state::sensors2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d2: punch strength high bits
 	// d3: coin 2
@@ -111,12 +111,12 @@ READ8_MEMBER(kopunch_state::sensors2_r)
 	return (machine().rand() & 0x07) | ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER(kopunch_state::lamp_w)
+void kopunch_state::lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, ~data & 0x80);
 }
 
-WRITE8_MEMBER(kopunch_state::coin_w)
+void kopunch_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);

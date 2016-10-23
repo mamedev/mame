@@ -88,8 +88,8 @@ public:
 	template<class _Object> static devcb_base &set_tbre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tbre.set_callback(object); }
 	template<class _Object> static devcb_base &set_tre_wr_callback(device_t &device, _Object object) { return downcast<im6402_device &>(device).m_write_tre.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read ) { return m_rbr; }
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_rbr; }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_READ_LINE_MEMBER( dr_r ) { return m_dr; }
 	DECLARE_READ_LINE_MEMBER( tbre_r ) { return m_tbre; }

@@ -147,7 +147,7 @@ WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
 	m_pic->ir3_w(state);
 }
 
-WRITE8_MEMBER( tsispch_state::i8251_rxd )
+void tsispch_state::i8251_rxd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_uart->receive_character(data);
 }
@@ -155,7 +155,7 @@ WRITE8_MEMBER( tsispch_state::i8251_rxd )
 /*****************************************************************************
  LED/dipswitch stuff
 *****************************************************************************/
-READ8_MEMBER( tsispch_state::dsw_r )
+uint8_t tsispch_state::dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* the only dipswitch I'm really sure about is s4-7 which enables the test mode
 	 * The switches are, for normal operation on my unit (and the older unit as well):
@@ -167,7 +167,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
 	return ioport("s4")->read();
 }
 
-WRITE8_MEMBER( tsispch_state::peripheral_w )
+void tsispch_state::peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This controls the four LEDS, the RESET line for the upd77p20,
 	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
@@ -186,7 +186,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 /*****************************************************************************
  UPD77P20 stuff
 *****************************************************************************/
-READ16_MEMBER( tsispch_state::dsp_data_r )
+uint16_t tsispch_state::dsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
@@ -199,7 +199,7 @@ READ16_MEMBER( tsispch_state::dsp_data_r )
 #endif
 }
 
-WRITE16_MEMBER( tsispch_state::dsp_data_w )
+void tsispch_state::dsp_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP_W
@@ -208,7 +208,7 @@ WRITE16_MEMBER( tsispch_state::dsp_data_w )
 	upd7725->snesdsp_write(true, data);
 }
 
-READ16_MEMBER( tsispch_state::dsp_status_r )
+uint16_t tsispch_state::dsp_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");
 #ifdef DEBUG_DSP
@@ -221,7 +221,7 @@ READ16_MEMBER( tsispch_state::dsp_status_r )
 #endif
 }
 
-WRITE16_MEMBER( tsispch_state::dsp_status_w )
+void tsispch_state::dsp_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
 	upd7725_device *upd7725 = machine().device<upd7725_device>("dsp");

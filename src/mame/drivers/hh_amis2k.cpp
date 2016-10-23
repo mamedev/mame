@@ -57,8 +57,8 @@ public:
 	uint16_t m_display_cache[0x10];
 	uint8_t m_display_decay[0x100];
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE16_MEMBER(write_a);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_a(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(write_f);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
@@ -213,14 +213,14 @@ void wildfire_state::write_a12(int state)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wildfire_state::write_d)
+void wildfire_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D0-D7: leds out
 	m_d = data;
 	display_update();
 }
 
-WRITE16_MEMBER(wildfire_state::write_a)
+void wildfire_state::write_a(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data ^= 0x1fff; // active-low
 

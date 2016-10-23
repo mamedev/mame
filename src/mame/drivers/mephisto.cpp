@@ -94,11 +94,11 @@ public:
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<beep_device> m_beep;
-	DECLARE_WRITE8_MEMBER(write_lcd);
-	DECLARE_WRITE8_MEMBER(mephisto_NMI);
-	DECLARE_READ8_MEMBER(read_keys);
-	DECLARE_WRITE8_MEMBER(write_led);
-	DECLARE_WRITE8_MEMBER(write_led_mm2);
+	void write_lcd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mephisto_NMI(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_keys(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_led(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_led_mm2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led_status;
 	//uint8_t *m_p_ram;
@@ -132,7 +132,7 @@ protected:
 };
 
 
-WRITE8_MEMBER( mephisto_state::write_lcd )
+void mephisto_state::write_lcd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_led7 == 0) output().set_digit_value(m_lcd_shift_counter,data);  // 0x109 MM IV // 0x040 MM V
 
@@ -141,12 +141,12 @@ WRITE8_MEMBER( mephisto_state::write_lcd )
 	m_lcd_shift_counter &= 3;
 }
 
-WRITE8_MEMBER( mephisto_state::mephisto_NMI )
+void mephisto_state::mephisto_NMI(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_allowNMI = 1;
 }
 
-READ8_MEMBER( mephisto_state::read_keys )
+uint8_t mephisto_state::read_keys(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -183,7 +183,7 @@ READ8_MEMBER( mephisto_state::read_keys )
 	return data | 0x7f;
 }
 
-WRITE8_MEMBER( mephisto_state::write_led )
+void mephisto_state::write_led(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t LED_offset=100;
 	data &= 0x80;
@@ -194,7 +194,7 @@ WRITE8_MEMBER( mephisto_state::write_led )
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-WRITE8_MEMBER( mephisto_state::write_led_mm2 )
+void mephisto_state::write_led_mm2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t LED_offset=100;
 	data &= 0x80;

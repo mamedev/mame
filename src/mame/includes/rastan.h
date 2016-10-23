@@ -34,11 +34,11 @@ public:
 	required_device<msm5205_device> m_msm;
 	required_device<pc080sn_device> m_pc080sn;
 	required_device<pc090oj_device> m_pc090oj;
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);
-	DECLARE_WRITE16_MEMBER(rastan_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(rastan_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(rastan_msm5205_stop_w);
+	void rastan_msm5205_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rastan_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rastan_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rastan_msm5205_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rastan_msm5205_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

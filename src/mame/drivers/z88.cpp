@@ -44,16 +44,16 @@ explains why the extra checks are done
 */
 
 // cartridges read
-READ8_MEMBER(z88_state::bank0_cart_r) { return m_carts[m_bank[0].slot]->read(space, (m_bank[0].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank1_cart_r) { return m_carts[m_bank[1].slot]->read(space, (m_bank[1].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank2_cart_r) { return m_carts[m_bank[2].slot]->read(space, (m_bank[2].page<<14) + offset); }
-READ8_MEMBER(z88_state::bank3_cart_r) { return m_carts[m_bank[3].slot]->read(space, (m_bank[3].page<<14) + offset); }
+uint8_t z88_state::bank0_cart_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_carts[m_bank[0].slot]->read(space, (m_bank[0].page<<14) + offset); }
+uint8_t z88_state::bank1_cart_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_carts[m_bank[1].slot]->read(space, (m_bank[1].page<<14) + offset); }
+uint8_t z88_state::bank2_cart_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_carts[m_bank[2].slot]->read(space, (m_bank[2].page<<14) + offset); }
+uint8_t z88_state::bank3_cart_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_carts[m_bank[3].slot]->read(space, (m_bank[3].page<<14) + offset); }
 
 // cartridges write
-WRITE8_MEMBER(z88_state::bank0_cart_w) { m_carts[m_bank[0].slot]->write(space, (m_bank[0].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank1_cart_w) { m_carts[m_bank[1].slot]->write(space, (m_bank[1].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank2_cart_w) { m_carts[m_bank[2].slot]->write(space, (m_bank[2].page<<14) + offset, data); }
-WRITE8_MEMBER(z88_state::bank3_cart_w) { m_carts[m_bank[3].slot]->write(space, (m_bank[3].page<<14) + offset, data); }
+void z88_state::bank0_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_carts[m_bank[0].slot]->write(space, (m_bank[0].page<<14) + offset, data); }
+void z88_state::bank1_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_carts[m_bank[1].slot]->write(space, (m_bank[1].page<<14) + offset, data); }
+void z88_state::bank2_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_carts[m_bank[2].slot]->write(space, (m_bank[2].page<<14) + offset, data); }
+void z88_state::bank3_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_carts[m_bank[3].slot]->write(space, (m_bank[3].page<<14) + offset, data); }
 
 
 UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
@@ -574,7 +574,7 @@ void z88_state::machine_reset()
 	m_bank_type[0] = m_bank_type[1] = m_bank_type[2] = m_bank_type[3] = 0;
 }
 
-READ8_MEMBER(z88_state::kb_r)
+uint8_t z88_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

@@ -56,7 +56,7 @@ void crbaloon_state::pc3092_update()
 }
 
 
-WRITE8_MEMBER(crbaloon_state::pc3092_w)
+void crbaloon_state::pc3092_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pc3092_data[offset] = data & 0x0f;
 
@@ -112,7 +112,7 @@ void crbaloon_state::pc3259_update(void)
 }
 
 
-READ8_MEMBER(crbaloon_state::pc3259_r)
+uint8_t crbaloon_state::pc3259_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	uint8_t reg = offset >> 2;
@@ -153,7 +153,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
  *
  *************************************/
 
-WRITE8_MEMBER(crbaloon_state::port_sound_w)
+void crbaloon_state::port_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	m_irq_mask = data & 0x01;

@@ -54,14 +54,14 @@ INTERRUPT_GEN_MEMBER(dribling_state::dribling_irq_gen)
  *
  *************************************/
 
-READ8_MEMBER(dribling_state::dsr_r)
+uint8_t dribling_state::dsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* return DSR0-7 */
 	return (m_ds << m_sh) | (m_dr >> (8 - m_sh));
 }
 
 
-READ8_MEMBER(dribling_state::input_mux0_r)
+uint8_t dribling_state::input_mux0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* low value in the given bit selects */
 	if (!(m_input_mux & 0x01))
@@ -81,7 +81,7 @@ READ8_MEMBER(dribling_state::input_mux0_r)
  *
  *************************************/
 
-WRITE8_MEMBER(dribling_state::misc_w)
+void dribling_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 = di */
 	m_di = (data >> 7) & 1;
@@ -104,7 +104,7 @@ WRITE8_MEMBER(dribling_state::misc_w)
 }
 
 
-WRITE8_MEMBER(dribling_state::sound_w)
+void dribling_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 = stop palla */
 	/* bit 6 = contrasto */
@@ -118,14 +118,14 @@ WRITE8_MEMBER(dribling_state::sound_w)
 }
 
 
-WRITE8_MEMBER(dribling_state::pb_w)
+void dribling_state::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write PB0-7 */
 	logerror("%s:pb_w(%02X)\n", machine().describe_context(), data);
 }
 
 
-WRITE8_MEMBER(dribling_state::shr_w)
+void dribling_state::shr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3 = watchdog */
 	if (data & 0x08)
@@ -143,7 +143,7 @@ WRITE8_MEMBER(dribling_state::shr_w)
  *
  *************************************/
 
-READ8_MEMBER(dribling_state::ioread)
+uint8_t dribling_state::ioread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x08)
 		return m_ppi8255_0->read(space, offset & 3);
@@ -153,7 +153,7 @@ READ8_MEMBER(dribling_state::ioread)
 }
 
 
-WRITE8_MEMBER(dribling_state::iowrite)
+void dribling_state::iowrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x08)
 		m_ppi8255_0->write(space, offset & 3, data);

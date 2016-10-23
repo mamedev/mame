@@ -90,25 +90,25 @@ public:
 	DECLARE_PALETTE_INIT(hx20);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( ksc_w );
-	DECLARE_READ8_MEMBER( krtn07_r );
-	DECLARE_READ8_MEMBER( krtn89_r );
-	DECLARE_WRITE8_MEMBER( lcd_cs_w );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
+	void ksc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t krtn07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t krtn89_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( main_p1_r );
-	DECLARE_WRITE8_MEMBER( main_p1_w );
-	DECLARE_READ8_MEMBER( main_p2_r );
-	DECLARE_WRITE8_MEMBER( main_p2_w );
+	uint8_t main_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t main_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( slave_p1_r );
-	DECLARE_WRITE8_MEMBER( slave_p1_w );
-	DECLARE_READ8_MEMBER( slave_p2_r );
-	DECLARE_WRITE8_MEMBER( slave_p2_w );
-	DECLARE_READ8_MEMBER( slave_p3_r );
-	DECLARE_WRITE8_MEMBER( slave_p3_w );
-	DECLARE_READ8_MEMBER( slave_p4_r );
-	DECLARE_WRITE8_MEMBER( slave_p4_w );
+	uint8_t slave_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_p4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 

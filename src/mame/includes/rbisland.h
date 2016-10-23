@@ -45,16 +45,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(jumping_sound_w);
-	DECLARE_READ8_MEMBER(jumping_latch_r);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_ctrl_w);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(rbisland_cchip_ram_w);
-	DECLARE_READ16_MEMBER(rbisland_cchip_ctrl_r);
-	DECLARE_READ16_MEMBER(rbisland_cchip_ram_r);
-	DECLARE_WRITE16_MEMBER(rbisland_spritectrl_w);
-	DECLARE_WRITE16_MEMBER(jumping_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void jumping_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t jumping_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rbisland_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rbisland_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rbisland_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rbisland_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rbisland_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rbisland_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void jumping_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jumping();
 	void init_rbislande();
 	void init_rbisland();

@@ -44,15 +44,15 @@ public:
 	struct {
 		uint16_t cmd;
 	}m_key;
-	DECLARE_READ8_MEMBER(fp6000_pcg_r);
-	DECLARE_WRITE8_MEMBER(fp6000_pcg_w);
-	DECLARE_WRITE8_MEMBER(fp6000_6845_address_w);
-	DECLARE_WRITE8_MEMBER(fp6000_6845_data_w);
-	DECLARE_READ8_MEMBER(fp6000_key_r);
-	DECLARE_WRITE8_MEMBER(fp6000_key_w);
-	DECLARE_READ16_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(ex_board_r);
-	DECLARE_READ16_MEMBER(pit_r);
+	uint8_t fp6000_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fp6000_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fp6000_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fp6000_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fp6000_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fp6000_key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ex_board_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pit_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -149,24 +149,24 @@ uint32_t fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-READ8_MEMBER(fp6000_state::fp6000_pcg_r)
+uint8_t fp6000_state::fp6000_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_char_rom[offset];
 }
 
-WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
+void fp6000_state::fp6000_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_rom[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset >> 4);
 }
 
-WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
+void fp6000_state::fp6000_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
+void fp6000_state::fp6000_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START(fp6000_map, AS_PROGRAM, 16, fp6000_state )
 ADDRESS_MAP_END
 
 /* Hack until I understand what UART is this one ... */
-READ8_MEMBER(fp6000_state::fp6000_key_r)
+uint8_t fp6000_state::fp6000_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 	{
@@ -199,7 +199,7 @@ READ8_MEMBER(fp6000_state::fp6000_key_r)
 	return 0x40;
 }
 
-WRITE8_MEMBER(fp6000_state::fp6000_key_w)
+void fp6000_state::fp6000_key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset)
 		m_key.cmd = (data & 0xff) | (m_key.cmd << 8);
@@ -207,17 +207,17 @@ WRITE8_MEMBER(fp6000_state::fp6000_key_w)
 		m_key.cmd = (data << 8) | (m_key.cmd & 0xff);
 }
 
-READ16_MEMBER(fp6000_state::unk_r)
+uint16_t fp6000_state::unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x40;
 }
 
-READ16_MEMBER(fp6000_state::ex_board_r)
+uint16_t fp6000_state::ex_board_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(fp6000_state::pit_r)
+uint16_t fp6000_state::pit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }

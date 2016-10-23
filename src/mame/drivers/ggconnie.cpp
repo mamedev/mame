@@ -40,23 +40,23 @@ public:
 
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
-WRITE8_MEMBER(ggconnie_state::lamp_w)
+void ggconnie_state::lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("lamp", !BIT(data,0));
 }
 
-WRITE8_MEMBER(ggconnie_state::output_w)
+void ggconnie_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// written in "Output Test" in test mode
 }
 
 /* TODO: banking not understood (is the ROM dumped correctly btw?) */
-WRITE8_MEMBER(ggconnie_state::oki_bank_w)
+void ggconnie_state::oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data != 0);
 }

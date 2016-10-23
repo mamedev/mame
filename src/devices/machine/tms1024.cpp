@@ -84,13 +84,13 @@ void tms1024_device::device_reset()
 //  handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(tms1024_device::write_h)
+void tms1024_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// H1,2,3,4: data for outputs A,B,C,D
 	m_h = data & 0xf;
 }
 
-WRITE8_MEMBER(tms1024_device::write_s)
+void tms1024_device::write_s(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// S0,1,2: select port
 	m_s = data & 7;

@@ -228,8 +228,8 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
-	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
+	void mpu12wbk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpu12wbk_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_mpu12wbk();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
@@ -245,14 +245,14 @@ public:
 *************************/
 
 
-WRITE8_MEMBER(mpu12wbk_state::mpu12wbk_videoram_w)
+void mpu12wbk_state::mpu12wbk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mpu12wbk_state::mpu12wbk_colorram_w)
+void mpu12wbk_state::mpu12wbk_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

@@ -44,9 +44,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sd_poll_w);
 	DECLARE_READ_LINE_MEMBER(sd_poll_r);
 
-	DECLARE_READ8_MEMBER( port1_r );
-	DECLARE_READ8_MEMBER( port2_r );
-	DECLARE_WRITE8_MEMBER( port2_w );
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -67,7 +67,7 @@ public:
 
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE16_MEMBER(nibble_videoram_w);
+	void nibble_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
 	virtual void machine_start() override;
@@ -85,7 +85,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE16_MEMBER(nibble_state::nibble_videoram_w)
+void nibble_state::nibble_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_videoram+offset);
 	m_bg_tilemap->mark_tile_dirty(offset*2);

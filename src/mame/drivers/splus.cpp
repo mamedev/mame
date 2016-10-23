@@ -100,19 +100,19 @@ public:
 	int16_t m_stepper_pos[5];
 	uint8_t m_stop_pos[5];
 
-	DECLARE_WRITE8_MEMBER(splus_io_w);
-	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
-	DECLARE_WRITE8_MEMBER(splus_serial_w);
-	DECLARE_WRITE8_MEMBER(splus_7seg_w);
-	DECLARE_WRITE8_MEMBER(splus_duart_w);
-	DECLARE_READ8_MEMBER(splus_serial_r);
-	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
-	DECLARE_READ8_MEMBER(splus_io_r);
-	DECLARE_READ8_MEMBER(splus_duart_r);
-	DECLARE_READ8_MEMBER(splus_watchdog_r);
-	DECLARE_READ8_MEMBER(splus_registers_r);
-	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
-	DECLARE_READ8_MEMBER(splus_reel_optics_r);
+	void splus_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void splus_load_pulse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void splus_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void splus_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void splus_duart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t splus_serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t splus_m_reel_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t splus_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t splus_duart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t splus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t splus_registers_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t splus_reel_optics_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_splus();
 	required_device<cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
@@ -144,7 +144,7 @@ static const uint8_t optics[200] = {
 * Write Handlers *
 ******************/
 
-WRITE8_MEMBER(splus_state::splus_io_w)
+void splus_state::splus_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// P1.0 = Reel 1 Controller
 	// P1.1 = Reel 2 Controller
@@ -193,13 +193,13 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 	m_io_port[offset] = data;
 }
 
-WRITE8_MEMBER(splus_state::splus_load_pulse_w)
+void splus_state::splus_load_pulse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  uint8_t out = 0;
 //    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
-WRITE8_MEMBER(splus_state::splus_serial_w)
+void splus_state::splus_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t out = 0;
 	out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
@@ -340,7 +340,7 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 	}
 }
 
-WRITE8_MEMBER(splus_state::splus_7seg_w)
+void splus_state::splus_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
@@ -355,12 +355,12 @@ WRITE8_MEMBER(splus_state::splus_7seg_w)
 		output().set_digit_value(seg, ls48_map[val]);
 }
 
-WRITE8_MEMBER(splus_state::splus_duart_w)
+void splus_state::splus_duart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Used for Slot Accounting System Communication
 }
 
-WRITE8_MEMBER(splus_state::i2c_nvram_w)
+void splus_state::i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i2cmem->write_scl(BIT(data, 2));
 	m_sda_dir = BIT(data, 1);
@@ -371,7 +371,7 @@ WRITE8_MEMBER(splus_state::i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(splus_state::splus_serial_r)
+uint8_t splus_state::splus_serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t coin_out = 0x00;
 	uint8_t coin_optics = 0x00;
@@ -512,12 +512,12 @@ READ8_MEMBER(splus_state::splus_serial_r)
 	return val;
 }
 
-READ8_MEMBER(splus_state::splus_m_reel_ram_r)
+uint8_t splus_state::splus_m_reel_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_reel_ram[offset];
 }
 
-READ8_MEMBER(splus_state::splus_io_r)
+uint8_t splus_state::splus_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 3)
 		return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
@@ -525,23 +525,23 @@ READ8_MEMBER(splus_state::splus_io_r)
 		return m_io_port[offset];
 }
 
-READ8_MEMBER(splus_state::splus_duart_r)
+uint8_t splus_state::splus_duart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
-READ8_MEMBER(splus_state::splus_watchdog_r)
+uint8_t splus_state::splus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00; // Watchdog
 }
 
-READ8_MEMBER(splus_state::splus_registers_r)
+uint8_t splus_state::splus_registers_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff; // Reset Registers in Real Time Clock
 }
 
-READ8_MEMBER(splus_state::splus_reel_optics_r)
+uint8_t splus_state::splus_reel_optics_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
         Bit 0 = REEL #1

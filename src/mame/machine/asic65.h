@@ -24,14 +24,14 @@ public:
 	static void set_type(device_t &device, int type) { downcast<asic65_device &>(device).m_asic65_type = type; }
 
 	void reset_line(int state);
-	DECLARE_WRITE16_MEMBER( data_w );
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_READ16_MEMBER( io_r );
+	void data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( m68k_w );
-	DECLARE_READ16_MEMBER( m68k_r );
-	DECLARE_WRITE16_MEMBER( stat_w );
-	DECLARE_READ16_MEMBER( stat_r );
+	void m68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t m68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void stat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t stat_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER( get_bio );
 
 	enum

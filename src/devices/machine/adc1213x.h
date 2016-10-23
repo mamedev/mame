@@ -33,12 +33,12 @@ public:
 
 	static void set_ipt_convert_callback(device_t &device, adc1213x_ipt_convert_delegate callback) { downcast<adc12138_device &>(device).m_ipt_read_cb = callback; }
 
-	DECLARE_WRITE8_MEMBER( di_w );
-	DECLARE_WRITE8_MEMBER( cs_w );
-	DECLARE_WRITE8_MEMBER( sclk_w );
-	DECLARE_WRITE8_MEMBER( conv_w );
-	DECLARE_READ8_MEMBER( do_r );
-	DECLARE_READ8_MEMBER( eoc_r );
+	void di_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sclk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void conv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t do_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t eoc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

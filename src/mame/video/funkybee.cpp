@@ -42,19 +42,19 @@ PALETTE_INIT_MEMBER(funkybee_state, funkybee)
 	}
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_videoram_w)
+void funkybee_state::funkybee_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
+void funkybee_state::funkybee_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
+void funkybee_state::funkybee_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfx_bank != (data & 0x01))
 	{
@@ -63,12 +63,12 @@ WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
 	}
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
+void funkybee_state::funkybee_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
+void funkybee_state::funkybee_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }

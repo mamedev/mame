@@ -57,16 +57,16 @@ public:
 	memory_region *m_card2_reg;
 
 	virtual void machine_start() override;
-	DECLARE_WRITE16_MEMBER( gatearray_w );
-	DECLARE_WRITE8_MEMBER( lcd_control );
-	DECLARE_READ8_MEMBER( lcd_data_r );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
-	DECLARE_READ16_MEMBER( pb1000_kb_r );
-	DECLARE_READ16_MEMBER( pb2000c_kb_r );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( pb1000_port_r );
-	DECLARE_READ8_MEMBER( pb2000c_port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	void gatearray_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lcd_control(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t pb1000_kb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pb2000c_kb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pb1000_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pb2000c_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t read_touchscreen(uint8_t line);
 	DECLARE_PALETTE_INIT(pb1000);
 	TIMER_CALLBACK_MEMBER(keyboard_timer);
@@ -318,7 +318,7 @@ static GFXDECODE_START( pb1000 )
 	GFXDECODE_ENTRY( "hd44352", 0x0000, pb1000_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE16_MEMBER( pb1000_state::gatearray_w )
+void pb1000_state::gatearray_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gatearray[offset] = data&0xff;
 
@@ -330,19 +330,19 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 		membank("bank1")->set_base(m_rom_reg->base());
 }
 
-WRITE8_MEMBER( pb1000_state::lcd_control )
+void pb1000_state::lcd_control(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hd44352->control_write(data);
 }
 
 
-READ8_MEMBER( pb1000_state::lcd_data_r )
+uint8_t pb1000_state::lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hd44352->data_read();
 }
 
 
-WRITE8_MEMBER( pb1000_state::lcd_data_w )
+void pb1000_state::lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hd44352->data_write(data);
 }
@@ -363,7 +363,7 @@ uint16_t pb1000_state::read_touchscreen(uint8_t line)
 }
 
 
-READ16_MEMBER( pb1000_state::pb1000_kb_r )
+uint16_t pb1000_state::pb1000_kb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	uint16_t data = 0;
@@ -387,7 +387,7 @@ READ16_MEMBER( pb1000_state::pb1000_kb_r )
 	return data;
 }
 
-READ16_MEMBER( pb1000_state::pb2000c_kb_r )
+uint16_t pb1000_state::pb2000c_kb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const bitnames[] = {"NULL", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12", "NULL", "NULL", "NULL"};
 	uint16_t data = 0;
@@ -409,7 +409,7 @@ READ16_MEMBER( pb1000_state::pb2000c_kb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pb1000_state::kb_matrix_w )
+void pb1000_state::kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 	{
@@ -430,19 +430,19 @@ WRITE8_MEMBER( pb1000_state::kb_matrix_w )
 	m_kb_matrix = data;
 }
 
-READ8_MEMBER( pb1000_state::pb1000_port_r )
+uint8_t pb1000_state::pb1000_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//TODO
 	return 0x00;
 }
 
-READ8_MEMBER( pb1000_state::pb2000c_port_r )
+uint8_t pb1000_state::pb2000c_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//TODO
 	return 0xfc;
 }
 
-WRITE8_MEMBER( pb1000_state::port_w )
+void pb1000_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beeper->set_state((BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);

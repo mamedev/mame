@@ -63,23 +63,23 @@ public:
 
 	// in drivers/beathead.c
 	virtual void update_interrupts() override;
-	DECLARE_WRITE32_MEMBER( interrupt_control_w );
-	DECLARE_READ32_MEMBER( interrupt_control_r );
-	DECLARE_WRITE32_MEMBER( eeprom_data_w );
-	DECLARE_WRITE32_MEMBER( eeprom_enable_w );
-	DECLARE_WRITE32_MEMBER( sound_reset_w );
-	DECLARE_WRITE32_MEMBER( coin_count_w );
-	DECLARE_READ32_MEMBER( speedup_r );
-	DECLARE_READ32_MEMBER( movie_speedup_r );
+	void interrupt_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t interrupt_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void eeprom_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void coin_count_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t movie_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	// in video/beathead.c
-	DECLARE_WRITE32_MEMBER( vram_transparent_w );
-	DECLARE_WRITE32_MEMBER( vram_bulk_w );
-	DECLARE_WRITE32_MEMBER( vram_latch_w );
-	DECLARE_WRITE32_MEMBER( vram_copy_w );
-	DECLARE_WRITE32_MEMBER( finescroll_w );
-	DECLARE_READ32_MEMBER( hsync_ram_r );
-	DECLARE_WRITE32_MEMBER( hsync_ram_w );
+	void vram_transparent_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_bulk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_copy_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void finescroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hsync_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hsync_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_beathead();
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 };

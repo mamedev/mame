@@ -33,7 +33,7 @@
 const device_type C64_MAGIC_FORMEL = &device_creator<c64_magic_formel_cartridge_device>;
 
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
+void c64_magic_formel_cartridge_device::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -55,7 +55,7 @@ WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pa_w )
 	m_ram_oe = BIT(data, 4);
 }
 
-WRITE8_MEMBER( c64_magic_formel_cartridge_device::pia_pb_w )
+void c64_magic_formel_cartridge_device::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

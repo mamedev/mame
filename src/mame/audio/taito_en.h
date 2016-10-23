@@ -18,18 +18,18 @@ public:
 	taito_en_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~taito_en_device() {}
 
-	DECLARE_READ8_MEMBER( en_68000_share_r );
-	DECLARE_WRITE8_MEMBER( en_68000_share_w );
-	DECLARE_WRITE16_MEMBER( en_es5505_bank_w );
-	DECLARE_WRITE8_MEMBER( en_volume_w );
+	uint8_t en_68000_share_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void en_68000_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void en_es5505_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void en_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	//todo: hook up cpu/es5510
-	DECLARE_READ16_MEMBER( es5510_dsp_r );
-	DECLARE_WRITE16_MEMBER( es5510_dsp_w );
+	uint16_t es5510_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void es5510_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 
-	DECLARE_WRITE8_MEMBER(mb87078_gain_changed);
+	void mb87078_gain_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

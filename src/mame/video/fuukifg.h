@@ -18,12 +18,12 @@ public:
 	std::unique_ptr<uint16_t[]> m_sprram_old2;
 
 
-	DECLARE_WRITE16_MEMBER(fuuki_sprram_w)
+	void fuuki_sprram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_sprram[offset]);
 	};
 
-	DECLARE_READ16_MEMBER(fuuki_sprram_r)
+	uint16_t fuuki_sprram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)
 	{
 		return m_sprram[offset];
 	}

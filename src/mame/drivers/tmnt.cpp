@@ -67,7 +67,7 @@ Updates:
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
 
-READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
+uint16_t tmnt_state::k052109_word_noA12_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -75,7 +75,7 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 	return m_k052109->word_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
+void tmnt_state::k052109_word_noA12_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -83,7 +83,7 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 	m_k052109->word_w(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
+void tmnt_state::punkshot_k052109_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
@@ -93,7 +93,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 		m_k052109->write(space, offset + 0x2000, data & 0xff);
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
+void tmnt_state::punkshot_k052109_word_noA12_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -105,7 +105,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
 /* the interface with the 053245 is weird. The chip can address only 0x800 bytes */
 /* of RAM, but they put 0x4000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053245. */
-READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
+uint16_t tmnt_state::k053245_scattered_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0031)
 		return m_spriteram[offset];
@@ -116,7 +116,7 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
+void tmnt_state::k053245_scattered_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram + offset);
 
@@ -127,14 +127,14 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
+uint16_t tmnt_state::k053244_word_noA1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= ~1;   /* handle mirror address */
 
 	return m_k053245->k053244_r(space, offset + 1) | (m_k053245->k053244_r(space, offset) << 8);
 }
 
-WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
+void tmnt_state::k053244_word_noA1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= ~1;   /* handle mirror address */
 
@@ -165,7 +165,7 @@ INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
+void tmnt_state::glfgreat_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k053260->main_write(space, offset, data);
 
@@ -174,23 +174,23 @@ WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 }
 
 
-WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
+void tmnt_state::prmrsocr_sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
+void tmnt_state::prmrsocr_audio_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
 
-READ8_MEMBER(tmnt_state::tmnt_sres_r)
+uint8_t tmnt_state::tmnt_sres_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tmnt_soundlatch;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
+void tmnt_state::tmnt_sres_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 resets the UPD7795C sound chip */
 	m_upd7759->reset_w(data & 2);
@@ -206,12 +206,12 @@ WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 	m_tmnt_soundlatch = data;
 }
 
-WRITE8_MEMBER(tmnt_state::tmnt_upd_start_w)
+void tmnt_state::tmnt_upd_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->start_w(data & 1);
 }
 
-READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
+uint8_t tmnt_state::tmnt_upd_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
@@ -268,7 +268,7 @@ void tmnt_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
+void tmnt_state::sound_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  sound_nmi_enabled = 1;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -276,7 +276,7 @@ WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 }
 
 
-READ16_MEMBER(tmnt_state::punkshot_kludge_r)
+uint16_t tmnt_state::punkshot_kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* I don't know what's going on here; at one point, the code reads location */
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
@@ -287,7 +287,7 @@ READ16_MEMBER(tmnt_state::punkshot_kludge_r)
 
 
 /* protection simulation derived from a bootleg */
-READ16_MEMBER(tmnt_state::ssriders_protection_r)
+uint16_t tmnt_state::ssriders_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = space.read_word(0x105a0a);
 	int cmd = space.read_word(0x1058fc);
@@ -330,7 +330,7 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
+void tmnt_state::ssriders_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -362,7 +362,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(tmnt_state::blswhstl_coin_r)
+uint16_t tmnt_state::blswhstl_coin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int res;
 
@@ -374,7 +374,7 @@ READ16_MEMBER(tmnt_state::blswhstl_coin_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
+uint16_t tmnt_state::ssriders_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int res;
 
@@ -388,7 +388,7 @@ READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
 	return res ^ m_toggle;
 }
 
-READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
+uint16_t tmnt_state::sunsetbl_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int res;
 
@@ -402,7 +402,7 @@ READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
 	return res ^ m_toggle;
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
+void tmnt_state::blswhstl_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -413,7 +413,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
+uint16_t tmnt_state::thndrx2_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int res;
 
@@ -426,7 +426,7 @@ READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 	return (res ^ m_toggle);
 }
 
-WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
+void tmnt_state::thndrx2_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -445,7 +445,7 @@ WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
+void tmnt_state::prmrsocr_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -461,7 +461,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
 	}
 }
 
-WRITE8_MEMBER(tmnt_state::cuebrick_nvbank_w)
+void tmnt_state::cuebrick_nvbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("nvrambank")->set_entry(data);
 }
@@ -566,7 +566,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
+void tmnt_state::ssriders_soundkludge_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* I think this is more than just a trigger */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -592,7 +592,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
+void tmnt_state::k053251_glfgreat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -689,7 +689,7 @@ void tmnt_state::tmnt2_put_word( address_space &space, uint32_t addr, uint16_t d
 		m_sunset_104000[addr - 0x104000 / 2] = data;
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
@@ -809,7 +809,7 @@ WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
-WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
+void tmnt_state::tmnt2_1c0800_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 	if (offset == 0x0008 && (m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
@@ -1052,12 +1052,12 @@ static ADDRESS_MAP_START( thndrx2_audio_map, AS_PROGRAM, 8, tmnt_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tmnt_state::k054539_ctrl_r)
+uint8_t tmnt_state::k054539_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_k054539->read(space, 0x200 + offset, 0xff);
 }
 
-WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
+void tmnt_state::k054539_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k054539->write(space, 0x200 + offset, data, 0xff);
 }
@@ -1923,7 +1923,7 @@ static INPUT_PORTS_START( prmrsocr )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(tmnt_state::volume_callback)
+void tmnt_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

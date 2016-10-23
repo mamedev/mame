@@ -27,12 +27,12 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int       m_flipscreen;
-	DECLARE_READ8_MEMBER(mrdo_SECRE_r);
-	DECLARE_WRITE8_MEMBER(mrdo_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(mrdo_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(mrdo_scrollx_w);
-	DECLARE_WRITE8_MEMBER(mrdo_scrolly_w);
-	DECLARE_WRITE8_MEMBER(mrdo_flipscreen_w);
+	uint8_t mrdo_SECRE_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mrdo_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrdo_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrdo_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrdo_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrdo_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void video_start() override;

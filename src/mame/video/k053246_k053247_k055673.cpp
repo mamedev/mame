@@ -90,22 +90,22 @@ int k053247_device::k053247_read_register( int regnum )
 }
 
 
-WRITE16_MEMBER( k053247_device::k055673_reg_word_w ) // write-only OBJSET2 registers (see p.43 table 6.1)
+void k053247_device::k055673_reg_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) // write-only OBJSET2 registers (see p.43 table 6.1)
 {
 	COMBINE_DATA(m_kx47_regs + offset);
 }
 
-READ16_MEMBER( k053247_device::k053247_word_r )
+uint16_t k053247_device::k053247_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( k053247_device::k053247_word_w )
+void k053247_device::k053247_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_ram.get() + offset);
 }
 
-READ8_MEMBER( k053247_device::k053247_r )
+uint8_t k053247_device::k053247_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int offs = offset >> 1;
 
@@ -115,7 +115,7 @@ READ8_MEMBER( k053247_device::k053247_r )
 		return(m_ram[offs] >> 8);
 }
 
-WRITE8_MEMBER( k053247_device::k053247_w )
+void k053247_device::k053247_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int offs = offset >> 1;
 
@@ -131,7 +131,7 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // in this window, +0 = 32 bits from one set of ROMs, and +8 = 32 bits from another set
 
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
-READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
+uint16_t k053247_device::k055673_5bpp_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask) // 5bpp
 {
 	uint8_t *ROM8 = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
 	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
@@ -169,7 +169,7 @@ READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 	return 0;
 }
 
-READ16_MEMBER( k053247_device::k055673_rom_word_r )
+uint16_t k053247_device::k055673_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_bpp == 5)
 		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
@@ -186,7 +186,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	return ROM[romofs + (offset & 0x3)];
 }
 
-READ8_MEMBER( k053247_device::k053246_r )
+uint8_t k053247_device::k053246_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_objcha_line == ASSERT_LINE)
 	{
@@ -205,18 +205,18 @@ READ8_MEMBER( k053247_device::k053246_r )
 	}
 }
 
-WRITE8_MEMBER( k053247_device::k053246_w )
+void k053247_device::k053246_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kx46_regs[offset] = data;
 }
 
-READ16_MEMBER( k053247_device::k053246_word_r )
+uint16_t k053247_device::k053246_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset <<= 1;
 	return k053246_r( space, offset + 1) | (k053246_r( space, offset) << 8);
 }
 
-WRITE16_MEMBER( k053247_device::k053246_word_w )
+void k053247_device::k053246_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		k053246_w( space, offset << 1,(data >> 8) & 0xff);
@@ -1149,7 +1149,7 @@ void k053247_device::k053247_set_z_rejection( int zcode )
 }
 
 
-READ16_MEMBER( k053247_device::k053246_reg_word_r )
+uint16_t k053247_device::k053246_reg_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(m_kx46_regs[offset * 2] << 8 | m_kx46_regs[offset * 2 + 1]);
 }   // OBJSET1

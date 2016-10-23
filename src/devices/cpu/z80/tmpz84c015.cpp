@@ -132,7 +132,7 @@ void tmpz84c015_device::device_post_load()
 
 
 /* CPU interface */
-WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
+void tmpz84c015_device::irq_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 7;
 

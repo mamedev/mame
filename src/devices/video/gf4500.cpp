@@ -113,7 +113,7 @@ uint32_t gf4500_device::screen_update(screen_device &device, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ32_MEMBER( gf4500_device::read )
+uint32_t gf4500_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_data[offset];
 	switch (offset)
@@ -129,7 +129,7 @@ READ32_MEMBER( gf4500_device::read )
 	return data;
 }
 
-WRITE32_MEMBER( gf4500_device::write )
+void gf4500_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_data[offset]);
 	if ((offset < (GF4500_FRAMEBUF_OFFSET / 4)) || (offset >= ((GF4500_FRAMEBUF_OFFSET + (321 * 240 * 2)) / 4)))

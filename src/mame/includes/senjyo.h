@@ -72,19 +72,19 @@ public:
 	tilemap_t *m_bg2_tilemap;
 	tilemap_t *m_bg3_tilemap;
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
-	DECLARE_WRITE8_MEMBER(starforb_scrollx2);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgcolorram_w);
-	DECLARE_WRITE8_MEMBER(bg1videoram_w);
-	DECLARE_WRITE8_MEMBER(bg2videoram_w);
-	DECLARE_WRITE8_MEMBER(bg3videoram_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starforb_scrolly2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starforb_scrollx2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg3videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(sound_line_clock);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(irq_ctrl_w);
-	DECLARE_READ8_MEMBER(pio_pa_r);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_DECODER(IIBBGGRR);
 	DECLARE_PALETTE_INIT(radar);

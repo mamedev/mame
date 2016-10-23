@@ -61,7 +61,7 @@ void psion_state::update_banks()
 		membank("rombank")->set_entry(m_rom_bank);
 }
 
-WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
+void psion_state::hd63701_int_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
 	m_maincpu->m6801_io_w(space, offset, data);
 }
 
-READ8_MEMBER( psion_state::hd63701_int_reg_r )
+uint8_t psion_state::hd63701_int_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -191,7 +191,7 @@ void psion_state::io_rw(address_space &space, uint16_t offset)
 	}
 }
 
-WRITE8_MEMBER( psion_state::io_w )
+void psion_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0ffc0)
 	{
@@ -203,7 +203,7 @@ WRITE8_MEMBER( psion_state::io_w )
 	}
 }
 
-READ8_MEMBER( psion_state::io_r )
+uint8_t psion_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0xffc0)
 	{
@@ -223,19 +223,19 @@ INPUT_CHANGED_MEMBER(psion_state::psion_on)
 		m_maincpu->reset();
 }
 
-READ8_MEMBER( psion1_state::reset_kb_counter_r )
+uint8_t psion1_state::reset_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_kb_counter = 0;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::inc_kb_counter_r )
+uint8_t psion1_state::inc_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_kb_counter++;
 	return 0;
 }
 
-READ8_MEMBER( psion1_state::switchoff_r )
+uint8_t psion1_state::switchoff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_stby_pwr)
 	{

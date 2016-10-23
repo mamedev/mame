@@ -326,7 +326,7 @@ void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 /************************************/
 /* Write LSB of engine sound        */
 /************************************/
-WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_lsb_w )
+void polepos_sound_device::polepos_engine_sound_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Update stream first so all samples at old frequency are updated. */
 	m_stream->update();
@@ -337,7 +337,7 @@ WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_lsb_w )
 /************************************/
 /* Write MSB of engine sound        */
 /************************************/
-WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_msb_w )
+void polepos_sound_device::polepos_engine_sound_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_sample_msb = data & 63;

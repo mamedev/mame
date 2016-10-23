@@ -57,14 +57,14 @@ void btoads_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-WRITE16_MEMBER( btoads_state::main_sound_w )
+void btoads_state::main_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		synchronize(TIMER_ID_DELAYED_SOUND, data & 0xff);
 }
 
 
-READ16_MEMBER( btoads_state::main_sound_r )
+uint16_t btoads_state::main_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_sound_to_main_ready = 0;
 	return m_sound_to_main_data;
@@ -90,27 +90,27 @@ CUSTOM_INPUT_MEMBER( btoads_state::sound_to_main_r )
  *
  *************************************/
 
-WRITE8_MEMBER( btoads_state::sound_data_w )
+void btoads_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_to_main_data = data;
 	m_sound_to_main_ready = 1;
 }
 
 
-READ8_MEMBER( btoads_state::sound_data_r )
+uint8_t btoads_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_main_to_sound_ready = 0;
 	return m_main_to_sound_data;
 }
 
 
-READ8_MEMBER( btoads_state::sound_ready_to_send_r )
+uint8_t btoads_state::sound_ready_to_send_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_to_main_ready ? 0x00 : 0x80;
 }
 
 
-READ8_MEMBER( btoads_state::sound_data_ready_r )
+uint8_t btoads_state::sound_data_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_audiocpu->pc() == 0xd50 && !m_main_to_sound_ready)
 		m_audiocpu->spin_until_interrupt();
@@ -125,7 +125,7 @@ READ8_MEMBER( btoads_state::sound_data_ready_r )
  *
  *************************************/
 
-WRITE8_MEMBER( btoads_state::sound_int_state_w )
+void btoads_state::sound_int_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* top bit controls BSMT2000 reset */
 	if (!(m_sound_int_state & 0x80) && (data & 0x80))
@@ -144,13 +144,13 @@ WRITE8_MEMBER( btoads_state::sound_int_state_w )
  *
  *************************************/
 
-READ8_MEMBER( btoads_state::bsmt_ready_r )
+uint8_t btoads_state::bsmt_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bsmt->read_status() << 7;
 }
 
 
-WRITE8_MEMBER( btoads_state::bsmt2000_port_w )
+void btoads_state::bsmt2000_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bsmt->write_reg(offset >> 8);
 	m_bsmt->write_data(((offset & 0xff) << 8) | data);

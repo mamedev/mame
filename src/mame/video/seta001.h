@@ -17,24 +17,24 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfxbank_callback(device_t &device, gfxbank_cb_delegate callback) { downcast<seta001_device &>(device).m_gfxbank_cb = callback; }
 
-	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
+	void spritebgflag_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER( spritectrl_r16 );
-	DECLARE_WRITE16_MEMBER( spritectrl_w16 );
-	DECLARE_READ8_MEMBER( spritectrl_r8 );
-	DECLARE_WRITE8_MEMBER( spritectrl_w8 );
+	uint16_t spritectrl_r16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spritectrl_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t spritectrl_r8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spritectrl_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER( spriteylow_r16 );
-	DECLARE_WRITE16_MEMBER( spriteylow_w16 );
-	DECLARE_READ8_MEMBER( spriteylow_r8 );
-	DECLARE_WRITE8_MEMBER( spriteylow_w8 );
+	uint16_t spriteylow_r16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spriteylow_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t spriteylow_r8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spriteylow_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( spritecodelow_r8 );
-	DECLARE_WRITE8_MEMBER( spritecodelow_w8 );
-	DECLARE_READ8_MEMBER( spritecodehigh_r8 );
-	DECLARE_WRITE8_MEMBER( spritecodehigh_w8 );
-	DECLARE_READ16_MEMBER( spritecode_r16 );
-	DECLARE_WRITE16_MEMBER( spritecode_w16 );
+	uint8_t spritecodelow_r8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spritecodelow_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spritecodehigh_r8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spritecodehigh_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t spritecode_r16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spritecode_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac);
 

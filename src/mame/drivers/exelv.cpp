@@ -78,17 +78,17 @@ public:
 	required_device<tms5220c_device> m_tms5220c;
 	optional_device<generic_slot_device> m_cart;
 
-	DECLARE_READ8_MEMBER( mailbox_wx319_r );
-	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
-	DECLARE_READ8_MEMBER( tms7020_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7020_portb_w );
-	DECLARE_READ8_MEMBER( tms7041_porta_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portb_w );
-	DECLARE_READ8_MEMBER( tms7041_portc_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portc_w );
-	DECLARE_READ8_MEMBER( tms7041_portd_r );
-	DECLARE_WRITE8_MEMBER( tms7041_portd_w );
-	DECLARE_READ8_MEMBER( rom_r );
+	uint8_t mailbox_wx319_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mailbox_wx318_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms7020_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms7020_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms7041_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms7041_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms7041_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms7041_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms7041_portd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms7041_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void machine_start_exl100();
 	void machine_start_exeltel();
@@ -192,14 +192,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
 */
 
 
-READ8_MEMBER(exelv_state::mailbox_wx319_r)
+uint8_t exelv_state::mailbox_wx319_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("[TMS7220] reading mailbox %d\n", m_wx319);
 	return m_wx319;
 }
 
 
-WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
+void exelv_state::mailbox_wx318_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("wx318 write 0x%02x\n", data);
 	m_wx318 = data;
@@ -217,7 +217,7 @@ WRITE8_MEMBER(exelv_state::mailbox_wx318_w)
     A6 -
     A7 -
 */
-READ8_MEMBER(exelv_state::tms7020_porta_r)
+uint8_t exelv_state::tms7020_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("tms7020_porta_r\n");
 	return ( m_tms7041_portb & 0x80 ) ? 0x01 : 0x00;
@@ -235,7 +235,7 @@ READ8_MEMBER(exelv_state::tms7020_porta_r)
     B6 -
     B7 -
 */
-WRITE8_MEMBER(exelv_state::tms7020_portb_w)
+void exelv_state::tms7020_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("tms7020_portb_w: data = 0x%02x\n", data);
 	m_tms7020_portb = data;
@@ -253,7 +253,7 @@ WRITE8_MEMBER(exelv_state::tms7020_portb_w)
     A6 - X1 SCLK A9
     A7 - TMS5220 RDY
 */
-READ8_MEMBER(exelv_state::tms7041_porta_r)
+uint8_t exelv_state::tms7041_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 	static uint8_t data_last=0;
@@ -288,7 +288,7 @@ READ8_MEMBER(exelv_state::tms7041_porta_r)
     B6 - W - REV6 WX319-11
     B7 - W - TMS7020 port A bit 0 (REV3)
 */
-WRITE8_MEMBER(exelv_state::tms7041_portb_w)
+void exelv_state::tms7041_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 /*
     TMS7041 PORT C - connected to mailbox WX318 and WX319 data bits
 */
-READ8_MEMBER(exelv_state::tms7041_portc_r)
+uint8_t exelv_state::tms7041_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	logerror("tms7041_portc_r\n");
@@ -325,7 +325,7 @@ READ8_MEMBER(exelv_state::tms7041_portc_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7041_portc_w)
+void exelv_state::tms7041_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("tms7041_portc_w: data = 0x%02x\n", data);
 	m_tms7041_portc = data;
@@ -343,7 +343,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portc_w)
     D6 - TMS5220 D1
     D7 - TMS5220 D0
 */
-READ8_MEMBER(exelv_state::tms7041_portd_r)
+uint8_t exelv_state::tms7041_portd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	data=m_tms5220c->status_r(space, 0, data);
@@ -352,7 +352,7 @@ READ8_MEMBER(exelv_state::tms7041_portd_r)
 }
 
 
-WRITE8_MEMBER(exelv_state::tms7041_portd_w)
+void exelv_state::tms7041_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 /*
     CARTRIDGE ACCESS
 */
-READ8_MEMBER(exelv_state::rom_r)
+uint8_t exelv_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart && m_cart->exists())
 		return m_cart->read_rom(space, offset + 0x200);

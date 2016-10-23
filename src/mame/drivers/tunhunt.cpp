@@ -57,7 +57,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(tunhunt_state::control_w)
+void tunhunt_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    0x01    coin counter#2  "right counter"
@@ -83,38 +83,38 @@ WRITE8_MEMBER(tunhunt_state::control_w)
  *
  *************************************/
 
-READ8_MEMBER(tunhunt_state::button_r)
+uint8_t tunhunt_state::button_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = ioport("IN0")->read();
 	return ((data>>offset)&1)?0x00:0x80;
 }
 
 
-READ8_MEMBER(tunhunt_state::dsw2_0r)
+uint8_t tunhunt_state::dsw2_0r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read()&0x0100)?0x80:0x00;
 }
 
 
-READ8_MEMBER(tunhunt_state::dsw2_1r)
+uint8_t tunhunt_state::dsw2_1r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read()&0x0200)?0x80:0x00;
 }
 
 
-READ8_MEMBER(tunhunt_state::dsw2_2r)
+uint8_t tunhunt_state::dsw2_2r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read()&0x0400)?0x80:0x00;
 }
 
 
-READ8_MEMBER(tunhunt_state::dsw2_3r)
+uint8_t tunhunt_state::dsw2_3r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read()&0x0800)?0x80:0x00;
 }
 
 
-READ8_MEMBER(tunhunt_state::dsw2_4r)
+uint8_t tunhunt_state::dsw2_4r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW")->read()&0x1000)?0x80:0x00;
 }

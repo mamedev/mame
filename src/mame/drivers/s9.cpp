@@ -55,16 +55,16 @@ public:
 		, m_pia30(*this, "pia30")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w) { }; // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void sol2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 8-15
+	void sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 0-7
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
@@ -206,7 +206,7 @@ INPUT_CHANGED_MEMBER( s9_state::audio_nmi )
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER( s9_state::sound_w )
+void s9_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 }
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER( s9_state::pia21_ca2_w )
 	m_pias->ca1_w(state);
 }
 
-WRITE8_MEMBER( s9_state::dig0_w )
+void s9_state::dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
@@ -232,7 +232,7 @@ WRITE8_MEMBER( s9_state::dig0_w )
 	output().set_digit_value(60, patterns[data>>4]); // diag digit
 }
 
-WRITE8_MEMBER( s9_state::dig1_w )
+void s9_state::dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -243,19 +243,19 @@ WRITE8_MEMBER( s9_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s9_state::switch_r )
+uint8_t s9_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( s9_state::switch_w )
+void s9_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s9_state::sound_r )
+uint8_t s9_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }

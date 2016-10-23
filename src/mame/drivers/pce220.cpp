@@ -76,26 +76,26 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( lcd_status_r );
-	DECLARE_WRITE8_MEMBER( lcd_control_w );
-	DECLARE_READ8_MEMBER( lcd_data_r );
-	DECLARE_WRITE8_MEMBER( lcd_data_w );
-	DECLARE_READ8_MEMBER( rom_bank_r );
-	DECLARE_WRITE8_MEMBER( rom_bank_w );
-	DECLARE_WRITE8_MEMBER( ram_bank_w );
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
-	DECLARE_WRITE8_MEMBER( boot_bank_w );
-	DECLARE_READ8_MEMBER( port15_r );
-	DECLARE_WRITE8_MEMBER( port15_w );
-	DECLARE_READ8_MEMBER( port18_r );
-	DECLARE_WRITE8_MEMBER( port18_w );
-	DECLARE_READ8_MEMBER( port1f_r );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_ack_w );
-	DECLARE_WRITE8_MEMBER( irq_mask_w );
+	uint8_t lcd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port15_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port18_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port1f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(pce220);
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
@@ -117,12 +117,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( g850v_bank_r );
-	DECLARE_WRITE8_MEMBER( g850v_bank_w );
-	DECLARE_READ8_MEMBER( g850v_lcd_status_r );
-	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
-	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
-	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
+	uint8_t g850v_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void g850v_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t g850v_lcd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void g850v_lcd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t g850v_lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void g850v_lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -269,7 +269,7 @@ uint32_t pcg850v_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER( pce220_state::lcd_status_r )
+uint8_t pce220_state::lcd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- Busy (not emulated)
@@ -283,7 +283,7 @@ READ8_MEMBER( pce220_state::lcd_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pce220_state::lcd_control_w )
+void pce220_state::lcd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((data & 0xfe) == 0x3e)       //Display on/off
 		m_lcd_on = data & 0x01;
@@ -295,24 +295,24 @@ WRITE8_MEMBER( pce220_state::lcd_control_w )
 		m_lcd_start_line = data & 0x3f;
 }
 
-READ8_MEMBER( pce220_state::lcd_data_r )
+uint8_t pce220_state::lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col - 1) & 0x1ff];
 }
 
-WRITE8_MEMBER( pce220_state::lcd_data_w )
+void pce220_state::lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[(m_lcd_index_row*0x40 + m_lcd_index_col) & 0x1ff] = data;
 
 	m_lcd_index_col++;
 }
 
-READ8_MEMBER( pce220_state::rom_bank_r )
+uint8_t pce220_state::rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_num;
 }
 
-WRITE8_MEMBER( pce220_state::rom_bank_w )
+void pce220_state::rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank4 = data & 0x07; // bits 0,1,2
 	uint8_t bank3 = (data & 0x70) >> 4; // bits 4,5,6
@@ -323,7 +323,7 @@ WRITE8_MEMBER( pce220_state::rom_bank_w )
 	membank("bank4")->set_entry(bank4);
 }
 
-WRITE8_MEMBER( pce220_state::ram_bank_w )
+void pce220_state::ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank = BIT(data,2);
 
@@ -331,17 +331,17 @@ WRITE8_MEMBER( pce220_state::ram_bank_w )
 	membank("bank2")->set_entry(bank);
 }
 
-READ8_MEMBER( pce220_state::timer_r )
+uint8_t pce220_state::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_timer_status;
 }
 
-WRITE8_MEMBER( pce220_state::timer_w )
+void pce220_state::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_status = data & 1;
 }
 
-WRITE8_MEMBER( pce220_state::boot_bank_w )
+void pce220_state::boot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// set to 1 after boot for restore the ram in the first bank
 	if (data & 0x01)
@@ -352,7 +352,7 @@ WRITE8_MEMBER( pce220_state::boot_bank_w )
 	}
 }
 
-READ8_MEMBER( pce220_state::port15_r )
+uint8_t pce220_state::port15_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- XIN input enabled
@@ -361,14 +361,14 @@ READ8_MEMBER( pce220_state::port15_r )
 	return m_port15;
 }
 
-WRITE8_MEMBER( pce220_state::port15_w )
+void pce220_state::port15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_serial->enable_interface(BIT(data, 7));
 
 	m_port15 = data;
 }
 
-READ8_MEMBER( pce220_state::port18_r )
+uint8_t pce220_state::port18_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- XOUT/TXD
@@ -379,7 +379,7 @@ READ8_MEMBER( pce220_state::port18_r )
 	return m_port18;
 }
 
-WRITE8_MEMBER( pce220_state::port18_w )
+void pce220_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beep->set_state(BIT(data, 7));
 
@@ -390,7 +390,7 @@ WRITE8_MEMBER( pce220_state::port18_w )
 	m_port18 = data;
 }
 
-READ8_MEMBER( pce220_state::port1f_r )
+uint8_t pce220_state::port1f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- ON - resp. break key status (?)
@@ -410,7 +410,7 @@ READ8_MEMBER( pce220_state::port1f_r )
 	return data;
 }
 
-WRITE8_MEMBER( pce220_state::kb_matrix_w )
+void pce220_state::kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -423,7 +423,7 @@ WRITE8_MEMBER( pce220_state::kb_matrix_w )
 	}
 }
 
-READ8_MEMBER( pce220_state::kb_r )
+uint8_t pce220_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 
@@ -451,7 +451,7 @@ READ8_MEMBER( pce220_state::kb_r )
 	return data;
 }
 
-READ8_MEMBER( pce220_state::irq_status_r )
+uint8_t pce220_state::irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	---- -x-- timer
@@ -461,22 +461,22 @@ READ8_MEMBER( pce220_state::irq_status_r )
 	return m_irq_flag;
 }
 
-WRITE8_MEMBER( pce220_state::irq_ack_w )
+void pce220_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_flag &= ~data;
 }
 
-WRITE8_MEMBER( pce220_state::irq_mask_w )
+void pce220_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data;
 }
 
-READ8_MEMBER( pcg850v_state::g850v_bank_r )
+uint8_t pcg850v_state::g850v_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_g850v_bank_num;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
+void pcg850v_state::g850v_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space_prg = m_maincpu->space(AS_PROGRAM);
 
@@ -493,7 +493,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_bank_w )
 	m_g850v_bank_num = data;
 }
 
-READ8_MEMBER( pcg850v_state::g850v_lcd_status_r )
+uint8_t pcg850v_state::g850v_lcd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- Busy (not emulated)
@@ -506,7 +506,7 @@ READ8_MEMBER( pcg850v_state::g850v_lcd_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
+void pcg850v_state::g850v_lcd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xf0) == 0x00)          // LCD column LSB
 	{
@@ -549,7 +549,7 @@ WRITE8_MEMBER( pcg850v_state::g850v_lcd_control_w )
 	}
 }
 
-READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
+uint8_t pcg850v_state::g850v_lcd_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col - 1) & 0x7ff];
 
@@ -559,7 +559,7 @@ READ8_MEMBER( pcg850v_state::g850v_lcd_data_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcg850v_state::g850v_lcd_data_w )
+void pcg850v_state::g850v_lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[(m_lcd_index_row*0x100 + m_lcd_index_col) & 0x7ff] = data;
 

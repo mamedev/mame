@@ -105,18 +105,18 @@ TIMER_CALLBACK_MEMBER(lkage_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
+void lkage_state::lkage_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lkage_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
+void lkage_state::lkage_sh_nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
+void lkage_state::lkage_sh_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -127,7 +127,7 @@ WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
 	}
 }
 
-READ8_MEMBER(lkage_state::sound_status_r)
+uint8_t lkage_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(lkage_state::port_fetch_r)
+uint8_t lkage_state::port_fetch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("user1")->base()[offset];
 }
@@ -895,7 +895,7 @@ ROM_END
 
 /*Note: This probably uses another MCU dump,which is undumped.*/
 
-READ8_MEMBER(lkage_state::fake_mcu_r)
+uint8_t lkage_state::fake_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 
@@ -930,12 +930,12 @@ READ8_MEMBER(lkage_state::fake_mcu_r)
 	return result;
 }
 
-WRITE8_MEMBER(lkage_state::fake_mcu_w)
+void lkage_state::fake_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_val = data;
 }
 
-READ8_MEMBER(lkage_state::fake_status_r)
+uint8_t lkage_state::fake_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_ready;
 }

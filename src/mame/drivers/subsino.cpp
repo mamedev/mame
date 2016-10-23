@@ -280,21 +280,21 @@ public:
 
 	ticket_dispenser_device *m_hopper;
 
-	DECLARE_WRITE8_MEMBER(subsino_tiles_offset_w);
-	DECLARE_WRITE8_MEMBER(subsino_videoram_w);
-	DECLARE_WRITE8_MEMBER(subsino_colorram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_a_w);
-	DECLARE_WRITE8_MEMBER(subsino_out_b_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
-	DECLARE_READ8_MEMBER(hwcheck_r);
-	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
-	DECLARE_WRITE8_MEMBER(colordac_w);
-	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
-	DECLARE_READ8_MEMBER(reel_scrollattr_r);
+	void subsino_tiles_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subsino_out_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t flash_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hwcheck_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void subsino_out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colordac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel_scrollattr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t reel_scrollattr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_stbsub();
 	void init_stisub();
 	void init_tesorone();
@@ -341,20 +341,20 @@ void subsino_state::machine_start()
 ***************************************************************************/
 
 
-WRITE8_MEMBER(subsino_state::subsino_tiles_offset_w)
+void subsino_state::subsino_tiles_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tiles_offset = (data & 1) ? 0x1000: 0;
 	m_tmap->mark_tile_dirty(offset);
 //  popmessage("gfx %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_videoram_w)
+void subsino_state::subsino_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_colorram_w)
+void subsino_state::subsino_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tmap->mark_tile_dirty(offset);
@@ -386,7 +386,7 @@ void subsino_state::video_start_subsino()
 
 
 
-WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
+void subsino_state::subsino_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -415,7 +415,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
+void subsino_state::subsino_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -443,7 +443,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
+void subsino_state::subsino_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -635,7 +635,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino_state::subsino_out_a_w)
+void subsino_state::subsino_out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /***** COIN PULSE: *****
 
@@ -685,7 +685,7 @@ WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 //  popmessage("Out A %02x",data);
 }
 
-WRITE8_MEMBER(subsino_state::subsino_out_b_w)
+void subsino_state::subsino_out_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /***** LAMPS: *****
 
@@ -937,7 +937,7 @@ what it is exactly and what it can possibly do.
 */
 
 
-READ8_MEMBER(subsino_state::flash_r)
+uint8_t subsino_state::flash_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("R %02x\n",m_flash_val);
 
@@ -951,7 +951,7 @@ READ8_MEMBER(subsino_state::flash_r)
 		return 0xd9;
 }
 
-WRITE8_MEMBER(subsino_state::flash_w)
+void subsino_state::flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_flash_packet_start)
 	{
@@ -977,7 +977,7 @@ static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(subsino_state::hwcheck_r)
+uint8_t subsino_state::hwcheck_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Wants this at POST otherwise an "Hardware Error" occurs. */
 	return 0x55;
@@ -1016,7 +1016,7 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(subsino_state::subsino_out_c_w)
+void subsino_state::subsino_out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// not 100% sure on this
 
@@ -1073,7 +1073,7 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(subsino_state::colordac_w)
+void subsino_state::colordac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -1103,7 +1103,7 @@ WRITE8_MEMBER(subsino_state::colordac_w)
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
-WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
+void subsino_state::reel_scrollattr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (*m_stbsub_out_c & 0x20)
 	{
@@ -1147,7 +1147,7 @@ WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 	}
 }
 
-READ8_MEMBER(subsino_state::reel_scrollattr_r)
+uint8_t subsino_state::reel_scrollattr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_reel1_attr[offset];
 }

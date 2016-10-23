@@ -59,11 +59,11 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
-	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);
-	DECLARE_READ32_MEMBER(mjgtaste_input_r);
-	DECLARE_WRITE32_MEMBER(psh_eeprom_w);
-	DECLARE_READ32_MEMBER(psh_eeprom_r);
+	void psikyosh_irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void psikyosh_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t mjgtaste_input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void psh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t psh_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_ps3();
 	void init_ps5();
 	void init_mjgtaste();

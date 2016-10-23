@@ -18,22 +18,22 @@ public:
 	// construction/destruction
 	trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	DECLARE_READ8_MEMBER(port_83c6_r);
-	DECLARE_WRITE8_MEMBER(port_83c6_w);
-	DECLARE_READ8_MEMBER(port_43c6_r);
-	DECLARE_WRITE8_MEMBER(port_43c6_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	uint8_t port_83c6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_83c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_43c6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_43c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 	virtual uint16_t offset() override;
 
-	DECLARE_READ8_MEMBER(accel_r);
-	DECLARE_WRITE8_MEMBER(accel_w);
+	uint8_t accel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void accel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 

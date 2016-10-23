@@ -215,7 +215,7 @@ Dip locations verified with US conversion kit manual.
 
 /**********************************************************************************/
 
-READ16_MEMBER(dassault_state::dassault_control_r)
+uint16_t dassault_state::dassault_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -238,26 +238,26 @@ READ16_MEMBER(dassault_state::dassault_control_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(dassault_state::dassault_control_w)
+void dassault_state::dassault_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
-READ16_MEMBER(dassault_state::dassault_sub_control_r)
+uint16_t dassault_state::dassault_sub_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("VBLANK1")->read();
 }
 
-WRITE16_MEMBER(dassault_state::dassault_sound_w)
+void dassault_state::dassault_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
-READ16_MEMBER(dassault_state::dassault_irq_r)
+uint16_t dassault_state::dassault_irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -267,7 +267,7 @@ READ16_MEMBER(dassault_state::dassault_irq_r)
 	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
 
-WRITE16_MEMBER(dassault_state::dassault_irq_w)
+void dassault_state::dassault_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -278,12 +278,12 @@ WRITE16_MEMBER(dassault_state::dassault_irq_w)
 	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
-WRITE16_MEMBER(dassault_state::shared_ram_w)
+void dassault_state::shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
-READ16_MEMBER(dassault_state::shared_ram_r)
+uint16_t dassault_state::shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
@@ -520,7 +520,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
+void dassault_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_rom_bank(data & 1);

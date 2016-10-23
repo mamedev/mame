@@ -33,33 +33,33 @@ public:
 		m_screen(*this, "screen") { }
 
 	// in drivers/btoads
-	DECLARE_WRITE16_MEMBER( main_sound_w );
-	DECLARE_READ16_MEMBER( main_sound_r );
+	void main_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t main_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER( main_to_sound_r );
 	DECLARE_CUSTOM_INPUT_MEMBER( sound_to_main_r );
-	DECLARE_WRITE8_MEMBER( sound_data_w );
-	DECLARE_READ8_MEMBER( sound_data_r );
-	DECLARE_READ8_MEMBER( sound_ready_to_send_r );
-	DECLARE_READ8_MEMBER( sound_data_ready_r );
-	DECLARE_WRITE8_MEMBER( sound_int_state_w );
-	DECLARE_READ8_MEMBER( bsmt_ready_r );
-	DECLARE_WRITE8_MEMBER( bsmt2000_port_w );
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_ready_to_send_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_data_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_int_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bsmt_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bsmt2000_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// in video/btoads
-	DECLARE_WRITE16_MEMBER( misc_control_w );
-	DECLARE_WRITE16_MEMBER( display_control_w );
-	DECLARE_WRITE16_MEMBER( scroll0_w );
-	DECLARE_WRITE16_MEMBER( scroll1_w );
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_READ16_MEMBER( paletteram_r );
-	DECLARE_WRITE16_MEMBER( vram_bg0_w );
-	DECLARE_WRITE16_MEMBER( vram_bg1_w );
-	DECLARE_READ16_MEMBER( vram_bg0_r );
-	DECLARE_READ16_MEMBER( vram_bg1_r );
-	DECLARE_WRITE16_MEMBER( vram_fg_display_w );
-	DECLARE_WRITE16_MEMBER( vram_fg_draw_w );
-	DECLARE_READ16_MEMBER( vram_fg_display_r );
-	DECLARE_READ16_MEMBER( vram_fg_draw_r );
+	void misc_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void display_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void scroll0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_bg0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_bg1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vram_bg0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_bg1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_fg_display_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_fg_draw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vram_fg_display_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_fg_draw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void render_sprite_row(uint16_t *sprite_source, uint32_t address);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

@@ -21,7 +21,7 @@
     d0 80/64 or 40/32 characters per line (1=32) */
 
 
-WRITE8_MEMBER( trs80_state::trs80m4_88_w )
+void trs80_state::trs80m4_88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* This is for the programming of the CRTC registers.
     However this CRTC is mask-programmed, and only the
@@ -537,13 +537,13 @@ uint32_t trs80_state::screen_update_meritum(screen_device &screen, bitmap_ind16 
   Write to video ram
 ***************************************************************************/
 
-READ8_MEMBER( trs80_state::trs80_videoram_r )
+uint8_t trs80_state::trs80_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_mode & 0x80) && (~m_model4 & 1)) offset |= 0x400;
 	return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( trs80_state::trs80_videoram_w )
+void trs80_state::trs80_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_mode & 0x80) && (~m_model4 & 1)) offset |= 0x400;
 	m_p_videoram[offset] = data;
@@ -554,12 +554,12 @@ WRITE8_MEMBER( trs80_state::trs80_videoram_w )
   Write to graphics ram
 ***************************************************************************/
 
-READ8_MEMBER( trs80_state::trs80_gfxram_r )
+uint8_t trs80_state::trs80_gfxram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_gfxram[offset];
 }
 
-WRITE8_MEMBER( trs80_state::trs80_gfxram_w )
+void trs80_state::trs80_gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_gfxram[offset] = data;
 }

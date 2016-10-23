@@ -37,12 +37,12 @@ void usgames_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-WRITE8_MEMBER(usgames_state::rombank_w)
+void usgames_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(usgames_state::lamps1_w)
+void usgames_state::lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* button lamps */
 	output().set_led_value(0,data & 0x01);
@@ -54,7 +54,7 @@ WRITE8_MEMBER(usgames_state::lamps1_w)
 	/* bit 5 toggles all the time - extra lamp? */
 }
 
-WRITE8_MEMBER(usgames_state::lamps2_w)
+void usgames_state::lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 toggles all the time - extra lamp? */
 }

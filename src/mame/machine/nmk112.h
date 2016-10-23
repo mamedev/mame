@@ -24,7 +24,7 @@ public:
 	static void set_rom1_tag(device_t &device, const char *tag) { downcast<nmk112_device &>(device).m_tag1 = tag; }
 	static void set_page_mask(device_t &device, uint8_t mask) { downcast<nmk112_device &>(device).m_page_mask = ~mask; }
 
-	DECLARE_WRITE8_MEMBER( okibank_w );
+	void okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

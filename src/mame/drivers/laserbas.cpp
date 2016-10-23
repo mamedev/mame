@@ -71,14 +71,14 @@ public:
 	uint8_t    m_vram2[0x8000];
 	bool     m_flipscreen;
 	required_shared_ptr<uint8_t> m_protram;
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(vrambank_w);
-	DECLARE_READ8_MEMBER(protram_r);
-	DECLARE_WRITE8_MEMBER(protram_w);
-	DECLARE_READ8_MEMBER(track_lo_r);
-	DECLARE_READ8_MEMBER(track_hi_r);
-	DECLARE_WRITE8_MEMBER(out_w);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vrambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t protram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t track_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t track_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -132,7 +132,7 @@ uint32_t laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER(laserbas_state::vram_r)
+uint8_t laserbas_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!m_vrambank)
 		return m_vram1[offset];
@@ -140,7 +140,7 @@ READ8_MEMBER(laserbas_state::vram_r)
 		return m_vram2[offset];
 }
 
-WRITE8_MEMBER(laserbas_state::vram_w)
+void laserbas_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!m_vrambank)
 		m_vram1[offset] = data;
@@ -149,20 +149,20 @@ WRITE8_MEMBER(laserbas_state::vram_w)
 }
 
 #if 0
-READ8_MEMBER(laserbas_state::read_unk)
+uint8_t laserbas_state::read_unk(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_count ^= 0x80;
 	return m_count | 0x7f;
 }
 #endif
 
-WRITE8_MEMBER(laserbas_state::vrambank_w)
+void laserbas_state::vrambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vrambank = data & 0x40;
 	m_flipscreen = !(data & 0x80);
 }
 
-READ8_MEMBER(laserbas_state::protram_r)
+uint8_t laserbas_state::protram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t prot = m_protram[offset];
 //  prot = machine().rand();
@@ -170,13 +170,13 @@ READ8_MEMBER(laserbas_state::protram_r)
 	return prot;
 }
 
-WRITE8_MEMBER(laserbas_state::protram_w)
+void laserbas_state::protram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%s: Z1 write %03x = %02x\n", machine().describe_context(), offset, data);
 	m_protram[offset] = data;
 }
 
-READ8_MEMBER(laserbas_state::track_lo_r)
+uint8_t laserbas_state::track_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dx = ioport("TRACK_X")->read();
 	uint8_t dy = ioport("TRACK_Y")->read();
@@ -186,12 +186,12 @@ READ8_MEMBER(laserbas_state::track_lo_r)
 		dy ^= 0x0f;
 	return (dx & 0x0f) | ((dy & 0x0f) << 4);
 }
-READ8_MEMBER(laserbas_state::track_hi_r)
+uint8_t laserbas_state::track_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((ioport("TRACK_X")->read() & 0x10) >> 4) | ((ioport("TRACK_Y")->read() & 0x10) >> 3);
 }
 
-WRITE8_MEMBER(laserbas_state::out_w)
+void laserbas_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint8_t out[4];
 	out[offset] = data;

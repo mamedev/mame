@@ -17,12 +17,12 @@ Dip locations added from dip listing at crazykong.com
 #include "includes/citycon.h"
 
 
-READ8_MEMBER(citycon_state::citycon_in_r)
+uint8_t citycon_state::citycon_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
-READ8_MEMBER(citycon_state::citycon_irq_ack_r)
+uint8_t citycon_state::citycon_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 

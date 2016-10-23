@@ -28,7 +28,7 @@ DEVICE_ADDRESS_MAP_START( io_map, 16, i80130_device )
 	//AM_RANGE(0x08, 0x0f) AM_DEVREADWRITE8("pit", pit8254_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-READ16_MEMBER( i80130_device::io_r )
+uint16_t i80130_device::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -52,7 +52,7 @@ READ16_MEMBER( i80130_device::io_r )
 	return data;
 }
 
-WRITE16_MEMBER( i80130_device::io_w )
+void i80130_device::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

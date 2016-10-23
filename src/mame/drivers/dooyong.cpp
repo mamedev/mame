@@ -80,7 +80,7 @@ are almost identical, except for much darker BG layer colors).
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 
-WRITE8_MEMBER(dooyong_z80_state::bankswitch_w)
+void dooyong_z80_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 
@@ -92,7 +92,7 @@ void dooyong_z80_state::machine_start_cpu_z80()
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::flip_screen_w)
+void dooyong_z80_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
@@ -743,7 +743,7 @@ static GFXDECODE_START( popbingo )
 
 GFXDECODE_END
 
-READ8_MEMBER(dooyong_z80_ym2203_state::unk_r)
+uint8_t dooyong_z80_ym2203_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

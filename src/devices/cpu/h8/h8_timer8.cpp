@@ -44,12 +44,12 @@ void h8_timer8_channel_device::set_info(const char *intc, int _irq_ca, int _irq_
 	div_tab[5] = div6;
 }
 
-READ8_MEMBER(h8_timer8_channel_device::tcr_r)
+uint8_t h8_timer8_channel_device::tcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tcr;
 }
 
-WRITE8_MEMBER(h8_timer8_channel_device::tcr_w)
+void h8_timer8_channel_device::tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 	tcr = data;
@@ -136,12 +136,12 @@ void h8_timer8_channel_device::update_tcr()
 	logerror(buf);
 }
 
-READ8_MEMBER(h8_timer8_channel_device::tcsr_r)
+uint8_t h8_timer8_channel_device::tcsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tcsr;
 }
 
-WRITE8_MEMBER(h8_timer8_channel_device::tcsr_w)
+void h8_timer8_channel_device::tcsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 
@@ -154,12 +154,12 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcsr_w)
 	recalc_event();
 }
 
-READ8_MEMBER(h8_timer8_channel_device::tcor_r)
+uint8_t h8_timer8_channel_device::tcor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tcor[offset];
 }
 
-WRITE8_MEMBER(h8_timer8_channel_device::tcor_w)
+void h8_timer8_channel_device::tcor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 	tcor[offset] = data;
@@ -167,14 +167,14 @@ WRITE8_MEMBER(h8_timer8_channel_device::tcor_w)
 	recalc_event();
 }
 
-READ8_MEMBER(h8_timer8_channel_device::tcnt_r)
+uint8_t h8_timer8_channel_device::tcnt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_counter();
 	recalc_event();
 	return tcnt;
 }
 
-WRITE8_MEMBER(h8_timer8_channel_device::tcnt_w)
+void h8_timer8_channel_device::tcnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_counter();
 	tcnt = data;

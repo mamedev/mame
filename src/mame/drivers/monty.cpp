@@ -48,10 +48,10 @@ public:
 			elem = 0xff000000;
 	}
 
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(ioDisplayWrite_w);
-	DECLARE_WRITE8_MEMBER(ioCommandWrite0_w);
-	DECLARE_WRITE8_MEMBER(ioCommandWrite1_w);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ioDisplayWrite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ioCommandWrite0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ioCommandWrite1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// screen updates
 	uint32_t lcd_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
@@ -157,21 +157,21 @@ static INPUT_PORTS_START( monty )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( monty_state::sound_w )
+void monty_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_sw ^= 1;
 	m_speaker->level_w(m_sound_sw);
 }
 
 
-WRITE8_MEMBER( monty_state::ioCommandWrite0_w )
+void monty_state::ioCommandWrite0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("(%04x) Command Port 0 write : %02x\n", m_maincpu->pc(), data);
 	m_writeUpper = false;
 }
 
 
-WRITE8_MEMBER( monty_state::ioCommandWrite1_w )
+void monty_state::ioCommandWrite1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if (data == 0xfe)
 	//    printf("---\n");
@@ -181,7 +181,7 @@ WRITE8_MEMBER( monty_state::ioCommandWrite1_w )
 }
 
 
-WRITE8_MEMBER( monty_state::ioDisplayWrite_w )
+void monty_state::ioDisplayWrite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dirty = true;
 	// Offset directly corresponds to sed1503, DD RAM address (offset 0x7f may be special?)

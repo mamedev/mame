@@ -81,13 +81,13 @@ public:
 	required_shared_ptr<uint8_t> m_videoram_1;
 	required_shared_ptr<uint8_t> m_videoram_2;
 
-	DECLARE_WRITE8_MEMBER(lights_1_w);
-	DECLARE_WRITE8_MEMBER(lights_2_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_1_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_2_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
-	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
+	void lights_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lights_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8080_dac_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8080_dac_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8080_dac_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8080_dac_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
@@ -144,7 +144,7 @@ uint32_t meyc8080_state::screen_update_meyc8080(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::lights_1_w)
+void meyc8080_state::lights_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Wild Arrow lamps
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(meyc8080_state::lights_1_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::lights_2_w)
+void meyc8080_state::lights_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Wild Arrow unknown pulse...
 
@@ -239,7 +239,7 @@ WRITE8_MEMBER(meyc8080_state::lights_2_w)
 }
 
 
-WRITE8_MEMBER(meyc8080_state::counters_w)
+void meyc8080_state::counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Wild Arrow & Draw Poker counters
 
@@ -275,25 +275,25 @@ WRITE8_MEMBER(meyc8080_state::counters_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_1_w)
+void meyc8080_state::meyc8080_dac_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(0);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_2_w)
+void meyc8080_state::meyc8080_dac_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(1);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_3_w)
+void meyc8080_state::meyc8080_dac_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(2);
 }
 
 
-WRITE8_MEMBER(meyc8080_state::meyc8080_dac_4_w)
+void meyc8080_state::meyc8080_dac_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(3);
 }

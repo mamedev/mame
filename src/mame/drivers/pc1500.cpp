@@ -44,12 +44,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( port_a_r );
-	DECLARE_READ8_MEMBER( port_b_r );
-	DECLARE_WRITE8_MEMBER( port_c_w );
+	void kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( pc1500_kb_r );
+	uint8_t pc1500_kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(pc1500);
 };
 
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( pc1500_mem_io , AS_IO, 8, pc1500_state)
 	AM_RANGE( 0xf000, 0xf00f) AM_DEVREADWRITE("lh5810", lh5810_device, data_r, data_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER( pc1500_state::pc1500_kb_r )
+uint8_t pc1500_state::pc1500_kb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -212,12 +212,12 @@ static INPUT_PORTS_START( pc1500 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( pc1500_state::kb_matrix_w )
+void pc1500_state::kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_matrix = data;
 }
 
-WRITE8_MEMBER( pc1500_state::port_c_w )
+void pc1500_state::port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->data_in_w(BIT(data, 0));
 	m_rtc->stb_w(BIT(data, 1));
@@ -228,7 +228,7 @@ WRITE8_MEMBER( pc1500_state::port_c_w )
 	m_rtc->c2_w(BIT(data, 5));
 }
 
-READ8_MEMBER( pc1500_state::port_b_r )
+uint8_t pc1500_state::port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- ON/Break key
@@ -249,7 +249,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 	return data;
 }
 
-READ8_MEMBER( pc1500_state::port_a_r )
+uint8_t pc1500_state::port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

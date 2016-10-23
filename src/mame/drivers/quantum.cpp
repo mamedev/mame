@@ -66,10 +66,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_avg(*this, "avg") { }
 
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_READ8_MEMBER(input_2_r);
+	uint16_t trackball_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t input_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
 };
@@ -85,19 +85,19 @@ public:
  *
  *************************************/
 
-READ16_MEMBER(quantum_state::trackball_r)
+uint16_t quantum_state::trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACKY")->read() << 4) | ioport("TRACKX")->read();
 }
 
 
-READ8_MEMBER(quantum_state::input_1_r)
+uint8_t quantum_state::input_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
-READ8_MEMBER(quantum_state::input_2_r)
+uint8_t quantum_state::input_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
@@ -110,7 +110,7 @@ READ8_MEMBER(quantum_state::input_2_r)
  *
  *************************************/
 
-WRITE16_MEMBER(quantum_state::led_w)
+void quantum_state::led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -33,10 +33,10 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(shifter_r);
-	DECLARE_READ8_MEMBER(rd_r);
-	DECLARE_READ8_MEMBER(wpt_r);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t shifter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t wpt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

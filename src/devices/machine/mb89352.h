@@ -66,8 +66,8 @@ public:
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<mb89352_device &>(device).m_drq_cb.set_callback(object); }
 
 	// any publically accessible interfaces needed for runtime
-	DECLARE_READ8_MEMBER( mb89352_r );
-	DECLARE_WRITE8_MEMBER( mb89352_w );
+	uint8_t mb89352_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mb89352_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_phase(int phase);
 

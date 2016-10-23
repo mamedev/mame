@@ -67,10 +67,10 @@ public:
 		m_beep(*this, "beeper")
 	{ }
 
-	DECLARE_READ8_MEMBER(portf0_r);
-	DECLARE_WRITE8_MEMBER(portf0_w);
-	DECLARE_WRITE8_MEMBER(portf1_w);
-	DECLARE_WRITE8_MEMBER(h8_status_callback);
+	uint8_t portf0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portf1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void h8_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(h8_inte_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_cassette_clock);
@@ -104,7 +104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
-READ8_MEMBER( h8_state::portf0_r )
+uint8_t h8_state::portf0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// reads the keyboard
 
@@ -134,7 +134,7 @@ READ8_MEMBER( h8_state::portf0_r )
 	return data;
 }
 
-WRITE8_MEMBER( h8_state::portf0_w )
+void h8_state::portf0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// this will always turn off int10 that was set by the timer
 	// d0-d3 = digit select
@@ -155,7 +155,7 @@ WRITE8_MEMBER( h8_state::portf0_w )
 	if (!BIT(data, 4)) m_irq_ctl |= 2;
 }
 
-WRITE8_MEMBER( h8_state::portf1_w )
+void h8_state::portf1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//d7 segment dot
 	//d6 segment f
@@ -232,7 +232,7 @@ WRITE_LINE_MEMBER( h8_state::h8_inte_callback )
 	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
 }
 
-WRITE8_MEMBER( h8_state::h8_status_callback )
+void h8_state::h8_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* This is rather messy, but basically there are 2 D flipflops, one drives the other,
 the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,

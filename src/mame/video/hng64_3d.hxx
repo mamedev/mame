@@ -24,28 +24,28 @@ hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 //   30120000-3013ffff is framebuffer A1
 //   30140000-3015ffff is ZBuffer A
 
-READ32_MEMBER(hng64_state::hng64_3d_1_r)
+uint32_t hng64_state::hng64_3d_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_3d_1[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
+void hng64_state::hng64_3d_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_3d_1[offset]);
 }
 
-READ32_MEMBER(hng64_state::hng64_3d_2_r)
+uint32_t hng64_state::hng64_3d_2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_3d_2[offset];
 }
 
-WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
+void hng64_state::hng64_3d_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_3d_2[offset]);
 }
 
 // The 3d 'display list'
-WRITE16_MEMBER(hng64_state::dl_w)
+void hng64_state::dl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dl[offset]);
 }
@@ -53,7 +53,7 @@ WRITE16_MEMBER(hng64_state::dl_w)
 
 
 
-WRITE32_MEMBER(hng64_state::dl_upload_w)
+void hng64_state::dl_upload_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Data is:
 	// 00000b50 for the sams64 games
@@ -80,7 +80,7 @@ TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
 	set_irq(0x0008);
 }
 
-WRITE32_MEMBER(hng64_state::dl_control_w)
+void hng64_state::dl_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// This could be a multiple display list thing, but the palette seems to be lost between lists?
 	// Many games briefly set this to 0x4 on startup. Maybe there are 3 display lists?

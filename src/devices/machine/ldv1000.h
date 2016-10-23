@@ -91,17 +91,17 @@ protected:
 public:
 	// internal read/write handlers
 	DECLARE_WRITE_LINE_MEMBER( ctc_interrupt );
-	DECLARE_WRITE8_MEMBER( z80_decoder_display_port_w );
-	DECLARE_READ8_MEMBER( z80_decoder_display_port_r );
-	DECLARE_READ8_MEMBER( z80_controller_r );
-	DECLARE_WRITE8_MEMBER( z80_controller_w );
-	DECLARE_WRITE8_MEMBER( ppi0_porta_w );
-	DECLARE_READ8_MEMBER( ppi0_portb_r );
-	DECLARE_READ8_MEMBER( ppi0_portc_r );
-	DECLARE_WRITE8_MEMBER( ppi0_portc_w );
-	DECLARE_READ8_MEMBER( ppi1_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi1_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi1_portc_w );
+	void z80_decoder_display_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_decoder_display_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_controller_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_controller_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi0_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi1_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// internal state

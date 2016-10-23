@@ -159,12 +159,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( tl_mmu_r );
-	DECLARE_WRITE16_MEMBER( tl_mmu_w );
-	DECLARE_READ16_MEMBER( video_ctrl_r );
-	DECLARE_WRITE16_MEMBER( video_ctrl_w );
-	DECLARE_READ16_MEMBER( ram_r );
-	DECLARE_WRITE16_MEMBER( ram_w );
+	uint16_t tl_mmu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tl_mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t video_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -179,18 +179,18 @@ private:
 	uint16_t m_bw2_ctrl;
 };
 
-READ16_MEMBER( sun2_state::ram_r )
+uint16_t sun2_state::ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < m_ram_size_words) return m_ram_ptr[offset];
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::ram_w )
+void sun2_state::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < m_ram_size_words) COMBINE_DATA(&m_ram_ptr[offset]);
 }
 
-READ16_MEMBER( sun2_state::tl_mmu_r )
+uint16_t sun2_state::tl_mmu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -324,7 +324,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sun2_state::tl_mmu_w )
+void sun2_state::tl_mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -450,12 +450,12 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 }
 
 // BW2 video control
-READ16_MEMBER( sun2_state::video_ctrl_r )
+uint16_t sun2_state::video_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bw2_ctrl;
 }
 
-WRITE16_MEMBER( sun2_state::video_ctrl_w )
+void sun2_state::video_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("sun2: BW2: %x to video_ctrl\n", data);
 	COMBINE_DATA(&m_bw2_ctrl);

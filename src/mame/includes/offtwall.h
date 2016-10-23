@@ -31,11 +31,11 @@ public:
 	uint16_t *m_spritecache_count;
 	uint16_t *m_unknown_verify_base;
 	virtual void update_interrupts() override;
-	DECLARE_WRITE16_MEMBER(io_latch_w);
-	DECLARE_READ16_MEMBER(bankswitch_r);
-	DECLARE_READ16_MEMBER(bankrom_r);
-	DECLARE_READ16_MEMBER(spritecache_count_r);
-	DECLARE_READ16_MEMBER(unknown_verify_r);
+	void io_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bankswitch_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bankrom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t spritecache_count_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t unknown_verify_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_offtwall();
 	void init_offtwalc();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

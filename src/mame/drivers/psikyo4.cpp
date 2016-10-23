@@ -138,7 +138,7 @@ static GFXDECODE_START( ps4 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x40 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
+void psikyo4_state::ps4_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -152,7 +152,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-READ32_MEMBER(psikyo4_state::ps4_eeprom_r)
+uint32_t psikyo4_state::ps4_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -182,7 +182,7 @@ CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
 	return ret;
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)
+void psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r, g, b;
 	COMBINE_DATA(&m_paletteram[offset]);
@@ -195,7 +195,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_
 	m_palette2->set_pen_color(offset, rgb_t(r, g, b)); // For screen 2
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
+void psikyo4_state::ps4_bgpen_1_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r, g, b;
 	COMBINE_DATA(&m_bgpen_1[0]);
@@ -207,7 +207,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
 	m_palette->set_pen_color(0x800, rgb_t(r, g, b)); // Clear colour for screen 1
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
+void psikyo4_state::ps4_bgpen_2_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r, g, b;
 	COMBINE_DATA(&m_bgpen_2[0]);
@@ -219,7 +219,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 	m_palette2->set_pen_color(0x800, rgb_t(r, g, b)); // Clear colour for screen 2
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
+void psikyo4_state::ps4_screen1_brt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -248,7 +248,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 	}
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
+void psikyo4_state::ps4_screen2_brt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -278,7 +278,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
 	}
 }
 
-WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
+void psikyo4_state::ps4_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
 
@@ -289,7 +289,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	}
 }
 
-WRITE32_MEMBER(psikyo4_state::io_select_w)
+void psikyo4_state::io_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// YMF banking
 	if (ACCESSING_BITS_16_31)

@@ -68,10 +68,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_WRITE8_MEMBER(z1013_keyboard_w);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
-	DECLARE_READ8_MEMBER(k7659_port_b_r);
+	void z1013_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k7659_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	const uint8_t *m_p_chargen;
 	uint8_t m_keyboard_line;
@@ -265,12 +265,12 @@ void z1013_state::machine_reset()
 	m_keyboard_line = 0;
 }
 
-WRITE8_MEMBER( z1013_state::z1013_keyboard_w )
+void z1013_state::z1013_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_line = data;
 }
 
-READ8_MEMBER( z1013_state::port_b_r )
+uint8_t z1013_state::port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d", m_keyboard_line & 7);
@@ -287,13 +287,13 @@ READ8_MEMBER( z1013_state::port_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( z1013_state::port_b_w )
+void z1013_state::port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_part = BIT(data, 4); // for z1013a2 only
 	m_cass->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( z1013_state::k7659_port_b_r )
+uint8_t z1013_state::k7659_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

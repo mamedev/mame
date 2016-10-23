@@ -24,14 +24,14 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04) override { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom0c) override { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
+	virtual uint8_t read_rom04(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }
+	virtual uint8_t read_rom0c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (m_subslot->exists()) return m_subslot->read_rom0c(space, offset); else return 0xff; }
 
 	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
 	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
-	virtual DECLARE_WRITE8_MEMBER(io_write) override;
-	virtual DECLARE_READ8_MEMBER(t0_read)  override { return m_speech->lrq_r() ? 0 : 1; }
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t t0_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  override { return m_speech->lrq_r() ? 0 : 1; }
 
 private:
 	required_device<sp0256_device> m_speech;

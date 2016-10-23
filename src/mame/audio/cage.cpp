@@ -359,7 +359,7 @@ void atari_cage_device::update_serial()
  *
  *************************************/
 
-READ32_MEMBER( atari_cage_device::tms32031_io_r )
+uint32_t atari_cage_device::tms32031_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 	uint16_t result = tms32031_io_regs[offset];
@@ -377,7 +377,7 @@ READ32_MEMBER( atari_cage_device::tms32031_io_r )
 }
 
 
-WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
+void atari_cage_device::tms32031_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
@@ -458,7 +458,7 @@ void atari_cage_device::update_control_lines()
 }
 
 
-READ32_MEMBER( atari_cage_device::cage_from_main_r )
+uint32_t atari_cage_device::cage_from_main_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (LOG_COMM)
 		logerror("%06X:CAGE read command = %04X\n", space.device().safe_pc(), m_from_main);
@@ -469,7 +469,7 @@ READ32_MEMBER( atari_cage_device::cage_from_main_r )
 }
 
 
-WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
+void atari_cage_device::cage_from_main_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_COMM)
 	{
@@ -478,7 +478,7 @@ WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
 }
 
 
-WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
+void atari_cage_device::cage_to_main_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_COMM)
 		logerror("%06X:Data from CAGE = %04X\n", space.device().safe_pc(), data);
@@ -488,7 +488,7 @@ WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 }
 
 
-READ32_MEMBER( atari_cage_device::cage_io_status_r )
+uint32_t atari_cage_device::cage_io_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int result = 0;
 	if (m_cpu_to_cage_ready)
@@ -584,7 +584,7 @@ void atari_cage_device::control_w(uint16_t data)
  *
  *************************************/
 
-WRITE32_MEMBER( atari_cage_device::speedup_w )
+void atari_cage_device::speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	space.device().execute().eat_cycles(100);
 	COMBINE_DATA(&m_speedup_ram[offset]);

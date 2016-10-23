@@ -69,13 +69,13 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
 			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
-WRITE16_MEMBER(yunsun16_state::vram_0_w)
+void yunsun16_state::vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(yunsun16_state::vram_1_w)
+void yunsun16_state::vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset / 2);

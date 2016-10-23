@@ -46,6 +46,6 @@ public:
 	uint32_t screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	DECLARE_READ16_MEMBER( dietgo_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( dietgo_protection_region_0_104_w );
+	uint16_t dietgo_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dietgo_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };

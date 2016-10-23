@@ -18,7 +18,7 @@ naomi_m1_board::naomi_m1_board(const machine_config &mconfig, const char *tag, d
 {
 }
 
-READ16_MEMBER(naomi_m1_board::actel_id_r)
+uint16_t naomi_m1_board::actel_id_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return actel_id;
 }

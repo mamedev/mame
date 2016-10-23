@@ -35,10 +35,10 @@ public:
 	static void static_set_gfx_character_width(device_t &device, int value) { downcast<scn2674_device &>(device).m_gfx_hpixels_per_column = value; }
 	static void static_set_display_callback(device_t &device, draw_character_delegate callback) { downcast<scn2674_device &>(device).m_display_cb = callback; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( buffer_r ) { return m_buffer; }
-	DECLARE_WRITE8_MEMBER( buffer_w ) { m_buffer = data; }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t buffer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_buffer; }
+	void buffer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_buffer = data; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_0) ? &m_space_config : nullptr; }

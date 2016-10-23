@@ -68,7 +68,7 @@ void galastrm_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
+void galastrm_state::galastrm_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0110pcr_addr = data >> 16;
@@ -76,7 +76,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 		m_palette->set_pen_color(m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
+void galastrm_state::galastrm_tc0610_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0610_0_addr = data >> 16;
@@ -84,7 +84,7 @@ WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
 		m_tc0610_ctrl_reg[0][m_tc0610_0_addr] = data;
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_tc0610_1_w)
+void galastrm_state::galastrm_tc0610_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		m_tc0610_1_addr = data >> 16;
@@ -103,7 +103,7 @@ CUSTOM_INPUT_MEMBER(galastrm_state::coin_word_r)
 	return m_coin_word;
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_input_w)
+void galastrm_state::galastrm_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #if 0
 {
@@ -149,7 +149,7 @@ popmessage(t);
 	}
 }
 
-READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
+uint32_t galastrm_state::galastrm_adstick_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0x00)
 	{
@@ -161,7 +161,7 @@ READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 	return 0;
 }
 
-WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
+void galastrm_state::galastrm_adstick_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_GALASTRM_INTERRUPT6);
 }

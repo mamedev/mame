@@ -341,7 +341,7 @@ void saa1099_device::envelope_w(int ch)
 }
 
 
-WRITE8_MEMBER( saa1099_device::control_w )
+void saa1099_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xff) > 0x1c)
 	{
@@ -361,7 +361,7 @@ WRITE8_MEMBER( saa1099_device::control_w )
 }
 
 
-WRITE8_MEMBER( saa1099_device::data_w )
+void saa1099_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg = m_selected_reg;
 	int ch;

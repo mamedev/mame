@@ -20,7 +20,7 @@ pc_joy_device::pc_joy_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-READ8_MEMBER ( pc_joy_device::joy_port_r )
+uint8_t pc_joy_device::joy_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int delta = ((machine().time() - m_stime) * 256 * 1000).seconds();
 
@@ -30,7 +30,7 @@ READ8_MEMBER ( pc_joy_device::joy_port_r )
 	return (m_dev->btn() << 4) | (m_dev->y2(delta) << 3) | (m_dev->x2(delta) << 2) | (m_dev->y1(delta) << 1) | m_dev->x1(delta);
 }
 
-WRITE8_MEMBER ( pc_joy_device::joy_port_w )
+void pc_joy_device::joy_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stime = machine().time();
 	if(!m_dev)

@@ -70,8 +70,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_WRITE8_MEMBER(port10_w);
+	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
@@ -103,13 +103,13 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-READ8_MEMBER( alphatro_state::port10_r )
+uint8_t alphatro_state::port10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//return (space.machine().device<screen_device>("screen")->vblank() ? 0x00 : 0x80);
 	return m_timer_bit;
 }
 
-WRITE8_MEMBER( alphatro_state::port10_w )
+void alphatro_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // Bit 0 -> 0 = 40 cols; 1 = 80 cols
 // Bit 1 ? each keystroke, and a lot when it scrolls

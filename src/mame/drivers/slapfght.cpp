@@ -357,7 +357,7 @@ INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(slapfght_state::irq_enable_w)
+void slapfght_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_irq_enabled = offset ? true : false;
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(slapfght_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(slapfght_state::sound_reset_w)
+void slapfght_state::sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 
@@ -373,12 +373,12 @@ WRITE8_MEMBER(slapfght_state::sound_reset_w)
 		m_sound_nmi_enabled = false;
 }
 
-WRITE8_MEMBER(slapfght_state::prg_bank_w)
+void slapfght_state::prg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(offset);
 }
 
-READ8_MEMBER(slapfght_state::vblank_r)
+uint8_t slapfght_state::vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vblank() ? 1 : 0;
 }
@@ -449,7 +449,7 @@ INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(slapfght_state::sound_nmi_enable_w)
+void slapfght_state::sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enabled = offset ? false : true;
 }

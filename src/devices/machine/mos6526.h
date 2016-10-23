@@ -122,13 +122,13 @@ public:
 	template<class _Object> static devcb_base &set_pb_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pc_wr_callback(device_t &device, _Object object) { return downcast<mos6526_device &>(device).m_write_pc.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t pa_r() { return m_pa; }
-	DECLARE_READ8_MEMBER( pa_r ) { return pa_r(); }
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return pa_r(); }
 	uint8_t pb_r() { return m_pb; }
-	DECLARE_READ8_MEMBER( pb_r ) { return pb_r(); }
+	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return pb_r(); }
 
 	DECLARE_READ_LINE_MEMBER( sp_r ) { return m_sp; }
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
@@ -265,8 +265,8 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual inline void clock_tod() override;
@@ -280,8 +280,8 @@ class mos5710_device : public mos6526_device
 public:
 	mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//DECLARE_READ8_MEMBER( read );
-	//DECLARE_WRITE8_MEMBER( write );
+	//uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	//void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 

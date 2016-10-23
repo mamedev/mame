@@ -34,8 +34,8 @@ public:
 	virtual ~device_crvision_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom80) { return 0xff; }
+	virtual uint8_t read_rom40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_rom80(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -83,8 +83,8 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom40);
-	virtual DECLARE_READ8_MEMBER(read_rom80);
+	virtual uint8_t read_rom40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_rom80(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 

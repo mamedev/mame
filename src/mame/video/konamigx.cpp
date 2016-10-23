@@ -920,7 +920,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
 }
 
 
-WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
+void konamigx_state::konamigx_type3_psac2_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// other bits are used for something...
 
@@ -1563,7 +1563,7 @@ static inline void set_color_555(palette_device &palette, pen_t color, int rshif
 
 #ifdef UNUSED_FUNCTION
 // main monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
+void konamigx_state::konamigx_555_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
@@ -1575,7 +1575,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette_w)
 }
 
 // sub monitor for type 3
-WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
+void konamigx_state::konamigx_555_palette2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t coldat;
 	COMBINE_DATA(&m_subpaletteram32[offset]);
@@ -1588,7 +1588,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_555_palette2_w)
 }
 #endif
 
-WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
+void konamigx_state::konamigx_tilebank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 		m_gx_tilebanks[offset*4] = (data>>24)&0xff;
@@ -1601,7 +1601,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_tilebank_w)
 }
 
 // type 1 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
+void konamigx_state::konamigx_t1_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 	m_gx_psac_tilemap->mark_tile_dirty(offset/2);
@@ -1609,7 +1609,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_t1_psacmap_w)
 }
 
 // type 4 RAM-based PSAC tilemap
-WRITE32_MEMBER(konamigx_state::konamigx_t4_psacmap_w)
+void konamigx_state::konamigx_t4_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_psacram[offset]);
 

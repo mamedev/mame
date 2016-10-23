@@ -27,8 +27,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(rtc_r);
+	uint8_t rtc_w(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

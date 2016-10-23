@@ -659,7 +659,7 @@ void m37710_cpu_device::m37710_internal_w(int offset, uint8_t data)
 	}
 }
 
-READ16_MEMBER( m37710_cpu_device::m37710_internal_word_r )
+uint16_t m37710_cpu_device::m37710_internal_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -671,7 +671,7 @@ READ16_MEMBER( m37710_cpu_device::m37710_internal_word_r )
 	return ret;
 }
 
-WRITE16_MEMBER( m37710_cpu_device::m37710_internal_word_w )
+void m37710_cpu_device::m37710_internal_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask & 0x00ff)
 		m37710_internal_w(offset*2, data & 0xff);

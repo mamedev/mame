@@ -110,7 +110,7 @@ void k033906_device::reg_w(int reg, uint32_t data)
 	}
 }
 
-READ32_MEMBER(k033906_device::read)
+uint32_t k033906_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_reg_set)
 		return reg_r(offset);
@@ -118,7 +118,7 @@ READ32_MEMBER(k033906_device::read)
 		return m_ram[offset];
 }
 
-WRITE32_MEMBER(k033906_device::write)
+void k033906_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_reg_set)
 		reg_w(offset, data);

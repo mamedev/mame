@@ -45,37 +45,37 @@ void h8_dma_device::clear_dte(int id)
 	dmabcr &= ~(0x0010 << id);
 }
 
-READ8_MEMBER(h8_dma_device::dmawer_r)
+uint8_t h8_dma_device::dmawer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("dmawer_r %02x\n", dmawer);
 	return dmawer;
 }
 
-WRITE8_MEMBER(h8_dma_device::dmawer_w)
+void h8_dma_device::dmawer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmawer = data;
 	logerror("dmawer_w %02x\n", data);
 }
 
-READ8_MEMBER(h8_dma_device::dmatcr_r)
+uint8_t h8_dma_device::dmatcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("dmatcr_r %02x\n", dmatcr);
 	return dmatcr;
 }
 
-WRITE8_MEMBER(h8_dma_device::dmatcr_w)
+void h8_dma_device::dmatcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmatcr = data;
 	logerror("dmatcr_w %02x\n", data);
 }
 
-READ16_MEMBER(h8_dma_device::dmabcr_r)
+uint16_t h8_dma_device::dmabcr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("dmabcr_r %04x\n", dmabcr);
 	return dmabcr;
 }
 
-WRITE16_MEMBER(h8_dma_device::dmabcr_w)
+void h8_dma_device::dmabcr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&dmabcr);
 	logerror("dmabcr_w %04x\n", dmabcr);
@@ -136,111 +136,111 @@ void h8_dma_channel_device::set_id(int id)
 
 }
 
-READ16_MEMBER(h8_dma_channel_device::marah_r)
+uint16_t h8_dma_channel_device::marah_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("marah_r %06x\n", mar[0]);
 	return mar[0] >> 16;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marah_w)
+void h8_dma_channel_device::marah_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		mar[0] = ((data & 0x00ff) << 16) | (mar[0] & 0xffff);
 	logerror("marah_w %06x\n", mar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::maral_r)
+uint16_t h8_dma_channel_device::maral_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("maral_r %06x\n", mar[0]);
 	return mar[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::maral_w)
+void h8_dma_channel_device::maral_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mar[0] = (mar[0] & ~mem_mask) | (data & mem_mask);
 	logerror("maral_w %06x\n", mar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::ioara_r)
+uint16_t h8_dma_channel_device::ioara_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("iorar_r %04x\n", ioar[0]);
 	return ioar[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::ioara_w)
+void h8_dma_channel_device::ioara_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&ioar[0]);
 	logerror("ioara_w %04x\n", ioar[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::etcra_r)
+uint16_t h8_dma_channel_device::etcra_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("etcra_r %04x\n", etcr[0]);
 	return etcr[0];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::etcra_w)
+void h8_dma_channel_device::etcra_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&etcr[0]);
 	logerror("etcra_w %04x\n", etcr[0]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::marbh_r)
+uint16_t h8_dma_channel_device::marbh_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("marbh_r %06x\n", mar[1]);
 	return mar[1] >> 16;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marbh_w)
+void h8_dma_channel_device::marbh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		mar[1] = ((data & 0x00ff) << 16) | (mar[1] & 0xffff);
 	logerror("marbh_w %06x\n", mar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::marbl_r)
+uint16_t h8_dma_channel_device::marbl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("marbl_r %06x\n", mar[1]);
 	return mar[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::marbl_w)
+void h8_dma_channel_device::marbl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mar[1] = (mar[1] & ~mem_mask) | (data & mem_mask);
 	logerror("marbl_w %06x\n", mar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::ioarb_r)
+uint16_t h8_dma_channel_device::ioarb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("ioarb_r %04x\n", ioar[1]);
 	return ioar[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::ioarb_w)
+void h8_dma_channel_device::ioarb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&ioar[1]);
 	logerror("ioarb_w %04x\n", ioar[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::etcrb_r)
+uint16_t h8_dma_channel_device::etcrb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("etcrb_r %04x\n", etcr[1]);
 	return etcr[1];
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::etcrb_w)
+void h8_dma_channel_device::etcrb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&etcr[1]);
 	logerror("etcrb_w %04x\n", etcr[1]);
 }
 
-READ16_MEMBER(h8_dma_channel_device::dmacr_r)
+uint16_t h8_dma_channel_device::dmacr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("dmacr_r %04x\n", dmacr);
 	return dmacr;
 }
 
-WRITE16_MEMBER(h8_dma_channel_device::dmacr_w)
+void h8_dma_channel_device::dmacr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&dmacr);
 	logerror("dmacr_w %04x\n", dmacr);

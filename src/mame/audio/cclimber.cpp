@@ -77,23 +77,23 @@ machine_config_constructor cclimber_audio_device::device_mconfig_additions() con
 	return MACHINE_CONFIG_NAME( cclimber_audio );
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_select_w )
+void cclimber_audio_device::sample_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_num = data;
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_rate_w )
+void cclimber_audio_device::sample_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* calculate the sampling frequency */
 	m_sample_freq = SND_CLOCK / 4 / (256 - data);
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_volume_w )
+void cclimber_audio_device::sample_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_volume = data & 0x1f;    /* range 0-31 */
 }
 
-WRITE8_MEMBER( cclimber_audio_device::sample_trigger_w )
+void cclimber_audio_device::sample_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0)
 		return;

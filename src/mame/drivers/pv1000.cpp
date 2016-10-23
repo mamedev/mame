@@ -19,7 +19,7 @@ class pv1000_sound_device : public device_t,
 public:
 	pv1000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voice_w);
+	void voice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -85,7 +85,7 @@ void pv1000_sound_device::device_start()
 	save_item(NAME(m_voice[3].val));
 }
 
-WRITE8_MEMBER(pv1000_sound_device::voice_w)
+void pv1000_sound_device::voice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03;
 	m_voice[offset].period = data;
@@ -153,9 +153,9 @@ public:
 		m_palette(*this, "palette")
 		{ }
 
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t   m_io_regs[8];
 	uint8_t   m_fd_data;
 
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( pv1000_io, AS_IO, 8, pv1000_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( pv1000_state::gfxram_w )
+void pv1000_state::gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *gfxram = memregion( "gfxram" )->base();
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER( pv1000_state::gfxram_w )
 }
 
 
-WRITE8_MEMBER( pv1000_state::io_w )
+void pv1000_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -238,7 +238,7 @@ WRITE8_MEMBER( pv1000_state::io_w )
 }
 
 
-READ8_MEMBER( pv1000_state::io_r )
+uint8_t pv1000_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_io_regs[offset];
 

@@ -271,7 +271,7 @@ gottlieb_sound_r0_device::gottlieb_sound_r0_device(const machine_config &mconfig
 //  read port -
 //-------------------------------------------------
 
-READ8_MEMBER( gottlieb_sound_r0_device::r6530b_r )
+uint8_t gottlieb_sound_r0_device::r6530b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sndcmd;
 }
@@ -281,7 +281,7 @@ READ8_MEMBER( gottlieb_sound_r0_device::r6530b_r )
 //  write - handle an external command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r0_device::write )
+void gottlieb_sound_r0_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write the command data to the low 4 bits
 	uint8_t pb0_3 = data ^ 15;
@@ -421,7 +421,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 //  write - handle an external command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r1_device::write )
+void gottlieb_sound_r1_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write the command data to the low 6 bits, and the trigger to the upper bit
 	uint8_t pa7 = (data & 0x0f) != 0xf;
@@ -450,7 +450,7 @@ WRITE_LINE_MEMBER( gottlieb_sound_r1_device::snd_interrupt )
 //  port B
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
+void gottlieb_sound_r1_device::r6532_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// unsure if this is ever used, but the NMI is connected to the RIOT's PB7
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
@@ -462,7 +462,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
 //  speech chip
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
+void gottlieb_sound_r1_device::votrax_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_votrax != nullptr)
 	{
@@ -481,7 +481,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
 //  the Votrax SC-01 speech chip
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
+void gottlieb_sound_r1_device::speech_clock_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// prevent negative clock values (and possible crash)
 	if (data < 0x65) data = 0x65;
@@ -700,7 +700,7 @@ void gottlieb_sound_r2_device::static_enable_cobram3_mods(device_t &device)
 //  write - handle an external command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::write )
+void gottlieb_sound_r2_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested
 	if (data != 0xff)
@@ -748,7 +748,7 @@ inline void gottlieb_sound_r2_device::nmi_state_update()
 //  from the audio CPU
 //-------------------------------------------------
 
-READ8_MEMBER( gottlieb_sound_r2_device::audio_data_r )
+uint8_t gottlieb_sound_r2_device::audio_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	return m_audiocpu_latch;
@@ -760,7 +760,7 @@ READ8_MEMBER( gottlieb_sound_r2_device::audio_data_r )
 //  from the speech CPU
 //-------------------------------------------------
 
-READ8_MEMBER( gottlieb_sound_r2_device::speech_data_r )
+uint8_t gottlieb_sound_r2_device::speech_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_speechcpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	return m_speechcpu_latch;
@@ -772,7 +772,7 @@ READ8_MEMBER( gottlieb_sound_r2_device::speech_data_r )
 //  speech CPU to the audio CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::signal_audio_nmi_w )
+void gottlieb_sound_r2_device::signal_audio_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -784,7 +784,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::signal_audio_nmi_w )
 //  CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::nmi_rate_w )
+void gottlieb_sound_r2_device::nmi_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// the new rate is picked up when the previous timer expires
 	m_nmi_rate = data;
@@ -807,7 +807,7 @@ CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
 //  register on the speech board
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
+void gottlieb_sound_r2_device::speech_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t previous = m_speech_control;
 	m_speech_control = data;
@@ -863,7 +863,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 //  latch register
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::psg_latch_w )
+void gottlieb_sound_r2_device::psg_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_latch = data;
 }
@@ -874,7 +874,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::psg_latch_w )
 //  SP0250 latch register
 //-------------------------------------------------
 
-WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
+void gottlieb_sound_r2_device::sp0250_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sp0250_latch = data;
 }

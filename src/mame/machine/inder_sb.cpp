@@ -22,14 +22,14 @@ inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag,
 
 
 // hacks for test purposes, these are installed over the program rom so we know when irqs are actually taken
-READ8_MEMBER(inder_sb_device::megaphx_02cc_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; }
-READ8_MEMBER(inder_sb_device::megaphx_02e6_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; }
-READ8_MEMBER(inder_sb_device::megaphx_0309_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; }
-READ8_MEMBER(inder_sb_device::megaphx_0323_hack_r)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; }
+uint8_t inder_sb_device::megaphx_02cc_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)  { /*logerror("%04x audicpu IRQ hack 0x02cc\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02cc]; }
+uint8_t inder_sb_device::megaphx_02e6_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)  { /*logerror("%04x audicpu IRQ hack 0x02e6\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x02e6]; }
+uint8_t inder_sb_device::megaphx_0309_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)  { /*logerror("%04x audicpu IRQ hack 0x0309\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0309]; }
+uint8_t inder_sb_device::megaphx_0323_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)  { /*logerror("%04x audicpu IRQ hack 0x0323\n", machine().device("audiocpu")->safe_pc());*/  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank); return memregion("audiocpu")->base()[0x0323]; }
 
 
 
-READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
+uint16_t inder_sb_device::megaphx_0x050002_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	space.machine().scheduler().synchronize();
 //  int pc = machine().device("maincpu")->safe_pc();
@@ -39,7 +39,7 @@ READ16_MEMBER(inder_sb_device::megaphx_0x050002_r)
 	return ret;
 }
 
-WRITE16_MEMBER(inder_sb_device::megaphx_0x050000_w)
+void inder_sb_device::megaphx_0x050000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  int pc = machine().device("maincpu")->safe_pc();
 	space.machine().scheduler().synchronize();
@@ -126,13 +126,13 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, inder_sb_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("snddata")
 ADDRESS_MAP_END
 
-READ8_MEMBER(inder_sb_device::megaphx_sound_cmd_r)
+uint8_t inder_sb_device::megaphx_sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	space.machine().scheduler().synchronize();
 	return m_sounddata;
 }
 
-READ8_MEMBER(inder_sb_device::megaphx_sound_sent_r)
+uint8_t inder_sb_device::megaphx_sound_sent_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	space.machine().scheduler().synchronize();
 	int ret = m_soundsent;
@@ -140,7 +140,7 @@ READ8_MEMBER(inder_sb_device::megaphx_sound_sent_r)
 	return ret;
 }
 
-WRITE8_MEMBER(inder_sb_device::megaphx_sound_to_68k_w)
+void inder_sb_device::megaphx_sound_to_68k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  int pc = machine().device("audiocpu")->safe_pc();
 	space.machine().scheduler().synchronize();
@@ -149,27 +149,27 @@ WRITE8_MEMBER(inder_sb_device::megaphx_sound_to_68k_w)
 	m_soundback = data;
 }
 
-WRITE8_MEMBER(inder_sb_device::dac0_rombank_write)
+void inder_sb_device::dac0_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbank[0] = data;
 
 //  printf("dac0_rombank_write %02x", data);
 }
 
-WRITE8_MEMBER(inder_sb_device::dac1_rombank_write)
+void inder_sb_device::dac1_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbank[1] = data;
 //  printf("dac1_rombank_write %02x", data);
 
 }
 
-WRITE8_MEMBER(inder_sb_device::dac2_rombank_write)
+void inder_sb_device::dac2_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbank[2] = data;
 //  printf("dac2_rombank_write %02x", data);
 }
 
-WRITE8_MEMBER(inder_sb_device::dac3_rombank_write)
+void inder_sb_device::dac3_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbank[3] = data;
 //  printf("dac3_rombank_write %02x", data);

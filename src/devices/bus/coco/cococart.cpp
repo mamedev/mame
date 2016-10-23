@@ -132,7 +132,7 @@ void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, in
 //  coco_cartridge_r
 //-------------------------------------------------
 
-READ8_MEMBER(cococart_slot_device::read)
+uint8_t cococart_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0x00;
 	if (m_cart)
@@ -145,7 +145,7 @@ READ8_MEMBER(cococart_slot_device::read)
 //  coco_cartridge_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(cococart_slot_device::write)
+void cococart_slot_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write(space, offset, data);
@@ -389,7 +389,7 @@ device_cococart_interface::~device_cococart_interface()
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER(device_cococart_interface::read)
+uint8_t device_cococart_interface::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -400,7 +400,7 @@ READ8_MEMBER(device_cococart_interface::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(device_cococart_interface::write)
+void device_cococart_interface::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

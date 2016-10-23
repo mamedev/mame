@@ -113,27 +113,27 @@ void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, u
 		m_ppi->write(space, offset & 0x03, data);
 }
 
-READ8_MEMBER( dmv_k210_device::porta_r )
+uint8_t dmv_k210_device::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cent_data_in->read();
 }
 
-READ8_MEMBER( dmv_k210_device::portb_r )
+uint8_t dmv_k210_device::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portb;
 }
 
-READ8_MEMBER( dmv_k210_device::portc_r )
+uint8_t dmv_k210_device::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portc;
 }
 
-WRITE8_MEMBER( dmv_k210_device::porta_w )
+void dmv_k210_device::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cent_data_out->write(data);
 }
 
-WRITE8_MEMBER( dmv_k210_device::portb_w )
+void dmv_k210_device::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_ack(BIT(data, 2));
 	m_centronics->write_select(BIT(data, 4));
@@ -142,7 +142,7 @@ WRITE8_MEMBER( dmv_k210_device::portb_w )
 	m_centronics->write_fault(BIT(data, 7));
 }
 
-WRITE8_MEMBER( dmv_k210_device::portc_w )
+void dmv_k210_device::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x80))
 	{

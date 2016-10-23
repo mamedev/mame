@@ -72,11 +72,11 @@ public:
 
 	uint8_t kb_read();
 	void update_banks();
-	DECLARE_WRITE8_MEMBER( hd63701_int_reg_w );
-	DECLARE_READ8_MEMBER( hd63701_int_reg_r );
+	void hd63701_int_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hd63701_int_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_rw(address_space &space, uint16_t offset);
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ8_MEMBER( io_r );
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(psion);
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
@@ -94,9 +94,9 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( reset_kb_counter_r );
-	DECLARE_READ8_MEMBER( inc_kb_counter_r );
-	DECLARE_READ8_MEMBER( switchoff_r );
+	uint8_t reset_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t inc_kb_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t switchoff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
 };

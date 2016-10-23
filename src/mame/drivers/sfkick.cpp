@@ -192,13 +192,13 @@ public:
 	int m_bank[8];
 	int m_input_mux;
 	required_device<v9938_device> m_v9938;
-	DECLARE_WRITE8_MEMBER(page0_w);
-	DECLARE_WRITE8_MEMBER(page1_w);
-	DECLARE_WRITE8_MEMBER(page2_w);
-	DECLARE_WRITE8_MEMBER(page3_w);
-	DECLARE_READ8_MEMBER(ppi_port_b_r);
-	DECLARE_WRITE8_MEMBER(ppi_port_a_w);
-	DECLARE_WRITE8_MEMBER(ppi_port_c_w);
+	void page0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sfkick();
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
@@ -229,7 +229,7 @@ public:
 #define MASTER_CLOCK    XTAL_21_4772MHz
 
 
-READ8_MEMBER(sfkick_state::ppi_port_b_r)
+uint8_t sfkick_state::ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_input_mux&0x0f)
 	{
@@ -367,7 +367,7 @@ void sfkick_state::sfkick_remap_banks()
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::ppi_port_a_w)
+void sfkick_state::ppi_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_cfg=data;
 	sfkick_remap_banks();
@@ -384,7 +384,7 @@ void sfkick_state::sfkick_bank_set(int num, int data)
 	sfkick_remap_banks();
 }
 
-WRITE8_MEMBER(sfkick_state::page0_w)
+void sfkick_state::page0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((m_bank_cfg&3)==2)
 	{
@@ -399,7 +399,7 @@ WRITE8_MEMBER(sfkick_state::page0_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page1_w)
+void sfkick_state::page1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(((m_bank_cfg>>2)&3)==2)
 	{
@@ -414,7 +414,7 @@ WRITE8_MEMBER(sfkick_state::page1_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page2_w)
+void sfkick_state::page2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(((m_bank_cfg>>4)&3)==2)
 	{
@@ -429,7 +429,7 @@ WRITE8_MEMBER(sfkick_state::page2_w)
 	}
 }
 
-WRITE8_MEMBER(sfkick_state::page3_w)
+void sfkick_state::page3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(((m_bank_cfg>>6)&3)==2)
 	{
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8, sfkick_state )
 	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sfkick_state::ppi_port_c_w)
+void sfkick_state::ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_mux=data;
 }

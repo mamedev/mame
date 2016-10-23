@@ -721,7 +721,7 @@ void apollo_graphics_15i::set_lut_cr(uint8_t data)
 	}
 }
 
-READ8_MEMBER( apollo_graphics_15i::apollo_mcr_r )
+uint8_t apollo_graphics_15i::apollo_mcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	switch (offset & 0x407)
@@ -766,7 +766,7 @@ READ8_MEMBER( apollo_graphics_15i::apollo_mcr_r )
 	return data;
 }
 
-WRITE8_MEMBER( apollo_graphics_15i::apollo_mcr_w )
+void apollo_graphics_15i::apollo_mcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	MLOG1(("writing Graphics Controller at offset %03x = %02x (%s)", offset, data, cr_text(offset, data, 0)));
 	switch (offset & 0x407)
@@ -992,7 +992,7 @@ void apollo_graphics_15i::blt(uint32_t dest_addr, uint16_t mem_mask)
  Color graphics memory space at A0000 - BFFFF
  ***************************************************************************/
 
-READ16_MEMBER( apollo_graphics_15i::apollo_mem_r )
+uint16_t apollo_graphics_15i::apollo_mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 	uint32_t src_addr;
@@ -1031,7 +1031,7 @@ READ16_MEMBER( apollo_graphics_15i::apollo_mem_r )
 	return data;
 }
 
-WRITE16_MEMBER( apollo_graphics_15i::apollo_mem_w )
+void apollo_graphics_15i::apollo_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t dest_addr;
 	uint32_t src_addr;
@@ -1149,7 +1149,7 @@ WRITE16_MEMBER( apollo_graphics_15i::apollo_mem_w )
  Color Screen
  ***************************************************************************/
 
-READ8_MEMBER( apollo_graphics_15i::apollo_ccr_r )
+uint8_t apollo_graphics_15i::apollo_ccr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -1391,7 +1391,7 @@ uint8_t apollo_graphics_15i::c8p_read_adc(uint8_t data)
 	return value;
 }
 
-WRITE8_MEMBER( apollo_graphics_15i::apollo_ccr_w )
+void apollo_graphics_15i::apollo_ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t rgb_value[16] =
 	{ 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
@@ -1514,7 +1514,7 @@ WRITE8_MEMBER( apollo_graphics_15i::apollo_ccr_w )
 	MLOG1(("writing Color Graphics Controller at offset %03x = %02x (%s)", offset, data, cr_text(offset, data, 0)));
 }
 
-READ16_MEMBER( apollo_graphics_15i::apollo_cgm_r )
+uint16_t apollo_graphics_15i::apollo_cgm_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!is_mono())
 	{
@@ -1526,7 +1526,7 @@ READ16_MEMBER( apollo_graphics_15i::apollo_cgm_r )
 	}
 }
 
-WRITE16_MEMBER( apollo_graphics_15i::apollo_cgm_w )
+void apollo_graphics_15i::apollo_cgm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!is_mono())
 	{
@@ -1951,7 +1951,7 @@ void apollo_graphics_19i::device_reset()
 }
 
 
-READ16_MEMBER( apollo_graphics_15i::apollo_mgm_r )
+uint16_t apollo_graphics_15i::apollo_mgm_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (is_mono())
 	{
@@ -1963,7 +1963,7 @@ READ16_MEMBER( apollo_graphics_15i::apollo_mgm_r )
 	}
 }
 
-WRITE16_MEMBER( apollo_graphics_15i::apollo_mgm_w )
+void apollo_graphics_15i::apollo_mgm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (is_mono())
 	{

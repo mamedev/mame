@@ -131,7 +131,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 
 
 /* Send sound data to the sound cpu and cause an nmi */
-READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
+uint8_t galaxold_state::drivfrcg_port0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -342,10 +342,10 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8202, 0x8202) AM_READ(scramblb_protection_2_r)
 ADDRESS_MAP_END
 
-READ8_MEMBER(galaxold_state::scramb2_protection_r){ return 0x25; }
-READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (ioport("IN0")->read() >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (ioport("IN1")->read() >> offset) & 0x1; }
-READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (ioport("IN2")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_protection_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0x25; }
+uint8_t galaxold_state::scramb2_port0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return (ioport("IN0")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_port1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return (ioport("IN1")->read() >> offset) & 0x1; }
+uint8_t galaxold_state::scramb2_port2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return (ioport("IN2")->read() >> offset) & 0x1; }
 
 static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER( galaxold_state::scrambler_protection_2_r )
+uint8_t galaxold_state::scrambler_protection_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// if this doesn't return a value the code is happy with then it jumps out of ROM space after reading the port
 	return 0xff;
@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
+void galaxold_state::guttang_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("rombank %02x\n",data);
 	if (data&1)
@@ -729,7 +729,7 @@ static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
+uint8_t galaxold_state::hexpoola_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
+uint8_t galaxold_state::bullsdrtg_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{

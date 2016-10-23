@@ -195,19 +195,19 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
  *
  *************************************/
 
-WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
+void ddragon3_state::oki_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
+void wwfwfest_state::wwfwfest_soundwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space,1,data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
-WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
+void ddragon3_state::ddragon3_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_io_reg[offset]);
 
@@ -247,7 +247,7 @@ WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 }
 
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
+void wwfwfest_state::wwfwfest_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(3, CLEAR_LINE);
@@ -256,20 +256,20 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 		m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
+void wwfwfest_state::wwfwfest_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	flip_screen_set(data&1);
 }
 
 /*- Palette Reads/Writes - A5 and A6 are not connected */
 
-READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram_r)
+uint16_t wwfwfest_state::wwfwfest_paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	return m_paletteram[offset];
 }
 
-WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
+void wwfwfest_state::wwfwfest_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	m_palette->write(space, offset, data, mem_mask);
@@ -278,7 +278,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram_w)
 /*- Priority Control -*/
 
 
-WRITE8_MEMBER(wwfwfest_state::wwfwfest_priority_w)
+void wwfwfest_state::wwfwfest_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pri = data;
 }

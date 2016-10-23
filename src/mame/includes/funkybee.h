@@ -23,13 +23,13 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	int        m_gfx_bank;
-	DECLARE_READ8_MEMBER(funkybee_input_port_0_r);
-	DECLARE_WRITE8_MEMBER(funkybee_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(funkybee_videoram_w);
-	DECLARE_WRITE8_MEMBER(funkybee_colorram_w);
-	DECLARE_WRITE8_MEMBER(funkybee_gfx_bank_w);
-	DECLARE_WRITE8_MEMBER(funkybee_scroll_w);
-	DECLARE_WRITE8_MEMBER(funkybee_flipscreen_w);
+	uint8_t funkybee_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void funkybee_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkybee_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkybee_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkybee_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkybee_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkybee_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(funkybee_tilemap_scan);
 	virtual void machine_start() override;

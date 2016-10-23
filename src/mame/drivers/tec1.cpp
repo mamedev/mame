@@ -107,11 +107,11 @@ public:
 	required_ioport m_io_line3;
 	required_ioport m_io_shift;
 	emu_timer *m_kbd_timer;
-	DECLARE_READ8_MEMBER( tec1_kbd_r );
-	DECLARE_READ8_MEMBER( latch_r );
-	DECLARE_WRITE8_MEMBER( tec1_digit_w );
-	DECLARE_WRITE8_MEMBER( tecjmon_digit_w );
-	DECLARE_WRITE8_MEMBER( tec1_segment_w );
+	uint8_t tec1_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tec1_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tecjmon_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tec1_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_kbd;
 	uint8_t m_segment;
 	uint8_t m_digit;
@@ -132,7 +132,7 @@ public:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tec1_state::tec1_segment_w )
+void tec1_state::tec1_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 segment d
     d6 segment e
@@ -146,7 +146,7 @@ WRITE8_MEMBER( tec1_state::tec1_segment_w )
 	m_segment = BITSWAP8(data, 4, 2, 1, 6, 7, 5, 3, 0);
 }
 
-WRITE8_MEMBER( tec1_state::tec1_digit_w )
+void tec1_state::tec1_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 speaker
     d6 not used
@@ -162,7 +162,7 @@ WRITE8_MEMBER( tec1_state::tec1_digit_w )
 	m_digit = data & 0x3f;
 }
 
-WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
+void tec1_state::tecjmon_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 speaker & cassout
     d6 not used
@@ -185,7 +185,7 @@ WRITE8_MEMBER( tec1_state::tecjmon_digit_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( tec1_state::latch_r )
+uint8_t tec1_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // bit 7 - cass in ; bit 6 low = key pressed
 	uint8_t data = (m_key_pressed) ? 0 : 0x40;
@@ -197,7 +197,7 @@ READ8_MEMBER( tec1_state::latch_r )
 }
 
 
-READ8_MEMBER( tec1_state::tec1_kbd_r )
+uint8_t tec1_state::tec1_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_kbd | m_io_shift->read();

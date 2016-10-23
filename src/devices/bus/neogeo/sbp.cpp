@@ -31,7 +31,7 @@ void neogeo_sbp_cart::device_reset()
 
 
 
-READ16_MEMBER( neogeo_sbp_cart::protection_r )
+uint16_t neogeo_sbp_cart::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t* rom = (get_rom_size()) ? get_rom_base() : get_region_rom_base();
 	uint16_t origdata = rom[offset + (0x200/2)];
@@ -48,7 +48,7 @@ READ16_MEMBER( neogeo_sbp_cart::protection_r )
 }
 
 
-WRITE16_MEMBER( neogeo_sbp_cart::protection_w )
+void neogeo_sbp_cart::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int realoffset = 0x200 + (offset * 2);
 

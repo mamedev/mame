@@ -117,7 +117,7 @@ void sv807_device::device_reset()
 
 // test setup: S2 = enabled (22), S3 = enabled (31)
 
-READ8_MEMBER( sv807_device::mreq_r )
+uint8_t sv807_device::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((BK21_ACTIVE || BK31_ACTIVE) && offset < 0x8000)
 	{
@@ -134,7 +134,7 @@ READ8_MEMBER( sv807_device::mreq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv807_device::mreq_w )
+void sv807_device::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((BK21_ACTIVE || BK31_ACTIVE) && offset < 0x8000)
 	{

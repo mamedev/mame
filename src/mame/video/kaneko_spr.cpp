@@ -537,12 +537,12 @@ FLIP ON:
 900010: 0000 0400 A000 A400-1E00 2200 0000 0400     ; +1f<<6 on y
 */
 
-READ16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_r)
+uint16_t kaneko16_sprite_device::kaneko16_sprites_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sprites_regs[offset];
 }
 
-WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
+void kaneko16_sprite_device::kaneko16_sprites_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t new_data;
 

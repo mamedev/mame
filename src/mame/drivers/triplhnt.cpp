@@ -84,13 +84,13 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 }
 
 
-WRITE8_MEMBER(triplhnt_state::triplhnt_misc_w)
+void triplhnt_state::triplhnt_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	triplhnt_update_misc(space, offset);
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
+uint8_t triplhnt_state::triplhnt_cmos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cmos_latch = offset;
 
@@ -98,21 +98,21 @@ READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
+uint8_t triplhnt_state::triplhnt_input_port_4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_watchdog->watchdog_reset();
 	return ioport("0C0B")->read();
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
+uint8_t triplhnt_state::triplhnt_misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	triplhnt_update_misc(space, offset);
 	return ioport("VBLANK")->read() | m_hit_code;
 }
 
 
-READ8_MEMBER(triplhnt_state::triplhnt_da_latch_r)
+uint8_t triplhnt_state::triplhnt_da_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int cross_x = ioport("STICKX")->read();
 	int cross_y = ioport("STICKY")->read();

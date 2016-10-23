@@ -29,7 +29,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
+void cbasebal_state::cbasebal_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
@@ -43,7 +43,7 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 }
 
 
-READ8_MEMBER(cbasebal_state::bankedram_r)
+uint8_t cbasebal_state::bankedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_rambank)
 	{
@@ -59,7 +59,7 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 	}
 }
 
-WRITE8_MEMBER(cbasebal_state::bankedram_w)
+void cbasebal_state::bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_rambank)
 	{
@@ -76,7 +76,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 	}
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
+void cbasebal_state::cbasebal_coinctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x04);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x08);

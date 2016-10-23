@@ -51,36 +51,36 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(port02_r);
-	DECLARE_READ8_MEMBER(port03_r);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_READ8_MEMBER(portfc_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port03_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portfc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_rom;
 	uint8_t m_term_data;
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( hpz80unk_state::port02_r )
+uint8_t hpz80unk_state::port02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_port02_data ^= 1;
 	return m_port02_data;
 }
 
-READ8_MEMBER( hpz80unk_state::port03_r )
+uint8_t hpz80unk_state::port03_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0xff : 0xfd;
 }
 
-READ8_MEMBER( hpz80unk_state::port04_r )
+uint8_t hpz80unk_state::port04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( hpz80unk_state::portfc_r )
+uint8_t hpz80unk_state::portfc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfe; // or it halts
 }
@@ -114,7 +114,7 @@ void hpz80unk_state::machine_reset()
 	// this should be rom/ram banking
 }
 
-WRITE8_MEMBER( hpz80unk_state::kbd_put )
+void hpz80unk_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

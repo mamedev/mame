@@ -20,20 +20,20 @@ public:
 	// construction/destruction
 	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(pio0_pa_r);
-	DECLARE_WRITE8_MEMBER(pio0_pa_w);
-//  DECLARE_READ8_MEMBER(pio0_pb_r);
-	DECLARE_WRITE8_MEMBER(pio0_pb_w);
+	uint8_t pio0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t pio0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-//  DECLARE_READ8_MEMBER(pio1_pa_r);
-	DECLARE_WRITE8_MEMBER(pio1_pa_w);
-//  DECLARE_READ8_MEMBER(pio1_pb_r);
-	DECLARE_WRITE8_MEMBER(pio1_pb_w);
+//  uint8_t pio1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(plane_portcc_w);
-	DECLARE_WRITE8_MEMBER(plane_portcd_w);
-	DECLARE_WRITE8_MEMBER(plane_portce_w);
-	DECLARE_WRITE8_MEMBER(plane_portcf_w);
+	void plane_portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plane_portcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plane_portce_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plane_portcf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_framebuffer[0x10000];
 	int m_curline;

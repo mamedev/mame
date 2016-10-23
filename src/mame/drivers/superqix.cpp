@@ -184,7 +184,7 @@ SAMPLES_START_CB_MEMBER(superqix_state::pbillian_sh_start)
 		m_samplebuf[i] = (int8_t)(src[i] ^ 0x80) * 256;
 }
 
-WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
+void superqix_state::pbillian_sample_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("sample trigger write of %02x\n", data);
 	uint8_t *src = memregion("samples")->base();
@@ -264,7 +264,7 @@ CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r) // similar to pb
 	return res;
 }
 
-READ8_MEMBER(superqix_state::in4_mcu_r)
+uint8_t superqix_state::in4_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: in4_mcu_r\n",space.device().safe_pc());
 	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
@@ -273,7 +273,7 @@ READ8_MEMBER(superqix_state::in4_mcu_r)
 	return temp;
 }
 
-READ8_MEMBER(superqix_state::sqix_from_mcu_r)
+uint8_t superqix_state::sqix_from_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: read mcu answer (%02x)\n",space.device().safe_pc(),m_fromMCU);
 	return m_fromMCU;
@@ -294,19 +294,19 @@ TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
 //  logerror("Z80->MCU %02x\n",m_fromZ80);
 }
 
-READ8_MEMBER(superqix_state::mcu_acknowledge_r)
+uint8_t superqix_state::mcu_acknowledge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(superqix_state::mcu_acknowledge_callback),this));
 	return 0;
 }
 
-WRITE8_MEMBER(superqix_state::sqix_z80_mcu_w)
+void superqix_state::sqix_z80_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: sqix_z80_mcu_w %02x\n",space.device().safe_pc(),data);
 	m_fromZ80pending = data;
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
+void superqix_state::bootleg_mcu_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((data & 0x0e) >> 1)
 	{
@@ -347,12 +347,12 @@ WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::mcu_p3_w)
+void superqix_state::mcu_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port3 = data;
 }
 
-READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
+uint8_t superqix_state::bootleg_mcu_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_port1 & 0x10) == 0)
 	{
@@ -371,12 +371,12 @@ READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 	return 0;
 }
 
-READ8_MEMBER(superqix_state::sqix_system_status_r)
+uint8_t superqix_state::sqix_system_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
+void superqix_state::sqixu_mcu_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = enable latch for bits 1-6 below on high level or falling edge (doesn't particularly matter which, either one works)
 
@@ -410,7 +410,7 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
+uint8_t superqix_state::sqixu_mcu_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
 	if(!space.debugger_access())
@@ -421,7 +421,7 @@ READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 }
 
 
-READ8_MEMBER(superqix_state::nmi_ack_r)
+uint8_t superqix_state::nmi_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -430,12 +430,12 @@ READ8_MEMBER(superqix_state::nmi_ack_r)
 	return sqix_system_status_r(space, 0);
 }
 
-READ8_MEMBER(superqix_state::bootleg_in0_r)
+uint8_t superqix_state::bootleg_in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
-WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
+void superqix_state::bootleg_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
@@ -770,39 +770,39 @@ int superqix_state::read_dial(int player)
 		return ((m_oldpos[player] & 1) << 3) | (m_sign[player] << 2);
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_a_w)
+void superqix_state::hotsmash_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_b_w)
+void superqix_state::hotsmash_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_68705_ddr_c_w)
+void superqix_state::hotsmash_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
 
-READ8_MEMBER(superqix_state::hotsmash_68705_portA_r)
+uint8_t superqix_state::hotsmash_68705_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: 68705 reads port A = %02x\n",space.device().safe_pc(),m_portA_in);
 	return (/*m_portA_internal*/0 & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_68705_portB_w)
+void superqix_state::hotsmash_68705_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portB_internal = data;
 	m_portB_out = (m_portB_internal|(~m_ddrB));
 }
 
-READ8_MEMBER(superqix_state::hotsmash_68705_portC_r)
+uint8_t superqix_state::hotsmash_68705_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portC_internal & m_ddrC) | (/*m_portC_in*/0 & ~m_ddrA);
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
+void superqix_state::hotsmash_68705_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portC_internal = data|0xF0;
 	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
@@ -852,7 +852,7 @@ WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::hotsmash_Z80_mcu_w)
+void superqix_state::hotsmash_Z80_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fromZ80 = data;
 	m_MCUHasWritten = 0; // this is cleared here, strangely enough. Doesn't make a lot of sense, but doesn't work otherwise.
@@ -869,7 +869,7 @@ WRITE8_MEMBER(superqix_state::hotsmash_Z80_mcu_w)
 	}
 }
 
-READ8_MEMBER(superqix_state::hotsmash_Z80_mcu_r)
+uint8_t superqix_state::hotsmash_Z80_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: z80 reads answer %02x\n",space.device().safe_pc(),m_fromMCU);
 	/* return the last value the 68705 wrote, but do not mark that we've read it */
@@ -890,7 +890,7 @@ CUSTOM_INPUT_MEMBER(superqix_state::pbillian_semaphore_input_r)
 	return res;
 }
 
-READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
+uint8_t superqix_state::pbillian_ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: ay_port_a_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_state_interface &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
 	uint8_t temp = ioport("BUTTONS")->read();
@@ -898,7 +898,7 @@ READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 	return temp;
 }
 
-READ8_MEMBER(superqix_state::pbillian_ay_port_b_r)
+uint8_t superqix_state::pbillian_ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: ay_port_b_r and MCUHasWritten is %d and Z80HasWritten is %d: ",static_cast<device_t &>(*m_maincpu).safe_pc(),m_MCUHasWritten, m_Z80HasWritten);
 	uint8_t temp = ioport("SYSTEM")->read();

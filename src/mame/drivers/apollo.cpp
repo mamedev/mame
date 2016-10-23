@@ -209,7 +209,7 @@ uint8_t apollo_get_ram_config_byte(void) {
   apollo_instruction_hook
   must be called by the CPU core before executing each instruction
 ***************************************************************************/
-READ32_MEMBER(apollo_state::apollo_instruction_hook)
+uint32_t apollo_state::apollo_instruction_hook(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	static uint16_t idle_counter = 0;
 
@@ -287,7 +287,7 @@ IRQ_CALLBACK_MEMBER(apollo_state::apollo_irq_acknowledge)
  DN3500 Cache Control/Status Register at 0x10200
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::cache_control_register_w){
+void apollo_state::cache_control_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	if (apollo_is_dn5500())
 	{
 		SLOG1(("Error: writing DN5500 Cache Status Register at offset %02x = %02x", offset, data));
@@ -300,7 +300,7 @@ WRITE8_MEMBER(apollo_state::cache_control_register_w){
 	}
 }
 
-READ8_MEMBER(apollo_state::cache_status_register_r){
+uint8_t apollo_state::cache_status_register_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = cache_status_register;
 
 	if (apollo_is_dn5500()) {
@@ -326,13 +326,13 @@ void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t dat
  DN3500 Task Alias Register at 0x10300
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::task_alias_register_w){
+void apollo_state::task_alias_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	task_alias_register = data;
 	apollo_set_cache_status_register(this,0x07,  data);
 	SLOG(("writing Task Alias Register at offset %02x = %02x",offset, data));
 }
 
-READ8_MEMBER(apollo_state::task_alias_register_r){
+uint8_t apollo_state::task_alias_register_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = 0xff;
 	SLOG(("reading Task Alias Register at offset %02x = %02x", offset, data));
 	return data;
@@ -342,12 +342,12 @@ READ8_MEMBER(apollo_state::task_alias_register_r){
  DN3000/DN3500 Latch Page on Parity Error Register at 0x9300/0x11300
  ***************************************************************************/
 
-WRITE16_MEMBER(apollo_state::latch_page_on_parity_error_register_w){
+void apollo_state::latch_page_on_parity_error_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	latch_page_on_parity_error_register = data;
 	SLOG1(("writing Latch Page on Error Parity Register at offset %02x = %04x", offset*2, data));
 }
 
-READ16_MEMBER(apollo_state::latch_page_on_parity_error_register_r){
+uint16_t apollo_state::latch_page_on_parity_error_register_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	uint16_t data = latch_page_on_parity_error_register;
 	SLOG2(("reading Latch Page on Error Parity Register at offset %02x = %04x", offset*2, data));
 	return data;
@@ -357,12 +357,12 @@ READ16_MEMBER(apollo_state::latch_page_on_parity_error_register_r){
  DN3500 Master REQ Register at 0x11600
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::master_req_register_w){
+void apollo_state::master_req_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	master_req_register = data;
 	SLOG2(("writing Master REQ Register at offset %02x = %02x", offset, data));
 }
 
-READ8_MEMBER(apollo_state::master_req_register_r){
+uint8_t apollo_state::master_req_register_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = 0xff;
 	SLOG1(("reading Master REQ Register at offset %02x = %02x", offset, data));
 	return data;
@@ -372,7 +372,7 @@ READ8_MEMBER(apollo_state::master_req_register_r){
  DN3500 Selective Clear Locations at 0x11600
  ***************************************************************************/
 
-WRITE16_MEMBER(apollo_state::selective_clear_locations_w){
+void apollo_state::selective_clear_locations_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	SLOG2(("writing Selective Clear Locations at offset %02x = %02x", offset*2, data));
 	switch (offset * 2) {
 	case 0x00: // Clear All
@@ -392,7 +392,7 @@ WRITE16_MEMBER(apollo_state::selective_clear_locations_w){
 	}
 }
 
-READ16_MEMBER(apollo_state::selective_clear_locations_r){
+uint16_t apollo_state::selective_clear_locations_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	uint16_t data = 0xffff;
 	SLOG1(("reading Selective Clear Locations at offset %02x = %02x", offset*2, data));
 	return data;
@@ -402,7 +402,7 @@ READ16_MEMBER(apollo_state::selective_clear_locations_r){
  DN3000/DN3500 RAM with parity (and null proc loop delay for DomainOS)
  ***************************************************************************/
 
-READ32_MEMBER(apollo_state::ram_with_parity_r){
+uint32_t apollo_state::ram_with_parity_r(address_space &space, offs_t offset, uint32_t mem_mask){
 	uint32_t data = m_messram_ptr[parity_error_offset+offset];
 
 	SLOG2(("memory dword read with parity error at %08x = %08x & %08x parity_byte=%04x",
@@ -423,7 +423,7 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 	return data;
 }
 
-WRITE32_MEMBER(apollo_state::ram_with_parity_w){
+void apollo_state::ram_with_parity_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	COMBINE_DATA(m_messram_ptr+offset);
 
 	if (apollo_csr_get_control_register() & APOLLO_CSR_CR_FORCE_BAD_PARITY) {
@@ -467,7 +467,7 @@ WRITE32_MEMBER(apollo_state::ram_with_parity_w){
  DN3000/DN3500 unmapped memory
  ***************************************************************************/
 
-READ32_MEMBER(apollo_state::apollo_unmapped_r)
+uint32_t apollo_state::apollo_unmapped_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t address = offset * 4;
 
@@ -496,7 +496,7 @@ READ32_MEMBER(apollo_state::apollo_unmapped_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(apollo_state::apollo_unmapped_w)
+void apollo_state::apollo_unmapped_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	SLOG(("unmapped memory dword write to %08x = %08x & %08x", offset * 4, data, mem_mask));
 
@@ -508,7 +508,7 @@ WRITE32_MEMBER(apollo_state::apollo_unmapped_w)
  DN3000/DN3500 ROM write
  ***************************************************************************/
 
-WRITE32_MEMBER(apollo_state::apollo_rom_w)
+void apollo_state::apollo_rom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t address =  offset * 4;
 	offs_t pc = space.device().safe_pcbase();
@@ -524,7 +524,7 @@ WRITE32_MEMBER(apollo_state::apollo_rom_w)
  DN3000/DN3500 AT Bus I/O space
  ***************************************************************************/
 
-READ16_MEMBER(apollo_state::apollo_atbus_io_r)
+uint16_t apollo_state::apollo_atbus_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
 
@@ -536,7 +536,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_io_r)
 	return data;
 }
 
-WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
+void apollo_state::apollo_atbus_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
 
@@ -550,7 +550,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_io_w)
  DN3000/DN3500 AT Bus memory space
  ***************************************************************************/
 
-READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
+uint16_t apollo_state::apollo_atbus_memory_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -561,7 +561,7 @@ READ16_MEMBER(apollo_state::apollo_atbus_memory_r)
 	return data;
 }
 
-WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
+void apollo_state::apollo_atbus_memory_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	SLOG2(("apollo_atbus_memory_w at %08x = %04x & %04x", ATBUS_MEMORY_BASE + offset*2, data, mem_mask));
 
@@ -573,7 +573,7 @@ WRITE16_MEMBER(apollo_state::apollo_atbus_memory_w)
  DN3000/DN3500 AT Bus unmapped read/write
  ***************************************************************************/
 
-READ16_MEMBER(apollo_state::apollo_atbus_unmap_io_r)
+uint16_t apollo_state::apollo_atbus_unmap_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// ISA bus has 0xff for unmapped addresses
 	uint16_t data = 0xffff;
@@ -582,13 +582,13 @@ READ16_MEMBER(apollo_state::apollo_atbus_unmap_io_r)
 	return data;
 }
 
-WRITE16_MEMBER(apollo_state::apollo_atbus_unmap_io_w)
+void apollo_state::apollo_atbus_unmap_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t isa_addr = (offset & 3) + ((offset & ~0x1ff) >> 7);
 	SLOG1(("apollo_atbus_unmap_io_w at %08x -> %04x = %04x & %04x", ATBUS_IO_BASE + offset*2, isa_addr*2, data, mem_mask));
 }
 
-READ8_MEMBER(apollo_state::apollo_atbus_unmap_r)
+uint8_t apollo_state::apollo_atbus_unmap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ISA bus has 0xff for unmapped addresses
 	uint8_t data = 0xff;
@@ -596,7 +596,7 @@ READ8_MEMBER(apollo_state::apollo_atbus_unmap_r)
 	return data;
 }
 
-WRITE8_MEMBER(apollo_state::apollo_atbus_unmap_w)
+void apollo_state::apollo_atbus_unmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	SLOG1(("apollo_atbus_unmap_w at %08x = %02x & %02x", ATBUS_MEMORY_BASE + offset, data, mem_mask));
 }
@@ -606,11 +606,11 @@ WRITE8_MEMBER(apollo_state::apollo_atbus_unmap_w)
  Strange: documented but not used
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::dn5500_memory_present_register_w){
+void apollo_state::dn5500_memory_present_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	SLOG(("Error: writing DN5500 Memory Present Register at offset %02x = %02x", offset, data));
 }
 
-READ8_MEMBER(apollo_state::dn5500_memory_present_register_r){
+uint8_t apollo_state::dn5500_memory_present_register_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = DN5500_MEM_PRESENT_BYTE;
 	SLOG(("reading DN5500 Memory Present Register at offset %02x = %02x", offset, data));
 	return data;
@@ -620,11 +620,11 @@ READ8_MEMBER(apollo_state::dn5500_memory_present_register_r){
  DN5500 11500 Registers at 0x11500-0x115ff (undocumented, what does it do?)
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::dn5500_11500_w){
+void apollo_state::dn5500_11500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	SLOG1(("writing DN5500 11500 at offset %02x = %02x", offset, data));
 }
 
-READ8_MEMBER(apollo_state::dn5500_11500_r){
+uint8_t apollo_state::dn5500_11500_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = 0xff;
 	SLOG1(("reading DN5500 11500 at offset %02x = %02x", offset, data));
 	return data;
@@ -634,12 +634,12 @@ READ8_MEMBER(apollo_state::dn5500_11500_r){
  DN5500 I/O Protection Map at 0x7000000-0x700FFFF
  ***************************************************************************/
 
-WRITE8_MEMBER(apollo_state::dn5500_io_protection_map_w){
+void apollo_state::dn5500_io_protection_map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	// TODO
 	SLOG1(("writing DN5500 I/O Protection Map at offset %02x = %02x", offset, data));
 }
 
-READ8_MEMBER(apollo_state::dn5500_io_protection_map_r){
+uint8_t apollo_state::dn5500_io_protection_map_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t data = 0xff;
 	SLOG1(("reading DN5500 I/O Protection Map at offset %02x = %02x", offset, data));
 	return data;
@@ -650,7 +650,7 @@ READ8_MEMBER(apollo_state::dn5500_io_protection_map_r){
  DN3000/DN3500 at f8000000 - ffffffff (used by fpa and/or color7?)
  ***************************************************************************/
 
-READ32_MEMBER(apollo_state::apollo_f8_r){
+uint32_t apollo_state::apollo_f8_r(address_space &space, offs_t offset, uint32_t mem_mask){
 	offs_t address = 0xf8000000 + offset * 4;
 	uint32_t data = 0xffffffff;
 	SLOG2(("unexpected memory dword read from %08x = %08x & %08x",
@@ -658,7 +658,7 @@ READ32_MEMBER(apollo_state::apollo_f8_r){
 	return data;
 }
 
-WRITE32_MEMBER(apollo_state::apollo_f8_w){
+void apollo_state::apollo_f8_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	offs_t address = 0xf8000000 +offset * 4;
 
 	SLOG2(("unexpected memory dword write to %08x = %08x & %08x",

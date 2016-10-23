@@ -65,12 +65,12 @@ public:
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<gaelco_serial_device &>(device).m_irq_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( status_r);
-	DECLARE_WRITE8_MEMBER( data_w);
-	DECLARE_READ8_MEMBER( data_r);
-	DECLARE_WRITE8_MEMBER( rts_w );
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	/* Set to 1 during transmit, 0 for receive */
-	DECLARE_WRITE8_MEMBER( tr_w);
+	void tr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	/* Big questions marks, related to serial i/o */
@@ -78,11 +78,11 @@ public:
 	/* Not used in surfplnt, but in radikalb
 	 * Set at beginning of transfer sub, cleared at end
 	 */
-	DECLARE_WRITE8_MEMBER( unknown_w);
+	void unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	/* only used in radikalb, set at beginning of receive isr, cleared at end */
-	DECLARE_WRITE8_MEMBER( irq_enable );
+	void irq_enable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

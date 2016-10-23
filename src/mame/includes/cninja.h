@@ -76,13 +76,13 @@ public:
 	int        m_scanline;
 	int        m_irq_mask;
 
-	DECLARE_WRITE16_MEMBER(cninja_sound_w);
-	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
-	DECLARE_READ16_MEMBER(cninja_irq_r);
-	DECLARE_WRITE16_MEMBER(cninja_irq_w);
-	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
-	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void cninja_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stoneage_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cninja_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cninja_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cninja_pf12_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cninja_pf34_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_stoneage();
 	void init_mutantf();
 	void init_cninja();
@@ -107,15 +107,15 @@ public:
 
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 
-	DECLARE_READ16_MEMBER( sshangha_protection_region_6_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_6_146_w );
-	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
+	uint16_t sshangha_protection_region_6_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sshangha_protection_region_6_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sshangha_protection_region_8_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sshangha_protection_region_8_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( mutantf_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );
-	DECLARE_READ16_MEMBER( cninja_protection_region_0_104_r );
-	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
+	uint16_t mutantf_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mutantf_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cninja_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cninja_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
+	uint16_t cninjabl2_sprite_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };

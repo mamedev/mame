@@ -124,21 +124,21 @@ void k053260_device::rom_bank_updated()
 }
 
 
-READ8_MEMBER( k053260_device::main_read )
+uint8_t k053260_device::main_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// sub-to-main ports
 	return m_portdata[2 + (offset & 1)];
 }
 
 
-WRITE8_MEMBER( k053260_device::main_write )
+void k053260_device::main_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// main-to-sub ports
 	m_portdata[offset & 1] = data;
 }
 
 
-READ8_MEMBER( k053260_device::read )
+uint8_t k053260_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x3f;
 	uint8_t ret = 0;
@@ -170,7 +170,7 @@ READ8_MEMBER( k053260_device::read )
 }
 
 
-WRITE8_MEMBER( k053260_device::write )
+void k053260_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x3f;
 

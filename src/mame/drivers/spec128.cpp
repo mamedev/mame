@@ -164,7 +164,7 @@ resulting mess can be seen in the F4 viewer display.
 /****************************************************************************************************/
 /* Spectrum 128 specific functions */
 
-WRITE8_MEMBER(spectrum_state::spectrum_128_port_7ffd_w)
+void spectrum_state::spectrum_128_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -211,7 +211,7 @@ void spectrum_state::spectrum_128_update_memory()
 	}
 }
 
-READ8_MEMBER( spectrum_state::spectrum_128_ula_r )
+uint8_t spectrum_state::spectrum_128_ula_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int vpos = machine().first_screen()->vpos();
 

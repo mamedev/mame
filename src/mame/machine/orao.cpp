@@ -29,7 +29,7 @@ void orao_state::machine_reset()
 {
 }
 
-READ8_MEMBER(orao_state::orao_io_r)
+uint8_t orao_state::orao_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double level;
 
@@ -69,7 +69,7 @@ READ8_MEMBER(orao_state::orao_io_r)
 }
 
 
-WRITE8_MEMBER(orao_state::orao_io_w)
+void orao_state::orao_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x0800)
 	{

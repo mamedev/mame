@@ -32,8 +32,8 @@ protected:
 	virtual void device_reset();
 
 public:
-	virtual DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
-	virtual DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+	virtual uint8_t pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 

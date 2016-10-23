@@ -85,24 +85,24 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 		,m_tcr (0)
 {
 }
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ8_MEMBER (tcr_r);
-	DECLARE_WRITE8_MEMBER (tcr_w);
+	uint16_t bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t tcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
+	void dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	//fdc
-	DECLARE_WRITE8_MEMBER(fdc_irq);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	void fdc_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER (not_implemented_r);
-	DECLARE_WRITE8_MEMBER (not_implemented_w);
+	uint8_t not_implemented_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void not_implemented_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t fdc_irq_state;
 	uint8_t dmac_irq_state;
@@ -156,7 +156,7 @@ void fcscsi1_state::machine_start ()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (fcscsi1_state::bootvect_r){
+uint16_t fcscsi1_state::bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	return m_sysrom [offset];
 }
 
@@ -172,18 +172,18 @@ Bit #: 7 6 5 4 3 2 1 0
               \ ISCSI-l 1.D. Bit #2
 */
 
-READ8_MEMBER (fcscsi1_state::tcr_r){
+uint8_t fcscsi1_state::tcr_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return (uint8_t) m_tcr;
 }
 
-WRITE8_MEMBER (fcscsi1_state::tcr_w){
+void fcscsi1_state::tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s [%02x]\n", FUNCNAME, data));
 	m_tcr = data;
 	return;
 }
 
-WRITE8_MEMBER(fcscsi1_state::dma_end)
+void fcscsi1_state::dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0)
 	{
@@ -198,7 +198,7 @@ WRITE8_MEMBER(fcscsi1_state::dma_end)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(fcscsi1_state::dma_error)
+void fcscsi1_state::dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != 0)
 	{
@@ -214,7 +214,7 @@ WRITE8_MEMBER(fcscsi1_state::dma_error)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(fcscsi1_state::fdc_irq)
+void fcscsi1_state::fdc_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0)
 	{
@@ -227,17 +227,17 @@ WRITE8_MEMBER(fcscsi1_state::fdc_irq)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(fcscsi1_state::fdc_read_byte)
+uint8_t fcscsi1_state::fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(fcscsi1_state::fdc_write_byte)
+void fcscsi1_state::fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->data_w(data & 0xff);
 }
 
-READ8_MEMBER (fcscsi1_state::not_implemented_r){
+uint8_t fcscsi1_state::not_implemented_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -246,7 +246,7 @@ READ8_MEMBER (fcscsi1_state::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (fcscsi1_state::not_implemented_w){
+void fcscsi1_state::not_implemented_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);

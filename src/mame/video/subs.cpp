@@ -10,7 +10,7 @@
 #include "includes/subs.h"
 #include "sound/discrete.h"
 
-WRITE8_MEMBER(subs_state::invert1_w)
+void subs_state::invert1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0x01) == 1)
 	{
@@ -24,7 +24,7 @@ WRITE8_MEMBER(subs_state::invert1_w)
 	}
 }
 
-WRITE8_MEMBER(subs_state::invert2_w)
+void subs_state::invert2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0x01) == 1)
 	{

@@ -56,26 +56,26 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER( cause_r );
-	DECLARE_WRITE8_MEMBER( task_w );
-	DECLARE_READ8_MEMBER( segment_r );
-	DECLARE_WRITE8_MEMBER( segment_w );
-	DECLARE_READ8_MEMBER( page_r );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_WRITE8_MEMBER( dmamap_w );
+	uint8_t cause_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void task_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t segment_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t page_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmamap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( dma0_mreq_r ) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_mreq_w ) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma0_iorq_r ) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma0_iorq_w ) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_mreq_r ) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_mreq_w ) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma1_iorq_r ) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma1_iorq_w ) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_mreq_r ) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_mreq_w ) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
-	DECLARE_READ8_MEMBER( dma2_iorq_r ) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
-	DECLARE_WRITE8_MEMBER( dma2_iorq_w ) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma0_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_mreq_r(DMAMAP_R0_LO, offset); }
+	void dma0_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_mreq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma0_iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_iorq_r(DMAMAP_R0_LO, offset); }
+	void dma0_iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_iorq_w(DMAMAP_R0_LO, offset, data); }
+	uint8_t dma1_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_mreq_r(DMAMAP_R1_LO, offset); }
+	void dma1_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_mreq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma1_iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_iorq_r(DMAMAP_R1_LO, offset); }
+	void dma1_iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_iorq_w(DMAMAP_R1_LO, offset, data); }
+	uint8_t dma2_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_mreq_r(DMAMAP_R2_LO, offset); }
+	void dma2_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_mreq_w(DMAMAP_R2_LO, offset, data); }
+	uint8_t dma2_iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
+	void dma2_iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
 
 protected:
 	// device-level overrides
@@ -96,8 +96,8 @@ private:
 		DMAMAP_R0_HI
 	};
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int get_current_task(offs_t offset);
 	offs_t get_segment_address(offs_t offset);

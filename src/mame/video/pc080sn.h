@@ -21,11 +21,11 @@ public:
 		dev.m_y_offset = y_offset;
 	}
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
-	DECLARE_WRITE16_MEMBER( xscroll_word_w );
-	DECLARE_WRITE16_MEMBER( yscroll_word_w );
-	DECLARE_WRITE16_MEMBER( ctrl_word_w );
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void xscroll_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void yscroll_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

@@ -206,7 +206,7 @@ void upd4701_device::switches_set( uint8_t data )
     d_r
 -------------------------------------------------*/
 
-READ16_MEMBER( upd4701_device::d_r )
+uint16_t upd4701_device::d_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data;
 

@@ -90,15 +90,15 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_READ8_MEMBER(port17_r);
-	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port17_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_ravens2();
-	DECLARE_READ8_MEMBER(cass_r);
+	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	uint8_t m_term_char;
@@ -113,17 +113,17 @@ WRITE_LINE_MEMBER( ravens_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( ravens_state::cass_r )
+uint8_t ravens_state::cass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE8_MEMBER( ravens_state::display_w )
+void ravens_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(offset, data);
 }
 
-WRITE8_MEMBER( ravens_state::leds_w )
+void ravens_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	char ledname[8];
 	for (int i = 0; i < 8; i++)
@@ -133,14 +133,14 @@ WRITE8_MEMBER( ravens_state::leds_w )
 	}
 }
 
-READ8_MEMBER( ravens_state::port07_r )
+uint8_t ravens_state::port07_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0x80;
 	return ret;
 }
 
-READ8_MEMBER( ravens_state::port17_r )
+uint8_t ravens_state::port17_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t keyin, i;
 
@@ -167,7 +167,7 @@ READ8_MEMBER( ravens_state::port17_r )
 	return 0;
 }
 
-WRITE8_MEMBER( ravens_state::port1b_w )
+void ravens_state::port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 7))
 		return;
@@ -186,7 +186,7 @@ WRITE8_MEMBER( ravens_state::port1b_w )
 	m_terminal->write(space, 0, data);
 }
 
-WRITE8_MEMBER( ravens_state::port1c_w )
+void ravens_state::port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_char = data;
 }
@@ -254,7 +254,7 @@ static INPUT_PORTS_START( ravens )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ravens_state::kbd_put )
+void ravens_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data > 0x60) data -= 0x20; // fold to uppercase
 	m_term_data = data;

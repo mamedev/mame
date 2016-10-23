@@ -32,10 +32,10 @@ public:
 	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
 	static void set_alpha_invert(device_t &device, int alpha_inv) { downcast<k054338_device &>(device).m_alpha_inv = alpha_inv; }
 
-	DECLARE_WRITE16_MEMBER( word_w ); // "CLCT" registers
-	DECLARE_WRITE32_MEMBER( long_w );
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff); // "CLCT" registers
+	void long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ16_MEMBER( word_r );        // CLTC
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);        // CLTC
 
 	int register_r(int reg);
 	void update_all_shadows(int rushingheroes_hack, palette_device &palette);          // called at the beginning of SCREEN_UPDATE()

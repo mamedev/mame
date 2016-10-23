@@ -282,30 +282,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
  *************************************************************/
 
 /* triggered by WRTC,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_ctrl_port_w)
+void lazercmd_state::lazercmd_ctrl_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /* triggered by REDC,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_ctrl_port_r)
+uint8_t lazercmd_state::lazercmd_ctrl_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	return data;
 }
 
 /* triggered by WRTD,r opcode */
-WRITE8_MEMBER(lazercmd_state::lazercmd_data_port_w)
+void lazercmd_state::lazercmd_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /* triggered by REDD,r opcode */
-READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
+uint8_t lazercmd_state::lazercmd_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("DSW")->read() & 0x0f;
 	return data;
 }
 
-WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
+void lazercmd_state::lazercmd_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -327,7 +327,7 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
+void lazercmd_state::medlanes_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -350,7 +350,7 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 	}
 }
 
-WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
+void lazercmd_state::bbonk_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -367,7 +367,7 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 	}
 }
 
-READ8_MEMBER(lazercmd_state::lazercmd_hardware_r)
+uint8_t lazercmd_state::lazercmd_hardware_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 

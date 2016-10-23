@@ -56,7 +56,7 @@ void toobin_state::machine_reset_toobin()
  *
  *************************************/
 
-WRITE16_MEMBER(toobin_state::interrupt_scan_w)
+void toobin_state::interrupt_scan_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword = m_interrupt_scan[offset];
 	int newword = oldword;

@@ -34,17 +34,17 @@ public:
 	std::unique_ptr<bitmap_ind16> m_bg_bitmap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// vigilant and buccanrs
-	DECLARE_WRITE8_MEMBER(vigilant_out2_w);
-	DECLARE_WRITE8_MEMBER(vigilant_horiz_scroll_w);
-	DECLARE_WRITE8_MEMBER(vigilant_rear_horiz_scroll_w);
-	DECLARE_WRITE8_MEMBER(vigilant_rear_color_w);
+	void vigilant_out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vigilant_horiz_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vigilant_rear_horiz_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vigilant_rear_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// kikcubic
-	DECLARE_WRITE8_MEMBER(kikcubic_coin_w);
+	void kikcubic_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

@@ -50,16 +50,16 @@ public:
 	// construction/destruction
 	lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(ddr_r);
-	DECLARE_WRITE8_MEMBER(ddr_w);
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(ports_w);
-	DECLARE_READ8_MEMBER(sci_r);
-	DECLARE_WRITE8_MEMBER(sci_w);
-	DECLARE_READ8_MEMBER(spi_r);
-	DECLARE_WRITE8_MEMBER(spi_w);
-	DECLARE_READ8_MEMBER(timer_r);
-	DECLARE_WRITE8_MEMBER(timer_w);
+	uint8_t ddr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ports_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sci_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sci_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	template<class _Object> static devcb_base &set_tx_handler(device_t &device, _Object wr) { return downcast<lk201_device &>(device).m_tx_handler.set_callback(wr); }
 

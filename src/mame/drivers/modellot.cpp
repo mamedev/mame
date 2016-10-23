@@ -32,9 +32,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(port77_r);
-	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port77_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 private:
@@ -63,19 +63,19 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( modellot )
 INPUT_PORTS_END
 
-READ8_MEMBER( modellot_state::port77_r)
+uint8_t modellot_state::port77_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 4;
 }
 
-READ8_MEMBER( modellot_state::portff_r)
+uint8_t modellot_state::portff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
 	m_term_data = 0;
 	return data;
 }
 
-WRITE8_MEMBER( modellot_state::kbd_put )
+void modellot_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

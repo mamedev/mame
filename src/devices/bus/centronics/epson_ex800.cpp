@@ -387,25 +387,25 @@ void epson_ex800_t::device_reset()
 }
 
 
-READ8_MEMBER(epson_ex800_t::porta_r)
+uint8_t epson_ex800_t::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PA R @%x\n", space.device().safe_pc());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_t::portb_r)
+uint8_t epson_ex800_t::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PB R @%x\n", space.device().safe_pc());
 	return machine().rand();
 }
 
-READ8_MEMBER(epson_ex800_t::portc_r)
+uint8_t epson_ex800_t::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PC R @%x\n", space.device().safe_pc());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_t::porta_w)
+void epson_ex800_t::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (PA6) logerror("BNK0 selected.\n");
 	if (PA7) logerror("BNK1 selected.\n");
@@ -413,7 +413,7 @@ WRITE8_MEMBER(epson_ex800_t::porta_w)
 	logerror("PA W %x @%x\n", data, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(epson_ex800_t::portb_w)
+void epson_ex800_t::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 3)
 		logerror("PB0/1 Line feed @%x\n", space.device().safe_pc());
@@ -437,7 +437,7 @@ WRITE8_MEMBER(epson_ex800_t::portb_w)
 //  logerror("PB W %x @%x\n", data, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(epson_ex800_t::portc_w)
+void epson_ex800_t::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 		m_beeper->set_state(0);
@@ -450,46 +450,46 @@ WRITE8_MEMBER(epson_ex800_t::portc_w)
 
 /* Memory mapped I/O access */
 
-READ8_MEMBER(epson_ex800_t::devsel_r)
+uint8_t epson_ex800_t::devsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("DEVSEL R @%x with offset %x\n", space.device().safe_pc(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_t::devsel_w)
+void epson_ex800_t::devsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("DEVSEL W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
 }
 
-READ8_MEMBER(epson_ex800_t::gate5a_r)
+uint8_t epson_ex800_t::gate5a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("GATE5A R @%x with offset %x\n", space.device().safe_pc(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_t::gate5a_w)
+void epson_ex800_t::gate5a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("GATE5A W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
 }
 
-READ8_MEMBER(epson_ex800_t::iosel_r)
+uint8_t epson_ex800_t::iosel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("IOSEL R @%x with offset %x\n", space.device().safe_pc(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_t::iosel_w)
+void epson_ex800_t::iosel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("IOSEL W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
 }
 
-READ8_MEMBER(epson_ex800_t::gate7a_r)
+uint8_t epson_ex800_t::gate7a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("GATE7A R @%x with offset %x\n", space.device().safe_pc(), offset);
 	return machine().rand();
 }
 
-WRITE8_MEMBER(epson_ex800_t::gate7a_w)
+void epson_ex800_t::gate7a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("GATE7A W %x @%x with offset %x\n", data, space.device().safe_pc(), offset);
 }

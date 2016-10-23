@@ -90,12 +90,12 @@ void x68k_scsiext_device::drq_w(int state)
 	// TODO
 }
 
-READ8_MEMBER(x68k_scsiext_device::register_r)
+uint8_t x68k_scsiext_device::register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spc->mb89352_r(space,offset);
 }
 
-WRITE8_MEMBER(x68k_scsiext_device::register_w)
+void x68k_scsiext_device::register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spc->mb89352_w(space,offset,data);
 }

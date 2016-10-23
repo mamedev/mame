@@ -10,32 +10,32 @@
 #include "includes/battlex.h"
 
 
-WRITE8_MEMBER(battlex_state::battlex_palette_w)
+void battlex_state::battlex_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette->set_pen_color(offset, pal1bit(data >> 0), pal1bit(data >> 2), pal1bit(data >> 1));
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_x_lsb_w)
+void battlex_state::battlex_scroll_x_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_lsb = data;
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_x_msb_w)
+void battlex_state::battlex_scroll_x_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_msb = data;
 }
 
-WRITE8_MEMBER(battlex_state::battlex_scroll_starfield_w)
+void battlex_state::battlex_scroll_starfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(battlex_state::battlex_videoram_w)
+void battlex_state::battlex_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(battlex_state::battlex_flipscreen_w)
+void battlex_state::battlex_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_starfield_enabled = data & 0x10;
 

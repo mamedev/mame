@@ -42,15 +42,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( vismac_r );
-	DECLARE_WRITE8_MEMBER( vismac_w );
-	DECLARE_READ8_MEMBER( floppy_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
-	DECLARE_READ8_MEMBER( ascii_keyboard_r );
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_WRITE8_MEMBER( io_select_w );
-	DECLARE_WRITE8_MEMBER( keyboard_latch_w );
+	uint8_t vismac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vismac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ascii_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -58,7 +58,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* video state */
 	int m_cdp1864_efx;      /* EFx */

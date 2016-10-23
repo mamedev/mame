@@ -52,13 +52,13 @@
 
 /*********************************************************************/
 
-READ16_MEMBER(superchs_state::shared_ram_r)
+uint16_t superchs_state::shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ((offset&1)==0) return (m_shared_ram[offset/2]&0xffff0000)>>16;
 	return (m_shared_ram[offset/2]&0x0000ffff);
 }
 
-WRITE16_MEMBER(superchs_state::shared_ram_w)
+void superchs_state::shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
@@ -73,7 +73,7 @@ WRITE16_MEMBER(superchs_state::shared_ram_w)
 	}
 }
 
-WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
+void superchs_state::cpua_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	CPUA writes 0x00, 22, 72, f2 in that order.
@@ -96,7 +96,7 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 	}
 }
 
-READ32_MEMBER(superchs_state::superchs_input_r)
+uint32_t superchs_state::superchs_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -110,7 +110,7 @@ READ32_MEMBER(superchs_state::superchs_input_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(superchs_state::superchs_input_w)
+void superchs_state::superchs_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	#if 0
 	{
@@ -157,7 +157,7 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 	}
 }
 
-READ32_MEMBER(superchs_state::superchs_stick_r)
+uint32_t superchs_state::superchs_stick_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t b0 = ioport("UNKNOWN")->read();
 	uint8_t b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
@@ -167,7 +167,7 @@ READ32_MEMBER(superchs_state::superchs_stick_r)
 	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
 }
 
-WRITE32_MEMBER(superchs_state::superchs_stick_w)
+void superchs_state::superchs_stick_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* This is guess work - the interrupts are in groups of 4, with each writing to a
 	    different byte in this long word before the RTE.  I assume all but the last
@@ -561,7 +561,7 @@ ROM_END
 
 
 
-READ32_MEMBER(superchs_state::main_cycle_r)
+uint32_t superchs_state::main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc()==0x702)
 		space.device().execute().spin_until_interrupt();
@@ -569,7 +569,7 @@ READ32_MEMBER(superchs_state::main_cycle_r)
 	return m_ram[0];
 }
 
-READ16_MEMBER(superchs_state::sub_cycle_r)
+uint16_t superchs_state::sub_cycle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (space.device().safe_pc()==0x454)
 		space.device().execute().spin_until_interrupt();

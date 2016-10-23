@@ -38,15 +38,15 @@ public:
 	uint8_t    m_input_mux;
 	uint8_t    m_di;
 
-	DECLARE_READ8_MEMBER(ioread);
-	DECLARE_WRITE8_MEMBER(iowrite);
-	DECLARE_WRITE8_MEMBER(dribling_colorram_w);
-	DECLARE_READ8_MEMBER(dsr_r);
-	DECLARE_READ8_MEMBER(input_mux0_r);
-	DECLARE_WRITE8_MEMBER(misc_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pb_w);
-	DECLARE_WRITE8_MEMBER(shr_w);
+	uint8_t ioread(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iowrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dribling_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_mux0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(dribling);

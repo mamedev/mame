@@ -114,7 +114,7 @@ void msx_cart_msx_audio_hxmu900::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_hxmu900::read_cart)
+uint8_t msx_cart_msx_audio_hxmu900::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xC000)
 	{
@@ -220,7 +220,7 @@ void msx_cart_msx_audio_nms1205::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_nms1205::read_cart)
+uint8_t msx_cart_msx_audio_nms1205::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xC000)
 	{
@@ -311,7 +311,7 @@ void msx_cart_msx_audio_fsca1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1::read_cart)
+uint8_t msx_cart_msx_audio_fsca1::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_7ffe == 0 && (offset & 0xB000) == 0x3000)
 	{
@@ -321,7 +321,7 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_cart)
+void msx_cart_msx_audio_fsca1::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x7ffe)
 	{
@@ -345,7 +345,7 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_y8950)
+void msx_cart_msx_audio_fsca1::write_y8950(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 2)
 	{
@@ -364,7 +364,7 @@ WRITE8_MEMBER(msx_cart_msx_audio_fsca1::write_y8950)
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1::read_y8950)
+uint8_t msx_cart_msx_audio_fsca1::read_y8950(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 2)
 	{
@@ -377,13 +377,13 @@ READ8_MEMBER(msx_cart_msx_audio_fsca1::read_y8950)
 }
 
 
-WRITE8_MEMBER(msx_cart_msx_audio_fsca1::y8950_io_w)
+void msx_cart_msx_audio_fsca1::y8950_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("msx_fsca1::y8950_io_w: %02x\n", data);
 }
 
 
-READ8_MEMBER(msx_cart_msx_audio_fsca1::y8950_io_r)
+uint8_t msx_cart_msx_audio_fsca1::y8950_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_config->read();
 }

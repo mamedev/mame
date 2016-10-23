@@ -82,7 +82,7 @@ void irem_audio_device::device_start()
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::cmd_w )
+void irem_audio_device::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x80) == 0)
 		m_soundlatch->write(space, 0, data & 0x7f);
@@ -98,13 +98,13 @@ WRITE8_MEMBER( irem_audio_device::cmd_w )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::m6803_port1_w )
+void irem_audio_device::m6803_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port1 = data;
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
+void irem_audio_device::m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write latch */
 	if ((m_port2 & 0x01) && !(data & 0x01))
@@ -138,7 +138,7 @@ WRITE8_MEMBER( irem_audio_device::m6803_port2_w )
  *
  *************************************/
 
-READ8_MEMBER( irem_audio_device::m6803_port1_r )
+uint8_t irem_audio_device::m6803_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* PSG 0 or 1? */
 	if (m_port2 & 0x08)
@@ -149,7 +149,7 @@ READ8_MEMBER( irem_audio_device::m6803_port1_r )
 }
 
 
-READ8_MEMBER( irem_audio_device::m6803_port2_r )
+uint8_t irem_audio_device::m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	 * Pin21, 6803 (Port 21) tied with 4.7k to +5V
@@ -167,7 +167,7 @@ READ8_MEMBER( irem_audio_device::m6803_port2_r )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
+void irem_audio_device::ay8910_45M_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	m_adpcm1->playmode_w((data >> 2) & 7);
@@ -181,7 +181,7 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45M_portb_w )
 }
 
 
-WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
+void irem_audio_device::ay8910_45L_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 *  45L 21 IOA0  ==> BD
@@ -207,13 +207,13 @@ WRITE8_MEMBER( irem_audio_device::ay8910_45L_porta_w )
  *
  *************************************/
 
-WRITE8_MEMBER( irem_audio_device::sound_irq_ack_w )
+void irem_audio_device::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	subdevice("iremsound")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
+void irem_audio_device::m52_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -227,7 +227,7 @@ WRITE8_MEMBER( irem_audio_device::m52_adpcm_w )
 }
 
 
-WRITE8_MEMBER( irem_audio_device::m62_adpcm_w )
+void irem_audio_device::m62_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
 	if (adpcm != nullptr)

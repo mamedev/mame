@@ -41,7 +41,7 @@ Check game speed, it depends on a bit we toggle..
 
 /* The top 64k of samples are banked (16 banks total) */
 
-WRITE16_MEMBER(blmbycar_state::okibank_w)
+void blmbycar_state::okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -59,13 +59,13 @@ WRITE16_MEMBER(blmbycar_state::okibank_w)
 
 /* Preliminary potentiometric wheel support */
 
-WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
+void blmbycar_state::blmbycar_pot_wheel_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_pot_wheel = ~ioport("WHEEL")->read() & 0xff;
 }
 
-WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
+void blmbycar_state::blmbycar_pot_wheel_shift_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -75,7 +75,7 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
 	}
 }
 
-READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
+uint16_t blmbycar_state::blmbycar_pot_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_pot_wheel & 0x80) ? 0x04 : 0) | (machine().rand() & 0x08);
 }
@@ -83,7 +83,7 @@ READ16_MEMBER(blmbycar_state::blmbycar_pot_wheel_r)
 
 /* Preliminary optical wheel support */
 
-READ16_MEMBER(blmbycar_state::blmbycar_opt_wheel_r)
+uint16_t blmbycar_state::blmbycar_opt_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (~ioport("WHEEL")->read() & 0xff) << 8;
 }
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70007a, 0x70007b) AM_WRITE(blmbycar_pot_wheel_shift_w)                       //
 ADDRESS_MAP_END
 
-READ16_MEMBER(blmbycar_state::waterball_unk_r)
+uint16_t blmbycar_state::waterball_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_retvalue ^= 0x0008; // must toggle.. but not vblank?
 	return m_retvalue;

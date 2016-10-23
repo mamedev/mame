@@ -206,14 +206,14 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
+void rallyx_state::rallyx_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line_vector(0, data);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
+void rallyx_state::rallyx_bang_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0 && m_last_bang != 0)
 		m_samples->start(0, 0);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
 	m_last_bang = data;
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
+void rallyx_state::rallyx_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 1;
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 }
 
 
-WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
+void rallyx_state::locomotn_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 1;
 

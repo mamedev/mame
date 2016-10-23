@@ -223,7 +223,7 @@ void wswan_state::machine_reset()
 	memset(&m_sound_dma, 0, sizeof(m_sound_dma));
 }
 
-READ8_MEMBER( wswan_state::bios_r )
+uint8_t wswan_state::bios_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_bios_disabled)
 		return m_ws_bios_bank[offset];
@@ -231,7 +231,7 @@ READ8_MEMBER( wswan_state::bios_r )
 		return m_cart->read_rom40(space, offset + 0xb0000);
 }
 
-READ8_MEMBER( wswan_state::port_r )
+uint8_t wswan_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = m_ws_portram[offset];
 
@@ -295,7 +295,7 @@ READ8_MEMBER( wswan_state::port_r )
 	return value;
 }
 
-WRITE8_MEMBER( wswan_state::port_w )
+void wswan_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t input;

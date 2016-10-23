@@ -174,13 +174,13 @@ public:
 	uint32_t m_flash_cmd;
 	int32_t m_first_offset;
 
-	DECLARE_READ32_MEMBER(flash_r);
-	DECLARE_WRITE32_MEMBER(flash_w);
-	DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(vram_r);
-	DECLARE_WRITE32_MEMBER(vbuffer_w);
-	DECLARE_WRITE32_MEMBER(coin_w);
-	DECLARE_READ32_MEMBER(vblank_r);
+	uint32_t flash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vbuffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void coin_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t vblank_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	void init_elfin();
 	void init_jumpjump();
@@ -197,7 +197,7 @@ public:
 };
 
 
-READ32_MEMBER(dgpix_state::flash_r)
+uint32_t dgpix_state::flash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)memregion("flash")->base();
 
@@ -228,7 +228,7 @@ READ32_MEMBER(dgpix_state::flash_r)
 	return ROM[offset];
 }
 
-WRITE32_MEMBER(dgpix_state::flash_w)
+void dgpix_state::flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(m_flash_cmd == 0x20200000)
 	{
@@ -275,7 +275,7 @@ WRITE32_MEMBER(dgpix_state::flash_w)
 	}
 }
 
-WRITE32_MEMBER(dgpix_state::vram_w)
+void dgpix_state::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *dest = &m_vram[offset+(0x40000/4)*m_vbuffer];
 
@@ -292,12 +292,12 @@ WRITE32_MEMBER(dgpix_state::vram_w)
 		COMBINE_DATA(dest);
 }
 
-READ32_MEMBER(dgpix_state::vram_r)
+uint32_t dgpix_state::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram[offset+(0x40000/4)*m_vbuffer];
 }
 
-WRITE32_MEMBER(dgpix_state::vbuffer_w)
+void dgpix_state::vbuffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(m_old_vbuf == 3 && (data & 3) == 2)
 	{
@@ -307,13 +307,13 @@ WRITE32_MEMBER(dgpix_state::vbuffer_w)
 	m_old_vbuf = data & 3;
 }
 
-WRITE32_MEMBER(dgpix_state::coin_w)
+void dgpix_state::coin_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-READ32_MEMBER(dgpix_state::vblank_r)
+uint32_t dgpix_state::vblank_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	space.device().execute().eat_cycles(100);

@@ -707,27 +707,27 @@ void mario_state::sound_reset()
  *
  ****************************************************************/
 
-READ8_MEMBER(mario_state::mario_sh_p1_r)
+uint8_t mario_state::mario_sh_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return I8035_P1_R(space);
 }
 
-READ8_MEMBER(mario_state::mario_sh_p2_r)
+uint8_t mario_state::mario_sh_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return I8035_P2_R(space) & 0xEF; /* Bit 4 connected to GND! */
 }
 
-READ8_MEMBER(mario_state::mario_sh_t0_r)
+uint8_t mario_state::mario_sh_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return I8035_T_R(space, 0);
 }
 
-READ8_MEMBER(mario_state::mario_sh_t1_r)
+uint8_t mario_state::mario_sh_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return I8035_T_R(space, 1);
 }
 
-READ8_MEMBER(mario_state::mario_sh_tune_r)
+uint8_t mario_state::mario_sh_tune_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *SND = memregion("audiocpu")->base();
 	uint16_t mask = memregion("audiocpu")->bytes()-1;
@@ -739,7 +739,7 @@ READ8_MEMBER(mario_state::mario_sh_tune_r)
 		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_sound_w)
+void mario_state::mario_sh_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if OLD_SOUND
 	m_discrete->write(space, DS_DAC, data);
@@ -748,12 +748,12 @@ WRITE8_MEMBER(mario_state::mario_sh_sound_w)
 #endif
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_p1_w)
+void mario_state::mario_sh_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	I8035_P1_W(space, data);
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_p2_w)
+void mario_state::mario_sh_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	I8035_P2_W(space, data);
 }
@@ -764,7 +764,7 @@ WRITE8_MEMBER(mario_state::mario_sh_p2_w)
  *
  ****************************************************************/
 
-WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
+void mario_state::masao_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_last == 1 && data == 0)
 	{
@@ -775,7 +775,7 @@ WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 	m_last = data;
 }
 
-WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
+void mario_state::mario_sh_tuneselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 }
@@ -783,7 +783,7 @@ WRITE8_MEMBER(mario_state::mario_sh_tuneselect_w)
 /* Sound 0 and 1 are pulsed !*/
 
 /* Mario running sample */
-WRITE8_MEMBER(mario_state::mario_sh1_w)
+void mario_state::mario_sh1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if OLD_SOUND
 	m_discrete->write(space, DS_SOUND0_INP, 0);
@@ -793,7 +793,7 @@ WRITE8_MEMBER(mario_state::mario_sh1_w)
 }
 
 /* Luigi running sample */
-WRITE8_MEMBER(mario_state::mario_sh2_w)
+void mario_state::mario_sh2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if OLD_SOUND
 	m_discrete->write(space, DS_SOUND1_INP, 0);
@@ -801,7 +801,7 @@ WRITE8_MEMBER(mario_state::mario_sh2_w)
 }
 
 /* Misc samples */
-WRITE8_MEMBER(mario_state::mario_sh3_w)
+void mario_state::mario_sh3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

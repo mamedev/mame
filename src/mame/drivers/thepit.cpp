@@ -179,17 +179,17 @@ void thepit_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-READ8_MEMBER(thepit_state::intrepid_colorram_mirror_r)
+uint8_t thepit_state::intrepid_colorram_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_colorram[offset];
 }
 
-WRITE8_MEMBER(thepit_state::sound_enable_w)
+void thepit_state::sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(data);
 }
 
-WRITE8_MEMBER(thepit_state::nmi_mask_w)
+void thepit_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -1227,7 +1227,7 @@ ROM_END
 */
 
 
-READ8_MEMBER(thepit_state::rtriv_question_r)
+uint8_t thepit_state::rtriv_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)

@@ -27,11 +27,11 @@ public:
 	{ }
 
 	required_device<beep_device> m_beep;
-	DECLARE_READ8_MEMBER(pio_port_a_r);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
-	DECLARE_WRITE8_MEMBER(pio_port_b_w);
-	DECLARE_READ8_MEMBER(sc2_beep);
+	uint8_t pio_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sc2_beep(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_kp_matrix;
 	uint8_t m_led_7seg_data[4];
 	uint8_t m_led_selected;
@@ -43,7 +43,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-READ8_MEMBER( sc2_state::sc2_beep )
+uint8_t sc2_state::sc2_beep(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//if (!space.debugger_access())
 	{
@@ -147,12 +147,12 @@ void sc2_state::sc2_update_display()
 	}
 }
 
-READ8_MEMBER( sc2_state::pio_port_a_r )
+uint8_t sc2_state::pio_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_digit_data;
 }
 
-READ8_MEMBER( sc2_state::pio_port_b_r )
+uint8_t sc2_state::pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_led_selected & 0x0f;
 
@@ -179,12 +179,12 @@ READ8_MEMBER( sc2_state::pio_port_b_r )
 	return data;
 }
 
-WRITE8_MEMBER( sc2_state::pio_port_a_w )
+void sc2_state::pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit_data = data;
 }
 
-WRITE8_MEMBER( sc2_state::pio_port_b_w )
+void sc2_state::pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0xf1 && data != 0xf2 && data != 0xf4 && data != 0xf8)
 	{

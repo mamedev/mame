@@ -156,7 +156,7 @@ READ8Z_MEMBER(gromport_device::readz)
     Writing via the GROM port. Only 13 address lines are passed through
     on the TI-99/4A, and 14 lines on the TI-99/8.
 */
-WRITE8_MEMBER(gromport_device::write)
+void gromport_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_connector != nullptr)
 	{
@@ -171,7 +171,7 @@ READ8Z_MEMBER(gromport_device::crureadz)
 		m_connector->crureadz(space, offset, value);
 }
 
-WRITE8_MEMBER(gromport_device::cruwrite)
+void gromport_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_connector != nullptr)
 		m_connector->cruwrite(space, offset, data);
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER(gromport_device::gclock_in)
 /*
     Combined GROM control lines.
 */
-WRITE8_MEMBER( gromport_device::set_gromlines )
+void gromport_device::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_connector != nullptr)
 		m_connector->set_gromlines(space, offset, data);
@@ -321,7 +321,7 @@ READ8Z_MEMBER(single_conn_device::readz)
 	m_cartridge->readz(space, offset, value);
 }
 
-WRITE8_MEMBER(single_conn_device::write)
+void single_conn_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Pass through
 	m_cartridge->write(space, offset, data);
@@ -333,7 +333,7 @@ READ8Z_MEMBER(single_conn_device::crureadz)
 	m_cartridge->crureadz(space, offset, value);
 }
 
-WRITE8_MEMBER(single_conn_device::cruwrite)
+void single_conn_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Pass through
 	m_cartridge->cruwrite(space, offset, data);
@@ -348,7 +348,7 @@ WRITE_LINE_MEMBER(single_conn_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(single_conn_device::set_gromlines)
+void single_conn_device::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Pass through
 	m_cartridge->set_gromlines(space, offset, data);
@@ -531,7 +531,7 @@ WRITE_LINE_MEMBER(multi_conn_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(multi_conn_device::set_gromlines)
+void multi_conn_device::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// GROM selected?
 	m_grom_selected = (data != 0);
@@ -589,7 +589,7 @@ READ8Z_MEMBER(multi_conn_device::readz)
 	}
 }
 
-WRITE8_MEMBER(multi_conn_device::write)
+void multi_conn_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Same issue as above (read)
 	// We don't have GRAM cartridges, anyway, so it's just used for setting the address.
@@ -627,7 +627,7 @@ READ8Z_MEMBER(multi_conn_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(multi_conn_device::cruwrite)
+void multi_conn_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slot = get_active_slot(true, offset);
 
@@ -849,7 +849,7 @@ WRITE_LINE_MEMBER(gkracker_device::romgq_line)
 /*
     Combined select lines
 */
-WRITE8_MEMBER(gkracker_device::set_gromlines)
+void gkracker_device::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_grom_selected = (data != 0);
 	if (m_cartridge != nullptr) m_cartridge->set_gromlines(space, offset, data);
@@ -927,7 +927,7 @@ READ8Z_MEMBER(gkracker_device::readz)
 	}
 }
 
-WRITE8_MEMBER(gkracker_device::write)
+void gkracker_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write to the guest cartridge if present
 	if (m_cartridge != nullptr)
@@ -1004,7 +1004,7 @@ READ8Z_MEMBER( gkracker_device::crureadz )
 	if (m_cartridge != nullptr) m_cartridge->crureadz(space, offset, value);
 }
 
-WRITE8_MEMBER( gkracker_device::cruwrite )
+void gkracker_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartridge != nullptr) m_cartridge->cruwrite(space, offset, data);
 }
@@ -1478,7 +1478,7 @@ READ8Z_MEMBER(ti99_cartridge_device::readz)
 		m_pcb->readz(space, offset, value);
 }
 
-WRITE8_MEMBER(ti99_cartridge_device::write)
+void ti99_cartridge_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pcb != nullptr)
 		m_pcb->write(space, offset, data);
@@ -1489,7 +1489,7 @@ READ8Z_MEMBER(ti99_cartridge_device::crureadz)
 	if (m_pcb != nullptr) m_pcb->crureadz(space, offset, value);
 }
 
-WRITE8_MEMBER(ti99_cartridge_device::cruwrite)
+void ti99_cartridge_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pcb != nullptr) m_pcb->cruwrite(space, offset, data);
 }
@@ -1511,7 +1511,7 @@ WRITE_LINE_MEMBER( ti99_cartridge_device::romgq_line )
 /*
     Combined select lines
 */
-WRITE8_MEMBER(ti99_cartridge_device::set_gromlines)
+void ti99_cartridge_device::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pcb != nullptr) m_pcb->set_gromlines(space, offset, data);
 }
@@ -1618,7 +1618,7 @@ READ8Z_MEMBER(ti99_cartridge_pcb::gromreadz)
 	}
 }
 
-WRITE8_MEMBER(ti99_cartridge_pcb::gromwrite)
+void ti99_cartridge_pcb::gromwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (auto & elem : m_grom)
 	{
@@ -1650,7 +1650,7 @@ READ8Z_MEMBER(ti99_cartridge_pcb::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_cartridge_pcb::write)
+void ti99_cartridge_pcb::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -1667,7 +1667,7 @@ READ8Z_MEMBER(ti99_cartridge_pcb::crureadz)
 {
 }
 
-WRITE8_MEMBER(ti99_cartridge_pcb::cruwrite)
+void ti99_cartridge_pcb::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -1687,7 +1687,7 @@ WRITE_LINE_MEMBER( ti99_cartridge_pcb::romgq_line )
 /*
     Combined select lines
 */
-WRITE8_MEMBER(ti99_cartridge_pcb::set_gromlines)
+void ti99_cartridge_pcb::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (auto& elem : m_grom)
 	{
@@ -1755,7 +1755,7 @@ READ8Z_MEMBER(ti99_paged12k_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_paged12k_cartridge::write)
+void ti99_paged12k_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -1802,7 +1802,7 @@ READ8Z_MEMBER(ti99_paged16k_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_paged16k_cartridge::write)
+void ti99_paged16k_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -1857,7 +1857,7 @@ READ8Z_MEMBER(ti99_minimem_cartridge::readz)
 }
 
 /* Write function for the minimem cartridge. */
-WRITE8_MEMBER(ti99_minimem_cartridge::write)
+void ti99_minimem_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -1925,7 +1925,7 @@ READ8Z_MEMBER(ti99_super_cartridge::readz)
 }
 
 /* Write function for the super cartridge. */
-WRITE8_MEMBER(ti99_super_cartridge::write)
+void ti99_super_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -1975,7 +1975,7 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 	}
 }
 
-WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
+void ti99_super_cartridge::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
@@ -2056,7 +2056,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 }
 
 /* Write function for the mbx cartridge. */
-WRITE8_MEMBER(ti99_mbx_cartridge::write)
+void ti99_mbx_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -2134,7 +2134,7 @@ READ8Z_MEMBER(ti99_paged379i_cartridge::readz)
 }
 
 /* Write function for the paged379i cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged379i_cartridge::write)
+void ti99_paged379i_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Bits: 011x xxxx xxxb bbbx
 	// x = don't care, bbbb = bank
@@ -2183,7 +2183,7 @@ READ8Z_MEMBER(ti99_paged378_cartridge::readz)
 }
 
 /* Write function for the paged378 cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged378_cartridge::write)
+void ti99_paged378_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Bits: 011x xxxx xbbb bbbx
 	// x = don't care, bbbb = bank
@@ -2221,7 +2221,7 @@ READ8Z_MEMBER(ti99_paged377_cartridge::readz)
 }
 
 /* Write function for the paged377 cartridge. Only used to set the bank. */
-WRITE8_MEMBER(ti99_paged377_cartridge::write)
+void ti99_paged377_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Bits: 011x xxxb bbbb bbbx
 	// x = don't care, bbbb = bank
@@ -2271,7 +2271,7 @@ READ8Z_MEMBER(ti99_pagedcru_cartridge::readz)
 }
 
 /* Write function for the pagedcru cartridge. No effect. */
-WRITE8_MEMBER(ti99_pagedcru_cartridge::write)
+void ti99_pagedcru_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return;
 }
@@ -2290,7 +2290,7 @@ READ8Z_MEMBER(ti99_pagedcru_cartridge::crureadz)
 	}
 }
 
-WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
+void ti99_pagedcru_cartridge::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xf800)==0x0800)
 	{
@@ -2347,7 +2347,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(ti99_gromemu_cartridge::set_gromlines)
+void ti99_gromemu_cartridge::set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_grom_ptr != nullptr)
 	{
@@ -2381,7 +2381,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 	}
 }
 
-WRITE8_MEMBER(ti99_gromemu_cartridge::write)
+void ti99_gromemu_cartridge::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_romspace_selected)
 	{
@@ -2425,7 +2425,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
 	m_waddr_LSB = false;
 }
 
-WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
+void ti99_gromemu_cartridge::gromemuwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Set GROM address
 	if (m_grom_address_mode)

@@ -13,15 +13,15 @@ public:
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0280grd_device &>(device).m_gfxnum = gfxregion; }
 
-	DECLARE_READ16_MEMBER( tc0280grd_word_r );
-	DECLARE_WRITE16_MEMBER( tc0280grd_word_w );
-	DECLARE_WRITE16_MEMBER( tc0280grd_ctrl_word_w );
+	uint16_t tc0280grd_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tc0280grd_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tc0280grd_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tc0280grd_tilemap_update(int base_color);
 	void tc0280grd_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority);
 
-	DECLARE_READ16_MEMBER( tc0430grw_word_r );
-	DECLARE_WRITE16_MEMBER( tc0430grw_word_w );
-	DECLARE_WRITE16_MEMBER( tc0430grw_ctrl_word_w );
+	uint16_t tc0430grw_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tc0430grw_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tc0430grw_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tc0430grw_tilemap_update(int base_color);
 	void tc0430grw_zoom_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority);
 

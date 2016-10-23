@@ -58,10 +58,10 @@ public:
 	uint8_t       m_adpcm_trigger;
 	uint8_t       m_adpcm_data;
 
-	DECLARE_READ16_MEMBER(ioc_r);
-	DECLARE_WRITE16_MEMBER(ioc_w);
-	DECLARE_READ16_MEMBER(gcpinbal_tilemaps_word_r);
-	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
+	uint16_t ioc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gcpinbal_tilemaps_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gcpinbal_tilemaps_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

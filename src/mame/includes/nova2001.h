@@ -24,17 +24,17 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_paletteram_w);
-	DECLARE_WRITE8_MEMBER(nova2001_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(nova2001_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(ninjakun_bg_videoram_w);
-	DECLARE_READ8_MEMBER(ninjakun_bg_videoram_r);
-	DECLARE_WRITE8_MEMBER(nova2001_scroll_x_w);
-	DECLARE_WRITE8_MEMBER(nova2001_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(nova2001_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(pkunwar_flipscreen_w);
+	void ninjakun_cpu1_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_cpu2_io_A002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjakun_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ninjakun_bg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nova2001_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nova2001_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pkunwar_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
 

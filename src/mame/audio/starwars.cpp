@@ -21,7 +21,7 @@
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::r6532_porta_r)
+uint8_t starwars_state::r6532_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Configured as follows:           */
 	/* d7 (in)  Main Ready Flag         */
@@ -41,7 +41,7 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 }
 
 
-WRITE8_MEMBER(starwars_state::r6532_porta_w)
+void starwars_state::r6532_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	/* handle 5220 read */
@@ -71,14 +71,14 @@ TIMER_CALLBACK_MEMBER(starwars_state::sound_callback)
 }
 
 
-READ8_MEMBER(starwars_state::starwars_sin_r)
+uint8_t starwars_state::starwars_sin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_riot->porta_in_set(0x00, 0x80);
 	return m_sound_data;
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_sout_w)
+void starwars_state::starwars_sout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(starwars_state::sound_callback), this), data);
 }
@@ -91,14 +91,14 @@ WRITE8_MEMBER(starwars_state::starwars_sout_w)
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_main_read_r)
+uint8_t starwars_state::starwars_main_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_riot->porta_in_set(0x00, 0x40);
 	return m_main_data;
 }
 
 
-READ8_MEMBER(starwars_state::starwars_main_ready_flag_r)
+uint8_t starwars_state::starwars_main_ready_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_riot->porta_in_get() & 0xc0;    /* only upper two flag bits mapped */
 }
@@ -113,13 +113,13 @@ TIMER_CALLBACK_MEMBER(starwars_state::main_callback )
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-WRITE8_MEMBER(starwars_state::starwars_main_wr_w)
+void starwars_state::starwars_main_wr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(starwars_state::main_callback), this), data);
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_soundrst_w)
+void starwars_state::starwars_soundrst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_riot->porta_in_set(0x00, 0xc0);
 

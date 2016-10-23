@@ -46,14 +46,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_bit );
 	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
 	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
-	DECLARE_WRITE16_MEMBER(vreg_120_w);
-	DECLARE_WRITE16_MEMBER(vreg_121_w);
-	DECLARE_WRITE16_MEMBER(vreg_122_w);
-	DECLARE_WRITE16_MEMBER(vreg_123_w);
-	DECLARE_WRITE16_MEMBER(vreg_124_w);
-	DECLARE_WRITE16_MEMBER(vreg_125_w);
-	DECLARE_WRITE16_MEMBER(vreg_126_w);
-	DECLARE_WRITE16_MEMBER(vreg_127_w);
+	void vreg_120_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_121_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_122_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_123_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_124_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_125_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_126_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vreg_127_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override;

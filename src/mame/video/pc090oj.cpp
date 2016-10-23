@@ -142,12 +142,12 @@ void pc090oj_device::set_sprite_ctrl( uint16_t sprctrl )
 	m_sprite_ctrl = sprctrl;
 }
 
-READ16_MEMBER( pc090oj_device::word_r )
+uint16_t pc090oj_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( pc090oj_device::word_w )
+void pc090oj_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 

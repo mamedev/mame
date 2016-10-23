@@ -48,7 +48,7 @@ public:
 	uint8_t m_control;
 
 	// member functions
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// driver_device overrides
@@ -153,7 +153,7 @@ uint32_t kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitm
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kontest_state::control_w)
+void kontest_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d3: irq mask
 	// d2: ? (reset during 1st grid test and color test)

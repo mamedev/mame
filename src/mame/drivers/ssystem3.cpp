@@ -113,13 +113,13 @@ void ssystem3_state::ssystem3_playfield_read(int *on, int *ready)
 	*ready=false;
 }
 
-WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_a)
+void ssystem3_state::ssystem3_via_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta=data;
 	//  logerror("%.4x via port a write %02x\n",(int)activecpu_get_pc(), data);
 }
 
-READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
+uint8_t ssystem3_state::ssystem3_via_read_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0xff;
 #if 1 // time switch
@@ -183,7 +183,7 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
    bit 5: input low x/$37 4 (else 1)
 
  */
-READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
+uint8_t ssystem3_state::ssystem3_via_read_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0xff;
 	int on, ready;
@@ -193,7 +193,7 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_b)
 	return data;
 }
 
-WRITE8_MEMBER(ssystem3_state::ssystem3_via_write_b)
+void ssystem3_state::ssystem3_via_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ssystem3_playfield_write(data & 1, data & 8);
 	ssystem3_lcd_write(data & 4, data & 2);

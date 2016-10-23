@@ -270,7 +270,7 @@ void astrocade_device::state_save_register()
  *
  *************************************/
 
-WRITE8_MEMBER( astrocade_device::astrocade_sound_w )
+void astrocade_device::astrocade_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 8) != 0)
 		offset = (offset >> 8) & 7;

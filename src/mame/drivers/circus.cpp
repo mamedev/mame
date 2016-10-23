@@ -54,7 +54,7 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 #include "crash.lh"
 
 
-READ8_MEMBER(circus_state::circus_paddle_r)
+uint8_t circus_state::circus_paddle_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// also clears irq
 	m_maincpu->set_input_line(0, CLEAR_LINE);

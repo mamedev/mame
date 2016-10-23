@@ -93,7 +93,7 @@ void cpc_ddi1_device::device_reset()
 	m_rom_active = false;
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::motor_w)
+void cpc_ddi1_device::motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -115,7 +115,7 @@ WRITE8_MEMBER(cpc_ddi1_device::motor_w)
 	}
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
+void cpc_ddi1_device::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -125,7 +125,7 @@ WRITE8_MEMBER(cpc_ddi1_device::fdc_w)
 	}
 }
 
-READ8_MEMBER(cpc_ddi1_device::fdc_r)
+uint8_t cpc_ddi1_device::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -141,7 +141,7 @@ READ8_MEMBER(cpc_ddi1_device::fdc_r)
 	return data;
 }
 
-WRITE8_MEMBER(cpc_ddi1_device::rombank_w)
+void cpc_ddi1_device::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0x07)
 		m_rom_active = true;

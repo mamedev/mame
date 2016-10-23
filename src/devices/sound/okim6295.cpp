@@ -224,7 +224,7 @@ uint8_t okim6295_device::read_status()
 //  read - memory interface for read
 //-------------------------------------------------
 
-READ8_MEMBER( okim6295_device::read )
+uint8_t okim6295_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_status();
 }
@@ -320,7 +320,7 @@ void okim6295_device::write_command(uint8_t command)
 //  write - memory interface for write
 //-------------------------------------------------
 
-WRITE8_MEMBER( okim6295_device::write )
+void okim6295_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_command(data);
 }

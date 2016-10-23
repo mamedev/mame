@@ -53,7 +53,7 @@ CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
 }
 
 
-READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
+uint8_t wolfpack_state::wolfpack_misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -79,43 +79,43 @@ READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_high_explo_w){ }
-WRITE8_MEMBER(wolfpack_state::wolfpack_sonar_ping_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_sirlat_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_sound_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_launch_torpedo_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_low_explo_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_screw_cont_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_lamp_flash_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_warning_light_w){}
-WRITE8_MEMBER(wolfpack_state::wolfpack_audamp_w){}
+void wolfpack_state::wolfpack_high_explo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ }
+void wolfpack_state::wolfpack_sonar_ping_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_sirlat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_pt_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_launch_torpedo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_low_explo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_screw_cont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_lamp_flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_warning_light_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
+void wolfpack_state::wolfpack_audamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){}
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_word_w)
+void wolfpack_state::wolfpack_word_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* latch word from bus into temp register, and place on s14001a input bus */
 	/* there is no real need for a temp register at all, since the bus 'register' acts as one */
 	m_s14001a->data_w(space, 0, data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_start_speech_w)
+void wolfpack_state::wolfpack_start_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s14001a->start_w(data&1);
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
+void wolfpack_state::wolfpack_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(!(data & 1));
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_credit_w)
+void wolfpack_state::wolfpack_credit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, !(data & 1));
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_coldetres_w)
+void wolfpack_state::wolfpack_coldetres_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision = 0;
 }

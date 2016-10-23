@@ -141,7 +141,7 @@ PALETTE_INIT_MEMBER(skydiver_state, skydiver)
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::nmion_w)
+void skydiver_state::nmion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmion = offset;
 }
@@ -169,12 +169,12 @@ INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::sound_enable_w)
+void skydiver_state::sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SKYDIVER_SOUND_EN, offset);
 }
 
-WRITE8_MEMBER(skydiver_state::whistle_w)
+void skydiver_state::whistle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NODE_RELATIVE(SKYDIVER_WHISTLE1_EN, (offset >> 1)), offset & 0x01);
 }

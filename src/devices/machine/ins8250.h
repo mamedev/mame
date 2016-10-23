@@ -28,8 +28,8 @@ public:
 	template<class _Object> static devcb_base &set_out_out1_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_out1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_out2_callback(device_t &device, _Object object) { return downcast<ins8250_uart_device &>(device).m_out_out2_cb.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( ins8250_w );
-	DECLARE_READ8_MEMBER( ins8250_r );
+	void ins8250_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ins8250_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 	DECLARE_WRITE_LINE_MEMBER( dsr_w );
 	DECLARE_WRITE_LINE_MEMBER( ri_w );
@@ -133,8 +133,8 @@ class pc16552_device : public device_t
 public:
 	pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read) { return ((offset & 8) ? m_chan1 : m_chan0)->ins8250_r(space, offset & 7, mem_mask); }
-	DECLARE_WRITE8_MEMBER(write) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(space, offset & 7, data, mem_mask); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return ((offset & 8) ? m_chan1 : m_chan0)->ins8250_r(space, offset & 7, mem_mask); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ((offset & 8) ? m_chan1 : m_chan0)->ins8250_w(space, offset & 7, data, mem_mask); }
 
 protected:
 	virtual void device_start() override;

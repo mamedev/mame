@@ -97,40 +97,40 @@ Noted added by ClawGrip 28-Mar-2008:
 #define MSM5205_CLOCK XTAL_384kHz
 
 
-WRITE8_MEMBER(wc90b_state::bankswitch_w)
+void wc90b_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::bankswitch1_w)
+void wc90b_state::bankswitch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(wc90b_state::sound_command_w)
+void wc90b_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(wc90b_state::adpcm_control_w)
+void wc90b_state::adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("audiobank")->set_entry(data & 0x01);
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(wc90b_state::adpcm_data_w)
+void wc90b_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(wc90b_state::master_irq_ack_r)
+uint8_t wc90b_state::master_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 	return 0xff;
 }
 
-WRITE8_MEMBER(wc90b_state::slave_irq_ack_w)
+void wc90b_state::slave_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(0,CLEAR_LINE);
 }

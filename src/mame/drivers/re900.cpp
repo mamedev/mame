@@ -105,15 +105,15 @@ public:
 	uint8_t m_stat_a;
 
 	// common
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
-	DECLARE_WRITE8_MEMBER(watchdog_reset_w);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// re900 specific
-	DECLARE_READ8_MEMBER(re_psg_portA_r);
-	DECLARE_READ8_MEMBER(re_psg_portB_r);
-	DECLARE_WRITE8_MEMBER(re_mux_port_A_w);
-	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
+	uint8_t re_psg_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t re_psg_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void re_mux_port_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void re_mux_port_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_re900();
 };
@@ -123,7 +123,7 @@ public:
 * Read Handlers *
 ****************/
 
-READ8_MEMBER(re900_state::re_psg_portA_r)
+uint8_t re900_state::re_psg_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((ioport("IN0")->read() & 0x01) == 0)
 	{
@@ -138,7 +138,7 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 	return ioport("IN0")->read();
 }
 
-READ8_MEMBER(re900_state::re_psg_portB_r)
+uint8_t re900_state::re_psg_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retval = 0xff;
 	logerror("llamada a re_psg_portB_r\n");
@@ -188,7 +188,7 @@ READ8_MEMBER(re900_state::re_psg_portB_r)
 	return retval;
 }
 
-READ8_MEMBER(re900_state::rom_r)
+uint8_t re900_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset];
 }
@@ -198,13 +198,13 @@ READ8_MEMBER(re900_state::rom_r)
 *    Write Handlers    *
 ***********************/
 
-WRITE8_MEMBER(re900_state::re_mux_port_A_w)
+void re900_state::re_mux_port_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_pa = data;
 	m_mux_data = ((data >> 2) & 0x3f) ^ 0x3f;
 }
 
-WRITE8_MEMBER(re900_state::re_mux_port_B_w)
+void re900_state::re_mux_port_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t led;
 	m_psg_pb = data;
@@ -222,13 +222,13 @@ WRITE8_MEMBER(re900_state::re_mux_port_B_w)
 	}
 }
 
-WRITE8_MEMBER(re900_state::cpu_port_0_w)
+void re900_state::cpu_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  output().set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
 //  output().set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
 }
 
-WRITE8_MEMBER(re900_state::watchdog_reset_w)
+void re900_state::watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//watchdog_reset_w(space,0,0); /* To do! */
 }

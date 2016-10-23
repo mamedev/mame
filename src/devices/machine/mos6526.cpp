@@ -799,7 +799,7 @@ void mos6526_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6526_device::read )
+uint8_t mos6526_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0xff;
@@ -919,7 +919,7 @@ READ8_MEMBER( mos6526_device::read )
 	return data;
 }
 
-READ8_MEMBER( mos8520_device::read )
+uint8_t mos8520_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -950,7 +950,7 @@ READ8_MEMBER( mos8520_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6526_device::write )
+void mos6526_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0f)
 	{
@@ -1092,7 +1092,7 @@ WRITE8_MEMBER( mos6526_device::write )
 	}
 }
 
-WRITE8_MEMBER( mos8520_device::write )
+void mos8520_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0f)
 	{

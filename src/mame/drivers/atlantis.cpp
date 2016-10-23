@@ -108,31 +108,31 @@ public:
 	uint8_t m_rtc_data[0x8000];
 
 	uint32_t m_last_offset;
-	READ8_MEMBER(cmos_r);
-	WRITE8_MEMBER(cmos_w);
-	DECLARE_WRITE32_MEMBER(cmos_protect_w);
-	DECLARE_READ32_MEMBER(cmos_protect_r);
+	uint8_t cmos_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cmos_protect_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t m_cmos_write_enabled;
 	uint32_t m_serial_count;
 
-	DECLARE_READ32_MEMBER(status_leds_r);
-	DECLARE_WRITE32_MEMBER(status_leds_w);
+	uint32_t status_leds_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void status_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint8_t m_status_leds;
 
-	DECLARE_WRITE32_MEMBER(asic_fifo_w);
-	DECLARE_WRITE32_MEMBER(dcs3_fifo_full_w);
+	void asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dcs3_fifo_full_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	READ32_MEMBER (green_r);
-	WRITE32_MEMBER(green_w);
-	READ8_MEMBER (blue_r);
-	WRITE8_MEMBER(blue_w);
+	uint32_t green_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void green_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint8_t blue_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void blue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
-	WRITE32_MEMBER(user_io_output);
-	READ32_MEMBER(user_io_input);
+	void user_io_output(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t user_io_input(address_space &space, offs_t offset, uint32_t mem_mask);
 	int m_user_io_state;
 
-	DECLARE_READ32_MEMBER(board_ctrl_r);
-	DECLARE_WRITE32_MEMBER(board_ctrl_w);
+	uint32_t board_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void board_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t m_irq_state;
 	uint8_t board_ctrl[CTRL_SIZE];
 	void update_asic_irq();
@@ -146,12 +146,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq_callback);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
-	DECLARE_READ32_MEMBER(port_ctrl_r);
-	DECLARE_WRITE32_MEMBER(port_ctrl_w);
+	uint32_t port_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void port_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t m_port_ctrl_reg[0x8];
 };
 
-READ32_MEMBER(atlantis_state::green_r)
+uint32_t atlantis_state::green_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// If not 0x80 cpu writes to 00e80000 = 0
 	if ((offset | 0x20000) != m_last_offset)
@@ -160,13 +160,13 @@ READ32_MEMBER(atlantis_state::green_r)
 	return 0x80;
 }
 
-WRITE32_MEMBER(atlantis_state::green_w)
+void atlantis_state::green_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%06X: green_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
 	m_last_offset = offset | 0x20000;
 }
 
-READ8_MEMBER (atlantis_state::blue_r)
+uint8_t atlantis_state::blue_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//uint8_t data = m_red_data[offset];
 	logerror("%06X: blue_r %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, 0);
@@ -174,12 +174,12 @@ READ8_MEMBER (atlantis_state::blue_r)
 	return 0;
 }
 
-WRITE8_MEMBER(atlantis_state::blue_w)
+void atlantis_state::blue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%06X: blue_w %08x = %02x\n", machine().device("maincpu")->safe_pc(), offset, data);
 }
 
-READ32_MEMBER(atlantis_state::board_ctrl_r)
+uint32_t atlantis_state::board_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t data = board_ctrl[newOffset];
@@ -200,7 +200,7 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 	return data;
 }
 
-WRITE32_MEMBER(atlantis_state::board_ctrl_w)
+void atlantis_state::board_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t changeData = board_ctrl[newOffset] ^ data;
@@ -253,7 +253,7 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 }
 
 
-READ8_MEMBER(atlantis_state::cmos_r)
+uint8_t atlantis_state::cmos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_rtc_data[offset];
 
@@ -288,7 +288,7 @@ READ8_MEMBER(atlantis_state::cmos_r)
 	return result;
 }
 
-WRITE8_MEMBER(atlantis_state::cmos_w)
+void atlantis_state::cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	system_time systime;
 	// User I/O 0 = Allow write to cmos[0]. Serial Write Enable?
@@ -329,18 +329,18 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	}
 }
 
-WRITE32_MEMBER(atlantis_state::cmos_protect_w)
+void atlantis_state::cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cmos_write_enabled = true;
 }
 
-READ32_MEMBER(atlantis_state::status_leds_r)
+uint32_t atlantis_state::status_leds_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_status_leds | 0xffffff00;
 }
 
 
-WRITE32_MEMBER(atlantis_state::status_leds_w)
+void atlantis_state::status_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_status_leds = data;
@@ -376,17 +376,17 @@ WRITE32_MEMBER(atlantis_state::status_leds_w)
 	}
 }
 
-READ32_MEMBER(atlantis_state::cmos_protect_r)
+uint32_t atlantis_state::cmos_protect_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_cmos_write_enabled;
 }
 
-WRITE32_MEMBER(atlantis_state::asic_fifo_w)
+void atlantis_state::asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ioasic->fifo_w(data);
 }
 
-WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
+void atlantis_state::dcs3_fifo_full_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ioasic->fifo_full_w(data);
 }
@@ -394,13 +394,13 @@ WRITE32_MEMBER(atlantis_state::dcs3_fifo_full_w)
 /*************************************
 *  PCI9050 User I/O handlers
 *************************************/
-WRITE32_MEMBER(atlantis_state::user_io_output)
+void atlantis_state::user_io_output(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_user_io_state = data;
 	logerror("atlantis_state::user_io_output m_user_io_state = %1x\n", m_user_io_state);
 }
 
-READ32_MEMBER(atlantis_state::user_io_input)
+uint32_t atlantis_state::user_io_input(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// Set user i/o (2) Power Detect?
 	m_user_io_state |= 1 << 2;
@@ -540,7 +540,7 @@ void atlantis_state::update_asic_irq()
 /*************************************
 *  I/O Port control
 *************************************/
-READ32_MEMBER(atlantis_state::port_ctrl_r)
+uint32_t atlantis_state::port_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	uint32_t result = m_port_ctrl_reg[newOffset];
@@ -549,7 +549,7 @@ READ32_MEMBER(atlantis_state::port_ctrl_r)
 	return result;
 }
 
-WRITE32_MEMBER(atlantis_state::port_ctrl_w)
+void atlantis_state::port_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t newOffset = offset >> 17;
 	COMBINE_DATA(&m_port_ctrl_reg[newOffset]);

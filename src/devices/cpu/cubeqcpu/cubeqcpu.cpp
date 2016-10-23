@@ -99,7 +99,7 @@ cquestrot_cpu_device::cquestrot_cpu_device(const machine_config &mconfig, const 
 }
 
 
-READ16_MEMBER( cquestrot_cpu_device::linedata_r )
+uint16_t cquestrot_cpu_device::linedata_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_linedata;
 }
@@ -129,7 +129,7 @@ offs_t cquestlin_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const u
 }
 
 
-WRITE16_MEMBER( cquestlin_cpu_device::linedata_w )
+void cquestlin_cpu_device::linedata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sram[offset] = data;
 }
@@ -139,23 +139,23 @@ WRITE16_MEMBER( cquestlin_cpu_device::linedata_w )
     MEMORY ACCESSORS FOR 68000
 ***************************************************************************/
 
-WRITE16_MEMBER( cquestsnd_cpu_device::sndram_w )
+void cquestsnd_cpu_device::sndram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sram[offset]);
 }
 
-READ16_MEMBER( cquestsnd_cpu_device::sndram_r )
+uint16_t cquestsnd_cpu_device::sndram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sram[offset];
 }
 
 
-WRITE16_MEMBER( cquestrot_cpu_device::rotram_w )
+void cquestrot_cpu_device::rotram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dram[offset]);
 }
 
-READ16_MEMBER( cquestrot_cpu_device::rotram_r )
+uint16_t cquestrot_cpu_device::rotram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dram[offset];
 }

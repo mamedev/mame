@@ -14,27 +14,27 @@ Namco System 21 Video Hardware
 
 #define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(uint16_t)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
 
-READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
+uint16_t namcos21_state::winrun_gpu_color_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_winrun_color;
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_color_w)
+void namcos21_state::winrun_gpu_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_color );
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
+uint16_t namcos21_state::winrun_gpu_register_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_winrun_gpu_register[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
+void namcos21_state::winrun_gpu_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
 }
 
-WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
+void namcos21_state::winrun_gpu_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *videoram = m_videoram.get();
 	int color = data>>8;
@@ -49,7 +49,7 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	}
 }
 
-READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
+uint16_t namcos21_state::winrun_gpu_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *videoram = m_videoram.get();
 	return videoram[offset]<<8;

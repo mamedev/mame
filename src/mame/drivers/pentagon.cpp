@@ -30,10 +30,10 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
-	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr_w);
-	DECLARE_WRITE8_MEMBER(pentagon_scr2_w);
+	offs_t pentagon_direct(direct_read_data &direct, offs_t address);
+	void pentagon_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pentagon_scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pentagon_scr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_pentagon();
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
@@ -50,7 +50,7 @@ private:
 	void pentagon_update_memory();
 };
 
-DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
+offs_t pentagon_state::pentagon_direct(direct_read_data &direct, offs_t address)
 {
 	uint16_t pc = m_maincpu->pcbase();
 
@@ -121,7 +121,7 @@ void pentagon_state::pentagon_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
+void pentagon_state::pentagon_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
@@ -137,14 +137,14 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	pentagon_update_memory();
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
+void pentagon_state::pentagon_scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	spectrum_UpdateScreenBitmap();
 
 	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
-WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
+void pentagon_state::pentagon_scr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();

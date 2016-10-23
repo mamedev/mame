@@ -203,20 +203,20 @@ void pacland_state::machine_start()
 	save_item(NAME(m_mcu_irq_mask));
 }
 
-WRITE8_MEMBER(pacland_state::subreset_w)
+void pacland_state::subreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::flipscreen_w)
+void pacland_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset,11);
 	flip_screen_set(bit);
 }
 
 
-READ8_MEMBER(pacland_state::input_r)
+uint8_t pacland_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
@@ -227,20 +227,20 @@ READ8_MEMBER(pacland_state::input_r)
 	return r;
 }
 
-WRITE8_MEMBER(pacland_state::coin_w)
+void pacland_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 	machine().bookkeeping().coin_counter_w(0, ~data & 2);
 	machine().bookkeeping().coin_counter_w(1, ~data & 4);
 }
 
-WRITE8_MEMBER(pacland_state::led_w)
+void pacland_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x08);
 	output().set_led_value(1, data & 0x10);
 }
 
-WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
+void pacland_state::irq_1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
@@ -248,7 +248,7 @@ WRITE8_MEMBER(pacland_state::irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(pacland_state::irq_2_ctrl_w)
+void pacland_state::irq_2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(pacland_state::readFF)
+uint8_t pacland_state::readFF(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

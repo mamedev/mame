@@ -281,7 +281,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
+void gottlieb_state::gottlieb_analog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the trackball counters */
 	m_track[0] = m_track_x.read_safe(0);
@@ -303,7 +303,7 @@ CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::general_output_w)
+void gottlieb_state::general_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (m_laserdisc == nullptr)
@@ -320,7 +320,7 @@ WRITE8_MEMBER(gottlieb_state::general_output_w)
 }
 
 // custom overrides
-WRITE8_MEMBER(gottlieb_state::reactor_output_w)
+void gottlieb_state::reactor_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0xe0);
 
@@ -329,7 +329,7 @@ WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 	output().set_led_value(2, data & 0x80);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbert_output_w)
+void gottlieb_state::qbert_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0x20);
 
@@ -337,7 +337,7 @@ WRITE8_MEMBER(gottlieb_state::qbert_output_w)
 	qbert_knocker(data >> 5 & 1);
 }
 
-WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
+void gottlieb_state::qbertqub_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// coincounter is on bit 5 instead
 	general_output_w(space, offset, (data >> 1 & 0x10) | (data & ~0x30));
@@ -346,7 +346,7 @@ WRITE8_MEMBER(gottlieb_state::qbertqub_output_w)
 	m_spritebank = (data & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(gottlieb_state::stooges_output_w)
+void gottlieb_state::stooges_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	general_output_w(space, offset, data & ~0x60);
 
@@ -362,7 +362,7 @@ WRITE8_MEMBER(gottlieb_state::stooges_output_w)
  *
  *************************************/
 
-READ8_MEMBER(gottlieb_state::laserdisc_status_r)
+uint8_t gottlieb_state::laserdisc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* IP5 reads low 8 bits of philips code */
 	if (offset == 0)
@@ -392,14 +392,14 @@ READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_select_w)
+void gottlieb_state::laserdisc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* selects between reading audio data and reading status */
 	m_laserdisc_select = data & 1;
 }
 
 
-WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
+void gottlieb_state::laserdisc_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* a write here latches data into a 8-bit register and starts
 	   a sequence of events that sends serial data to the player */
@@ -738,7 +738,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
+void gottlieb_state::gottlieb_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_r1_sound != nullptr)
 		m_r1_sound->write(space, offset, data);

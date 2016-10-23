@@ -1131,30 +1131,30 @@ public:
 	uint8_t m_jvssense;
 	uint8_t m_tssio_port_4;
 
-	DECLARE_READ16_MEMBER(s12_mcu_p6_r);
-	DECLARE_READ16_MEMBER(iob_p4_r);
-	DECLARE_READ16_MEMBER(iob_p6_r);
-	DECLARE_WRITE16_MEMBER(iob_p4_w);
+	uint16_t s12_mcu_p6_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t iob_p4_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t iob_p6_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void iob_p4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(sharedram_w);
-	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_WRITE16_MEMBER(bankoffset_w);
-	DECLARE_WRITE16_MEMBER(dmaoffset_w);
-	DECLARE_WRITE16_MEMBER(system11gun_w);
-	DECLARE_READ16_MEMBER(system11gun_r);
-	DECLARE_WRITE16_MEMBER(tektagt_protection_1_w);
-	DECLARE_READ16_MEMBER(tektagt_protection_1_r);
-	DECLARE_WRITE16_MEMBER(tektagt_protection_2_w);
-	DECLARE_READ16_MEMBER(tektagt_protection_2_r);
-	DECLARE_READ16_MEMBER(tektagt_protection_3_r);
-	DECLARE_READ16_MEMBER(s12_mcu_p8_r);
-	DECLARE_READ16_MEMBER(s12_mcu_jvs_p8_r);
-	DECLARE_READ16_MEMBER(s12_mcu_pa_r);
-	DECLARE_WRITE16_MEMBER(s12_mcu_pa_w);
-	DECLARE_READ16_MEMBER(s12_mcu_portB_r);
-	DECLARE_WRITE16_MEMBER(s12_mcu_portB_w);
-	DECLARE_READ16_MEMBER(s12_mcu_gun_h_r);
-	DECLARE_READ16_MEMBER(s12_mcu_gun_v_r);
+	void sharedram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sharedram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bankoffset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dmaoffset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void system11gun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t system11gun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tektagt_protection_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tektagt_protection_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tektagt_protection_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tektagt_protection_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t tektagt_protection_3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_p8_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_jvs_p8_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_pa_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void s12_mcu_pa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_portB_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void s12_mcu_portB_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_gun_h_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t s12_mcu_gun_v_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void init_namcos12();
 	void init_ptblank2();
@@ -1181,19 +1181,19 @@ inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char
 	}
 }
 
-WRITE16_MEMBER(namcos12_state::sharedram_w)
+void namcos12_state::sharedram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &m_sharedram[ offset ] );
 }
 
-READ16_MEMBER(namcos12_state::sharedram_r)
+uint16_t namcos12_state::sharedram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
 	return m_sharedram[ offset ];
 }
 
-WRITE16_MEMBER(namcos12_state::bankoffset_w)
+void namcos12_state::bankoffset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
 	if( strcmp( machine().system().name, "golgo13" ) == 0 ||
@@ -1218,7 +1218,7 @@ WRITE16_MEMBER(namcos12_state::bankoffset_w)
 	verboselog(1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
 
-WRITE16_MEMBER(namcos12_state::dmaoffset_w)
+void namcos12_state::dmaoffset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_n_dmaoffset = ( offset * 2 ) | ( data << 16 );
 
@@ -1320,7 +1320,7 @@ static ADDRESS_MAP_START( tektagt_map, AS_PROGRAM, 32, namcos12_state )
 	AM_IMPORT_FROM( namcos12_map )
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(namcos12_state::system11gun_w)
+void namcos12_state::system11gun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1345,7 +1345,7 @@ WRITE16_MEMBER(namcos12_state::system11gun_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::system11gun_r)
+uint16_t namcos12_state::system11gun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -1379,7 +1379,7 @@ READ16_MEMBER(namcos12_state::system11gun_r)
 	return data;
 }
 
-WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
+void namcos12_state::tektagt_protection_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Second dma offset or protection ref values write
 
@@ -1400,7 +1400,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_1_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
+uint16_t namcos12_state::tektagt_protection_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1414,7 +1414,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_1_r)
 	return 0;
 }
 
-WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
+void namcos12_state::tektagt_protection_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1427,7 +1427,7 @@ WRITE16_MEMBER(namcos12_state::tektagt_protection_2_w)
 	}
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_2_r)
+uint16_t namcos12_state::tektagt_protection_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( m_ttt_cnt == 2 )
 	{
@@ -1461,7 +1461,7 @@ READ16_MEMBER(namcos12_state::tektagt_protection_2_r)
 	return 0;
 }
 
-READ16_MEMBER(namcos12_state::tektagt_protection_3_r)
+uint16_t namcos12_state::tektagt_protection_3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_has_tektagt_dma = 1;
 	// Always ignored
@@ -1536,7 +1536,7 @@ static ADDRESS_MAP_START( s12h8rwjvsmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x300030, 0x300031) AM_NOP // most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END
 
-READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
+uint16_t namcos12_state::s12_mcu_p8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x02;
 }
@@ -1545,37 +1545,37 @@ READ16_MEMBER(namcos12_state::s12_mcu_p8_r)
 // in System 12, bit 0 of H8/3002 port A is connected to its chip enable
 // the actual I/O takes place through the H8/3002's serial port B.
 
-READ16_MEMBER(namcos12_state::s12_mcu_pa_r)
+uint16_t namcos12_state::s12_mcu_pa_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sub_porta;
 }
 
-WRITE16_MEMBER(namcos12_state::s12_mcu_pa_w)
+void namcos12_state::s12_mcu_pa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sub_porta = data;
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_portB_r)
+uint16_t namcos12_state::s12_mcu_portB_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sub_portb;
 }
 
-WRITE16_MEMBER(namcos12_state::s12_mcu_portB_w)
+void namcos12_state::s12_mcu_portB_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sub_portb = (m_sub_portb & 0x80) | (data & 0x7f);
 	m_rtc->ce_w((m_sub_portb & 0x20) && (m_sub_porta & 1));
 	m_settings->ce_w((m_sub_portb & 0x20) && !(m_sub_porta & 1));
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_p6_r)
+uint16_t namcos12_state::s12_mcu_p6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 1 = JVS cable present sense (1 = I/O board plugged in)
 	return (m_jvssense << 1) | 0xfd;
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_jvs_p8_r)
+uint16_t namcos12_state::s12_mcu_jvs_p8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x12;    // bit 4 = JVS enable.  aplarail requires it to be on, soulclbr & others will require JVS I/O if it's on
 }
@@ -1618,12 +1618,12 @@ ADDRESS_MAP_END
 
 // Golgo 13 lightgun inputs
 
-READ16_MEMBER(namcos12_state::s12_mcu_gun_h_r)
+uint16_t namcos12_state::s12_mcu_gun_h_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("LIGHT0_X")->read();
 }
 
-READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
+uint16_t namcos12_state::s12_mcu_gun_v_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("LIGHT0_Y")->read();
 }
@@ -1760,12 +1760,12 @@ static MACHINE_CONFIG_DERIVED( truckk, coh700 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(2*115200))
 MACHINE_CONFIG_END
 
-READ16_MEMBER(namcos12_state::iob_p4_r)
+uint16_t namcos12_state::iob_p4_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tssio_port_4;
 }
 
-WRITE16_MEMBER(namcos12_state::iob_p4_w)
+void namcos12_state::iob_p4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tssio_port_4 = data;
 
@@ -1773,7 +1773,7 @@ WRITE16_MEMBER(namcos12_state::iob_p4_w)
 	m_jvssense = (data & 0x04) ? 0 : 1;
 }
 
-READ16_MEMBER(namcos12_state::iob_p6_r)
+uint16_t namcos12_state::iob_p6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// d4 is service button
 	uint8_t sb = (ioport("SERVICE")->read() & 1) << 4;

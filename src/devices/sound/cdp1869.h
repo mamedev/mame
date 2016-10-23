@@ -206,17 +206,17 @@ public:
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
 	virtual DECLARE_ADDRESS_MAP(page_map, 8);
 
-	DECLARE_WRITE8_MEMBER( out3_w );
-	DECLARE_WRITE8_MEMBER( out4_w );
-	DECLARE_WRITE8_MEMBER( out5_w );
-	DECLARE_WRITE8_MEMBER( out6_w );
-	DECLARE_WRITE8_MEMBER( out7_w );
+	void out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_WRITE8_MEMBER( char_ram_w );
+	uint8_t char_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void char_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( page_ram_r );
-	DECLARE_WRITE8_MEMBER( page_ram_w );
+	uint8_t page_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void page_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );

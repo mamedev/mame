@@ -26,7 +26,7 @@ Notes:
 #include "includes/goindol.h"
 
 
-WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
+void goindol_state::goindol_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 
@@ -41,7 +41,7 @@ WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 
 
 
-READ8_MEMBER(goindol_state::prot_f422_r)
+uint8_t goindol_state::prot_f422_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 7 = vblank? */
 	m_prot_toggle ^= 0x80;
@@ -50,7 +50,7 @@ READ8_MEMBER(goindol_state::prot_f422_r)
 }
 
 
-WRITE8_MEMBER(goindol_state::prot_fc44_w)
+void goindol_state::prot_fc44_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: prot_fc44_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0419] = 0x5b;
@@ -58,19 +58,19 @@ WRITE8_MEMBER(goindol_state::prot_fc44_w)
 	m_ram[0x041b] = 0x6d;
 }
 
-WRITE8_MEMBER(goindol_state::prot_fd99_w)
+void goindol_state::prot_fd99_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: prot_fd99_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0421] = 0x3f;
 }
 
-WRITE8_MEMBER(goindol_state::prot_fc66_w)
+void goindol_state::prot_fc66_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: prot_fc66_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0423] = 0x06;
 }
 
-WRITE8_MEMBER(goindol_state::prot_fcb0_w)
+void goindol_state::prot_fcb0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: prot_fcb0_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0425] = 0x06;

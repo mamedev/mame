@@ -19,12 +19,12 @@ void taitoz_state::video_start_taitoz()
 ********************************************************/
 
 
-READ16_MEMBER(taitoz_state::sci_spriteframe_r)
+uint16_t taitoz_state::sci_spriteframe_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_sci_spriteframe << 8);
 }
 
-WRITE16_MEMBER(taitoz_state::sci_spriteframe_w)
+void taitoz_state::sci_spriteframe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sci_spriteframe = (data >> 8) & 0xff;
 }
@@ -813,7 +813,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
                         SCREEN REFRESH
 **************************************************************/
 
-WRITE16_MEMBER(taitoz_state::contcirc_out_w)
+void taitoz_state::contcirc_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

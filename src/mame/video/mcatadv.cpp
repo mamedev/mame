@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 	tileinfo.category = pri;
 }
 
-WRITE16_MEMBER(mcatadv_state::mcatadv_videoram1_w)
+void mcatadv_state::mcatadv_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tilemap1->mark_tile_dirty(offset / 2);
@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
 	tileinfo.category = pri;
 }
 
-WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
+void mcatadv_state::mcatadv_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_tilemap2->mark_tile_dirty(offset / 2);

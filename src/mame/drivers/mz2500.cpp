@@ -148,51 +148,51 @@ public:
 	uint8_t m_pio_latchb;
 	uint8_t m_ym_porta;
 	uint8_t m_screen_enable;
-	DECLARE_READ8_MEMBER(bank0_r);
-	DECLARE_READ8_MEMBER(bank1_r);
-	DECLARE_READ8_MEMBER(bank2_r);
-	DECLARE_READ8_MEMBER(bank3_r);
-	DECLARE_READ8_MEMBER(bank4_r);
-	DECLARE_READ8_MEMBER(bank5_r);
-	DECLARE_READ8_MEMBER(bank6_r);
-	DECLARE_READ8_MEMBER(bank7_r);
-	DECLARE_WRITE8_MEMBER(bank0_w);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_WRITE8_MEMBER(bank3_w);
-	DECLARE_WRITE8_MEMBER(bank4_w);
-	DECLARE_WRITE8_MEMBER(bank5_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(bank7_w);
-	DECLARE_READ8_MEMBER(mz2500_bank_addr_r);
-	DECLARE_WRITE8_MEMBER(mz2500_bank_addr_w);
-	DECLARE_READ8_MEMBER(mz2500_bank_data_r);
-	DECLARE_WRITE8_MEMBER(mz2500_bank_data_w);
-	DECLARE_WRITE8_MEMBER(mz2500_kanji_bank_w);
-	DECLARE_WRITE8_MEMBER(mz2500_dictionary_bank_w);
-	DECLARE_READ8_MEMBER(mz2500_crtc_hvblank_r);
-	DECLARE_WRITE8_MEMBER(mz2500_tv_crtc_w);
-	DECLARE_WRITE8_MEMBER(mz2500_irq_sel_w);
-	DECLARE_WRITE8_MEMBER(mz2500_irq_data_w);
-	DECLARE_READ8_MEMBER(mz2500_rom_r);
-	DECLARE_WRITE8_MEMBER(mz2500_rom_w);
-	DECLARE_WRITE8_MEMBER(palette4096_io_w);
-	DECLARE_READ8_MEMBER(mz2500_bplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_rplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_gplane_latch_r);
-	DECLARE_READ8_MEMBER(mz2500_iplane_latch_r);
-	DECLARE_WRITE8_MEMBER(mz2500_cg_addr_w);
-	DECLARE_WRITE8_MEMBER(mz2500_cg_data_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_READ8_MEMBER(mz2500_joystick_r);
-	DECLARE_WRITE8_MEMBER(mz2500_joystick_w);
-	DECLARE_READ8_MEMBER(mz2500_kanji_r);
-	DECLARE_WRITE8_MEMBER(mz2500_kanji_w);
-	DECLARE_READ8_MEMBER(rp5c15_8_r);
-	DECLARE_WRITE8_MEMBER(rp5c15_8_w);
-	DECLARE_READ8_MEMBER(mz2500_emm_data_r);
-	DECLARE_WRITE8_MEMBER(mz2500_emm_addr_w);
-	DECLARE_WRITE8_MEMBER(mz2500_emm_data_w);
+	uint8_t bank0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_bank_addr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_bank_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_bank_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_bank_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_kanji_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_dictionary_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_crtc_hvblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_tv_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_irq_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_irq_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette4096_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_bplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_rplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_gplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_iplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_cg_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_cg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rp5c15_8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rp5c15_8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_emm_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_emm_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_emm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mz2500_cg_latch_compare();
 	uint8_t mz2500_ram_read(uint16_t offset, uint8_t bank_num);
 	void mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_num);
@@ -203,21 +203,21 @@ public:
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mz2500_vbl);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_side_w);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_side_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(mz2500_porta_r);
-	DECLARE_READ8_MEMBER(mz2500_portb_r);
-	DECLARE_READ8_MEMBER(mz2500_portc_r);
-	DECLARE_WRITE8_MEMBER(mz2500_porta_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portb_w);
-	DECLARE_WRITE8_MEMBER(mz2500_portc_w);
-	DECLARE_WRITE8_MEMBER(mz2500_pio1_porta_w);
-	DECLARE_READ8_MEMBER(mz2500_pio1_porta_r);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_porta_w);
+	uint8_t mz2500_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2500_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2500_pio1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2500_pio1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void opn_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
 	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
@@ -976,36 +976,36 @@ void mz2500_state::mz2500_ram_write(uint16_t offset, uint8_t data, uint8_t bank_
 	}
 }
 
-READ8_MEMBER(mz2500_state::bank0_r){ return mz2500_ram_read(offset, 0); }
-READ8_MEMBER(mz2500_state::bank1_r){ return mz2500_ram_read(offset, 1); }
-READ8_MEMBER(mz2500_state::bank2_r){ return mz2500_ram_read(offset, 2); }
-READ8_MEMBER(mz2500_state::bank3_r){ return mz2500_ram_read(offset, 3); }
-READ8_MEMBER(mz2500_state::bank4_r){ return mz2500_ram_read(offset, 4); }
-READ8_MEMBER(mz2500_state::bank5_r){ return mz2500_ram_read(offset, 5); }
-READ8_MEMBER(mz2500_state::bank6_r){ return mz2500_ram_read(offset, 6); }
-READ8_MEMBER(mz2500_state::bank7_r){ return mz2500_ram_read(offset, 7); }
-WRITE8_MEMBER(mz2500_state::bank0_w){ mz2500_ram_write(offset, data, 0); }
-WRITE8_MEMBER(mz2500_state::bank1_w){ mz2500_ram_write(offset, data, 1); }
-WRITE8_MEMBER(mz2500_state::bank2_w){ mz2500_ram_write(offset, data, 2); }
-WRITE8_MEMBER(mz2500_state::bank3_w){ mz2500_ram_write(offset, data, 3); }
-WRITE8_MEMBER(mz2500_state::bank4_w){ mz2500_ram_write(offset, data, 4); }
-WRITE8_MEMBER(mz2500_state::bank5_w){ mz2500_ram_write(offset, data, 5); }
-WRITE8_MEMBER(mz2500_state::bank6_w){ mz2500_ram_write(offset, data, 6); }
-WRITE8_MEMBER(mz2500_state::bank7_w){ mz2500_ram_write(offset, data, 7); }
+uint8_t mz2500_state::bank0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 0); }
+uint8_t mz2500_state::bank1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 1); }
+uint8_t mz2500_state::bank2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 2); }
+uint8_t mz2500_state::bank3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 3); }
+uint8_t mz2500_state::bank4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 4); }
+uint8_t mz2500_state::bank5_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 5); }
+uint8_t mz2500_state::bank6_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 6); }
+uint8_t mz2500_state::bank7_r(address_space &space, offs_t offset, uint8_t mem_mask){ return mz2500_ram_read(offset, 7); }
+void mz2500_state::bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 0); }
+void mz2500_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 1); }
+void mz2500_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 2); }
+void mz2500_state::bank3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 3); }
+void mz2500_state::bank4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 4); }
+void mz2500_state::bank5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 5); }
+void mz2500_state::bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 6); }
+void mz2500_state::bank7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ mz2500_ram_write(offset, data, 7); }
 
 
-READ8_MEMBER(mz2500_state::mz2500_bank_addr_r)
+uint8_t mz2500_state::mz2500_bank_addr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_addr;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_addr_w)
+void mz2500_state::mz2500_bank_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x\n",data);
 	m_bank_addr = data & 7;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
+uint8_t mz2500_state::mz2500_bank_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -1017,7 +1017,7 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
+void mz2500_state::mz2500_bank_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
@@ -1032,18 +1032,18 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 	m_bank_addr&=7;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_bank_w)
+void mz2500_state::mz2500_kanji_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kanji_bank = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_dictionary_bank_w)
+void mz2500_state::mz2500_dictionary_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-READ8_MEMBER(mz2500_state::mz2500_crtc_hvblank_r)
+uint8_t mz2500_state::mz2500_crtc_hvblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t vblank_bit, hblank_bit;
 
@@ -1092,7 +1092,7 @@ uint8_t mz2500_state::pal_256_param(int index, int param)
 	return val;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
+void mz2500_state::mz2500_tv_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1172,7 +1172,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 	}
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
+void mz2500_state::mz2500_irq_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_sel = data;
 	//printf("%02x\n",m_irq_sel);
@@ -1183,7 +1183,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_sel_w)
 	m_irq_mask[3] = (data & 0x01); //RP5c15
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
+void mz2500_state::mz2500_irq_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_irq_sel & 0x80)
 		m_irq_vector[0] = data; //CRTC
@@ -1197,7 +1197,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_irq_data_w)
 //  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_select_w)
+void mz2500_state::floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((data & 0x03) ^ m_fdc_reverse)
 	{
@@ -1213,7 +1213,7 @@ WRITE8_MEMBER(mz2500_state::floppy_select_w)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER(mz2500_state::floppy_side_w)
+void mz2500_state::floppy_side_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
@@ -1232,7 +1232,7 @@ static ADDRESS_MAP_START(mz2500_map, AS_PROGRAM, 8, mz2500_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(mz2500_state::mz2500_rom_r)
+uint8_t mz2500_state::mz2500_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_lrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -1241,7 +1241,7 @@ READ8_MEMBER(mz2500_state::mz2500_rom_r)
 	return m_iplpro_rom[m_rom_index];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
+void mz2500_state::mz2500_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hrom_index = (m_maincpu->state_int(Z80_B));
 
@@ -1250,7 +1250,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
-WRITE8_MEMBER(mz2500_state::palette4096_io_w)
+void mz2500_state::palette4096_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t pal_index;
 	uint8_t pal_entry;
@@ -1269,17 +1269,17 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
-READ8_MEMBER(mz2500_state::fdc_r)
+uint8_t mz2500_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->read(space, offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::fdc_w)
+void mz2500_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->write(space, offset, data ^ 0xff);
 }
 
-READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
+uint8_t mz2500_state::mz2500_bplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_cg_reg[7] & 0x10)
 		return mz2500_cg_latch_compare();
@@ -1288,7 +1288,7 @@ READ8_MEMBER(mz2500_state::mz2500_bplane_latch_r)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
+uint8_t mz2500_state::mz2500_rplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_cg_reg[0x07] & 0x10)
 	{
@@ -1302,12 +1302,12 @@ READ8_MEMBER(mz2500_state::mz2500_rplane_latch_r)
 		return m_cg_latch[1];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_gplane_latch_r)
+uint8_t mz2500_state::mz2500_gplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cg_latch[2];
 }
 
-READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
+uint8_t mz2500_state::mz2500_iplane_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cg_latch[3];
 }
@@ -1342,12 +1342,12 @@ READ8_MEMBER(mz2500_state::mz2500_iplane_latch_r)
 0x18: CG color masking
 */
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_addr_w)
+void mz2500_state::mz2500_cg_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cg_reg_index = data;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
+void mz2500_state::mz2500_cg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cg_reg[m_cg_reg_index & 0x1f] = data;
 
@@ -1397,7 +1397,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 		m_cg_reg_index = (m_cg_reg_index & 0xfc) | ((m_cg_reg_index + 1) & 0x03);
 }
 
-WRITE8_MEMBER(mz2500_state::timer_w)
+void mz2500_state::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -1408,7 +1408,7 @@ WRITE8_MEMBER(mz2500_state::timer_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_joystick_r)
+uint8_t mz2500_state::mz2500_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res,dir_en,in_r;
 
@@ -1436,32 +1436,32 @@ READ8_MEMBER(mz2500_state::mz2500_joystick_r)
 	return res;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
+void mz2500_state::mz2500_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_mode = data;
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_kanji_r)
+uint8_t mz2500_state::mz2500_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("Read from kanji 2 ROM\n");
 
 	return m_kanji2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
+void mz2500_state::mz2500_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	(offset & 1) ? (m_kanji_index = (data << 8) | (m_kanji_index & 0xff)) : (m_kanji_index = (data & 0xff) | (m_kanji_index & 0xff00));
 }
 
-READ8_MEMBER(mz2500_state::rp5c15_8_r)
+uint8_t mz2500_state::rp5c15_8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
 	return m_rtc->read(space, rtc_index);
 }
 
-WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
+void mz2500_state::rp5c15_8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
 
@@ -1469,7 +1469,7 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
+uint8_t mz2500_state::mz2500_emm_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t emm_lo_index;
 
@@ -1483,7 +1483,7 @@ READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
+void mz2500_state::mz2500_emm_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t emm_hi_index;
 
@@ -1492,7 +1492,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
+void mz2500_state::mz2500_emm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t emm_lo_index;
 
@@ -1879,14 +1879,14 @@ IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
 	return 0;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_porta_r)
+uint8_t mz2500_state::mz2500_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PPI PORTA R\n");
 
 	return 0xff;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portb_r)
+uint8_t mz2500_state::mz2500_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t vblank_bit;
 
@@ -1895,24 +1895,24 @@ READ8_MEMBER(mz2500_state::mz2500_portb_r)
 	return 0xfe | vblank_bit;
 }
 
-READ8_MEMBER(mz2500_state::mz2500_portc_r)
+uint8_t mz2500_state::mz2500_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("PPI PORTC R\n");
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_porta_w)
+void mz2500_state::mz2500_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PPI PORTA W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portb_w)
+void mz2500_state::mz2500_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PPI PORTB W %02x\n",data);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
+void mz2500_state::mz2500_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---- x--- 0->1 transition = IPL reset
@@ -1945,7 +1945,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
-WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
+void mz2500_state::mz2500_pio1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x\n",data);
 
@@ -1959,7 +1959,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 }
 
 
-READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
+uint8_t mz2500_state::mz2500_pio1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -1985,18 +1985,18 @@ READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
 }
 
 #if 0
-READ8_MEMBER(mz2500_state::mz2500_pio1_portb_r)
+uint8_t mz2500_state::mz2500_pio1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio_latchb;
 }
 #endif
 
-READ8_MEMBER(mz2500_state::opn_porta_r)
+uint8_t mz2500_state::opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ym_porta;
 }
 
-WRITE8_MEMBER(mz2500_state::opn_porta_w)
+void mz2500_state::opn_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---- x--- mouse select

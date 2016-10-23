@@ -30,24 +30,24 @@ public:
 	required_device<cpu_device> m_cpu;
 
 	// mcu ports
-	DECLARE_READ8_MEMBER( dev_dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dev_dsp_data_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_WRITE8_MEMBER( dev_host_irq_w );
-	DECLARE_WRITE8_MEMBER( raise_drq_w );
-	DECLARE_WRITE8_MEMBER( port20_w );
-	DECLARE_WRITE8_MEMBER( port00_w );
+	uint8_t dev_dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dev_dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dev_host_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void raise_drq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// host ports
-	DECLARE_READ8_MEMBER( dsp_data_r );
-	DECLARE_WRITE8_MEMBER( dsp_cmd_w );
-	DECLARE_WRITE8_MEMBER( dsp_reset_w );
-	DECLARE_READ8_MEMBER( dsp_wbuf_status_r );
-	DECLARE_READ8_MEMBER( dsp_rbuf_status_r );
-	DECLARE_READ8_MEMBER( invalid_r );
-	DECLARE_WRITE8_MEMBER( invalid_w );
+	uint8_t dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dsp_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t invalid_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void invalid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

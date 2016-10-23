@@ -145,28 +145,28 @@ public:
 	int m_touchscr[5];
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_WRITE16_MEMBER(pntnpuzl_200000_w);
-	DECLARE_WRITE16_MEMBER(pntnpuzl_280018_w);
-	DECLARE_READ16_MEMBER(pntnpuzl_280014_r);
-	DECLARE_READ16_MEMBER(pntnpuzl_28001a_r);
-	DECLARE_READ16_MEMBER(irq1_ack_r);
-	DECLARE_READ16_MEMBER(irq2_ack_r);
-	DECLARE_READ16_MEMBER(irq4_ack_r);
+	void pntnpuzl_200000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pntnpuzl_280018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pntnpuzl_280014_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pntnpuzl_28001a_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t irq1_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t irq2_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t irq4_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
-	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
+	uint16_t pntnpuzl_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pntnpuzl_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_pip();
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
+uint16_t pntnpuzl_state::pntnpuzl_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 11 is EEPROM data */
 	return (m_eeprom_data & 0xf4ff) | (m_eeprom->do_read()<<11) | (ioport("IN1")->read() & 0x0300);
 }
 
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
+void pntnpuzl_state::pntnpuzl_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eeprom_data = data;
 
@@ -203,7 +203,7 @@ write                                     read
 01 03 46 31 38 0d                    ---> 80 0c
 */
 
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
+void pntnpuzl_state::pntnpuzl_200000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 // logerror("200000: %04x\n",data);
 	// bit 12: set to 1 when going to serial output to 280018
@@ -217,7 +217,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_200000_w)
 	m_pntpzl_200000 = data;
 }
 
-WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
+void pntnpuzl_state::pntnpuzl_280018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 // logerror("%04x: 280018: %04x\n",space.device().safe_pc(),data);
 	m_serial >>= 1;
@@ -225,7 +225,7 @@ WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_280018_w)
 		m_serial |= 0x400;
 }
 
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
+uint16_t pntnpuzl_state::pntnpuzl_280014_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int startup[3] = { 0x80, 0x0c, 0x00 };
 	int res;
@@ -255,24 +255,24 @@ READ16_MEMBER(pntnpuzl_state::pntnpuzl_280014_r)
 	return res << 8;
 }
 
-READ16_MEMBER(pntnpuzl_state::pntnpuzl_28001a_r)
+uint16_t pntnpuzl_state::pntnpuzl_28001a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x4c00;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq1_ack_r)
+uint16_t pntnpuzl_state::irq1_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  m_maincpu->set_input_line(1, CLEAR_LINE);
 	return 0;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq2_ack_r)
+uint16_t pntnpuzl_state::irq2_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
-READ16_MEMBER(pntnpuzl_state::irq4_ack_r)
+uint16_t pntnpuzl_state::irq4_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0;

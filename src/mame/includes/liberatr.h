@@ -28,22 +28,22 @@ public:
 			m_bitmapram(*this, "bitmapram"),
 			m_colorram(*this, "colorram") { }
 
-	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_WRITE8_MEMBER( coin_counter_w );
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( trackball_reset_w );
-	DECLARE_READ8_MEMBER( port0_r );
+	void trackball_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( bitmap_w );
-	DECLARE_READ8_MEMBER( bitmap_xy_r );
-	DECLARE_WRITE8_MEMBER( bitmap_xy_w );
+	void bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bitmap_xy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bitmap_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// early raster EAROM interface
-	DECLARE_READ8_MEMBER( earom_r );
-	DECLARE_WRITE8_MEMBER( earom_w );
-	DECLARE_WRITE8_MEMBER( earom_control_w );
+	uint8_t earom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void earom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void earom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void machine_start() override;

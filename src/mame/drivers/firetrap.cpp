@@ -177,17 +177,17 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #define FIRETRAP_XTAL XTAL_12MHz
 
 
-WRITE8_MEMBER(firetrap_state::firetrap_nmi_disable_w)
+void firetrap_state::firetrap_nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = ~data & 1;
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_bankselect_w)
+void firetrap_state::firetrap_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
+uint8_t firetrap_state::firetrap_8751_bootleg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
@@ -213,13 +213,13 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	return 0;
 }
 
-READ8_MEMBER(firetrap_state::firetrap_8751_r)
+uint8_t firetrap_state::firetrap_8751_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("PC:%04x read from 8751\n",space.device().safe_pc());
 	return m_i8751_return;
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
+void firetrap_state::firetrap_8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t i8751_init_data[]={
 		0xf5,0xd5,0xdd,0x21,0x05,0xc1,0x87,0x5f,0x87,0x83,0x5f,0x16,0x00,0xdd,0x19,0xd1,
@@ -302,19 +302,19 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	m_i8751_current_command=data;
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
+void firetrap_state::firetrap_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
+void firetrap_state::firetrap_sound_2400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(~data & 0x01);
 	m_sound_irq_enable = data & 0x02;
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
+void firetrap_state::firetrap_sound_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
@@ -329,12 +329,12 @@ WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
+void firetrap_state::firetrap_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(firetrap_state::flip_screen_w)
+void firetrap_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }

@@ -28,7 +28,7 @@ INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
 		irq0_line_hold(device);
 }
 
-READ8_MEMBER(_88games_state::bankedram_r)
+uint8_t _88games_state::bankedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_videobank)
 		return m_ram[offset];
@@ -41,7 +41,7 @@ READ8_MEMBER(_88games_state::bankedram_r)
 	}
 }
 
-WRITE8_MEMBER(_88games_state::bankedram_w)
+void _88games_state::bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_videobank)
 		m_ram[offset] = data;
@@ -49,7 +49,7 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 		m_k051316->write(space, offset, data);
 }
 
-WRITE8_MEMBER(_88games_state::k88games_5f84_w)
+void _88games_state::k88games_5f84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0/1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -63,13 +63,13 @@ WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 		popmessage("5f84 = %02x", data);
 }
 
-WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
+void _88games_state::k88games_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
-WRITE8_MEMBER(_88games_state::speech_control_w)
+void _88games_state::speech_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speech_chip = (data & 4) ? 1 : 0;
 	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
@@ -78,7 +78,7 @@ WRITE8_MEMBER(_88games_state::speech_control_w)
 	upd->start_w(data & 1);
 }
 
-WRITE8_MEMBER(_88games_state::speech_msg_w)
+void _88games_state::speech_msg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER(_88games_state::speech_msg_w)
 }
 
 /* special handlers to combine 052109 & 051960 */
-READ8_MEMBER(_88games_state::k052109_051960_r)
+uint8_t _88games_state::k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -101,7 +101,7 @@ READ8_MEMBER(_88games_state::k052109_051960_r)
 		return m_k052109->read(space, offset);
 }
 
-WRITE8_MEMBER(_88games_state::k052109_051960_w)
+void _88games_state::k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(space, offset - 0x3800, data);
@@ -255,7 +255,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE8_MEMBER( _88games_state::banking_callback )
+void _88games_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
 

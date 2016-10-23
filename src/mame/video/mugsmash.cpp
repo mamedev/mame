@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info1)
 	SET_TILE_INFO_MEMBER(1, tileno, colour, TILE_FLIPYX(fx));
 }
 
-WRITE16_MEMBER(mugsmash_state::mugsmash_videoram1_w)
+void mugsmash_state::mugsmash_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_videoram1[offset] = data;
 	m_tilemap1->mark_tile_dirty(offset / 2);
@@ -103,13 +103,13 @@ TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info2)
 	SET_TILE_INFO_MEMBER(1, tileno, 16 + colour, TILE_FLIPYX(fx));
 }
 
-WRITE16_MEMBER(mugsmash_state::mugsmash_videoram2_w)
+void mugsmash_state::mugsmash_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_tilemap2->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(mugsmash_state::mugsmash_reg_w)
+void mugsmash_state::mugsmash_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_regs1[offset] = data;
 //  popmessage ("Regs %04x, %04x, %04x, %04x", mugsmash_regs1[0], mugsmash_regs1[1],mugsmash_regs1[2], mugsmash_regs1[3]);

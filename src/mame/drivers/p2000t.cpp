@@ -209,7 +209,7 @@ INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER( p2000t_state::videoram_r )
+uint8_t p2000t_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }

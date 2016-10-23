@@ -52,10 +52,10 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER( via_pa_r );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	uint8_t via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 

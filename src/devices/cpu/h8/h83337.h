@@ -35,14 +35,14 @@ public:
 	h83337_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	h83337_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(wscr_r);
-	DECLARE_WRITE8_MEMBER(wscr_w);
-	DECLARE_READ8_MEMBER(stcr_r);
-	DECLARE_WRITE8_MEMBER(stcr_w);
-	DECLARE_READ8_MEMBER(syscr_r);
-	DECLARE_WRITE8_MEMBER(syscr_w);
-	DECLARE_READ8_MEMBER(mdcr_r);
-	DECLARE_WRITE8_MEMBER(mdcr_w);
+	uint8_t wscr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wscr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t syscr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void syscr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mdcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mdcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<h8_intc_device> intc;

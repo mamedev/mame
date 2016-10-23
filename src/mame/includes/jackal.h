@@ -38,15 +38,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(jackalr_rotary_r);
-	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
-	DECLARE_READ8_MEMBER(jackal_zram_r);
-	DECLARE_READ8_MEMBER(jackal_voram_r);
-	DECLARE_READ8_MEMBER(jackal_spriteram_r);
-	DECLARE_WRITE8_MEMBER(jackal_rambank_w);
-	DECLARE_WRITE8_MEMBER(jackal_zram_w);
-	DECLARE_WRITE8_MEMBER(jackal_voram_w);
-	DECLARE_WRITE8_MEMBER(jackal_spriteram_w);
+	uint8_t jackalr_rotary_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jackal_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jackal_zram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t jackal_voram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t jackal_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jackal_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jackal_zram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jackal_voram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jackal_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -94,7 +94,7 @@ void ra17xx_device::device_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( ra17xx_device::io_w )
+void ra17xx_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset < 16);
 	m_bl = (data >> 4) & 15;    // BL on the data bus most significant bits
@@ -124,7 +124,7 @@ WRITE8_MEMBER( ra17xx_device::io_w )
 }
 
 
-READ8_MEMBER( ra17xx_device::io_r )
+uint8_t ra17xx_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	assert(offset < 16);
 	return (m_iord(m_bl) & 1) ? 0x0f : 0x07;

@@ -86,20 +86,20 @@ protected:
 
 public:
 	// internal read/write handlers
-	DECLARE_WRITE8_MEMBER( i8049_output0_w );
-	DECLARE_WRITE8_MEMBER( i8049_output1_w );
-	DECLARE_WRITE8_MEMBER( i8049_lcd_w );
-	DECLARE_READ8_MEMBER( i8049_unknown_r );
-	DECLARE_READ8_MEMBER( i8049_keypad_r );
-	DECLARE_READ8_MEMBER( i8049_datic_r );
-	DECLARE_READ8_MEMBER( i8049_from_controller_r );
-	DECLARE_WRITE8_MEMBER( i8049_to_controller_w );
-	DECLARE_READ8_MEMBER( i8049_port1_r );
-	DECLARE_WRITE8_MEMBER( i8049_port1_w );
-	DECLARE_READ8_MEMBER( i8049_port2_r );
-	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ8_MEMBER( i8049_t0_r );
-	DECLARE_READ8_MEMBER( i8049_t1_r );
+	void i8049_output0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8049_output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8049_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8049_keypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8049_datic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8049_from_controller_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8049_to_controller_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8049_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8049_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8049_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// internal state

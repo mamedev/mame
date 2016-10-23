@@ -9,21 +9,21 @@
 
 
 
-WRITE8_MEMBER(pc1350_state::pc1350_outa)
+void pc1350_state::pc1350_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa=data;
 }
 
-WRITE8_MEMBER(pc1350_state::pc1350_outb)
+void pc1350_state::pc1350_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outb=data;
 }
 
-WRITE8_MEMBER(pc1350_state::pc1350_outc)
+void pc1350_state::pc1350_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(pc1350_state::pc1350_ina)
+uint8_t pc1350_state::pc1350_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outa;
 	int t = pc1350_keyboard_line_r(space,0);
@@ -75,7 +75,7 @@ READ8_MEMBER(pc1350_state::pc1350_ina)
 	return data;
 }
 
-READ8_MEMBER(pc1350_state::pc1350_inb)
+uint8_t pc1350_state::pc1350_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_outb;
 }

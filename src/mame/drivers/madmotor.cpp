@@ -25,7 +25,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
+void madmotor_state::madmotor_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

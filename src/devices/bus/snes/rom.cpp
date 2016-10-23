@@ -176,12 +176,12 @@ void sns_rom_20col_device::device_start()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(sns_rom_device::read_l)
+uint8_t sns_rom_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_h(space, offset);
 }
 
-READ8_MEMBER(sns_rom_device::read_h)
+uint8_t sns_rom_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset / 0x10000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
@@ -202,7 +202,7 @@ READ8_MEMBER(sns_rom_device::read_h)
  ***********************************************************************************************************/
 
 
-READ8_MEMBER( sns_rom_obc1_device::chip_read )
+uint8_t sns_rom_obc1_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0x1fff;
 	uint8_t value;
@@ -238,7 +238,7 @@ READ8_MEMBER( sns_rom_obc1_device::chip_read )
 }
 
 
-WRITE8_MEMBER( sns_rom_obc1_device::chip_write )
+void sns_rom_obc1_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0x1fff;
 	uint8_t temp;
@@ -291,12 +291,12 @@ WRITE8_MEMBER( sns_rom_obc1_device::chip_write )
 
 // Pokemon (and many others): a byte is written and a permutation of its bits must be returned.
 // Address range for read/write depends on the game (check snes.xml)
-READ8_MEMBER( sns_rom_pokemon_device::chip_read )
+uint8_t sns_rom_pokemon_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_latch,0,6,7,1,2,3,4,5);
 }
 
-WRITE8_MEMBER( sns_rom_pokemon_device::chip_write )
+void sns_rom_pokemon_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch = data;
 }
@@ -342,7 +342,7 @@ void sns_rom_tekken2_device::update_prot(uint32_t offset)
 	}
 }
 
-READ8_MEMBER( sns_rom_tekken2_device::chip_read )
+uint8_t sns_rom_tekken2_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_prot(offset);
 
@@ -367,7 +367,7 @@ READ8_MEMBER( sns_rom_tekken2_device::chip_read )
 	return 0xff; // should be open_bus
 }
 
-WRITE8_MEMBER( sns_rom_tekken2_device::chip_write )
+void sns_rom_tekken2_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_prot(offset);
 }
@@ -375,7 +375,7 @@ WRITE8_MEMBER( sns_rom_tekken2_device::chip_write )
 
 // Soul Blade: Adresses $xxx0-$xxx3 in banks $80-$bf always read $55, $0f, $aa, $f0.
 // Banks $c0-$ff return open bus.
-READ8_MEMBER( sns_rom_soulblad_device::chip_read )
+uint8_t sns_rom_soulblad_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value;
 	offset &= 3;
@@ -403,36 +403,36 @@ READ8_MEMBER( sns_rom_soulblad_device::chip_read )
 // The actual banks depends on the last 8bits of the address accessed.
 
 // Type 1: bits0-4 of the address are used as base bank (256KB chunks)
-READ8_MEMBER(sns_rom_mcpirate1_device::read_l)
+uint8_t sns_rom_mcpirate1_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_h(space, offset);
 }
 
-READ8_MEMBER(sns_rom_mcpirate1_device::read_h)
+uint8_t sns_rom_mcpirate1_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = (offset / 0x10000) + (m_base_bank * 8);
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER( sns_rom_mcpirate1_device::chip_write )
+void sns_rom_mcpirate1_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_base_bank = offset & 0x1f;
 //  printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
 }
 
 // Type 2: bits0-3 & bit5 of the address are used as base bank (256KB chunks)
-READ8_MEMBER(sns_rom_mcpirate2_device::read_l)
+uint8_t sns_rom_mcpirate2_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_h(space, offset);
 }
 
-READ8_MEMBER(sns_rom_mcpirate2_device::read_h)
+uint8_t sns_rom_mcpirate2_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = (offset / 0x10000) + (m_base_bank * 8);
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER( sns_rom_mcpirate2_device::chip_write )
+void sns_rom_mcpirate2_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_base_bank = (offset & 0x0f) | ((offset & 0x20) >> 1);
 //  printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
@@ -445,19 +445,19 @@ WRITE8_MEMBER( sns_rom_mcpirate2_device::chip_write )
 //   accesses in [01-3f] don't go to the only 32KB bank)
 // - bit 5 is always 0
 // it's worth to notice that for FC games size of bank is twice the size of original FC PRG
-READ8_MEMBER(sns_rom_20col_device::read_l)
+uint8_t sns_rom_20col_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_h(space, offset);
 }
 
-READ8_MEMBER(sns_rom_20col_device::read_h)
+uint8_t sns_rom_20col_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int prg32k = (!BIT(m_base_bank, 6) && BIT(m_base_bank, 7));
 	int bank = prg32k ? 0 : (offset / 0x10000);
 	return m_rom[((m_base_bank & 0x1f) + bank) * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER( sns_rom_20col_device::chip_write )
+void sns_rom_20col_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// [#]  game - written bank value
 	// [01] spartan x - c6
@@ -488,23 +488,23 @@ WRITE8_MEMBER( sns_rom_20col_device::chip_write )
 
 // Work in progress (probably very wrong)
 
-READ8_MEMBER( sns_rom_banana_device::chip_read )
+uint8_t sns_rom_banana_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_latch[0xf],0,6,7,1,2,3,4,5);
 }
 
-WRITE8_MEMBER( sns_rom_banana_device::chip_write )
+void sns_rom_banana_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("write addr %X data %X\n", offset, data);
 	m_latch[0xf] = data;
 }
 
-READ8_MEMBER( sns_rom_bugs_device::chip_read )
+uint8_t sns_rom_bugs_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_latch[offset & 0xff],0,6,7,1,2,3,4,5);
 }
 
-WRITE8_MEMBER( sns_rom_bugs_device::chip_write )
+void sns_rom_bugs_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[offset & 0xff] = data;
 }

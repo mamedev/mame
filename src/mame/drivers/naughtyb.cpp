@@ -111,7 +111,7 @@ TODO:
 
 #define CLOCK_XTAL 12000000
 
-READ8_MEMBER(naughtyb_state::in0_port_r)
+uint8_t naughtyb_state::in0_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int in0 = ioport("IN0")->read();
 
@@ -126,7 +126,7 @@ READ8_MEMBER(naughtyb_state::in0_port_r)
 	return in0;
 }
 
-READ8_MEMBER(naughtyb_state::dsw0_port_r)
+uint8_t naughtyb_state::dsw0_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// vblank replaces the cabinet dip
 
@@ -142,7 +142,7 @@ READ8_MEMBER(naughtyb_state::dsw0_port_r)
    Paul Priest: tourniquet@mameworld.net */
 
 
-READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack */
+uint8_t naughtyb_state::popflame_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)/* Not used by bootleg/hack */
 {
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
@@ -181,7 +181,7 @@ READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack *
 #endif
 }
 
-WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
+void naughtyb_state::popflame_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
@@ -839,12 +839,12 @@ void naughtyb_state::init_popflame()
 }
 
 
-READ8_MEMBER(naughtyb_state::trvmstr_questions_r)
+uint8_t naughtyb_state::trvmstr_questions_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("user1")->base()[m_question_offset];
 }
 
-WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
+void naughtyb_state::trvmstr_questions_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

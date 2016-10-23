@@ -24,12 +24,12 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(irq2_ack_w);
-	DECLARE_WRITE16_MEMBER(irq6_ack_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(eeprom_chip_select_w);
-	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
-	DECLARE_WRITE16_MEMBER(eeprom_data_w);
+	void irq2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq6_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_chip_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_serial_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

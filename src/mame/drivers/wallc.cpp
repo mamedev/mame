@@ -71,8 +71,8 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
-	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
+	void wallc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wallc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_wallc();
 	void init_wallca();
 	void init_sidam();
@@ -146,7 +146,7 @@ PALETTE_INIT_MEMBER(wallc_state, wallc)
 	}
 }
 
-WRITE8_MEMBER(wallc_state::wallc_videoram_w)
+void wallc_state::wallc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -168,7 +168,7 @@ uint32_t wallc_state::screen_update_wallc(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
+void wallc_state::wallc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 2);
 }

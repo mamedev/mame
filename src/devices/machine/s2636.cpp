@@ -403,7 +403,7 @@ void s2636_device::render_next_line()
 //  bus access handlers
 //-------------------------------------------------
 
-READ8_MEMBER( s2636_device::read_data )
+uint8_t s2636_device::read_data(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	mask_offset(offset);
 	uint8_t data = m_registers[offset];
@@ -422,7 +422,7 @@ READ8_MEMBER( s2636_device::read_data )
 	return data;
 }
 
-WRITE8_MEMBER( s2636_device::write_data )
+void s2636_device::write_data(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mask_offset(offset);
 

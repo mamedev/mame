@@ -172,7 +172,7 @@ DISCRETE_SOUND_END
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_state::pling_r )
+uint8_t abc800_state::pling_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_pling = !m_pling;
 
@@ -186,7 +186,7 @@ READ8_MEMBER( abc800_state::pling_r )
 //  pling_r - speaker read
 //-------------------------------------------------
 
-READ8_MEMBER( abc802_state::pling_r )
+uint8_t abc802_state::pling_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_pling = !m_pling;
 
@@ -383,7 +383,7 @@ void abc806_state::bankswitch()
 //  mai_r - memory bank map read
 //-------------------------------------------------
 
-READ8_MEMBER( abc806_state::mai_r )
+uint8_t abc806_state::mai_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 12;
 
@@ -395,7 +395,7 @@ READ8_MEMBER( abc806_state::mai_r )
 //  mao_w - memory bank map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc806_state::mao_w )
+void abc806_state::mao_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1582,7 +1582,7 @@ ROM_END
 //  DRIVER_INIT( abc800c )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
+offs_t abc800c_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
@@ -1616,7 +1616,7 @@ void abc800c_state::init_driver_init()
 //  DRIVER_INIT( abc800m )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
+offs_t abc800m_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1650,7 +1650,7 @@ void abc800m_state::init_driver_init()
 //  DRIVER_INIT( abc802 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
+offs_t abc802_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_lrs)
 	{
@@ -1674,7 +1674,7 @@ void abc802_state::init_driver_init()
 //  DRIVER_INIT( abc806 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
+offs_t abc806_state::direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{

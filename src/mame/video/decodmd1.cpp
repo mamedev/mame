@@ -12,23 +12,23 @@
 
 const device_type DECODMD1 = &device_creator<decodmd_type1_device>;
 
-READ8_MEMBER( decodmd_type1_device::latch_r )
+uint8_t decodmd_type1_device::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( decodmd_type1_device::data_w )
+void decodmd_type1_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type1_device::busy_r )
+uint8_t decodmd_type1_device::busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
 
 
-WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
+void decodmd_type1_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((data | m_ctrl) & 0x01)
 	{
@@ -49,24 +49,24 @@ WRITE8_MEMBER( decodmd_type1_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ8_MEMBER( decodmd_type1_device::ctrl_r )
+uint8_t decodmd_type1_device::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctrl;
 }
 
-READ8_MEMBER( decodmd_type1_device::status_r )
+uint8_t decodmd_type1_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_busy & 0x01) | (m_status << 1);
 }
 
-WRITE8_MEMBER( decodmd_type1_device::status_w )
+void decodmd_type1_device::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status = data;
 }
 
 // Z80 I/O ports not fully decoded.
 // if bit 7 = 0, then when bit 2 is 0 selects COCLK, and when bit 2 is 1 selects CLATCH
-READ8_MEMBER( decodmd_type1_device::dmd_port_r )
+uint8_t decodmd_type1_device::dmd_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 0x84) == 0x80)
 	{
@@ -79,7 +79,7 @@ READ8_MEMBER( decodmd_type1_device::dmd_port_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
+void decodmd_type1_device::dmd_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bit;
 

@@ -491,7 +491,7 @@ WRITE_LINE_MEMBER(wangpc_keyboard_t::write_rxd)
 //  mcs51_rx_callback -
 //-------------------------------------------------
 
-READ8_MEMBER(wangpc_keyboard_t::mcs51_rx_callback)
+uint8_t wangpc_keyboard_t::mcs51_rx_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("KB '%s' CPU Receive Data %02x\n", tag(), get_received_char());
 
@@ -503,7 +503,7 @@ READ8_MEMBER(wangpc_keyboard_t::mcs51_rx_callback)
 //  mcs51_tx_callback -
 //-------------------------------------------------
 
-WRITE8_MEMBER(wangpc_keyboard_t::mcs51_tx_callback)
+void wangpc_keyboard_t::mcs51_tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("KB '%s' CPU Transmit Data %02x\n", tag(), data);
 
@@ -521,7 +521,7 @@ WRITE8_MEMBER(wangpc_keyboard_t::mcs51_tx_callback)
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_keyboard_t::kb_p1_r )
+uint8_t wangpc_keyboard_t::kb_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_y[m_keylatch]->read();
 }
@@ -531,7 +531,7 @@ READ8_MEMBER( wangpc_keyboard_t::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p1_w )
+void wangpc_keyboard_t::kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -561,7 +561,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
+void wangpc_keyboard_t::kb_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -588,7 +588,7 @@ WRITE8_MEMBER( wangpc_keyboard_t::kb_p2_w )
 //  kb_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_keyboard_t::kb_p3_w )
+void wangpc_keyboard_t::kb_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

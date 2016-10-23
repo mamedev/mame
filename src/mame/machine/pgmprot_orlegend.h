@@ -18,8 +18,8 @@ public:
 
 	void init_orlegend();
 	void asic3_compute_hold(int,int);
-	DECLARE_READ16_MEMBER( pgm_asic3_r );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
+	uint16_t pgm_asic3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pgm_asic3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 INPUT_PORTS_EXTERN( orlegend );

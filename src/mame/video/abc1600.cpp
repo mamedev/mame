@@ -323,7 +323,7 @@ inline void abc1600_mover_device::write_videoram(offs_t offset, uint16_t data, u
 //  video_ram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mover_device::video_ram_r )
+uint8_t abc1600_mover_device::video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offs_t addr = (offset & VIDEORAM8_MASK) >> 1;
 	uint8_t data = 0;
@@ -345,7 +345,7 @@ READ8_MEMBER( abc1600_mover_device::video_ram_r )
 //  video_ram_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::video_ram_w )
+void abc1600_mover_device::video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offs_t addr = (offset & VIDEORAM8_MASK) >> 1;
 
@@ -394,7 +394,7 @@ WRITE8_MEMBER( abc1600_mover_device::video_ram_w )
 //  iord0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mover_device::iord0_r )
+uint8_t abc1600_mover_device::iord0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -427,7 +427,7 @@ READ8_MEMBER( abc1600_mover_device::iord0_r )
 //  ldsx_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldsx_hb_w )
+void abc1600_mover_device::ldsx_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldsx_hb_w )
 //  ldsx_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldsx_lb_w )
+void abc1600_mover_device::ldsx_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -483,7 +483,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldsx_lb_w )
 //  ldsy_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldsy_hb_w )
+void abc1600_mover_device::ldsy_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -510,7 +510,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldsy_hb_w )
 //  ldsy_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldsy_lb_w )
+void abc1600_mover_device::ldsy_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -537,7 +537,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldsy_lb_w )
 //  ldtx_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldtx_hb_w )
+void abc1600_mover_device::ldtx_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -565,7 +565,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldtx_hb_w )
 //  ldtx_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldtx_lb_w )
+void abc1600_mover_device::ldtx_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -593,7 +593,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldtx_lb_w )
 //  ldty_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldty_hb_w )
+void abc1600_mover_device::ldty_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -624,7 +624,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldty_hb_w )
 //  ldty_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldty_lb_w )
+void abc1600_mover_device::ldty_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -655,7 +655,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldty_lb_w )
 //  ldfx_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldfx_hb_w )
+void abc1600_mover_device::ldfx_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -683,7 +683,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldfx_hb_w )
 //  ldfx_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldfx_lb_w )
+void abc1600_mover_device::ldfx_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -711,7 +711,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldfx_lb_w )
 //  ldfy_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldfy_hb_w )
+void abc1600_mover_device::ldfy_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -738,7 +738,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldfy_hb_w )
 //  ldfy_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::ldfy_lb_w )
+void abc1600_mover_device::ldfy_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -767,7 +767,7 @@ WRITE8_MEMBER( abc1600_mover_device::ldfy_lb_w )
 //  wrml_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::wrml_w )
+void abc1600_mover_device::wrml_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -797,7 +797,7 @@ WRITE8_MEMBER( abc1600_mover_device::wrml_w )
 //  wrdl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::wrdl_w )
+void abc1600_mover_device::wrdl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -827,7 +827,7 @@ WRITE8_MEMBER( abc1600_mover_device::wrdl_w )
 //  wrmask_strobe_hb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::wrmask_strobe_hb_w )
+void abc1600_mover_device::wrmask_strobe_hb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (REPLACE)
 	{
@@ -848,7 +848,7 @@ WRITE8_MEMBER( abc1600_mover_device::wrmask_strobe_hb_w )
 //  wrmask_strobe_lb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::wrmask_strobe_lb_w )
+void abc1600_mover_device::wrmask_strobe_lb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (REPLACE)
 	{
@@ -869,7 +869,7 @@ WRITE8_MEMBER( abc1600_mover_device::wrmask_strobe_lb_w )
 //  enable_clocks_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::enable_clocks_w )
+void abc1600_mover_device::enable_clocks_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ENABLE CLOCKS\n");
 	m_clocks_disabled = 0;
@@ -880,7 +880,7 @@ WRITE8_MEMBER( abc1600_mover_device::enable_clocks_w )
 //  flag_strobe_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::flag_strobe_w )
+void abc1600_mover_device::flag_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -906,7 +906,7 @@ WRITE8_MEMBER( abc1600_mover_device::flag_strobe_w )
 //  endisp_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mover_device::endisp_w )
+void abc1600_mover_device::endisp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_endisp = 1;
 	if (LOG) logerror("ENDISP\n");

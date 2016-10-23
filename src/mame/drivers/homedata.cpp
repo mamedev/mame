@@ -261,7 +261,7 @@ INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
+uint8_t homedata_state::mrokumei_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
@@ -296,13 +296,13 @@ READ8_MEMBER(homedata_state::mrokumei_keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_keyboard_select_w)
+void homedata_state::mrokumei_keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb = data;
 }
 
 
-READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
+uint8_t homedata_state::mrokumei_sound_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_sndbank & 4)
 		return(m_soundlatch->read(space, 0));
@@ -310,7 +310,7 @@ READ8_MEMBER(homedata_state::mrokumei_sound_io_r)
 		return memregion("audiocpu")->base()[0x10000 + offset + (m_sndbank & 1) * 0x10000];
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
+void homedata_state::mrokumei_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = ROM bank
 	   bit 2 = ROM or soundlatch
@@ -318,7 +318,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_bank_w)
 	m_sndbank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
+void homedata_state::mrokumei_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -333,17 +333,17 @@ WRITE8_MEMBER(homedata_state::mrokumei_sound_cmd_w)
 
  ********************************************************************************/
 
-READ8_MEMBER(homedata_state::reikaids_upd7807_porta_r)
+uint8_t homedata_state::reikaids_upd7807_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_porta_w)
+void homedata_state::reikaids_upd7807_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
+void homedata_state::reikaids_upd7807_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port C layout:
 	   7 coin counter
@@ -370,7 +370,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	m_upd7807_portc = data;
 }
 
-READ8_MEMBER(homedata_state::reikaids_io_r)
+uint8_t homedata_state::reikaids_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("IN2")->read();    // bit 4 = coin, bit 5 = service
 
@@ -387,13 +387,13 @@ READ8_MEMBER(homedata_state::reikaids_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::reikaids_snd_command_r)
+uint8_t homedata_state::reikaids_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: sndmcd_r (%02x)\n", space.device().safe_pc(), m_snd_command);
 	return m_snd_command;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
+void homedata_state::reikaids_snd_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_command = data;
 	//logerror("%04x: coprocessor_command_w %02x\n", space.device().safe_pc(), data);
@@ -408,19 +408,19 @@ WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 
  ********************************************************************************/
 
-WRITE8_MEMBER(homedata_state::pteacher_snd_command_w)
+void homedata_state::pteacher_snd_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: snd_command_w %02x\n", space.device().safe_pc(), data);
 	m_from_cpu = data;
 }
 
-READ8_MEMBER(homedata_state::pteacher_snd_r)
+uint8_t homedata_state::pteacher_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: pteacher_snd_r %02x\n",space.device().safe_pc(),to_cpu);
 	return m_to_cpu;
 }
 
-READ8_MEMBER(homedata_state::pteacher_io_r)
+uint8_t homedata_state::pteacher_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 6: !vblank
 	 * bit 7: visible page
@@ -437,7 +437,7 @@ READ8_MEMBER(homedata_state::pteacher_io_r)
 	return res;
 }
 
-READ8_MEMBER(homedata_state::pteacher_keyboard_r)
+uint8_t homedata_state::pteacher_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = ioport("DSW")->read();
@@ -460,7 +460,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	return 0xff;
 }
 
-READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
+uint8_t homedata_state::pteacher_upd7807_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_from_cpu;
@@ -470,18 +470,18 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	return m_upd7807_porta;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_snd_answer_w)
+void homedata_state::pteacher_snd_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_to_cpu = data;
 	//logerror("%04x: to_cpu = %02x\n", space.device().safe_pc(), m_to_cpu);
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
+void homedata_state::pteacher_upd7807_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7807_porta = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
+void homedata_state::pteacher_upd7807_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port C layout:
 	   7 coin counter
@@ -509,7 +509,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 /********************************************************************************/
 
 
-WRITE8_MEMBER(homedata_state::bankswitch_w)
+void homedata_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int last_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
@@ -1396,13 +1396,13 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, homedata_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(homedata_state::mirderby_prot_r)
+uint8_t homedata_state::mirderby_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_prot_data&=0x7f;
 	return m_prot_data++;
 }
 
-WRITE8_MEMBER(homedata_state::mirderby_prot_w)
+void homedata_state::mirderby_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_data = data;
 }

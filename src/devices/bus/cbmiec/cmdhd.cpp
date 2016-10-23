@@ -179,7 +179,7 @@ void cmd_hd_device::cbm_iec_reset(int state)
 //  led_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cmd_hd_device::led_w )
+void cmd_hd_device::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

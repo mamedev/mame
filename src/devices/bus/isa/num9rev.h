@@ -28,18 +28,18 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const override;
 
 		UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_display_pixels);
-		DECLARE_READ8_MEMBER(pal8_r);
-		DECLARE_WRITE8_MEMBER(pal8_w);
-		DECLARE_READ8_MEMBER(pal12_r);
-		DECLARE_WRITE8_MEMBER(pal12_w);
-		DECLARE_READ8_MEMBER(overlay_r);
-		DECLARE_WRITE8_MEMBER(overlay_w);
-		DECLARE_READ8_MEMBER(bank_r);
-		DECLARE_WRITE8_MEMBER(bank_w);
-		DECLARE_READ8_MEMBER(ctrl_r);
-		DECLARE_WRITE8_MEMBER(ctrl_w);
-		DECLARE_READ8_MEMBER(read8);
-		DECLARE_WRITE8_MEMBER(write8);
+		uint8_t pal8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pal8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t pal12_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pal12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t overlay_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void overlay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t read8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 		uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:

@@ -611,7 +611,7 @@ WRITE_LINE_MEMBER (fga002_device::lirq5_w) { LOGINT(("%s\n", FUNCNAME)); lirq_w(
 WRITE_LINE_MEMBER (fga002_device::lirq6_w) { LOGINT(("%s\n", FUNCNAME)); lirq_w( FGA_ISLOCAL6, INT_LOCAL6, FGA_ICRLOCAL6, state ); }
 WRITE_LINE_MEMBER (fga002_device::lirq7_w) { LOGINT(("%s\n", FUNCNAME)); lirq_w( FGA_ISLOCAL7, INT_LOCAL7, FGA_ICRLOCAL7, state ); }
 
-WRITE8_MEMBER (fga002_device::write){
+void fga002_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("%s[%04x] <- %02x    - ", FUNCNAME, offset, data));
 	LOGSETUP((" * %s Reg %04x <- %02x\n", tag(), offset, data));
 	switch(offset)
@@ -721,7 +721,7 @@ WRITE8_MEMBER (fga002_device::write){
 	}
 }
 
-READ8_MEMBER (fga002_device::read){
+uint8_t fga002_device::read(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t ret = 0;
 
 	LOG(("%s[%04x]      ", FUNCNAME, offset));

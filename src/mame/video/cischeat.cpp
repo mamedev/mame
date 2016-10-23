@@ -141,7 +141,7 @@ void cischeat_state::video_start()
                                 Big Run
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
+uint16_t cischeat_state::bigrun_ip_select_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_ip_select & 0x3)
 	{
@@ -154,7 +154,7 @@ READ16_MEMBER(cischeat_state::bigrun_ip_select_r)
 }
 
 
-WRITE16_MEMBER(cischeat_state::leds_out_w)
+void cischeat_state::leds_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// leds
 	if (ACCESSING_BITS_0_7)
@@ -167,13 +167,13 @@ WRITE16_MEMBER(cischeat_state::leds_out_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::unknown_out_w)
+void cischeat_state::unknown_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// ?? 91/1/91/1 ...
 }
 
 
-WRITE16_MEMBER(cischeat_state::motor_out_w)
+void cischeat_state::motor_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// motor (seat?)
 	if (ACCESSING_BITS_0_7)
@@ -182,26 +182,26 @@ WRITE16_MEMBER(cischeat_state::motor_out_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::wheel_out_w)
+void cischeat_state::wheel_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// motor (wheel?)
 }
 
 
-WRITE16_MEMBER(cischeat_state::ip_select_w)
+void cischeat_state::ip_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ip_select = data;
 }
 
 
-WRITE16_MEMBER(cischeat_state::ip_select_plus1_w)
+void cischeat_state::ip_select_plus1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// value above + 1
 	m_ip_select = data + 1;
 }
 
 
-WRITE16_MEMBER(cischeat_state::bigrun_comms_w)
+void cischeat_state::bigrun_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Not sure about this one.. */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -210,7 +210,7 @@ WRITE16_MEMBER(cischeat_state::bigrun_comms_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::active_layers_w)
+void cischeat_state::active_layers_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_active_layers);
 }
@@ -220,7 +220,7 @@ WRITE16_MEMBER(cischeat_state::active_layers_w)
                                 Cisco Heat
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
+uint16_t cischeat_state::cischeat_ip_select_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_ip_select & 0x3)
 	{
@@ -232,7 +232,7 @@ READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
 }
 
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
+void cischeat_state::cischeat_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Sound CPU: reads latch during int 4, and stores command */
 	m_soundlatch->write(space, 0, data, mem_mask);
@@ -240,7 +240,7 @@ WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::cischeat_comms_w)
+void cischeat_state::cischeat_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Not sure about this one.. */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -254,13 +254,13 @@ WRITE16_MEMBER(cischeat_state::cischeat_comms_w)
                             F1 GrandPrix Star
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::f1gpstar_wheel_r)
+uint16_t cischeat_state::f1gpstar_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("PEDAL")->read() & 0xff) + ((ioport("IN5")->read() & 0xff)<<8);
 }
 
 
-READ16_MEMBER(cischeat_state::f1gpstr2_ioready_r)
+uint16_t cischeat_state::f1gpstr2_ioready_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_f1gpstr2_ioready[0]&1) ? 0xff : 0xf0;
 }
@@ -271,7 +271,7 @@ READ16_MEMBER(cischeat_state::f1gpstr2_ioready_r)
 **************************************************************************/
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
+void cischeat_state::f1gpstar_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// "shudder" motors, leds
 	if (ACCESSING_BITS_0_7)
@@ -286,14 +286,14 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_motor_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_soundint_w)
+void cischeat_state::f1gpstar_soundint_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* $80008 and $80018 usually written in sequence, but not always */
 	m_soundcpu->set_input_line(4, HOLD_LINE);
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstar_comms_w)
+void cischeat_state::f1gpstar_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Not sure about this one. Values: $10 then 0, $7 then 0 */
 	m_cpu2->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -302,7 +302,7 @@ WRITE16_MEMBER(cischeat_state::f1gpstar_comms_w)
 }
 
 
-WRITE16_MEMBER(cischeat_state::f1gpstr2_io_w)
+void cischeat_state::f1gpstr2_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -67,22 +67,22 @@ public:
 	int m_mcu_sent;
 	int m_main_sent;
 
-	DECLARE_READ8_MEMBER(maniach_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(maniach_68705_port_a_w);
-	DECLARE_READ8_MEMBER(maniach_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(maniach_68705_port_b_w);
-	DECLARE_READ8_MEMBER(maniach_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(maniach_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_a_w);
-	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_b_w);
-	DECLARE_WRITE8_MEMBER(maniach_68705_ddr_c_w);
-	DECLARE_WRITE8_MEMBER(maniach_mcu_w);
-	DECLARE_READ8_MEMBER(maniach_mcu_r);
-	DECLARE_READ8_MEMBER(maniach_mcu_status_r);
+	uint8_t maniach_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void maniach_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t maniach_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void maniach_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t maniach_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void maniach_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maniach_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maniach_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maniach_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maniach_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t maniach_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t maniach_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
-	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
-	DECLARE_WRITE8_MEMBER(matmania_paletteram_w);
+	void matmania_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maniach_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void matmania_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(matmania);
 	void machine_start_maniach();

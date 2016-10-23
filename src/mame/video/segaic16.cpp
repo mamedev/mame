@@ -1303,26 +1303,26 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::tileram_r )
+uint16_t segaic16_video_device::tileram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tileram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::tileram_w )
+void segaic16_video_device::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tileram[offset]);
 	m_bg_tilemap[0].tilemaps[offset / (64*32)]->mark_tile_dirty(offset % (64*32));
 }
 
 
-READ16_MEMBER( segaic16_video_device::textram_r )
+uint16_t segaic16_video_device::textram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_textram[offset];
 }
 
 
-WRITE16_MEMBER( segaic16_video_device::textram_w )
+void segaic16_video_device::textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
@@ -1454,7 +1454,7 @@ void segaic16_video_device::rotate_draw(int which, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-READ16_MEMBER( segaic16_video_device::rotate_control_r )
+uint16_t segaic16_video_device::rotate_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	struct rotate_info *info = &m_rotate[0];
 

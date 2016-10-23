@@ -381,12 +381,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
 
 ***************************************************************************/
 
-READ8_MEMBER(psychic5_state::bankselect_r)
+uint8_t psychic5_state::bankselect_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_latch;
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
+void psychic5_state::psychic5_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bank_latch != data)
 	{
@@ -395,7 +395,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
+void psychic5_state::bombsa_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bank_latch != data)
 	{
@@ -404,7 +404,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
+void psychic5_state::psychic5_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
@@ -416,7 +416,7 @@ WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 	}
 }
 
-WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
+void psychic5_state::bombsa_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7 toggles flip screen
 	if (data & 0x80)

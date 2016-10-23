@@ -18,12 +18,12 @@ TIMER_CALLBACK_MEMBER(lsasquad_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_disable_w)
+void lsasquad_state::lsasquad_sh_nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
+void lsasquad_state::lsasquad_sh_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -33,7 +33,7 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sound_command_w)
+void lsasquad_state::lsasquad_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_pending |= 0x01;
 	m_sound_cmd = data;
@@ -42,28 +42,28 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_sound_command_w)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(lsasquad_state::nmi_callback),this), data);
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_sh_sound_command_r)
+uint8_t lsasquad_state::lsasquad_sh_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_pending &= ~0x01;
 	//logerror("%04x: read sound cmd %02x\n", space.device().safe_pc(), m_sound_cmd);
 	return m_sound_cmd;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_sh_result_w)
+void lsasquad_state::lsasquad_sh_result_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_pending |= 0x02;
 	//logerror("%04x: sound res %02x\n", space.device().safe_pc(), data);
 	m_sound_result = data;
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_sound_result_r)
+uint8_t lsasquad_state::lsasquad_sound_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_pending &= ~0x02;
 	//logerror("%04x: read sound res %02x\n", space.device().safe_pc(), m_sound_result);
 	return m_sound_result;
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
+uint8_t lsasquad_state::lsasquad_sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
@@ -71,7 +71,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
 }
 
 
-READ8_MEMBER(lsasquad_state::daikaiju_sh_sound_command_r)
+uint8_t lsasquad_state::daikaiju_sh_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_pending &= ~0x01;
 	m_sound_pending |= 0x02;
@@ -79,7 +79,7 @@ READ8_MEMBER(lsasquad_state::daikaiju_sh_sound_command_r)
 	return m_sound_cmd;
 }
 
-READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
+uint8_t lsasquad_state::daikaiju_sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
@@ -95,19 +95,19 @@ READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
 
 ***************************************************************************/
 
-READ8_MEMBER(lsasquad_state::lsasquad_68705_port_a_r)
+uint8_t lsasquad_state::lsasquad_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_a_w)
+void lsasquad_state::lsasquad_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_68705_ddr_a_w)
+void lsasquad_state::lsasquad_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
@@ -123,12 +123,12 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_68705_ddr_a_w)
  *  2   W  when 0->1, copies port A to the latch for the main CPU
  */
 
-READ8_MEMBER(lsasquad_state::lsasquad_68705_port_b_r)
+uint8_t lsasquad_state::lsasquad_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_b_w)
+void lsasquad_state::lsasquad_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
@@ -151,12 +151,12 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_68705_ddr_b_w)
+void lsasquad_state::lsasquad_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
-WRITE8_MEMBER(lsasquad_state::lsasquad_mcu_w)
+void lsasquad_state::lsasquad_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: mcu_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
@@ -164,14 +164,14 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_mcu_w)
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_mcu_r)
+uint8_t lsasquad_state::lsasquad_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: mcu_r %02x\n", space.device().safe_pc(), m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
-READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
+uint8_t lsasquad_state::lsasquad_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("MCU")->read();
 
@@ -186,7 +186,7 @@ READ8_MEMBER(lsasquad_state::lsasquad_mcu_status_r)
 	return res;
 }
 
-READ8_MEMBER(lsasquad_state::daikaiju_mcu_status_r)
+uint8_t lsasquad_state::daikaiju_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("MCU")->read();
 

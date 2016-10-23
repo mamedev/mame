@@ -31,7 +31,7 @@ public:
 
 	uint8_t m_color;
 
-	DECLARE_WRITE8_MEMBER(color_w);
+	void color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 
@@ -85,7 +85,7 @@ uint32_t tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER(tgtpanic_state::color_w)
+void tgtpanic_state::color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_color = data;

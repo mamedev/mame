@@ -278,7 +278,7 @@ void m72_state::video_start_poundfor()
 
 ***************************************************************************/
 
-READ16_MEMBER(m72_state::palette1_r)
+uint16_t m72_state::palette1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -286,7 +286,7 @@ READ16_MEMBER(m72_state::palette1_r)
 	return m_generic_paletteram_16[offset] | 0xffe0;    /* only D0-D4 are connected */
 }
 
-READ16_MEMBER(m72_state::palette2_r)
+uint16_t m72_state::palette2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -299,7 +299,7 @@ inline void m72_state::changecolor(int color,int r,int g,int b)
 	m_palette->set_pen_color(color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-WRITE16_MEMBER(m72_state::palette1_w)
+void m72_state::palette1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -312,7 +312,7 @@ WRITE16_MEMBER(m72_state::palette1_w)
 			m_generic_paletteram_16[offset + 0x400]);
 }
 
-WRITE16_MEMBER(m72_state::palette2_w)
+void m72_state::palette2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
@@ -325,13 +325,13 @@ WRITE16_MEMBER(m72_state::palette2_w)
 			m_generic_paletteram2_16[offset + 0x400]);
 }
 
-WRITE16_MEMBER(m72_state::videoram1_w)
+void m72_state::videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(m72_state::videoram2_w)
+void m72_state::videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
@@ -342,44 +342,44 @@ WRITE16_MEMBER(m72_state::videoram2_w)
 
 }
 
-WRITE16_MEMBER(m72_state::irq_line_w)
+void m72_state::irq_line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_raster_irq_position);
 //  printf("m_raster_irq_position %04x\n", m_raster_irq_position);
 }
 
-WRITE16_MEMBER(m72_state::scrollx1_w)
+void m72_state::scrollx1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx1);
 }
 
-WRITE16_MEMBER(m72_state::scrollx2_w)
+void m72_state::scrollx2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrollx2);
 }
 
-WRITE16_MEMBER(m72_state::scrolly1_w)
+void m72_state::scrolly1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly1);
 }
 
-WRITE16_MEMBER(m72_state::scrolly2_w)
+void m72_state::scrolly2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	COMBINE_DATA(&m_scrolly2);
 }
 
-WRITE16_MEMBER(m72_state::dmaon_w)
+void m72_state::dmaon_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		memcpy(m_buffered_spriteram.get(), m_spriteram, m_spriteram.bytes());
 }
 
 
-WRITE16_MEMBER(m72_state::port02_w)
+void m72_state::port02_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -405,7 +405,7 @@ WRITE16_MEMBER(m72_state::port02_w)
 	}
 }
 
-WRITE16_MEMBER(m72_state::rtype2_port02_w)
+void m72_state::rtype2_port02_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -428,7 +428,7 @@ WRITE16_MEMBER(m72_state::rtype2_port02_w)
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
+void m72_state::m82_gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -439,7 +439,7 @@ WRITE16_MEMBER(m72_state::m82_gfx_ctrl_w)
 
 }
 
-WRITE16_MEMBER(m72_state::m82_tm_ctrl_w)
+void m72_state::m82_tm_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_m82_tmcontrol);
 //  printf("tmcontrol %04x\n", m_m82_tmcontrol);

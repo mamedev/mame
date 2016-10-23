@@ -45,15 +45,15 @@ public:
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
-	DECLARE_READ16_MEMBER(cpuB_ctrl_r);
-	DECLARE_WRITE16_MEMBER(cpuB_ctrl_w);
-	DECLARE_WRITE16_MEMBER(overdriv_soundirq_w);
-	DECLARE_WRITE8_MEMBER(sound_ack_w);
-	DECLARE_WRITE16_MEMBER(slave_irq4_assert_w);
-	DECLARE_WRITE16_MEMBER(slave_irq5_assert_w);
-	DECLARE_WRITE16_MEMBER(objdma_w);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cpuA_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cpuB_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cpuB_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void overdriv_soundirq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_irq4_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void slave_irq5_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void objdma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TIMER_CALLBACK_MEMBER(objdma_end_cb);
 
 	virtual void machine_start() override;

@@ -50,14 +50,14 @@ single plane board.
 
 
 
-WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
+void tigeroad_state::tigeroad_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_soundlatch->write(space,offset,data >> 8);
 }
 
 
-WRITE8_MEMBER(tigeroad_state::msm5205_w)
+void tigeroad_state::msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(BIT(data, 7));
 	m_msm->data_w(data);

@@ -161,7 +161,7 @@ enum
 };
 
 
-WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
+void btime_state::audio_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* for most games, this serves as the NMI enable for the audio CPU; however,
 	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
@@ -173,7 +173,7 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
+void btime_state::ay_audio_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
@@ -365,19 +365,19 @@ INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 }
 
 
-WRITE8_MEMBER(btime_state::audio_command_w)
+void btime_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(btime_state::audio_command_r)
+uint8_t btime_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read(space, offset);
 }
 
-READ8_MEMBER(btime_state::zoar_dsw1_read)
+uint8_t btime_state::zoar_dsw1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (!m_screen->vblank() << 7) | (ioport("DSW1")->read() & 0x7f);
 }
@@ -1973,7 +1973,7 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-READ8_MEMBER(btime_state::wtennis_reset_hack_r)
+uint8_t btime_state::wtennis_reset_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 

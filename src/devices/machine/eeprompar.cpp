@@ -98,12 +98,12 @@ eeprom_parallel_28xx_device::eeprom_parallel_28xx_device(const machine_config &m
 //  read/write - read/write handlers
 //-------------------------------------------------
 
-WRITE8_MEMBER(eeprom_parallel_28xx_device::write)
+void eeprom_parallel_28xx_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	eeprom_base_device::write(offset, data);
 }
 
-READ8_MEMBER(eeprom_parallel_28xx_device::read)
+uint8_t eeprom_parallel_28xx_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return eeprom_base_device::read(offset);
 }

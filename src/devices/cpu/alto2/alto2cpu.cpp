@@ -1020,7 +1020,7 @@ void alto2_cpu_device::state_string_export(const device_state_entry &entry, std:
 }
 
 //! read microcode CROM or CRAM
-READ32_MEMBER ( alto2_cpu_device::crom_cram_r )
+uint32_t alto2_cpu_device::crom_cram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset < m_ucode_ram_base)
 		return *reinterpret_cast<uint32_t *>(m_ucode_crom + offset * 4);
@@ -1028,7 +1028,7 @@ READ32_MEMBER ( alto2_cpu_device::crom_cram_r )
 }
 
 //! write microcode CROM or CRAM (CROM of course can't be written)
-WRITE32_MEMBER( alto2_cpu_device::crom_cram_w )
+void alto2_cpu_device::crom_cram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset < m_ucode_ram_base)
 		return;
@@ -1036,7 +1036,7 @@ WRITE32_MEMBER( alto2_cpu_device::crom_cram_w )
 }
 
 //! read constants PROM
-READ16_MEMBER ( alto2_cpu_device::const_r )
+uint16_t alto2_cpu_device::const_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return *reinterpret_cast<uint16_t *>(m_const_data + offset * 2);
 }
@@ -1386,7 +1386,7 @@ static const char* memory_range_name(offs_t offset)
 /**
  * @brief read the open bus for unused MMIO range
  */
-READ16_MEMBER( alto2_cpu_device::noop_r )
+uint16_t alto2_cpu_device::noop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	LOG((this,LOG_CPU,0,"    MMIO rd %s\n", memory_range_name(offset)));
 	return 0177777;
@@ -1395,7 +1395,7 @@ READ16_MEMBER( alto2_cpu_device::noop_r )
 /**
  * @brief write nowhere for unused MMIO range
  */
-WRITE16_MEMBER( alto2_cpu_device::noop_w )
+void alto2_cpu_device::noop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG((this,LOG_CPU,0,"    MMIO wr %s\n", memory_range_name(offset)));
 }
@@ -1405,7 +1405,7 @@ WRITE16_MEMBER( alto2_cpu_device::noop_w )
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-READ16_MEMBER( alto2_cpu_device::bank_reg_r )
+uint16_t alto2_cpu_device::bank_reg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int task = offset & 017;
 	int bank = m_bank_reg[task] | 0177760;
@@ -1417,7 +1417,7 @@ READ16_MEMBER( alto2_cpu_device::bank_reg_r )
  *
  * The bank registers are stored in a 16x4-bit RAM 74S189.
  */
-WRITE16_MEMBER( alto2_cpu_device::bank_reg_w )
+void alto2_cpu_device::bank_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int task = offset & 017;
 	m_bank_reg[task] = data & 017;

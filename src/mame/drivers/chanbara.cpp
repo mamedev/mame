@@ -87,12 +87,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
-	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_0_w);
-	DECLARE_WRITE8_MEMBER(chanbara_ay_out_1_w);
+	void chanbara_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_ay_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chanbara_ay_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_chanbara();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
@@ -120,25 +120,25 @@ PALETTE_INIT_MEMBER(chanbara_state, chanbara)
 	}
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
+void chanbara_state::chanbara_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
+void chanbara_state::chanbara_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
+void chanbara_state::chanbara_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
+void chanbara_state::chanbara_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
@@ -351,14 +351,14 @@ GFXDECODE_END
 /***************************************************************************/
 
 
-WRITE8_MEMBER(chanbara_state::chanbara_ay_out_0_w)
+void chanbara_state::chanbara_ay_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("chanbara_ay_out_0_w %02x\n",data);
 
 	m_scroll = data;
 }
 
-WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
+void chanbara_state::chanbara_ay_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("chanbara_ay_out_1_w %02x\n",data);
 

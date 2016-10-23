@@ -51,26 +51,26 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(systec_c4_r);
-	DECLARE_READ8_MEMBER(systec_c6_r);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t systec_c4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t systec_c6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( systec_state::systec_c4_r )
+uint8_t systec_state::systec_c4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( systec_state::systec_c6_r )
+uint8_t systec_state::systec_c6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x04 | (m_term_data ? 1 : 0);
 }
 
-WRITE8_MEMBER( systec_state::kbd_put )
+void systec_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

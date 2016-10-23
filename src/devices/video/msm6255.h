@@ -31,11 +31,11 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER( ir_r );
-	DECLARE_WRITE8_MEMBER( ir_w );
+	uint8_t ir_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ir_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( dr_r );
-	DECLARE_WRITE8_MEMBER( dr_w );
+	uint8_t dr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

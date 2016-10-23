@@ -14,7 +14,7 @@ driver by Nicola Salmoria
 #include "sound/ym2151.h"
 #include "sound/volt_reg.h"
 
-READ8_MEMBER(shisen_state::dsw1_r)
+uint8_t shisen_state::dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = ioport("DSW1")->read();
 
@@ -33,7 +33,7 @@ READ8_MEMBER(shisen_state::dsw1_r)
 	return ret;
 }
 
-WRITE8_MEMBER(shisen_state::coin_w)
+void shisen_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 

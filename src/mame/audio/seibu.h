@@ -46,19 +46,19 @@ public:
 	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~seibu_sound_device() {}
 
-	DECLARE_READ16_MEMBER( main_word_r );
-	DECLARE_WRITE16_MEMBER( main_word_w );
-	DECLARE_WRITE16_MEMBER( main_mustb_w );
-	DECLARE_WRITE8_MEMBER( irq_clear_w );
-	DECLARE_WRITE8_MEMBER( rst10_ack_w );
-	DECLARE_WRITE8_MEMBER( rst18_ack_w );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE8_MEMBER( coin_w );
+	uint16_t main_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void main_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void main_mustb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rst10_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rst18_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	WRITE_LINE_MEMBER( fm_irqhandler );
-	DECLARE_READ8_MEMBER( soundlatch_r );
-	DECLARE_READ8_MEMBER( main_data_pending_r );
-	DECLARE_WRITE8_MEMBER( main_data_w );
-	DECLARE_WRITE8_MEMBER( pending_w );
+	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t main_data_pending_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pending_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	static void apply_decrypt(uint8_t *rom, uint8_t *opcodes, int length);
 	void set_encryption(int mode);
@@ -107,8 +107,8 @@ public:
 	~seibu_adpcm_device() {}
 
 	void decrypt();
-	DECLARE_WRITE8_MEMBER( adr_w );
-	DECLARE_WRITE8_MEMBER( ctl_w );
+	void adr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

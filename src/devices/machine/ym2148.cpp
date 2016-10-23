@@ -140,7 +140,7 @@ void ym2148_device::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-READ8_MEMBER(ym2148_device::read)
+uint8_t ym2148_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -159,7 +159,7 @@ READ8_MEMBER(ym2148_device::read)
 }
 
 
-WRITE8_MEMBER(ym2148_device::write)
+void ym2148_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{

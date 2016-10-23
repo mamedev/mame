@@ -58,28 +58,28 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(swtpc_status_r);
-	DECLARE_READ8_MEMBER(swtpc_terminal_r);
-	DECLARE_READ8_MEMBER(swtpc_tricky_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t swtpc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t swtpc_terminal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t swtpc_tricky_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 // bit 0 - ready to receive a character; bit 1 - ready to send a character to the terminal
-READ8_MEMBER( swtpc_state::swtpc_status_r )
+uint8_t swtpc_state::swtpc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 0x82;
 }
 
-READ8_MEMBER( swtpc_state::swtpc_terminal_r )
+uint8_t swtpc_state::swtpc_terminal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( swtpc_state::swtpc_tricky_r )
+uint8_t swtpc_state::swtpc_tricky_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	return ret;
@@ -103,7 +103,7 @@ void swtpc_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( swtpc_state::kbd_put )
+void swtpc_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

@@ -80,10 +80,10 @@ public:
 	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_in_pb_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8355_device &>(device).m_out_pb_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( memory_r );
+	uint8_t memory_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

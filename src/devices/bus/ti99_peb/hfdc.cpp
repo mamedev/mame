@@ -274,7 +274,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
     0x5800 - 0x5bff static RAM page any of 32 pages
     0x5c00 - 0x5fff static RAM page any of 32 pages
 */
-WRITE8_MEMBER( myarc_hfdc_device::write )
+void myarc_hfdc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -421,7 +421,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 
     HFDC manual p. 43
 */
-WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
+void myarc_hfdc_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -626,7 +626,7 @@ void myarc_hfdc_device::signal_drive_status()
     (1,0) = OUTPUT1
     (1,1) = OUTPUT2
 */
-WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
+void myarc_hfdc_device::auxbus_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int index;
 	switch (offset)
@@ -849,7 +849,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 /*
     Read a byte from the onboard SRAM. This is called from the HDC9234.
 */
-READ8_MEMBER( myarc_hfdc_device::read_buffer )
+uint8_t myarc_hfdc_device::read_buffer(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (TRACE_DMA) logerror("Read access to onboard SRAM at %04x\n", m_dma_address);
 	if (m_dma_address > 0x8000) logerror("Read access beyond RAM size: %06x\n", m_dma_address);
@@ -861,7 +861,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 /*
     Write a byte to the onboard SRAM. This is called from the HDC9234.
 */
-WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
+void myarc_hfdc_device::write_buffer(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (TRACE_DMA) logerror("Write access to onboard SRAM at %04x: %02x\n", m_dma_address, data);
 	if (m_dma_address > 0x8000) logerror("Write access beyond RAM size: %06x\n", m_dma_address);

@@ -120,17 +120,17 @@ public:
 	uint8_t m_mc;
 	uint8_t m_mr;
 
-	DECLARE_READ8_MEMBER(start_read);
+	uint8_t start_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(w_a0);
-	DECLARE_READ8_MEMBER(r_a0);
-	DECLARE_WRITE8_MEMBER(cso1_w);
-	DECLARE_WRITE8_MEMBER(cso2_w);
-	DECLARE_WRITE8_MEMBER(csoki_w);
-	DECLARE_READ8_MEMBER(csoki_r);
+	void w_a0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r_a0(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cso1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cso2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void csoki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t csoki_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ay8910_a_r);
-	DECLARE_READ8_MEMBER(ay8910_b_r);
+	uint8_t ay8910_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ay8910_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_mgavegas();
 	void init_mgavegas21();
@@ -267,7 +267,7 @@ uint64_t tmp;
 }
 
 
-READ8_MEMBER( mgavegas_state::start_read )
+uint8_t mgavegas_state::start_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  in HW it look for /IOREQ going down to clear the IRQ line
 	if (m_int){
@@ -282,7 +282,7 @@ READ8_MEMBER( mgavegas_state::start_read )
 /****************************
 *    Read/Write Handlers    *
 ****************************/
-READ8_MEMBER(mgavegas_state::r_a0)
+uint8_t mgavegas_state::r_a0(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 uint8_t ret=0;
 
@@ -303,7 +303,7 @@ uint8_t ret=0;
 	return ret;
 }
 
-WRITE8_MEMBER(mgavegas_state::w_a0)
+void mgavegas_state::w_a0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_AY8910)
 		logerror("write to %04X data = %02X \n",offset+0xa000,data);
@@ -333,7 +333,7 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 
 
 
-READ8_MEMBER(mgavegas_state::csoki_r)
+uint8_t mgavegas_state::csoki_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 uint8_t ret=0;
 
@@ -342,7 +342,7 @@ uint8_t ret=0;
 	return ret;
 }
 
-WRITE8_MEMBER(mgavegas_state::csoki_w)
+void mgavegas_state::csoki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_MSM5205)
 		logerror("MSM5205 write to %04X data = %02X \n",offset+0xc800,data);
@@ -351,7 +351,7 @@ WRITE8_MEMBER(mgavegas_state::csoki_w)
 }
 
 
-WRITE8_MEMBER(mgavegas_state::cso1_w)
+void mgavegas_state::cso1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int hopper_data = 0x00;
 	if (LOG_CSO1)
@@ -372,7 +372,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 	m_ticket->write(machine().driver_data()->generic_space(), 0, hopper_data);
 }
 
-WRITE8_MEMBER(mgavegas_state::cso2_w)
+void mgavegas_state::cso2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_CSO2)
 		logerror("write to CSO2 data = %02X\n",data);
@@ -390,7 +390,7 @@ WRITE8_MEMBER(mgavegas_state::cso2_w)
 }
 
 
-READ8_MEMBER(mgavegas_state::ay8910_a_r)
+uint8_t mgavegas_state::ay8910_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret=0xff;
 
@@ -402,7 +402,7 @@ READ8_MEMBER(mgavegas_state::ay8910_a_r)
 	return ret;
 }
 
-READ8_MEMBER(mgavegas_state::ay8910_b_r)
+uint8_t mgavegas_state::ay8910_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret=0xff;
 

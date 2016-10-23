@@ -574,7 +574,7 @@ INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 }
 
 
-WRITE8_MEMBER(itech8_state::nmi_ack_w)
+void itech8_state::nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
 /*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
@@ -693,7 +693,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::blitter_bank_w)
+void itech8_state::blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
@@ -704,7 +704,7 @@ WRITE8_MEMBER(itech8_state::blitter_bank_w)
 }
 
 
-WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
+void itech8_state::rimrockn_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* banking is controlled here instead of by the blitter output */
 	membank("bank1")->set_entry(data & 3);
@@ -730,14 +730,14 @@ CUSTOM_INPUT_MEMBER(itech8_state::special_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::pia_porta_out)
+void itech8_state::pia_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PIA port A write = %02x\n", data);
 	m_pia_porta_data = data;
 }
 
 
-WRITE8_MEMBER(itech8_state::pia_portb_out)
+void itech8_state::pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("PIA port B write = %02x\n", data);
 
@@ -751,7 +751,7 @@ WRITE8_MEMBER(itech8_state::pia_portb_out)
 }
 
 
-WRITE8_MEMBER(itech8_state::ym2203_portb_out)
+void itech8_state::ym2203_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("YM2203 port B write = %02x\n", data);
 
@@ -779,13 +779,13 @@ TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
 }
 
 
-WRITE8_MEMBER(itech8_state::sound_data_w)
+void itech8_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(TIMER_DELAYED_SOUND_DATA, data);
 }
 
 
-WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
+void itech8_state::gtg2_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* on the later GTG2 board, they swizzle the data lines */
 	data = ((data & 0x80) >> 7) |
@@ -796,14 +796,14 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 }
 
 
-READ8_MEMBER(itech8_state::sound_data_r)
+uint8_t itech8_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 
 
-WRITE8_MEMBER(itech8_state::grom_bank_w)
+void itech8_state::grom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_grom_bank = data;
 }
@@ -816,21 +816,21 @@ WRITE8_MEMBER(itech8_state::grom_bank_w)
  *
  *************************************/
 
-WRITE16_MEMBER(itech8_state::grom_bank16_w)
+void itech8_state::grom_bank16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_grom_bank = data >> 8;
 }
 
 
-WRITE16_MEMBER(itech8_state::display_page16_w)
+void itech8_state::display_page16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		page_w(space, 0, ~data >> 8);
 }
 
 
-WRITE16_MEMBER(itech8_state::palette16_w)
+void itech8_state::palette16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		palette_w(space, offset / 8, data >> 8);

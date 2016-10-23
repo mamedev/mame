@@ -55,10 +55,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fd800(*this, "fd800") { }
 
-	DECLARE_READ8_MEMBER( panel_read );
-	DECLARE_WRITE8_MEMBER( panel_write );
-	DECLARE_WRITE8_MEMBER( external_operation );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	uint8_t panel_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( fd_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( asrkey_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( vdtkey_interrupt );
@@ -106,7 +106,7 @@ void ti990_4_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	logerror("ti990_4: Released LOAD interrupt\n");
 }
 
-READ8_MEMBER( ti990_4_state::panel_read )
+uint8_t ti990_4_state::panel_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 		return 0x48;
@@ -114,7 +114,7 @@ READ8_MEMBER( ti990_4_state::panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_4_state::panel_write )
+void ti990_4_state::panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("ti990_4: writing to panel @CRU %04x: %02x\n", offset<<1, data);
 }
@@ -171,7 +171,7 @@ WRITE_LINE_MEMBER(ti990_4_state::asrkey_interrupt)
 	set_int_line(6, state);
 }
 
-WRITE8_MEMBER( ti990_4_state::external_operation )
+void ti990_4_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	switch (offset)
@@ -199,7 +199,7 @@ WRITE8_MEMBER( ti990_4_state::external_operation )
 	}
 }
 
-READ8_MEMBER( ti990_4_state::interrupt_level )
+uint8_t ti990_4_state::interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_int_level;
 }

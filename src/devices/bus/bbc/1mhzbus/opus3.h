@@ -36,10 +36,10 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(ramdisk_r);
-	DECLARE_WRITE8_MEMBER(ramdisk_w);
+	void wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ramdisk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ramdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

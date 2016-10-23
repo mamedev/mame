@@ -103,18 +103,18 @@
 #include "includes/tdv2324.h"
 #include "softlist.h"
 
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_30 )
+uint8_t tdv2324_state::tdv2324_main_io_30(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
 // Not sure what this is for, i/o read at 0xE6 on maincpu, post fails if it does not return bit 4 set
-READ8_MEMBER( tdv2324_state::tdv2324_main_io_e6 )
+uint8_t tdv2324_state::tdv2324_main_io_e6(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x10; // TODO: this should actually return something meaningful, for now is enough to pass early boot test
 }
 
-WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
+void tdv2324_state::tdv2324_main_io_e2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%c\n", data);
 }

@@ -111,20 +111,20 @@ public:
 
 	void init_amust();
 	void machine_reset_amust();
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port04_w);
-	DECLARE_READ8_MEMBER(port05_r);
-	DECLARE_READ8_MEMBER(port06_r);
-	DECLARE_WRITE8_MEMBER(port06_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_READ8_MEMBER(port09_r);
-	DECLARE_READ8_MEMBER(port0a_r);
-	DECLARE_WRITE8_MEMBER(port0a_w);
-	DECLARE_WRITE8_MEMBER(port0d_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port05_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port06_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port09_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port0a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t *m_p_videoram;
@@ -156,7 +156,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-//WRITE8_MEMBER( amust_state::port00_w )
+//void amust_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  membank("bankr0")->set_entry(BIT(data, 6));
 //  m_fdc->dden_w(BIT(data, 5));
@@ -211,14 +211,14 @@ static INPUT_PORTS_START( amust )
 	PORT_DIPSETTING(    0x08, "4" )
 INPUT_PORTS_END
 
-READ8_MEMBER( amust_state::port00_r )
+uint8_t amust_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( amust_state::port01_r )
+uint8_t amust_state::port01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -229,39 +229,39 @@ INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xff);
 }
 
-READ8_MEMBER( amust_state::port04_r )
+uint8_t amust_state::port04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port04;
 }
 
-WRITE8_MEMBER( amust_state::port04_w )
+void amust_state::port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port04 = data;
 }
 
-READ8_MEMBER( amust_state::port05_r )
+uint8_t amust_state::port05_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER( amust_state::port06_r )
+uint8_t amust_state::port06_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port06;
 }
 
 // BIT 5 low while writing to screen
-WRITE8_MEMBER( amust_state::port06_w )
+void amust_state::port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port06 = data;
 }
 
-READ8_MEMBER( amust_state::port08_r )
+uint8_t amust_state::port08_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port08;
 }
 
 // lower 8 bits of video address
-WRITE8_MEMBER( amust_state::port08_w )
+void amust_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port08 = data;
 }
@@ -276,13 +276,13 @@ d5 - status of disk-related; loops till NZ
 d6 -
 d7 -
 */
-READ8_MEMBER( amust_state::port09_r )
+uint8_t amust_state::port09_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("%s\n",machine().describe_context());
 	return ioport("P9")->read();
 }
 
-READ8_MEMBER( amust_state::port0a_r )
+uint8_t amust_state::port0a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port0a;
 }
@@ -294,7 +294,7 @@ with selecting which device causes interrupt?
 D0 ?
 Bit 4 low = beeper.
 Lower 3 bits = upper part of video address */
-WRITE8_MEMBER( amust_state::port0a_w )
+void amust_state::port0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port0a = data;
 
@@ -305,13 +305,13 @@ WRITE8_MEMBER( amust_state::port0a_w )
 	}
 }
 
-WRITE8_MEMBER( amust_state::port0d_w )
+void amust_state::port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t video_address = m_port08 | ((m_port0a & 7) << 8);
 	m_p_videoram[video_address] = data;
 }
 
-WRITE8_MEMBER( amust_state::kbd_put )
+void amust_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

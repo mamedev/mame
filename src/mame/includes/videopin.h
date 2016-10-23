@@ -51,13 +51,13 @@ public:
 	tilemap_t* m_bg_tilemap;
 	emu_timer *m_interrupt_timer;
 
-	DECLARE_READ8_MEMBER(misc_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(ball_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(out2_w);
-	DECLARE_WRITE8_MEMBER(note_dvsr_w);
+	uint8_t misc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void note_dvsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);

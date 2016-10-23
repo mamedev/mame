@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( divebomb_fgcpu_iomap, AS_IO, 8, divebomb_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(divebomb_state::fgcpu_spr_comm_r)
+uint8_t divebomb_state::fgcpu_spr_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	has_fromsprite = false;
 	update_irqs();
@@ -138,14 +138,14 @@ READ8_MEMBER(divebomb_state::fgcpu_spr_comm_r)
 }
 
 
-WRITE8_MEMBER(divebomb_state::fgcpu_spr_comm_w)
+void divebomb_state::fgcpu_spr_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	to_spritecpu = data;
 }
 
 
-READ8_MEMBER(divebomb_state::fgcpu_roz_comm_r)
+uint8_t divebomb_state::fgcpu_roz_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	has_fromroz = false;
 	update_irqs();
@@ -153,14 +153,14 @@ READ8_MEMBER(divebomb_state::fgcpu_roz_comm_r)
 }
 
 
-WRITE8_MEMBER(divebomb_state::fgcpu_roz_comm_w)
+void divebomb_state::fgcpu_roz_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	to_rozcpu = data;
 }
 
 
-READ8_MEMBER(divebomb_state::fgcpu_comm_flags_r)
+uint8_t divebomb_state::fgcpu_comm_flags_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -195,14 +195,14 @@ static ADDRESS_MAP_START( divebomb_spritecpu_iomap, AS_IO, 8, divebomb_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(divebomb_state::spritecpu_comm_r)
+uint8_t divebomb_state::spritecpu_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_spritecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return to_spritecpu;
 }
 
 
-WRITE8_MEMBER(divebomb_state::spritecpu_comm_w)
+void divebomb_state::spritecpu_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	from_sprite = data;
 	has_fromsprite = true;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(divebomb_state::spritecpu_comm_w)
 }
 
 
-WRITE8_MEMBER(divebomb_state::spritecpu_port00_w)
+void divebomb_state::spritecpu_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Written with 0x00 on reset
 	// Written with 0x34 7 times in succession on occasion (see PC:0x00E3)
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( divebomb_rozcpu_iomap, AS_IO, 8, divebomb_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
+void divebomb_state::rozcpu_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_bank1->set_entry(bank);
@@ -257,14 +257,14 @@ WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 }
 
 
-READ8_MEMBER(divebomb_state::rozcpu_comm_r)
+uint8_t divebomb_state::rozcpu_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_rozcpucpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return to_rozcpu;
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_comm_w)
+void divebomb_state::rozcpu_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	from_roz = data;
 	has_fromroz = true;

@@ -85,18 +85,18 @@ public:
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
-	DECLARE_READ8_MEMBER(main_read_k);
-	DECLARE_WRITE16_MEMBER(main_write_o);
-	DECLARE_WRITE16_MEMBER(main_write_r);
+	uint8_t main_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void main_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER(rev1_ctl_r);
-	DECLARE_WRITE8_MEMBER(rev1_ctl_w);
-	DECLARE_READ8_MEMBER(sub_read_k);
-	DECLARE_WRITE16_MEMBER(sub_write_o);
-	DECLARE_WRITE16_MEMBER(sub_write_r);
+	uint8_t rev1_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rev1_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sub_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sub_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sub_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(rev2_write_o);
-	DECLARE_WRITE16_MEMBER(rev2_write_r);
+	void rev2_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rev2_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void machine_start() override;
@@ -145,14 +145,14 @@ void tispellb_state::prepare_display()
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
-WRITE16_MEMBER(tispellb_state::main_write_o)
+void tispellb_state::main_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = BITSWAP16(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	prepare_display();
 }
 
-WRITE16_MEMBER(tispellb_state::main_write_r)
+void tispellb_state::main_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
@@ -167,7 +167,7 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 	prepare_display();
 }
 
-READ8_MEMBER(tispellb_state::main_read_k)
+uint8_t tispellb_state::main_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[7]->read() | read_inputs(7);
@@ -176,31 +176,31 @@ READ8_MEMBER(tispellb_state::main_read_k)
 
 // 1st revision mcu/mcu comms
 
-WRITE8_MEMBER(tispellb_state::rev1_ctl_w)
+void tispellb_state::rev1_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// main CTL write data
 	m_rev1_ctl = data & 0xf;
 }
 
-READ8_MEMBER(tispellb_state::sub_read_k)
+uint8_t tispellb_state::sub_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// sub K8421 <- main CTL3210
 	return m_rev1_ctl;
 }
 
-WRITE16_MEMBER(tispellb_state::sub_write_o)
+void tispellb_state::sub_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// sub O write data
 	m_sub_o = data;
 }
 
-READ8_MEMBER(tispellb_state::rev1_ctl_r)
+uint8_t tispellb_state::rev1_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// main CTL3210 <- sub O6043
 	return BITSWAP8(m_sub_o,7,5,2,1,6,0,4,3) & 0xf;
 }
 
-WRITE16_MEMBER(tispellb_state::sub_write_r)
+void tispellb_state::sub_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// sub R: unused?
 	m_sub_r = data;
@@ -209,7 +209,7 @@ WRITE16_MEMBER(tispellb_state::sub_write_r)
 
 // 2nd revision specifics
 
-WRITE16_MEMBER(tispellb_state::rev2_write_o)
+void tispellb_state::rev2_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// SEG DP: speaker out
 	m_speaker->level_w(data >> 15 & 1);
@@ -218,7 +218,7 @@ WRITE16_MEMBER(tispellb_state::rev2_write_o)
 	main_write_o(space, offset, data & 0x6fff);
 }
 
-WRITE16_MEMBER(tispellb_state::rev2_write_r)
+void tispellb_state::rev2_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1

@@ -554,7 +554,7 @@ int z80scc_device::m1_r()
 //-------------------------------------------------
 //  zbus_r - Z-Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::zbus_r )
+uint8_t z80scc_device::zbus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = 0;
 	int reg = 0x20; // Default point to a non register number
@@ -588,7 +588,7 @@ READ8_MEMBER( z80scc_device::zbus_r )
 //-------------------------------------------------
 //  zbus_w - Z-Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::zbus_w )
+void z80scc_device::zbus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = 0;
 	int reg = 0x20; // Default point to a non register number
@@ -620,7 +620,7 @@ WRITE8_MEMBER( z80scc_device::zbus_w )
 //-------------------------------------------------
 //  cd_ba_r - Universal Bus read
 //-------------------------------------------------
-READ8_MEMBER( z80scc_device::cd_ba_r )
+uint8_t z80scc_device::cd_ba_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -640,7 +640,7 @@ READ8_MEMBER( z80scc_device::cd_ba_r )
 //-------------------------------------------------
 //  cd_ba_w - Universal Bus write
 //-------------------------------------------------
-WRITE8_MEMBER( z80scc_device::cd_ba_w )
+void z80scc_device::cd_ba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 0);
 	int cd = BIT(offset, 1);
@@ -665,7 +665,7 @@ WRITE8_MEMBER( z80scc_device::cd_ba_w )
 //  ba_cd_r - Universal Bus read
 //-------------------------------------------------
 
-READ8_MEMBER( z80scc_device::ba_cd_r )
+uint8_t z80scc_device::ba_cd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -687,7 +687,7 @@ READ8_MEMBER( z80scc_device::ba_cd_r )
 //  ba_cd_w - Universal Bus write
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80scc_device::ba_cd_w )
+void z80scc_device::ba_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -712,7 +712,7 @@ WRITE8_MEMBER( z80scc_device::ba_cd_w )
 //  ba_cd_inv_r - Universal Bus read
 //-------------------------------------------------
 
-READ8_MEMBER( z80scc_device::ba_cd_inv_r )
+uint8_t z80scc_device::ba_cd_inv_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -734,7 +734,7 @@ READ8_MEMBER( z80scc_device::ba_cd_inv_r )
 //  ba_cd_inv_w - Universal Bus read
 //-------------------------------------------------
 
-WRITE8_MEMBER( z80scc_device::ba_cd_inv_w )
+void z80scc_device::ba_cd_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int ba = BIT(offset, 1);
 	int cd = BIT(offset, 0);
@@ -2237,10 +2237,10 @@ void z80scc_channel::m_tx_fifo_rp_step()
 		}
 }
 
-READ8_MEMBER (z80scc_device::da_r)  { return m_chanA->data_read(); }
-WRITE8_MEMBER (z80scc_device::da_w) { m_chanA->data_write(data); }
-READ8_MEMBER (z80scc_device::db_r)  { return m_chanB->data_read(); }
-WRITE8_MEMBER (z80scc_device::db_w) { m_chanB->data_write(data); }
+uint8_t z80scc_device::da_r(address_space &space, offs_t offset, uint8_t mem_mask)  { return m_chanA->data_read(); }
+void z80scc_device::da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_chanA->data_write(data); }
+uint8_t z80scc_device::db_r(address_space &space, offs_t offset, uint8_t mem_mask)  { return m_chanB->data_read(); }
+void z80scc_device::db_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_chanB->data_write(data); }
 
 //-------------------------------------------------
 //  data_write - write data register

@@ -143,7 +143,7 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	}
 }
 
-READ8_MEMBER(electron_state::electron_read_keyboard)
+uint8_t electron_state::electron_read_keyboard(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -159,39 +159,39 @@ READ8_MEMBER(electron_state::electron_read_keyboard)
 	return data;
 }
 
-READ8_MEMBER(electron_state::electron_mem_r)
+uint8_t electron_state::electron_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//waitforramsync();
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER(electron_state::electron_mem_w)
+void electron_state::electron_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//waitforramsync();
 	m_ram->write(offset, data);
 }
 
-READ8_MEMBER(electron_state::electron_fred_r)
+uint8_t electron_state::electron_fred_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("FRED: read fc%02x\n", offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(electron_state::electron_fred_w)
+void electron_state::electron_fred_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(electron_state::electron_jim_r)
+uint8_t electron_state::electron_jim_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("JIM: read fd%02x\n", offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(electron_state::electron_jim_w)
+void electron_state::electron_jim_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(electron_state::electron_sheila_r)
+uint8_t electron_state::electron_sheila_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ((uint8_t *)memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
@@ -214,7 +214,7 @@ READ8_MEMBER(electron_state::electron_sheila_r)
 static const int electron_palette_offset[4] = { 0, 4, 5, 1 };
 static const uint16_t electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
 
-WRITE8_MEMBER(electron_state::electron_sheila_w)
+void electron_state::electron_sheila_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );

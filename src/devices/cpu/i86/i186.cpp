@@ -1302,7 +1302,7 @@ void i80186_cpu_device::drq_callback(int which)
 	}
 }
 
-READ16_MEMBER(i80186_cpu_device::internal_port_r)
+uint16_t i80186_cpu_device::internal_port_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp, which;
 
@@ -1482,7 +1482,7 @@ READ16_MEMBER(i80186_cpu_device::internal_port_r)
  *
  *************************************/
 
-WRITE16_MEMBER(i80186_cpu_device::internal_port_w)
+void i80186_cpu_device::internal_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int which;
 

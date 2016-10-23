@@ -350,8 +350,8 @@ public:
 
 	template<class _Object> static devcb_base &set_interrupt_handler(device_t &device, _Object object) { return downcast<ohci_usb_controller &>(device).m_interrupt_handler.set_callback(object); }
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

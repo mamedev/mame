@@ -58,14 +58,14 @@ public:
 	uint8_t m_sense_state;
 	uint8_t m_attract;
 
-	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);
-	DECLARE_READ8_MEMBER(lazercmd_ctrl_port_r);
-	DECLARE_WRITE8_MEMBER(lazercmd_data_port_w);
-	DECLARE_READ8_MEMBER(lazercmd_data_port_r);
-	DECLARE_WRITE8_MEMBER(lazercmd_hardware_w);
-	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
-	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
-	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
+	void lazercmd_ctrl_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lazercmd_ctrl_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lazercmd_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lazercmd_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lazercmd_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void medlanes_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bbonk_hardware_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lazercmd_hardware_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_lazercmd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

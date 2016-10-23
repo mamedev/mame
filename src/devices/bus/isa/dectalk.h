@@ -19,22 +19,22 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE16_MEMBER(status_w);
-	DECLARE_READ16_MEMBER(cmd_r);
-	DECLARE_WRITE16_MEMBER(data_w);
-	DECLARE_READ16_MEMBER(data_r);
-	DECLARE_READ16_MEMBER(host_irq_r);
-	DECLARE_READ8_MEMBER(dma_r);
-	DECLARE_WRITE8_MEMBER(dma_w);
-	DECLARE_WRITE16_MEMBER(dac_w);
-	DECLARE_READ16_MEMBER(dsp_dma_r);
-	DECLARE_WRITE16_MEMBER(dsp_dma_w);
-	DECLARE_WRITE16_MEMBER(output_ctl_w);
+	void status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t host_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void output_ctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(bio_line_r);
-	DECLARE_WRITE16_MEMBER(irq_line_w);
+	void irq_line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 protected:

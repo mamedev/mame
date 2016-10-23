@@ -46,15 +46,15 @@ public:
 	/* devices */
 	required_device<cpu_device> m_video_cpu;
 	required_device<cpu_device> m_sprite_cpu;
-	DECLARE_WRITE8_MEMBER(video_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sprite_interrupt_w);
-	DECLARE_WRITE8_MEMBER(scroll_interrupt_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(kingofb_videoram_w);
-	DECLARE_WRITE8_MEMBER(kingofb_colorram_w);
-	DECLARE_WRITE8_MEMBER(kingofb_videoram2_w);
-	DECLARE_WRITE8_MEMBER(kingofb_colorram2_w);
-	DECLARE_WRITE8_MEMBER(kingofb_f800_w);
+	void video_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingofb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingofb_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingofb_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingofb_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kingofb_f800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ringkingw();
 	void init_ringking3();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

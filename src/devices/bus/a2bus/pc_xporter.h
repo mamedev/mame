@@ -40,7 +40,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ16_MEMBER(pc_bios_r);
+	uint16_t pc_bios_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	required_device<v30_device> m_v30;
 	required_device<pic8259_device>  m_pic8259;
@@ -77,26 +77,26 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
-	DECLARE_READ8_MEMBER( pc_dma_read_byte );
-	DECLARE_WRITE8_MEMBER( pc_dma_write_byte );
-	DECLARE_READ8_MEMBER( pc_dma8237_1_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_2_dack_r );
-	DECLARE_READ8_MEMBER( pc_dma8237_3_dack_r );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_1_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_2_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_3_dack_w );
-	DECLARE_WRITE8_MEMBER( pc_dma8237_0_dack_w );
+	uint8_t pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc_dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
-	DECLARE_READ8_MEMBER( kbd_6502_r );
-	DECLARE_WRITE8_MEMBER( kbd_6502_w );
+	uint8_t kbd_6502_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_6502_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
-	DECLARE_WRITE8_MEMBER(pc_page_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void pc_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

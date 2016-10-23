@@ -28,7 +28,7 @@ public:
 
 	uint8_t m_flip_screen;
 
-	DECLARE_WRITE8_MEMBER(port_w);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 
@@ -124,7 +124,7 @@ uint32_t sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rg
 }
 
 
-WRITE8_MEMBER(sstrangr_state::port_w)
+void sstrangr_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = data & 0x20;
 }

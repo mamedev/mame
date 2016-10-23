@@ -14,9 +14,9 @@ public:
 	};
 
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( music1_w );
-	DECLARE_WRITE8_MEMBER( music2_w );
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void music1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void music2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

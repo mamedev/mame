@@ -117,13 +117,13 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_black_w)
 	}
 }
 
-READ8_MEMBER(cpc_transtape_device::input_r)
+uint8_t cpc_transtape_device::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO
 	return 0x80;
 }
 
-WRITE8_MEMBER(cpc_transtape_device::output_w)
+void cpc_transtape_device::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO
 	m_output = data;

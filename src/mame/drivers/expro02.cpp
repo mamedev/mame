@@ -240,7 +240,7 @@ public:
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
+	void expro02_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_expro02();
 	virtual void machine_start() override;
@@ -252,9 +252,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	// comad
-	READ16_MEMBER(comad_timer_r);
-	READ8_MEMBER(comad_okim6295_r);
-	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
+	uint16_t comad_timer_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint8_t comad_okim6295_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void galpanica_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 };
 
 
@@ -623,7 +623,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE16_MEMBER(expro02_state::expro02_6295_bankswitch_w)
+void expro02_state::expro02_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -826,13 +826,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::scanline)
  *
  *************************************/
 
-READ16_MEMBER(expro02_state::comad_timer_r)
+uint16_t expro02_state::comad_timer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_screen->vpos() & 0x07) << 8;
 }
 
 /* a kludge! */
-READ8_MEMBER(expro02_state::comad_okim6295_r)
+uint8_t expro02_state::comad_okim6295_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t retvalue;
 //  retvalue = m_oki->read_status(); // doesn't work, causes lockups when girls change..
@@ -840,7 +840,7 @@ READ8_MEMBER(expro02_state::comad_okim6295_r)
 	return retvalue;
 }
 
-WRITE16_MEMBER(expro02_state::galpanica_6295_bankswitch_w)
+void expro02_state::galpanica_6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

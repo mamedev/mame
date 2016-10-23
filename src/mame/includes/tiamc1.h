@@ -30,19 +30,19 @@ public:
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	std::unique_ptr<rgb_t[]> m_palette_ptr;
-	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_videoram_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_x_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_y_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_a_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_sprite_n_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_vshift_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_hshift_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_bg_bplctrl_w);
-	DECLARE_WRITE8_MEMBER(tiamc1_palette_w);
-	DECLARE_WRITE8_MEMBER(kot_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kot_videoram_w);
+	void tiamc1_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_sprite_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_sprite_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_sprite_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_sprite_n_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_bg_vshift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_bg_hshift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_bg_bplctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kot_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kot_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_2_w);
 
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -117,9 +117,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );
-	DECLARE_WRITE8_MEMBER( tiamc1_timer1_w );
-	DECLARE_WRITE8_MEMBER( tiamc1_timer1_gate_w );
+	void tiamc1_timer0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_timer1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tiamc1_timer1_gate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	void timer8253_reset(struct timer8253struct *t);

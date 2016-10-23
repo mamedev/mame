@@ -45,8 +45,8 @@ public:
 	template<class _Object> static devcb_base &set_pe_wr_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_write_pe.set_callback(object); }
 	template<class _Object> static devcb_base &set_data_rd_callback(device_t &device, _Object object) { return downcast<e05a03_device &>(device).m_read_data.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	WRITE_LINE_MEMBER( home_w ); /* home position signal */
 	WRITE_LINE_MEMBER( fire_w ); /* printhead solenoids trigger */

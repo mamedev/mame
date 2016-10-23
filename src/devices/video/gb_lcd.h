@@ -38,12 +38,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(oam_r);
-	DECLARE_WRITE8_MEMBER(oam_w);
-	virtual DECLARE_READ8_MEMBER(video_r);
-	virtual DECLARE_WRITE8_MEMBER(video_w);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t oam_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void oam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// FIXME: remove it when proper sgb support is added
 	void set_sgb_hack(bool val) { m_sgb_border_hack = val ? 1 : 0; }
@@ -268,8 +268,8 @@ class cgb_ppu_device : public dmg_ppu_device
 public:
 	cgb_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(video_r) override;
-	virtual DECLARE_WRITE8_MEMBER(video_w) override;
+	virtual uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 

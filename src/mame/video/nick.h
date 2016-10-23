@@ -91,13 +91,13 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( fixbias_w );
-	DECLARE_WRITE8_MEMBER( border_w );
-	DECLARE_WRITE8_MEMBER( lpl_w );
-	DECLARE_WRITE8_MEMBER( lph_w );
+	void fixbias_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void border_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lpl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lph_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	address_space_config m_space_config;
 

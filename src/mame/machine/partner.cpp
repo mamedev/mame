@@ -55,7 +55,7 @@ void partner_state::partner_window_2(uint8_t bank_num, uint16_t offset,uint8_t *
 	}
 }
 
-READ8_MEMBER(partner_state::partner_floppy_r){
+uint8_t partner_state::partner_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : return m_fdc->status_r(space, 0);
@@ -69,7 +69,7 @@ READ8_MEMBER(partner_state::partner_floppy_r){
 	}
 }
 
-WRITE8_MEMBER(partner_state::partner_floppy_w){
+void partner_state::partner_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	if (offset<0x100) {
 		switch(offset & 3) {
 			case 0x00 : m_fdc->cmd_w(space, 0,data); break;
@@ -320,13 +320,13 @@ void partner_state::partner_bank_switch()
 	}
 }
 
-WRITE8_MEMBER(partner_state::partner_win_memory_page_w)
+void partner_state::partner_win_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_win_mem_page = ~data;
 	partner_bank_switch();
 }
 
-WRITE8_MEMBER(partner_state::partner_mem_page_w)
+void partner_state::partner_mem_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem_page = (data >> 4) & 0x0f;
 	partner_bank_switch();

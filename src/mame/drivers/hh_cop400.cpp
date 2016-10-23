@@ -263,27 +263,27 @@ public:
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_l);
+	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(ctstein_state::write_g)
+void ctstein_state::write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G0-G2: input mux
 	m_inp_mux = data & 7;
 }
 
-WRITE8_MEMBER(ctstein_state::write_l)
+void ctstein_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// L0-L3: button lamps (strobed)
 	display_matrix(4, 1, data & 0xf, 1);
 	display_matrix(4, 1, 0, 0);
 }
 
-READ8_MEMBER(ctstein_state::read_l)
+uint8_t ctstein_state::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// L4-L7: multiplexed inputs
 	return read_inputs(3) << 4 | 0xf;
@@ -356,29 +356,29 @@ public:
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 };
 
 // handlers
 
-WRITE8_MEMBER(h2hbaskb_state::write_d)
+void h2hbaskb_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: led select
 	m_d = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskb_state::write_g)
+void h2hbaskb_state::write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G: led select, input mux
 	m_inp_mux = data;
 	m_g = data & 0xf;
 }
 
-WRITE8_MEMBER(h2hbaskb_state::write_l)
+void h2hbaskb_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D2,D3 double as multiplexer
 	uint16_t mask = ((m_d >> 2 & 1) * 0x00ff) | ((m_d >> 3 & 1) * 0xff00);
@@ -393,7 +393,7 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 	display_matrix(7, 16, 0, 0);
 }
 
-READ8_MEMBER(h2hbaskb_state::read_in)
+uint8_t h2hbaskb_state::read_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// IN: multiplexed inputs
 	return (read_inputs(4) & 7) | (m_inp_matrix[4]->read() & 8);
@@ -485,11 +485,11 @@ public:
 	required_device<dac_bit_interface> m_dac;
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_g);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_WRITE8_MEMBER(write_l);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -506,14 +506,14 @@ void einvaderc_state::prepare_display()
 	display_matrix(8, 10, l, grid);
 }
 
-WRITE8_MEMBER(einvaderc_state::write_d)
+void einvaderc_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: led grid 0-3
 	m_d = data;
 	prepare_display();
 }
 
-WRITE8_MEMBER(einvaderc_state::write_g)
+void einvaderc_state::write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G: led grid 4-7
 	m_g = data;
@@ -535,7 +535,7 @@ WRITE_LINE_MEMBER(einvaderc_state::write_so)
 	prepare_display();
 }
 
-WRITE8_MEMBER(einvaderc_state::write_l)
+void einvaderc_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// L: led state/segment
 	m_l = data;
@@ -599,16 +599,16 @@ public:
 
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_g);
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_g);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_g(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(funjacks_state::write_d)
+void funjacks_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: led grid + input mux
 	m_inp_mux = data;
@@ -616,27 +616,27 @@ WRITE8_MEMBER(funjacks_state::write_d)
 	display_matrix(2, 4, m_l, m_d);
 }
 
-WRITE8_MEMBER(funjacks_state::write_l)
+void funjacks_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// L0,L1: led state
 	m_l = data & 3;
 	display_matrix(2, 4, m_l, m_d);
 }
 
-WRITE8_MEMBER(funjacks_state::write_g)
+void funjacks_state::write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G1: speaker out
 	m_dac->write(BIT(data, 1));
 	m_g = data;
 }
 
-READ8_MEMBER(funjacks_state::read_l)
+uint8_t funjacks_state::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// L4,L5: multiplexed inputs
 	return read_inputs(3) & 0x30;
 }
 
-READ8_MEMBER(funjacks_state::read_g)
+uint8_t funjacks_state::read_g(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// G1: speaker out state
 	// G2,G3: inputs
@@ -715,23 +715,23 @@ public:
 
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_WRITE8_MEMBER(write_g);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
 
 // handlers
 
-WRITE8_MEMBER(funrlgl_state::write_d)
+void funrlgl_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: led grid
 	m_d = data ^ 0xf;
 	display_matrix(4, 4, m_l, m_d);
 }
 
-WRITE8_MEMBER(funrlgl_state::write_l)
+void funrlgl_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// L0-L3: led state
 	// L4-L7: N/C
@@ -739,7 +739,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 	display_matrix(4, 4, m_l, m_d);
 }
 
-WRITE8_MEMBER(funrlgl_state::write_g)
+void funrlgl_state::write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G3: speaker out
 	m_dac->write(BIT(data, 3));
@@ -810,12 +810,12 @@ public:
 
 	required_device<dac_bit_interface> m_dac;
 
-	DECLARE_WRITE8_MEMBER(write_d);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(plus1_state::write_d)
+void plus1_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D?: speaker out
 	m_dac->write(BIT(data, 0));
@@ -890,9 +890,9 @@ public:
 
 	void prepare_display();
 	DECLARE_WRITE_LINE_MEMBER(write_so);
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_WRITE8_MEMBER(write_l);
-	DECLARE_READ8_MEMBER(read_g);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_g(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -910,14 +910,14 @@ WRITE_LINE_MEMBER(lightfgt_state::write_so)
 	prepare_display();
 }
 
-WRITE8_MEMBER(lightfgt_state::write_d)
+void lightfgt_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: led grid 1-4 (and input mux)
 	m_d = data;
 	prepare_display();
 }
 
-WRITE8_MEMBER(lightfgt_state::write_l)
+void lightfgt_state::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// L0-L4: led state
 	// L5-L7: N/C
@@ -925,7 +925,7 @@ WRITE8_MEMBER(lightfgt_state::write_l)
 	prepare_display();
 }
 
-READ8_MEMBER(lightfgt_state::read_g)
+uint8_t lightfgt_state::read_g(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// G: multiplexed inputs
 	m_inp_mux = m_d << 1 | m_so;
@@ -1008,27 +1008,27 @@ public:
 		: hh_cop400_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(write_d);
-	DECLARE_READ8_MEMBER(read_l);
-	DECLARE_READ8_MEMBER(read_in);
+	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 };
 
 // handlers
 
-WRITE8_MEMBER(bship82_state::write_d)
+void bship82_state::write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D: input mux
 	m_inp_mux = data;
 }
 
-READ8_MEMBER(bship82_state::read_l)
+uint8_t bship82_state::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// L: multiplexed inputs
 	return read_inputs(4) & 0xff;
 }
 
-READ8_MEMBER(bship82_state::read_in)
+uint8_t bship82_state::read_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// IN: multiplexed inputs
 	return read_inputs(4) >> 8 & 0xf;

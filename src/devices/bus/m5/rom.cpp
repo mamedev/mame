@@ -44,7 +44,7 @@ m5_ram_device::m5_ram_device(const machine_config &mconfig, const char *tag, dev
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(m5_rom_device::read_rom)
+uint8_t m5_rom_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -52,12 +52,12 @@ READ8_MEMBER(m5_rom_device::read_rom)
 		return 0xff;
 }
 
-READ8_MEMBER(m5_ram_device::read_ram)
+uint8_t m5_ram_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(m5_ram_device::write_ram)
+void m5_ram_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 }

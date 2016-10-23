@@ -132,23 +132,23 @@ public:
 
 	int m_palette_count;
 	uint8_t m_palette_ram[0x10000];
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel2_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel3_attr_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(luckgrln_reel4_attr_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
-	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_READ8_MEMBER(test_r);
+	void luckgrln_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel1_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel2_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel3_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void luckgrln_reel4_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_offset_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_offset_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_luckgrln();
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
 	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
@@ -163,13 +163,13 @@ public:
 };
 
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
+void luckgrln_state::luckgrln_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
+void luckgrln_state::luckgrln_reel1_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_attr[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -193,13 +193,13 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
+void luckgrln_state::luckgrln_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
+void luckgrln_state::luckgrln_reel2_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_attr[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -221,13 +221,13 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel2_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
+void luckgrln_state::luckgrln_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
+void luckgrln_state::luckgrln_reel3_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_attr[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -248,13 +248,13 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel3_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
+void luckgrln_state::luckgrln_reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_ram[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
+void luckgrln_state::luckgrln_reel4_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_attr[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(luckgrln_state::output_w)
+void luckgrln_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* correct? */
 	if (data==0x84)
@@ -444,17 +444,17 @@ WRITE8_MEMBER(luckgrln_state::output_w)
 
 
 
-WRITE8_MEMBER(luckgrln_state::palette_offset_low_w)
+void luckgrln_state::palette_offset_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_count = data<<1;
 }
-WRITE8_MEMBER(luckgrln_state::palette_offset_high_w)
+void luckgrln_state::palette_offset_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_count = m_palette_count | data<<9;
 }
 
 
-WRITE8_MEMBER(luckgrln_state::palette_w)
+void luckgrln_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_ram[m_palette_count] = data;
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER(luckgrln_state::palette_w)
 }
 
 // Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
-READ8_MEMBER(luckgrln_state::rtc_r)
+uint8_t luckgrln_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	system_time systime;
 	machine().base_datetime(systime);
@@ -506,7 +506,7 @@ READ8_MEMBER(luckgrln_state::rtc_r)
 }
 
 /* Analizing the lamps, the game should has a 12-buttons control layout */
-WRITE8_MEMBER(luckgrln_state::lamps_a_w)
+void luckgrln_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS A:
 
@@ -531,7 +531,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 	output().set_lamp_value(7, (data >> 7) & 1);      /* TAKE */
 }
 
-WRITE8_MEMBER(luckgrln_state::lamps_b_w)
+void luckgrln_state::lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS B:
 
@@ -550,7 +550,7 @@ WRITE8_MEMBER(luckgrln_state::lamps_b_w)
 	output().set_lamp_value(11, (data >> 3) & 1);     /* CANCEL */
 }
 
-WRITE8_MEMBER(luckgrln_state::counters_w)
+void luckgrln_state::counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  COUNTERS:
 
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 ADDRESS_MAP_END
 
 /* reads a bit 1 status there after every round played */
-READ8_MEMBER(luckgrln_state::test_r)
+uint8_t luckgrln_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

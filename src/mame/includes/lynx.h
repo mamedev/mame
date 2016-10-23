@@ -146,14 +146,14 @@ public:
 
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_bitmap_temp;
-	DECLARE_READ8_MEMBER(suzy_read);
-	DECLARE_WRITE8_MEMBER(suzy_write);
-	DECLARE_WRITE8_MEMBER(lynx_uart_w);
-	DECLARE_READ8_MEMBER(lynx_uart_r);
-	DECLARE_READ8_MEMBER(mikey_read);
-	DECLARE_WRITE8_MEMBER(mikey_write);
-	DECLARE_READ8_MEMBER(lynx_memory_config_r);
-	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
+	uint8_t suzy_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void suzy_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lynx_uart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lynx_uart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mikey_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mikey_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lynx_memory_config_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lynx_memory_config_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lynx_divide();
 	void lynx_multiply();
 	uint8_t lynx_timer_read(int which, int offset);

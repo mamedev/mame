@@ -65,7 +65,7 @@ void relief_state::machine_reset_relief()
  *
  *************************************/
 
-READ16_MEMBER(relief_state::special_port2_r)
+uint16_t relief_state::special_port2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("260010")->read();
 	if (!(result & 0x0080) || get_hblank(*m_screen)) result ^= 0x0001;
@@ -80,7 +80,7 @@ READ16_MEMBER(relief_state::special_port2_r)
  *
  *************************************/
 
-WRITE16_MEMBER(relief_state::audio_control_w)
+void relief_state::audio_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -95,7 +95,7 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 }
 
 
-WRITE16_MEMBER(relief_state::audio_volume_w)
+void relief_state::audio_volume_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

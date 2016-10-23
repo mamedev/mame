@@ -129,28 +129,28 @@ public:
 
 	int     m_last;
 
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(looping_videoram_w);
-	DECLARE_WRITE8_MEMBER(looping_colorram_w);
-	DECLARE_WRITE8_MEMBER(level2_irq_set);
-	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(looping_souint_clr);
-	DECLARE_WRITE8_MEMBER(looping_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(ballon_enable_w);
-	DECLARE_WRITE8_MEMBER(out_0_w);
-	DECLARE_WRITE8_MEMBER(out_2_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
-	DECLARE_WRITE8_MEMBER(plr2_w);
-	DECLARE_READ8_MEMBER(cop_unk_r);
+	void flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void looping_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void looping_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void level2_irq_set(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void looping_souint_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void looping_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ballon_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(cop_serial_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(protection_r);
+	void cop_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
-	DECLARE_WRITE8_MEMBER(looping_sound_sw);
-	DECLARE_WRITE8_MEMBER(ay_enable_w);
-	DECLARE_WRITE8_MEMBER(speech_enable_w);
+	void looping_sound_sw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speech_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_looping();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
@@ -246,28 +246,28 @@ void looping_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::flip_screen_x_w)
+void looping_state::flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(~data & 0x01);
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
 }
 
 
-WRITE8_MEMBER(looping_state::flip_screen_y_w)
+void looping_state::flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(~data & 0x01);
 	m_bg_tilemap->set_scrollx(0, flip_screen() ? 128 : 0);
 }
 
 
-WRITE8_MEMBER(looping_state::looping_videoram_w)
+void looping_state::looping_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(looping_state::looping_colorram_w)
+void looping_state::looping_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -364,7 +364,7 @@ INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
 }
 
 
-WRITE8_MEMBER(looping_state::level2_irq_set)
+void looping_state::level2_irq_set(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Level 2 int = %d\n", data);
 	if (!(data & 1))
@@ -372,14 +372,14 @@ WRITE8_MEMBER(looping_state::level2_irq_set)
 }
 
 
-WRITE8_MEMBER(looping_state::main_irq_ack_w)
+void looping_state::main_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0)
 		m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(looping_state::looping_souint_clr)
+void looping_state::looping_souint_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Soundint clr = %d\n", data);
 	if (data == 0)
@@ -394,7 +394,7 @@ WRITE_LINE_MEMBER(looping_state::looping_spcint)
 }
 
 
-WRITE8_MEMBER(looping_state::looping_soundlatch_w)
+void looping_state::looping_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL2, ASSERT_LINE);
@@ -406,7 +406,7 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::looping_sound_sw)
+void looping_state::looping_sound_sw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
@@ -431,7 +431,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::ay_enable_w)
+void looping_state::ay_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("aysnd");
 	int output;
@@ -443,7 +443,7 @@ WRITE8_MEMBER(looping_state::ay_enable_w)
 }
 
 
-WRITE8_MEMBER(looping_state::speech_enable_w)
+void looping_state::speech_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("tms");
 	device_sound_interface *sound;
@@ -452,7 +452,7 @@ WRITE8_MEMBER(looping_state::speech_enable_w)
 }
 
 
-WRITE8_MEMBER(looping_state::ballon_enable_w)
+void looping_state::ballon_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_last != data)
 		osd_printf_debug("ballon_enable_w = %d\n", data);
@@ -467,13 +467,13 @@ WRITE8_MEMBER(looping_state::ballon_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(looping_state::out_0_w){ osd_printf_debug("out0 = %02X\n", data); }
-WRITE8_MEMBER(looping_state::out_2_w){ osd_printf_debug("out2 = %02X\n", data); }
+void looping_state::out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ osd_printf_debug("out0 = %02X\n", data); }
+void looping_state::out_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ osd_printf_debug("out2 = %02X\n", data); }
 
-READ8_MEMBER(looping_state::adc_r){ osd_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
-WRITE8_MEMBER(looping_state::adc_w){ osd_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
+uint8_t looping_state::adc_r(address_space &space, offs_t offset, uint8_t mem_mask){ osd_printf_debug("%04X:ADC read\n", space.device().safe_pc()); return 0xff; }
+void looping_state::adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ osd_printf_debug("%04X:ADC write = %02X\n", space.device().safe_pc(), data); }
 
-WRITE8_MEMBER(looping_state::plr2_w)
+void looping_state::plr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* set to 1 after IDLE, cleared to 0 during processing */
 	/* is this an LED on the PCB? */
@@ -487,7 +487,7 @@ WRITE8_MEMBER(looping_state::plr2_w)
  *
  *************************************/
 
-READ8_MEMBER(looping_state::cop_unk_r)
+uint8_t looping_state::cop_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
@@ -497,13 +497,13 @@ READ_LINE_MEMBER(looping_state::cop_serial_r)
 	return 1;
 }
 
-WRITE8_MEMBER(looping_state::cop_l_w)
+void looping_state::cop_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cop_port_l = data;
 	logerror("%02x  ",data);
 }
 
-READ8_MEMBER(looping_state::protection_r)
+uint8_t looping_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //        The code reads ($7002) ($7004) alternately
 //        The result must change at least once every 10 reads

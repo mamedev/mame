@@ -125,33 +125,33 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE16_MEMBER(dma_start_w);
-	DECLARE_WRITE16_MEMBER(dma_stop_w);
-	DECLARE_WRITE16_MEMBER(output_w);
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_READ16_MEMBER(analog1_lsb_r);
-	DECLARE_READ16_MEMBER(analog2_lsb_r);
-	DECLARE_READ16_MEMBER(analog3_lsb_r);
-	DECLARE_READ16_MEMBER(analog1_msb_r);
-	DECLARE_READ16_MEMBER(analog2_msb_r);
-	DECLARE_READ16_MEMBER(analog3_msb_r);
-	DECLARE_READ16_MEMBER(power_ram_r);
-	DECLARE_WRITE16_MEMBER(power_ram_w);
+	void dma_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dma_stop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog1_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog2_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog3_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog1_msb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog2_msb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analog3_msb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t power_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void power_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(dsp_control_w);
-	DECLARE_READ16_MEMBER(dsp_hold_signal_r);
+	void dsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_hold_signal_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_stop_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(msm5205_1_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(msm5205_2_start_w);
-	DECLARE_WRITE8_MEMBER(msm5205_2_stop_w);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_1_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_1_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_1_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_1_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_2_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_2_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
 
-	DECLARE_READ8_MEMBER(motor_r);
+	uint8_t motor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t exec_dma();
@@ -241,7 +241,7 @@ uint32_t mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_in
  *
  *************************************/
 
-WRITE16_MEMBER(mlanding_state::dma_start_w)
+void mlanding_state::dma_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dma_cpu_bank ^= 1;
 	membank("dma_ram")->set_entry(m_dma_cpu_bank);
@@ -258,7 +258,7 @@ WRITE16_MEMBER(mlanding_state::dma_start_w)
 }
 
 
-WRITE16_MEMBER(mlanding_state::dma_stop_w)
+void mlanding_state::dma_stop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dma_busy = 0;
 	timer_set(attotime::never);
@@ -416,7 +416,7 @@ void mlanding_state::device_timer(emu_timer &timer, device_timer_id id, int para
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::input_r)
+uint16_t mlanding_state::input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    FEDCBA98 76543210
@@ -431,7 +431,7 @@ READ16_MEMBER(mlanding_state::input_r)
 }
 
 
-WRITE16_MEMBER(mlanding_state::output_w)
+void mlanding_state::output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    76543210
@@ -456,25 +456,25 @@ WRITE16_MEMBER(mlanding_state::output_w)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::analog1_msb_r)
+uint16_t mlanding_state::analog1_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("THROTTLE")->read() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog2_msb_r)
+uint16_t mlanding_state::analog2_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("STICK_X")->read() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog3_msb_r)
+uint16_t mlanding_state::analog3_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("STICK_Y")->read() >> 4) & 0xff;
 }
 
 
-READ16_MEMBER(mlanding_state::analog1_lsb_r)
+uint16_t mlanding_state::analog1_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    76543210
@@ -500,7 +500,7 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 }
 
 
-READ16_MEMBER(mlanding_state::analog2_lsb_r)
+uint16_t mlanding_state::analog2_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    76543210
@@ -510,7 +510,7 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 }
 
 
-READ16_MEMBER(mlanding_state::analog3_lsb_r)
+uint16_t mlanding_state::analog3_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    76543210
@@ -542,13 +542,13 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::dsp_hold_signal_r)
+uint16_t mlanding_state::dsp_hold_signal_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_hold_signal;
 }
 
 
-WRITE16_MEMBER(mlanding_state::dsp_control_w)
+void mlanding_state::dsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    1 after zeroing 'dot' RAM
@@ -565,7 +565,7 @@ WRITE16_MEMBER(mlanding_state::dsp_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
+void mlanding_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Unused?
 }
@@ -629,14 +629,14 @@ WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_start_w)
+void mlanding_state::msm5205_1_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_reset[0] = 0;
 	m_msm1->reset_w(0);
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_stop_w)
+void mlanding_state::msm5205_1_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_reset[0] = 1;
 	m_msm_nibble[0] = 0;
@@ -645,28 +645,28 @@ WRITE8_MEMBER(mlanding_state::msm5205_1_stop_w)
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_addr_lo_w)
+void mlanding_state::msm5205_1_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_pos[0] &= ~0x0ff00;
 	m_msm_pos[0] |= data << 8;
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_1_addr_hi_w)
+void mlanding_state::msm5205_1_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_pos[0] &= ~0x70000;
 	m_msm_pos[0] |= (data & 7) << 16;
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_2_start_w)
+void mlanding_state::msm5205_2_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_reset[1] = 0;
 	m_msm2->reset_w(0);
 }
 
 
-WRITE8_MEMBER(mlanding_state::msm5205_2_stop_w)
+void mlanding_state::msm5205_2_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_reset[1] = 1;
 	m_msm_nibble[1] = 0;
@@ -681,20 +681,20 @@ WRITE8_MEMBER(mlanding_state::msm5205_2_stop_w)
  *
  *************************************/
 
-READ16_MEMBER(mlanding_state::power_ram_r)
+uint16_t mlanding_state::power_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_power_ram[offset];
 }
 
 
-WRITE16_MEMBER(mlanding_state::power_ram_w)
+void mlanding_state::power_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_power_ram[offset] = data & 0xff;
 }
 
 
-READ8_MEMBER(mlanding_state::motor_r)
+uint8_t mlanding_state::motor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    9001: RIGHT MOTOR: 1F=UP, 00=STOP, 2F=DOWN

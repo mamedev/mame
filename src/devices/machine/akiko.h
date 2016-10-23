@@ -62,8 +62,8 @@ public:
 	template<class _Object> static devcb_base &set_sda_write_handler(device_t &device, _Object object)
 		{ return downcast<akiko_device &>(device).m_sda_w.set_callback(object); }
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// inline configuration
 	static void set_cputag(device_t &device, const char *tag);

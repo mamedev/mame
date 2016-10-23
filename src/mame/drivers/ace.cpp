@@ -72,10 +72,10 @@ public:
 	/* input-related */
 	int m_objpos[8];
 
-	DECLARE_WRITE8_MEMBER(ace_objpos_w);
-	DECLARE_WRITE8_MEMBER(ace_characterram_w);
-	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	void ace_objpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ace_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ace_scoreram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -84,7 +84,7 @@ public:
 };
 
 
-WRITE8_MEMBER(aceal_state::ace_objpos_w)
+void aceal_state::ace_objpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_objpos[offset] = data;
 }
@@ -112,7 +112,7 @@ uint32_t aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-WRITE8_MEMBER(aceal_state::ace_characterram_w)
+void aceal_state::ace_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_characterram[offset] != data)
 	{
@@ -126,13 +126,13 @@ WRITE8_MEMBER(aceal_state::ace_characterram_w)
 	}
 }
 
-WRITE8_MEMBER(aceal_state::ace_scoreram_w)
+void aceal_state::ace_scoreram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scoreram[offset] = data;
 	m_gfxdecode->gfx(4)->mark_dirty(offset / 32);
 }
 
-READ8_MEMBER(aceal_state::unk_r)
+uint8_t aceal_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand() & 0xff;
 }

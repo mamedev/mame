@@ -252,7 +252,7 @@ void seta_state::seta_coin_lockout_w(int data)
 }
 
 
-WRITE16_MEMBER(seta_state::seta_vregs_w)
+void seta_state::seta_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 	switch (offset)
@@ -407,7 +407,7 @@ TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info(tileinfo, tile_
 TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
 
 
-WRITE16_MEMBER(seta_state::seta_vram_0_w)
+void seta_state::seta_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (offset & 0x1000)
@@ -416,7 +416,7 @@ WRITE16_MEMBER(seta_state::seta_vram_0_w)
 		m_tilemap_0->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(seta_state::seta_vram_2_w)
+void seta_state::seta_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_2[offset]);
 	if (offset & 0x1000)
@@ -425,7 +425,7 @@ WRITE16_MEMBER(seta_state::seta_vram_2_w)
 		m_tilemap_2->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
+void seta_state::twineagl_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

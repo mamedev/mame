@@ -218,7 +218,7 @@ void kr2376_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 /* Keyboard Data */
 
-READ8_MEMBER( kr2376_device::data_r )
+uint8_t kr2376_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_pins[KR2376_DSII])
 		return m_data ^ 0xff;

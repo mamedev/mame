@@ -47,12 +47,12 @@ Memo:
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(niyanpai_state::soundbank_w)
+void niyanpai_state::soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(niyanpai_state::soundlatch_clear_w)
+void niyanpai_state::soundlatch_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
 }
@@ -74,7 +74,7 @@ void niyanpai_state::init_niyanpai()
 }
 
 
-READ16_MEMBER(niyanpai_state::dipsw_r)
+uint16_t niyanpai_state::dipsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t dipsw_a = ioport("DSWA")->read();
 	uint8_t dipsw_b = ioport("DSWB")->read();
@@ -92,7 +92,7 @@ void niyanpai_state::machine_start_musobana()
 	save_item(NAME(m_musobana_outcoin_flag));
 }
 
-READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
+uint16_t niyanpai_state::musobana_inputport_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int portdata;
 
@@ -110,7 +110,7 @@ READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 	return (portdata);
 }
 
-WRITE16_MEMBER(niyanpai_state::tmp68301_parallel_port_w)
+void niyanpai_state::tmp68301_parallel_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
@@ -131,7 +131,7 @@ CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
 	return m_musobana_outcoin_flag & 0x01;
 }
 
-WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
+void niyanpai_state::musobana_inputport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_musobana_inputport = data;
 }

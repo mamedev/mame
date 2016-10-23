@@ -270,7 +270,7 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
  *
  *************************************/
 
-READ32_MEMBER( zeus2_device::zeus2_r )
+uint32_t zeus2_device::zeus2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int logit = (offset != 0x00 && offset != 0x01 &&
 		offset != 0x48 && offset != 0x49 &&
@@ -321,7 +321,7 @@ READ32_MEMBER( zeus2_device::zeus2_r )
  *
  *************************************/
 
-WRITE32_MEMBER( zeus2_device::zeus2_w )
+void zeus2_device::zeus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int logit = (offset != 0x08 &&
 					(offset != 0x20 || data != 0) &&

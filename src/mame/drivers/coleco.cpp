@@ -68,22 +68,22 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( coleco_state::paddle_1_r )
+uint8_t coleco_state::paddle_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_joy_d7_state[0] | coleco_paddle_read(0, m_joy_mode, m_joy_analog_state[0]);
 }
 
-READ8_MEMBER( coleco_state::paddle_2_r )
+uint8_t coleco_state::paddle_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_joy_d7_state[1] | coleco_paddle_read(1, m_joy_mode, m_joy_analog_state[1]);
 }
 
-WRITE8_MEMBER( coleco_state::paddle_off_w )
+void coleco_state::paddle_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_mode = 0;
 }
 
-WRITE8_MEMBER( coleco_state::paddle_on_w )
+void coleco_state::paddle_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_mode = 1;
 }
@@ -224,7 +224,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 	}
 }
 
-READ8_MEMBER( coleco_state::cart_r )
+uint8_t coleco_state::cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cart->bd_r(space, offset & 0x7fff, 0, 0, 0, 0, 0);
 }

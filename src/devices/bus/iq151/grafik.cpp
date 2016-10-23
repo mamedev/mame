@@ -80,7 +80,7 @@ machine_config_constructor iq151_grafik_device::device_mconfig_additions() const
 //  I8255 port a
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::x_write)
+void iq151_grafik_device::x_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("Grafik: set posx 0x%02x\n", data);
 
@@ -91,7 +91,7 @@ WRITE8_MEMBER(iq151_grafik_device::x_write)
 //  I8255 port b
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::y_write)
+void iq151_grafik_device::y_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("Grafik: set posy 0x%02x\n", data);
 
@@ -102,7 +102,7 @@ WRITE8_MEMBER(iq151_grafik_device::y_write)
 //  I8255 port c
 //-------------------------------------------------
 
-WRITE8_MEMBER(iq151_grafik_device::control_w)
+void iq151_grafik_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("Grafik: control write 0x%02x\n", data);
 

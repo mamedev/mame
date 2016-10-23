@@ -18,10 +18,10 @@ public:
 	// static configuration helpers
 	static void set_pccard_name(device_t &device, const char *name) { downcast<rf5c296_device &>(device).m_pccard_name = name; }
 
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_READ16_MEMBER(mem_r);
-	DECLARE_WRITE16_MEMBER(mem_w);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

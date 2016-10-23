@@ -48,7 +48,7 @@ void shangkid_state::video_start_shangkid()
 	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 }
 
-WRITE8_MEMBER(shangkid_state::videoram_w)
+void shangkid_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset&0x7ff );

@@ -64,7 +64,7 @@ void thunderx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 #define PMC_BK (m_1f98_latch & 0x02)
 
-READ8_MEMBER(thunderx_state::pmc_r)
+uint8_t thunderx_state::pmc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (PMC_BK)
 	{
@@ -78,7 +78,7 @@ READ8_MEMBER(thunderx_state::pmc_r)
 	}
 }
 
-WRITE8_MEMBER(thunderx_state::pmc_w)
+void thunderx_state::pmc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (PMC_BK)
 	{
@@ -280,7 +280,7 @@ void thunderx_state::calculate_collisions(  )
 	run_collisions(X0, Y0, X1, Y1, CM, HM);
 }
 
-WRITE8_MEMBER(thunderx_state::scontra_1f98_w)
+void thunderx_state::scontra_1f98_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = enable char ROM reading through the video RAM
 	m_k052109->set_rmrd_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -288,14 +288,14 @@ WRITE8_MEMBER(thunderx_state::scontra_1f98_w)
 	m_1f98_latch = data;
 }
 
-READ8_MEMBER(thunderx_state::_1f98_r)
+uint8_t thunderx_state::_1f98_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// thunderx and gbusters read from here during the gfx rom test...
 	// though it doesn't look like it should be readable based on the schematics
 	return m_1f98_latch;
 }
 
-WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
+void thunderx_state::thunderx_1f98_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
 
@@ -317,7 +317,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 	m_1f98_latch = data;
 }
 
-WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
+void thunderx_state::scontra_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 0-3 select ROM bank at 6000-7fff
 	m_rombank->set_entry(data & 0x0f);
@@ -333,7 +333,7 @@ WRITE8_MEMBER(thunderx_state::scontra_bankswitch_w)
 	m_priority = data & 0x80;
 }
 
-WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
+void thunderx_state::thunderx_videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x01 = work RAM at 4000-5fff
 	// 0x00 = palette at 5800-5fff
@@ -348,7 +348,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_videobank_w)
 	m_priority = data & 0x08;
 }
 
-WRITE8_MEMBER(thunderx_state::gbusters_videobank_w)
+void thunderx_state::gbusters_videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// same as thunderx without the PMC
 	m_bank5800->set_bank(data & 0x1);
@@ -359,12 +359,12 @@ WRITE8_MEMBER(thunderx_state::gbusters_videobank_w)
 	m_priority = data & 0x08;
 }
 
-WRITE8_MEMBER(thunderx_state::sh_irqtrigger_w)
+void thunderx_state::sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(thunderx_state::k007232_bankswitch_w)
+void thunderx_state::k007232_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* b3-b2: bank for channel B */
 	/* b1-b0: bank for channel A */
@@ -373,7 +373,7 @@ WRITE8_MEMBER(thunderx_state::k007232_bankswitch_w)
 	m_k007232->set_bank(bank_A, bank_B);
 }
 
-READ8_MEMBER(thunderx_state::k052109_051960_r)
+uint8_t thunderx_state::k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -388,7 +388,7 @@ READ8_MEMBER(thunderx_state::k052109_051960_r)
 		return m_k052109->read(space, offset);
 }
 
-WRITE8_MEMBER(thunderx_state::k052109_051960_w)
+void thunderx_state::k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(space, offset - 0x3800, data);
@@ -601,7 +601,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(thunderx_state::volume_callback)
+void thunderx_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);
@@ -685,7 +685,7 @@ static MACHINE_CONFIG_START( scontra, thunderx_state )
 MACHINE_CONFIG_END
 
 
-WRITE8_MEMBER( thunderx_state::banking_callback )
+void thunderx_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("thunderx %04x: bank select %02x\n", machine().device("maincpu")->safe_pc(), data);
 	m_rombank->set_entry(data & 0x0f);

@@ -43,9 +43,9 @@ public:
 	uint8_t m_port60;
 	uint8_t m_port70;
 
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(port70_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_quizo();
 	DECLARE_PALETTE_INIT(quizo);
@@ -118,18 +118,18 @@ uint32_t quizo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER(quizo_state::vram_w)
+void quizo_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank=(m_port70&8)?1:0;
 	m_videoram[offset+bank*0x4000]=data;
 }
 
-WRITE8_MEMBER(quizo_state::port70_w)
+void quizo_state::port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port70=data;
 }
 
-WRITE8_MEMBER(quizo_state::port60_w)
+void quizo_state::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data>9)
 	{

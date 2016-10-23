@@ -52,10 +52,10 @@ public:
 
 	void init_dmax8000();
 	void machine_reset_dmax8000();
-	DECLARE_WRITE8_MEMBER(port0c_w);
-	DECLARE_WRITE8_MEMBER(port0d_w);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port40_w);
+	void port0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
@@ -75,7 +75,7 @@ WRITE_LINE_MEMBER( dmax8000_state::fdc_drq_w )
 	if (state) printf("DRQ ");
 }
 
-WRITE8_MEMBER( dmax8000_state::port0c_w )
+void dmax8000_state::port0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port0c=%X\n", data);
 	m_fdc->dden_w(BIT(data, 6));
@@ -89,17 +89,17 @@ WRITE8_MEMBER( dmax8000_state::port0c_w )
 	}
 }
 
-WRITE8_MEMBER( dmax8000_state::port0d_w )
+void dmax8000_state::port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port0d=%X\n", data);
 }
 
-WRITE8_MEMBER( dmax8000_state::port14_w )
+void dmax8000_state::port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Port14=%X\n", data);
 }
 
-WRITE8_MEMBER( dmax8000_state::port40_w )
+void dmax8000_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(BIT(data, 0));
 }

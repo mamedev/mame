@@ -639,7 +639,7 @@ int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zeros
 }
 
 
-READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
+uint16_t k056832_device::k_5bpp_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (mem_mask == 0xff00)
 		return rom_read_b(offset * 2, 4, 5, 0)<<8;
@@ -652,7 +652,7 @@ READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 	return 0;
 }
 
-READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
+uint32_t k056832_device::k_5bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 		return rom_read_b(offset * 4, 4, 5, 0) << 24;
@@ -669,7 +669,7 @@ READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
 	return 0;
 }
 
-READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
+uint32_t k056832_device::k_6bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 		return rom_read_b(offset * 4, 4, 6, 0) << 24;
@@ -689,7 +689,7 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 
 
 
-READ16_MEMBER( k056832_device::rom_word_r )
+uint16_t k056832_device::rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
@@ -698,7 +698,7 @@ READ16_MEMBER( k056832_device::rom_word_r )
 
 // data is arranged like this:
 // 0000 1111 22 0000 1111 22
-READ16_MEMBER( k056832_device::mw_rom_word_r )
+uint16_t k056832_device::mw_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int bank = 10240 * m_cur_gfx_banks;
 	int addr;
@@ -758,35 +758,35 @@ READ16_MEMBER( k056832_device::mw_rom_word_r )
 
 }
 
-READ16_MEMBER( k056832_device::bishi_rom_word_r )
+uint16_t k056832_device::bishi_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int addr = 0x4000 * m_cur_gfx_banks + offset;
 
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_MEMBER( k056832_device::rom_word_8000_r )
+uint16_t k056832_device::rom_word_8000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int addr = 0x8000 * m_cur_gfx_banks + 2 * offset;
 
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_MEMBER( k056832_device::old_rom_word_r )
+uint16_t k056832_device::old_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
-READ32_MEMBER( k056832_device::rom_long_r )
+uint32_t k056832_device::rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset <<= 1;
 	return (rom_word_r(space, offset + 1, 0xffff) | (rom_word_r(space, offset, 0xffff) << 16));
 }
 
 /* only one page is mapped to videoram at a time through a window */
-READ16_MEMBER( k056832_device::ram_word_r )
+uint16_t k056832_device::ram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// reading from tile RAM resets the ROM readback "half" offset
 	m_rom_half = 0;
@@ -794,7 +794,7 @@ READ16_MEMBER( k056832_device::ram_word_r )
 	return m_videoram[m_selected_page_x4096 + offset];
 }
 
-READ16_MEMBER( k056832_device::ram_half_word_r )
+uint16_t k056832_device::ram_half_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | ((offset >> 11) ^ 1))];
 }
@@ -803,7 +803,7 @@ READ16_MEMBER( k056832_device::ram_half_word_r )
 
 
 
-READ32_MEMBER( k056832_device::ram_long_r )
+uint32_t k056832_device::ram_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t *pMem = &m_videoram[m_selected_page_x4096 + offset * 2];
 
@@ -813,7 +813,7 @@ READ32_MEMBER( k056832_device::ram_long_r )
 	return (pMem[0]<<16 | pMem[1]);
 }
 
-READ32_MEMBER( k056832_device::unpaged_ram_long_r )
+uint32_t k056832_device::unpaged_ram_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t *pMem = &m_videoram[offset * 2];
 
@@ -824,35 +824,35 @@ READ32_MEMBER( k056832_device::unpaged_ram_long_r )
 }
 
 /* special 8-bit handlers for Lethal Enforcers */
-READ8_MEMBER( k056832_device::ram_code_lo_r )
+uint8_t k056832_device::ram_code_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr & 0xff;
 }
 
-READ8_MEMBER( k056832_device::ram_code_hi_r )
+uint8_t k056832_device::ram_code_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
 	return *adr >> 8;
 }
 
-READ8_MEMBER( k056832_device::ram_attr_lo_r )
+uint8_t k056832_device::ram_attr_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr & 0xff;
 }
 
-READ8_MEMBER( k056832_device::ram_attr_hi_r )
+uint8_t k056832_device::ram_attr_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
 	return *adr >> 8;
 }
 
-WRITE8_MEMBER( k056832_device::ram_code_lo_w )
+void k056832_device::ram_code_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
@@ -868,7 +868,7 @@ WRITE8_MEMBER( k056832_device::ram_code_lo_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_code_hi_w )
+void k056832_device::ram_code_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
@@ -884,7 +884,7 @@ WRITE8_MEMBER( k056832_device::ram_code_hi_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
+void k056832_device::ram_attr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
@@ -900,7 +900,7 @@ WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
+void k056832_device::ram_attr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
@@ -916,7 +916,7 @@ WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
 	}
 }
 
-WRITE16_MEMBER( k056832_device::ram_word_w )
+void k056832_device::ram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *tile_ptr;
 	uint16_t old_mask, old_data;
@@ -940,7 +940,7 @@ WRITE16_MEMBER( k056832_device::ram_word_w )
 
 
 
-WRITE16_MEMBER( k056832_device::ram_half_word_w )
+void k056832_device::ram_half_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
 	uint16_t old = *adr;
@@ -959,7 +959,7 @@ WRITE16_MEMBER( k056832_device::ram_half_word_w )
 	}
 }
 
-WRITE32_MEMBER( k056832_device::ram_long_w )
+void k056832_device::ram_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t *tile_ptr;
 	uint32_t old_mask, old_data;
@@ -984,7 +984,7 @@ WRITE32_MEMBER( k056832_device::ram_long_w )
 
 
 
-WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
+void k056832_device::unpaged_ram_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t *tile_ptr;
 	uint32_t old_mask, old_data;
@@ -1006,7 +1006,7 @@ WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 	}
 }
 
-WRITE16_MEMBER( k056832_device::word_w )
+void k056832_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int layer, flip, mask, i;
 	uint32_t old_data, new_data;
@@ -1127,7 +1127,7 @@ WRITE16_MEMBER( k056832_device::word_w )
 }
 
 
-WRITE32_MEMBER( k056832_device::long_w )
+void k056832_device::long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// GX does access of all 3 widths (8/16/32) so we can't do the
 	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
@@ -1138,7 +1138,7 @@ WRITE32_MEMBER( k056832_device::long_w )
 }
 
 
-WRITE16_MEMBER( k056832_device::b_word_w )
+void k056832_device::b_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_regsb[offset]);
 }
@@ -1146,7 +1146,7 @@ WRITE16_MEMBER( k056832_device::b_word_w )
 
 
 
-WRITE8_MEMBER( k056832_device::write )
+void k056832_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -1158,7 +1158,7 @@ WRITE8_MEMBER( k056832_device::write )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::b_w )
+void k056832_device::b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -1170,7 +1170,7 @@ WRITE8_MEMBER( k056832_device::b_w )
 	}
 }
 
-WRITE32_MEMBER( k056832_device::b_long_w )
+void k056832_device::b_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1947,18 +1947,18 @@ void k056832_device::postload()
 
 //misc debug handlers
 
-READ32_MEMBER( k056832_device::long_r )
+uint32_t k056832_device::long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset <<= 1;
 	return (word_r(space, offset + 1, 0xffff) | word_r(space, offset, 0xffff) << 16);
 }
 
-READ16_MEMBER( k056832_device::word_r )
+uint16_t k056832_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_regs[offset]);
 }       // VACSET
 
-READ16_MEMBER( k056832_device::b_word_r )
+uint16_t k056832_device::b_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_regsb[offset]);
 }   // VSCCS (board dependent)

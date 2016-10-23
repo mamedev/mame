@@ -43,7 +43,7 @@ void sega_315_5641_pcm_device::advance_state()
 }
 
 
-WRITE8_MEMBER( sega_315_5641_pcm_device::port_w )
+void sega_315_5641_pcm_device::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_rombase != nullptr)
 	{

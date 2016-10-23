@@ -57,12 +57,12 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 
 	required_memory_bank m_z80bank;
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_WRITE16_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_WRITE16_MEMBER(xmen_18fa00_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void xmen_18fa00_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

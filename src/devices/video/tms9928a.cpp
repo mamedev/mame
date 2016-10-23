@@ -112,7 +112,7 @@ tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag,
 	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
 { }
 
-READ8_MEMBER( tms9928a_device::read )
+uint8_t tms9928a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 
@@ -124,7 +124,7 @@ READ8_MEMBER( tms9928a_device::read )
 	return value;
 }
 
-WRITE8_MEMBER( tms9928a_device::write )
+void tms9928a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		vram_write(space, 0, data);
@@ -132,7 +132,7 @@ WRITE8_MEMBER( tms9928a_device::write )
 		register_write(space, 0, data);
 }
 
-READ8_MEMBER( tms9928a_device::vram_read )
+uint8_t tms9928a_device::vram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// prevent debugger from changing the address base
 	if (space.debugger_access()) return 0;
@@ -147,7 +147,7 @@ READ8_MEMBER( tms9928a_device::vram_read )
 }
 
 
-WRITE8_MEMBER( tms9928a_device::vram_write )
+void tms9928a_device::vram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// prevent debugger from changing the address base
 	if (space.debugger_access()) return;
@@ -159,7 +159,7 @@ WRITE8_MEMBER( tms9928a_device::vram_write )
 }
 
 
-READ8_MEMBER( tms9928a_device::register_read )
+uint8_t tms9928a_device::register_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// prevent debugger from changing the internal state
 	if (space.debugger_access()) return 0;
@@ -287,7 +287,7 @@ void tms9928a_device::change_register(uint8_t reg, uint8_t val)
 }
 
 
-WRITE8_MEMBER( tms9928a_device::register_write )
+void tms9928a_device::register_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// prevent debugger from changing the internal state
 	if (space.debugger_access()) return;

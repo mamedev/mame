@@ -41,11 +41,11 @@ public:
 	required_ioport m_inp3;
 	required_ioport m_inp4;
 
-	DECLARE_READ8_MEMBER(fruit_inp_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	uint8_t fruit_inp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
-READ8_MEMBER(fruitpc_state::fruit_inp_r)
+uint8_t fruitpc_state::fruit_inp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -107,7 +107,7 @@ static INPUT_PORTS_START( fruitpc )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( fruitpc_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void fruitpc_state::dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(1, data); }
 
 static SLOT_INTERFACE_START( fruitpc_isa8_cards )
 	SLOT_INTERFACE("sb15",  ISA8_SOUND_BLASTER_1_5)

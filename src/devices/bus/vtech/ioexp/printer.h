@@ -31,8 +31,8 @@ public:
 	printer_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ8_MEMBER( busy_r );
-	DECLARE_WRITE8_MEMBER( strobe_w );
+	uint8_t busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -179,7 +179,7 @@ READ8Z_MEMBER(snug_high_speed_gpl_device::crureadz)
 /*
     Write hsgpl CRU interface
 */
-WRITE8_MEMBER(snug_high_speed_gpl_device::cruwrite)
+void snug_high_speed_gpl_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// SuperCart handling - see gromport.c
 	if (m_supercart_enabled && ((offset & 0xfff0)==SUPERCART_BASE))
@@ -278,7 +278,7 @@ READ8Z_MEMBER(snug_high_speed_gpl_device::readz)
 /*
     Memory write
 */
-WRITE8_MEMBER(snug_high_speed_gpl_device::write)
+void snug_high_speed_gpl_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0x7e000)==0x76000)
 	{

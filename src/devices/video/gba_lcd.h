@@ -92,14 +92,14 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ32_MEMBER(video_r);
-	DECLARE_WRITE32_MEMBER(video_w);
-	DECLARE_READ32_MEMBER(gba_pram_r);
-	DECLARE_WRITE32_MEMBER(gba_pram_w);
-	DECLARE_READ32_MEMBER(gba_vram_r);
-	DECLARE_WRITE32_MEMBER(gba_vram_w);
-	DECLARE_READ32_MEMBER(gba_oam_r);
-	DECLARE_WRITE32_MEMBER(gba_oam_w);
+	uint32_t video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_pram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gba_pram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gba_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_oam_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gba_oam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_PALETTE_INIT(gba);
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);

@@ -144,14 +144,14 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(flash_r);
-	DECLARE_WRITE16_MEMBER(flash_w);
-	DECLARE_READ16_MEMBER(trackball_r);
-	DECLARE_READ16_MEMBER(unknown_r);
-	DECLARE_READ16_MEMBER(btc_trackball_r);
-	DECLARE_WRITE16_MEMBER(btc_trackball_w);
-	DECLARE_READ16_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
+	uint16_t flash_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t trackball_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t unknown_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t btc_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void btc_trackball_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tokimeki_serial_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tokimeki_serial_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_simpbowl();
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -417,7 +417,7 @@ INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-READ16_MEMBER(konamigv_state::flash_r)
+uint16_t konamigv_state::flash_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 4)   // set odd address
 	{
@@ -439,7 +439,7 @@ READ16_MEMBER(konamigv_state::flash_r)
 	return 0;
 }
 
-WRITE16_MEMBER(konamigv_state::flash_w)
+void konamigv_state::flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int chip;
 
@@ -468,7 +468,7 @@ WRITE16_MEMBER(konamigv_state::flash_w)
 	}
 }
 
-READ16_MEMBER(konamigv_state::trackball_r)
+uint16_t konamigv_state::trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( offset == 0 )
 	{
@@ -490,7 +490,7 @@ READ16_MEMBER(konamigv_state::trackball_r)
 	return m_trackball_data[ offset >> 1 ] & 0xf00;
 }
 
-READ16_MEMBER(konamigv_state::unknown_r)
+uint16_t konamigv_state::unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
@@ -526,7 +526,7 @@ INPUT_PORTS_END
 
 /* Beat the Champ */
 
-READ16_MEMBER(konamigv_state::btc_trackball_r)
+uint16_t konamigv_state::btc_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  osd_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
 
@@ -550,7 +550,7 @@ READ16_MEMBER(konamigv_state::btc_trackball_r)
 	return ( m_btc_trackball_data[ offset >> 1 ] & 0xf00 ) | ( m_btc_trackball_data[ ( offset >> 1 ) + 2 ] >> 8 );
 }
 
-WRITE16_MEMBER(konamigv_state::btc_trackball_w)
+void konamigv_state::btc_trackball_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
 }
@@ -580,7 +580,7 @@ INPUT_PORTS_END
 
 /* Tokimeki Memorial games - have a mouse and printer and who knows what else */
 
-READ16_MEMBER(konamigv_state::tokimeki_serial_r)
+uint16_t konamigv_state::tokimeki_serial_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bits checked: 0x80 and 0x20 for periodic status (800b6968 and 800b69e0 in tmoshs)
 	// 0x08 for reading the serial device (8005e624)
@@ -588,7 +588,7 @@ READ16_MEMBER(konamigv_state::tokimeki_serial_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
+void konamigv_state::tokimeki_serial_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,

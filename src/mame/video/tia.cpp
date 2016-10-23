@@ -1012,7 +1012,7 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 }
 
 
-WRITE8_MEMBER( tia_video_device::WSYNC_w )
+void tia_video_device::WSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cycles = machine().device<cpu_device>("maincpu")->total_cycles() - frame_cycles;
 
@@ -1023,7 +1023,7 @@ WRITE8_MEMBER( tia_video_device::WSYNC_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::VSYNC_w )
+void tia_video_device::VSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 2)
 	{
@@ -1051,7 +1051,7 @@ WRITE8_MEMBER( tia_video_device::VSYNC_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::VBLANK_w )
+void tia_video_device::VBLANK_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 	{
@@ -1065,7 +1065,7 @@ WRITE8_MEMBER( tia_video_device::VBLANK_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::CTRLPF_w )
+void tia_video_device::CTRLPF_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1075,7 +1075,7 @@ WRITE8_MEMBER( tia_video_device::CTRLPF_w )
 	}
 }
 
-WRITE8_MEMBER( tia_video_device::HMP0_w )
+void tia_video_device::HMP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1107,7 +1107,7 @@ WRITE8_MEMBER( tia_video_device::HMP0_w )
 	HMP0 = data;
 }
 
-WRITE8_MEMBER( tia_video_device::HMP1_w )
+void tia_video_device::HMP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1139,7 +1139,7 @@ WRITE8_MEMBER( tia_video_device::HMP1_w )
 	HMP1 = data;
 }
 
-WRITE8_MEMBER( tia_video_device::HMM0_w )
+void tia_video_device::HMM0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1170,7 +1170,7 @@ WRITE8_MEMBER( tia_video_device::HMM0_w )
 	HMM0 = data;
 }
 
-WRITE8_MEMBER( tia_video_device::HMM1_w )
+void tia_video_device::HMM1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1201,7 +1201,7 @@ WRITE8_MEMBER( tia_video_device::HMM1_w )
 	HMM1 = data;
 }
 
-WRITE8_MEMBER( tia_video_device::HMBL_w )
+void tia_video_device::HMBL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1232,7 +1232,7 @@ WRITE8_MEMBER( tia_video_device::HMBL_w )
 	HMBL = data;
 }
 
-WRITE8_MEMBER( tia_video_device::HMOVE_w )
+void tia_video_device::HMOVE_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 	int curr_y = current_y();
@@ -1357,13 +1357,13 @@ WRITE8_MEMBER( tia_video_device::HMOVE_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RSYNC_w )
+void tia_video_device::RSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* this address is used in chip testing */
 }
 
 
-WRITE8_MEMBER( tia_video_device::NUSIZ0_w )
+void tia_video_device::NUSIZ0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1441,7 +1441,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ0_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::NUSIZ1_w )
+void tia_video_device::NUSIZ1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1519,7 +1519,7 @@ WRITE8_MEMBER( tia_video_device::NUSIZ1_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::HMCLR_w )
+void tia_video_device::HMCLR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	HMP0_w( space, offset, 0 );
 	HMP1_w( space, offset, 0 );
@@ -1529,7 +1529,7 @@ WRITE8_MEMBER( tia_video_device::HMCLR_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::CXCLR_w )
+void tia_video_device::CXCLR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	CXM0P = 0;
 	CXM1P = 0;
@@ -1564,7 +1564,7 @@ WRITE8_MEMBER( tia_video_device::CXCLR_w )
 		}                                                                                   \
 	}
 
-WRITE8_MEMBER( tia_video_device::RESP0_w )
+void tia_video_device::RESP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 	int new_horzP0;
@@ -1624,7 +1624,7 @@ WRITE8_MEMBER( tia_video_device::RESP0_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESP1_w )
+void tia_video_device::RESP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 	int new_horzP1;
@@ -1684,7 +1684,7 @@ WRITE8_MEMBER( tia_video_device::RESP1_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESM0_w )
+void tia_video_device::RESM0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 	int new_horzM0;
@@ -1706,7 +1706,7 @@ WRITE8_MEMBER( tia_video_device::RESM0_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESM1_w )
+void tia_video_device::RESM1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 	int new_horzM1;
@@ -1728,7 +1728,7 @@ WRITE8_MEMBER( tia_video_device::RESM1_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESBL_w )
+void tia_video_device::RESBL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int curr_x = current_x();
 
@@ -1744,7 +1744,7 @@ WRITE8_MEMBER( tia_video_device::RESBL_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESMP0_w )
+void tia_video_device::RESMP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (RESMP0 & 2)
 	{
@@ -1766,7 +1766,7 @@ WRITE8_MEMBER( tia_video_device::RESMP0_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::RESMP1_w )
+void tia_video_device::RESMP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (RESMP1 & 2)
 	{
@@ -1788,7 +1788,7 @@ WRITE8_MEMBER( tia_video_device::RESMP1_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::GRP0_w )
+void tia_video_device::GRP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	prevGRP1 = GRP1;
 
@@ -1796,7 +1796,7 @@ WRITE8_MEMBER( tia_video_device::GRP0_w )
 }
 
 
-WRITE8_MEMBER( tia_video_device::GRP1_w )
+void tia_video_device::GRP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	prevGRP0 = GRP0;
 
@@ -1806,7 +1806,7 @@ WRITE8_MEMBER( tia_video_device::GRP1_w )
 }
 
 
-READ8_MEMBER( tia_video_device::INPT_r )
+uint8_t tia_video_device::INPT_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint64_t elapsed = machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start;
 	uint16_t input = TIA_INPUT_PORT_ALWAYS_ON;
@@ -1825,7 +1825,7 @@ READ8_MEMBER( tia_video_device::INPT_r )
 }
 
 
-READ8_MEMBER( tia_video_device::read )
+uint8_t tia_video_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 		/* lower bits 0 - 5 seem to depend on the last byte on the
 		 data bus. If the driver supplied a routine to retrieve
@@ -1888,7 +1888,7 @@ READ8_MEMBER( tia_video_device::read )
 }
 
 
-WRITE8_MEMBER( tia_video_device::write )
+void tia_video_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int delay[0x40] =
 	{

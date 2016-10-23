@@ -17,15 +17,15 @@ public:
 	alpha_8201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~alpha_8201_device() {}
 
-	DECLARE_READ8_MEMBER(mcu_data_r);
-	DECLARE_WRITE8_MEMBER(mcu_data_w);
-	DECLARE_WRITE16_MEMBER(mcu_d_w);
+	uint8_t mcu_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_d_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// external I/O
 	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
 	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
-	DECLARE_READ8_MEMBER(ext_ram_r);
-	DECLARE_WRITE8_MEMBER(ext_ram_w);
+	uint8_t ext_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ext_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

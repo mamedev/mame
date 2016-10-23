@@ -32,18 +32,18 @@ public:
 	// Construction/destruction
 	isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( ppi0_i_a );
-	DECLARE_WRITE8_MEMBER( ppi0_o_b );
-	DECLARE_READ8_MEMBER( ppi0_i_c );
-	DECLARE_WRITE8_MEMBER( ppi0_o_c );
+	uint8_t ppi0_i_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_o_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi0_i_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_o_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ppi1_o_a );
-	DECLARE_READ8_MEMBER( ppi1_i_b );
+	void ppi1_o_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_i_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ppi1_o_c );
+	void ppi1_o_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ibm_mfc_r );
-	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
+	uint8_t ibm_mfc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ibm_mfc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( d8253_out0 );
 	DECLARE_WRITE_LINE_MEMBER( d8253_out1 );

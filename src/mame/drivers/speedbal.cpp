@@ -42,7 +42,7 @@ void speedbal_state::machine_start()
 	save_item(NAME(m_leds_shiftreg));
 }
 
-WRITE8_MEMBER(speedbal_state::coincounter_w)
+void speedbal_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(speedbal_state::maincpu_50_w)
+void speedbal_state::maincpu_50_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%s: maincpu_50_w %02x\n", this->machine().describe_context(), data);
 }
@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(speedbal_state::leds_output_block)
+void speedbal_state::leds_output_block(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_leds_start)
 		return;
@@ -99,13 +99,13 @@ WRITE8_MEMBER(speedbal_state::leds_output_block)
 	output().set_digit_value(10 * block + 2, ~m_leds_shiftreg >> 16 & 0xff);
 }
 
-WRITE8_MEMBER(speedbal_state::leds_start_block)
+void speedbal_state::leds_start_block(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_leds_shiftreg = 0;
 	m_leds_start = true;
 }
 
-WRITE8_MEMBER(speedbal_state::leds_shift_bit)
+void speedbal_state::leds_shift_bit(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_leds_shiftreg <<= 1;
 	m_leds_shiftreg |= (data & 1);

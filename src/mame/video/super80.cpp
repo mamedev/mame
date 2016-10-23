@@ -283,7 +283,7 @@ void super80_state::video_start_super80()
 
 /**************************** I/O PORTS *****************************************************************/
 
-WRITE8_MEMBER( super80_state::super80_f1_w )
+void super80_state::super80_f1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidpg = (data & 0xfe) << 8;
 	m_current_charset = data & 1;
@@ -297,7 +297,7 @@ WRITE8_MEMBER( super80_state::super80_f1_w )
 
 static const uint8_t mc6845_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0};
 
-READ8_MEMBER( super80_state::super80v_low_r )
+uint8_t super80_state::super80v_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_portf0, 2))
 		return m_p_videoram[offset];
@@ -305,7 +305,7 @@ READ8_MEMBER( super80_state::super80v_low_r )
 		return m_p_colorram[offset];
 }
 
-WRITE8_MEMBER( super80_state::super80v_low_w )
+void super80_state::super80v_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_portf0, 2))
 		m_p_videoram[offset] = data;
@@ -313,7 +313,7 @@ WRITE8_MEMBER( super80_state::super80v_low_w )
 		m_p_colorram[offset] = data;
 }
 
-READ8_MEMBER( super80_state::super80v_high_r )
+uint8_t super80_state::super80v_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_portf0, 2))
 		return m_p_colorram[0x800 | offset];
@@ -324,7 +324,7 @@ READ8_MEMBER( super80_state::super80v_high_r )
 		return m_p_pcgram[offset];
 }
 
-WRITE8_MEMBER( super80_state::super80v_high_w )
+void super80_state::super80v_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(m_portf0, 2))
 		m_p_colorram[0x800 | offset] = data;
@@ -439,14 +439,14 @@ MC6845_UPDATE_ROW( super80_state::crtc_update_row )
 
 /**************************** I/O PORTS *****************************************************************/
 
-WRITE8_MEMBER( super80_state::super80v_10_w )
+void super80_state::super80v_10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x1f;
 	m_mc6845_ind = data;
 	m_crtc->address_w( space, 0, data );
 }
 
-WRITE8_MEMBER( super80_state::super80v_11_w )
+void super80_state::super80v_11_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mc6845_reg[m_mc6845_ind] = data & mc6845_mask[m_mc6845_ind];  /* save data in register */
 	m_crtc->register_w( space, 0, data );

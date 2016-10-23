@@ -68,12 +68,12 @@ public:
 	template<class _Object> static devcb_base &set_read_1_callback(device_t &device, _Object object) { return downcast<huc6202_device &>(device).m_read_1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_1_callback(device_t &device, _Object object) { return downcast<huc6202_device &>(device).m_write_1_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( io_read );
-	DECLARE_WRITE8_MEMBER( io_write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	DECLARE_READ16_MEMBER( time_until_next_event );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t next_pixel(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t time_until_next_event(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 

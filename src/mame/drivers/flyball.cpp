@@ -67,16 +67,16 @@ public:
 	emu_timer *m_pot_clear_timer;
 	emu_timer *m_quarter_timer;
 
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_READ8_MEMBER(scanline_r);
-	DECLARE_READ8_MEMBER(potsense_r);
-	DECLARE_WRITE8_MEMBER(potmask_w);
-	DECLARE_WRITE8_MEMBER(pitcher_pic_w);
-	DECLARE_WRITE8_MEMBER(ball_vert_w);
-	DECLARE_WRITE8_MEMBER(ball_horz_w);
-	DECLARE_WRITE8_MEMBER(pitcher_vert_w);
-	DECLARE_WRITE8_MEMBER(pitcher_horz_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t potsense_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void potmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pitcher_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ball_vert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ball_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pitcher_vert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pitcher_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILEMAP_MAPPER_MEMBER(get_memory_offset);
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -224,52 +224,52 @@ TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
  *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-READ8_MEMBER(flyball_state::input_r)
+uint8_t flyball_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read() & ioport("IN1")->read();
 }
 
-READ8_MEMBER(flyball_state::scanline_r)
+uint8_t flyball_state::scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos() & 0x3f;
 }
 
-READ8_MEMBER(flyball_state::potsense_r)
+uint8_t flyball_state::potsense_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_potsense & ~m_potmask;
 }
 
-WRITE8_MEMBER(flyball_state::potmask_w)
+void flyball_state::potmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_potmask |= data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_pic_w)
+void flyball_state::pitcher_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pitcher_pic = data & 0xf;
 }
 
-WRITE8_MEMBER(flyball_state::ball_vert_w)
+void flyball_state::ball_vert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ball_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::ball_horz_w)
+void flyball_state::ball_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ball_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_vert_w)
+void flyball_state::pitcher_vert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pitcher_vert = data;
 }
 
-WRITE8_MEMBER(flyball_state::pitcher_horz_w)
+void flyball_state::pitcher_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pitcher_horz = data;
 }
 
-WRITE8_MEMBER(flyball_state::misc_w)
+void flyball_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = ~data & 1;
 

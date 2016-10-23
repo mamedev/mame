@@ -217,7 +217,7 @@ void itech32_state::video_start()
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::timekill_colora_w)
+void itech32_state::timekill_colora_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,14 +228,14 @@ WRITE16_MEMBER(itech32_state::timekill_colora_w)
 }
 
 
-WRITE16_MEMBER(itech32_state::timekill_colorbc_w)
+void itech32_state::timekill_colorbc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_color_latch[1] = ((data & 0xf0) << 4) | 0x1000;
 }
 
 
-WRITE16_MEMBER(itech32_state::timekill_intensity_w)
+void itech32_state::timekill_intensity_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -247,21 +247,21 @@ WRITE16_MEMBER(itech32_state::timekill_intensity_w)
 }
 
 
-WRITE16_MEMBER(itech32_state::bloodstm_color1_w)
+void itech32_state::bloodstm_color1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_color_latch[0] = (data & 0x7f) << 8;
 }
 
 
-WRITE16_MEMBER(itech32_state::bloodstm_color2_w)
+void itech32_state::bloodstm_color2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_color_latch[1] = (data & 0x7f) << 8;
 }
 
 
-WRITE16_MEMBER(itech32_state::bloodstm_plane_w)
+void itech32_state::bloodstm_plane_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -271,28 +271,28 @@ WRITE16_MEMBER(itech32_state::bloodstm_plane_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::drivedge_color0_w)
+void itech32_state::drivedge_color0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 		m_color_latch[0] = ((data >> 16) & 0x7f) << 8;
 }
 
 
-WRITE32_MEMBER(itech32_state::itech020_color1_w)
+void itech32_state::itech020_color1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_color_latch[1] = (data & 0x7f) << 8;
 }
 
 
-WRITE32_MEMBER(itech32_state::itech020_color2_w)
+void itech32_state::itech020_color2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_color_latch[0] = (data & 0x7f) << 8;
 }
 
 
-WRITE32_MEMBER(itech32_state::itech020_plane_w)
+void itech32_state::itech020_plane_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -310,7 +310,7 @@ WRITE32_MEMBER(itech32_state::itech020_plane_w)
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::bloodstm_paletteram_w)
+void itech32_state::bloodstm_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))
@@ -1203,7 +1203,7 @@ void itech32_state::handle_video_command()
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::itech32_video_w)
+void itech32_state::itech32_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	rectangle visarea;
 
@@ -1306,7 +1306,7 @@ WRITE16_MEMBER(itech32_state::itech32_video_w)
 }
 
 
-READ16_MEMBER(itech32_state::itech32_video_r)
+uint16_t itech32_state::itech32_video_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1328,19 +1328,19 @@ READ16_MEMBER(itech32_state::itech32_video_r)
  *
  *************************************/
 
-WRITE16_MEMBER(itech32_state::bloodstm_video_w)
+void itech32_state::bloodstm_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	itech32_video_w(space, offset / 2, data, mem_mask);
 }
 
 
-READ16_MEMBER(itech32_state::bloodstm_video_r)
+uint16_t itech32_state::bloodstm_video_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return itech32_video_r(space, offset / 2, mem_mask);
 }
 
 
-WRITE32_MEMBER(itech32_state::itech020_video_w)
+void itech32_state::itech020_video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		itech32_video_w(space, offset, data >> 16, mem_mask >> 16);
@@ -1349,13 +1349,13 @@ WRITE32_MEMBER(itech32_state::itech020_video_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::drivedge_zbuf_control_w)
+void itech32_state::drivedge_zbuf_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_drivedge_zbuf_control[offset]);
 }
 
 
-READ32_MEMBER(itech32_state::itech020_video_r)
+uint32_t itech32_state::itech020_video_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int result = itech32_video_r(space, offset, mem_mask);
 	return (result << 16) | result;

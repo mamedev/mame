@@ -26,20 +26,20 @@ public:
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<decodmd_type3_device> m_dmdtype3;
 
-	DECLARE_WRITE8_MEMBER(lamp0_w) { };
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia2c_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 
@@ -130,14 +130,14 @@ static INPUT_PORTS_START( de_3b )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-READ8_MEMBER( de_3b_state::switch_r )
+uint8_t de_3b_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3b_state::switch_w )
+void de_3b_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x;
 
@@ -149,37 +149,37 @@ WRITE8_MEMBER( de_3b_state::switch_w )
 	m_kbdrow = data & (1<<x);
 }
 
-WRITE8_MEMBER( de_3b_state::sound_w )
+void de_3b_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
 		m_decobsmt->bsmt_comms_w(space,offset,m_sound_data);
 }
 
-READ8_MEMBER( de_3b_state::dmd_status_r )
+uint8_t de_3b_state::dmd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmdtype3->status_r(space,offset);
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pa_w )
+void de_3b_state::pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DMD data */
 	m_dmdtype3->data_w(space,offset,data);
 	logerror("DMD: Data write %02x\n", data);
 }
 
-READ8_MEMBER( de_3b_state::pia2c_pb_r )
+uint8_t de_3b_state::pia2c_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dmdtype3->busy_r(space,offset);
 }
 
-WRITE8_MEMBER( de_3b_state::pia2c_pb_w )
+void de_3b_state::pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DMD ctrl */
 	m_dmdtype3->ctrl_w(space,offset,data);
 	logerror("DMD: Control write %02x\n", data);
 }
-READ8_MEMBER(de_3b_state::display_r)
+uint8_t de_3b_state::display_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -196,7 +196,7 @@ READ8_MEMBER(de_3b_state::display_r)
 	return ret;
 }
 
-WRITE8_MEMBER(de_3b_state::display_w)
+void de_3b_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -218,7 +218,7 @@ WRITE8_MEMBER(de_3b_state::display_w)
 	}
 }
 
-WRITE8_MEMBER(de_3b_state::lamps_w)
+void de_3b_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

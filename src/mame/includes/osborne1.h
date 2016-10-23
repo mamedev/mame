@@ -61,21 +61,21 @@ public:
 	{ }
 
 
-	DECLARE_WRITE8_MEMBER(bank_0xxx_w);
-	DECLARE_WRITE8_MEMBER(bank_1xxx_w);
-	DECLARE_READ8_MEMBER(bank_2xxx_3xxx_r);
-	DECLARE_WRITE8_MEMBER(bank_2xxx_3xxx_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(opcode_r);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	void bank_0xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_1xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bank_2xxx_3xxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_2xxx_3xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t opcode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irqack_w);
 
-	DECLARE_READ8_MEMBER(ieee_pia_pb_r);
-	DECLARE_WRITE8_MEMBER(ieee_pia_pb_w);
+	uint8_t ieee_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ieee_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ieee_pia_irq_a_func);
 
-	DECLARE_WRITE8_MEMBER(video_pia_port_a_w);
-	DECLARE_WRITE8_MEMBER(video_pia_port_b_w);
+	void video_pia_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_out_cb2_dummy);
 	DECLARE_WRITE_LINE_MEMBER(video_pia_irq_a_func);
 

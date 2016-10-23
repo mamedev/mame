@@ -32,24 +32,24 @@ public:
 	pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// PCI9050 I/O register space handlers
-	DECLARE_READ32_MEMBER( lasrr_r  );
-	DECLARE_WRITE32_MEMBER(lasrr_w  );
-	DECLARE_READ32_MEMBER( eromrr_r );
-	DECLARE_WRITE32_MEMBER(eromrr_w );
-	DECLARE_READ32_MEMBER( lasba_r  );
-	DECLARE_WRITE32_MEMBER(lasba_w  );
-	DECLARE_READ32_MEMBER( eromba_r );
-	DECLARE_WRITE32_MEMBER(eromba_w );
-	DECLARE_READ32_MEMBER( lasbrd_r );
-	DECLARE_WRITE32_MEMBER(lasbrd_w );
-	DECLARE_READ32_MEMBER( erombrd_r);
-	DECLARE_WRITE32_MEMBER(erombrd_w);
-	DECLARE_READ32_MEMBER( csbase_r );
-	DECLARE_WRITE32_MEMBER(csbase_w );
-	DECLARE_READ32_MEMBER( intcsr_r );
-	DECLARE_WRITE32_MEMBER(intcsr_w );
-	DECLARE_READ32_MEMBER( cntrl_r  );
-	DECLARE_WRITE32_MEMBER(cntrl_w  );
+	uint32_t lasrr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lasrr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t eromrr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eromrr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t lasba_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lasba_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t eromba_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eromba_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t lasbrd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lasbrd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t erombrd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void erombrd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t csbase_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void csbase_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t intcsr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void intcsr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cntrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cntrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	template<class _Object> static devcb_base &set_user_input_callback(device_t &device, _Object object) { return downcast<pci9050_device &>(device).m_user_input_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_user_output_callback(device_t &device, _Object object) { return downcast<pci9050_device &>(device).m_user_output_handler.set_callback(object); }

@@ -74,12 +74,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t keypad_r();
-	DECLARE_WRITE16_MEMBER ( ti68k_io_w );
-	DECLARE_READ16_MEMBER ( ti68k_io_r );
-	DECLARE_WRITE16_MEMBER ( ti68k_io2_w );
-	DECLARE_READ16_MEMBER ( ti68k_io2_r );
-	DECLARE_WRITE16_MEMBER ( flash_w );
-	DECLARE_READ16_MEMBER ( flash_r );
+	void ti68k_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ti68k_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ti68k_io2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ti68k_io2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t flash_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint64_t m_timer;
 	DECLARE_PALETTE_INIT(ti68k);
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);

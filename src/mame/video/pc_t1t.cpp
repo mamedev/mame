@@ -885,7 +885,7 @@ int pc_t1t_device::bank_r(void)
  *
  *************************************************************************/
 
-WRITE8_MEMBER( pcvideo_t1000_device::write )
+void pcvideo_t1000_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -923,7 +923,7 @@ WRITE8_MEMBER( pcvideo_t1000_device::write )
 	}
 }
 
-WRITE8_MEMBER( pcvideo_pcjr_device::write )
+void pcvideo_pcjr_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -962,7 +962,7 @@ WRITE8_MEMBER( pcvideo_pcjr_device::write )
 }
 
 
-READ8_MEMBER( pc_t1t_device::read )
+uint8_t pc_t1t_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int             data = 0xff;
 

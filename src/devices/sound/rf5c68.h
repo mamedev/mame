@@ -73,11 +73,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_READ8_MEMBER( rf5c68_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_w );
+	uint8_t rf5c68_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rf5c68_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( rf5c68_mem_r );
-	DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
+	uint8_t rf5c68_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rf5c68_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	sound_stream*        m_stream;

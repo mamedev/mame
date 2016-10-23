@@ -30,13 +30,13 @@ Notes:
 #include "includes/spdodgeb.h"
 
 
-WRITE8_MEMBER(spdodgeb_state::sound_command_w)
+void spdodgeb_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
+void spdodgeb_state::spd_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int chip = offset & 1;
 	msm5205_device *adpcm = chip ? m_msm2 : m_msm1;
@@ -215,7 +215,7 @@ void spdodgeb_state::mcu63705_update_inputs()
 }
 #endif
 
-READ8_MEMBER(spdodgeb_state::mcu63701_r)
+uint8_t spdodgeb_state::mcu63701_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",space.device().safe_pc(),offset);
 
@@ -231,7 +231,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 	}
 }
 
-WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
+void spdodgeb_state::mcu63701_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
 	m_mcu63701_command = data;

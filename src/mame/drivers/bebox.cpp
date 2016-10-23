@@ -28,8 +28,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/8042kbdc.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return m_dma8237_2->read(space, offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { m_dma8237_2->write(space, offset / 2, data); }
+uint8_t bebox_state::at_dma8237_1_r(address_space &space, offs_t offset, uint8_t mem_mask)  { return m_dma8237_2->read(space, offset / 2); }
+void bebox_state::at_dma8237_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_dma8237_2->write(space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 // The following is a gross hack to let the BeBox boot ROM identify the processors correctly.
 // This needs to be done in a better way if someone comes up with one.
 
-READ64_MEMBER(bebox_state::bb_slave_64be_r)
+uint64_t bebox_state::bb_slave_64be_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
 	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))

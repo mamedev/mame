@@ -322,13 +322,13 @@ TODO:
 
 
 
-WRITE8_MEMBER(welltris_state::sound_bankswitch_w)
+void welltris_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
 
-WRITE16_MEMBER(welltris_state::sound_command_w)
+void welltris_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -343,7 +343,7 @@ CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
 	return m_pending_command ? 1 : 0;
 }
 
-WRITE8_MEMBER(welltris_state::pending_command_clear_w)
+void welltris_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }

@@ -18,12 +18,12 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 
 #define MCLK 16000000
 
-WRITE8_MEMBER(quizdna_state::rombank_w)
+void quizdna_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data & 0x3f);
 }
 
-WRITE8_MEMBER(quizdna_state::gekiretu_rombank_w)
+void quizdna_state::gekiretu_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry((data & 0x3f) ^ 0x0a);
 }

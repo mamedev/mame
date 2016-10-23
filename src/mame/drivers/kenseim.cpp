@@ -203,26 +203,26 @@ public:
 
 
 	/* kenseim */
-	DECLARE_WRITE16_MEMBER(cps1_kensei_w);
+	void cps1_kensei_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_kenseim();
 
 	// certain
 
-	DECLARE_WRITE8_MEMBER(mb8936_portc_w); // 20x LEDs
+	void mb8936_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // 20x LEDs
 
 
 
 	// uncertain
-	DECLARE_WRITE8_MEMBER(cpu_portc_w); // 4 bit out (lamps, coinlock etc.?)
+	void cpu_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // 4 bit out (lamps, coinlock etc.?)
 
-	DECLARE_READ8_MEMBER(cpu_portd_r);  // 4 bit in (comms flags from 68k)
+	uint8_t cpu_portd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);  // 4 bit in (comms flags from 68k)
 
-	DECLARE_WRITE8_MEMBER(cpu_portd_w); // 4 bit out (command flags to 68k?)
-	DECLARE_WRITE8_MEMBER(cpu_porte_w); // 8 bit out (command to 68k?)
+	void cpu_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // 4 bit out (command flags to 68k?)
+	void cpu_porte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // 8 bit out (command to 68k?)
 
-	WRITE8_MEMBER(mb8936_porta_w); // maybe molesa output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
-	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
+	void mb8936_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask); // maybe molesa output? (6-bits?)
+	void mb8936_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask); // maybe molesb output? (6-bits?)
+	void mb8936_portf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask); // maybe strobe output?
 
 	uint8_t m_to_68k_cmd_low;
 	uint8_t m_to_68k_cmd_d9;
@@ -264,7 +264,7 @@ void kenseim_state::set_leds(uint32_t ledstates)
 }
 
 // could be wrong
-WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
+void kenseim_state::mb8936_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I'm guessing these are the 20 'power meter' LEDs, 10 for each player? (it writes 42 times, with the last write being some terminator?)
 
@@ -301,7 +301,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_portc_w)
 }
 
 
-WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
+void kenseim_state::mb8936_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // maybe molesa output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port A (mole output 1?)\n", machine().describe_context(), data);
 
@@ -320,7 +320,7 @@ WRITE8_MEMBER(kenseim_state::mb8936_porta_w) // maybe molesa output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
+void kenseim_state::mb8936_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // maybe molesb output? (6-bits?)
 {
 	//if (data&0xc0) printf("%s mb8936 write %02x to port B (mole output 2?)\n", machine().describe_context(), data);
 
@@ -338,14 +338,14 @@ WRITE8_MEMBER(kenseim_state::mb8936_portb_w) // maybe molesb output? (6-bits?)
 
 }
 
-WRITE8_MEMBER(kenseim_state::mb8936_portf_w)
+void kenseim_state::mb8936_portf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// typically written when the 'moles' output is, maybe the 2 strobes?
 	//printf("%s mb8936 write %02x to port F (strobe?)\n", machine().describe_context(), data);
 }
 
 
-WRITE8_MEMBER(kenseim_state::cpu_portc_w)
+void kenseim_state::cpu_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// port direction is set to 4-in 4-out
 	// d4: coin counter
@@ -395,7 +395,7 @@ CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
 
 /* 68k side COMMS writes */
 
-WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
+void kenseim_state::cps1_kensei_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -417,7 +417,7 @@ WRITE16_MEMBER(kenseim_state::cps1_kensei_w)
 
 /* Z80 side COMMS reads */
 
-READ8_MEMBER(kenseim_state::cpu_portd_r)
+uint8_t kenseim_state::cpu_portd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// port direction is set to 4-in 4-out
 	// d4: ACK
@@ -429,7 +429,7 @@ READ8_MEMBER(kenseim_state::cpu_portd_r)
 
 /* Z80 side COMMS writes */
 
-WRITE8_MEMBER(kenseim_state::cpu_portd_w)
+void kenseim_state::cpu_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// port direction is set to 4-in 4-out
 	// d0: D9
@@ -441,7 +441,7 @@ WRITE8_MEMBER(kenseim_state::cpu_portd_w)
 	m_to_68k_cmd_LVm = data >> 2 & 1;
 }
 
-WRITE8_MEMBER(kenseim_state::cpu_porte_w)
+void kenseim_state::cpu_porte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// DT1-DT8
 	m_to_68k_cmd_low = data;

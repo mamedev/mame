@@ -41,13 +41,13 @@ public:
 	int m_point_work_list_index;
 	int m_point_display_list_index;
 	int m_interrupt;
-	DECLARE_READ16_MEMBER(ke_r);
-	DECLARE_WRITE16_MEMBER(ke_w);
-	DECLARE_READ16_MEMBER(x_r);
-	DECLARE_WRITE16_MEMBER(x_w);
-	DECLARE_READ16_MEMBER(y_r);
-	DECLARE_WRITE16_MEMBER(y_w);
-	DECLARE_WRITE16_MEMBER(clk_w);
+	uint16_t ke_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ke_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t x_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t y_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void clk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -63,7 +63,7 @@ public:
  *
  *************************************/
 
-READ16_MEMBER(galaxygame_state::ke_r)
+uint16_t galaxygame_state::ke_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 
@@ -89,7 +89,7 @@ READ16_MEMBER(galaxygame_state::ke_r)
 	return ret;
 }
 
-WRITE16_MEMBER(galaxygame_state::ke_w)
+void galaxygame_state::ke_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -184,22 +184,22 @@ uint32_t galaxygame_state::screen_update_galaxygame(screen_device &screen, bitma
 	return 0;
 }
 
-READ16_MEMBER(galaxygame_state::x_r)
+uint16_t galaxygame_state::x_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_x;
 }
 
-WRITE16_MEMBER(galaxygame_state::x_w)
+void galaxygame_state::x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_x = data;
 }
 
-READ16_MEMBER(galaxygame_state::y_r)
+uint16_t galaxygame_state::y_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_y;
 }
 
-WRITE16_MEMBER(galaxygame_state::y_w)
+void galaxygame_state::y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_y = data;
 	if ( data == 0x0101 )
@@ -278,7 +278,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE16_MEMBER(galaxygame_state::clk_w)
+void galaxygame_state::clk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_clk = data;
 }

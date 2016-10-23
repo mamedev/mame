@@ -177,7 +177,7 @@ void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, in
 
 }
 
-READ32_MEMBER( iteagle_fpga_device::fpga_r )
+uint32_t iteagle_fpga_device::fpga_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_fpga_regs[offset];
 
@@ -248,7 +248,7 @@ READ32_MEMBER( iteagle_fpga_device::fpga_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
+void iteagle_fpga_device::fpga_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_fpga_regs[offset]);
 	switch (offset) {
@@ -392,7 +392,7 @@ WRITE32_MEMBER( iteagle_fpga_device::fpga_w )
 //*************************************
 //*  RTC M48T02
 //*************************************
-READ32_MEMBER( iteagle_fpga_device::rtc_r )
+uint32_t iteagle_fpga_device::rtc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_rtc_regs[offset];
 
@@ -405,7 +405,7 @@ READ32_MEMBER( iteagle_fpga_device::rtc_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
+void iteagle_fpga_device::rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	system_time systime;
 	int raw[8];
@@ -444,7 +444,7 @@ WRITE32_MEMBER( iteagle_fpga_device::rtc_w )
 //*************************************
 //*  FPGA RAM -- Eagle 1 only
 //*************************************
-READ32_MEMBER( iteagle_fpga_device::ram_r )
+uint32_t iteagle_fpga_device::ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_ram[offset];
 	if (LOG_RAM)
@@ -452,7 +452,7 @@ READ32_MEMBER( iteagle_fpga_device::ram_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_fpga_device::ram_w )
+void iteagle_fpga_device::ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 	if (LOG_RAM)
@@ -533,7 +533,7 @@ void iteagle_eeprom_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	m_memory_space = memory_space;
 }
 
-READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
+uint32_t iteagle_eeprom_device::eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -554,7 +554,7 @@ READ32_MEMBER( iteagle_eeprom_device::eeprom_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
+void iteagle_eeprom_device::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset) {
 		case 0x8/4: // 8255x PORT command
@@ -628,7 +628,7 @@ void iteagle_periph_device::device_reset()
 	m_ctrl_regs[0x10/4] =  0x00000000; // 0x6=No SIMM, 0x2, 0x1, 0x0 = SIMM .  Top 16 bits are compared to 0x3. Bit 0 might be lan chip present.
 }
 
-READ32_MEMBER( iteagle_periph_device::ctrl_r )
+uint32_t iteagle_periph_device::ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	system_time systime;
 	uint32_t result = m_ctrl_regs[offset];
@@ -672,7 +672,7 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 	return result;
 }
 
-WRITE32_MEMBER( iteagle_periph_device::ctrl_w )
+void iteagle_periph_device::ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl_regs[offset]);
 	switch (offset) {

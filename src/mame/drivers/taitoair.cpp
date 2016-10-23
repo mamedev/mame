@@ -207,7 +207,7 @@ perhaps? The two writes seem to take only two values.
                 MEMORY handlers
 ***********************************************************/
 
-WRITE16_MEMBER(taitoair_state::system_control_w)
+void taitoair_state::system_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 		data >>= 8;
@@ -220,12 +220,12 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
-READ16_MEMBER(taitoair_state::lineram_r)
+uint16_t taitoair_state::lineram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_line_ram[offset];
 }
 
-WRITE16_MEMBER(taitoair_state::lineram_w)
+void taitoair_state::lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_line_ram[offset] = data;
@@ -234,18 +234,18 @@ WRITE16_MEMBER(taitoair_state::lineram_w)
 	//  printf("LineRAM go %d\n",(int)m_screen->frame_number());
 }
 
-READ16_MEMBER(taitoair_state::dspram_r)
+uint16_t taitoair_state::dspram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_ram[offset];
 }
 
-WRITE16_MEMBER(taitoair_state::dspram_w)
+void taitoair_state::dspram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_dsp_ram[offset] = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
+uint16_t taitoair_state::dsp_HOLD_signal_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* HOLD signal is active low */
 	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
@@ -253,14 +253,14 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 	return m_dsp_hold_signal;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
+void taitoair_state::dsp_HOLDA_signal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", space.device().safe_pcbase(), data);
 }
 
 
-WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
+void taitoair_state::airsys_paletteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)/* xxBBBBxRRRRxGGGG */
 {
 	int a;
 
@@ -270,7 +270,7 @@ WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
 	m_palette->set_pen_color(offset, pal4bit(a >> 0), pal4bit(a >> 5), pal4bit(a >> 10));
 }
 
-WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
+void taitoair_state::airsys_gradram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t pen;
 	int r,g,b;
@@ -301,7 +301,7 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 #define STICK2_PORT_TAG  "STICK2"
 #define STICK3_PORT_TAG  "STICK3"
 
-READ16_MEMBER(taitoair_state::stick_input_r)
+uint16_t taitoair_state::stick_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -324,7 +324,7 @@ READ16_MEMBER(taitoair_state::stick_input_r)
 	return 0;
 }
 
-READ16_MEMBER(taitoair_state::stick2_input_r)
+uint16_t taitoair_state::stick2_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -338,7 +338,7 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
+void taitoair_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 3);
 }
@@ -353,7 +353,7 @@ WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
           [2] (unused)
           [3] both games uses 0xb7, most likely a register setting.
 */
-WRITE16_MEMBER(taitoair_state::dma_regs_w)
+void taitoair_state::dma_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("%08x %04x\n",offset,data);
 
@@ -412,29 +412,29 @@ ADDRESS_MAP_END
 
 /********************************** TMS32025 ********************************/
 
-WRITE16_MEMBER(taitoair_state::dsp_test_start_w)
+void taitoair_state::dsp_test_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_test_object_type = data;
 	m_dsp_test_or_clip = 0;
 	m_dsp_test_and_clip = 0xf;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_x_w)
+void taitoair_state::dsp_test_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_test_x = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_y_w)
+void taitoair_state::dsp_test_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_test_y = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_test_z_w)
+void taitoair_state::dsp_test_z_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_test_z = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_point_r)
+uint16_t taitoair_state::dsp_test_point_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t r = 0;
 	if(m_dsp_test_x < -m_dsp_test_z)
@@ -451,32 +451,32 @@ READ16_MEMBER(taitoair_state::dsp_test_point_r)
 	return r;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_or_clip_r)
+uint16_t taitoair_state::dsp_test_or_clip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_test_or_clip;
 }
 
-READ16_MEMBER(taitoair_state::dsp_test_and_clip_r)
+uint16_t taitoair_state::dsp_test_and_clip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_test_and_clip;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_1_w)
+void taitoair_state::dsp_muldiv_a_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_a_1 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_1_w)
+void taitoair_state::dsp_muldiv_b_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_b_1 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_1_w)
+void taitoair_state::dsp_muldiv_c_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_c_1 = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
+uint16_t taitoair_state::dsp_muldiv_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_dsp_muldiv_c_1 == 0)
 		return 0xffff; /**< @todo true value? */
@@ -484,22 +484,22 @@ READ16_MEMBER(taitoair_state::dsp_muldiv_1_r)
 	return m_dsp_muldiv_a_1*m_dsp_muldiv_b_1/m_dsp_muldiv_c_1;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_a_2_w)
+void taitoair_state::dsp_muldiv_a_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_a_2 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_b_2_w)
+void taitoair_state::dsp_muldiv_b_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_b_2 = data;
 }
 
-WRITE16_MEMBER(taitoair_state::dsp_muldiv_c_2_w)
+void taitoair_state::dsp_muldiv_c_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_muldiv_c_2 = data;
 }
 
-READ16_MEMBER(taitoair_state::dsp_muldiv_2_r)
+uint16_t taitoair_state::dsp_muldiv_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_dsp_muldiv_c_2 == 0)
 		return 0xffff; /**< @todo true value? */

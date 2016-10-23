@@ -26,7 +26,7 @@ public:
 		: n64_state(mconfig, type, tag)
 		{ }
 
-	DECLARE_READ32_MEMBER(dd_null_r);
+	uint32_t dd_null_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void machine_start_n64dd();
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
@@ -37,7 +37,7 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
 };
 
-READ32_MEMBER(n64_mess_state::dd_null_r)
+uint32_t n64_mess_state::dd_null_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }

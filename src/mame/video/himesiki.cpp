@@ -27,18 +27,18 @@ void himesiki_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(himesiki_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-WRITE8_MEMBER(himesiki_state::himesiki_bg_ram_w)
+void himesiki_state::himesiki_bg_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(himesiki_state::himesiki_scrollx_w)
+void himesiki_state::himesiki_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx[offset] = data;
 }
 
-WRITE8_MEMBER(himesiki_state::himesiki_scrolly_w)
+void himesiki_state::himesiki_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }

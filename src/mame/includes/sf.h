@@ -46,16 +46,16 @@ public:
 	uint16_t m_bgscroll;
 	uint16_t m_fgscroll;
 
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(soundcmd_w);
-	DECLARE_WRITE16_MEMBER(protection_w);
-	DECLARE_WRITE8_MEMBER(sound2_bank_w);
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_scroll_w);
-	DECLARE_WRITE16_MEMBER(fg_scroll_w);
-	DECLARE_WRITE16_MEMBER(gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(msm1_5205_w);
-	DECLARE_WRITE8_MEMBER(msm2_5205_w);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound2_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void msm1_5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm2_5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

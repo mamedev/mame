@@ -77,17 +77,17 @@ public:
 
 	void msm5205_update(int chip);
 
-	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
-	DECLARE_READ8_MEMBER(input_bypass_r);
-	DECLARE_READ16_MEMBER(motor_r);
-	DECLARE_WRITE16_MEMBER(motor_w);
+	void cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t motor_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(msm5205_command_w);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
 	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
-	DECLARE_WRITE8_MEMBER(volume_w);
+	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// video/topspeed.c
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

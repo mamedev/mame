@@ -108,12 +108,12 @@ public:
 	required_shared_ptr<uint8_t> m_gfxram;
 	required_shared_ptr<uint8_t> m_tileram;
 	int m_old_data;
-	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
-	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
-	DECLARE_WRITE8_MEMBER(trvmadns_palette_w);
-	DECLARE_WRITE8_MEMBER(w2);
-	DECLARE_WRITE8_MEMBER(w3);
-	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
+	void trvmadns_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trvmadns_gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trvmadns_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void w3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trvmadns_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -125,7 +125,7 @@ public:
 };
 
 
-WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
+void trvmadns_state::trvmadns_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom;
 	int address = 0;
@@ -196,13 +196,13 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 	}
 }
 
-WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
+void trvmadns_state::trvmadns_gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxram[offset] = data;
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
+void trvmadns_state::trvmadns_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b,datax;
 	m_generic_paletteram_8[offset] = data;
@@ -217,7 +217,7 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
 }
 
 
-WRITE8_MEMBER(trvmadns_state::w2)
+void trvmadns_state::w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  static int old = -1;
     if(data!=old)
@@ -225,7 +225,7 @@ WRITE8_MEMBER(trvmadns_state::w2)
 */
 }
 
-WRITE8_MEMBER(trvmadns_state::w3)
+void trvmadns_state::w3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  static int old = -1;
     if(data!=old)
@@ -233,7 +233,7 @@ WRITE8_MEMBER(trvmadns_state::w3)
 */
 }
 
-WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
+void trvmadns_state::trvmadns_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset==0)
 	{

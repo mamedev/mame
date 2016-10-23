@@ -23,42 +23,42 @@ DEVICE_ADDRESS_MAP_START( registers, 8, wpc_shift_device )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(wpc_shift_device::adrh_r)
+uint8_t wpc_shift_device::adrh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (adr + (val1 >> 3)) >> 8;
 }
 
-WRITE8_MEMBER(wpc_shift_device::adrh_w)
+void wpc_shift_device::adrh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	adr = (adr & 0xff) | (data << 8);
 }
 
-READ8_MEMBER(wpc_shift_device::adrl_r)
+uint8_t wpc_shift_device::adrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return adr + (val1 >> 3);
 }
 
-WRITE8_MEMBER(wpc_shift_device::adrl_w)
+void wpc_shift_device::adrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	adr = (adr & 0xff00) | data;
 }
 
-READ8_MEMBER(wpc_shift_device::val1_r)
+uint8_t wpc_shift_device::val1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1 << (val1 & 7);
 }
 
-WRITE8_MEMBER(wpc_shift_device::val1_w)
+void wpc_shift_device::val1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	val1 = data;
 }
 
-READ8_MEMBER(wpc_shift_device::val2_r)
+uint8_t wpc_shift_device::val2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1 << (val2 & 7);
 }
 
-WRITE8_MEMBER(wpc_shift_device::val2_w)
+void wpc_shift_device::val2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	val2 = data;
 }

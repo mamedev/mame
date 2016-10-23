@@ -28,7 +28,7 @@
 *
 *************************************/
 
-READ32_MEMBER( stv_state::common_prot_r )
+uint32_t stv_state::common_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *ROM = (uint32_t *)space.machine().root_device().memregion("abus")->base();
 
@@ -60,7 +60,7 @@ uint16_t stv_state::crypt_read_callback(uint32_t addr)
 	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
 }
 
-WRITE32_MEMBER ( stv_state::common_prot_w )
+void stv_state::common_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_a_bus[offset]);
 

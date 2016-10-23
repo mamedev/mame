@@ -42,15 +42,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ula_high_r);
-	DECLARE_READ8_MEMBER(ula_low_r);
-	DECLARE_WRITE16_MEMBER(refresh_w);
-	DECLARE_READ8_MEMBER(zx80_io_r);
-	DECLARE_READ8_MEMBER(zx81_io_r);
-	DECLARE_READ8_MEMBER(pc8300_io_r);
-	DECLARE_READ8_MEMBER(pow3000_io_r);
-	DECLARE_WRITE8_MEMBER(zx80_io_w);
-	DECLARE_WRITE8_MEMBER(zx81_io_w);
+	uint8_t ula_high_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ula_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void refresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t zx80_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zx81_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8300_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pow3000_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zx80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zx81_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_zx();
 	virtual void machine_reset() override;
 	virtual void video_start() override;

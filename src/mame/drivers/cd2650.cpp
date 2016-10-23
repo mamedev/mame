@@ -50,10 +50,10 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(beep_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(cass_r);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(cd2650);
 	const uint8_t *m_p_chargen;
@@ -70,7 +70,7 @@ private:
 };
 
 
-WRITE8_MEMBER( cd2650_state::beep_w )
+void cd2650_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 7)
 		m_beep->set_state(BIT(data, 3));
@@ -81,12 +81,12 @@ WRITE_LINE_MEMBER( cd2650_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( cd2650_state::cass_r )
+uint8_t cd2650_state::cass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-READ8_MEMBER( cd2650_state::keyin_r )
+uint8_t cd2650_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = ret | 0x80;
@@ -187,7 +187,7 @@ static GFXDECODE_START( cd2650 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( cd2650_state::kbd_put )
+void cd2650_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		m_term_data = data;

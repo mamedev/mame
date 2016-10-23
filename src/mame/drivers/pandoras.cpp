@@ -52,7 +52,7 @@ INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_slave_interrupt)
 		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
+void pandoras_state::pandoras_int_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  byte 0: irq enable (CPU A)
 	    byte 2: coin counter 1
@@ -88,7 +88,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
 	}
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
+void pandoras_state::pandoras_cpua_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_firq_old_data_a && data)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -96,7 +96,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 	m_firq_old_data_a = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
+void pandoras_state::pandoras_cpub_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_firq_old_data_b && data)
 		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
@@ -104,12 +104,12 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
 	m_firq_old_data_b = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
+void pandoras_state::pandoras_i8039_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
+void pandoras_state::i8039_irqen_and_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
@@ -119,7 +119,7 @@ WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 	m_i8039_status = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
+void pandoras_state::pandoras_z80_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -310,12 +310,12 @@ void pandoras_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portA_r)
+uint8_t pandoras_state::pandoras_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8039_status;
 }
 
-READ8_MEMBER(pandoras_state::pandoras_portB_r)
+uint8_t pandoras_state::pandoras_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }

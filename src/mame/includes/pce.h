@@ -64,12 +64,12 @@ public:
 	int m_joystick_port_select;
 	int m_joystick_data_select;
 	uint8_t m_joy_6b_packet[5];
-	DECLARE_WRITE8_MEMBER(mess_pce_joystick_w);
-	DECLARE_READ8_MEMBER(mess_pce_joystick_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_intf_w);
-	DECLARE_READ8_MEMBER(pce_cd_intf_r);
-	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
-	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
+	void mess_pce_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mess_pce_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pce_cd_intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pce_cd_intf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pce_cd_acard_wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pce_cd_acard_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sgx();
 	void init_tg16();
 	void init_mess_pce();

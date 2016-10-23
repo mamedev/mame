@@ -199,7 +199,7 @@ void micropolis_device::set_drive(uint8_t drive)
 
 
 /* read the FDC status register. */
-READ8_MEMBER( micropolis_device::status_r )
+uint8_t micropolis_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int inv = 0;
 
@@ -217,7 +217,7 @@ READ8_MEMBER( micropolis_device::status_r )
 
 
 /* read the FDC data register */
-READ8_MEMBER( micropolis_device::data_r )
+uint8_t micropolis_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_data_offset >= m_sector_length)
 		return 0;
@@ -226,7 +226,7 @@ READ8_MEMBER( micropolis_device::data_r )
 }
 
 /* write the FDC command register */
-WRITE8_MEMBER( micropolis_device::command_w )
+void micropolis_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* List of commands:
 Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
@@ -286,7 +286,7 @@ Command (bits 5,6,7)      Options (bits 0,1,2,3,4)
 
 
 /* write the FDC data register */
-WRITE8_MEMBER( micropolis_device::data_w )
+void micropolis_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_data_count > 0)
 	{
@@ -311,7 +311,7 @@ WRITE8_MEMBER( micropolis_device::data_w )
 	m_data = data;
 }
 
-READ8_MEMBER( micropolis_device::read )
+uint8_t micropolis_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -326,7 +326,7 @@ READ8_MEMBER( micropolis_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( micropolis_device::write )
+void micropolis_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x03)
 	{

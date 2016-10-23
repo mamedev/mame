@@ -49,16 +49,16 @@ public:
 	static void set_split_read(device_t &device, int split) { downcast<ramdac_device &>(device).m_split_read_reg = split; }
 
 	// I/O operations
-	DECLARE_READ8_MEMBER( index_r );
-	DECLARE_READ8_MEMBER( pal_r );
-	DECLARE_WRITE8_MEMBER( index_w );
-	DECLARE_WRITE8_MEMBER( index_r_w );
-	DECLARE_WRITE8_MEMBER( pal_w );
-	DECLARE_WRITE8_MEMBER( mask_w );
+	uint8_t index_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void index_r_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ramdac_pal_r );
-	DECLARE_WRITE8_MEMBER( ramdac_rgb666_w );
-	DECLARE_WRITE8_MEMBER( ramdac_rgb888_w );
+	uint8_t ramdac_pal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ramdac_rgb666_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ramdac_rgb888_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 

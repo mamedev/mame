@@ -74,10 +74,10 @@ public:
 	virtual uint8_t id_r() { return 0x00; }   // ID_A and ID_B lines
 	virtual void int_ack() { }
 	virtual uint8_t int_r() { return 1; }
-	virtual DECLARE_READ8_MEMBER(read) { return 0x00; }
-	virtual DECLARE_WRITE8_MEMBER(write) {}
-	virtual DECLARE_READ8_MEMBER(io_read) { return 0x00; }
-	virtual DECLARE_WRITE8_MEMBER(io_write) {}
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0x00; }
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0x00; }
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 };
 
 // ======================> tvcexp_slot_device
@@ -100,10 +100,10 @@ public:
 	virtual uint8_t id_r();
 	virtual void int_ack();
 	virtual uint8_t int_r();
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	devcb_write_line                m_out_irq_cb;
 	devcb_write_line                m_out_nmi_cb;

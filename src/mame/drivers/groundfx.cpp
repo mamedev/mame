@@ -103,7 +103,7 @@ CUSTOM_INPUT_MEMBER(groundfx_state::coin_word_r)
 	return m_coin_word;
 }
 
-WRITE32_MEMBER(groundfx_state::groundfx_input_w)
+void groundfx_state::groundfx_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -133,19 +133,19 @@ WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 	}
 }
 
-READ32_MEMBER(groundfx_state::groundfx_adc_r)
+uint32_t groundfx_state::groundfx_adc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (ioport("AN0")->read() << 8) | ioport("AN1")->read();
 }
 
-WRITE32_MEMBER(groundfx_state::groundfx_adc_w)
+void groundfx_state::groundfx_adc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
 	    1000 cycle delay is arbitrary */
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_GROUNDFX_INTERRUPT5);
 }
 
-WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
+void groundfx_state::rotate_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)/* only a guess that it's rotation */
 {
 		if (ACCESSING_BITS_0_15)
 		{
@@ -160,7 +160,7 @@ WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotati
 }
 
 
-WRITE32_MEMBER(groundfx_state::motor_control_w)
+void groundfx_state::motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
     Standard value poked is 0x00910200 (we ignore lsb and msb
@@ -395,7 +395,7 @@ ROM_START( groundfx )
 ROM_END
 
 
-READ32_MEMBER(groundfx_state::irq_speedup_r_groundfx)
+uint32_t groundfx_state::irq_speedup_r_groundfx(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	cpu_device *cpu = downcast<cpu_device *>(&space.device());
 	int ptr;

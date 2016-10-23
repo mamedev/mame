@@ -43,11 +43,11 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE16_MEMBER(tail2nos_txvideoram_w);
-	DECLARE_WRITE16_MEMBER(tail2nos_zoomdata_w);
-	DECLARE_WRITE16_MEMBER(tail2nos_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tail2nos_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tail2nos_zoomdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tail2nos_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

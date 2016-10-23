@@ -82,12 +82,12 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
-	DECLARE_READ8_MEMBER(pb_r);
-	DECLARE_WRITE8_MEMBER(pa_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(v6809_address_w);
-	DECLARE_WRITE8_MEMBER(v6809_register_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void v6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void v6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	void machine_reset_v6809();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -201,12 +201,12 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_state::crtc_update_addr )
 	m_video_address = address & 0x7ff;
 }
 
-WRITE8_MEMBER( v6809_state::videoram_w )
+void v6809_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidbyte = data;
 }
 
-WRITE8_MEMBER( v6809_state::v6809_address_w )
+void v6809_state::v6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc->address_w( space, 0, data );
 
@@ -216,7 +216,7 @@ WRITE8_MEMBER( v6809_state::v6809_address_w )
 		m_p_videoram[m_video_address] = m_vidbyte;
 }
 
-WRITE8_MEMBER( v6809_state::v6809_register_w )
+void v6809_state::v6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t temp = m_video_address;
 
@@ -232,7 +232,7 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 
 // **** Keyboard ****
 
-WRITE8_MEMBER( v6809_state::kbd_put )
+void v6809_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_pia0->cb1_w(0);
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
 	m_acia1->write_rxc(state);
 }
 
-READ8_MEMBER( v6809_state::pb_r )
+uint8_t v6809_state::pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -255,7 +255,7 @@ READ8_MEMBER( v6809_state::pb_r )
 }
 
 // can support 4 drives
-WRITE8_MEMBER( v6809_state::pa_w )
+void v6809_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 	if ((data & 3) == 0) floppy = m_floppy0->get_device();

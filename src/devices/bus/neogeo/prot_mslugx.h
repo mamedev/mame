@@ -19,8 +19,8 @@ public:
 	// construction/destruction
 	mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( protection_w );
-	DECLARE_READ16_MEMBER( protection_r );
+	void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

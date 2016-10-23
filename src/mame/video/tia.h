@@ -56,8 +56,8 @@ public:
 	template<class _Object> static devcb_base &set_databus_contents_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_databus_contents_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_vsync_callback(device_t &device, _Object object) { return downcast<tia_video_device &>(device).m_vsync_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// construction/destruction
@@ -82,31 +82,31 @@ protected:
 	int current_y();
 	void setup_pXgfx(void);
 	void update_bitmap(int next_x, int next_y);
-	DECLARE_WRITE8_MEMBER( WSYNC_w );
-	DECLARE_WRITE8_MEMBER( VSYNC_w );
-	DECLARE_WRITE8_MEMBER( VBLANK_w );
-	DECLARE_WRITE8_MEMBER( CTRLPF_w );
-	DECLARE_WRITE8_MEMBER( HMP0_w );
-	DECLARE_WRITE8_MEMBER( HMP1_w );
-	DECLARE_WRITE8_MEMBER( HMM0_w );
-	DECLARE_WRITE8_MEMBER( HMM1_w );
-	DECLARE_WRITE8_MEMBER( HMBL_w );
-	DECLARE_WRITE8_MEMBER( HMOVE_w );
-	DECLARE_WRITE8_MEMBER( RSYNC_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ0_w );
-	DECLARE_WRITE8_MEMBER( NUSIZ1_w );
-	DECLARE_WRITE8_MEMBER( HMCLR_w );
-	DECLARE_WRITE8_MEMBER( CXCLR_w );
-	DECLARE_WRITE8_MEMBER( RESP0_w );
-	DECLARE_WRITE8_MEMBER( RESP1_w );
-	DECLARE_WRITE8_MEMBER( RESM0_w );
-	DECLARE_WRITE8_MEMBER( RESM1_w );
-	DECLARE_WRITE8_MEMBER( RESBL_w );
-	DECLARE_WRITE8_MEMBER( RESMP0_w );
-	DECLARE_WRITE8_MEMBER( RESMP1_w );
-	DECLARE_WRITE8_MEMBER( GRP0_w );
-	DECLARE_WRITE8_MEMBER( GRP1_w );
-	DECLARE_READ8_MEMBER( INPT_r );
+	void WSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void VSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void VBLANK_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void CTRLPF_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMM0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMM1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMBL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMOVE_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RSYNC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void NUSIZ0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void NUSIZ1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void HMCLR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void CXCLR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESM0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESM1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESBL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESMP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void RESMP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void GRP0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void GRP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t INPT_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 
 private:

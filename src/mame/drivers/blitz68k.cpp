@@ -84,81 +84,81 @@ public:
 	optional_shared_ptr<uint16_t> m_leds0;
 	optional_shared_ptr<uint16_t> m_leds1;
 	optional_shared_ptr<uint16_t> m_leds2;
-	DECLARE_WRITE16_MEMBER(blit_copy_w);
-	DECLARE_READ8_MEMBER(blit_status_r);
-	DECLARE_WRITE8_MEMBER(blit_x_w);
-	DECLARE_WRITE8_MEMBER(blit_y_w);
-	DECLARE_WRITE8_MEMBER(blit_xy_w);
-	DECLARE_WRITE8_MEMBER(blit_w_w);
-	DECLARE_WRITE8_MEMBER(blit_h_w);
-	DECLARE_WRITE8_MEMBER(blit_wh_w);
-	DECLARE_WRITE8_MEMBER(blit_addr0_w);
-	DECLARE_WRITE8_MEMBER(blit_addr1_w);
-	DECLARE_WRITE8_MEMBER(blit_addr01_w);
-	DECLARE_WRITE8_MEMBER(blit_addr2_w);
-	DECLARE_WRITE8_MEMBER(blit_pens_w);
-	DECLARE_WRITE8_MEMBER(blit_pen0_w);
-	DECLARE_WRITE8_MEMBER(blit_pen1_w);
-	DECLARE_WRITE8_MEMBER(blit_pen2_w);
-	DECLARE_WRITE8_MEMBER(blit_pen3_w);
-	DECLARE_WRITE8_MEMBER(blit_flag0_w);
-	DECLARE_WRITE8_MEMBER(blit_flag1_w);
-	DECLARE_WRITE8_MEMBER(blit_flipx_w);
-	DECLARE_WRITE8_MEMBER(blit_flipy_w);
-	DECLARE_WRITE8_MEMBER(blit_solid_w);
-	DECLARE_WRITE8_MEMBER(blit_trans_w);
-	DECLARE_WRITE8_MEMBER(blit_flag6_w);
-	DECLARE_WRITE8_MEMBER(blit_flag7_w);
-	DECLARE_WRITE8_MEMBER(blit_flags_w);
-	DECLARE_WRITE8_MEMBER(blit_draw_w);
-	DECLARE_WRITE8_MEMBER(blit_hwyxa_draw_w);
-	DECLARE_READ16_MEMBER(blitter_status_r);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_READ16_MEMBER(test_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu1_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu2_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(bankrob_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(bankrob_mcu1_w);
-	DECLARE_WRITE8_MEMBER(bankrob_mcu2_w);
-	DECLARE_READ8_MEMBER(bankroba_mcu1_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu2_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu1_status_write_r);
-	DECLARE_READ8_MEMBER(bankroba_mcu2_status_write_r);
-	DECLARE_WRITE8_MEMBER(bankroba_mcu1_w);
-	DECLARE_WRITE8_MEMBER(bankroba_mcu2_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds1_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds2_w);
-	DECLARE_WRITE16_MEMBER(cjffruit_leds3_w);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ16_MEMBER(cjffruit_mcu_r);
-	DECLARE_WRITE16_MEMBER(cjffruit_mcu_w);
-	DECLARE_READ16_MEMBER(deucesw2_mcu_r);
-	DECLARE_WRITE16_MEMBER(deucesw2_mcu_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds1_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds2_w);
-	DECLARE_WRITE16_MEMBER(deucesw2_leds3_w);
-	DECLARE_READ8_MEMBER(dualgame_mcu1_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu2_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(dualgame_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(dualgame_mcu1_w);
-	DECLARE_WRITE8_MEMBER(dualgame_mcu2_w);
-	DECLARE_READ16_MEMBER(hermit_mcu_r);
-	DECLARE_WRITE16_MEMBER(hermit_mcu_w);
-	DECLARE_WRITE16_MEMBER(hermit_leds1_w);
-	DECLARE_WRITE16_MEMBER(hermit_leds2_w);
-	DECLARE_READ16_MEMBER(hermit_track_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu1_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu2_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu_status_read_r);
-	DECLARE_READ8_MEMBER(maxidbl_mcu_status_write_r);
-	DECLARE_WRITE8_MEMBER(maxidbl_mcu1_w);
-	DECLARE_WRITE8_MEMBER(maxidbl_mcu2_w);
+	void blit_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t blit_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blit_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_wh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_addr0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_addr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_addr01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_addr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_pens_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_pen0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_pen1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_pen2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_pen3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flag0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flag1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_solid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_trans_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flag6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flag7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_flags_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_draw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blit_hwyxa_draw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t blitter_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t test_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t bankrob_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankrob_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankrob_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankrob_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankrob_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankrob_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bankroba_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankroba_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankroba_mcu1_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bankroba_mcu2_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankroba_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankroba_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cjffruit_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cjffruit_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cjffruit_leds3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t crtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t cjffruit_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cjffruit_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t deucesw2_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void deucesw2_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deucesw2_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deucesw2_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deucesw2_leds3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t dualgame_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dualgame_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dualgame_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dualgame_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dualgame_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dualgame_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t hermit_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hermit_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hermit_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hermit_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hermit_track_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t maxidbl_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t maxidbl_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t maxidbl_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t maxidbl_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void maxidbl_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maxidbl_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void show_leds123();
 	void show_leds12();
-	DECLARE_WRITE16_MEMBER(crtc_lpen_w);
+	void crtc_lpen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
@@ -272,7 +272,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
 *************************************************************************************************************/
 
 
-WRITE16_MEMBER(blitz68k_state::blit_copy_w)
+void blitz68k_state::blit_copy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *blit_rom = memregion("blitter")->base();
 	uint32_t blit_dst_xpos;
@@ -334,20 +334,20 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 
 *************************************************************************************************************/
 
-READ8_MEMBER(blitz68k_state::blit_status_r)
+uint8_t blitz68k_state::blit_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;   // bit 0 = blitter busy
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_x_w)
+void blitz68k_state::blit_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.x = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_y_w)
+void blitz68k_state::blit_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.y = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_xy_w)
+void blitz68k_state::blit_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		blit_x_w(space, offset, data);
@@ -356,15 +356,15 @@ WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_w_w)
+void blitz68k_state::blit_w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.w = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_h_w)
+void blitz68k_state::blit_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.h = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_wh_w)
+void blitz68k_state::blit_wh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		blit_w_w(space, offset, data-1);
@@ -373,83 +373,83 @@ WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_addr0_w)
+void blitz68k_state::blit_addr0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.addr[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr1_w)
+void blitz68k_state::blit_addr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.addr[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
+void blitz68k_state::blit_addr01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		blit_addr0_w(space, offset, data);
 	else
 		blit_addr1_w(space, offset, data);
 }
-WRITE8_MEMBER(blitz68k_state::blit_addr2_w)
+void blitz68k_state::blit_addr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.addr[2] = data;
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_pens_w)
+void blitz68k_state::blit_pens_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.pen[offset] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen0_w)
+void blitz68k_state::blit_pen0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.pen[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen1_w)
+void blitz68k_state::blit_pen1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.pen[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen2_w)
+void blitz68k_state::blit_pen2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.pen[2] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_pen3_w)
+void blitz68k_state::blit_pen3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.pen[3] = data;
 }
 
 
-WRITE8_MEMBER(blitz68k_state::blit_flag0_w)
+void blitz68k_state::blit_flag0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flag[0] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag1_w)
+void blitz68k_state::blit_flag1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flag[1] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flipx_w)
+void blitz68k_state::blit_flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flipx = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flipy_w)
+void blitz68k_state::blit_flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flipy = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_solid_w)
+void blitz68k_state::blit_solid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.solid = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_trans_w)
+void blitz68k_state::blit_trans_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.trans = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag6_w)
+void blitz68k_state::blit_flag6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flag[6] = data;
 }
-WRITE8_MEMBER(blitz68k_state::blit_flag7_w)
+void blitz68k_state::blit_flag7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blit.flag[7] = data;
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_flags_w)
+void blitz68k_state::blit_flags_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -460,7 +460,7 @@ WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 	}
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_draw_w)
+void blitz68k_state::blit_draw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *blit_rom  = memregion("blitter")->base();
 	int blit_romsize = memregion("blitter")->bytes();
@@ -528,7 +528,7 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 	blit.y = blit_dst_ypos;
 }
 
-WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
+void blitz68k_state::blit_hwyxa_draw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -567,30 +567,30 @@ void blitz68k_state::show_leds12()
 *************************************************************************************************************/
 
 /*bit 0 is the blitter busy flag*/
-READ16_MEMBER(blitz68k_state::blitter_status_r)
+uint16_t blitz68k_state::blitter_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
 /*TODO*/
-WRITE16_MEMBER(blitz68k_state::lamps_w)
+void blitz68k_state::lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02x",data);
 }
 
-READ16_MEMBER(blitz68k_state::test_r)
+uint16_t blitz68k_state::test_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;//machine().rand();
 }
 
 #if 0
-WRITE16_MEMBER(blitz68k_state::irq_callback_w)
+void blitz68k_state::irq_callback_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02x",data);
 	m_maincpu->set_input_line(3, HOLD_LINE );
 }
 
-WRITE16_MEMBER(blitz68k_state::sound_write_w)
+void blitz68k_state::sound_write_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	popmessage("%02x",data);
 	dac_data_w(0, data & 0x0f);     /* Sound DAC? */
@@ -662,34 +662,34 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::bankrob_mcu1_r)
+uint8_t blitz68k_state::bankrob_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::bankrob_mcu2_r)
+uint8_t blitz68k_state::bankrob_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::bankrob_mcu_status_read_r)
+uint8_t blitz68k_state::bankrob_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::bankrob_mcu_status_write_r)
+uint8_t blitz68k_state::bankrob_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::bankrob_mcu1_w)
+void blitz68k_state::bankrob_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::bankrob_mcu2_w)
+void blitz68k_state::bankrob_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -748,33 +748,33 @@ ADDRESS_MAP_END
 // bankroba:
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::bankroba_mcu1_r)
+uint8_t blitz68k_state::bankroba_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::bankroba_mcu2_r)
+uint8_t blitz68k_state::bankroba_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = machine().rand();   // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::bankroba_mcu1_status_write_r)
+uint8_t blitz68k_state::bankroba_mcu1_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;    // bit 0 = MCU1. Active low.
 }
-READ8_MEMBER(blitz68k_state::bankroba_mcu2_status_write_r)
+uint8_t blitz68k_state::bankroba_mcu2_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x01;    // bit 0 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::bankroba_mcu1_w)
+void blitz68k_state::bankroba_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::bankroba_mcu2_w)
+void blitz68k_state::bankroba_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -836,7 +836,7 @@ ADDRESS_MAP_END
     Funny Fruit
 *************************************************************************************************************/
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
+void blitz68k_state::cjffruit_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -853,7 +853,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
+void blitz68k_state::cjffruit_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -870,7 +870,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
+void blitz68k_state::cjffruit_leds3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
@@ -882,7 +882,7 @@ WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 }
 
 // CRTC
-READ8_MEMBER(blitz68k_state::crtc_r)
+uint8_t blitz68k_state::crtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
@@ -891,7 +891,7 @@ READ8_MEMBER(blitz68k_state::crtc_r)
 		return mc6845->status_r(space, 0);
 }
 
-WRITE8_MEMBER(blitz68k_state::crtc_w)
+void blitz68k_state::crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
@@ -900,7 +900,7 @@ WRITE8_MEMBER(blitz68k_state::crtc_w)
 		mc6845->address_w(space, 0, data);
 }
 
-WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
+void blitz68k_state::crtc_lpen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	device_t *device = machine().device("crtc");
 	// 8fe0006: 0->1
@@ -910,14 +910,14 @@ WRITE16_MEMBER(blitz68k_state::crtc_lpen_w)
 }
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::cjffruit_mcu_r)
+uint16_t blitz68k_state::cjffruit_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::cjffruit_mcu_w)
+void blitz68k_state::cjffruit_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
@@ -964,19 +964,19 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::deucesw2_mcu_r)
+uint16_t blitz68k_state::deucesw2_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_mcu_w)
+void blitz68k_state::deucesw2_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
+void blitz68k_state::deucesw2_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -993,7 +993,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
+void blitz68k_state::deucesw2_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -1010,7 +1010,7 @@ WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
+void blitz68k_state::deucesw2_leds3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
@@ -1063,34 +1063,34 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::dualgame_mcu1_r)
+uint8_t blitz68k_state::dualgame_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::dualgame_mcu2_r)
+uint8_t blitz68k_state::dualgame_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::dualgame_mcu_status_read_r)
+uint8_t blitz68k_state::dualgame_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::dualgame_mcu_status_write_r)
+uint8_t blitz68k_state::dualgame_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::dualgame_mcu1_w)
+void blitz68k_state::dualgame_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::dualgame_mcu2_w)
+void blitz68k_state::dualgame_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
@@ -1154,19 +1154,19 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ16_MEMBER(blitz68k_state::hermit_mcu_r)
+uint16_t blitz68k_state::hermit_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0x00;   // machine().rand() gives "interesting" results
 	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_mcu_w)
+void blitz68k_state::hermit_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
+void blitz68k_state::hermit_leds1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
@@ -1176,7 +1176,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 	}
 }
 
-WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
+void blitz68k_state::hermit_leds2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
@@ -1186,7 +1186,7 @@ WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 	}
 }
 
-READ16_MEMBER(blitz68k_state::hermit_track_r)
+uint16_t blitz68k_state::hermit_track_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef MAME_DEBUG
 //  popmessage("track %02x %02x", ioport("TRACK_X")->read(), ioport("TRACK_Y")->read());
@@ -1239,34 +1239,34 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-READ8_MEMBER(blitz68k_state::maxidbl_mcu1_r)
+uint8_t blitz68k_state::maxidbl_mcu1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(blitz68k_state::maxidbl_mcu2_r)
+uint8_t blitz68k_state::maxidbl_mcu2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;  // machine().rand() gives "interesting" results
 	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_read_r)
+uint8_t blitz68k_state::maxidbl_mcu_status_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_write_r)
+uint8_t blitz68k_state::maxidbl_mcu_status_write_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x03;    // bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-WRITE8_MEMBER(blitz68k_state::maxidbl_mcu1_w)
+void blitz68k_state::maxidbl_mcu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(blitz68k_state::maxidbl_mcu2_w)
+void blitz68k_state::maxidbl_mcu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }

@@ -45,13 +45,13 @@ void midtunit_state::register_state_saving()
  *
  *************************************/
 
-WRITE16_MEMBER(midtunit_state::midtunit_cmos_enable_w)
+void midtunit_state::midtunit_cmos_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cmos_write_enable = 1;
 }
 
 
-WRITE16_MEMBER(midtunit_state::midtunit_cmos_w)
+void midtunit_state::midtunit_cmos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (1)/*m_cmos_write_enable*/
 	{
@@ -66,7 +66,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_cmos_w)
 }
 
 
-READ16_MEMBER(midtunit_state::midtunit_cmos_r)
+uint16_t midtunit_state::midtunit_cmos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_nvram[offset];
 }
@@ -90,7 +90,7 @@ static const uint8_t mk_prot_values[] =
 	0xff
 };
 
-READ16_MEMBER(midtunit_state::mk_prot_r)
+uint16_t midtunit_state::mk_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%08X:Protection R @ %05X = %04X\n", space.device().safe_pc(), offset, mk_prot_values[m_mk_prot_index] << 9);
 
@@ -104,7 +104,7 @@ READ16_MEMBER(midtunit_state::mk_prot_r)
 	return mk_prot_values[m_mk_prot_index++] << 9;
 }
 
-WRITE16_MEMBER(midtunit_state::mk_prot_w)
+void midtunit_state::mk_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -138,7 +138,7 @@ WRITE16_MEMBER(midtunit_state::mk_prot_w)
  *
  *************************************/
 
-READ16_MEMBER(midtunit_state::mkturbo_prot_r)
+uint16_t midtunit_state::mkturbo_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM &space.
 	 * A startup protection check expects to read back two different values in succession */
@@ -153,22 +153,22 @@ READ16_MEMBER(midtunit_state::mkturbo_prot_r)
  *
  *************************************/
 
-READ16_MEMBER(midtunit_state::mk2_prot_const_r)
+uint16_t midtunit_state::mk2_prot_const_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 2;
 }
 
-READ16_MEMBER(midtunit_state::mk2_prot_r)
+uint16_t midtunit_state::mk2_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mk2_prot_data;
 }
 
-READ16_MEMBER(midtunit_state::mk2_prot_shift_r)
+uint16_t midtunit_state::mk2_prot_shift_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mk2_prot_data >> 1;
 }
 
-WRITE16_MEMBER(midtunit_state::mk2_prot_w)
+void midtunit_state::mk2_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mk2_prot_data);
 }
@@ -221,7 +221,7 @@ static const uint32_t nbajamte_prot_values[128] =
 	0x381c2e17, 0x393c3e3f, 0x3a3d1e0f, 0x3b1d0e27, 0x3c3e1f2f, 0x3d1e0f07, 0x3e1f2f37, 0x3f3f3f1f
 };
 
-READ16_MEMBER(midtunit_state::nbajam_prot_r)
+uint16_t midtunit_state::nbajam_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = m_nbajam_prot_queue[m_nbajam_prot_index];
 	if (m_nbajam_prot_index < 4)
@@ -229,7 +229,7 @@ READ16_MEMBER(midtunit_state::nbajam_prot_r)
 	return result;
 }
 
-WRITE16_MEMBER(midtunit_state::nbajam_prot_w)
+void midtunit_state::nbajam_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int table_index = (offset >> 6) & 0x7f;
 	uint32_t protval = m_nbajam_prot_table[table_index];
@@ -292,7 +292,7 @@ static const uint8_t jdredd_prot_values_80020[] =
 	0x39,0x33,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
+void midtunit_state::jdredd_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", space.device().safe_pcbase(), offset*16, data);
 
@@ -335,7 +335,7 @@ WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 	}
 }
 
-READ16_MEMBER(midtunit_state::jdredd_prot_r)
+uint16_t midtunit_state::jdredd_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0xffff;
 
@@ -509,7 +509,7 @@ void midtunit_state::machine_reset_midtunit()
  *
  *************************************/
 
-READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
+uint16_t midtunit_state::midtunit_sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 /*  logerror("%08X:Sound status read\n", space.device().safe_pc());*/
 
@@ -524,7 +524,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 	return ~0;
 }
 
-READ16_MEMBER(midtunit_state::midtunit_sound_r)
+uint16_t midtunit_state::midtunit_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%08X:Sound data read\n", space.device().safe_pc());
 
@@ -534,7 +534,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_r)
 	return ~0;
 }
 
-WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
+void midtunit_state::midtunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* check for out-of-bounds accesses */
 	if (!offset)

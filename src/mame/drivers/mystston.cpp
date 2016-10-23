@@ -45,7 +45,7 @@ void mystston_state::mystston_on_scanline_interrupt()
 }
 
 
-WRITE8_MEMBER(mystston_state::irq_clear_w)
+void mystston_state::irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -72,7 +72,7 @@ INPUT_CHANGED_MEMBER(mystston_state::coin_inserted)
  *
  *************************************/
 
-WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
+void mystston_state::mystston_ay8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 goes to 8910 #0 BDIR pin */
 	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))

@@ -36,8 +36,8 @@ public:
 	omti8621_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	~omti8621_device() {}
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static void set_verbose(int on_off);
 
@@ -124,8 +124,8 @@ private:
 	uint16_t get_data();
 	void set_data(uint16_t data);
 	void set_jumper(uint16_t disk_type);
-	DECLARE_READ8_MEMBER(read8);
-	DECLARE_WRITE8_MEMBER(write8);
+	uint8_t read8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /* ----- omti8621 for PC device interface ----- */

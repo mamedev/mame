@@ -21,7 +21,7 @@ Might be some priority glitches
 #include "includes/tbowl.h"
 
 
-WRITE8_MEMBER(tbowl_state::coincounter_w)
+void tbowl_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -32,12 +32,12 @@ note: check this, its borrowed from tecmo.cpp / wc90.cpp at the moment and could
 
 ***/
 
-WRITE8_MEMBER(tbowl_state::boardb_bankswitch_w)
+void tbowl_state::boardb_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
+void tbowl_state::boardc_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
@@ -46,7 +46,7 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 
 ***/
 
-WRITE8_MEMBER(tbowl_state::sound_command_w)
+void tbowl_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 ADDRESS_MAP_END
 
 /* Board C */
-WRITE8_MEMBER(tbowl_state::trigger_nmi)
+void tbowl_state::trigger_nmi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -122,19 +122,19 @@ ADDRESS_MAP_END
 
 /* Board A */
 
-WRITE8_MEMBER(tbowl_state::adpcm_start_w)
+void tbowl_state::adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	m_adpcm_pos[offset & 1] = data << 8;
 	adpcm->reset_w(0);
 }
 
-WRITE8_MEMBER(tbowl_state::adpcm_end_w)
+void tbowl_state::adpcm_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_end[offset & 1] = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tbowl_state::adpcm_vol_w)
+void tbowl_state::adpcm_vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
 	adpcm->set_volume((data & 0x7f) * 100 / 0x7f);

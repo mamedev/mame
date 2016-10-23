@@ -103,12 +103,12 @@ public:
 	uint8_t m_question_offset_high;
 	uint8_t m_latched_coin;
 	uint8_t m_last_coin;
-	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
-	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_READ8_MEMBER(laserdisc_io_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
+	void statriv2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t question_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t laserdisc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void laserdisc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
+	void ppi_portc_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_addr_xlh();
 	void init_addr_lhx();
 	void init_addr_lmh();
@@ -189,7 +189,7 @@ void statriv2_state::video_start_vertical()
  *
  *************************************/
 
-WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
+void statriv2_state::statriv2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -241,7 +241,7 @@ INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
  *
  *************************************/
 
-READ8_MEMBER(statriv2_state::question_data_r)
+uint8_t statriv2_state::question_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const uint8_t *qrom = memregion("questions")->base();
 	uint32_t qromsize = memregion("questions")->bytes();
@@ -272,7 +272,7 @@ CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
 }
 
 
-WRITE8_MEMBER(statriv2_state::ppi_portc_hi_w)
+void statriv2_state::ppi_portc_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -1142,7 +1142,7 @@ void statriv2_state::init_addr_lmhe()
 }
 
 
-READ8_MEMBER(statriv2_state::laserdisc_io_r)
+uint8_t statriv2_state::laserdisc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0x00;
 	if (offset == 1)
@@ -1151,7 +1151,7 @@ READ8_MEMBER(statriv2_state::laserdisc_io_r)
 	return result;
 }
 
-WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
+void statriv2_state::laserdisc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }

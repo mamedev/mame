@@ -500,7 +500,7 @@ std::string intv_cart_slot_device::get_default_card_software()
  read_ay
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_ay)
+uint16_t intv_cart_slot_device::read_ay(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ay(space, offset, mem_mask);
@@ -512,7 +512,7 @@ READ16_MEMBER(intv_cart_slot_device::read_ay)
  write_ay
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_ay)
+void intv_cart_slot_device::write_ay(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ay(space, offset, data, mem_mask);
@@ -522,7 +522,7 @@ WRITE16_MEMBER(intv_cart_slot_device::write_ay)
  read_speech
  -------------------------------------------------*/
 
-READ16_MEMBER(intv_cart_slot_device::read_speech)
+uint16_t intv_cart_slot_device::read_speech(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_speech(space, offset, mem_mask);
@@ -534,7 +534,7 @@ READ16_MEMBER(intv_cart_slot_device::read_speech)
  write_speech
  -------------------------------------------------*/
 
-WRITE16_MEMBER(intv_cart_slot_device::write_speech)
+void intv_cart_slot_device::write_speech(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_speech(space, offset, data, mem_mask);

@@ -18,11 +18,11 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER( port_l_w );
+	void port_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER( t400_test_suite_state::port_l_w )
+void t400_test_suite_state::port_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("L: %u\n", data);
 }

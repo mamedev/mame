@@ -39,13 +39,13 @@ void mjkjidai_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
+void mjkjidai_state::mjkjidai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
+void mjkjidai_state::mjkjidai_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: port c0 = %02x\n",space.device().safe_pc(),data);
 

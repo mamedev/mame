@@ -55,17 +55,17 @@
     TODO: ports CB1 and CB2, need tracing; ports CA1 and CA2 could use verify as well
     */
 
-READ8_MEMBER(beezer_state::b_via_0_pa_r)
+uint8_t beezer_state::b_via_0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_banklatch&0x38)<<2; // return X,Y,Z bits TODO: the Z bit connects somewhere else... where?
 }
 
-READ8_MEMBER(beezer_state::b_via_0_pb_r)
+uint8_t beezer_state::b_via_0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pbus;
 }
 
-WRITE8_MEMBER(beezer_state::b_via_0_pa_w)
+void beezer_state::b_via_0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x08) == 0)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -92,27 +92,27 @@ WRITE8_MEMBER(beezer_state::b_via_0_pa_w)
 	}
 }
 
-WRITE8_MEMBER(beezer_state::b_via_0_pb_w)
+void beezer_state::b_via_0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pbus = data;
 }
 
-READ8_MEMBER(beezer_state::b_via_1_pa_r)
+uint8_t beezer_state::b_via_1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pbus;
 }
 
-READ8_MEMBER(beezer_state::b_via_1_pb_r)
+uint8_t beezer_state::b_via_1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x1F | (m_custom->noise_r(space, 0)?0x40:0);
 }
 
-WRITE8_MEMBER(beezer_state::b_via_1_pa_w)
+void beezer_state::b_via_1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pbus = data;
 }
 
-WRITE8_MEMBER(beezer_state::b_via_1_pb_w)
+void beezer_state::b_via_1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_custom->timer1_w(space, 0, data&0x80);
 	//if ((data&0x1f) != 0x01)
@@ -125,7 +125,7 @@ void beezer_state::init_beezer()
 	m_banklatch = 0;
 }
 
-WRITE8_MEMBER(beezer_state::beezer_bankswitch_w)
+void beezer_state::beezer_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_banklatch = data&0x3f; // latched 'x,y,z' plus bank bits in ls174 @ 4H
 	if ((data & 0x07) == 0)

@@ -157,9 +157,9 @@ protected:
 	uint8_t arm7_cpu_read8(uint32_t addr);
 
 	// Coprocessor support
-	DECLARE_WRITE32_MEMBER( arm7_do_callback );
-	DECLARE_READ32_MEMBER( arm7_rt_r_callback );
-	DECLARE_WRITE32_MEMBER( arm7_rt_w_callback );
+	void arm7_do_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t arm7_rt_r_callback(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void arm7_rt_w_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void arm7_dt_r_callback(uint32_t insn, uint32_t *prn);
 	void arm7_dt_w_callback(uint32_t insn, uint32_t *prn);
 

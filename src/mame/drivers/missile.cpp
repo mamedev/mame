@@ -400,8 +400,8 @@ public:
 	uint8_t m_flipscreen;
 	uint64_t m_madsel_lastcycles;
 
-	DECLARE_WRITE8_MEMBER(missile_w);
-	DECLARE_READ8_MEMBER(missile_r);
+	void missile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t missile_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 	void init_missilem();
 	void init_suprmatk();
@@ -703,7 +703,7 @@ uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(missile_state::missile_w)
+void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -763,7 +763,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 }
 
 
-READ8_MEMBER(missile_state::missile_r)
+uint8_t missile_state::missile_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t result = 0xff;

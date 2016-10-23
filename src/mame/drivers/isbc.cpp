@@ -53,8 +53,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(isbc86_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc286_tmr2_w);
 	DECLARE_WRITE_LINE_MEMBER(isbc_uart8274_irq);
-	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE8_MEMBER(ppi_c_w);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	void machine_reset() override;
 };
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER( isbc_state::isbc86_tmr2_w )
 	m_uart8251->write_txc(state);
 }
 
-READ8_MEMBER( isbc_state::get_slave_ack )
+uint8_t isbc_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 7)
 		return m_pic_1->acknowledge();
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER( isbc_state::write_centronics_ack )
 		m_pic_1->ir7_w(1);
 }
 
-WRITE8_MEMBER( isbc_state::ppi_c_w )
+void isbc_state::ppi_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(data & 1);
 

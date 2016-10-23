@@ -53,19 +53,19 @@ PALETTE_INIT_MEMBER(grchamp_state, grchamp)
 }
 
 
-WRITE8_MEMBER(grchamp_state::left_w)
+void grchamp_state::left_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_leftram[offset] = data;
 	m_left_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(grchamp_state::center_w)
+void grchamp_state::center_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centerram[offset] = data;
 	m_center_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(grchamp_state::right_w)
+void grchamp_state::right_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rightram[offset] = data;
 	m_right_tilemap->mark_tile_dirty(offset);

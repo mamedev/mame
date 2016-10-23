@@ -117,9 +117,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
 
-	DECLARE_READ8_MEMBER(_620000_r);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	uint8_t _620000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -131,7 +131,7 @@ public:
 };
 
 
-WRITE16_MEMBER(popobear_state::vram_w)
+void popobear_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
@@ -452,12 +452,12 @@ uint32_t popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 /* ??? */
-READ8_MEMBER(popobear_state::_620000_r)
+uint8_t popobear_state::_620000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 9;
 }
 
-WRITE8_MEMBER(popobear_state::irq_ack_w)
+void popobear_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 

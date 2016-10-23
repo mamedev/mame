@@ -60,8 +60,8 @@ public:
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_READ16_MEMBER( cpuregs_r );
-	DECLARE_WRITE16_MEMBER( cpuregs_w );
+	uint16_t cpuregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cpuregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

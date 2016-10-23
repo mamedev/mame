@@ -113,7 +113,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
-	DECLARE_READ8_MEMBER(irq_latch_r);
+	uint8_t irq_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_dblewing();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -123,8 +123,8 @@ public:
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
 	void dblewing_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 
-	READ16_MEMBER( wf_protection_region_0_104_r );
-	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	uint16_t wf_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void wf_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 };
 
 
@@ -145,7 +145,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
+uint16_t dblewing_state::wf_protection_region_0_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -154,7 +154,7 @@ READ16_MEMBER( dblewing_state::wf_protection_region_0_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( dblewing_state::wf_protection_region_0_104_w )
+void dblewing_state::wf_protection_region_0_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, dblew
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-READ8_MEMBER(dblewing_state::irq_latch_r)
+uint8_t dblewing_state::irq_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
 	m_sound_irq &= ~0x02;

@@ -100,33 +100,33 @@ void speech_sound_device::device_start()
 
 
 
-READ8_MEMBER( speech_sound_device::t0_r )
+uint8_t speech_sound_device::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t0;
 }
 
-READ8_MEMBER( speech_sound_device::t1_r )
+uint8_t speech_sound_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drq;
 }
 
-READ8_MEMBER( speech_sound_device::p1_r )
+uint8_t speech_sound_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latch & 0x7f;
 }
 
-READ8_MEMBER( speech_sound_device::rom_r )
+uint8_t speech_sound_device::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_speech[0x100 * (m_p2 & 0x3f) + offset];
 }
 
-WRITE8_MEMBER( speech_sound_device::p1_w )
+void speech_sound_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x80))
 		m_t0 = 0;
 }
 
-WRITE8_MEMBER( speech_sound_device::p2_w )
+void speech_sound_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
@@ -169,13 +169,13 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 }
 
 
-WRITE8_MEMBER( speech_sound_device::data_w )
+void speech_sound_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
 }
 
 
-WRITE8_MEMBER( speech_sound_device::control_w )
+void speech_sound_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("Speech control = %X\n", data));
 }
@@ -389,7 +389,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::increment_t1_clock_timer_cb )
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::status_r )
+uint8_t usb_sound_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%04X:usb_data_r = %02X\n", m_maincpu->safe_pc(), (m_out_latch & 0x81) | (m_in_latch & 0x7e)));
 
@@ -417,7 +417,7 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::data_w )
+void usb_sound_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%04X:usb_data_w = %02X\n", m_maincpu->safe_pc(), data));
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
@@ -427,13 +427,13 @@ WRITE8_MEMBER( usb_sound_device::data_w )
 }
 
 
-READ8_MEMBER( usb_sound_device::ram_r )
+uint8_t usb_sound_device::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_program_ram[offset];
 }
 
 
-WRITE8_MEMBER( usb_sound_device::ram_w )
+void usb_sound_device::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_in_latch & 0x80)
 		m_program_ram[offset] = data;
@@ -449,7 +449,7 @@ WRITE8_MEMBER( usb_sound_device::ram_w )
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::p1_r )
+uint8_t usb_sound_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 0-6 are inputs and map to bits 0-6 of the input latch */
 	if ((m_in_latch & 0x7f) != 0)
@@ -458,7 +458,7 @@ READ8_MEMBER( usb_sound_device::p1_r )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::p1_w )
+void usb_sound_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 maps to bit 0 on the output latch */
 	m_out_latch = (m_out_latch & 0xfe) | (data >> 7);
@@ -466,7 +466,7 @@ WRITE8_MEMBER( usb_sound_device::p1_w )
 }
 
 
-WRITE8_MEMBER( usb_sound_device::p2_w )
+void usb_sound_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t old = m_last_p2_value;
 	m_last_p2_value = data;
@@ -488,7 +488,7 @@ WRITE8_MEMBER( usb_sound_device::p2_w )
 }
 
 
-READ8_MEMBER( usb_sound_device::t1_r )
+uint8_t usb_sound_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* T1 returns 1 based on the value of the T1 clock; the exact */
 	/* pattern is determined by one or more jumpers on the board. */
@@ -639,14 +639,14 @@ void usb_sound_device::env_w(int which, uint8_t offset, uint8_t data)
  *
  *************************************/
 
-READ8_MEMBER( usb_sound_device::workram_r )
+uint8_t usb_sound_device::workram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 256 * m_work_ram_bank;
 	return m_work_ram[offset];
 }
 
 
-WRITE8_MEMBER( usb_sound_device::workram_w )
+void usb_sound_device::workram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 256 * m_work_ram_bank;
 	m_work_ram[offset] = data;

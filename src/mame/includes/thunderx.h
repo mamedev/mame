@@ -49,18 +49,18 @@ public:
 	int        m_priority;
 	uint8_t      m_1f98_latch;
 
-	DECLARE_WRITE8_MEMBER(scontra_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(thunderx_videobank_w);
-	DECLARE_WRITE8_MEMBER(gbusters_videobank_w);
-	DECLARE_READ8_MEMBER(pmc_r);
-	DECLARE_WRITE8_MEMBER(pmc_w);
-	DECLARE_READ8_MEMBER(_1f98_r);
-	DECLARE_WRITE8_MEMBER(scontra_1f98_w);
-	DECLARE_WRITE8_MEMBER(thunderx_1f98_w);
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
+	void scontra_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void thunderx_videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gbusters_videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pmc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pmc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t _1f98_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scontra_1f98_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void thunderx_1f98_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k007232_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -70,11 +70,11 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
 	void calculate_collisions(  );
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K052109_CB_MEMBER(tile_callback);
 	K052109_CB_MEMBER(gbusters_tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

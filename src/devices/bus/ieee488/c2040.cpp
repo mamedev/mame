@@ -203,7 +203,7 @@ ADDRESS_MAP_END
 //  riot6532 uc1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_t::dio_r )
+uint8_t c2040_t::dio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -223,7 +223,7 @@ READ8_MEMBER( c2040_t::dio_r )
 	return m_bus->dio_r();
 }
 
-WRITE8_MEMBER( c2040_t::dio_w )
+void c2040_t::dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( c2040_t::dio_w )
 //  riot6532 ue1
 //-------------------------------------------------
 
-READ8_MEMBER( c2040_t::riot1_pa_r )
+uint8_t c2040_t::riot1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -279,7 +279,7 @@ READ8_MEMBER( c2040_t::riot1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_t::riot1_pa_w )
+void c2040_t::riot1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -314,7 +314,7 @@ WRITE8_MEMBER( c2040_t::riot1_pa_w )
 	update_ieee_signals();
 }
 
-READ8_MEMBER( c2040_t::riot1_pb_r )
+uint8_t c2040_t::riot1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -345,7 +345,7 @@ READ8_MEMBER( c2040_t::riot1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_t::riot1_pb_w )
+void c2040_t::riot1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -373,7 +373,7 @@ WRITE8_MEMBER( c2040_t::riot1_pb_w )
 }
 
 
-WRITE8_MEMBER( c2040_t::via_pb_w )
+void c2040_t::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

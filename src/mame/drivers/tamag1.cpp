@@ -27,7 +27,7 @@ public:
 	required_device<e0c6s46_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT(tama);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(tamag1_state, tama)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tamag1_state::speaker_w)
+void tamag1_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// R43: speaker out
 	m_speaker->level_w(data >> 3 & 1);

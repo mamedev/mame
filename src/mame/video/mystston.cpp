@@ -124,7 +124,7 @@ void mystston_state::set_palette()
  *
  *************************************/
 
-WRITE8_MEMBER(mystston_state::mystston_video_control_w)
+void mystston_state::mystston_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	*m_video_control = data;
 

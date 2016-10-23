@@ -70,12 +70,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mc1502_speaker_set_spkrdata);
 	DECLARE_WRITE_LINE_MEMBER(mc1502_i8251_syndet);
 
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_ppi_portc_w);
-	DECLARE_READ8_MEMBER(mc1502_ppi_portc_r);
-	DECLARE_READ8_MEMBER(mc1502_kppi_porta_r);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portb_w);
-	DECLARE_WRITE8_MEMBER(mc1502_kppi_portc_w);
+	void mc1502_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc1502_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mc1502_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mc1502_kppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc1502_kppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc1502_kppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	int m_pit_out2;

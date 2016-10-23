@@ -37,7 +37,7 @@ public:
 	ertictac_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag) { }
 
-	DECLARE_READ32_MEMBER(ertictac_podule_r);
+	uint32_t ertictac_podule_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_ertictac();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -45,7 +45,7 @@ public:
 };
 
 
-READ32_MEMBER(ertictac_state::ertictac_podule_r)
+uint32_t ertictac_state::ertictac_podule_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	archimedes_clear_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 

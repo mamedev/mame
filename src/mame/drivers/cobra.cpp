@@ -680,44 +680,44 @@ public:
 	required_shared_ptr<uint64_t> m_gfx_ram0;
 	required_shared_ptr<uint64_t> m_gfx_ram1;
 
-	DECLARE_READ64_MEMBER(main_comram_r);
-	DECLARE_WRITE64_MEMBER(main_comram_w);
-	DECLARE_READ64_MEMBER(main_fifo_r);
-	DECLARE_WRITE64_MEMBER(main_fifo_w);
-	DECLARE_READ64_MEMBER(main_mpc106_r);
-	DECLARE_WRITE64_MEMBER(main_mpc106_w);
-	DECLARE_WRITE32_MEMBER(main_cpu_dc_store);
+	uint64_t main_comram_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void main_comram_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t main_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void main_fifo_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t main_mpc106_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void main_mpc106_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void main_cpu_dc_store(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(sub_comram_r);
-	DECLARE_WRITE32_MEMBER(sub_comram_w);
-	DECLARE_READ32_MEMBER(sub_unk7e_r);
-	DECLARE_WRITE32_MEMBER(sub_debug_w);
-	DECLARE_READ32_MEMBER(sub_unk1_r);
-	DECLARE_WRITE32_MEMBER(sub_unk1_w);
-	DECLARE_READ32_MEMBER(sub_config_r);
-	DECLARE_WRITE32_MEMBER(sub_config_w);
-	DECLARE_READ32_MEMBER(sub_mainbd_r);
-	DECLARE_WRITE32_MEMBER(sub_mainbd_w);
-	DECLARE_READ16_MEMBER(sub_ata0_r);
-	DECLARE_WRITE16_MEMBER(sub_ata0_w);
-	DECLARE_READ16_MEMBER(sub_ata1_r);
-	DECLARE_WRITE16_MEMBER(sub_ata1_w);
-	DECLARE_READ32_MEMBER(sub_psac2_r);
-	DECLARE_WRITE32_MEMBER(sub_psac2_w);
-	DECLARE_WRITE32_MEMBER(sub_psac_palette_w);
-	DECLARE_WRITE32_MEMBER(sub_sound_dma_w);
+	uint32_t sub_comram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_comram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sub_unk7e_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sub_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sub_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sub_mainbd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_mainbd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t sub_ata0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sub_ata0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sub_ata1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sub_ata1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t sub_psac2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sub_psac2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sub_psac_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sub_sound_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE64_MEMBER(gfx_fifo0_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo1_w);
-	DECLARE_WRITE64_MEMBER(gfx_fifo2_w);
-	DECLARE_WRITE64_MEMBER(gfx_debug_state_w);
-	DECLARE_READ64_MEMBER(gfx_unk1_r);
-	DECLARE_WRITE64_MEMBER(gfx_unk1_w);
-	DECLARE_READ64_MEMBER(gfx_fifo_r);
-	DECLARE_WRITE64_MEMBER(gfx_buf_w);
-	DECLARE_WRITE32_MEMBER(gfx_cpu_dc_store);
+	void gfx_fifo0_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_fifo1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_fifo2_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_debug_state_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t gfx_unk1_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_unk1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t gfx_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_buf_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gfx_cpu_dc_store(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE8_MEMBER(sub_jvs_w);
+	void sub_jvs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 
@@ -1393,21 +1393,21 @@ static void mpc106_pci_w(device_t *busdevice, device_t *device, int function, in
 	COMBINE_DATA(mpc106_regs + (reg/4));
 }
 
-READ64_MEMBER(cobra_state::main_mpc106_r)
+uint64_t cobra_state::main_mpc106_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	//return pci_64be_r(offset, mem_mask);
 	return device->read_64be(space, offset, mem_mask);
 }
 
-WRITE64_MEMBER(cobra_state::main_mpc106_w)
+void cobra_state::main_mpc106_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
 	//pci_64be_w(offset, data, mem_mask);
 	device->write_64be(space, offset, data, mem_mask);
 }
 
-READ64_MEMBER(cobra_state::main_fifo_r)
+uint64_t cobra_state::main_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -1477,7 +1477,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_fifo_w)
+void cobra_state::main_fifo_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{
@@ -1647,7 +1647,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 	}
 }
 
-READ64_MEMBER(cobra_state::main_comram_r)
+uint64_t cobra_state::main_comram_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	int page = m_comram_page;
@@ -1664,7 +1664,7 @@ READ64_MEMBER(cobra_state::main_comram_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::main_comram_w)
+void cobra_state::main_comram_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int page = m_comram_page;
 
@@ -1679,7 +1679,7 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
-WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
+void cobra_state::main_cpu_dc_store(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset & 0xf0000000) == 0xc0000000)
 	{
@@ -1715,7 +1715,7 @@ ADDRESS_MAP_END
 
 //static int ucount = 0;
 
-READ32_MEMBER(cobra_state::sub_unk1_r)
+uint32_t cobra_state::sub_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1727,7 +1727,7 @@ READ32_MEMBER(cobra_state::sub_unk1_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_unk1_w)
+void cobra_state::sub_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	if (!ACCESSING_BITS_24_31)
@@ -1744,7 +1744,7 @@ WRITE32_MEMBER(cobra_state::sub_unk1_w)
 	*/
 }
 
-READ32_MEMBER(cobra_state::sub_mainbd_r)
+uint32_t cobra_state::sub_mainbd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1791,7 +1791,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_mainbd_w)
+void cobra_state::sub_mainbd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1843,12 +1843,12 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_unk7e_r)
+uint32_t cobra_state::sub_unk7e_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(cobra_state::sub_debug_w)
+void cobra_state::sub_debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1875,7 +1875,7 @@ WRITE32_MEMBER(cobra_state::sub_debug_w)
 	}
 }
 
-READ32_MEMBER(cobra_state::sub_config_r)
+uint32_t cobra_state::sub_config_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -1891,11 +1891,11 @@ READ32_MEMBER(cobra_state::sub_config_r)
 	return r;
 }
 
-WRITE32_MEMBER(cobra_state::sub_config_w)
+void cobra_state::sub_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ16_MEMBER(cobra_state::sub_ata0_r)
+uint16_t cobra_state::sub_ata0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
@@ -1905,7 +1905,7 @@ READ16_MEMBER(cobra_state::sub_ata0_r)
 	return data;
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata0_w)
+void cobra_state::sub_ata0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
@@ -1913,7 +1913,7 @@ WRITE16_MEMBER(cobra_state::sub_ata0_w)
 	m_ata->write_cs0(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER(cobra_state::sub_ata1_r)
+uint16_t cobra_state::sub_ata1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
@@ -1922,7 +1922,7 @@ READ16_MEMBER(cobra_state::sub_ata1_r)
 	return ( data << 8 ) | ( data >> 8 );
 }
 
-WRITE16_MEMBER(cobra_state::sub_ata1_w)
+void cobra_state::sub_ata1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
@@ -1930,28 +1930,28 @@ WRITE16_MEMBER(cobra_state::sub_ata1_w)
 	m_ata->write_cs1(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(cobra_state::sub_comram_r)
+uint32_t cobra_state::sub_comram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int page = m_comram_page ^ 1;
 
 	return m_comram[page][offset];
 }
 
-WRITE32_MEMBER(cobra_state::sub_comram_w)
+void cobra_state::sub_comram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int page = m_comram_page ^ 1;
 
 	COMBINE_DATA(m_comram[page].get() + offset);
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac_palette_w)
+void cobra_state::sub_psac_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-READ32_MEMBER(cobra_state::sub_psac2_r)
+uint32_t cobra_state::sub_psac2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_sub_psac_count++;
 	if (m_sub_psac_count >= 0x8000)
@@ -1962,11 +1962,11 @@ READ32_MEMBER(cobra_state::sub_psac2_r)
 	return m_sub_psac_reg;
 }
 
-WRITE32_MEMBER(cobra_state::sub_psac2_w)
+void cobra_state::sub_psac2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
+void cobra_state::sub_sound_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("DMA write to unknown: size %d, data %08X\n", address, data);
 
@@ -1997,7 +1997,7 @@ WRITE32_MEMBER(cobra_state::sub_sound_dma_w)
 	}
 }
 
-WRITE8_MEMBER(cobra_state::sub_jvs_w)
+void cobra_state::sub_jvs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cobra_jvs_host *jvs = machine().device<cobra_jvs_host>("cobra_jvs_host");
 
@@ -2912,7 +2912,7 @@ void cobra_renderer::gfx_fifo_exec()
 	wait();
 }
 
-READ64_MEMBER(cobra_state::gfx_fifo_r)
+uint64_t cobra_state::gfx_fifo_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -2941,25 +2941,25 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo0_w)
+void cobra_state::gfx_fifo0_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 2;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo1_w)
+void cobra_state::gfx_fifo1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 0;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-WRITE64_MEMBER(cobra_state::gfx_fifo2_w)
+void cobra_state::gfx_fifo2_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_gfx_fifo_cache_addr = 1;
 	COMBINE_DATA(m_gfx_fifo_mem + offset);
 }
 
-READ64_MEMBER(cobra_state::gfx_unk1_r)
+uint64_t cobra_state::gfx_unk1_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -2992,7 +2992,7 @@ READ64_MEMBER(cobra_state::gfx_unk1_r)
 	return r;
 }
 
-WRITE64_MEMBER(cobra_state::gfx_unk1_w)
+void cobra_state::gfx_unk1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("gfx_unk1_w: %08X %08X, %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 
@@ -3031,7 +3031,7 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_buf_w)
+void cobra_state::gfx_buf_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("buf_w: top = %08X\n", gfxfifo_get_top());
 
@@ -3075,7 +3075,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 	}
 }
 
-WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
+void cobra_state::gfx_cpu_dc_store(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t addr = offset >> 24;
 	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
@@ -3102,7 +3102,7 @@ WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
 	}
 }
 
-WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
+void cobra_state::gfx_debug_state_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_40_47)
 	{

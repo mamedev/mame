@@ -21,7 +21,7 @@ public:
 	wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~wiping_sound_device() {}
 
-	DECLARE_WRITE8_MEMBER( sound_w );
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

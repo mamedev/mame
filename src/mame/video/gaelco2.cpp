@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(gaelco2_state::get_tile_info_gaelco2_screen1_dual)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_vram_w)
+void gaelco2_state::gaelco2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pant0_start = ((m_vregs[0] >> 9) & 0x07)*0x1000;
 	int pant0_end = pant0_start + 0x1000;
@@ -219,7 +219,7 @@ static const int pen_color_adjust[16] = {
 };
 
 
-WRITE16_MEMBER(gaelco2_state::gaelco2_palette_w)
+void gaelco2_state::gaelco2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i, color, r, g, b, auxr, auxg, auxb;
 

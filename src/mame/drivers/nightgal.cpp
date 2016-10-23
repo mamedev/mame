@@ -72,20 +72,20 @@ public:
 	required_device<cpu_device> m_subcpu;
 
 	/* memory */
-	//DECLARE_WRITE8_MEMBER(sexygal_nsc_true_blitter_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_0_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_1_w);
-	DECLARE_WRITE8_MEMBER(royalqn_blitter_2_w);
-	DECLARE_READ8_MEMBER(royalqn_nsc_blit_r);
-	DECLARE_READ8_MEMBER(royalqn_comm_r);
-	DECLARE_WRITE8_MEMBER(royalqn_comm_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	//void sexygal_nsc_true_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void royalqn_blitter_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void royalqn_blitter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void royalqn_blitter_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t royalqn_nsc_blit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t royalqn_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void royalqn_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_1p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_2p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ngalsumr();
 	void init_royalqn();
-	DECLARE_WRITE8_MEMBER(ngalsumr_unk_w);
+	void ngalsumr_unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -198,23 +198,23 @@ PALETTE_INIT_MEMBER(nightgal_state, nightgal)
    There are three unidirectional latches that also sends an irq from z80 to MCU.
  */
 // TODO: simplify this (error in the document)
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_0_w)
+void nightgal_state::royalqn_blitter_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_raw_data[0] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_1_w)
+void nightgal_state::royalqn_blitter_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_raw_data[1] = data;
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_blitter_2_w)
+void nightgal_state::royalqn_blitter_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_raw_data[2] = data;
 	m_subcpu->set_input_line(0, ASSERT_LINE );
 }
 
-READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
+uint8_t nightgal_state::royalqn_nsc_blit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
@@ -236,13 +236,13 @@ void nightgal_state::z80_wait_assert_cb()
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(nightgal_state::z80_wait_ack_cb),this));
 }
 
-READ8_MEMBER(nightgal_state::royalqn_comm_r)
+uint8_t nightgal_state::royalqn_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	z80_wait_assert_cb();
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
-WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
+void nightgal_state::royalqn_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	z80_wait_assert_cb();
 	m_comms_ram[offset] = data & 0x80;
@@ -255,13 +255,13 @@ WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 *
 ********************************************/
 
-WRITE8_MEMBER(nightgal_state::mux_w)
+void nightgal_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = ~data;
 	//printf("%02x\n", m_mux_data);
 }
 
-READ8_MEMBER(nightgal_state::input_1p_r)
+uint8_t nightgal_state::input_1p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t cr_clear = m_io_cr_clear->read();
 
@@ -280,7 +280,7 @@ READ8_MEMBER(nightgal_state::input_1p_r)
 			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
 }
 
-READ8_MEMBER(nightgal_state::input_2p_r)
+uint8_t nightgal_state::input_2p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t coin_port = m_io_coins->read();
 
@@ -299,7 +299,7 @@ READ8_MEMBER(nightgal_state::input_2p_r)
 			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
-WRITE8_MEMBER(nightgal_state::output_w)
+void nightgal_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	Doesn't match Charles notes?
@@ -1041,7 +1041,7 @@ void nightgal_state::init_royalqn()
 	ROM[0x027f] = 0x02;
 }
 
-WRITE8_MEMBER(nightgal_state::ngalsumr_unk_w)
+void nightgal_state::ngalsumr_unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_z80_latch = data;
 }

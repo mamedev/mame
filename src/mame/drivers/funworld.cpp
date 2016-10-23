@@ -1008,7 +1008,7 @@
 * Read/Write Handlers *
 **********************/
 
-WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
+void funworld_state::funworld_lamp_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -1036,7 +1036,7 @@ WRITE8_MEMBER(funworld_state::funworld_lamp_a_w)
 //  popmessage("Lamps A: %02X", (data ^ 0xff));
 }
 
-WRITE8_MEMBER(funworld_state::funworld_lamp_b_w)
+void funworld_state::funworld_lamp_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -1081,7 +1081,7 @@ ADDRESS_MAP_END
 
 static uint8_t funquiz_question_bank = 0x80;
 
-READ8_MEMBER(funworld_state::questions_r)
+uint8_t funworld_state::questions_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* quiz = memregion("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
@@ -1092,7 +1092,7 @@ READ8_MEMBER(funworld_state::questions_r)
 	return quiz[offset + extraoffset];
 }
 
-WRITE8_MEMBER(funworld_state::question_bank_w)
+void funworld_state::question_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
@@ -1149,7 +1149,7 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(funworld_state::chinatow_r_32f0)
+uint8_t funworld_state::chinatow_r_32f0(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("read from 0x32f0 at offset %02X\n",offset);
 	switch (offset)
@@ -2934,12 +2934,12 @@ GFXDECODE_END
 */
 
 /* these ports are set to output anyway, but this quietens the log */
-READ8_MEMBER(funworld_state::funquiz_ay8910_a_r)
+uint8_t funworld_state::funquiz_ay8910_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(funworld_state::funquiz_ay8910_b_r)
+uint8_t funworld_state::funquiz_ay8910_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }

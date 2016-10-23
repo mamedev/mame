@@ -52,7 +52,7 @@ aladdin_cart_interface::~aladdin_cart_interface()
 {
 }
 
-READ8_MEMBER(aladdin_cart_interface::read)
+uint8_t aladdin_cart_interface::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x4000)
 		return m_rom[(m_lobank * 0x4000) + (offset & 0x3fff)];
@@ -83,7 +83,7 @@ void nes_aladdin_slot_device::device_start()
 	m_cart = dynamic_cast<aladdin_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_aladdin_slot_device::read)
+uint8_t nes_aladdin_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
@@ -297,7 +297,7 @@ void nes_aladdin_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_aladdin_device::read_h)
+uint8_t nes_aladdin_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("aladdin read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
@@ -309,7 +309,7 @@ READ8_MEMBER(nes_aladdin_device::read_h)
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_aladdin_device::write_h)
+void nes_aladdin_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("aladdin write_h, offset: %04x, data: %02x\n", offset, data));
 	m_subslot->write_prg(offset, data);

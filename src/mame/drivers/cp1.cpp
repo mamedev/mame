@@ -40,22 +40,22 @@ public:
 	required_ioport m_io_config;
 
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_READ8_MEMBER(getbus);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(putbus);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t getbus(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void putbus(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
 
-	DECLARE_READ8_MEMBER(i8155_read);
-	DECLARE_WRITE8_MEMBER(i8155_write);
-	DECLARE_WRITE8_MEMBER(i8155_porta_w);
-	DECLARE_READ8_MEMBER(i8155_portb_r);
-	DECLARE_WRITE8_MEMBER(i8155_portb_w);
-	DECLARE_WRITE8_MEMBER(i8155_portc_w);
+	uint8_t i8155_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8155_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8155_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8155_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t   m_7seg;
@@ -63,7 +63,7 @@ private:
 	uint8_t   m_matrix;
 };
 
-READ8_MEMBER(cp1_state::port1_r)
+uint8_t cp1_state::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("Read from expansion port 1\n");
 
@@ -75,7 +75,7 @@ READ8_MEMBER(cp1_state::port1_r)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::port1_w)
+void cp1_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Write to expansion port 1 %x\n", data);
 
@@ -83,7 +83,7 @@ WRITE8_MEMBER(cp1_state::port1_w)
 		m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(cp1_state::port2_r)
+uint8_t cp1_state::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// x--- ----   I8155 IO/M
 	// -x-- ----   I8155 RESET
@@ -100,7 +100,7 @@ READ8_MEMBER(cp1_state::port2_r)
 	return (data & 0x0f) | (m_port2 & 0xf0);
 }
 
-WRITE8_MEMBER(cp1_state::port2_w)
+void cp1_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x40)
 	{
@@ -113,30 +113,30 @@ WRITE8_MEMBER(cp1_state::port2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(cp1_state::t0_r)
+uint8_t cp1_state::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("t0_r\n");
 	return 0;
 }
 
-READ8_MEMBER(cp1_state::t1_r)
+uint8_t cp1_state::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("t1_r\n");
 	return 0;
 }
 
-READ8_MEMBER(cp1_state::getbus)
+uint8_t cp1_state::getbus(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("getbus\n");
 	return 0;
 }
 
-WRITE8_MEMBER(cp1_state::putbus)
+void cp1_state::putbus(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("putbus\n");
 }
 
-READ8_MEMBER(cp1_state::i8155_read)
+uint8_t cp1_state::i8155_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -155,7 +155,7 @@ READ8_MEMBER(cp1_state::i8155_read)
 	return data;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_write)
+void cp1_state::i8155_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(m_port2 & 0x10))
 	{
@@ -170,7 +170,7 @@ WRITE8_MEMBER(cp1_state::i8155_write)
 	}
 }
 
-WRITE8_MEMBER(cp1_state::i8155_porta_w)
+void cp1_state::i8155_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x7f;   // PA7 is not connected
 
@@ -187,18 +187,18 @@ WRITE8_MEMBER(cp1_state::i8155_porta_w)
 	m_7seg ^= 0x01;
 }
 
-READ8_MEMBER(cp1_state::i8155_portb_r)
+uint8_t cp1_state::i8155_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("read from expansion port 2\n");
 	return 0;
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portb_w)
+void cp1_state::i8155_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Write to expansion port 2 %x\n", data);
 }
 
-WRITE8_MEMBER(cp1_state::i8155_portc_w)
+void cp1_state::i8155_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// --xx xxxx   keyboard matrix
 

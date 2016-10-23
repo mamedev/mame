@@ -202,14 +202,14 @@ public:
 	unsigned char m_Psg_FunctionSelected;
 	int m_previous_ppi_portc_w;
 	uint8_t m_amx_mouse_data;
-	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_4000_w);
-	DECLARE_WRITE8_MEMBER(amstrad_plus_asic_6000_w);
-	DECLARE_READ8_MEMBER(amstrad_plus_asic_4000_r);
-	DECLARE_READ8_MEMBER(amstrad_plus_asic_6000_r);
-	DECLARE_WRITE8_MEMBER(aleste_msx_mapper);
-	DECLARE_READ8_MEMBER(amstrad_cpc_io_r);
-	DECLARE_WRITE8_MEMBER(amstrad_cpc_io_w);
-	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
+	void amstrad_plus_asic_4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void amstrad_plus_asic_6000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amstrad_plus_asic_4000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t amstrad_plus_asic_6000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void aleste_msx_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amstrad_cpc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amstrad_cpc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amstrad_psg_porta_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void amstrad_plus_seqcheck(int data);
 	void machine_start_amstrad();
 	void machine_reset_amstrad();
@@ -239,13 +239,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_vsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_de_changed);
 	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_de_changed);
-	DECLARE_READ8_MEMBER(amstrad_ppi_porta_r);
-	DECLARE_WRITE8_MEMBER(amstrad_ppi_porta_w);
-	DECLARE_READ8_MEMBER(amstrad_ppi_portb_r);
-	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
+	uint8_t amstrad_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amstrad_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amstrad_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amstrad_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
-	DECLARE_WRITE8_MEMBER(rom_select);
+	void rom_select(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );
 

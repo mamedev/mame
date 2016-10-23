@@ -27,10 +27,10 @@ public:
 	}
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( k8915_52_r );
-	DECLARE_READ8_MEMBER( k8915_53_r );
-	DECLARE_WRITE8_MEMBER( k8915_a8_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t k8915_52_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t k8915_53_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k8915_a8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
@@ -41,7 +41,7 @@ public:
 	void init_k8915();
 };
 
-READ8_MEMBER( k8915_state::k8915_52_r )
+uint8_t k8915_state::k8915_52_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // get data from ascii keyboard
 	uint8_t ret = m_term_data;
@@ -49,13 +49,13 @@ READ8_MEMBER( k8915_state::k8915_52_r )
 	return ret;
 }
 
-READ8_MEMBER( k8915_state::k8915_53_r )
+uint8_t k8915_state::k8915_53_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // keyboard status
 	return m_term_data ? 1 : 0;
 }
 
-WRITE8_MEMBER( k8915_state::k8915_a8_w )
+void k8915_state::k8915_a8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // seems to switch ram and rom around.
 	if (data == 0x87)
@@ -144,7 +144,7 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER( k8915_state::kbd_put )
+void k8915_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

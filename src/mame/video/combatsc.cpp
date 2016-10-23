@@ -297,12 +297,12 @@ void combatsc_state::video_start_combatscb()
 
 ***************************************************************************/
 
-READ8_MEMBER(combatsc_state::combatsc_video_r)
+uint8_t combatsc_state::combatsc_video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_video_w)
+void combatsc_state::combatsc_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 
@@ -319,7 +319,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_video_w)
 	}
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
+void combatsc_state::combatsc_pf_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	k007121_device *k007121 = m_video_circuit ? m_k007121_2 : m_k007121_1;
 	k007121->ctrl_w(space, offset, data);
@@ -336,12 +336,12 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	}
 }
 
-READ8_MEMBER(combatsc_state::combatsc_scrollram_r)
+uint8_t combatsc_state::combatsc_scrollram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scrollram[offset];
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
+void combatsc_state::combatsc_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollram[offset] = data;
 }

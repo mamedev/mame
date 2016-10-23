@@ -69,9 +69,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER(sun1_upd7201_r);
-	DECLARE_WRITE16_MEMBER(sun1_upd7201_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t sun1_upd7201_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sun1_upd7201_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_ram;
 	uint8_t m_term_data;
@@ -81,7 +81,7 @@ public:
 
 // Just hack to show output since upd7201 is not implemented yet
 
-READ16_MEMBER( sun1_state::sun1_upd7201_r )
+uint16_t sun1_state::sun1_upd7201_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 	if (offset == 0)
@@ -95,7 +95,7 @@ READ16_MEMBER( sun1_state::sun1_upd7201_r )
 	return ret;
 }
 
-WRITE16_MEMBER( sun1_state::sun1_upd7201_w )
+void sun1_state::sun1_upd7201_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_terminal->write(space, 0, data >> 8);
@@ -124,7 +124,7 @@ void sun1_state::machine_reset()
 }
 
 
-WRITE8_MEMBER( sun1_state::kbd_put )
+void sun1_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

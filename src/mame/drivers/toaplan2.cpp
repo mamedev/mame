@@ -506,7 +506,7 @@ INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq2){ toaplan2_vblank_irq(
 INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq4){ toaplan2_vblank_irq(4); }
 
 
-READ16_MEMBER(toaplan2_state::video_count_r)
+uint16_t toaplan2_state::video_count_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* +---------+---------+--------+---------------------------+ */
 	/* | /H-Sync | /V-Sync | /Blank |       Scanline Count      | */
@@ -543,7 +543,7 @@ READ16_MEMBER(toaplan2_state::video_count_r)
 }
 
 
-WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
+void toaplan2_state::toaplan2_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
 	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
@@ -566,7 +566,7 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 	}
 }
 
-WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
+void toaplan2_state::pwrkick_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 ); // medal
 	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 ); // 10 yen
@@ -574,7 +574,7 @@ WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 	m_hopper->write(space, 0, data & 0x80);
 }
 
-WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
+void toaplan2_state::pwrkick_coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, (data & 4) ? 0 : 1);
 	machine().bookkeeping().coin_lockout_w(1, (data & 4) ? 0 : 1);
@@ -582,7 +582,7 @@ WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_coin_word_w)
+void toaplan2_state::toaplan2_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -595,7 +595,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_coin_word_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
+void toaplan2_state::toaplan2_v25_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("toaplan2_v25_coin_word_w %04x\n",data);
 
@@ -612,7 +612,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
+void toaplan2_state::shippumd_coin_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -626,13 +626,13 @@ WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
 }
 
 
-READ16_MEMBER(toaplan2_state::shared_ram_r)
+uint16_t toaplan2_state::shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
 
 
-WRITE16_MEMBER(toaplan2_state::shared_ram_w)
+void toaplan2_state::shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -641,7 +641,7 @@ WRITE16_MEMBER(toaplan2_state::shared_ram_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
+void toaplan2_state::toaplan2_hd647180_cpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Command sent to secondary CPU. Support for HD647180 will be
 	// required when a ROM dump becomes available for this hardware
@@ -665,7 +665,7 @@ CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
+uint16_t toaplan2_state::ghox_p1_h_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int8_t value, new_value;
 
@@ -677,7 +677,7 @@ READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
+uint16_t toaplan2_state::ghox_p2_h_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int8_t value, new_value;
 
@@ -689,13 +689,13 @@ READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_mcu_r)
+uint16_t toaplan2_state::ghox_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff;
 }
 
 
-WRITE16_MEMBER(toaplan2_state::ghox_mcu_w)
+void toaplan2_state::ghox_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -737,7 +737,7 @@ WRITE16_MEMBER(toaplan2_state::ghox_mcu_w)
 }
 
 
-READ16_MEMBER(toaplan2_state::ghox_shared_ram_r)
+uint16_t toaplan2_state::ghox_shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Ghox 68K reads data from MCU shared RAM and writes it to main RAM.
 	// It then subroutine jumps to main RAM and executes this code.
@@ -756,7 +756,7 @@ READ16_MEMBER(toaplan2_state::ghox_shared_ram_r)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
+void toaplan2_state::ghox_shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -765,13 +765,13 @@ WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
+void toaplan2_state::fixeight_subcpu_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
+void toaplan2_state::oki_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -779,7 +779,7 @@ WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan2_state::oki1_bankswitch_w)
+void toaplan2_state::oki1_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -787,7 +787,7 @@ WRITE16_MEMBER(toaplan2_state::oki1_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
+void toaplan2_state::fixeightbl_oki_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -796,7 +796,7 @@ WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 	}
 }
 
-READ8_MEMBER(toaplan2_state::fixeight_region_r)
+uint8_t toaplan2_state::fixeight_region_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this must match the eeprom region!
 	// however on the real PCB any of the EEPROMs we have work without any special treatment
@@ -829,7 +829,7 @@ READ8_MEMBER(toaplan2_state::fixeight_region_r)
 ***************************************************************************/
 
 
-WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
+void toaplan2_state::raizing_z80_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -840,14 +840,14 @@ WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 // it may not be a coincidence that the composer and sound designer for
 // these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
 
-WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
+void toaplan2_state::raizing_oki_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmk112->okibank_w(space, offset, data & 0x0f);
 	m_nmk112->okibank_w(space, offset + 1, (data >> 4) & 0x0f);
 }
 
 
-WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
+void toaplan2_state::bgaregga_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -857,7 +857,7 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 }
 
 
-READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
+uint8_t toaplan2_state::bgaregga_E01D_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
@@ -865,7 +865,7 @@ READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
 }
 
 
-WRITE8_MEMBER(toaplan2_state::bgaregga_E00C_w)
+void toaplan2_state::bgaregga_E00C_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// the Z80 writes here after reading the soundlatch.
 	// I would think that this was an acknowledge latch like
@@ -874,7 +874,7 @@ WRITE8_MEMBER(toaplan2_state::bgaregga_E00C_w)
 }
 
 
-READ16_MEMBER(toaplan2_state::batrider_z80_busack_r)
+uint16_t toaplan2_state::batrider_z80_busack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// These accesses are made when the 68K wants to read the Z80
@@ -885,7 +885,7 @@ READ16_MEMBER(toaplan2_state::batrider_z80_busack_r)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
+void toaplan2_state::batrider_z80_busreq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -894,7 +894,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 }
 
 
-READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
+uint16_t toaplan2_state::batrider_z80rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *Z80 = memregion("audiocpu")->base();
 
@@ -903,7 +903,7 @@ READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 
 
 // these two latches are always written together, via a single move.l instruction
-WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
+void toaplan2_state::batrider_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -913,7 +913,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
+void toaplan2_state::batrider_soundlatch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -923,14 +923,14 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_unknown_sound_w)
+void toaplan2_state::batrider_unknown_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
+void toaplan2_state::batrider_clear_sndirq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
@@ -938,20 +938,20 @@ WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
+void toaplan2_state::batrider_sndirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
-WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
+void toaplan2_state::batrider_clear_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
+uint16_t toaplan2_state::bbakraid_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
@@ -966,7 +966,7 @@ READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 }
 
 
-WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
+void toaplan2_state::bbakraid_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x001f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",space.device().safe_pc(),data);

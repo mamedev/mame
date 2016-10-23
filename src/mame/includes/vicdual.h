@@ -70,64 +70,64 @@ public:
 	void assert_coin_status();
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(characterram_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// game specific
-	DECLARE_READ8_MEMBER(depthch_io_r);
-	DECLARE_WRITE8_MEMBER(depthch_io_w);
-	DECLARE_READ8_MEMBER(safari_io_r);
-	DECLARE_WRITE8_MEMBER(safari_io_w);
-	DECLARE_READ8_MEMBER(frogs_io_r);
-	DECLARE_WRITE8_MEMBER(frogs_io_w);
-	DECLARE_READ8_MEMBER(headon_io_r);
-	DECLARE_READ8_MEMBER(sspaceat_io_r);
-	DECLARE_WRITE8_MEMBER(headon_io_w);
-	DECLARE_READ8_MEMBER(headon2_io_r);
-	DECLARE_WRITE8_MEMBER(headon2_io_w);
-	DECLARE_WRITE8_MEMBER(digger_io_w);
-	DECLARE_WRITE8_MEMBER(invho2_io_w);
-	DECLARE_WRITE8_MEMBER(invds_io_w);
-	DECLARE_WRITE8_MEMBER(carhntds_io_w);
-	DECLARE_WRITE8_MEMBER(sspacaho_io_w);
-	DECLARE_WRITE8_MEMBER(tranqgun_io_w);
-	DECLARE_WRITE8_MEMBER(spacetrk_io_w);
-	DECLARE_WRITE8_MEMBER(carnival_io_w);
-	DECLARE_WRITE8_MEMBER(brdrline_io_w);
-	DECLARE_WRITE8_MEMBER(pulsar_io_w);
-	DECLARE_WRITE8_MEMBER(heiankyo_io_w);
-	DECLARE_WRITE8_MEMBER(alphaho_io_w);
-	DECLARE_WRITE8_MEMBER(samurai_protection_w);
-	DECLARE_WRITE8_MEMBER(samurai_io_w);
-	DECLARE_READ8_MEMBER(nsub_io_r);
-	DECLARE_WRITE8_MEMBER(nsub_io_w);
-	DECLARE_READ8_MEMBER(invinco_io_r);
-	DECLARE_WRITE8_MEMBER(invinco_io_w);
+	uint8_t depthch_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void depthch_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t safari_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void safari_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t frogs_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void frogs_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t headon_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sspaceat_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void headon_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t headon2_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void headon2_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digger_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void invho2_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void invds_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void carhntds_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sspacaho_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tranqgun_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spacetrk_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void carnival_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brdrline_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pulsar_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void heiankyo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alphaho_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void samurai_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void samurai_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nsub_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nsub_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t invinco_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void invinco_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/*----------- defined in audio/vicdual.c -----------*/
-	DECLARE_WRITE8_MEMBER( frogs_audio_w );
-	DECLARE_WRITE8_MEMBER( headon_audio_w );
-	DECLARE_WRITE8_MEMBER( invho2_audio_w );
+	void frogs_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void headon_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void invho2_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
 
 	/*----------- defined in audio/carnival.c -----------*/
-	DECLARE_WRITE8_MEMBER( carnival_audio_1_w );
-	DECLARE_WRITE8_MEMBER( carnival_audio_2_w );
-	DECLARE_READ8_MEMBER( carnival_music_port_t1_r );
-	DECLARE_WRITE8_MEMBER( carnival_music_port_1_w );
-	DECLARE_WRITE8_MEMBER( carnival_music_port_2_w );
+	void carnival_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void carnival_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t carnival_music_port_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void carnival_music_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void carnival_music_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void carnival_psg_latch(address_space &space);
 
 	/*----------- defined in audio/depthch.c -----------*/
-	DECLARE_WRITE8_MEMBER( depthch_audio_w );
+	void depthch_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/*----------- defined in audio/invinco.c -----------*/
-	DECLARE_WRITE8_MEMBER( invinco_audio_w );
+	void invinco_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/*----------- defined in audio/pulsar.c -----------*/
-	DECLARE_WRITE8_MEMBER( pulsar_audio_1_w );
-	DECLARE_WRITE8_MEMBER( pulsar_audio_2_w );
+	void pulsar_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pulsar_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);

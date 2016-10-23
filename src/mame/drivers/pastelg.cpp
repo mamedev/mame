@@ -36,7 +36,7 @@ void pastelg_state::machine_start()
 	save_item(NAME(m_mux_data));
 }
 
-READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
+uint8_t pastelg_state::pastelg_sndrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("voice")->base();
 
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
+uint8_t pastelg_state::pastelg_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	space.device().execute().set_input_line(0, CLEAR_LINE);
 	return 0;
@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(pastelg_state::threeds_inputport1_r)
+uint8_t pastelg_state::threeds_inputport1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -85,7 +85,7 @@ READ8_MEMBER(pastelg_state::threeds_inputport1_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pastelg_state::threeds_inputport2_r)
+uint8_t pastelg_state::threeds_inputport2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -99,7 +99,7 @@ READ8_MEMBER(pastelg_state::threeds_inputport2_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pastelg_state::threeds_inputportsel_w)
+void pastelg_state::threeds_inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = ~data;
 }

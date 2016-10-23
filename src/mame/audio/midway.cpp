@@ -72,7 +72,7 @@ midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::read)
+uint8_t midway_ssio_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
@@ -83,7 +83,7 @@ READ8_MEMBER(midway_ssio_device::read)
 //  input latches
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::write)
+void midway_ssio_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(0, (offset << 8) | (data & 0xff));
 }
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(midway_ssio_device::reset_write)
 //  on the device
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::ioport_read)
+uint8_t midway_ssio_device::ioport_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_ports[offset].read_safe(0xff);
 	if (!m_custom_input[offset].isnull())
@@ -128,7 +128,7 @@ READ8_MEMBER(midway_ssio_device::ioport_read)
 //  on the device
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::ioport_write)
+void midway_ssio_device::ioport_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int which = offset >> 2;
 	if (!m_custom_output[which].isnull())
@@ -258,7 +258,7 @@ INTERRUPT_GEN_MEMBER(midway_ssio_device::clock_14024)
 //  irq_clear - reset the IRQ state and 14024 count
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::irq_clear)
+uint8_t midway_ssio_device::irq_clear(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// a read here asynchronously resets the 14024 count, clearing /SINT
 	m_14024_count = 0;
@@ -271,7 +271,7 @@ READ8_MEMBER(midway_ssio_device::irq_clear)
 //  status_w - set the outgoing status value
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::status_w)
+void midway_ssio_device::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status = data;
 }
@@ -281,7 +281,7 @@ WRITE8_MEMBER(midway_ssio_device::status_w)
 //  data_r - read incoming data latches
 //-------------------------------------------------
 
-READ8_MEMBER(midway_ssio_device::data_r)
+uint8_t midway_ssio_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data[offset];
 }
@@ -291,7 +291,7 @@ READ8_MEMBER(midway_ssio_device::data_r)
 //  porta0_w - handle writes to AY-8910 #0 port A
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::porta0_w)
+void midway_ssio_device::porta0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duty_cycle[0][0] = data & 15;
 	m_duty_cycle[0][1] = data >> 4;
@@ -303,7 +303,7 @@ WRITE8_MEMBER(midway_ssio_device::porta0_w)
 //  portb0_w - handle writes to AY-8910 #0 port B
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::portb0_w)
+void midway_ssio_device::portb0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duty_cycle[0][2] = data & 15;
 	m_overall[0] = (data >> 4) & 7;
@@ -315,7 +315,7 @@ WRITE8_MEMBER(midway_ssio_device::portb0_w)
 //  porta1_w - handle writes to AY-8910 #1 port A
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::porta1_w)
+void midway_ssio_device::porta1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duty_cycle[1][0] = data & 15;
 	m_duty_cycle[1][1] = data >> 4;
@@ -327,7 +327,7 @@ WRITE8_MEMBER(midway_ssio_device::porta1_w)
 //  portb1_w - handle writes to AY-8910 #1 port B
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_ssio_device::portb1_w)
+void midway_ssio_device::portb1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duty_cycle[1][2] = data & 15;
 	m_overall[1] = (data >> 4) & 7;
@@ -507,7 +507,7 @@ midway_chip_squeak_deluxe_device::midway_chip_squeak_deluxe_device(const machine
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_chip_squeak_deluxe_device::read)
+uint8_t midway_chip_squeak_deluxe_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
@@ -518,7 +518,7 @@ READ8_MEMBER(midway_chip_squeak_deluxe_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_chip_squeak_deluxe_device::write)
+void midway_chip_squeak_deluxe_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(0, data);
 }
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER(midway_chip_squeak_deluxe_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
+void midway_chip_squeak_deluxe_device::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -549,7 +549,7 @@ WRITE8_MEMBER(midway_chip_squeak_deluxe_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_chip_squeak_deluxe_device::portb_w)
+void midway_chip_squeak_deluxe_device::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
@@ -575,7 +575,7 @@ WRITE_LINE_MEMBER(midway_chip_squeak_deluxe_device::irq_w)
 //  pia_r - PIA read access
 //-------------------------------------------------
 
-READ16_MEMBER(midway_chip_squeak_deluxe_device::pia_r)
+uint16_t midway_chip_squeak_deluxe_device::pia_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Spy Hunter accesses the MSB; Turbo Tag access via the LSB
 	// My guess is that Turbo Tag works through a fluke, whereby the 68000
@@ -592,7 +592,7 @@ READ16_MEMBER(midway_chip_squeak_deluxe_device::pia_r)
 //  pia_w - PIA write access
 //-------------------------------------------------
 
-WRITE16_MEMBER(midway_chip_squeak_deluxe_device::pia_w)
+void midway_chip_squeak_deluxe_device::pia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_pia->write_alt(space, offset, data >> 8);
@@ -706,7 +706,7 @@ midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconf
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_sounds_good_device::read)
+uint8_t midway_sounds_good_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
@@ -717,7 +717,7 @@ READ8_MEMBER(midway_sounds_good_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::write)
+void midway_sounds_good_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(0, data);
 }
@@ -738,7 +738,7 @@ WRITE_LINE_MEMBER(midway_sounds_good_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::porta_w)
+void midway_sounds_good_device::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -749,7 +749,7 @@ WRITE8_MEMBER(midway_sounds_good_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_sounds_good_device::portb_w)
+void midway_sounds_good_device::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t z_mask = m_pia->port_b_z_mask();
 
@@ -877,7 +877,7 @@ midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_c
 //  read - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER(midway_turbo_chip_squeak_device::read)
+uint8_t midway_turbo_chip_squeak_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
@@ -888,7 +888,7 @@ READ8_MEMBER(midway_turbo_chip_squeak_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::write)
+void midway_turbo_chip_squeak_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(0, data);
 }
@@ -908,7 +908,7 @@ WRITE_LINE_MEMBER(midway_turbo_chip_squeak_device::reset_write)
 //  porta_w - PIA port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
+void midway_turbo_chip_squeak_device::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacval = (data << 2) | (m_dacval & 3);
 	m_dac->write(m_dacval);
@@ -919,7 +919,7 @@ WRITE8_MEMBER(midway_turbo_chip_squeak_device::porta_w)
 //  portb_w - PIA port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_turbo_chip_squeak_device::portb_w)
+void midway_turbo_chip_squeak_device::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dacval = (m_dacval & ~3) | (data >> 6);
 	m_dac->write(m_dacval);
@@ -1043,7 +1043,7 @@ midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &m
 //  latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::write)
+void midway_squawk_n_talk_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(0, data);
 }
@@ -1063,7 +1063,7 @@ WRITE_LINE_MEMBER(midway_squawk_n_talk_device::reset_write)
 //  porta1_w - PIA #1 port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::porta1_w )
+void midway_squawk_n_talk_device::porta1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Write to AY-8912 = %02X\n", data);
 }
@@ -1073,7 +1073,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::porta1_w )
 //  dac_w - DAC data writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::dac_w)
+void midway_squawk_n_talk_device::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Write to DAC = %02X\n", data);
 }
@@ -1083,7 +1083,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::dac_w)
 //  porta2_w - PIA #2 port A writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::porta2_w)
+void midway_squawk_n_talk_device::porta2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tms_command = data;
 }
@@ -1093,7 +1093,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::porta2_w)
 //  portb2_w - PIA #2 port B writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
+void midway_squawk_n_talk_device::portb2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 0-1 select read/write strobes on the TMS5200
 	data &= 0x03;

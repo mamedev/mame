@@ -131,7 +131,7 @@ void adam_printer_device::adamnet_reset_w(int state)
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_printer_device::p1_w )
+void adam_printer_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER( adam_printer_device::p1_w )
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_printer_device::p2_r )
+uint8_t adam_printer_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -181,7 +181,7 @@ READ8_MEMBER( adam_printer_device::p2_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_printer_device::p2_w )
+void adam_printer_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER( adam_printer_device::p2_w )
 //  p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_printer_device::p3_r )
+uint8_t adam_printer_device::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -213,7 +213,7 @@ READ8_MEMBER( adam_printer_device::p3_r )
 //  p4_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_printer_device::p4_r )
+uint8_t adam_printer_device::p4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -238,7 +238,7 @@ READ8_MEMBER( adam_printer_device::p4_r )
 //  p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_printer_device::p4_w )
+void adam_printer_device::p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

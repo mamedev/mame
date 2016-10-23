@@ -43,11 +43,11 @@ public:
 	uint16_t m_video_memory_base;
 	uint8_t m_port_FD;
 	int m_nmi;
-	DECLARE_READ8_MEMBER(primo_be_1_r);
-	DECLARE_READ8_MEMBER(primo_be_2_r);
-	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
-	DECLARE_WRITE8_MEMBER(primo_ki_2_w);
-	DECLARE_WRITE8_MEMBER(primo_FD_w);
+	uint8_t primo_be_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t primo_be_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void primo_ki_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void primo_ki_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void primo_FD_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_primo48();
 	void init_primo64();
 	void init_primo32();

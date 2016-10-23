@@ -277,7 +277,7 @@ void cdp1871_device::detect_keypress()
 //  read - keyboard data read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1871_device::read )
+uint8_t cdp1871_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int table = 0;
 

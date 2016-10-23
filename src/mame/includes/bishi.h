@@ -46,11 +46,11 @@ public:
 	required_device<k055555_device> m_k055555;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	DECLARE_READ16_MEMBER(control_r);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ16_MEMBER(bishi_mirror_r);
-	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
+	uint16_t control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bishi_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bishi_K056832_rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

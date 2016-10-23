@@ -12,19 +12,19 @@
 #include "includes/prehisle.h"
 
 
-WRITE16_MEMBER(prehisle_state::fg_vram_w)
+void prehisle_state::fg_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_vram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(prehisle_state::tx_vram_w)
+void prehisle_state::tx_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(prehisle_state::control_r)
+uint16_t prehisle_state::control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -37,7 +37,7 @@ READ16_MEMBER(prehisle_state::control_r)
 	}
 }
 
-WRITE16_MEMBER(prehisle_state::control_w)
+void prehisle_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = 0;
 

@@ -18,54 +18,54 @@
 #define ARKANOID_BOOTLEG_VERBOSE 1
 
 
-READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
+uint8_t arkanoid_state::arkanoid_Z80_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* return the last value the 68705 wrote, and mark that we've read it */
 	m_MCUHasWritten = 0;
 	return m_fromMCU;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
+void arkanoid_state::arkanoid_Z80_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_Z80HasWritten = 1;
 	m_fromZ80 = data;
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(arkanoid_state::arkanoid_68705_port_a_r)
+uint8_t arkanoid_state::arkanoid_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_a_w)
+void arkanoid_state::arkanoid_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_a_w)
+void arkanoid_state::arkanoid_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-READ8_MEMBER(arkanoid_state::arkanoid_68705_tdr_r)
+uint8_t arkanoid_state::arkanoid_68705_tdr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("arkanoid_68705 TDR read, returning %02X\n", m_tdr);
 	return m_tdr;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tdr_w)
+void arkanoid_state::arkanoid_68705_tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("arkanoid_68705 TDR written with %02X, was %02X\n", data, m_tdr);
 	m_tdr = data;
 }
 
-READ8_MEMBER(arkanoid_state::arkanoid_68705_tcr_r)
+uint8_t arkanoid_state::arkanoid_68705_tcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("arkanoid_68705 TCR read, returning %02X\n", (m_tcr&0xF7));
 	return (m_tcr & 0xF7);
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tcr_w)
+void arkanoid_state::arkanoid_68705_tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     logerror("arkanoid_68705 TCR written with %02X\n", data);
@@ -123,7 +123,7 @@ TIMER_CALLBACK_MEMBER(arkanoid_state::timer_68705_increment)
 	m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 }
 
-READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
+uint8_t arkanoid_state::arkanoid_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int portC_in = 0;
 
@@ -141,7 +141,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 	return (m_portC_internal & m_ddrC) | (portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
+void arkanoid_state::arkanoid_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portC_internal = data|0xF0;
 	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
@@ -172,7 +172,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 	}
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
+void arkanoid_state::arkanoid_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data|0xF0)^m_ddrC) // if ddr changed, recalculate the port c output
 	{
@@ -289,7 +289,7 @@ TO DO (2006.09.12) :
 
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -331,7 +331,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f000_r)
 }
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
+uint8_t arkanoid_state::arkanoid_bootleg_f002_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t arkanoid_bootleg_val = 0x00;
 
@@ -418,7 +418,7 @@ READ8_MEMBER(arkanoid_state::arkanoid_bootleg_f002_r)
 }
 
 /* Kludge for some bootlegs that write this address */
-WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
+void arkanoid_state::arkanoid_bootleg_d018_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bootleg_cmd = 0x00;
 
@@ -673,14 +673,14 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_bootleg_d018_w)
 }
 
 #ifdef UNUSED_CODE
-READ8_MEMBER(arkanoid_state::block2_bootleg_f000_r)
+uint8_t arkanoid_state::block2_bootleg_f000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bootleg_cmd;
 }
 #endif
 
 /* Kludge for some bootlegs that read this address */
-READ8_MEMBER(arkanoid_state::arkanoid_bootleg_d008_r)
+uint8_t arkanoid_state::arkanoid_bootleg_d008_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t arkanoid_bootleg_d008_bit[8];
 	uint8_t arkanoid_bootleg_d008_val;

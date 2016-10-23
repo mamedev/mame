@@ -129,7 +129,7 @@ static INPUT_PORTS_START( simpl156 )
 INPUT_PORTS_END
 
 
-WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
+void simpl156_state::simpl156_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//int okibank;
 
@@ -145,12 +145,12 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 /* we need to throw away bits for all ram accesses as the devices are connected as 16-bit */
 
-READ32_MEMBER(simpl156_state::simpl156_spriteram_r)
+uint32_t simpl156_state::simpl156_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_spriteram[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(simpl156_state::simpl156_spriteram_w)
+void simpl156_state::simpl156_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -159,12 +159,12 @@ WRITE32_MEMBER(simpl156_state::simpl156_spriteram_w)
 }
 
 
-READ32_MEMBER(simpl156_state::simpl156_mainram_r)
+uint32_t simpl156_state::simpl156_mainram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_mainram[offset]^0xffff0000;
 }
 
-WRITE32_MEMBER(simpl156_state::simpl156_mainram_w)
+void simpl156_state::simpl156_mainram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -172,12 +172,12 @@ WRITE32_MEMBER(simpl156_state::simpl156_mainram_w)
 	COMBINE_DATA(&m_mainram[offset]);
 }
 
-READ32_MEMBER(simpl156_state::simpl156_pf1_rowscroll_r)
+uint32_t simpl156_state::simpl156_pf1_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_pf1_rowscroll[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(simpl156_state::simpl156_pf1_rowscroll_w)
+void simpl156_state::simpl156_pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -185,12 +185,12 @@ WRITE32_MEMBER(simpl156_state::simpl156_pf1_rowscroll_w)
 	COMBINE_DATA(&m_pf1_rowscroll[offset]);
 }
 
-READ32_MEMBER(simpl156_state::simpl156_pf2_rowscroll_r)
+uint32_t simpl156_state::simpl156_pf2_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_pf2_rowscroll[offset] ^ 0xffff0000;
 }
 
-WRITE32_MEMBER(simpl156_state::simpl156_pf2_rowscroll_w)
+void simpl156_state::simpl156_pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
@@ -1045,7 +1045,7 @@ void simpl156_state::init_simpl156()
 }
 
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
-READ32_MEMBER(simpl156_state::joemacr_speedup_r)
+uint32_t simpl156_state::joemacr_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x284)
 		space.device().execute().spin_until_time(attotime::from_usec(400));
@@ -1059,7 +1059,7 @@ void simpl156_state::init_joemacr()
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::chainrec_speedup_r)
+uint32_t simpl156_state::chainrec_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x2d4)
 		space.device().execute().spin_until_time(attotime::from_usec(400));
@@ -1072,7 +1072,7 @@ void simpl156_state::init_chainrec()
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::prtytime_speedup_r)
+uint32_t simpl156_state::prtytime_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x4f0)
 		space.device().execute().spin_until_time(attotime::from_usec(400));
@@ -1086,7 +1086,7 @@ void simpl156_state::init_prtytime()
 }
 
 
-READ32_MEMBER(simpl156_state::charlien_speedup_r)
+uint32_t simpl156_state::charlien_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc() == 0xc8c8)
 		space.device().execute().spin_until_time(attotime::from_usec(400));
@@ -1099,7 +1099,7 @@ void simpl156_state::init_charlien()
 	init_simpl156();
 }
 
-READ32_MEMBER(simpl156_state::osman_speedup_r)
+uint32_t simpl156_state::osman_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x5974)
 		space.device().execute().spin_until_time(attotime::from_usec(400));

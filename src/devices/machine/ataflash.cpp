@@ -41,7 +41,7 @@ void ata_flash_pccard_device::device_reset()
 	}
 }
 
-READ16_MEMBER( ata_flash_pccard_device::read_memory )
+uint16_t ata_flash_pccard_device::read_memory(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset <= 7)
 	{
@@ -58,7 +58,7 @@ READ16_MEMBER( ata_flash_pccard_device::read_memory )
 	}
 }
 
-WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
+void ata_flash_pccard_device::write_memory(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset <= 7)
 	{
@@ -71,7 +71,7 @@ WRITE16_MEMBER( ata_flash_pccard_device::write_memory )
 	}
 }
 
-READ16_MEMBER( ata_flash_pccard_device::read_reg )
+uint16_t ata_flash_pccard_device::read_reg(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset < 0x100)
 		return m_cis[offset];
@@ -95,7 +95,7 @@ READ16_MEMBER( ata_flash_pccard_device::read_reg )
 	}
 }
 
-WRITE16_MEMBER( ata_flash_pccard_device::write_reg )
+void ata_flash_pccard_device::write_reg(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset >= 0x280 && offset <= 0x288 && m_handle != nullptr)
 	{

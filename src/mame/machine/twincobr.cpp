@@ -33,7 +33,7 @@ INTERRUPT_GEN_MEMBER(twincobr_state::wardner_interrupt)
 }
 
 
-WRITE16_MEMBER(twincobr_state::twincobr_dsp_addrsel_w)
+void twincobr_state::twincobr_dsp_addrsel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
@@ -49,7 +49,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_addrsel_w)
 	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-READ16_MEMBER(twincobr_state::twincobr_dsp_r)
+uint16_t twincobr_state::twincobr_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
@@ -66,7 +66,7 @@ READ16_MEMBER(twincobr_state::twincobr_dsp_r)
 	return input_data;
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_dsp_w)
+void twincobr_state::twincobr_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
@@ -81,7 +81,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_w)
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-WRITE16_MEMBER(twincobr_state::wardner_dsp_addrsel_w)
+void twincobr_state::wardner_dsp_addrsel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
@@ -96,7 +96,7 @@ WRITE16_MEMBER(twincobr_state::wardner_dsp_addrsel_w)
 	LOG(("DSP PC:%04x IO write %04x (%08x) at port 0\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-READ16_MEMBER(twincobr_state::wardner_dsp_r)
+uint16_t twincobr_state::wardner_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
@@ -114,7 +114,7 @@ READ16_MEMBER(twincobr_state::wardner_dsp_r)
 	return input_data;
 }
 
-WRITE16_MEMBER(twincobr_state::wardner_dsp_w)
+void twincobr_state::wardner_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
@@ -130,7 +130,7 @@ WRITE16_MEMBER(twincobr_state::wardner_dsp_w)
 	LOG(("DSP PC:%04x IO write %04x at %08x (port 1)\n",space.device().safe_pcbase(),data,m_main_ram_seg + m_dsp_addr_w));
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_dsp_bio_w)
+void twincobr_state::twincobr_dsp_bio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* data 0xffff  means inhibit BIO line to DSP and enable */
 	/*              communication to main processor */
@@ -151,7 +151,7 @@ WRITE16_MEMBER(twincobr_state::twincobr_dsp_bio_w)
 	}
 }
 
-READ16_MEMBER(twincobr_state::fsharkbt_dsp_r)
+uint16_t twincobr_state::fsharkbt_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* IO Port 2 used by Flying Shark bootleg */
 	/* DSP reads data from an extra MCU (8741) at IO port 2 */
@@ -162,7 +162,7 @@ READ16_MEMBER(twincobr_state::fsharkbt_dsp_r)
 	return (m_fsharkbt_8741 & 1);
 }
 
-WRITE16_MEMBER(twincobr_state::fsharkbt_dsp_w)
+void twincobr_state::fsharkbt_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Flying Shark bootleg DSP writes data to an extra MCU (8741) at IO port 2 */
 #if 0
@@ -223,7 +223,7 @@ void twincobr_state::toaplan0_control_w(int offset, int data)
 	}
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_control_w)
+void twincobr_state::twincobr_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -231,18 +231,18 @@ WRITE16_MEMBER(twincobr_state::twincobr_control_w)
 	}
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_control_w)
+void twincobr_state::wardner_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	toaplan0_control_w(offset, data);
 }
 
 
-READ16_MEMBER(twincobr_state::twincobr_sharedram_r)
+uint16_t twincobr_state::twincobr_sharedram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sharedram[offset];
 }
 
-WRITE16_MEMBER(twincobr_state::twincobr_sharedram_w)
+void twincobr_state::twincobr_sharedram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -280,7 +280,7 @@ void twincobr_state::toaplan0_coin_dsp_w(address_space &space, int offset, int d
 }
 
 
-WRITE16_MEMBER(twincobr_state::fshark_coin_dsp_w)
+void twincobr_state::fshark_coin_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -288,12 +288,12 @@ WRITE16_MEMBER(twincobr_state::fshark_coin_dsp_w)
 	}
 }
 
-WRITE8_MEMBER(twincobr_state::twincobr_coin_w)
+void twincobr_state::twincobr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	toaplan0_coin_dsp_w(space, offset, data);
 }
 
-WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
+void twincobr_state::wardner_coin_dsp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	toaplan0_coin_dsp_w(space, offset, data);
 }

@@ -440,13 +440,13 @@ public:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(unk80_w);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(out_a_w);
-	DECLARE_WRITE8_MEMBER(out_c_w);
+	void out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ama8000_3_o();
 	void init_ama8000_2_i();
 	void init_ama8000_2_v();
@@ -572,17 +572,17 @@ PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 *       Read/Write Handlers         *
 ************************************/
 
-WRITE8_MEMBER( amaticmg_state::rombank_w )
+void amaticmg_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER( amaticmg_state::nmi_mask_w )
+void amaticmg_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = (data & 1) ^ 1;
 }
 
-WRITE8_MEMBER(amaticmg_state::out_a_w)
+void amaticmg_state::out_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS A:
 
@@ -602,7 +602,7 @@ WRITE8_MEMBER(amaticmg_state::out_a_w)
 	logerror("port A: %2X\n", data);
 }
 
-WRITE8_MEMBER(amaticmg_state::out_c_w)
+void amaticmg_state::out_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS B:
 
@@ -625,7 +625,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 	logerror("port C: %2X\n", data);
 }
 
-WRITE8_MEMBER( amaticmg_state::unk80_w )
+void amaticmg_state::unk80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_dac->write(BIT(data, 0));       /* Sound DAC */
 }

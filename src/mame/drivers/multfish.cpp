@@ -244,7 +244,7 @@ uint32_t igrosoft_gamble_state::screen_update_igrosoft_gamble(screen_device &scr
 	return 0;
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_vid_w)
+void igrosoft_gamble_state::igrosoft_gamble_vid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vid[offset]=data;
 
@@ -298,22 +298,22 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_vid_w)
 	}
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_bank_w)
+void igrosoft_gamble_state::igrosoft_gamble_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-READ8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_r)
+uint8_t igrosoft_gamble_state::igrosoft_gamble_timekeeper_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_m48t35->read(space, offset + 0x6000, 0xff);
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_timekeeper_w)
+void igrosoft_gamble_state::igrosoft_gamble_timekeeper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m48t35->write(space, offset + 0x6000, data, 0xff);
 }
 
-READ8_MEMBER(igrosoft_gamble_state::bankedram_r)
+uint8_t igrosoft_gamble_state::bankedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
@@ -326,7 +326,7 @@ READ8_MEMBER(igrosoft_gamble_state::bankedram_r)
 
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::bankedram_w)
+void igrosoft_gamble_state::bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
@@ -338,13 +338,13 @@ WRITE8_MEMBER(igrosoft_gamble_state::bankedram_w)
 	}
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_rambank_w)
+void igrosoft_gamble_state::igrosoft_gamble_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambk = data;
 }
 
 
-READ8_MEMBER(igrosoft_gamble_state::ray_r)
+uint8_t igrosoft_gamble_state::ray_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// the games read the raster beam position as part of the hardware checks..
 	// with a 6mhz clock and 640x480 resolution this seems to give the right results.
@@ -364,7 +364,7 @@ CUSTOM_INPUT_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_r)
 	}
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_w)
+void igrosoft_gamble_state::igrosoft_gamble_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Port 0x33
 
@@ -386,7 +386,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_w)
 	machine().bookkeeping().coin_lockout_w(7, data & 0x04);
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::rollfr_hopper_w)
+void igrosoft_gamble_state::rollfr_hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     By default RollFruit use inverted coinlock bit.
@@ -840,7 +840,7 @@ static INPUT_PORTS_START( rollfr )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
+void igrosoft_gamble_state::igrosoft_gamble_lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Port 0x30
 
@@ -864,7 +864,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps1_w)
 	output().set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
+void igrosoft_gamble_state::igrosoft_gamble_lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Port 0x34
 
@@ -880,7 +880,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps2_w)
 	output().set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
+void igrosoft_gamble_state::igrosoft_gamble_lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Port 0x35
 
@@ -890,7 +890,7 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_lamps3_w)
 	output().set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
+void igrosoft_gamble_state::igrosoft_gamble_counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Port 0x31
 
@@ -910,12 +910,12 @@ WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_counters_w)
 		machine().bookkeeping().coin_counter_w(5, data & 0x80);
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_f3_w)
+void igrosoft_gamble_state::igrosoft_gamble_f3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("igrosoft_gamble_f3_w %02x",data);
 }
 
-WRITE8_MEMBER(igrosoft_gamble_state::igrosoft_gamble_dispenable_w)
+void igrosoft_gamble_state::igrosoft_gamble_dispenable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("igrosoft_gamble_f4_w %02x",data); // display enable?
 	m_disp_enable = data;

@@ -27,7 +27,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(darkseal_state::control_w)
+void darkseal_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset<<1) {
 	case 6: /* DMA flag */
@@ -42,7 +42,7 @@ WRITE16_MEMBER(darkseal_state::control_w)
 	}
 }
 
-READ16_MEMBER(darkseal_state::control_r)
+uint16_t darkseal_state::control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{

@@ -29,13 +29,13 @@ public:
 	virtual void speedup_addon_bios_access() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	virtual uint32_t necdsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint16_t necdsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 private:
 	uint8_t m_base_bank;

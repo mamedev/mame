@@ -177,55 +177,55 @@ public:
 		virtual void machine_reset() override;
 
 		uint8_t hp64k_crtc_filter(uint8_t data);
-		DECLARE_WRITE16_MEMBER(hp64k_crtc_w);
+		void hp64k_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_drq_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_crtc_vrtc_w);
 
 		I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 
-		DECLARE_READ16_MEMBER(hp64k_rear_sw_r);
+		uint16_t hp64k_rear_sw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 		IRQ_CALLBACK_MEMBER(hp64k_irq_callback);
 		void hp64k_update_irl(void);
-		DECLARE_WRITE16_MEMBER(hp64k_irl_mask_w);
+		void hp64k_irl_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_kb_scan);
-		DECLARE_READ16_MEMBER(hp64k_kb_r);
+		uint16_t hp64k_kb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_line_sync);
-		DECLARE_READ16_MEMBER(hp64k_deltat_r);
-		DECLARE_WRITE16_MEMBER(hp64k_deltat_w);
+		uint16_t hp64k_deltat_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void hp64k_deltat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-		DECLARE_READ16_MEMBER(hp64k_slot_r);
-		DECLARE_WRITE16_MEMBER(hp64k_slot_w);
-		DECLARE_WRITE16_MEMBER(hp64k_slot_sel_w);
+		uint16_t hp64k_slot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void hp64k_slot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		void hp64k_slot_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-		DECLARE_READ16_MEMBER(hp64k_flp_r);
-		DECLARE_WRITE16_MEMBER(hp64k_flp_w);
+		uint16_t hp64k_flp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void hp64k_flp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_flp_drq_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_flp_intrq_w);
 		void hp64k_update_floppy_dma(void);
 		void hp64k_update_floppy_irq(void);
 		void hp64k_update_drv_ctrl(void);
-		DECLARE_WRITE8_MEMBER(hp64k_floppy0_rdy);
-		DECLARE_WRITE8_MEMBER(hp64k_floppy1_rdy);
+		void hp64k_floppy0_rdy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		void hp64k_floppy1_rdy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		void hp64k_floppy_idx_cb(floppy_image_device *floppy , int state);
 		void hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state);
 
-		DECLARE_READ16_MEMBER(hp64k_usart_r);
-		DECLARE_WRITE16_MEMBER(hp64k_usart_w);
+		uint16_t hp64k_usart_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void hp64k_usart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_rxrdy_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_txrdy_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_txd_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_dtr_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_rts_w);
-		DECLARE_WRITE16_MEMBER(hp64k_loopback_w);
+		void hp64k_loopback_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 		void hp64k_update_loopback(void);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_rxd_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_dcd_w);
 		DECLARE_WRITE_LINE_MEMBER(hp64k_rs232_cts_w);
 
-		DECLARE_WRITE16_MEMBER(hp64k_beep_w);
+		void hp64k_beep_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 		TIMER_DEVICE_CALLBACK_MEMBER(hp64k_beeper_off);
 
 		DECLARE_WRITE_LINE_MEMBER(hp64k_baud_clk_w);
@@ -422,7 +422,7 @@ uint8_t hp64k_state::hp64k_crtc_filter(uint8_t data)
 		return inv ? (data & 0xf2) : data;
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_crtc_w)
+void hp64k_state::hp64k_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		m_crtc->write(space , offset == 0 , hp64k_crtc_filter((uint8_t)data));
 }
@@ -496,7 +496,7 @@ I8275_DRAW_CHARACTER_MEMBER(hp64k_state::crtc_display_pixels)
 
 }
 
-READ16_MEMBER(hp64k_state::hp64k_rear_sw_r)
+uint16_t hp64k_state::hp64k_rear_sw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_rear_panel_sw->read() | 0x0020;
 }
@@ -515,7 +515,7 @@ void hp64k_state::hp64k_update_irl(void)
 		m_cpu->set_input_line(HPHYBRID_IRL , (m_irl_mask & m_irl_pending) != 0);
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_irl_mask_w)
+void hp64k_state::hp64k_irl_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		m_irl_mask = (uint8_t)data;
 		hp64k_update_irl();
@@ -553,7 +553,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_kb_scan)
 		}
 }
 
-READ16_MEMBER(hp64k_state::hp64k_kb_r)
+uint16_t hp64k_state::hp64k_kb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		uint16_t ret = 0xff00 | m_kb_row_col;
 
@@ -574,20 +574,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp64k_state::hp64k_line_sync)
 		hp64k_update_irl();
 }
 
-READ16_MEMBER(hp64k_state::hp64k_deltat_r)
+uint16_t hp64k_state::hp64k_deltat_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		BIT_CLR(m_irl_pending , 2);
 		hp64k_update_irl();
 		return 0;
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_deltat_w)
+void hp64k_state::hp64k_deltat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		BIT_CLR(m_irl_pending , 2);
 		hp64k_update_irl();
 }
 
-READ16_MEMBER(hp64k_state::hp64k_slot_r)
+uint16_t hp64k_state::hp64k_slot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		if (m_slot_select == 0x0a) {
 				// Slot 10 selected
@@ -614,7 +614,7 @@ READ16_MEMBER(hp64k_state::hp64k_slot_r)
 		}
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_slot_w)
+void hp64k_state::hp64k_slot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		if (m_slot_select == 0x0a && m_slot_map != 0) {
 				if (m_slot_map != 1) {
@@ -626,13 +626,13 @@ WRITE16_MEMBER(hp64k_state::hp64k_slot_w)
 		}
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_slot_sel_w)
+void hp64k_state::hp64k_slot_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		m_slot_map = (uint8_t)offset;
 		m_slot_select = (uint8_t)((data >> 8) & 0x3f);
 }
 
-READ16_MEMBER(hp64k_state::hp64k_flp_r)
+uint16_t hp64k_state::hp64k_flp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		m_cpu->dmar_w(0);
 
@@ -672,7 +672,7 @@ READ16_MEMBER(hp64k_state::hp64k_flp_r)
 		return ((uint16_t)m_floppy_out_latch_msb << 8) | (uint16_t)m_floppy_out_latch_lsb;
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_flp_w)
+void hp64k_state::hp64k_flp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		m_cpu->dmar_w(0);
 
@@ -874,7 +874,7 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy0_rdy)
+void hp64k_state::hp64k_floppy0_rdy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		if (data) {
 				BIT_CLR(m_floppy_status , 0);
@@ -883,7 +883,7 @@ WRITE8_MEMBER(hp64k_state::hp64k_floppy0_rdy)
 		}
 }
 
-WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
+void hp64k_state::hp64k_floppy1_rdy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		if (data) {
 				BIT_CLR(m_floppy_status , 3);
@@ -934,7 +934,7 @@ void hp64k_state::hp64k_floppy_wpt_cb(floppy_image_device *floppy , int state)
 		}
 }
 
-READ16_MEMBER(hp64k_state::hp64k_usart_r)
+uint16_t hp64k_state::hp64k_usart_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		uint16_t tmp;
 
@@ -955,7 +955,7 @@ READ16_MEMBER(hp64k_state::hp64k_usart_r)
 		return tmp;
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_usart_w)
+void hp64k_state::hp64k_usart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		if ((offset & 1) == 0) {
 				m_uart->control_w(space , 0 , (uint8_t)(data & 0xff));
@@ -1017,7 +1017,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_rts_w)
 		m_rs232->write_rts(state);
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_loopback_w)
+void hp64k_state::hp64k_loopback_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		m_loopback = BIT(data , 11);
 		hp64k_update_loopback();
@@ -1057,7 +1057,7 @@ WRITE_LINE_MEMBER(hp64k_state::hp64k_rs232_cts_w)
 		}
 }
 
-WRITE16_MEMBER(hp64k_state::hp64k_beep_w)
+void hp64k_state::hp64k_beep_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		if (!BIT(offset , 0)) {
 				m_beeper->set_state(1);

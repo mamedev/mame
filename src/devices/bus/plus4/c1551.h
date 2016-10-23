@@ -38,19 +38,19 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( tcbm_data_r );
-	DECLARE_WRITE8_MEMBER( tcbm_data_w );
-	DECLARE_READ8_MEMBER( tpi0_r );
-	DECLARE_WRITE8_MEMBER( tpi0_w );
-	DECLARE_READ8_MEMBER( tpi0_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi0_pc_w );
+	uint8_t tcbm_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tcbm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tpi0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tpi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tpi0_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tpi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( tpi1_pb_r );
-	DECLARE_READ8_MEMBER( tpi1_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
+	uint8_t tpi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tpi1_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tpi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

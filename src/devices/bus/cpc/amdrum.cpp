@@ -66,7 +66,7 @@ void cpc_amdrum_device::device_reset()
 	// TODO
 }
 
-WRITE8_MEMBER(cpc_amdrum_device::dac_w)
+void cpc_amdrum_device::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(data);
 }

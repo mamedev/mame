@@ -215,7 +215,7 @@ uint16_t raiden2_state::rpc()
 int cnt=0, ccol = -1;
 
 
-WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
+void raiden2_state::m_videoram_private_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
 	//AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
@@ -368,36 +368,36 @@ void raiden2_state::draw_sprites(const rectangle &cliprect)
 
 /* VIDEO RELATED WRITE HANDLERS (move to video file) */
 
-WRITE16_MEMBER(raiden2_state::raiden2_background_w)
+void raiden2_state::raiden2_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&back_data[offset]);
 	background_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
+void raiden2_state::raiden2_midground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&mid_data[offset]);
 	midground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
+void raiden2_state::raiden2_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&fore_data[offset]);
 	foreground_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_text_w)
+void raiden2_state::raiden2_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&text_data[offset]);
 	text_layer->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
+void raiden2_state::tilemap_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&raiden2_tilemap_enable);
 }
 
-WRITE16_MEMBER(raiden2_state::tile_scroll_w)
+void raiden2_state::tile_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(scrollvals + offset);
 	data = scrollvals[offset];
@@ -414,7 +414,7 @@ WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 		tm->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
+void raiden2_state::tile_bank_01_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
@@ -432,12 +432,12 @@ WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
 	}
 }
 
-READ16_MEMBER(raiden2_state::cop_tile_bank_2_r)
+uint16_t raiden2_state::cop_tile_bank_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return cop_bank;
 }
 
-WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
+void raiden2_state::cop_tile_bank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_bank);
 
@@ -450,7 +450,7 @@ WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
+void raiden2_state::raidendx_cop_bank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&cop_bank);
 
@@ -640,22 +640,22 @@ void raiden2_state::sprcpt_init(void)
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprcpt_adr_w)
+void raiden2_state::sprcpt_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(&sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_1_w)
+void raiden2_state::sprcpt_data_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_2_w)
+void raiden2_state::sprcpt_data_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_3_w)
+void raiden2_state::sprcpt_data_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -665,7 +665,7 @@ WRITE16_MEMBER(raiden2_state::sprcpt_data_3_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_data_4_w)
+void raiden2_state::sprcpt_data_4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -675,17 +675,17 @@ WRITE16_MEMBER(raiden2_state::sprcpt_data_4_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_1_w)
+void raiden2_state::sprcpt_val_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_val+0, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_val_2_w)
+void raiden2_state::sprcpt_val_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(sprcpt_val+1, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
+void raiden2_state::sprcpt_flags_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	combine32(&sprcpt_flags1, offset, data, mem_mask);
 	if(offset == 1) {
@@ -714,7 +714,7 @@ WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
 	}
 }
 
-WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
+void raiden2_state::sprcpt_flags_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&sprcpt_flags2);
 	if(offset == 0) {
@@ -783,17 +783,17 @@ void raiden2_state::machine_reset_xsedae()
 	sprcpt_init();
 }
 
-READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
+uint16_t raiden2_state::raiden2_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
+void raiden2_state::raiden2_sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
 }
 
-WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
+void raiden2_state::raiden2_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15) {
 		int bb = (~data >> 15) & 1;
@@ -805,29 +805,29 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 }
 
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_x_w)
+void raiden2_state::sprite_prot_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sprite_prot_x = data;
 	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_y_w)
+void raiden2_state::sprite_prot_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sprite_prot_y = data;
 	//popmessage("%04x %04x",sprite_prot_x,sprite_prot_y);
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_seg_w)
+void raiden2_state::sprite_prot_src_seg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sprite_prot_src_addr[0] = data;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
+uint16_t raiden2_state::sprite_prot_src_seg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return sprite_prot_src_addr[0];
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
+void raiden2_state::sprite_prot_src_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sprite_prot_src_addr[1] = data;
 	uint32_t src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
@@ -859,32 +859,32 @@ WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 	//machine().debug_break();
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_dst1_r)
+uint16_t raiden2_state::sprite_prot_dst1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return dst1;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_maxx_r)
+uint16_t raiden2_state::sprite_prot_maxx_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return cop_spr_maxx;
 }
 
-READ16_MEMBER(raiden2_state::sprite_prot_off_r)
+uint16_t raiden2_state::sprite_prot_off_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return cop_spr_off;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_dst1_w)
+void raiden2_state::sprite_prot_dst1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dst1 = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_maxx_w)
+void raiden2_state::sprite_prot_maxx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_spr_maxx = data;
 }
 
-WRITE16_MEMBER(raiden2_state::sprite_prot_off_w)
+void raiden2_state::sprite_prot_off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cop_spr_off = data;
 }

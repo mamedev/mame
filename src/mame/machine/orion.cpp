@@ -22,7 +22,7 @@
 
 
 
-READ8_MEMBER(orion_state::orion_romdisk_porta_r)
+uint8_t orion_state::orion_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
@@ -31,12 +31,12 @@ READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(orion_state::orion_romdisk_portb_w)
+void orion_state::orion_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romdisk_lsb = data;
 }
 
-WRITE8_MEMBER(orion_state::orion_romdisk_portc_w)
+void orion_state::orion_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romdisk_msb = data;
 }
@@ -46,22 +46,22 @@ void orion_state::machine_start_orion128()
 	m_video_mode_mask = 7;
 }
 
-READ8_MEMBER(orion_state::orion128_system_r)
+uint8_t orion_state::orion128_system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi8255_2->read(space, offset & 3);
 }
 
-WRITE8_MEMBER(orion_state::orion128_system_w)
+void orion_state::orion128_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi8255_2->write(space, offset & 3, data);
 }
 
-READ8_MEMBER(orion_state::orion128_romdisk_r)
+uint8_t orion_state::orion128_romdisk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi8255_1->read(space, offset & 3);
 }
 
-WRITE8_MEMBER(orion_state::orion128_romdisk_w)
+void orion_state::orion128_romdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi8255_1->write(space, offset & 3, data);
 }
@@ -72,7 +72,7 @@ void orion_state::orion_set_video_mode(int width)
 	machine().first_screen()->configure(width, 256, visarea, machine().first_screen()->frame_period().attoseconds());
 }
 
-WRITE8_MEMBER(orion_state::orion128_video_mode_w)
+void orion_state::orion128_video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x80)!=(m_orion128_video_mode & 0x80))
 	{
@@ -99,7 +99,7 @@ WRITE8_MEMBER(orion_state::orion128_video_mode_w)
 	m_orion128_video_mode = data;
 }
 
-WRITE8_MEMBER(orion_state::orion128_video_page_w)
+void orion_state::orion128_video_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_orion128_video_page != data)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(orion_state::orion128_video_page_w)
 }
 
 
-WRITE8_MEMBER(orion_state::orion128_memory_page_w)
+void orion_state::orion128_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data!=m_orion128_memory_page )
 	{
@@ -150,7 +150,7 @@ void orion_state::machine_reset_orion128()
 	radio86_init_keyboard();
 }
 
-WRITE8_MEMBER(orion_state::orion_disk_control_w)
+void orion_state::orion_disk_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_connector *names[] = { m_fd0, m_fd1, m_fd2, m_fd3};
 	floppy_image_device *floppy = names[data & 3]->get_device();
@@ -160,7 +160,7 @@ WRITE8_MEMBER(orion_state::orion_disk_control_w)
 	floppy->ss_w(((data & 0x10) >> 4) ^ 1);
 }
 
-READ8_MEMBER(orion_state::orion128_floppy_r)
+uint8_t orion_state::orion128_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -176,7 +176,7 @@ READ8_MEMBER(orion_state::orion128_floppy_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(orion_state::orion128_floppy_w)
+void orion_state::orion128_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -193,7 +193,7 @@ WRITE8_MEMBER(orion_state::orion128_floppy_w)
 		case 0x20 : orion_disk_control_w(space, offset, data);break;
 	}
 }
-READ8_MEMBER(orion_state::orionz80_floppy_rtc_r)
+uint8_t orion_state::orionz80_floppy_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
@@ -205,7 +205,7 @@ READ8_MEMBER(orion_state::orionz80_floppy_rtc_r)
 	}
 }
 
-WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
+void orion_state::orionz80_floppy_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
@@ -223,7 +223,7 @@ void orion_state::machine_start_orionz80()
 	m_video_mode_mask = 7;
 }
 
-WRITE8_MEMBER(orion_state::orionz80_sound_w)
+void orion_state::orionz80_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_speaker_data == 0)
 	{
@@ -237,7 +237,7 @@ WRITE8_MEMBER(orion_state::orionz80_sound_w)
 
 }
 
-WRITE8_MEMBER(orion_state::orionz80_sound_fe_w)
+void orion_state::orionz80_sound_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 4));
 }
@@ -293,13 +293,13 @@ void orion_state::orionz80_switch_bank()
 	}
 }
 
-WRITE8_MEMBER(orion_state::orionz80_memory_page_w)
+void orion_state::orionz80_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_orionz80_memory_page = data & 7;
 	orionz80_switch_bank();
 }
 
-WRITE8_MEMBER(orion_state::orionz80_dispatcher_w)
+void orion_state::orionz80_dispatcher_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_orionz80_dispatcher = data;
 	orionz80_switch_bank();
@@ -352,7 +352,7 @@ INTERRUPT_GEN_MEMBER(orion_state::orionz80_interrupt)
 	}
 }
 
-READ8_MEMBER(orion_state::orionz80_io_r)
+uint8_t orion_state::orionz80_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0xFFFD)
 	{
@@ -361,7 +361,7 @@ READ8_MEMBER(orion_state::orionz80_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(orion_state::orionz80_io_w)
+void orion_state::orionz80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xff)
 	{
@@ -489,7 +489,7 @@ void orion_state::orionpro_bank_switch()
 	}
 }
 
-WRITE8_MEMBER(orion_state::orionpro_memory_page_w)
+void orion_state::orionpro_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_orionpro_128_page = data;
 	orionpro_bank_switch();
@@ -520,7 +520,7 @@ void orion_state::machine_reset_orionpro()
 	m_orionpro_pseudo_color = 0;
 }
 
-READ8_MEMBER(orion_state::orionpro_io_r)
+uint8_t orion_state::orionpro_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0xff)
 	{
@@ -552,7 +552,7 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(orion_state::orionpro_io_w)
+void orion_state::orionpro_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xff)
 	{

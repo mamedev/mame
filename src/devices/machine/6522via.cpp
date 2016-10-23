@@ -492,7 +492,7 @@ void via6522_device::output_pb()
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-READ8_MEMBER( via6522_device::read )
+uint8_t via6522_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	if (space.debugger_access())
@@ -652,7 +652,7 @@ READ8_MEMBER( via6522_device::read )
     via_w - CPU interface for VIA write
 -------------------------------------------------*/
 
-WRITE8_MEMBER( via6522_device::write )
+void via6522_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &=0x0f;
 
@@ -855,7 +855,7 @@ void via6522_device::write_pa(int line, int state)
 		m_in_a &= ~(1 << line);
 }
 
-WRITE8_MEMBER( via6522_device::write_pa )
+void via6522_device::write_pa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_in_a = data;
 }
@@ -920,7 +920,7 @@ void via6522_device::write_pb(int line, int state)
 		m_in_b &= ~(1 << line);
 }
 
-WRITE8_MEMBER( via6522_device::write_pb )
+void via6522_device::write_pb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_in_b = data;
 }

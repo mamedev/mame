@@ -80,18 +80,18 @@ public:
 		{ }
 
 	required_shared_ptr<uint16_t> m_tilemapram;
-	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
-	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
+	void blackt96_c0000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blackt96_80000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
+	void blackt96_soundio_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blackt96_soundio_port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blackt96_soundio_port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blackt96_soundio_port02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blackt96_soundio_port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void tile_callback(int &tile, int& fx, int& fy, int& region);
 
-	DECLARE_READ16_MEMBER( random_r )
+	uint16_t random_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)
 	{
 		return machine().rand();
 	}
@@ -138,14 +138,14 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 }
 
 
-WRITE16_MEMBER(blackt96_state::blackt96_80000_w)
+void blackt96_state::blackt96_80000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// TO sound MCU?
 	//printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
 }
 
 
-WRITE16_MEMBER(blackt96_state::blackt96_c0000_w)
+void blackt96_state::blackt96_c0000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// unknown, also sound mcu?
 	// -bbb --21
@@ -305,25 +305,25 @@ READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
 	return 0;
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port00_w)
+void blackt96_state::blackt96_soundio_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port01_r)
-{
-	return machine().rand();
-}
-
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port01_w)
-{
-}
-
-READ8_MEMBER(blackt96_state::blackt96_soundio_port02_r)
+uint8_t blackt96_state::blackt96_soundio_port01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port02_w)
+void blackt96_state::blackt96_soundio_port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+}
+
+uint8_t blackt96_state::blackt96_soundio_port02_r(address_space &space, offs_t offset, uint8_t mem_mask)
+{
+	return machine().rand();
+}
+
+void blackt96_state::blackt96_soundio_port02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

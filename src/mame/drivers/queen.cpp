@@ -48,9 +48,9 @@ public:
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[4][256];
 
-	DECLARE_WRITE32_MEMBER( bios_ext_ram_w );
+	void bios_ext_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
+	void bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
@@ -213,7 +213,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 
-WRITE32_MEMBER(queen_state::bios_ext_ram_w)
+void queen_state::bios_ext_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x40)     // write to RAM if this region is write-enabled
 	{
@@ -222,7 +222,7 @@ WRITE32_MEMBER(queen_state::bios_ext_ram_w)
 }
 
 
-WRITE32_MEMBER(queen_state::bios_ram_w)
+void queen_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_mtxc_config_reg[0x63] & 0x10)     // write to RAM if this region is write-enabled
 	{

@@ -173,7 +173,7 @@ CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
  *
  *************************************/
 
-WRITE16_MEMBER(lethalj_state::ripribit_control_w)
+void lethalj_state::ripribit_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	m_ticket->write(space, 0, ((data >> 1) & 1) << 7);
@@ -181,7 +181,7 @@ WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cfarm_control_w)
+void lethalj_state::cfarm_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output().set_lamp_value(0, (data >> 2) & 1);
@@ -191,7 +191,7 @@ WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 }
 
 
-WRITE16_MEMBER(lethalj_state::cclownz_control_w)
+void lethalj_state::cclownz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ticket->write(space, 0, ((data >> 0) & 1) << 7);
 	output().set_lamp_value(0, (data >> 2) & 1);

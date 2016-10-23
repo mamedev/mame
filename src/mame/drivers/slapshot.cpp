@@ -170,7 +170,7 @@ INTERRUPT_GEN_MEMBER(slapshot_state::interrupt)
                 GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(slapshot_state::service_input_r)
+uint16_t slapshot_state::service_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -184,14 +184,14 @@ READ16_MEMBER(slapshot_state::service_input_r)
 }
 
 
-READ16_MEMBER(slapshot_state::opwolf3_adc_r)
+uint16_t slapshot_state::opwolf3_adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
 
 	return ioport(adcnames[offset])->read() << 8;
 }
 
-WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
+void slapshot_state::opwolf3_adc_req_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -220,12 +220,12 @@ WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
                 SOUND
 *****************************************************/
 
-WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
+void slapshot_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(slapshot_state::msb_sound_w)
+void slapshot_state::msb_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, (data >> 8) & 0xff);
@@ -238,7 +238,7 @@ WRITE16_MEMBER(slapshot_state::msb_sound_w)
 #endif
 }
 
-READ16_MEMBER(slapshot_state::msb_sound_r)
+uint16_t slapshot_state::msb_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff) << 8);

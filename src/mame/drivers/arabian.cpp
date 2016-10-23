@@ -60,7 +60,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(arabian_state::ay8910_porta_w)
+void arabian_state::ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit 7 = ENA
@@ -73,7 +73,7 @@ WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 }
 
 
-WRITE8_MEMBER(arabian_state::ay8910_portb_w)
+void arabian_state::ay8910_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit 5 = /IREQ to custom CPU
@@ -98,7 +98,7 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
  *
  *************************************/
 
-READ8_MEMBER(arabian_state::mcu_port_r_r)
+uint8_t arabian_state::mcu_port_r_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = m_mcu_port_r[offset];
 
@@ -109,7 +109,7 @@ READ8_MEMBER(arabian_state::mcu_port_r_r)
 	return val;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_r_w)
+void arabian_state::mcu_port_r_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -124,7 +124,7 @@ WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 	m_mcu_port_r[offset] = data & 0x0f;
 }
 
-READ8_MEMBER(arabian_state::mcu_portk_r)
+uint8_t arabian_state::mcu_portk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xf;
 
@@ -152,7 +152,7 @@ READ8_MEMBER(arabian_state::mcu_portk_r)
 	return val & 0x0f;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_o_w)
+void arabian_state::mcu_port_o_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t out = data & 0x0f;
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER(arabian_state::mcu_port_o_w)
 		m_mcu_port_o = (m_mcu_port_o & 0xf0) | out;
 }
 
-WRITE8_MEMBER(arabian_state::mcu_port_p_w)
+void arabian_state::mcu_port_p_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port_p = data & 0x0f;
 }

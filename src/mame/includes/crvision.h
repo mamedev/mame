@@ -61,9 +61,9 @@ public:
 	uint8_t m_keylatch;
 	uint8_t read_keyboard(int pa);
 
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_READ8_MEMBER( pia_pb_r );
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 protected:
@@ -98,10 +98,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );

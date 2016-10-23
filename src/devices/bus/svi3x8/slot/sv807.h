@@ -30,8 +30,8 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void bk21_w(int state) override;
 	virtual void bk22_w(int state) override;

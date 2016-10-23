@@ -58,8 +58,8 @@ public:
 
 	required_device<avr8_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_craft();
 	virtual void machine_reset() override;
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -86,7 +86,7 @@ void craft_state::machine_start()
 {
 }
 
-READ8_MEMBER(craft_state::port_r)
+uint8_t craft_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset )
 	{
@@ -101,7 +101,7 @@ READ8_MEMBER(craft_state::port_r)
 	return 0;
 }
 
-WRITE8_MEMBER(craft_state::port_w)
+void craft_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{

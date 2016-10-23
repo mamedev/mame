@@ -14,54 +14,54 @@
 #include "includes/momoko.h"
 
 
-WRITE8_MEMBER(momoko_state::momoko_fg_scrollx_w)
+void momoko_state::momoko_fg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrollx = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_fg_scrolly_w)
+void momoko_state::momoko_fg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_scrolly = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_fg_select_w)
+void momoko_state::momoko_fg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_select = data & 0x0f;
 	m_fg_mask = data & 0x10;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_text_scrolly_w)
+void momoko_state::momoko_text_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_text_scrolly = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_text_mode_w)
+void momoko_state::momoko_text_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_text_mode = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_bg_scrollx_w)
+void momoko_state::momoko_bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scrollx[offset] = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_bg_scrolly_w)
+void momoko_state::momoko_bg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scrolly[offset] = data;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_bg_select_w)
+void momoko_state::momoko_bg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_select = data & 0x0f;
 	m_bg_mask = data & 0x10;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_bg_priority_w)
+void momoko_state::momoko_bg_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_priority = data & 0x01;
 }
 
-WRITE8_MEMBER(momoko_state::momoko_flipscreen_w)
+void momoko_state::momoko_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 0x01;
 }

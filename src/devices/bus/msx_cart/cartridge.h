@@ -21,8 +21,8 @@ public:
 	virtual void initialize_cartridge() {}
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) {}
+	virtual uint8_t read_cart(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	// ROM/RAM/SRAM management
 	// Mainly used by the cartridge slot when loading images

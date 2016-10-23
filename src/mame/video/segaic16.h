@@ -133,14 +133,14 @@ public:
 	void tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
 	void rotate_init(int which, int type, int colorbase);
 
-	DECLARE_READ16_MEMBER( tileram_r );
-	DECLARE_READ16_MEMBER( textram_r );
-	DECLARE_WRITE16_MEMBER( tileram_w );
-	DECLARE_WRITE16_MEMBER( textram_w );
+	uint16_t tileram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t textram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void rotate_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, bitmap_ind16 &srcbitmap);
 
-	DECLARE_READ16_MEMBER( rotate_control_r );
+	uint16_t rotate_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER( tilemap_16b_tile_info );
 	TILE_GET_INFO_MEMBER( tilemap_16b_text_info );

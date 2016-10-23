@@ -79,7 +79,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
+uint8_t gunsmoke_state::gunsmoke_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    The routine at 0x0e69 tries to read data starting at 0xc4c9.

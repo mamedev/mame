@@ -16,7 +16,7 @@
 #include "imagedev/flopdrv.h"
 
 
-READ8_MEMBER(pk8020_state::keyboard_r)
+uint8_t pk8020_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal=0x00;
 	uint8_t line = 0;
@@ -42,11 +42,11 @@ READ8_MEMBER(pk8020_state::keyboard_r)
 	return retVal;
 }
 
-READ8_MEMBER(pk8020_state::sysreg_r)
+uint8_t pk8020_state::sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram->pointer()[offset];
 }
-WRITE8_MEMBER(pk8020_state::sysreg_w)
+void pk8020_state::sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(offset,7)==0) {
 		pk8020_set_bank(data >> 2);
@@ -65,13 +65,13 @@ WRITE8_MEMBER(pk8020_state::sysreg_w)
 	}
 }
 
-READ8_MEMBER(pk8020_state::text_r)
+uint8_t pk8020_state::text_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_attr == 3) m_text_attr=m_ram->pointer()[0x40400+offset];
 	return m_ram->pointer()[0x40000+offset];
 }
 
-WRITE8_MEMBER(pk8020_state::text_w)
+void pk8020_state::text_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ram = m_ram->pointer();
 	ram[0x40000+offset] = data;
@@ -83,7 +83,7 @@ WRITE8_MEMBER(pk8020_state::text_w)
 	}
 }
 
-READ8_MEMBER(pk8020_state::gzu_r)
+uint8_t pk8020_state::gzu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
 	uint8_t p0 = addr[offset];
@@ -117,7 +117,7 @@ READ8_MEMBER(pk8020_state::gzu_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(pk8020_state::gzu_w)
+void pk8020_state::gzu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
 	uint8_t *plane_0 = addr;
@@ -145,7 +145,7 @@ WRITE8_MEMBER(pk8020_state::gzu_w)
 	}
 }
 
-READ8_MEMBER(pk8020_state::devices_r)
+uint8_t pk8020_state::devices_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 0x38)
 	{
@@ -169,7 +169,7 @@ READ8_MEMBER(pk8020_state::devices_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pk8020_state::devices_w)
+void pk8020_state::devices_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset & 0x38)
 	{
@@ -811,12 +811,12 @@ void pk8020_state::pk8020_set_bank(uint8_t data)
 	}
 }
 
-READ8_MEMBER(pk8020_state::pk8020_porta_r)
+uint8_t pk8020_state::pk8020_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf0 | (m_takt <<1) | (m_text_attr)<<3;
 }
 
-WRITE8_MEMBER(pk8020_state::pk8020_portc_w)
+void pk8020_state::pk8020_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_page_access =(data>>6) & 3;
 	m_attr = (data >> 4) & 3;
@@ -828,7 +828,7 @@ WRITE8_MEMBER(pk8020_state::pk8020_portc_w)
 	m_portc_data = data;
 }
 
-WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
+void pk8020_state::pk8020_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -854,13 +854,13 @@ WRITE8_MEMBER(pk8020_state::pk8020_portb_w)
 	// todo: at least bit 5 and bit 7 is connected to something too...
 }
 
-READ8_MEMBER(pk8020_state::pk8020_portc_r)
+uint8_t pk8020_state::pk8020_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portc_data;
 }
 
 
-WRITE8_MEMBER(pk8020_state::pk8020_2_portc_w)
+void pk8020_state::pk8020_2_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_gate = BIT(data,3);
 

@@ -216,7 +216,7 @@ void naomi_m4_board::enc_fill()
 	}
 }
 
-READ16_MEMBER(naomi_m4_board::m4_id_r)
+uint16_t naomi_m4_board::m4_id_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m4id & 0xff80;
 }

@@ -49,7 +49,7 @@ void zx_state::zx_ula_hsync()
 	recalc_hsync();
 }
 
-WRITE16_MEMBER(zx_state::refresh_w)
+void zx_state::refresh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if((data ^ m_prev_refresh) & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
@@ -91,7 +91,7 @@ void zx_state::recalc_hsync()
 	m_ula_hsync->adjust(m_maincpu->cycles_to_attotime(delta));
 }
 
-READ8_MEMBER(zx_state::ula_low_r)
+uint8_t zx_state::ula_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 	if(space.debugger_access())
@@ -109,7 +109,7 @@ READ8_MEMBER(zx_state::ula_low_r)
 	return cdata;
 }
 
-READ8_MEMBER(zx_state::ula_high_r)
+uint8_t zx_state::ula_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 

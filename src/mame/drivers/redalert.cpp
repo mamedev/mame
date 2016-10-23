@@ -119,7 +119,7 @@ INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 }
 
 
-READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
+uint8_t redalert_state::redalert_interrupt_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
@@ -129,19 +129,19 @@ READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
 
 
 
-WRITE8_MEMBER(redalert_state::redalert_interrupt_clear_w)
+void redalert_state::redalert_interrupt_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	redalert_interrupt_clear_r(space, 0);
 }
 
-READ8_MEMBER(redalert_state::panther_interrupt_clear_r)
+uint8_t redalert_state::panther_interrupt_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	return ioport("STICK0")->read();
 }
 
-READ8_MEMBER(redalert_state::panther_unk_r)
+uint8_t redalert_state::panther_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((machine().rand() & 0x01) | (ioport("C020")->read() & 0xfe));
 }

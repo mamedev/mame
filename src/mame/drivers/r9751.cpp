@@ -81,17 +81,17 @@ public:
 	{
 	}
 
-	DECLARE_READ32_MEMBER(r9751_mmio_5ff_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_5ff_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_ff01_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_ff01_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_ff05_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_ff05_w);
-	DECLARE_READ32_MEMBER(r9751_mmio_fff8_r);
-	DECLARE_WRITE32_MEMBER(r9751_mmio_fff8_w);
+	uint32_t r9751_mmio_5ff_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void r9751_mmio_5ff_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t r9751_mmio_ff01_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void r9751_mmio_ff01_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t r9751_mmio_ff05_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void r9751_mmio_ff05_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t r9751_mmio_fff8_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void r9751_mmio_fff8_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ8_MEMBER(pdc_dma_r);
-	DECLARE_WRITE8_MEMBER(pdc_dma_w);
+	uint8_t pdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_r9751();
 
@@ -148,7 +148,7 @@ uint32_t r9751_state::debug_a5_20()
 	return m_maincpu->space(AS_PROGRAM).read_dword(ptr_m68000->dar[13] + 0x20);
 }
 
-READ8_MEMBER(r9751_state::pdc_dma_r)
+uint8_t r9751_state::pdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
 	uint32_t address = (fdd_dma_bank & 0x7FFFF800) + (offset&0x3FFFF);
@@ -156,7 +156,7 @@ READ8_MEMBER(r9751_state::pdc_dma_r)
 	return m_maincpu->space(AS_PROGRAM).read_byte(address);
 }
 
-WRITE8_MEMBER(r9751_state::pdc_dma_w)
+void r9751_state::pdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This callback function takes the value written to 0xFF01000C as the bank offset */
 	uint32_t address = (fdd_dma_bank & 0x7FFFF800) + (m_pdc->fdd_68k_dma_address&0x3FFFF);
@@ -203,7 +203,7 @@ void r9751_state::machine_reset()
 /******************************************************************************
  External board communication registers [0x5FF00000 - 0x5FFFFFFF]
 ******************************************************************************/
-READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
+uint32_t r9751_state::r9751_mmio_5ff_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -235,7 +235,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_5ff_r )
 	}
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
+void r9751_state::r9751_mmio_5ff_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t data_b0, data_b1;
 	/* Unknown mask */
@@ -354,7 +354,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_5ff_w )
 /******************************************************************************
  CPU board registers [0xFF010000 - 0xFF06FFFF]
 ******************************************************************************/
-READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
+uint32_t r9751_state::r9751_mmio_ff01_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//uint32_t data;
 
@@ -366,7 +366,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff01_r )
 	}
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
+void r9751_state::r9751_mmio_ff01_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
@@ -388,7 +388,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff01_w )
 	}
 }
 
-READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
+uint32_t r9751_state::r9751_mmio_ff05_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -413,7 +413,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_ff05_r )
 	}
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
+void r9751_state::r9751_mmio_ff05_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)
@@ -436,7 +436,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_ff05_w )
 	}
 }
 
-READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
+uint32_t r9751_state::r9751_mmio_fff8_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -451,7 +451,7 @@ READ32_MEMBER( r9751_state::r9751_mmio_fff8_r )
 	}
 }
 
-WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
+void r9751_state::r9751_mmio_fff8_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Unknown mask */
 	if (mem_mask != 0xFFFFFFFF)

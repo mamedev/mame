@@ -6,7 +6,7 @@
 #include "68307.h"
 
 
-READ16_MEMBER( m68307cpu_device::m68307_internal_sim_r )
+uint16_t m68307cpu_device::m68307_internal_sim_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;
@@ -43,7 +43,7 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_sim_r )
 }
 
 
-WRITE16_MEMBER( m68307cpu_device::m68307_internal_sim_w )
+void m68307cpu_device::m68307_internal_sim_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_sim* sim = m68k->m68307SIM;

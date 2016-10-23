@@ -296,7 +296,7 @@ void uv201_device::do_partial_update()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( uv201_device::read )
+uint8_t uv201_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -356,7 +356,7 @@ READ8_MEMBER( uv201_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( uv201_device::write )
+void uv201_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

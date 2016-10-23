@@ -166,14 +166,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
 	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
 
-	DECLARE_WRITE8_MEMBER( pa_w ) { m_pio->pa_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pa_r ) { return m_pio->pa_r(space, offset, mem_mask); }
-	DECLARE_WRITE8_MEMBER( pb_w ) { m_pio->pb_w(space, offset, data, mem_mask); }
-	DECLARE_READ8_MEMBER( pb_r ) { return m_pio->pb_r(space, offset, mem_mask); }
+	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio->pa_w(space, offset, data, mem_mask); }
+	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio->pa_r(space, offset, mem_mask); }
+	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio->pb_w(space, offset, data, mem_mask); }
+	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio->pb_r(space, offset, mem_mask); }
 
 	/////////////////////////////////////////////////////////
 
-	DECLARE_WRITE8_MEMBER( irq_priority_w );
+	void irq_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( out_txda_cb_trampoline_w ) { m_out_txda_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( out_dtra_cb_trampoline_w ) { m_out_dtra_cb(state); }
@@ -196,12 +196,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
 
-	DECLARE_READ8_MEMBER( in_pa_cb_trampoline_r ) { return m_in_pa_cb(); }
-	DECLARE_WRITE8_MEMBER( out_pa_cb_trampoline_w ) { m_out_pa_cb(data); }
+	uint8_t in_pa_cb_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_pa_cb(); }
+	void out_pa_cb_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_pa_cb(data); }
 	DECLARE_WRITE_LINE_MEMBER( out_ardy_cb_trampoline_w ) { m_out_ardy_cb(state); }
 
-	DECLARE_READ8_MEMBER( in_pb_cb_trampoline_r ) { return m_in_pb_cb(); }
-	DECLARE_WRITE8_MEMBER( out_pb_cb_trampoline_w ) { m_out_pb_cb(data); }
+	uint8_t in_pb_cb_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_pb_cb(); }
+	void out_pb_cb_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_pb_cb(data); }
 	DECLARE_WRITE_LINE_MEMBER( out_brdy_cb_trampoline_w ) { m_out_brdy_cb(state); }
 
 protected:

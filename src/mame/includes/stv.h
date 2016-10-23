@@ -63,22 +63,22 @@ public:
 	void init_othellos();
 	void init_mausuke();
 
-	DECLARE_READ8_MEMBER(stv_ioga_r);
-	DECLARE_WRITE8_MEMBER(stv_ioga_w);
-	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
-	DECLARE_READ8_MEMBER(magzun_ioga_r);
-	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
-	DECLARE_READ8_MEMBER(stvmp_ioga_r);
-	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
-	DECLARE_READ32_MEMBER(stv_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
-	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
-	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_ioga_r32);
-	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
-	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+	uint8_t stv_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stv_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t critcrsh_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t magzun_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void magzun_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stvmp_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stvmp_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t stv_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void stv_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t critcrsh_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t stvmp_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void stvmp_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void magzun_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_hef_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t magzun_rx_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
@@ -104,9 +104,9 @@ public:
 	} m_adsp_regs;
 
 	void machine_reset_batmanfr();
-	DECLARE_READ16_MEMBER( adsp_control_r );
-	DECLARE_WRITE16_MEMBER( adsp_control_w );
-	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
+	uint16_t adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void batmanfr_sound_comms_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// protection specific variables and functions (see machine/stvprot.c)
 	uint32_t m_abus_protenable;
@@ -114,8 +114,8 @@ public:
 
 	uint32_t m_a_bus[4];
 
-	DECLARE_READ32_MEMBER( common_prot_r );
-	DECLARE_WRITE32_MEMBER( common_prot_w );
+	uint32_t common_prot_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void common_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void install_common_protection();
 	void stv_register_protection_savestates();

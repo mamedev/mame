@@ -51,7 +51,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
+void cinemat_state::cinemat_sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t oldval = m_sound_control;
 
@@ -1230,20 +1230,20 @@ void cinemat_state::demon_sound_w(uint8_t sound_val, uint8_t bits_changed)
 }
 
 
-READ8_MEMBER(cinemat_state::sound_porta_r)
+uint8_t cinemat_state::sound_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 0-3 are the sound data; bit 4 is the data ready */
 	return m_sound_fifo[m_sound_fifo_out] | ((m_sound_fifo_in != m_sound_fifo_out) << 4);
 }
 
 
-READ8_MEMBER(cinemat_state::sound_portb_r)
+uint8_t cinemat_state::sound_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_last_portb_write;
 }
 
 
-WRITE8_MEMBER(cinemat_state::sound_portb_w)
+void cinemat_state::sound_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* watch for a 0->1 edge on bit 0 ("shift out") to advance the data pointer */
 	if ((data & 1) != (m_last_portb_write & 1) && (data & 1) != 0)
@@ -1261,7 +1261,7 @@ WRITE8_MEMBER(cinemat_state::sound_portb_w)
 	m_last_portb_write = data;
 }
 
-WRITE8_MEMBER(cinemat_state::sound_output_w)
+void cinemat_state::sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("sound_output = %02X\n", data);
 }
@@ -1347,7 +1347,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(cinemat_state::qb3_sound_w)
+void cinemat_state::qb3_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t rega = m_maincpu->state_int(CCPU_A);
 	demon_sound_w(0x00 | (~rega & 0x0f), 0x10);

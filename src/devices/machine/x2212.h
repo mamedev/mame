@@ -55,8 +55,8 @@ public:
 	static void static_set_auto_save(device_t &device);
 
 	// I/O operations
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( store );
 	DECLARE_WRITE_LINE_MEMBER( recall );

@@ -334,7 +334,7 @@ void k054539_device::init_chip()
 	save_item(NAME(cur_ptr));
 }
 
-WRITE8_MEMBER(k054539_device::write)
+void k054539_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(0) {
 		int voice, reg;
@@ -476,7 +476,7 @@ void k054539_device::device_post_load()
 	cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 
-READ8_MEMBER(k054539_device::read)
+uint8_t k054539_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset) {
 	case 0x22d:

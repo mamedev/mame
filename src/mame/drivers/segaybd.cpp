@@ -87,7 +87,7 @@ const uint32_t SOUND_CLOCK = 32215900;
 //  analog_r - handle analog input reads
 //-------------------------------------------------
 
-READ16_MEMBER( segaybd_state::analog_r )
+uint16_t segaybd_state::analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0xff;
 	if (ACCESSING_BITS_0_7)
@@ -103,7 +103,7 @@ READ16_MEMBER( segaybd_state::analog_r )
 //  analog_w - handle analog input control writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::analog_w )
+void segaybd_state::analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data[0x08/2] & 3)) : (offset & 3);
 	m_analog_data[offset & 3] = m_adc_ports[selected].read_safe(0xff);
@@ -114,7 +114,7 @@ WRITE16_MEMBER( segaybd_state::analog_w )
 //  io_chip_r - handle reads from the I/O chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaybd_state::io_chip_r )
+uint16_t segaybd_state::io_chip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1f/2;
 
@@ -164,7 +164,7 @@ READ16_MEMBER( segaybd_state::io_chip_r )
 //  io_chip_w - handle writes to the I/O chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::io_chip_w )
+void segaybd_state::io_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t old;
 
@@ -232,7 +232,7 @@ WRITE16_MEMBER( segaybd_state::io_chip_w )
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaybd_state::sound_data_w )
+void segaybd_state::sound_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		synchronize(TID_SOUND_WRITE, data & 0xff);
@@ -248,7 +248,7 @@ WRITE16_MEMBER( segaybd_state::sound_data_w )
 //  sound_data_r - read latched sound data
 //-------------------------------------------------
 
-READ8_MEMBER( segaybd_state::sound_data_r )
+uint8_t segaybd_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
@@ -776,17 +776,17 @@ WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
 }
 
 
-READ16_MEMBER(segaybd_state::link_r)
+uint16_t segaybd_state::link_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return rand();
 }
 
-READ16_MEMBER(segaybd_state::link2_r)
+uint16_t segaybd_state::link2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;
 }
 
-WRITE16_MEMBER(segaybd_state::link2_w)
+void segaybd_state::link2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 	logerror("link2_w %04x\n", data);
@@ -809,7 +809,7 @@ static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 ADDRESS_MAP_END
 
 #if 0
-READ8_MEMBER(segaybd_state::link_portc0_r)
+uint8_t segaybd_state::link_portc0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf8;
 }

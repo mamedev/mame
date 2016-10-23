@@ -65,7 +65,7 @@ public:
 	// construction/destruction
 	ymz770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	sound_stream *m_stream;
 

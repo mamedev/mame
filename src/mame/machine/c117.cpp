@@ -125,17 +125,17 @@ machine_config_constructor namco_c117_device::device_mconfig_additions() const
 }
 
 
-READ8_MEMBER(namco_c117_device::main_r)
+uint8_t namco_c117_device::main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_program->read_byte(remap(0, offset));
 }
 
-READ8_MEMBER(namco_c117_device::sub_r)
+uint8_t namco_c117_device::sub_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_program->read_byte(remap(1, offset));
 }
 
-WRITE8_MEMBER(namco_c117_device::main_w)
+void namco_c117_device::main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0xe000)
 		m_program->write_byte(remap(0, offset), data);
@@ -143,7 +143,7 @@ WRITE8_MEMBER(namco_c117_device::main_w)
 		register_w(0, offset, data);
 }
 
-WRITE8_MEMBER(namco_c117_device::sub_w)
+void namco_c117_device::sub_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0xe000)
 		m_program->write_byte(remap(1, offset), data);
@@ -154,7 +154,7 @@ WRITE8_MEMBER(namco_c117_device::sub_w)
 // FIXME: the sound CPU watchdog is probably in CUS121, and definitely isn't in CUS117
 // however, until the watchdog is a device and it's possible to have two independent
 // watchdogs in a machine, it's easiest to handle it here
-WRITE8_MEMBER(namco_c117_device::sound_watchdog_w)
+void namco_c117_device::sound_watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	kick_watchdog(2);
 }

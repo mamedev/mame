@@ -110,12 +110,12 @@ public:
 	template<class _mwait> void set_mwait_callback(_mwait mwait) { m_write_mwait.set_callback(mwait); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( mcs0_r ) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs0_w ) { if (m_card) m_card->mcs0_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mcs1_r ) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mcs1_w ) { if (m_card) m_card->mcs1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( mdack_r ) { return m_card ? m_card->mdack_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( mdack_w ) { if (m_card) m_card->mdack_w(space, offset, data); }
+	uint8_t mcs0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->mcs0_r(space, offset) : 0xff; }
+	void mcs0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->mcs0_w(space, offset, data); }
+	uint8_t mcs1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->mcs1_r(space, offset) : 0xff; }
+	void mcs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->mcs1_w(space, offset, data); }
+	uint8_t mdack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_card ? m_card->mdack_r(space, offset) : 0xff; }
+	void mdack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card) m_card->mdack_w(space, offset, data); }
 	DECLARE_READ_LINE_MEMBER( mpst_r ) { return m_card == nullptr; }
 	DECLARE_READ_LINE_MEMBER( opt0_r ) { return m_card ? m_card->opt0_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( opt0_w ) { if (m_card) m_card->opt0_w(state); }

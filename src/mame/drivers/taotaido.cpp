@@ -83,13 +83,13 @@ void taotaido_state::machine_start()
 }
 
 
-READ16_MEMBER(taotaido_state::pending_command_r)
+uint16_t taotaido_state::pending_command_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Only bit 0 is tested */
 	return m_pending_command;
 }
 
-WRITE16_MEMBER(taotaido_state::sound_command_w)
+void taotaido_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -127,12 +127,12 @@ ADDRESS_MAP_END
 /* sound cpu - same as aerofgt */
 
 
-WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
+void taotaido_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(taotaido_state::sh_bankswitch_w)
+void taotaido_state::sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }

@@ -79,27 +79,27 @@ void snk68_state::video_start_searchar()
 
 ***************************************************************************/
 
-READ16_MEMBER(snk68_state::pow_fg_videoram_r)
+uint16_t snk68_state::pow_fg_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// RAM is only 8-bit
 	return m_pow_fg_videoram[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(snk68_state::pow_fg_videoram_w)
+void snk68_state::pow_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data |= 0xff00;
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(snk68_state::searchar_fg_videoram_w)
+void snk68_state::searchar_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
+void snk68_state::pow_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -115,7 +115,7 @@ WRITE16_MEMBER(snk68_state::pow_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(snk68_state::searchar_flipscreen_w)
+void snk68_state::searchar_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

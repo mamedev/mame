@@ -45,7 +45,7 @@ void runaway_state::machine_reset()
 }
 
 
-READ8_MEMBER(runaway_state::runaway_input_r)
+uint8_t runaway_state::runaway_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -62,19 +62,19 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 }
 
 
-READ8_MEMBER(runaway_state::runaway_pot_r)
+uint8_t runaway_state::runaway_pot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("7000")->read() << (7 - offset)) & 0x80;
 }
 
 
-WRITE8_MEMBER(runaway_state::runaway_led_w)
+void runaway_state::runaway_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 1);
 }
 
 
-WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
+void runaway_state::runaway_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

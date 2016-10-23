@@ -36,16 +36,16 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_memory_bank m_rombank;
 
-	DECLARE_WRITE8_MEMBER(aliens_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(aliens_sh_irqtrigger_w);
-	DECLARE_READ8_MEMBER(k052109_051960_r);
-	DECLARE_WRITE8_MEMBER(k052109_051960_w);
-	DECLARE_WRITE8_MEMBER(aliens_snd_bankswitch_w);
+	void aliens_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aliens_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aliens_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

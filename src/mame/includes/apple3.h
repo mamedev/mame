@@ -84,11 +84,11 @@ public:
 	required_device<floppy_connector> floppy2;
 	required_device<floppy_connector> floppy3;
 
-	DECLARE_READ8_MEMBER(apple3_memory_r);
-	DECLARE_WRITE8_MEMBER(apple3_memory_w);
+	uint8_t apple3_memory_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apple3_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
-	DECLARE_READ8_MEMBER(apple3_c0xx_r);
-	DECLARE_WRITE8_MEMBER(apple3_c0xx_w);
+	uint8_t apple3_c0xx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apple3_c0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_apple3();
 	void machine_reset_apple3();
 	void video_start_apple3();
@@ -97,10 +97,10 @@ public:
 	TIMER_CALLBACK_MEMBER(scanstart_cb);
 	TIMER_CALLBACK_MEMBER(scanend_cb);
 	DECLARE_WRITE_LINE_MEMBER(apple3_acia_irq_func);
-	DECLARE_WRITE8_MEMBER(apple3_via_0_out_a);
-	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
-	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
-	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
+	void apple3_via_0_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple3_via_0_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple3_via_1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void apple3_via_1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(apple3_via_0_irq_func);
 	DECLARE_WRITE_LINE_MEMBER(apple3_via_1_irq_func);
 	void apple3_write_charmem();

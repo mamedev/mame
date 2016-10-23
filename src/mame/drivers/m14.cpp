@@ -78,11 +78,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(m14_vram_w);
-	DECLARE_WRITE8_MEMBER(m14_cram_w);
-	DECLARE_READ8_MEMBER(m14_rng_r);
-	DECLARE_READ8_MEMBER(input_buttons_r);
-	DECLARE_WRITE8_MEMBER(hopper_w);
+	void m14_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m14_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m14_rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 	TILE_GET_INFO_MEMBER(m14_get_tile_info);
@@ -144,13 +144,13 @@ uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE8_MEMBER(m14_state::m14_vram_w)
+void m14_state::m14_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(m14_state::m14_cram_w)
+void m14_state::m14_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_ram[offset] = data;
 	m_m14_tilemap->mark_tile_dirty(offset);
@@ -162,14 +162,14 @@ WRITE8_MEMBER(m14_state::m14_cram_w)
  *
  *************************************/
 
-READ8_MEMBER(m14_state::m14_rng_r)
+uint8_t m14_state::m14_rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* graphic artifacts happens if this doesn't return random values. */
 	return (machine().rand() & 0x0f) | 0xf0; /* | (ioport("IN1")->read() & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */
-READ8_MEMBER(m14_state::input_buttons_r)
+uint8_t m14_state::input_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_hop_mux)
 	{
@@ -181,7 +181,7 @@ READ8_MEMBER(m14_state::input_buttons_r)
 }
 
 #if 0
-WRITE8_MEMBER(m14_state::test_w)
+void m14_state::test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint8_t x[5];
 
@@ -191,7 +191,7 @@ WRITE8_MEMBER(m14_state::test_w)
 }
 #endif
 
-WRITE8_MEMBER(m14_state::hopper_w)
+void m14_state::hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */

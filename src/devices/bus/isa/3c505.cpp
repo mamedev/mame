@@ -1606,7 +1606,7 @@ uint8_t threecom3c505_device::read_status_port()
  write_port
  ***************************************************************************/
 
-WRITE16_MEMBER(threecom3c505_device::write)
+void threecom3c505_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// make byte offset
 	offset *= 2;
@@ -1637,7 +1637,7 @@ WRITE16_MEMBER(threecom3c505_device::write)
  read_port
  ***************************************************************************/
 
-READ16_MEMBER(threecom3c505_device::read)
+uint16_t threecom3c505_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// data to omit excessive logging
 	static uint16_t last_data = 0xff;

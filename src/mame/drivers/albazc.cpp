@@ -33,10 +33,10 @@ public:
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_spriteram3;
 	uint8_t m_flip_bit;
-	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
-	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
-	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
-	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
+	void hanaroku_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanaroku_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanaroku_out_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void albazc_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(albazc);
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -103,7 +103,7 @@ uint32_t albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
+void albazc_state::hanaroku_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -125,7 +125,7 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 	machine().bookkeeping().coin_counter_w(4, data & 0x80);
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
+void albazc_state::hanaroku_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -141,12 +141,12 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
 	*/
 }
 
-WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
+void albazc_state::hanaroku_out_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// unused
 }
 
-WRITE8_MEMBER(albazc_state::albazc_vregs_w)
+void albazc_state::albazc_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#ifdef UNUSED_FUNCTION
 	{

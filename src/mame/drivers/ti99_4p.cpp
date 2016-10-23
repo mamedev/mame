@@ -153,31 +153,31 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
 	DECLARE_WRITE_LINE_MEMBER( extint );
 	DECLARE_WRITE_LINE_MEMBER( notconnected );
-	DECLARE_READ8_MEMBER( interrupt_level );
+	uint8_t interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_SETOFFSET_MEMBER( setoffset );
-	DECLARE_READ16_MEMBER( memread );
-	DECLARE_WRITE16_MEMBER( memwrite );
+	void setoffset(address_space &space, offs_t offset);
+	uint16_t memread(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void memwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 
-	DECLARE_READ16_MEMBER( samsmem_read );
-	DECLARE_WRITE16_MEMBER( samsmem_write );
+	uint16_t samsmem_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void samsmem_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(external_operation);
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( dbin_line );
 
 	// CRU (Communication Register Unit) handling
-	DECLARE_READ8_MEMBER( cruread );
-	DECLARE_WRITE8_MEMBER( cruwrite );
-	DECLARE_READ8_MEMBER( read_by_9901 );
+	uint8_t cruread(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(keyC0);
 	DECLARE_WRITE_LINE_MEMBER(keyC1);
 	DECLARE_WRITE_LINE_MEMBER(keyC2);
 	DECLARE_WRITE_LINE_MEMBER(cs_motor);
 	DECLARE_WRITE_LINE_MEMBER(audio_gate);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output);
-	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
+	void tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(alphaW);
 	virtual void machine_start() override;
 	void machine_reset_ti99_4p();
@@ -197,8 +197,8 @@ private:
 	required_device<ram_device> m_amsram;
 
 	int decode_address(int address);
-	DECLARE_READ16_MEMBER( debugger_read );
-	DECLARE_WRITE16_MEMBER( debugger_write );
+	uint16_t debugger_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void debugger_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ready_join();
 	void    set_keyboard_column(int number, int data);
 
@@ -417,7 +417,7 @@ int ti99_4p_state::decode_address(int address)
     Called when the memory access starts by setting the address bus. From that
     point on, we suspend the CPU until all operations are done.
 */
-SETOFFSET_MEMBER( ti99_4p_state::setoffset )
+void ti99_4p_state::setoffset(address_space &space, offs_t offset)
 {
 	m_addr_buf = offset << 1;
 	m_waitcount = 0;
@@ -445,7 +445,7 @@ SETOFFSET_MEMBER( ti99_4p_state::setoffset )
 	ready_join();
 }
 
-READ16_MEMBER( ti99_4p_state::memread )
+uint16_t ti99_4p_state::memread(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int address = 0;
 	uint8_t hbyte = 0;
@@ -511,7 +511,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 }
 
 
-WRITE16_MEMBER( ti99_4p_state::memwrite )
+void ti99_4p_state::memwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int address = 0;
 
@@ -576,7 +576,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 /*
     Used when the debugger is reading values from PEB cards.
 */
-READ16_MEMBER( ti99_4p_state::debugger_read )
+uint16_t ti99_4p_state::debugger_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t lval = 0;
 	uint8_t hval = 0;
@@ -591,7 +591,7 @@ READ16_MEMBER( ti99_4p_state::debugger_read )
 /*
     Used when the debugger is writing values to PEB cards.
 */
-WRITE16_MEMBER( ti99_4p_state::debugger_write )
+void ti99_4p_state::debugger_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int addrb = offset << 1;
 	m_peribox->memen_in(ASSERT_LINE);
@@ -686,7 +686,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::datamux_clock_in )
 /*
     CRU write
 */
-WRITE8_MEMBER( ti99_4p_state::cruwrite )
+void ti99_4p_state::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addroff = offset<<1;
 
@@ -710,7 +710,7 @@ WRITE8_MEMBER( ti99_4p_state::cruwrite )
 	m_peribox->cruwrite(space, addroff, data);
 }
 
-READ8_MEMBER( ti99_4p_state::cruread )
+uint8_t ti99_4p_state::cruread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	m_peribox->crureadz(space, offset<<4, &value);
@@ -722,7 +722,7 @@ READ8_MEMBER( ti99_4p_state::cruread )
 ****************************************************************************/
 static const char *const column[] = { "COL0", "COL1", "COL2", "COL3", "COL4", "COL5" };
 
-READ8_MEMBER( ti99_4p_state::read_by_9901 )
+uint8_t ti99_4p_state::read_by_9901(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int answer=0;
 
@@ -905,7 +905,7 @@ WRITE_LINE_MEMBER( ti99_4p_state::clock_out )
 	m_peribox->clock_in(state);
 }
 
-WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
+void ti99_4p_state::tms9901_interrupt(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// offset contains the interrupt level (0-15)
 	// However, the TI board just ignores that level and hardwires it to 1
@@ -913,14 +913,14 @@ WRITE8_MEMBER( ti99_4p_state::tms9901_interrupt )
 	m_cpu->set_input_line(INT_9900_INTREQ, data);
 }
 
-READ8_MEMBER( ti99_4p_state::interrupt_level )
+uint8_t ti99_4p_state::interrupt_level(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// On the TI-99 systems these IC lines are not used; the input lines
 	// at the CPU are hardwired to level 1.
 	return 1;
 }
 
-WRITE8_MEMBER( ti99_4p_state::external_operation )
+void ti99_4p_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char* extop[8] = { "inv1", "inv2", "IDLE", "RSET", "inv3", "CKON", "CKOF", "LREX" };
 	if (offset != IDLE_OP) logerror("External operation %s not implemented on the SGCPU board\n", extop[offset]);

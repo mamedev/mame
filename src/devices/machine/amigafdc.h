@@ -15,7 +15,7 @@ public:
 
 	template<class _Object> static devcb_base &set_index_wr_callback(device_t &device, _Object object) { return downcast<amiga_fdc &>(device).m_write_index.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(ciaaprb_w);
+	void ciaaprb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t ciaapra_r();
 	uint16_t dskbytr_r();

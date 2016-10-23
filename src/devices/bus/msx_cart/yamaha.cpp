@@ -144,7 +144,7 @@ void msx_cart_sfg::check_irq()
 }
 
 
-READ8_MEMBER(msx_cart_sfg::read_cart)
+uint8_t msx_cart_sfg::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0x3fff)
 	{
@@ -171,7 +171,7 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_sfg::write_cart)
+void msx_cart_sfg::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x3fff)
 	{

@@ -303,7 +303,7 @@ tilemap_t* mb60553_zooming_tilemap_device::get_tilemap()
 }
 
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
+void mb60553_zooming_tilemap_device::regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldreg = m_regs[offset];
 
@@ -313,30 +313,30 @@ WRITE16_MEMBER(mb60553_zooming_tilemap_device::regs_w)
 		reg_written(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::vram_w)
+void mb60553_zooming_tilemap_device::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 
 	m_tmap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mb60553_zooming_tilemap_device::line_w)
+void mb60553_zooming_tilemap_device::line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::regs_r)
+uint16_t mb60553_zooming_tilemap_device::regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_regs[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::vram_r)
+uint16_t mb60553_zooming_tilemap_device::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset];
 }
 
-READ16_MEMBER(mb60553_zooming_tilemap_device::line_r)
+uint16_t mb60553_zooming_tilemap_device::line_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_lineram[offset];
 }

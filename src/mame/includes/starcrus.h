@@ -49,19 +49,19 @@ public:
 	int m_launch1_sound_playing;
 	int m_launch2_sound_playing;
 
-	DECLARE_WRITE8_MEMBER(s1_x_w);
-	DECLARE_WRITE8_MEMBER(s1_y_w);
-	DECLARE_WRITE8_MEMBER(s2_x_w);
-	DECLARE_WRITE8_MEMBER(s2_y_w);
-	DECLARE_WRITE8_MEMBER(p1_x_w);
-	DECLARE_WRITE8_MEMBER(p1_y_w);
-	DECLARE_WRITE8_MEMBER(p2_x_w);
-	DECLARE_WRITE8_MEMBER(p2_y_w);
-	DECLARE_WRITE8_MEMBER(ship_parm_1_w);
-	DECLARE_WRITE8_MEMBER(ship_parm_2_w);
-	DECLARE_WRITE8_MEMBER(proj_parm_1_w);
-	DECLARE_WRITE8_MEMBER(proj_parm_2_w);
-	DECLARE_READ8_MEMBER(coll_det_r);
+	void s1_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void s1_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void s2_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void s2_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ship_parm_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ship_parm_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void proj_parm_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void proj_parm_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t coll_det_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 

@@ -26,7 +26,7 @@ INTERRUPT_GEN_MEMBER(flkatck_state::flkatck_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(flkatck_state::flkatck_bankswitch_w)
+void flkatck_state::flkatck_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 3-4: coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
@@ -37,7 +37,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_bankswitch_w)
 		membank("bank1")->set_entry(data & 0x03);
 }
 
-READ8_MEMBER(flkatck_state::flkatck_ls138_r)
+uint8_t flkatck_state::flkatck_ls138_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -58,7 +58,7 @@ READ8_MEMBER(flkatck_state::flkatck_ls138_r)
 	return data;
 }
 
-WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
+void flkatck_state::flkatck_ls138_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -78,12 +78,12 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 }
 
 /* Protection - an external multiplyer connected to the sound CPU */
-READ8_MEMBER(flkatck_state::multiply_r)
+uint8_t flkatck_state::multiply_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xff;
 }
 
-WRITE8_MEMBER(flkatck_state::multiply_w)
+void flkatck_state::multiply_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_multiply_reg[offset] = data;
 }
@@ -177,7 +177,7 @@ static GFXDECODE_START( flkatck )
 	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout, 0, 32 )
 GFXDECODE_END
 
-WRITE8_MEMBER(flkatck_state::volume_callback)
+void flkatck_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

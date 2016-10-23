@@ -25,11 +25,11 @@ public:
 	required_device<fd1797_t> m_fdc;
 	required_device<SCSI_PORT_DEVICE> m_sasi;
 
-	DECLARE_WRITE8_MEMBER(sio_out_w);
-	DECLARE_WRITE8_MEMBER(drive_sel_w);
+	void sio_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void drive_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
-WRITE8_MEMBER(slicer_state::sio_out_w)
+void slicer_state::sio_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy;
 	int state = (data & 0x80) ? 0 : 1;
@@ -44,7 +44,7 @@ WRITE8_MEMBER(slicer_state::sio_out_w)
 	}
 }
 
-WRITE8_MEMBER(slicer_state::drive_sel_w)
+void slicer_state::drive_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 	switch(offset)

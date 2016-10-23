@@ -41,12 +41,12 @@ void nbmj9195_state::machine_start()
 	save_item(NAME(m_mscoutm_inputport));
 }
 
-WRITE8_MEMBER(nbmj9195_state::soundbank_w)
+void nbmj9195_state::soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(nbmj9195_state::outcoin_flag_w)
+void nbmj9195_state::outcoin_flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit0: coin in counter
 	// bit1: coin out counter
@@ -57,7 +57,7 @@ WRITE8_MEMBER(nbmj9195_state::outcoin_flag_w)
 	else m_outcoin_flag = 1;
 }
 
-WRITE8_MEMBER(nbmj9195_state::inputportsel_w)
+void nbmj9195_state::inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_inputport = (data ^ 0xff);
 }
@@ -67,7 +67,7 @@ int nbmj9195_state::dipsw_r()
 	return (((ioport("DSWA")->read() & 0xff) | ((ioport("DSWB")->read() & 0xff) << 8)) >> m_dipswbitsel) & 0x01;
 }
 
-WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
+void nbmj9195_state::dipswbitsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data & 0xc0)
 	{
@@ -86,12 +86,12 @@ WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::mscoutm_inputportsel_w)
+void nbmj9195_state::mscoutm_inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mscoutm_inputport = (data ^ 0x1f);
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
+uint8_t nbmj9195_state::mscoutm_dipsw_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// DIPSW A
 	return (((ioport("DSWA")->read() & 0x01) << 7) | ((ioport("DSWA")->read() & 0x02) << 5) |
@@ -100,7 +100,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
 			((ioport("DSWA")->read() & 0x40) >> 5) | ((ioport("DSWA")->read() & 0x80) >> 7));
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
+uint8_t nbmj9195_state::mscoutm_dipsw_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// DIPSW B
 	return (((ioport("DSWB")->read() & 0x01) << 7) | ((ioport("DSWB")->read() & 0x02) << 5) |
@@ -112,7 +112,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_1_r)
 
 /* TMPZ84C011 PIO emulation */
 
-READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
+uint8_t nbmj9195_state::mscoutm_cpu_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// PLAYER1 KEY, DIPSW A/B
 	switch (m_mscoutm_inputport)
@@ -133,7 +133,7 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portb_r)
 	}
 }
 
-READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
+uint8_t nbmj9195_state::mscoutm_cpu_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// PLAYER2 KEY
 	switch (m_mscoutm_inputport)
@@ -156,13 +156,13 @@ READ8_MEMBER(nbmj9195_state::mscoutm_cpu_portc_r)
 
 // other games
 
-READ8_MEMBER(nbmj9195_state::others_cpu_porta_r)
+uint8_t nbmj9195_state::others_cpu_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// COIN IN, ETC...
 	return ((ioport("SYSTEM")->read() & 0xfe) | m_outcoin_flag);
 }
 
-READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
+uint8_t nbmj9195_state::others_cpu_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// PLAYER1 KEY, DIPSW A/B
 	switch (m_inputport)
@@ -182,7 +182,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portb_r)
 	}
 }
 
-READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
+uint8_t nbmj9195_state::others_cpu_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// PLAYER2 KEY
 	switch (m_inputport)
@@ -202,7 +202,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 	}
 }
 
-WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
+void nbmj9195_state::soundcpu_porte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
 }

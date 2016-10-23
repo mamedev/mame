@@ -73,13 +73,13 @@
 
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
-READ8_MEMBER(polygonet_state::polygonet_inputs_r)
+uint8_t polygonet_state::polygonet_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_inputs[offset]->read();
 }
 
 
-WRITE8_MEMBER(polygonet_state::polygonet_sys_w)
+void polygonet_state::polygonet_sys_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -133,7 +133,7 @@ INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 }
 
 /* sound CPU communications */
-READ8_MEMBER(polygonet_state::sound_comms_r)
+uint8_t polygonet_state::sound_comms_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -151,7 +151,7 @@ READ8_MEMBER(polygonet_state::sound_comms_r)
 	return 0;
 }
 
-WRITE8_MEMBER(polygonet_state::sound_comms_w)
+void polygonet_state::sound_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -184,14 +184,14 @@ WRITE8_MEMBER(polygonet_state::sound_comms_w)
 	}
 }
 
-WRITE32_MEMBER(polygonet_state::sound_irq_w)
+void polygonet_state::sound_irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Auto-acknowledged interrupt
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* DSP communications */
-READ32_MEMBER(polygonet_state::dsp_host_interface_r)
+uint32_t polygonet_state::dsp_host_interface_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t value;
 	uint8_t hi_addr = offset << 1;
@@ -209,7 +209,7 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 	return value;
 }
 
-WRITE32_MEMBER(polygonet_state::shared_ram_write)
+void polygonet_state::shared_ram_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_shared_ram[offset]);
 
@@ -248,7 +248,7 @@ WRITE32_MEMBER(polygonet_state::shared_ram_write)
 	}
 }
 
-WRITE32_MEMBER(polygonet_state::dsp_w_lines)
+void polygonet_state::dsp_w_lines(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("2w %08x %08x %08x\n", offset, mem_mask, data);
 
@@ -267,7 +267,7 @@ WRITE32_MEMBER(polygonet_state::dsp_w_lines)
 	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
 }
 
-WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
+void polygonet_state::dsp_host_interface_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t hi_data = 0x00;
 	uint8_t hi_addr = offset << 1;
@@ -283,7 +283,7 @@ WRITE32_MEMBER(polygonet_state::dsp_host_interface_w)
 }
 
 
-READ32_MEMBER(polygonet_state::network_r)
+uint32_t polygonet_state::network_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x08000000;
 }
@@ -294,7 +294,7 @@ READ32_MEMBER(polygonet_state::network_r)
 /**********************************************************************************/
 
 /* It's believed this is hard-wired to return (at least) bit 15 as 0 - causes a host interface bootup */
-READ16_MEMBER(polygonet_state::dsp56k_bootload_r)
+uint16_t polygonet_state::dsp56k_bootload_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x7fff;
 }
@@ -353,7 +353,7 @@ static uint8_t dsp56k_bank_num(device_t* cpu, uint8_t bank_group)
 
 
 /* BANK HANDLERS */
-READ16_MEMBER(polygonet_state::dsp56k_ram_bank00_read)
+uint16_t polygonet_state::dsp56k_ram_bank00_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -362,7 +362,7 @@ READ16_MEMBER(polygonet_state::dsp56k_ram_bank00_read)
 	return m_dsp56k_bank00_ram[driver_bank_offset + offset];
 }
 
-WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank00_write)
+void polygonet_state::dsp56k_ram_bank00_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -372,7 +372,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank00_write)
 }
 
 
-READ16_MEMBER(polygonet_state::dsp56k_ram_bank01_read)
+uint16_t polygonet_state::dsp56k_ram_bank01_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -381,7 +381,7 @@ READ16_MEMBER(polygonet_state::dsp56k_ram_bank01_read)
 	return m_dsp56k_bank01_ram[driver_bank_offset + offset];
 }
 
-WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank01_write)
+void polygonet_state::dsp56k_ram_bank01_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -394,7 +394,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank01_write)
 }
 
 
-READ16_MEMBER(polygonet_state::dsp56k_ram_bank02_read)
+uint16_t polygonet_state::dsp56k_ram_bank02_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -403,7 +403,7 @@ READ16_MEMBER(polygonet_state::dsp56k_ram_bank02_read)
 	return m_dsp56k_bank02_ram[driver_bank_offset + offset];
 }
 
-WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank02_write)
+void polygonet_state::dsp56k_ram_bank02_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -413,7 +413,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank02_write)
 }
 
 
-READ16_MEMBER(polygonet_state::dsp56k_shared_ram_read)
+uint16_t polygonet_state::dsp56k_shared_ram_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -422,7 +422,7 @@ READ16_MEMBER(polygonet_state::dsp56k_shared_ram_read)
 	return m_dsp56k_shared_ram_16[driver_bank_offset + offset];
 }
 
-WRITE16_MEMBER(polygonet_state::dsp56k_shared_ram_write)
+void polygonet_state::dsp56k_shared_ram_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -441,7 +441,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_shared_ram_write)
 }
 
 
-READ16_MEMBER(polygonet_state::dsp56k_ram_bank04_read)
+uint16_t polygonet_state::dsp56k_ram_bank04_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -450,7 +450,7 @@ READ16_MEMBER(polygonet_state::dsp56k_ram_bank04_read)
 	return m_dsp56k_bank04_ram[driver_bank_offset + offset];
 }
 
-WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
+void polygonet_state::dsp56k_ram_bank04_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t en_group = dsp56k_bank_group(&space.device());
 	uint8_t bank_num = dsp56k_bank_num(&space.device(), en_group);
@@ -505,7 +505,7 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 
-WRITE8_MEMBER(polygonet_state::sound_ctrl_w)
+void polygonet_state::sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... .xxx - Sound bank
 	// ...x .... - NMI clear (clocked?)

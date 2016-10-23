@@ -37,8 +37,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( tx_w );
-	DECLARE_READ8_MEMBER( rx_r );
+	void tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:

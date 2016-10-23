@@ -80,13 +80,13 @@ public:
 	uint32_t m_adpcm_pos[2];
 	uint8_t m_adpcm_data[2];
 	uint8_t m_adpcm_sel[2];
-	DECLARE_WRITE8_MEMBER(kungfur_output_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch1_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch2_w);
-	DECLARE_WRITE8_MEMBER(kungfur_latch3_w);
-	DECLARE_WRITE8_MEMBER(kungfur_control_w);
-	DECLARE_WRITE8_MEMBER(kungfur_adpcm1_w);
-	DECLARE_WRITE8_MEMBER(kungfur_adpcm2_w);
+	void kungfur_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_latch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_adpcm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
@@ -111,7 +111,7 @@ INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(kungfur_state::kungfur_output_w)
+void kungfur_state::kungfur_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d2: output led7seg
 	static const int lut_digits[24] =
@@ -146,23 +146,23 @@ WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 
 
 // lamp output latches
-WRITE8_MEMBER(kungfur_state::kungfur_latch1_w)
+void kungfur_state::kungfur_latch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[0] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_latch2_w)
+void kungfur_state::kungfur_latch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[1] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_latch3_w)
+void kungfur_state::kungfur_latch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[2] = data;
 }
 
 
-WRITE8_MEMBER(kungfur_state::kungfur_control_w)
+void kungfur_state::kungfur_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: N/C
 	// d4: irq ack
@@ -188,12 +188,12 @@ WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 }
 
 // adpcm latches
-WRITE8_MEMBER(kungfur_state::kungfur_adpcm1_w)
+void kungfur_state::kungfur_adpcm1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data[0] = data;
 }
 
-WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
+void kungfur_state::kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data[1] = data;
 }

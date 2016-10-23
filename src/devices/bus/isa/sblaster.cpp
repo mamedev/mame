@@ -127,7 +127,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_MIDI_PORT_ADD("mdout", midiout_slot, "midiout")
 MACHINE_CONFIG_END
 
-READ8_MEMBER( sb8_device::ym3812_16_r )
+uint8_t sb8_device::ym3812_16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0xff;
 	switch(offset)
@@ -137,7 +137,7 @@ READ8_MEMBER( sb8_device::ym3812_16_r )
 	return retVal;
 }
 
-WRITE8_MEMBER( sb8_device::ym3812_16_w )
+void sb8_device::ym3812_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -146,12 +146,12 @@ WRITE8_MEMBER( sb8_device::ym3812_16_w )
 	}
 }
 
-READ8_MEMBER( isa8_sblaster1_0_device::saa1099_16_r )
+uint8_t isa8_sblaster1_0_device::saa1099_16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_1_16_w )
+void isa8_sblaster1_0_device::saa1099_1_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -160,7 +160,7 @@ WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_1_16_w )
 	}
 }
 
-WRITE8_MEMBER( isa8_sblaster1_0_device::saa1099_2_16_w )
+void isa8_sblaster1_0_device::saa1099_2_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -222,7 +222,7 @@ uint8_t sb_device::dequeue_r()
 }
 
 
-READ8_MEMBER( sb_device::dsp_reset_r )
+uint8_t sb_device::dsp_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("read DSP reset @ %x\n", offset);
 	if(offset)
@@ -231,7 +231,7 @@ READ8_MEMBER( sb_device::dsp_reset_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sb_device::dsp_reset_w )
+void sb_device::dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("%02x to DSP reset @ %x\n", data, offset);
 	if(offset)
@@ -277,7 +277,7 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	//printf("%02x\n",data);
 }
 
-READ8_MEMBER( sb_device::dsp_data_r )
+uint8_t sb_device::dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("read DSP data @ %x\n", offset);
 	if(offset)
@@ -302,7 +302,7 @@ READ8_MEMBER( sb_device::dsp_data_r )
 	return dequeue_r();
 }
 
-WRITE8_MEMBER( sb_device::dsp_data_w )
+void sb_device::dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("%02x to DSP data @ %x\n", data, offset);
 	if(offset)
@@ -310,7 +310,7 @@ WRITE8_MEMBER( sb_device::dsp_data_w )
 	logerror("Soundblaster DSP data port undocumented write\n");
 }
 
-READ8_MEMBER(sb_device::dsp_rbuf_status_r)
+uint8_t sb_device::dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("read Rbufstat @ %x\n", offset);
 
@@ -339,7 +339,7 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 	return m_dsp.rbuf_status;
 }
 
-READ8_MEMBER(sb_device::dsp_wbuf_status_r)
+uint8_t sb_device::dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("read Wbufstat @ %x\n", offset);
 
@@ -361,7 +361,7 @@ READ8_MEMBER(sb_device::dsp_wbuf_status_r)
 	return m_dsp.wbuf_status;
 }
 
-WRITE8_MEMBER(sb_device::dsp_rbuf_status_w)
+void sb_device::dsp_rbuf_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("%02x to Rbufstat @ %x\n", data, offset);
 	if(offset)
@@ -693,7 +693,7 @@ void sb_device::process_fifo(uint8_t cmd)
 	}
 }
 
-WRITE8_MEMBER(sb_device::dsp_cmd_w)
+void sb_device::dsp_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to DSP command @ %x\n", data, offset);
 
@@ -763,7 +763,7 @@ void sb_device::adpcm_decode(uint8_t sample, int size)
 	m_rdac->write(m_dsp.adpcm_ref << 8);
 }
 
-READ8_MEMBER( sb16_device::mpu401_r )
+uint8_t sb16_device::mpu401_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -797,7 +797,7 @@ READ8_MEMBER( sb16_device::mpu401_r )
 	return res;
 }
 
-WRITE8_MEMBER( sb16_device::mpu401_w )
+void sb16_device::mpu401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0) // data
 	{
@@ -877,14 +877,14 @@ void sb16_device::mixer_reset()
 	mixer_set();
 }
 
-READ8_MEMBER( sb16_device::mixer_r )
+uint8_t sb16_device::mixer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 0)
 		return m_mixer.status;
 	return m_mixer.data;
 }
 
-WRITE8_MEMBER( sb16_device::mixer_w )
+void sb16_device::mixer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{

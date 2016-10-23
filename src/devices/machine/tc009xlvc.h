@@ -22,25 +22,25 @@ public:
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
 
-	DECLARE_READ8_MEMBER( vregs_r );
-	DECLARE_WRITE8_MEMBER( vregs_w );
+	uint8_t vregs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( tc0091lvc_paletteram_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_paletteram_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_bitmap_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_bitmap_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_pcg1_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_pcg1_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_pcg2_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_pcg2_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_vram0_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_vram0_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_vram1_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_vram1_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_spr_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_spr_w );
-	DECLARE_READ8_MEMBER( tc0091lvc_tvram_r );
-	DECLARE_WRITE8_MEMBER( tc0091lvc_tvram_w );
+	uint8_t tc0091lvc_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_pcg1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_pcg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_pcg2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_pcg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_vram0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_vram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_vram1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_spr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_spr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tc0091lvc_tvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc0091lvc_tvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);

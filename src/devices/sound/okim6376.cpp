@@ -527,7 +527,7 @@ WRITE_LINE_MEMBER( okim6376_device::st_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( okim6376_device::write )
+void okim6376_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// The data port is purely used to set the latch, everything else is started by an ST pulse
 

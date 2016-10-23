@@ -23,11 +23,11 @@ public:
 	{ }
 
 	// in drivers/zerozone.c
-	DECLARE_WRITE16_MEMBER(sound_w);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// in video/zerozone.c
-	DECLARE_WRITE16_MEMBER(tilemap_w);
-	DECLARE_WRITE16_MEMBER(tilebank_w);
+	void tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// devices
 	required_device<cpu_device> m_maincpu;

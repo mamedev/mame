@@ -296,7 +296,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE16_MEMBER(md_boot_state::aladmdb_w )
+void md_boot_state::aladmdb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	Values returned from the log file :
@@ -308,7 +308,7 @@ WRITE16_MEMBER(md_boot_state::aladmdb_w )
 	logerror("aladmdb_w : %06x - data = %04x\n",space.device().safe_pc(),data);
 }
 
-READ16_MEMBER(md_boot_state::aladmdb_r )
+uint16_t md_boot_state::aladmdb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (space.device().safe_pc()==0x1b2a56)
 	{
@@ -328,31 +328,31 @@ READ16_MEMBER(md_boot_state::aladmdb_r )
 	return 0x0000;
 }
 
-READ16_MEMBER(md_boot_state::mk3mdb_dsw_r )
+uint16_t md_boot_state::mk3mdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::ssf2mdb_dsw_r )
+uint16_t md_boot_state::ssf2mdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::srmdb_dsw_r )
+uint16_t md_boot_state::srmdb_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(md_boot_state::topshoot_200051_r )
+uint16_t md_boot_state::topshoot_200051_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return -0x5b;
 }
 
 // jzth protection
-WRITE16_MEMBER(md_boot_state::bl_710000_w)
+void md_boot_state::bl_710000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -407,7 +407,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 }
 
 
-READ16_MEMBER(md_boot_state::bl_710000_r)
+uint16_t md_boot_state::bl_710000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 	int pc = space.device().safe_pc();

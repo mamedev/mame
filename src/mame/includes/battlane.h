@@ -34,14 +34,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
-	DECLARE_WRITE8_MEMBER(battlane_palette_w);
-	DECLARE_WRITE8_MEMBER(battlane_scrollx_w);
-	DECLARE_WRITE8_MEMBER(battlane_scrolly_w);
-	DECLARE_WRITE8_MEMBER(battlane_tileram_w);
-	DECLARE_WRITE8_MEMBER(battlane_spriteram_w);
-	DECLARE_WRITE8_MEMBER(battlane_bitmap_w);
-	DECLARE_WRITE8_MEMBER(battlane_video_ctrl_w);
+	void battlane_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlane_video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILEMAP_MAPPER_MEMBER(battlane_tilemap_scan_rows_2x2);
 	virtual void machine_start() override;

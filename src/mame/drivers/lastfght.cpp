@@ -108,24 +108,24 @@ public:
 
 	/* memory */
 	uint8_t   m_colorram[256 * 3];
-	DECLARE_WRITE16_MEMBER(colordac_w);
-	DECLARE_WRITE16_MEMBER(lastfght_hi_w);
-	DECLARE_WRITE16_MEMBER(lastfght_x_w);
-	DECLARE_WRITE16_MEMBER(lastfght_yw_w);
-	DECLARE_WRITE16_MEMBER(lastfght_h_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sx_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sy_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sr_w);
-	DECLARE_WRITE16_MEMBER(lastfght_sd_w);
-	DECLARE_WRITE16_MEMBER(lastfght_blit_w);
-	DECLARE_WRITE16_MEMBER(lastfght_dest_w);
-	DECLARE_READ16_MEMBER(lastfght_c00000_r);
-	DECLARE_READ16_MEMBER(lastfght_c00002_r);
-	DECLARE_READ16_MEMBER(lastfght_c00004_r);
-	DECLARE_READ16_MEMBER(lastfght_c00006_r);
-	DECLARE_WRITE16_MEMBER(lastfght_c00006_w);
-	DECLARE_READ16_MEMBER(lastfght_sound_r);
-	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
+	void colordac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_yw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_h_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_sx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_sy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_sr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_sd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_blit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastfght_dest_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lastfght_c00000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t lastfght_c00002_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t lastfght_c00004_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t lastfght_c00006_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lastfght_c00006_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lastfght_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lastfght_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_lastfght();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -191,7 +191,7 @@ uint32_t lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_in
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-WRITE16_MEMBER(lastfght_state::colordac_w)
+void lastfght_state::colordac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(lastfght_state::colordac_w)
 //  Blitter (supports zooming)
 
 // high byte of a 16 bit register
-WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
+void lastfght_state::lastfght_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 600000.b = %02x\n", space.device().safe_pc(), data >> 8);
@@ -224,7 +224,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
 }
 
 // screen x
-WRITE16_MEMBER(lastfght_state::lastfght_x_w)
+void lastfght_state::lastfght_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 800008.b = %02x\n", space.device().safe_pc(), data >> 8);
@@ -236,7 +236,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_x_w)
 }
 
 // screen y, screen width - 1
-WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
+void lastfght_state::lastfght_yw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -251,7 +251,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
 }
 
 // screen height - 1
-WRITE16_MEMBER(lastfght_state::lastfght_h_w)
+void lastfght_state::lastfght_h_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -263,7 +263,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_h_w)
 }
 
 // source delta x << 6, source x << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
+void lastfght_state::lastfght_sx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -278,7 +278,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
 }
 
 // source y << 6, source y1 << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
+void lastfght_state::lastfght_sy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -293,7 +293,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
 }
 
 // source rom (0x200000 bytes), source page (512x256 bytes)
-WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
+void lastfght_state::lastfght_sr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -308,7 +308,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
 }
 
 // source x1 << 6, source delta y << 6
-WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
+void lastfght_state::lastfght_sd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -323,7 +323,7 @@ WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
 }
 
 // start blit
-WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
+void lastfght_state::lastfght_blit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -360,13 +360,13 @@ WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 }
 
 // toggle framebuffer
-WRITE16_MEMBER(lastfght_state::lastfght_dest_w)
+void lastfght_state::lastfght_dest_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dest ^= 1;
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00000_r)
+uint16_t lastfght_state::lastfght_c00000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// high byte:
 	// bit 7 = blitter busy
@@ -375,19 +375,19 @@ READ16_MEMBER(lastfght_state::lastfght_c00000_r)
 
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00002_r)
+uint16_t lastfght_state::lastfght_c00002_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// high byte:
 	// mask 0x1c: from sound?
 	return (machine().rand() & 0x1c00) | ioport("IN0")->read();
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00004_r)
+uint16_t lastfght_state::lastfght_c00004_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN1")->read();
 }
 
-READ16_MEMBER(lastfght_state::lastfght_c00006_r)
+uint16_t lastfght_state::lastfght_c00006_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// low byte:
 	// bit 7 = protection?
@@ -395,20 +395,20 @@ READ16_MEMBER(lastfght_state::lastfght_c00006_r)
 	return ioport("IN2")->read();
 }
 
-WRITE16_MEMBER(lastfght_state::lastfght_c00006_w)
+void lastfght_state::lastfght_c00006_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c00006);
 	//  popmessage("%04x", m_c00006);
 }
 
-READ16_MEMBER(lastfght_state::lastfght_sound_r)
+uint16_t lastfght_state::lastfght_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// low byte:
 	// bit 3
 	return 8;
 }
 
-WRITE16_MEMBER(lastfght_state::lastfght_sound_w)
+void lastfght_state::lastfght_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: sound_w msb = %02x\n", space.device().safe_pc(), data >> 8);

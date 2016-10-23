@@ -80,7 +80,7 @@ void sms_expansion_slot_device::device_start()
 // read
 //-------------------------------------------------
 
-READ8_MEMBER(sms_expansion_slot_device::read)
+uint8_t sms_expansion_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_device)
 		return m_device->read(space, offset);
@@ -88,7 +88,7 @@ READ8_MEMBER(sms_expansion_slot_device::read)
 		return 0xff;
 }
 
-READ8_MEMBER(sms_expansion_slot_device::read_ram)
+uint8_t sms_expansion_slot_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_device)
 		return m_device->read_ram(space, offset);
@@ -109,19 +109,19 @@ int sms_expansion_slot_device::get_lphaser_xoffs()
 // write
 //-------------------------------------------------
 
-WRITE8_MEMBER(sms_expansion_slot_device::write_mapper)
+void sms_expansion_slot_device::write_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_device)
 		m_device->write_mapper(space, offset, data);
 }
 
-WRITE8_MEMBER(sms_expansion_slot_device::write)
+void sms_expansion_slot_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_device)
 		m_device->write(space, offset, data);
 }
 
-WRITE8_MEMBER(sms_expansion_slot_device::write_ram)
+void sms_expansion_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_device)
 		m_device->write_ram(space, offset, data);

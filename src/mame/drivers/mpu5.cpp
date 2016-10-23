@@ -220,16 +220,16 @@ public:
 	uint8_t m_pic_output_bit;
 	uint8_t m_input_strobe;
 
-	DECLARE_READ32_MEMBER(mpu5_mem_r);
-	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
+	uint32_t mpu5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mpu5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(asic_r32);
-	DECLARE_READ8_MEMBER(asic_r8);
-	DECLARE_WRITE32_MEMBER(asic_w32);
-	DECLARE_WRITE8_MEMBER(asic_w8);
+	uint32_t asic_r32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t asic_r8(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void asic_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void asic_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ32_MEMBER(pic_r);
-	DECLARE_WRITE32_MEMBER(pic_w);
+	uint32_t pic_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 
@@ -238,7 +238,7 @@ protected:
 	virtual void machine_start() override;
 };
 
-READ8_MEMBER(mpu5_state::asic_r8)
+uint8_t mpu5_state::asic_r8(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -267,7 +267,7 @@ READ8_MEMBER(mpu5_state::asic_r8)
 }
 
 
-READ32_MEMBER(mpu5_state::asic_r32)
+uint32_t mpu5_state::asic_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retdata = 0;
 	if (ACCESSING_BITS_24_31) retdata |= asic_r8(space,(offset*4)+0) <<24;
@@ -277,7 +277,7 @@ READ32_MEMBER(mpu5_state::asic_r32)
 	return retdata;
 }
 
-READ32_MEMBER(mpu5_state::mpu5_mem_r)
+uint32_t mpu5_state::mpu5_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;
@@ -330,7 +330,7 @@ READ32_MEMBER(mpu5_state::mpu5_mem_r)
 }
 
 // Each board is fitted with an ASIC that does most of the heavy lifting, including sound playback.
-WRITE8_MEMBER(mpu5_state::asic_w8)
+void mpu5_state::asic_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -402,7 +402,7 @@ WRITE8_MEMBER(mpu5_state::asic_w8)
 }
 
 
-WRITE32_MEMBER(mpu5_state::asic_w32)
+void mpu5_state::asic_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31) asic_w8(space,(offset*4)+0, (data>>24)&0xff);
 	if (ACCESSING_BITS_16_23) asic_w8(space,(offset*4)+1, (data>>16)&0xff);
@@ -411,14 +411,14 @@ WRITE32_MEMBER(mpu5_state::asic_w32)
 }
 
 
-READ32_MEMBER(mpu5_state::pic_r)
+uint32_t mpu5_state::pic_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	logerror("%08x maincpu read from PIC - offset %01x\n", pc, offset);
 	return m_pic_output_bit;
 }
 
-WRITE32_MEMBER(mpu5_state::pic_w)
+void mpu5_state::pic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -473,7 +473,7 @@ WRITE32_MEMBER(mpu5_state::pic_w)
 
 }
 
-WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
+void mpu5_state::mpu5_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int addr = offset *4;

@@ -25,11 +25,11 @@ public:
 	required_device<upd7725_device> m_upd7725;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	virtual uint32_t necdsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint16_t necdsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
@@ -52,11 +52,11 @@ public:
 	required_device<upd7725_device> m_upd7725;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	virtual uint32_t necdsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint16_t necdsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;
@@ -77,11 +77,11 @@ public:
 	required_device<upd96050_device> m_upd96050;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
-	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
+	virtual uint32_t setadsp_prg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint16_t setadsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	std::vector<uint32_t> m_dsp_prg;
 	std::vector<uint16_t> m_dsp_data;

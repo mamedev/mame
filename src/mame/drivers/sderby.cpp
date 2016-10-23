@@ -74,7 +74,7 @@
 *       R/W Handlers       *
 ***************************/
 
-READ16_MEMBER(sderby_state::sderby_input_r)
+uint16_t sderby_state::sderby_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -89,7 +89,7 @@ READ16_MEMBER(sderby_state::sderby_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(sderby_state::sderbya_input_r)
+uint16_t sderby_state::sderbya_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -105,7 +105,7 @@ READ16_MEMBER(sderby_state::sderbya_input_r)
 }
 
 
-READ16_MEMBER(sderby_state::roulette_input_r)
+uint16_t sderby_state::roulette_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -142,7 +142,7 @@ READ16_MEMBER(sderby_state::roulette_input_r)
 
 ****************************************************************/
 
-READ16_MEMBER(sderby_state::rprot_r)
+uint16_t sderby_state::rprot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("rprot_r : offset = %02x\n",space.device().safe_pc());
 
@@ -156,7 +156,7 @@ READ16_MEMBER(sderby_state::rprot_r)
 	return machine().rand() & 0x1f;
 }
 
-WRITE16_MEMBER(sderby_state::rprot_w)
+void sderby_state::rprot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("rprot_w %02x\n", data);
 }
@@ -166,7 +166,7 @@ WRITE16_MEMBER(sderby_state::rprot_w)
 *       Outputs / Lamps       *
 ******************************/
 
-WRITE16_MEMBER(sderby_state::sderby_out_w)
+void sderby_state::sderby_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   ---------------------------
@@ -210,7 +210,7 @@ WRITE16_MEMBER(sderby_state::sderby_out_w)
 }
 
 
-WRITE16_MEMBER(sderby_state::scmatto_out_w)
+void sderby_state::scmatto_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   ----------------------------------------
@@ -259,7 +259,7 @@ WRITE16_MEMBER(sderby_state::scmatto_out_w)
 }
 
 
-WRITE16_MEMBER(sderby_state::roulette_out_w)
+void sderby_state::roulette_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   -----------------------------------

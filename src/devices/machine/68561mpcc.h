@@ -40,8 +40,8 @@ public:
 
 	void set_status(int status);
 
-	DECLARE_READ8_MEMBER(reg_r);
-	DECLARE_WRITE8_MEMBER(reg_w);
+	uint8_t reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

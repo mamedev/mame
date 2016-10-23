@@ -98,11 +98,11 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ8_MEMBER(cass_r);
+	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(port07_r);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port06_w);
+	uint8_t port07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
 private:
 	uint8_t m_cass_data;
@@ -115,7 +115,7 @@ private:
 	required_device<cassette_image_device> m_cass;
 };
 
-READ8_MEMBER( dauphin_state::cass_r )
+uint8_t dauphin_state::cass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
@@ -125,18 +125,18 @@ WRITE_LINE_MEMBER( dauphin_state::cass_w )
 	m_cass_state = state; // get flag bit
 }
 
-WRITE8_MEMBER( dauphin_state::port00_w )
+void dauphin_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(offset, data);
 }
 
-WRITE8_MEMBER( dauphin_state::port06_w )
+void dauphin_state::port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker_state ^=1;
 	m_speaker->level_w(m_speaker_state);
 }
 
-READ8_MEMBER( dauphin_state::port07_r )
+uint8_t dauphin_state::port07_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t keyin, i, data = 0x40;
 

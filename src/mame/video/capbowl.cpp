@@ -17,7 +17,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::tms34061_w)
+void capbowl_state::tms34061_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
@@ -32,7 +32,7 @@ WRITE8_MEMBER(capbowl_state::tms34061_w)
 }
 
 
-READ8_MEMBER(capbowl_state::tms34061_r)
+uint8_t capbowl_state::tms34061_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int func = (offset >> 8) & 3;
 	int col = offset & 0xff;
@@ -54,7 +54,7 @@ READ8_MEMBER(capbowl_state::tms34061_r)
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
+void capbowl_state::bowlrama_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -77,7 +77,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 }
 
 
-READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
+uint8_t capbowl_state::bowlrama_blitter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = memregion("gfx1")->base()[m_blitter_addr];
 	uint8_t result = 0;

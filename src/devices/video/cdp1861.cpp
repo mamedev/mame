@@ -193,7 +193,7 @@ void cdp1861_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1861_device::dma_w )
+void cdp1861_device::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();

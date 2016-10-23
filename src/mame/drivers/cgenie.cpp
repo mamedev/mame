@@ -56,14 +56,14 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// 4-bit color ram
-	DECLARE_READ8_MEMBER(colorram_r);
-	DECLARE_WRITE8_MEMBER(colorram_w);
+	uint8_t colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// control port
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(control_r);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
 
 	DECLARE_WRITE_LINE_MEMBER(rs232_rx_w);
@@ -217,7 +217,7 @@ INPUT_PORTS_END
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::keyboard_r )
+uint8_t cgenie_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -238,7 +238,7 @@ INPUT_CHANGED_MEMBER( cgenie_state::rst_callback )
 //  CONTROL PORT & RS232
 //**************************************************************************
 
-WRITE8_MEMBER( cgenie_state::control_w )
+void cgenie_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// cassette output
 	m_cassette->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -258,7 +258,7 @@ WRITE8_MEMBER( cgenie_state::control_w )
 	m_control = data;
 }
 
-READ8_MEMBER( cgenie_state::control_r )
+uint8_t cgenie_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -309,12 +309,12 @@ void cgenie_state::machine_start()
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( cgenie_state::colorram_r )
+uint8_t cgenie_state::colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_color_ram[offset] | 0xf0;
 }
 
-WRITE8_MEMBER( cgenie_state::colorram_w )
+void cgenie_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color_ram[offset] = data & 0x0f;
 }

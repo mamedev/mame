@@ -75,7 +75,7 @@ void decocomn_device::device_reset()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
+void decocomn_device::nonbuffered_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 
@@ -89,14 +89,14 @@ WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
 	m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER( decocomn_device::buffered_palette_w )
+void decocomn_device::buffered_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
 	m_dirty_palette[offset / 2] = 1;
 }
 
-WRITE16_MEMBER( decocomn_device::palette_dma_w )
+void decocomn_device::palette_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	const int m = m_palette->entries();
 	int r, g, b, i;
@@ -119,17 +119,17 @@ WRITE16_MEMBER( decocomn_device::palette_dma_w )
 /*****************************************************************************************/
 
 /* */
-READ16_MEMBER( decocomn_device::d_71_r )
+uint16_t decocomn_device::d_71_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER( decocomn_device::priority_w )
+void decocomn_device::priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_priority = data;
 }
 
-READ16_MEMBER( decocomn_device::priority_r )
+uint16_t decocomn_device::priority_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_priority;
 }

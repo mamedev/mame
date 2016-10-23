@@ -1696,7 +1696,7 @@ void namcos22_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	}
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
+uint32_t namcos22_state::namcos22s_vics_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = m_vics_control[offset];
 
@@ -1720,7 +1720,7 @@ READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 	return ret;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
+void namcos22_state::namcos22s_vics_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
 }
@@ -1740,20 +1740,20 @@ TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, data & 0x03ff, data >> 12, TILE_FLIPYX((data & 0x0c00) >> 10));
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
+void namcos22_state::namcos22_textram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_bgtilemap->mark_tile_dirty(offset * 2);
 	m_bgtilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
+void namcos22_state::namcos22_cgram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cgram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset/32);
 }
 
-READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
+uint32_t namcos22_state::namcos22_tilemapattr_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1780,7 +1780,7 @@ READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 	return m_tilemapattr[offset];
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
+void namcos22_state::namcos22_tilemapattr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	0.hiword    R/W     x offset
@@ -1827,7 +1827,7 @@ low byte of each word:
 
 */
 
-READ32_MEMBER(namcos22_state::namcos22s_spotram_r)
+uint32_t namcos22_state::namcos22s_spotram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -1841,7 +1841,7 @@ READ32_MEMBER(namcos22_state::namcos22s_spotram_r)
 	return 0;
 }
 
-WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
+void namcos22_state::namcos22s_spotram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -2044,7 +2044,7 @@ void namcos22_state::draw_text_layer(screen_device &screen, bitmap_rgb32 &bitmap
 
 /*********************************************************************************************/
 
-WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
+void namcos22_state::namcos22_paletteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	m_dirtypal[offset & (0x7fff/4)] = 1;
@@ -2070,7 +2070,7 @@ void namcos22_state::update_palette()
 }
 
 
-WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
+void namcos22_state::namcos22s_czram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int bank = nthword(m_czattr, 0xa/2) & 3;
 	uint32_t prev = (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];
@@ -2082,7 +2082,7 @@ WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
 	m_cz_was_written[bank] |= (prev ^ data);
 }
 
-READ32_MEMBER(namcos22_state::namcos22s_czram_r)
+uint32_t namcos22_state::namcos22s_czram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int bank = nthword(m_czattr, 0xa/2) & 3;
 	return (m_banked_czram[bank][offset * 2] << 16) | m_banked_czram[bank][offset * 2 + 1];

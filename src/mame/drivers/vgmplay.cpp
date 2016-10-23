@@ -87,12 +87,12 @@ public:
 	virtual uint32_t disasm_max_opcode_bytes() const override;
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	READ8_MEMBER(segapcm_rom_r);
-	READ8_MEMBER(multipcma_rom_r);
-	READ8_MEMBER(multipcmb_rom_r);
-	READ8_MEMBER(k053260_rom_r);
-	READ8_MEMBER(okim6295_rom_r);
-	READ8_MEMBER(c352_rom_r);
+	uint8_t segapcm_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t multipcma_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t multipcmb_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t k053260_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t okim6295_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t c352_rom_r(address_space &space, offs_t offset, uint8_t mem_mask);
 
 private:
 	struct rom_block {
@@ -134,13 +134,13 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER(file_r);
-	DECLARE_READ8_MEMBER(file_size_r);
+	uint8_t file_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t file_size_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
+	void multipcm_bank_lo_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multipcm_bank_hi_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multipcm_bank_lo_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multipcm_bank_hi_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	std::vector<uint8_t> m_file_data;
@@ -868,32 +868,32 @@ uint8_t vgmplay_device::rom_r(int chip, uint8_t type, offs_t offset)
 	return 0;
 }
 
-READ8_MEMBER(vgmplay_device::segapcm_rom_r)
+uint8_t vgmplay_device::segapcm_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(0, 0x80, offset);
 }
 
-READ8_MEMBER(vgmplay_device::multipcma_rom_r)
+uint8_t vgmplay_device::multipcma_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(0, 0x89, offset);
 }
 
-READ8_MEMBER(vgmplay_device::multipcmb_rom_r)
+uint8_t vgmplay_device::multipcmb_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(1, 0x89, offset);
 }
 
-READ8_MEMBER(vgmplay_device::okim6295_rom_r)
+uint8_t vgmplay_device::okim6295_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(0, 0x8b, offset);
 }
 
-READ8_MEMBER(vgmplay_device::k053260_rom_r)
+uint8_t vgmplay_device::k053260_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(0, 0x8e, offset);
 }
 
-READ8_MEMBER(vgmplay_device::c352_rom_r)
+uint8_t vgmplay_device::c352_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rom_r(0, 0x92, offset);
 }
@@ -1157,20 +1157,20 @@ void vgmplay_state::machine_start()
 	}
 }
 
-READ8_MEMBER(vgmplay_state::file_r)
+uint8_t vgmplay_state::file_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset < m_file_data.size())
 		return m_file_data[offset];
 	return 0;
 }
 
-READ8_MEMBER(vgmplay_state::file_size_r)
+uint8_t vgmplay_state::file_size_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t size = m_file_data.size();
 	return size >> (8*offset);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
+void vgmplay_state::multipcm_bank_hi_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff) | (data << 16);
@@ -1178,7 +1178,7 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
+void vgmplay_state::multipcm_bank_lo_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff00) | data;
@@ -1188,7 +1188,7 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
 	m_multipcma->set_bank(m_multipcma_bank_l << 16, m_multipcma_bank_r << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
+void vgmplay_state::multipcm_bank_hi_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff) | (data << 16);
@@ -1196,7 +1196,7 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_b_w)
+void vgmplay_state::multipcm_bank_lo_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff00) | data;

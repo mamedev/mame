@@ -111,13 +111,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_slot_device> m_cart;
-	DECLARE_READ16_MEMBER(video_r);
-	DECLARE_WRITE16_MEMBER(video_w);
-	DECLARE_READ16_MEMBER(audio_r);
-	DECLARE_WRITE16_MEMBER(audio_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(rom_r);
+	uint16_t video_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t audio_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void audio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	required_shared_ptr<uint16_t> m_p_ram;
 	required_shared_ptr<uint16_t> m_p_rowscroll;
 	required_shared_ptr<uint16_t> m_p_palette;
@@ -489,7 +489,7 @@ void vii_state::do_dma(uint32_t len)
 	m_video_regs[0x63] |= 4;
 }
 
-READ16_MEMBER( vii_state::video_r )
+uint16_t vii_state::video_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -508,7 +508,7 @@ READ16_MEMBER( vii_state::video_r )
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER( vii_state::video_w )
+void vii_state::video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -562,7 +562,7 @@ WRITE16_MEMBER( vii_state::video_w )
 	}
 }
 
-READ16_MEMBER( vii_state::audio_r )
+uint16_t vii_state::audio_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -573,7 +573,7 @@ READ16_MEMBER( vii_state::audio_r )
 	return 0;
 }
 
-WRITE16_MEMBER( vii_state::audio_w )
+void vii_state::audio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -659,7 +659,7 @@ void vii_state::spg_do_dma(uint32_t len)
 	m_io_regs[0x102] = 0;
 }
 
-READ16_MEMBER( vii_state::io_r )
+uint16_t vii_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
@@ -730,7 +730,7 @@ READ16_MEMBER( vii_state::io_r )
 	return val;
 }
 
-WRITE16_MEMBER( vii_state::io_w )
+void vii_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
@@ -871,7 +871,7 @@ WRITE16_MEMBER( vii_state::io_w )
 }
 
 /*
-WRITE16_MEMBER( vii_state::rowscroll_w )
+void vii_state::rowscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     switch(offset)
     {
@@ -881,7 +881,7 @@ WRITE16_MEMBER( vii_state::rowscroll_w )
     }
 }
 
-WRITE16_MEMBER( vii_state::spriteram_w )
+void vii_state::spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     switch(offset)
     {

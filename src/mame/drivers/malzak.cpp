@@ -72,12 +72,12 @@
 #include "includes/malzak.h"
 
 
-READ8_MEMBER(malzak_state::fake_VRLE_r)
+uint8_t malzak_state::fake_VRLE_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_s2636_0->read_data(space, 0xcb) & 0x3f) + (m_screen->vblank() ? 0x40 : 0x00);
 }
 
-READ8_MEMBER(malzak_state::s2636_portA_r)
+uint8_t malzak_state::s2636_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
@@ -138,13 +138,13 @@ static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(malzak_state::s2650_data_r)
+uint8_t malzak_state::s2650_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("S2650 data port read");
 	return 0xff;
 }
 
-WRITE8_MEMBER(malzak_state::port40_w)
+void malzak_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  Bit 0 is constantly set high during gameplay
 //  Bit 4 is set high, then low, upon death
@@ -156,19 +156,19 @@ WRITE8_MEMBER(malzak_state::port40_w)
 	membank("bank1")->set_entry((data & 0x40) >> 6);
 }
 
-WRITE8_MEMBER(malzak_state::port60_w)
+void malzak_state::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_malzak_x = data;
 	//  logerror("I/O: port 0x60 write 0x%02x\n", data);
 }
 
-WRITE8_MEMBER(malzak_state::portc0_w)
+void malzak_state::portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_malzak_y = data;
 	//  logerror("I/O: port 0xc0 write 0x%02x\n", data);
 }
 
-READ8_MEMBER(malzak_state::collision_r)
+uint8_t malzak_state::collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// High 4 bits seem to refer to the row affected.
 	if(++m_collision_counter > 15)
@@ -273,7 +273,7 @@ PALETTE_INIT_MEMBER(malzak_state, malzak)
 }
 
 
-READ8_MEMBER(malzak_state::videoram_r)
+uint8_t malzak_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }

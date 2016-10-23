@@ -26,12 +26,12 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_bankselect_w);
-	DECLARE_WRITE8_MEMBER(sound_mute_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(tutankhm_flip_screen_y_w);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tutankhm_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_mute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tutankhm_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tutankhm_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tutankhm_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_tutankhm();
 	void machine_reset_tutankhm();
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -39,7 +39,7 @@ void vt83c461_device::device_start()
 	save_item(NAME(m_config_register_num));
 }
 
-READ32_MEMBER( vt83c461_device::read_config )
+uint32_t vt83c461_device::read_config(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -73,7 +73,7 @@ READ32_MEMBER( vt83c461_device::read_config )
 	return result;
 }
 
-WRITE32_MEMBER( vt83c461_device::write_config )
+void vt83c461_device::write_config(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf( "vt83c461 write config %04x %08x %04x\n", offset, data, mem_mask );
 

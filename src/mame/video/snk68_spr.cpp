@@ -56,7 +56,7 @@ void snk68_spr_device::device_reset()
 {
 }
 
-READ16_MEMBER(snk68_spr_device::spriteram_r)
+uint16_t snk68_spr_device::spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
@@ -66,7 +66,7 @@ READ16_MEMBER(snk68_spr_device::spriteram_r)
 		return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(snk68_spr_device::spriteram_w)
+void snk68_spr_device::spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = m_spriteram[offset];
 

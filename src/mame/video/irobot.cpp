@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(irobot_state, irobot)
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
+void irobot_state::irobot_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 	int bits,intensity;

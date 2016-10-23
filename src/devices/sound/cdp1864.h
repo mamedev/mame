@@ -126,13 +126,13 @@ public:
 	template<class _gdata> void set_gdata_callback(_gdata gdata) { m_read_gdata.set_callback(gdata); }
 	void set_chrominance_resistors(double r, double b, double g, double bkg) { m_chr_r = r; m_chr_b = b; m_chr_g = g; m_chr_bkg = bkg; }
 
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_READ8_MEMBER( dispoff_r );
+	uint8_t dispon_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dispoff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( step_bgcolor_w );
-	DECLARE_WRITE8_MEMBER( tone_latch_w );
+	void step_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tone_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 	DECLARE_WRITE_LINE_MEMBER( aoe_w );

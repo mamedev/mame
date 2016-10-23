@@ -226,7 +226,7 @@ uint32_t nubus_cb264_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264_device::cb264_w )
+void nubus_cb264_device::cb264_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -248,7 +248,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264_device::cb264_r )
+uint32_t nubus_cb264_device::cb264_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -268,7 +268,7 @@ READ32_MEMBER( nubus_cb264_device::cb264_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
+void nubus_cb264_device::cb264_ramdac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -294,7 +294,7 @@ WRITE32_MEMBER( nubus_cb264_device::cb264_ramdac_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264_device::cb264_ramdac_r )
+uint32_t nubus_cb264_device::cb264_ramdac_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }

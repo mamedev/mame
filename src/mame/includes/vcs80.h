@@ -36,12 +36,12 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( pio_r );
-	DECLARE_WRITE8_MEMBER( pio_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	uint8_t pio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(vcs80_direct_update_handler);
+	offs_t vcs80_direct_update_handler(direct_read_data &direct, offs_t address);
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;

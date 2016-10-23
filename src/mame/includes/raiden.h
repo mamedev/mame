@@ -48,13 +48,13 @@ public:
 	uint8_t m_flipscreen;
 	uint16_t m_raidenb_scroll_ram[6];
 
-	DECLARE_WRITE16_MEMBER(raiden_background_w);
-	DECLARE_WRITE16_MEMBER(raiden_foreground_w);
-	DECLARE_WRITE16_MEMBER(raiden_text_w);
-	DECLARE_WRITE8_MEMBER(raiden_control_w);
-	DECLARE_WRITE8_MEMBER(raidenb_control_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
-	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
+	void raiden_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void raidenb_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void raidenb_layer_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raidenb_layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_raidenu();
 	void init_raidenk();
 	void init_raiden();

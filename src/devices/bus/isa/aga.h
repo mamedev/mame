@@ -49,14 +49,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 
-	DECLARE_READ8_MEMBER( pc_aga_mda_r );
-	DECLARE_WRITE8_MEMBER( pc_aga_mda_w );
-	DECLARE_READ8_MEMBER( pc_aga_cga_r );
-	DECLARE_WRITE8_MEMBER( pc_aga_cga_w );
+	uint8_t pc_aga_mda_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_aga_mda_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc_aga_cga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc_aga_cga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void set_palette_luts(void);
 	void pc_aga_set_mode(AGA_MODE mode);
-	DECLARE_WRITE8_MEMBER( pc_aga_videoram_w );
-	DECLARE_READ8_MEMBER( pc_aga_videoram_r );
+	void pc_aga_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc_aga_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW( aga_update_row );
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );
@@ -116,10 +116,10 @@ public:
 	uint8_t m_portd;
 	uint8_t m_porte;
 
-	DECLARE_READ8_MEMBER( pc200_videoram_r );
-	DECLARE_WRITE8_MEMBER( pc200_videoram_w );
-	DECLARE_WRITE8_MEMBER( pc200_cga_w );
-	DECLARE_READ8_MEMBER( pc200_cga_r );
+	uint8_t pc200_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc200_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc200_cga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc200_cga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // device type definition

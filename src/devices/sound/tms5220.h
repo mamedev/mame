@@ -78,10 +78,10 @@ public:
 	WRITE_LINE_MEMBER( rsq_w );
 	WRITE_LINE_MEMBER( wsq_w );
 
-	DECLARE_WRITE8_MEMBER( combined_rsq_wsq_w ); // this hack is necessary for specific systems such as the TI 99/8 since the 5220c and cd2501ecd do specific things if both lines go active or inactive at slightly different times by separate write_line writes, which causes the chip to incorrectly reset itself on the 99/8, where the writes are supposed to happen simultaneously; /RS is bit 1, /WS is bit 0
+	void combined_rsq_wsq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // this hack is necessary for specific systems such as the TI 99/8 since the 5220c and cd2501ecd do specific things if both lines go active or inactive at slightly different times by separate write_line writes, which causes the chip to incorrectly reset itself on the 99/8, where the writes are supposed to happen simultaneously; /RS is bit 1, /WS is bit 0
 	// Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( status_r );
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	READ_LINE_MEMBER( readyq_r );
 	READ_LINE_MEMBER( intq_r );

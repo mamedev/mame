@@ -29,19 +29,19 @@ public:
 
 	// internal API - stuff that happens on the comm board
 	// MB89374 registers
-	DECLARE_READ8_MEMBER(dlc_reg_r);
-	DECLARE_WRITE8_MEMBER(dlc_reg_w);
+	uint8_t dlc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dlc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// MB89237A registers
-	DECLARE_READ8_MEMBER(dma_reg_r);
-	DECLARE_WRITE8_MEMBER(dma_reg_w);
+	uint8_t dma_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// single bit registers (74LS74)
-	DECLARE_READ8_MEMBER(syn_r);
-	DECLARE_WRITE8_MEMBER(syn_w);
-	DECLARE_READ8_MEMBER(zfg_r);
-	DECLARE_WRITE8_MEMBER(zfg_w);
+	uint8_t syn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void syn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t zfg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zfg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// shared memory 4k
-	DECLARE_READ8_MEMBER(share_r);
-	DECLARE_WRITE8_MEMBER(share_w);
+	uint8_t share_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// public API - stuff that gets called from the model1
 	// shared memory 4k
@@ -50,11 +50,11 @@ public:
 	// - share_w
 	// single bit registers (74LS74)
 	// reads/writes at I/O 0xB01000
-	DECLARE_READ8_MEMBER(cn_r);
-	DECLARE_WRITE8_MEMBER(cn_w);
+	uint8_t cn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// reads/writes at I/O 0xB01002
-	DECLARE_READ8_MEMBER(fg_r);
-	DECLARE_WRITE8_MEMBER(fg_w);
+	uint8_t fg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();

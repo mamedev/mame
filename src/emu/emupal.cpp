@@ -313,35 +313,35 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 //  write - write a byte to the base paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write)
+void palette_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
-WRITE16_MEMBER(palette_device::write)
+void palette_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_paletteram.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
 }
 
-WRITE32_MEMBER(palette_device::write)
+void palette_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_paletteram.write32(offset, data, mem_mask);
 	update_for_write(offset * 4, 4);
 }
 
-READ8_MEMBER(palette_device::read)
+uint8_t palette_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_paletteram.read8(offset);
 }
 
-READ16_MEMBER(palette_device::read)
+uint16_t palette_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_paletteram.read16(offset);
 }
 
-READ32_MEMBER(palette_device::read)
+uint32_t palette_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_paletteram.read32(offset);
 }
@@ -352,14 +352,14 @@ READ32_MEMBER(palette_device::read)
 //  paletteram
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_ext)
+void palette_device::write_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1);
 }
 
 
-WRITE16_MEMBER(palette_device::write_ext)
+void palette_device::write_ext(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_paletteram_ext.write16(offset, data, mem_mask);
 	update_for_write(offset * 2, 2);
@@ -371,7 +371,7 @@ WRITE16_MEMBER(palette_device::write_ext)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_indirect)
+void palette_device::write_indirect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram.write8(offset, data);
 	update_for_write(offset, 1, true);
@@ -383,7 +383,7 @@ WRITE8_MEMBER(palette_device::write_indirect)
 //  paletteram, updating indirect colors
 //-------------------------------------------------
 
-WRITE8_MEMBER(palette_device::write_indirect_ext)
+void palette_device::write_indirect_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram_ext.write8(offset, data);
 	update_for_write(offset, 1, true);

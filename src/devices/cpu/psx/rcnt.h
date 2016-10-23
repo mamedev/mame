@@ -50,8 +50,8 @@ public:
 	template<class _Object> static devcb_base &set_irq1_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq1_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_irq2_handler(device_t &device, _Object object) { return downcast<psxrcnt_device &>(device).m_irq2_handler.set_callback(object); }
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_start() override;

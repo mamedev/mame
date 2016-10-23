@@ -28,8 +28,8 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy;
 
-	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
-	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
+	void ms0515_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ms0515_sys_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_reset() override;
 
@@ -38,7 +38,7 @@ public:
 	int m_blink;
 	DECLARE_PALETTE_INIT(ms0515);
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(ms0515_portc_w);
+	void ms0515_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 	//AM_RANGE(0177770, 0177771) // read/write
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
+void ms0515_state::ms0515_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *ram = m_ram->pointer();
 	membank("bank0")->set_base(ram + 0000000 + BIT(data,0) * 0160000);
@@ -115,7 +115,7 @@ WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 	}
 }
 
-WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
+void ms0515_state::ms0515_sys_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sysreg = data;
 }
@@ -209,7 +209,7 @@ PALETTE_INIT_MEMBER(ms0515_state, ms0515)
 	palette.set_pen_color(15, rgb_t(255, 255, 255));
 }
 
-WRITE8_MEMBER(ms0515_state::ms0515_portc_w)
+void ms0515_state::ms0515_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sysreg = data;
 }

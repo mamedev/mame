@@ -98,19 +98,19 @@ PALETTE_INIT_MEMBER(ladybug_state,ladybug)
 	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_videoram_w)
+void ladybug_state::ladybug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
+void ladybug_state::ladybug_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
+void ladybug_state::ladybug_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{

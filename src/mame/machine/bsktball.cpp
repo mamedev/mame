@@ -12,7 +12,7 @@
 /***************************************************************************
     bsktball_nmion_w
 ***************************************************************************/
-WRITE8_MEMBER(bsktball_state::bsktball_nmion_w)
+void bsktball_state::bsktball_nmion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_on = offset & 0x01;
 }
@@ -36,12 +36,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
     bsktball_ld_w
 ***************************************************************************/
 
-WRITE8_MEMBER(bsktball_state::bsktball_ld1_w)
+void bsktball_state::bsktball_ld1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ld1 = (offset & 0x01);
 }
 
-WRITE8_MEMBER(bsktball_state::bsktball_ld2_w)
+void bsktball_state::bsktball_ld2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ld2 = (offset & 0x01);
 }
@@ -51,7 +51,7 @@ WRITE8_MEMBER(bsktball_state::bsktball_ld2_w)
     bsktball_in0_r
 ***************************************************************************/
 
-READ8_MEMBER(bsktball_state::bsktball_in0_r)
+uint8_t bsktball_state::bsktball_in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int p1_horiz;
 	int p1_vert;
@@ -156,12 +156,12 @@ READ8_MEMBER(bsktball_state::bsktball_in0_r)
 /***************************************************************************
     bsktball_led_w
 ***************************************************************************/
-WRITE8_MEMBER(bsktball_state::bsktball_led1_w)
+void bsktball_state::bsktball_led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset & 0x01);
 }
 
-WRITE8_MEMBER(bsktball_state::bsktball_led2_w)
+void bsktball_state::bsktball_led2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, offset & 0x01);
 }

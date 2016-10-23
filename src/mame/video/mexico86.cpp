@@ -4,7 +4,7 @@
 #include "includes/mexico86.h"
 
 
-WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
+void mexico86_state::mexico86_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");

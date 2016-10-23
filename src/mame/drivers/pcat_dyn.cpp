@@ -48,10 +48,10 @@ public:
 	required_memory_bank m_prgbank;
 	required_memory_bank m_nvram_bank;
 	std::vector<uint8_t> m_nvram_mem;
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_READ8_MEMBER(audio_r);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 };
@@ -68,7 +68,7 @@ void pcat_dyn_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memcpy(base, memregion("nvram")->base(), size);
 }
 
-READ8_MEMBER(pcat_dyn_state::audio_r)
+uint8_t pcat_dyn_state::audio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -78,12 +78,12 @@ READ8_MEMBER(pcat_dyn_state::audio_r)
 	return 0;
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank1_w)
+void pcat_dyn_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prgbank->set_entry(data);
 }
 
-WRITE8_MEMBER(pcat_dyn_state::bank2_w)
+void pcat_dyn_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_bank->set_entry(data & 1);
 }
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
 ADDRESS_MAP_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( pcat_dyn_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void pcat_dyn_state::dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(1, data); }
 
 static INPUT_PORTS_START( pcat_dyn )
 	// M,N,Numpad 6 -- Hang

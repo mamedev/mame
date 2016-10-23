@@ -289,7 +289,7 @@ void sega315_5124_device::set_frame_timing()
 }
 
 
-READ8_MEMBER( sega315_5124_device::vcount_read )
+uint8_t sega315_5124_device::vcount_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = m_screen->vpos();
@@ -305,7 +305,7 @@ READ8_MEMBER( sega315_5124_device::vcount_read )
 }
 
 
-READ8_MEMBER( sega315_5124_device::hcount_read )
+uint8_t sega315_5124_device::hcount_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hcounter;
 }
@@ -552,7 +552,7 @@ void sega315_5124_device::process_line_timer()
 }
 
 
-READ8_MEMBER( sega315_5124_device::vram_read )
+uint8_t sega315_5124_device::vram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t temp;
 
@@ -625,7 +625,7 @@ void sega315_5124_device::check_pending_flags()
 }
 
 
-READ8_MEMBER( sega315_5124_device::register_read )
+uint8_t sega315_5124_device::register_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t temp;
 
@@ -653,7 +653,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 }
 
 
-WRITE8_MEMBER( sega315_5124_device::vram_write )
+void sega315_5124_device::vram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* SMS 2 & GG behaviour. Seems like the latched data is passed straight through */
 	/* to the address register when in the middle of doing a command.               */
@@ -679,7 +679,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 }
 
 
-WRITE8_MEMBER( sega315_5124_device::register_write )
+void sega315_5124_device::register_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg_num;
 

@@ -51,26 +51,26 @@ public:
 		, m_votrax(*this, "votrax")
 	{}
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE8_MEMBER(port15_w);
-	DECLARE_WRITE8_MEMBER(port16_w);
-	DECLARE_WRITE8_MEMBER(port17_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_READ8_MEMBER(port19_r);
-	DECLARE_WRITE8_MEMBER(port1a_w);
-	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
-	DECLARE_WRITE8_MEMBER(port20_w);
-	DECLARE_READ8_MEMBER(port28_r);
-	DECLARE_READ8_MEMBER(port33_r);
-	DECLARE_WRITE8_MEMBER(port34_w);
-	DECLARE_WRITE8_MEMBER(port35_w);
-	DECLARE_READ8_MEMBER(port36_r);
-	DECLARE_READ8_MEMBER(port37_r);
+	void port15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port19_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port28_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port33_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port35_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port36_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port37_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -85,8 +85,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE8_MEMBER(address_w);
-	DECLARE_WRITE8_MEMBER(register_w);
+	void address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	int m_centronics_busy;

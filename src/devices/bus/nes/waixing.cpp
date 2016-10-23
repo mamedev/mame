@@ -435,7 +435,7 @@ void nes_waixing_a1_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, chr_src);
 }
 
-WRITE8_MEMBER(nes_waixing_a_device::waixing_write)
+void nes_waixing_a_device::waixing_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -454,7 +454,7 @@ WRITE8_MEMBER(nes_waixing_a_device::waixing_write)
 	}
 }
 
-READ8_MEMBER(nes_waixing_a_device::read_l)
+uint8_t nes_waixing_a_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -464,7 +464,7 @@ READ8_MEMBER(nes_waixing_a_device::read_l)
 		return 0xff;
 }
 
-WRITE8_MEMBER(nes_waixing_a_device::write_l)
+void nes_waixing_a_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -599,7 +599,7 @@ void nes_waixing_f_device::set_prg( int prg_base, int prg_mask )
 	prg_cb(3, m_mmc_prg_bank[3]);
 }
 
-WRITE8_MEMBER(nes_waixing_f_device::write_h)
+void nes_waixing_f_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd;
 	LOG_MMC(("waixing_f write_h, offset: %04x, data: %02x\n", offset, data));
@@ -670,7 +670,7 @@ void nes_waixing_g_device::set_chr(uint8_t chr, int chr_base, int chr_mask)
 	chr_cb(chr_page ^ 7, chr_base | (m_mmc_vrom_bank[5] & chr_mask), chr);
 }
 
-WRITE8_MEMBER(nes_waixing_g_device::write_h)
+void nes_waixing_g_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd;
 	LOG_MMC(("waixing_g write_h, offset: %04x, data: %02x\n", offset, data));
@@ -733,7 +733,7 @@ void nes_waixing_h_device::chr_cb(int start, int bank, int source)
 		chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_waixing_h_device::write_h)
+void nes_waixing_h_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd;
 	LOG_MMC(("waixing_h write_h, offset: %04x, data: %02x\n", offset, data));
@@ -774,7 +774,7 @@ WRITE8_MEMBER(nes_waixing_h_device::write_h)
 	}
 }
 
-WRITE8_MEMBER(nes_waixing_h1_device::write_h)
+void nes_waixing_h1_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd;
 	LOG_MMC(("waixing_h1 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -834,7 +834,7 @@ void nes_waixing_j_device::set_prg( int prg_base, int prg_mask )
 	prg_cb(3, m_reg[3]);
 }
 
-WRITE8_MEMBER(nes_waixing_j_device::write_h)
+void nes_waixing_j_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd;
 	LOG_MMC(("waixing_f write_h, offset: %04x, data: %02x\n", offset, data));
@@ -889,7 +889,7 @@ void nes_waixing_sh2_device::chr_cb(int start, int bank, int source)
 	chr4_4(m_reg[1], m_reg[1] ? CHRRAM : CHRROM);
 }
 
-READ8_MEMBER(nes_waixing_sh2_device::chr_r)
+uint8_t nes_waixing_sh2_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 	uint8_t val = m_chr_access[bank][offset & 0x3ff]; // this would be usual return value
@@ -942,7 +942,7 @@ void nes_waixing_sec_device::chr_cb(int start, int bank, int source)
 	chr1_x(start, bank, source);
 }
 
-WRITE8_MEMBER(nes_waixing_sec_device::write_l)
+void nes_waixing_sec_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing_sec write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -981,7 +981,7 @@ void nes_waixing_sgz_device::hblank_irq(int scanline, int vblank, int blanked)
 	}
 }
 
-WRITE8_MEMBER(nes_waixing_sgz_device::write_h)
+void nes_waixing_sgz_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t helper, bank;
 	LOG_MMC(("waixing_sgz write_h, offset: %04x, data: %02x\n", offset, data));
@@ -1043,7 +1043,7 @@ WRITE8_MEMBER(nes_waixing_sgz_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_sgzlz_device::write_l)
+void nes_waixing_sgzlz_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing_sgzlz write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -1075,7 +1075,7 @@ WRITE8_MEMBER(nes_waixing_sgzlz_device::write_l)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_ffv_device::write_l)
+void nes_waixing_ffv_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t helper;
 	LOG_MMC(("waixing_ffv write_l, offset: %04x, data: %02x\n", offset, data));
@@ -1124,7 +1124,7 @@ WRITE8_MEMBER(nes_waixing_ffv_device::write_l)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_wxzs_device::write_h)
+void nes_waixing_wxzs_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing_zs write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1154,7 +1154,7 @@ WRITE8_MEMBER(nes_waixing_wxzs_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_dq8_device::write_h)
+void nes_waixing_dq8_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("waixing_dq8 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -1175,7 +1175,7 @@ WRITE8_MEMBER(nes_waixing_dq8_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_wxzs2_device::write_h)
+void nes_waixing_wxzs2_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t flip = (data & 0x80) >> 7;
 	uint8_t helper = (data & 0x7f) << 1;
@@ -1228,7 +1228,7 @@ WRITE8_MEMBER(nes_waixing_wxzs2_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_waixing_fs304_device::write_l)
+void nes_waixing_fs304_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("fs304 write_l, offset: %04x, data: %02x\n", offset, data));
 	int bank;

@@ -20,8 +20,8 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 // ======================> sns_rom_obc1_device
@@ -37,8 +37,8 @@ public:
 	virtual void device_reset() override;
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	int m_address;
 	int m_offset;
@@ -61,8 +61,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;    // protection device
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // protection device
 	uint8_t m_latch;
 };
 
@@ -79,8 +79,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;    // protection device
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // protection device
 
 	void update_prot(uint32_t offset);
 
@@ -98,7 +98,7 @@ public:
 	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;    // protection device
 };
 
 // ======================> sns_rom_mcpirate1_device
@@ -114,9 +114,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // bankswitch device
 	uint8_t m_base_bank;
 };
 
@@ -133,9 +133,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // bankswitch device
 	uint8_t m_base_bank;
 };
 
@@ -151,9 +151,9 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // bankswitch device
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // bankswitch device
 	uint8_t m_base_bank;
 };
 
@@ -170,8 +170,8 @@ public:
 //  virtual void device_reset();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;    // protection device
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // protection device
 	uint8_t m_latch[16];
 };
 
@@ -188,8 +188,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(chip_read) override;    // protection device
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;  // protection device
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;    // protection device
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;  // protection device
 	uint8_t m_latch[0x800];
 };
 

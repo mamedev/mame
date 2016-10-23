@@ -145,8 +145,8 @@ public:
 
 	uint8_t m_nmi_en;
 
-	DECLARE_WRITE8_MEMBER(to_sound_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	void to_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(sub);
@@ -264,13 +264,13 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(sub_state::to_sound_w)
+void sub_state::to_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(sub_state::nmi_mask_w)
+void sub_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_en = data & 1;
 }

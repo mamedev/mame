@@ -31,18 +31,18 @@ public:
 	uint8_t m_security_bits;
 	uint16_t *m_umk3_palette;
 
-	DECLARE_WRITE16_MEMBER(midwunit_cmos_enable_w);
-	DECLARE_WRITE16_MEMBER(midwunit_cmos_w);
-	DECLARE_READ16_MEMBER(midwunit_cmos_r);
-	DECLARE_WRITE16_MEMBER(midwunit_io_w);
-	DECLARE_READ16_MEMBER(midwunit_io_r);
-	DECLARE_READ16_MEMBER(midwunit_security_r);
-	DECLARE_WRITE16_MEMBER(midwunit_security_w);
-	DECLARE_READ16_MEMBER(midwunit_sound_r);
-	DECLARE_READ16_MEMBER(midwunit_sound_state_r);
-	DECLARE_WRITE16_MEMBER(midwunit_sound_w);
-	DECLARE_WRITE16_MEMBER(umk3_palette_hack_w);
-	DECLARE_WRITE16_MEMBER(wwfmania_io_0_w);
+	void midwunit_cmos_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void midwunit_cmos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t midwunit_cmos_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void midwunit_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t midwunit_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t midwunit_security_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void midwunit_security_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t midwunit_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t midwunit_sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void midwunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umk3_palette_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wwfmania_io_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_mk3r10();
 	void init_nbahangt();

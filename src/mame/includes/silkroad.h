@@ -34,12 +34,12 @@ public:
 	tilemap_t *m_fg2_tilemap;
 	tilemap_t *m_fg3_tilemap;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
-	DECLARE_WRITE32_MEMBER(silk_coin_counter_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram2_w);
-	DECLARE_WRITE32_MEMBER(silkroad_fgram3_w);
-	DECLARE_WRITE32_MEMBER(silk_6295_bank_w);
+	void paletteram32_xRRRRRGGGGGBBBBB_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void silk_coin_counter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void silkroad_fgram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void silkroad_fgram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void silkroad_fgram3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void silk_6295_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg2_tile_info);

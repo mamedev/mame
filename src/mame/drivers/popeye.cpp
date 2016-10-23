@@ -124,7 +124,7 @@ INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-READ8_MEMBER(popeye_state::protection_r)
+uint8_t popeye_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -137,7 +137,7 @@ READ8_MEMBER(popeye_state::protection_r)
 	}
 }
 
-WRITE8_MEMBER(popeye_state::protection_w)
+void popeye_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -440,7 +440,7 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(popeye_state::popeye_portB_w)
+void popeye_state::popeye_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 flips screen */
 	flip_screen_set(data & 1);

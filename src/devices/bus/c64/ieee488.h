@@ -35,10 +35,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( tpi_pa_r );
-	DECLARE_WRITE8_MEMBER( tpi_pa_w );
-	DECLARE_READ8_MEMBER( tpi_pc_r );
-	DECLARE_WRITE8_MEMBER( tpi_pc_w );
+	uint8_t tpi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tpi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tpi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tpi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

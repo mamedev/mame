@@ -28,12 +28,12 @@ static MACHINE_CONFIG_FRAGMENT( game_blaster_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-READ8_MEMBER( isa8_gblaster_device::saa1099_16_r )
+uint8_t isa8_gblaster_device::saa1099_16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::saa1099_1_16_w )
+void isa8_gblaster_device::saa1099_1_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -42,7 +42,7 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_1_16_w )
 	}
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::saa1099_2_16_w )
+void isa8_gblaster_device::saa1099_2_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -51,7 +51,7 @@ WRITE8_MEMBER( isa8_gblaster_device::saa1099_2_16_w )
 	}
 }
 
-READ8_MEMBER( isa8_gblaster_device::detect_r )
+uint8_t isa8_gblaster_device::detect_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -63,7 +63,7 @@ READ8_MEMBER( isa8_gblaster_device::detect_r )
 	}
 }
 
-WRITE8_MEMBER( isa8_gblaster_device::detect_w )
+void isa8_gblaster_device::detect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

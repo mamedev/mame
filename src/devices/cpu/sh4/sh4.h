@@ -716,11 +716,11 @@ public:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness);
 
-	DECLARE_WRITE32_MEMBER( sh3_internal_w );
-	DECLARE_READ32_MEMBER( sh3_internal_r );
+	void sh3_internal_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sh3_internal_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( sh3_internal_high_w );
-	DECLARE_READ32_MEMBER( sh3_internal_high_r );
+	void sh3_internal_high_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sh3_internal_high_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_reset() override;
@@ -733,11 +733,11 @@ public:
 	// construction/destruction
 	sh4_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, endianness_t endianness);
 
-	DECLARE_WRITE32_MEMBER( sh4_internal_w );
-	DECLARE_READ32_MEMBER( sh4_internal_r );
+	void sh4_internal_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sh4_internal_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ64_MEMBER( sh4_tlb_r );
-	DECLARE_WRITE64_MEMBER( sh4_tlb_w );
+	uint64_t sh4_tlb_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void sh4_tlb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 protected:
 	virtual void device_reset() override;

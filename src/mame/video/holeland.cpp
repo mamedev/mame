@@ -74,19 +74,19 @@ void holeland_state::video_start_crzrally()
 	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::videoram_w)
+void holeland_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::colorram_w)
+void holeland_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::pal_offs_w)
+void holeland_state::pal_offs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 1) != m_po[offset])
 	{
@@ -96,12 +96,12 @@ WRITE8_MEMBER(holeland_state::pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::scroll_w)
+void holeland_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(holeland_state::flipscreen_w)
+void holeland_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		flip_screen_y_set(data);

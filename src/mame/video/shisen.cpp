@@ -3,13 +3,13 @@
 #include "emu.h"
 #include "includes/shisen.h"
 
-WRITE8_MEMBER(shisen_state::videoram_w)
+void shisen_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(shisen_state::bankswitch_w)
+void shisen_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
@@ -28,7 +28,7 @@ WRITE8_MEMBER(shisen_state::bankswitch_w)
 	/* bits 6-7 unknown */
 }
 
-WRITE8_MEMBER(shisen_state::paletteram_w)
+void shisen_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 

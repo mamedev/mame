@@ -402,7 +402,7 @@ void neopcb_state::kf2k3pcb_sp1_decrypt()
 /*********************************************** non-carts */
 
 
-WRITE16_MEMBER(neopcb_state::write_bankpvc)
+void neopcb_state::write_bankpvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
 	m_pvc_prot->protection_w(space, offset, data, mem_mask);

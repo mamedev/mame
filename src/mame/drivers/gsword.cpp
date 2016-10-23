@@ -169,7 +169,7 @@ int gsword_state::coins_in(void)
 /* CPU 2 memory hack */
 /* (402E) timeout upcount must be under 0AH                         */
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
-READ8_MEMBER(gsword_state::gsword_hack_r)
+uint8_t gsword_state::gsword_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_cpu2_ram[offset + 4];
 
@@ -187,7 +187,7 @@ READ8_MEMBER(gsword_state::gsword_hack_r)
 	return data;
 }
 
-READ8_MEMBER(gsword_state::gsword_8741_2_r )
+uint8_t gsword_state::gsword_8741_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -204,7 +204,7 @@ READ8_MEMBER(gsword_state::gsword_8741_2_r )
 	return 0;
 }
 
-READ8_MEMBER(gsword_state::gsword_8741_3_r )
+uint8_t gsword_state::gsword_8741_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -243,7 +243,7 @@ INTERRUPT_GEN_MEMBER(gsword_state::gsword_snd_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(gsword_state::nmi_set_w)
+void gsword_state::nmi_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  osd_printf_debug("AY write %02X\n",data);*/
 
@@ -278,34 +278,34 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 #endif
 }
 
-WRITE8_MEMBER(gsword_state::ay8910_control_port_0_w)
+void gsword_state::ay8910_control_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay0->address_w(space,offset,data);
 	m_fake8910_0 = data;
 }
-WRITE8_MEMBER(gsword_state::ay8910_control_port_1_w)
+void gsword_state::ay8910_control_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay1->address_w(space,offset,data);
 	m_fake8910_1 = data;
 }
 
-READ8_MEMBER(gsword_state::fake_0_r)
+uint8_t gsword_state::fake_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fake8910_0+1;
 }
-READ8_MEMBER(gsword_state::fake_1_r)
+uint8_t gsword_state::fake_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fake8910_1+1;
 }
 
-WRITE8_MEMBER(gsword_state::gsword_adpcm_data_w)
+void gsword_state::gsword_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w (data & 0x0f); /* bit 0..3 */
 	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
 	m_msm->vclk_w(BIT(data, 4));  /* bit 4    */
 }
 
-WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
+void gsword_state::adpcm_soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

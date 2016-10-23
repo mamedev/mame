@@ -51,16 +51,16 @@ public:
 	void init_empcity();
 	void init_cshooter();
 
-	DECLARE_WRITE8_MEMBER(stfight_io_w);
-	DECLARE_READ8_MEMBER(stfight_coin_r);
-	DECLARE_WRITE8_MEMBER(stfight_coin_w);
-	DECLARE_WRITE8_MEMBER(stfight_fm_w);
-	DECLARE_WRITE8_MEMBER(stfight_mcu_w);
+	void stfight_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stfight_coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stfight_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_fm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(stfight_bank_w);
+	void stfight_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_READ8_MEMBER(stfight_fm_r);
+	uint8_t stfight_fm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 
 	virtual void machine_start() override;
@@ -72,16 +72,16 @@ public:
 	    MCU specifics
 	*/
 
-	DECLARE_READ8_MEMBER(stfight_68705_port_a_r);
-	DECLARE_READ8_MEMBER(stfight_68705_port_b_r);
-	DECLARE_READ8_MEMBER(stfight_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_port_c_w);
+	uint8_t stfight_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t stfight_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t stfight_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stfight_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_a_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_b_w);
-	DECLARE_WRITE8_MEMBER(stfight_68705_ddr_c_w);
+	void stfight_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stfight_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_portA_out, m_portA_in;
 	uint8_t m_portB_out, m_portB_in;

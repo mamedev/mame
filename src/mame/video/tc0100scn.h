@@ -45,18 +45,18 @@ public:
 	void set_bg_tilemask(int mask);
 
 	/* Function to for Mjnquest to select gfx bank */
-	DECLARE_WRITE16_MEMBER(gfxbank_w);
+	void gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(word_r);
-	DECLARE_WRITE16_MEMBER(word_w);
-	DECLARE_READ16_MEMBER(ctrl_word_r);
-	DECLARE_WRITE16_MEMBER(ctrl_word_w);
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	/* Functions for use with 68020 (Under Fire) */
-	DECLARE_READ32_MEMBER(long_r);
-	DECLARE_WRITE32_MEMBER(long_w);
-	DECLARE_READ32_MEMBER(ctrl_long_r);
-	DECLARE_WRITE32_MEMBER(ctrl_long_w);
+	uint32_t long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ctrl_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ctrl_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void tilemap_update();
 	int tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);

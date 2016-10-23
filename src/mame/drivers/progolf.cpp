@@ -87,15 +87,15 @@ public:
 	uint8_t m_gfx_switch;
 	uint8_t m_sound_cmd;
 
-	DECLARE_WRITE8_MEMBER(charram_w);
-	DECLARE_WRITE8_MEMBER(char_vregs_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void char_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -179,7 +179,7 @@ uint32_t progolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(progolf_state::charram_w)
+void progolf_state::charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	m_fbram[offset] = data;
@@ -201,43 +201,43 @@ WRITE8_MEMBER(progolf_state::charram_w)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::char_vregs_w)
+void progolf_state::char_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_pen = data & 0x07;
 	m_gfx_switch = data & 0xf0;
 	m_char_pen_vreg = data & 0x30;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_lo_w)
+void progolf_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(progolf_state::scrollx_hi_w)
+void progolf_state::scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_hi = data;
 }
 
-WRITE8_MEMBER(progolf_state::flip_screen_w)
+void progolf_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 	if(data & 0xfe)
 		printf("$9600 with data = %02x used\n",data);
 }
 
-WRITE8_MEMBER(progolf_state::audio_command_w)
+void progolf_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_cmd = data;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(progolf_state::audio_command_r)
+uint8_t progolf_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_cmd;
 }
 
-READ8_MEMBER(progolf_state::videoram_r)
+uint8_t progolf_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *gfx_rom = memregion("gfx1")->base();
 
@@ -263,7 +263,7 @@ READ8_MEMBER(progolf_state::videoram_r)
 	}
 }
 
-WRITE8_MEMBER(progolf_state::videoram_w)
+void progolf_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if(m_gfx_switch & 0x40)
 	m_videoram[offset] = data;

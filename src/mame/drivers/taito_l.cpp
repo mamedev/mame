@@ -317,18 +317,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::irq_adr_w)
+void taitol_state::irq_adr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("irq_adr_table[%d] = %02x\n", offset, data);
 	m_irq_adr_table[offset] = data;
 }
 
-READ8_MEMBER(taitol_state::irq_adr_r)
+uint8_t taitol_state::irq_adr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_adr_table[offset];
 }
 
-WRITE8_MEMBER(taitol_state::irq_enable_w)
+void taitol_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("irq_enable = %02x\n",data);
 	m_irq_enable = data;
@@ -338,13 +338,13 @@ WRITE8_MEMBER(taitol_state::irq_enable_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(taitol_state::irq_enable_r)
+uint8_t taitol_state::irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_enable;
 }
 
 
-WRITE8_MEMBER(taitol_state::rombankswitch_w)
+void taitol_state::rombankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cur_rombank != data)
 	{
@@ -360,7 +360,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::rombank2switch_w)
+void taitol_state::rombank2switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0xf;
 
@@ -379,17 +379,17 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 	}
 }
 
-READ8_MEMBER(taitol_state::rombankswitch_r)
+uint8_t taitol_state::rombankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cur_rombank;
 }
 
-READ8_MEMBER(taitol_state::rombank2switch_r)
+uint8_t taitol_state::rombank2switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cur_rombank2;
 }
 
-WRITE8_MEMBER(taitol_state::rambankswitch_w)
+void taitol_state::rambankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cur_rambank[offset] != data)
 	{
@@ -416,7 +416,7 @@ WRITE8_MEMBER(taitol_state::rambankswitch_w)
 	}
 }
 
-READ8_MEMBER(taitol_state::rambankswitch_r)
+uint8_t taitol_state::rambankswitch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cur_rambank[offset];
 }
@@ -431,27 +431,27 @@ void taitol_state::bank_w(address_space &space, offs_t offset, uint8_t data, int
 	}
 }
 
-WRITE8_MEMBER(taitol_state::bank0_w)
+void taitol_state::bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bank_w(space, offset, data, 0);
 }
 
-WRITE8_MEMBER(taitol_state::bank1_w)
+void taitol_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bank_w(space, offset, data, 1);
 }
 
-WRITE8_MEMBER(taitol_state::bank2_w)
+void taitol_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bank_w(space, offset, data, 2);
 }
 
-WRITE8_MEMBER(taitol_state::bank3_w)
+void taitol_state::bank3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bank_w(space, offset, data, 3);
 }
 
-WRITE8_MEMBER(taitol_state::control2_w)
+void taitol_state::control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -459,24 +459,24 @@ WRITE8_MEMBER(taitol_state::control2_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
-READ8_MEMBER(taitol_state::portA_r)
+uint8_t taitol_state::portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport((m_extport == 0) ? m_porte0_tag : m_porte1_tag)->read();
 }
 
-READ8_MEMBER(taitol_state::portB_r)
+uint8_t taitol_state::portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport((m_extport == 0) ? m_portf0_tag : m_portf1_tag)->read();
 }
 
-READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
+uint8_t taitol_state::extport_select_and_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	ym2203_device *ym2203 = machine().device<ym2203_device>("ymsnd");
 	m_extport = (offset >> 1) & 1;
 	return ym2203->read(space, offset & 1);
 }
 
-WRITE8_MEMBER(taitol_state::mcu_data_w)
+void taitol_state::mcu_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_last_data = data;
 	m_last_data_adr = space.device().safe_pc();
@@ -490,12 +490,12 @@ WRITE8_MEMBER(taitol_state::mcu_data_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::mcu_control_w)
+void taitol_state::mcu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("mcu control %02x (%04x)\n", data, space.device().safe_pc());
 }
 
-READ8_MEMBER(taitol_state::mcu_data_r)
+uint8_t taitol_state::mcu_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("mcu read (%04x) [%02x, %04x]\n", space.device().safe_pc(), last_data, last_data_adr);
 	if (m_mcu_pos == m_mcu_reply_len)
@@ -504,20 +504,20 @@ READ8_MEMBER(taitol_state::mcu_data_r)
 	return m_mcu_reply[m_mcu_pos++];
 }
 
-READ8_MEMBER(taitol_state::mcu_control_r)
+uint8_t taitol_state::mcu_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("mcu control read (%04x)\n", space.device().safe_pc());
 	return 0x1;
 }
 
 #if 0
-WRITE8_MEMBER(taitol_state::sound_w)
+void taitol_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Sound_w %02x (%04x)\n", data, space.device().safe_pc());
 }
 #endif
 
-READ8_MEMBER(taitol_state::mux_r)
+uint8_t taitol_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_mux_ctrl)
 	{
@@ -537,7 +537,7 @@ READ8_MEMBER(taitol_state::mux_r)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::mux_w)
+void taitol_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_mux_ctrl)
 	{
@@ -549,7 +549,7 @@ WRITE8_MEMBER(taitol_state::mux_w)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::mux_ctrl_w)
+void taitol_state::mux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_ctrl = data;
 }
@@ -570,62 +570,62 @@ WRITE_LINE_MEMBER(taitol_state::champwr_msm5205_vck)
 	}
 }
 
-WRITE8_MEMBER(taitol_state::champwr_msm5205_lo_w)
+void taitol_state::champwr_msm5205_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (m_adpcm_pos & 0xff00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(taitol_state::champwr_msm5205_hi_w)
+void taitol_state::champwr_msm5205_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = ((m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
-WRITE8_MEMBER(taitol_state::champwr_msm5205_start_w)
+void taitol_state::champwr_msm5205_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(taitol_state::champwr_msm5205_stop_w)
+void taitol_state::champwr_msm5205_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(1);
 	m_adpcm_pos &= 0x1ff00;
 }
 
-WRITE8_MEMBER(taitol_state::champwr_msm5205_volume_w)
+void taitol_state::champwr_msm5205_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->set_output_gain(0, data / 255.0);
 }
 
-READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)
+uint8_t taitol_state::horshoes_tracky_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reset the trackball counter */
 	m_tracky = ioport("AN0")->read();
 	return 0;
 }
 
-READ8_MEMBER(taitol_state::horshoes_trackx_reset_r)
+uint8_t taitol_state::horshoes_trackx_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reset the trackball counter */
 	m_trackx = ioport("AN1")->read();
 	return 0;
 }
 
-READ8_MEMBER(taitol_state::horshoes_tracky_lo_r)
+uint8_t taitol_state::horshoes_tracky_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("AN0")->read() - m_tracky) & 0xff;
 }
 
-READ8_MEMBER(taitol_state::horshoes_tracky_hi_r)
+uint8_t taitol_state::horshoes_tracky_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("AN0")->read() - m_tracky) >> 8;
 }
 
-READ8_MEMBER(taitol_state::horshoes_trackx_lo_r)
+uint8_t taitol_state::horshoes_trackx_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("AN1")->read() - m_trackx) & 0xff;
 }
 
-READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
+uint8_t taitol_state::horshoes_trackx_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("AN1")->read() - m_trackx) >> 8;
 }
@@ -700,7 +700,7 @@ static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
+void taitol_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("audiocpu")->base();
 	int banknum = data & 0x03;
@@ -1710,7 +1710,7 @@ static GFXDECODE_START( taito_l )
 GFXDECODE_END
 
 
-WRITE8_MEMBER(taitol_state::portA_w)
+void taitol_state::portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cur_bank != (data & 0x03))
 	{

@@ -30,7 +30,7 @@
 const device_type PC9801_86 = &device_creator<pc9801_86_device>;
 
 
-READ8_MEMBER(pc9801_86_device::opn_porta_r)
+uint8_t pc9801_86_device::opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_joy_sel & 0x80)
 		return ioport(m_joy_sel & 0x40 ? "OPNA_PA2" : "OPNA_PA1")->read();
@@ -38,7 +38,7 @@ READ8_MEMBER(pc9801_86_device::opn_porta_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_86_device::opn_portb_w){ m_joy_sel = data; }
+void pc9801_86_device::opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_joy_sel = data; }
 
 WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
 {
@@ -200,7 +200,7 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_86_device::opn_r)
+uint8_t pc9801_86_device::opn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 1) == 0)
 		return m_opna->read(space, offset >> 1);
@@ -211,7 +211,7 @@ READ8_MEMBER(pc9801_86_device::opn_r)
 	}
 }
 
-WRITE8_MEMBER(pc9801_86_device::opn_w)
+void pc9801_86_device::opn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset & 1) == 0)
 		m_opna->write(space, offset >> 1,data);
@@ -219,17 +219,17 @@ WRITE8_MEMBER(pc9801_86_device::opn_w)
 		logerror("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
-READ8_MEMBER(pc9801_86_device::id_r)
+uint8_t pc9801_86_device::id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x40 | m_mask;
 }
 
-WRITE8_MEMBER(pc9801_86_device::mask_w)
+void pc9801_86_device::mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mask = data & 1;
 }
 
-READ8_MEMBER(pc9801_86_device::pcm_r)
+uint8_t pc9801_86_device::pcm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 1) == 0)
 	{
@@ -253,7 +253,7 @@ READ8_MEMBER(pc9801_86_device::pcm_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_86_device::pcm_w)
+void pc9801_86_device::pcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const int rates[] = {44100, 33075, 22050, 16538, 11025, 8268, 5513, 4134};
 	if((offset & 1) == 0)

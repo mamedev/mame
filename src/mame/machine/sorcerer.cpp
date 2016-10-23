@@ -143,13 +143,13 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
 	membank("boot")->set_entry(0);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
+void sorcerer_state::sorcerer_fc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_uart->set_transmit_data(data);
 }
 
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
+void sorcerer_state::sorcerer_fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Translate data to control signals */
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fd_w)
 	m_uart->set_input_pin(AY31015_CS, 1);
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
+void sorcerer_state::sorcerer_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t changed_bits = (m_fe ^ data) & 0xf0;
 	m_fe = data;
@@ -214,7 +214,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 	}
 }
 
-WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
+void sorcerer_state::sorcerer_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/// TODO: create a sorcerer parallel slot with a 7 bit and 8 bit centronics adapter as two of the options
 	/// TODO: figure out what role FE plays http://www.trailingedge.com/exidy/exidych7.html
@@ -244,7 +244,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 	}
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
+uint8_t sorcerer_state::sorcerer_fc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
@@ -252,7 +252,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fc_r)
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
+uint8_t sorcerer_state::sorcerer_fd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set unused bits high */
 	uint8_t data = 0xe0;
@@ -268,7 +268,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_fd_r)
 	return data;
 }
 
-READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
+uint8_t sorcerer_state::sorcerer_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 6..7
 	 - hardware handshakes from user port

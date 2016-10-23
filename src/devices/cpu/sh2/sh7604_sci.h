@@ -45,21 +45,21 @@ public:
 	sh7604_sci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( serial_mode_r );
-	DECLARE_WRITE8_MEMBER( serial_mode_w );
-	DECLARE_READ8_MEMBER( bitrate_r );
-	DECLARE_WRITE8_MEMBER( bitrate_w );
-	DECLARE_READ8_MEMBER( serial_control_r );
-	DECLARE_WRITE8_MEMBER( serial_control_w );
+	uint8_t serial_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bitrate_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bitrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( transmit_data_r );
-	DECLARE_WRITE8_MEMBER( transmit_data_w );
-	DECLARE_READ8_MEMBER( serial_status_r );
-	DECLARE_WRITE8_MEMBER( serial_ack_w );
-	DECLARE_READ8_MEMBER( receive_data_r );
+	uint8_t transmit_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 protected:

@@ -122,7 +122,7 @@ INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
 	perform_mouse_update();
 }
 
-READ16_MEMBER( cdislave_device::slave_r )
+uint16_t cdislave_device::slave_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -177,7 +177,7 @@ void cdislave_device::set_mouse_position()
 	}
 }
 
-WRITE16_MEMBER( cdislave_device::slave_w )
+void cdislave_device::slave_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 

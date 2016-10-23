@@ -185,25 +185,25 @@ void mrdo_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mrdo_state::mrdo_bgvideoram_w)
+void mrdo_state::mrdo_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_fgvideoram_w)
+void mrdo_state::mrdo_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrollx_w)
+void mrdo_state::mrdo_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
+void mrdo_state::mrdo_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This is NOT affected by flipscreen (so stop it happening) */
 	if (m_flipscreen)
@@ -213,7 +213,7 @@ WRITE8_MEMBER(mrdo_state::mrdo_scrolly_w)
 }
 
 
-WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
+void mrdo_state::mrdo_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 1-3 control the playfield priority, but they are not used by */
 	/* Mr. Do! so we don't emulate them */

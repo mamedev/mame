@@ -43,11 +43,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_r );
-	DECLARE_READ8_MEMBER( paddle_1_r );
-	DECLARE_READ8_MEMBER( paddle_2_r );
-	DECLARE_WRITE8_MEMBER( paddle_off_w );
-	DECLARE_WRITE8_MEMBER( paddle_on_w );
+	uint8_t cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t paddle_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t paddle_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paddle_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paddle_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_CALLBACK_MEMBER(paddle_d7reset_callback);
 	TIMER_CALLBACK_MEMBER(paddle_irqreset_callback);

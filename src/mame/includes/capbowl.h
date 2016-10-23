@@ -49,19 +49,19 @@ public:
 	emu_timer *m_update_timer;
 
 	// common
-	DECLARE_READ8_MEMBER(track_0_r);
-	DECLARE_READ8_MEMBER(track_1_r);
-	DECLARE_WRITE8_MEMBER(track_reset_w);
-	DECLARE_WRITE8_MEMBER(sndcmd_w);
-	DECLARE_WRITE8_MEMBER(tms34061_w);
-	DECLARE_READ8_MEMBER(tms34061_r);
+	uint8_t track_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t track_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void track_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tms34061_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms34061_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// capbowl specific
-	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
+	void capbowl_rom_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// bowlrama specific
-	DECLARE_WRITE8_MEMBER(bowlrama_blitter_w);
-	DECLARE_READ8_MEMBER(bowlrama_blitter_r);
+	void bowlrama_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bowlrama_blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_capbowl();
 	virtual void machine_start() override;

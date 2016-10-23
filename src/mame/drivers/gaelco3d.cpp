@@ -247,12 +247,12 @@ INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
+void gaelco3d_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
+void gaelco3d_state::irq_ack32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff0000)
 		irq_ack_w(space, offset, data, mem_mask >> 16);
@@ -270,7 +270,7 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
  *
  *************************************/
 
-READ16_MEMBER(gaelco3d_state::eeprom_data_r)
+uint16_t gaelco3d_state::eeprom_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t result = 0xffff;
 
@@ -289,7 +289,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 	return result;
 }
 
-READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
+uint32_t gaelco3d_state::eeprom_data32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		return (eeprom_data_r(space, 0, mem_mask >> 16) << 16) | 0xffff;
@@ -307,7 +307,7 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
+void gaelco3d_state::eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -318,7 +318,7 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
+void gaelco3d_state::eeprom_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -327,7 +327,7 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
+void gaelco3d_state::eeprom_cs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -352,7 +352,7 @@ TIMER_CALLBACK_MEMBER(gaelco3d_state::delayed_sound_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::sound_data_w)
+void gaelco3d_state::sound_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
@@ -361,7 +361,7 @@ WRITE16_MEMBER(gaelco3d_state::sound_data_w)
 }
 
 
-READ16_MEMBER(gaelco3d_state::sound_data_r)
+uint16_t gaelco3d_state::sound_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("sound_data_r(%02X)\n", m_sound_data);
@@ -370,7 +370,7 @@ READ16_MEMBER(gaelco3d_state::sound_data_r)
 }
 
 
-READ16_MEMBER(gaelco3d_state::sound_status_r)
+uint16_t gaelco3d_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("%06X:sound_status_r(%02X) = %02X\n", space.device().safe_pc(), offset, m_sound_status);
@@ -380,7 +380,7 @@ READ16_MEMBER(gaelco3d_state::sound_status_r)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::sound_status_w)
+void gaelco3d_state::sound_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("sound_status_w(%02X)\n", m_sound_data);
@@ -402,7 +402,7 @@ CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::analog_port_clock_w)
+void gaelco3d_state::analog_port_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
 	if (ACCESSING_BITS_0_7)
@@ -423,7 +423,7 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_clock_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
+void gaelco3d_state::analog_port_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
 	if (ACCESSING_BITS_0_7)
@@ -452,20 +452,20 @@ WRITE16_MEMBER(gaelco3d_state::analog_port_latch_w)
  *
  *************************************/
 
-READ32_MEMBER(gaelco3d_state::tms_m68k_ram_r)
+uint32_t gaelco3d_state::tms_m68k_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", space.device().safe_pc(), offset, !(offset & 1) ? ((int32_t)m_m68k_ram_base[offset/2] >> 16) : (int)(int16_t)m_m68k_ram_base[offset/2]);
 	return (int32_t)(int16_t)m_m68k_ram_base[offset ^ m_tms_offset_xor];
 }
 
 
-WRITE32_MEMBER(gaelco3d_state::tms_m68k_ram_w)
+void gaelco3d_state::tms_m68k_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_m68k_ram_base[offset ^ m_tms_offset_xor] = data;
 }
 
 
-WRITE8_MEMBER(gaelco3d_state::tms_iack_w)
+void gaelco3d_state::tms_iack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("iack_w(%d) - %06X\n", data, offset);
@@ -480,7 +480,7 @@ WRITE8_MEMBER(gaelco3d_state::tms_iack_w)
  *
  *************************************/
 
-WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
+void gaelco3d_state::tms_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
@@ -490,7 +490,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
+void gaelco3d_state::tms_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
@@ -501,14 +501,14 @@ WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::tms_control3_w)
+void gaelco3d_state::tms_control3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::tms_comm_w)
+void gaelco3d_state::tms_comm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tms_comm_base[offset ^ m_tms_offset_xor]);
 	if (LOG)
@@ -554,7 +554,7 @@ ADSP control 3FF2 W = 4A0F  (S1_CONTROL_REG)
 ADSP control 3FFF W = 0C08  (SYSCONTROL_REG)
 */
 
-WRITE16_MEMBER(gaelco3d_state::adsp_control_w)
+void gaelco3d_state::adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("ADSP control %04X W = %04X\n", 0x3fe0 + offset, data);
@@ -590,7 +590,7 @@ WRITE16_MEMBER(gaelco3d_state::adsp_control_w)
 }
 
 
-WRITE16_MEMBER(gaelco3d_state::adsp_rombank_w)
+void gaelco3d_state::adsp_rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG)
 		logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
@@ -632,7 +632,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 	m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
 }
 
-WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
+void gaelco3d_state::adsp_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* check if it's for SPORT1 */
 	if (offset != 1)
@@ -707,7 +707,7 @@ WRITE32_MEMBER(gaelco3d_state::adsp_tx_callback)
  *************************************/
 
 
-WRITE32_MEMBER(gaelco3d_state::radikalb_lamp_w)
+void gaelco3d_state::radikalb_lamp_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* arbitrary data written */
 	if (ACCESSING_BITS_0_7)
@@ -716,7 +716,7 @@ WRITE32_MEMBER(gaelco3d_state::radikalb_lamp_w)
 		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(gaelco3d_state::unknown_137_w)
+void gaelco3d_state::unknown_137_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
@@ -725,7 +725,7 @@ WRITE32_MEMBER(gaelco3d_state::unknown_137_w)
 		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(gaelco3d_state::unknown_13a_w)
+void gaelco3d_state::unknown_13a_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* only written $0000 or $0001 */
 	if (ACCESSING_BITS_0_15)

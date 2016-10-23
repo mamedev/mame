@@ -23,14 +23,14 @@ class nmk004_device : public device_t
 public:
 	nmk004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	WRITE8_MEMBER( write );
-	READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask);
 
-	DECLARE_WRITE8_MEMBER(nmk004_port4_w);
-	DECLARE_WRITE8_MEMBER(nmk004_oki0_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(nmk004_oki1_bankswitch_w);
-	DECLARE_READ8_MEMBER(nmk004_tonmk004_r);
-	DECLARE_WRITE8_MEMBER(nmk004_tomain_w);
+	void nmk004_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmk004_oki0_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmk004_oki1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nmk004_tonmk004_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nmk004_tomain_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ym2203_irq_handler(int irq);
 	required_device<tlcs90_device> m_cpu;
 

@@ -40,7 +40,7 @@ Notes:
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(nbmj8991_state::soundbank_w)
+void nbmj8991_state::soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x80)) m_soundlatch->clear_w(space, 0, 0);
 	membank("bank1")->set_entry(data & 0x03);

@@ -399,26 +399,26 @@ void segas32_state::common_paletteram_w(address_space &space, int which, offs_t 
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_paletteram_r)
+uint16_t segas32_state::system32_paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return common_paletteram_r(space, 0, offset);
 }
 
 
-WRITE16_MEMBER(segas32_state::system32_paletteram_w)
+void segas32_state::system32_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	common_paletteram_w(space, 0, offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(segas32_state::multi32_paletteram_0_r)
+uint32_t segas32_state::multi32_paletteram_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return common_paletteram_r(space, 0, offset*2+0) |
 			(common_paletteram_r(space, 0, offset*2+1) << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
+void segas32_state::multi32_paletteram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		common_paletteram_w(space, 0, offset*2+0, data, mem_mask);
@@ -427,14 +427,14 @@ WRITE32_MEMBER(segas32_state::multi32_paletteram_0_w)
 }
 
 
-READ32_MEMBER(segas32_state::multi32_paletteram_1_r)
+uint32_t segas32_state::multi32_paletteram_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return common_paletteram_r(space, 1, offset*2+0) |
 			(common_paletteram_r(space, 1, offset*2+1) << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_paletteram_1_w)
+void segas32_state::multi32_paletteram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		common_paletteram_w(space, 1, offset*2+0, data, mem_mask);
@@ -450,13 +450,13 @@ WRITE32_MEMBER(segas32_state::multi32_paletteram_1_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_videoram_r)
+uint16_t segas32_state::system32_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_system32_videoram[offset];
 }
 
 
-WRITE16_MEMBER(segas32_state::system32_videoram_w)
+void segas32_state::system32_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_system32_videoram[offset]);
 
@@ -475,14 +475,14 @@ WRITE16_MEMBER(segas32_state::system32_videoram_w)
 }
 
 
-READ32_MEMBER(segas32_state::multi32_videoram_r)
+uint32_t segas32_state::multi32_videoram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_system32_videoram[offset*2+0] |
 			(m_system32_videoram[offset*2+1] << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_videoram_w)
+void segas32_state::multi32_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		system32_videoram_w(space, offset*2+0, data, mem_mask);
@@ -498,7 +498,7 @@ WRITE32_MEMBER(segas32_state::multi32_videoram_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_sprite_control_r)
+uint16_t segas32_state::system32_sprite_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -556,21 +556,21 @@ READ16_MEMBER(segas32_state::system32_sprite_control_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::system32_sprite_control_w)
+void segas32_state::system32_sprite_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_sprite_control[offset & 7] = data;
 }
 
 
-READ32_MEMBER(segas32_state::multi32_sprite_control_r)
+uint32_t segas32_state::multi32_sprite_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return system32_sprite_control_r(space, offset*2+0, mem_mask) |
 			(system32_sprite_control_r(space, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_sprite_control_w)
+void segas32_state::multi32_sprite_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		system32_sprite_control_w(space, offset*2+0, data, mem_mask);
@@ -586,13 +586,13 @@ WRITE32_MEMBER(segas32_state::multi32_sprite_control_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_spriteram_r)
+uint16_t segas32_state::system32_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_system32_spriteram[offset];
 }
 
 
-WRITE16_MEMBER(segas32_state::system32_spriteram_w)
+void segas32_state::system32_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_system32_spriteram[offset]);
 	m_spriteram_32bit[offset/2] =
@@ -603,14 +603,14 @@ WRITE16_MEMBER(segas32_state::system32_spriteram_w)
 }
 
 
-READ32_MEMBER(segas32_state::multi32_spriteram_r)
+uint32_t segas32_state::multi32_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_system32_spriteram[offset*2+0] |
 			(m_system32_spriteram[offset*2+1] << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_spriteram_w)
+void segas32_state::multi32_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
@@ -630,18 +630,18 @@ WRITE32_MEMBER(segas32_state::multi32_spriteram_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::system32_mixer_r)
+uint16_t segas32_state::system32_mixer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mixer_control[0][offset];
 }
 
-WRITE16_MEMBER(segas32_state::system32_mixer_w)
+void segas32_state::system32_mixer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mixer_control[0][offset]);
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_mixer_0_w)
+void segas32_state::multi32_mixer_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);
@@ -649,7 +649,7 @@ WRITE32_MEMBER(segas32_state::multi32_mixer_0_w)
 }
 
 
-WRITE32_MEMBER(segas32_state::multi32_mixer_1_w)
+void segas32_state::multi32_mixer_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = SWAP_HALVES(data);
 	mem_mask = SWAP_HALVES(mem_mask);

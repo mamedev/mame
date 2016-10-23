@@ -75,7 +75,7 @@ uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind1
 //        groups of sprites.  I am unsure how to differentiate those groups
 //        at this time however.
 
-WRITE32_MEMBER(namcofl_state::namcofl_spritebank_w)
+void namcofl_state::namcofl_spritebank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sprbank);
 }

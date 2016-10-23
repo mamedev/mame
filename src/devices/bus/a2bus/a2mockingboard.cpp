@@ -298,12 +298,12 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
 	}
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_a )
+void a2bus_ayboard_device::via1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta1 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
+void a2bus_ayboard_device::via1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 4))
 	{
@@ -391,12 +391,12 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 	}
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_a )
+void a2bus_ayboard_device::via2_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta2 = data;
 }
 
-WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
+void a2bus_ayboard_device::via2_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 4))
 	{

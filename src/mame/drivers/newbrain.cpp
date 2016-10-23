@@ -85,7 +85,7 @@ void newbrain_state::check_interrupt()
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::mreq_r )
+uint8_t newbrain_state::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
@@ -131,7 +131,7 @@ READ8_MEMBER( newbrain_state::mreq_r )
 //  mreq_w - memory request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::mreq_w )
+void newbrain_state::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
@@ -152,7 +152,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::iorq_r )
+uint8_t newbrain_state::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool prtov = 0;
 	uint8_t data = m_exp->iorq_r(space, offset, 0xff, prtov);
@@ -195,7 +195,7 @@ READ8_MEMBER( newbrain_state::iorq_r )
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::iorq_w )
+void newbrain_state::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool prtov = 0;
 	m_exp->iorq_w(space, offset, 0xff, prtov);
@@ -250,7 +250,7 @@ void newbrain_state::clclk()
 //  enrg1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::enrg1_w )
+void newbrain_state::enrg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -288,7 +288,7 @@ WRITE8_MEMBER( newbrain_state::enrg1_w )
 //  ust_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::ust_a_r )
+uint8_t newbrain_state::ust_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -322,7 +322,7 @@ READ8_MEMBER( newbrain_state::ust_a_r )
 //  user_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::ust_b_r )
+uint8_t newbrain_state::ust_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -359,7 +359,7 @@ READ8_MEMBER( newbrain_state::ust_b_r )
 //  cop_in_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::cop_in_r )
+uint8_t newbrain_state::cop_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -387,7 +387,7 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 //  cop_g_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_state::cop_g_r )
+uint8_t newbrain_state::cop_g_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -426,7 +426,7 @@ void newbrain_state::tm()
 	m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( newbrain_state::cop_g_w )
+void newbrain_state::cop_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -454,7 +454,7 @@ WRITE8_MEMBER( newbrain_state::cop_g_w )
 //  cop_d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_state::cop_d_w )
+void newbrain_state::cop_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description

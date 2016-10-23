@@ -35,8 +35,8 @@ public:
 	// static configuration
 	static void set_reg_base(device_t &device, int base) { downcast<vrender0_device &>(device).m_reg_base = base; }
 
-	DECLARE_READ32_MEMBER( vr0_snd_read );
-	DECLARE_WRITE32_MEMBER( vr0_snd_write );
+	uint32_t vr0_snd_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vr0_snd_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void set_areas(uint32_t *texture, uint32_t *frame);
 

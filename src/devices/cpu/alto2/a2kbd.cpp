@@ -13,7 +13,7 @@
  * @param addr memory mapped I/O address to be read
  * @return keyboard matrix value for address modulo 4
  */
-READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
+uint16_t alto2_cpu_device::kbd_ad_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0177777;
 	switch (offset & 3) {

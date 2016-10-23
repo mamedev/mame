@@ -32,51 +32,51 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	virtual DECLARE_READ8_MEMBER(capptr_r) override;
+	virtual uint8_t capptr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_READ8_MEMBER(  agpm_r);
-	DECLARE_WRITE8_MEMBER( agpm_w);
-	DECLARE_READ8_MEMBER(  gc_r);
-	DECLARE_READ8_MEMBER(  csabcont_r);
-	DECLARE_READ32_MEMBER( eap_r);
-	DECLARE_READ8_MEMBER(  derrsyn_r);
-	DECLARE_READ8_MEMBER(  des_r);
-	DECLARE_READ8_MEMBER(  fpllcont_r);
-	DECLARE_WRITE8_MEMBER( fpllcont_w);
-	DECLARE_READ8_MEMBER(  pam_r);
-	DECLARE_WRITE8_MEMBER( pam_w);
-	DECLARE_READ8_MEMBER(  smram_r);
-	DECLARE_WRITE8_MEMBER( smram_w);
-	DECLARE_READ8_MEMBER(  esmramc_r);
-	DECLARE_WRITE8_MEMBER( esmramc_w);
-	DECLARE_READ32_MEMBER( acapid_r);
-	DECLARE_READ32_MEMBER( agpstat_r);
-	DECLARE_READ32_MEMBER( agpcmd_r);
-	DECLARE_READ32_MEMBER( agpctrl_r);
-	DECLARE_WRITE32_MEMBER(agpctrl_w);
-	DECLARE_READ8_MEMBER(  apsize_r);
-	DECLARE_WRITE8_MEMBER( apsize_w);
-	DECLARE_READ32_MEMBER( attbase_r);
-	DECLARE_WRITE32_MEMBER(attbase_w);
-	DECLARE_READ8_MEMBER(  amtt_r);
-	DECLARE_WRITE8_MEMBER( amtt_w);
-	DECLARE_READ8_MEMBER(  lptt_r);
-	DECLARE_WRITE8_MEMBER( lptt_w);
-	DECLARE_READ16_MEMBER( toud_r);
-	DECLARE_WRITE16_MEMBER(toud_w);
-	DECLARE_READ16_MEMBER( mchcfg_r);
-	DECLARE_WRITE16_MEMBER(mchcfg_w);
-	DECLARE_READ16_MEMBER( errsts_r);
-	DECLARE_READ16_MEMBER( errcmd_r);
-	DECLARE_WRITE16_MEMBER(errcmd_w);
-	DECLARE_READ16_MEMBER( smicmd_r);
-	DECLARE_WRITE16_MEMBER(smicmd_w);
-	DECLARE_READ16_MEMBER( scicmd_r);
-	DECLARE_WRITE16_MEMBER(scicmd_w);
-	DECLARE_READ16_MEMBER( skpd_r);
-	DECLARE_WRITE16_MEMBER(skpd_w);
-	DECLARE_READ32_MEMBER( capreg1_r);
-	DECLARE_READ8_MEMBER(  capreg2_r);
+	uint8_t agpm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void agpm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t csabcont_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t eap_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t derrsyn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t des_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fpllcont_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fpllcont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pam_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t smram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void smram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t esmramc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void esmramc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t acapid_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t agpstat_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t agpcmd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t agpctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void agpctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t apsize_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void apsize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t attbase_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void attbase_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t amtt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amtt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lptt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lptt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t toud_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toud_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mchcfg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mchcfg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t errsts_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t errcmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void errcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t smicmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void smicmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scicmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scicmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t skpd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void skpd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t capreg1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t capreg2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;
@@ -110,14 +110,14 @@ public:
 	i82875p_overflow_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	DECLARE_READ8_MEMBER  (dram_row_boundary_r);
-	DECLARE_WRITE8_MEMBER (dram_row_boundary_w);
-	DECLARE_READ8_MEMBER  (dram_row_attribute_r);
-	DECLARE_WRITE8_MEMBER (dram_row_attribute_w);
-	DECLARE_READ32_MEMBER (dram_timing_r);
-	DECLARE_WRITE32_MEMBER(dram_timing_w);
-	DECLARE_READ32_MEMBER (dram_controller_mode_r);
-	DECLARE_WRITE32_MEMBER(dram_controller_mode_w);
+	uint8_t dram_row_boundary_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dram_row_boundary_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dram_row_attribute_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dram_row_attribute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t dram_timing_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dram_timing_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dram_controller_mode_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dram_controller_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 

@@ -139,7 +139,7 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "includes/spbactn.h"
 
 
-WRITE16_MEMBER(spbactn_state::soundcommand_w)
+void spbactn_state::soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

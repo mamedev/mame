@@ -32,12 +32,12 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_WRITE8_MEMBER(opn_portb_w);
-	DECLARE_READ8_MEMBER(pc9801_118_r);
-	DECLARE_WRITE8_MEMBER(pc9801_118_w);
-	DECLARE_READ8_MEMBER(pc9801_118_ext_r);
-	DECLARE_WRITE8_MEMBER(pc9801_118_ext_w);
+	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc9801_118_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc9801_118_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc9801_118_ext_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc9801_118_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
 
 //  required_device<cpu_device>  m_maincpu;

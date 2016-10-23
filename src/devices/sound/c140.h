@@ -91,8 +91,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_READ8_MEMBER( c140_r );
-	DECLARE_WRITE8_MEMBER( c140_w );
+	uint8_t c140_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c140_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 public:
 	void set_base(void *base);

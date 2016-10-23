@@ -16,10 +16,10 @@ class ata_flash_pccard_device : public ide_hdd_device,
 public:
 	ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ16_MEMBER(read_memory) override;
-	virtual DECLARE_WRITE16_MEMBER(write_memory) override;
-	virtual DECLARE_READ16_MEMBER(read_reg) override;
-	virtual DECLARE_WRITE16_MEMBER(write_reg) override;
+	virtual uint16_t read_memory(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_memory(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_reg(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_reg(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 protected:
 	// device-level overrides

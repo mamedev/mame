@@ -12,18 +12,18 @@
 /***************************************************************************
 Sound handlers
 ***************************************************************************/
-WRITE8_MEMBER(bsktball_state::bsktball_bounce_w)
+void bsktball_state::bsktball_bounce_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, BSKTBALL_CROWD_DATA, data & 0x0f);  // Crowd
 	m_discrete->write(space, BSKTBALL_BOUNCE_EN, data & 0x10);   // Bounce
 }
 
-WRITE8_MEMBER(bsktball_state::bsktball_note_w)
+void bsktball_state::bsktball_note_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, BSKTBALL_NOTE_DATA, data);  // Note
 }
 
-WRITE8_MEMBER(bsktball_state::bsktball_noise_reset_w)
+void bsktball_state::bsktball_noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, BSKTBALL_NOISE_EN, offset & 0x01);
 }

@@ -27,7 +27,7 @@ const device_type PC9801_26 = &device_creator<pc9801_26_device>;
 
 
 
-READ8_MEMBER(pc9801_26_device::opn_porta_r)
+uint8_t pc9801_26_device::opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_joy_sel & 0x80)
 		return ioport(m_joy_sel & 0x40 ? "OPN_PA2" : "OPN_PA1")->read();
@@ -35,7 +35,7 @@ READ8_MEMBER(pc9801_26_device::opn_porta_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_26_device::opn_portb_w){ m_joy_sel = data; }
+void pc9801_26_device::opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_joy_sel = data; }
 
 WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 {
@@ -171,7 +171,7 @@ void pc9801_26_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_26_device::pc9801_26_r)
+uint8_t pc9801_26_device::pc9801_26_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 1) == 0)
 	{
@@ -185,7 +185,7 @@ READ8_MEMBER(pc9801_26_device::pc9801_26_r)
 }
 
 
-WRITE8_MEMBER(pc9801_26_device::pc9801_26_w)
+void pc9801_26_device::pc9801_26_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset & 5) == 0)
 		m_opn->write(space, offset >> 1, data);

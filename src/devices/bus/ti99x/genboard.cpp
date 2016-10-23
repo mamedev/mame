@@ -263,7 +263,7 @@ INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
     within the gate array. Unlike with real GROMs, no address wrapping occurs,
     and the complete 64K space is available.
 */
-READ8_MEMBER( geneve_mapper_device::read_grom )
+uint8_t geneve_mapper_device::read_grom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t reply;
 	if (offset & 0x0002)
@@ -298,7 +298,7 @@ READ8_MEMBER( geneve_mapper_device::read_grom )
     Simulates GROM. The real Geneve does not use GROMs but simulates them
     within the gate array.
 */
-WRITE8_MEMBER( geneve_mapper_device::write_grom )
+void geneve_mapper_device::write_grom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x0002)
 	{
@@ -455,7 +455,7 @@ enum
     SETOFFSET method, and we re-use the values stored there to quickly
     access the appropriate component.
 */
-READ8_MEMBER( geneve_mapper_device::readm )
+uint8_t geneve_mapper_device::readm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 
@@ -644,7 +644,7 @@ READ8_MEMBER( geneve_mapper_device::readm )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::writem )
+void geneve_mapper_device::writem(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	decdata *dec;
 	decdata debug;
@@ -1223,7 +1223,7 @@ void geneve_mapper_device::decode(address_space& space, offs_t offset, bool read
 /*
     Read from PFM.
 */
-READ8_MEMBER( geneve_mapper_device::read_from_pfm )
+uint8_t geneve_mapper_device::read_from_pfm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value;
 	if (!m_pfm_output_enable) return 0;
@@ -1247,7 +1247,7 @@ READ8_MEMBER( geneve_mapper_device::read_from_pfm )
 	return value;
 }
 
-WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
+void geneve_mapper_device::write_to_pfm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Nota bene: The PFM must be write protected on startup, or the RESET
 	// of the 9995 will attempt to write the return vector into the flash EEPROM
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER( geneve_mapper_device::write_to_pfm )
     This decoding will later be used in the READ/WRITE member functions. Also,
     we initiate wait state creation here.
 */
-SETOFFSET_MEMBER( geneve_mapper_device::setoffset )
+void geneve_mapper_device::setoffset(address_space &space, offs_t offset)
 {
 	if (TRACE_DETAIL) logerror("setoffset = %04x\n", offset);
 	m_debug_no_ws = false;

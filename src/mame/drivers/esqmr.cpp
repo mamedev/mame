@@ -222,7 +222,7 @@ public:
 public:
 	void init_mr();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 void esqmr_state::machine_reset()
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
 {
 }
 
-READ16_MEMBER(esqmr_state::esq5506_read_adc)
+uint16_t esqmr_state::esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }

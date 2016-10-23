@@ -67,19 +67,19 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER( mmr_w );
-	DECLARE_READ8_MEMBER( mmr_r );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_cmd_w );
-	DECLARE_WRITE8_MEMBER( rtc_ctrl_w );
-	DECLARE_READ8_MEMBER( io_rom_data_r );
-	DECLARE_WRITE8_MEMBER( io_rom_addr_w );
-	DECLARE_READ8_MEMBER( port70_r );
-	DECLARE_READ8_MEMBER( port71_r );
-	DECLARE_WRITE8_MEMBER( port70_w );
-	DECLARE_WRITE8_MEMBER( port71_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	void mmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rtc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_rom_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_rom_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port70_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port71_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port71_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(pc8401a);
 
 	void scan_keyboard();

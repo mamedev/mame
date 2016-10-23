@@ -234,7 +234,7 @@ INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int0_ack_w)
+void atarisy2_state::int0_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset sound IRQ */
 	m_p2portrd_state = 0;
@@ -242,7 +242,7 @@ WRITE16_MEMBER(atarisy2_state::int0_ack_w)
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int1_ack_w)
+void atarisy2_state::int1_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset sound CPU */
 	if (ACCESSING_BITS_0_7)
@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::delayed_int_enable_w)
 }
 
 
-WRITE16_MEMBER(atarisy2_state::int_enable_w)
+void atarisy2_state::int_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(atarisy2_state::delayed_int_enable_w),this), data);
@@ -270,7 +270,7 @@ WRITE16_MEMBER(atarisy2_state::int_enable_w)
  *
  *************************************/
 
-WRITE16_MEMBER(atarisy2_state::bankselect_w)
+void atarisy2_state::bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*static const int bankoffset[64] =
 	{
@@ -315,13 +315,13 @@ void atarisy2_state::device_post_load()
  *
  *************************************/
 
-READ16_MEMBER(atarisy2_state::switch_r)
+uint16_t atarisy2_state::switch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("1800")->read() | (ioport("1801")->read() << 8);
 }
 
 
-READ8_MEMBER(atarisy2_state::switch_6502_r)
+uint8_t atarisy2_state::switch_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = ioport("1840")->read();
 
@@ -333,7 +333,7 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 }
 
 
-WRITE8_MEMBER(atarisy2_state::switch_6502_w)
+void atarisy2_state::switch_6502_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x04);
 	output().set_led_value(1, data & 0x08);
@@ -352,13 +352,13 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
  *
  *************************************/
 
-WRITE16_MEMBER(atarisy2_state::adc_strobe_w)
+void atarisy2_state::adc_strobe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_which_adc = offset & 3;
 }
 
 
-READ16_MEMBER(atarisy2_state::adc_r)
+uint16_t atarisy2_state::adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 
@@ -369,7 +369,7 @@ READ16_MEMBER(atarisy2_state::adc_r)
 }
 
 
-READ8_MEMBER(atarisy2_state::leta_r)
+uint8_t atarisy2_state::leta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
@@ -598,7 +598,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
     important.  So it would be nice to add it in properly.
 */
 
-WRITE8_MEMBER(atarisy2_state::mixer_w)
+void atarisy2_state::mixer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	double rbott, rtop, gain;
 
@@ -651,7 +651,7 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 }
 
 
-WRITE8_MEMBER(atarisy2_state::sound_reset_w)
+void atarisy2_state::sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* if no change, do nothing */
 	if ((data & 1) == m_sound_reset_state)
@@ -673,7 +673,7 @@ WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 }
 
 
-READ16_MEMBER(atarisy2_state::sound_r)
+uint16_t atarisy2_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* clear the p2portwr state on a p1portrd */
 	m_p2portwr_state = 0;
@@ -684,7 +684,7 @@ READ16_MEMBER(atarisy2_state::sound_r)
 }
 
 
-WRITE8_MEMBER(atarisy2_state::sound_6502_w)
+void atarisy2_state::sound_6502_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* clock the state through */
 	m_p2portwr_state = (m_interrupt_enable & 2) != 0;
@@ -695,7 +695,7 @@ WRITE8_MEMBER(atarisy2_state::sound_6502_w)
 }
 
 
-READ8_MEMBER(atarisy2_state::sound_6502_r)
+uint8_t atarisy2_state::sound_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* clock the state through */
 	m_p2portrd_state = (m_interrupt_enable & 1) != 0;
@@ -713,7 +713,7 @@ READ8_MEMBER(atarisy2_state::sound_6502_r)
  *
  *************************************/
 
-WRITE8_MEMBER(atarisy2_state::tms5220_w)
+void atarisy2_state::tms5220_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tms5220.found())
 	{
@@ -721,7 +721,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 	}
 }
 
-WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
+void atarisy2_state::tms5220_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tms5220.found())
 	{
@@ -735,7 +735,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
  *
  *************************************/
 
-WRITE8_MEMBER(atarisy2_state::coincount_w)
+void atarisy2_state::coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);

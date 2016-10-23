@@ -590,8 +590,8 @@ public:
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size);
 
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
-	DECLARE_READ8_MEMBER(upi41_master_r);
-	DECLARE_WRITE8_MEMBER(upi41_master_w);
+	uint8_t upi41_master_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void upi41_master_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;

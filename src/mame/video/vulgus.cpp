@@ -126,20 +126,20 @@ void vulgus_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vulgus_state::fgvideoram_w)
+void vulgus_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(vulgus_state::bgvideoram_w)
+void vulgus_state::bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(vulgus_state::c804_w)
+void vulgus_state::c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -150,7 +150,7 @@ WRITE8_MEMBER(vulgus_state::c804_w)
 }
 
 
-WRITE8_MEMBER(vulgus_state::palette_bank_w)
+void vulgus_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != (data & 3))
 	{

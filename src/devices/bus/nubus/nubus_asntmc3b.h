@@ -28,18 +28,18 @@ public:
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		void dp_irq_w(int state);
-		DECLARE_READ8_MEMBER(dp_mem_read);
-		DECLARE_WRITE8_MEMBER(dp_mem_write);
+		uint8_t dp_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void dp_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 		// device-level overrides
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
-		DECLARE_READ8_MEMBER(asntm3b_ram_r);
-		DECLARE_WRITE8_MEMBER(asntm3b_ram_w);
-		DECLARE_READ32_MEMBER(en_r);
-		DECLARE_WRITE32_MEMBER(en_w);
+		uint8_t asntm3b_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void asntm3b_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint32_t en_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void en_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 		required_device<dp8390_device> m_dp83902;
 

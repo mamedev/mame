@@ -64,9 +64,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -84,21 +84,21 @@ void cmulti8_state::prepare_display()
 	display_matrix(8, 21, m_o, (sel & mask) | m);
 }
 
-WRITE16_MEMBER(cmulti8_state::write_r)
+void cmulti8_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	prepare_display();
 }
 
-WRITE16_MEMBER(cmulti8_state::write_o)
+void cmulti8_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O7: digit segments
 	m_o = BITSWAP8(data,0,4,5,6,7,1,2,3);
 	prepare_display();
 }
 
-READ8_MEMBER(cmulti8_state::read_k)
+uint8_t cmulti8_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(11);
@@ -218,9 +218,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -237,21 +237,21 @@ void tisr16_state::prepare_display()
 	display_update();
 }
 
-WRITE16_MEMBER(tisr16_state::write_r)
+void tisr16_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	prepare_display();
 }
 
-WRITE16_MEMBER(tisr16_state::write_o)
+void tisr16_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O7: digit segments
 	m_o = data;
 	prepare_display();
 }
 
-READ8_MEMBER(tisr16_state::read_k)
+uint8_t tisr16_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(11);
@@ -446,14 +446,14 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE16_MEMBER(ti1250_state::write_r)
+void ti1250_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R8: select digit
 	set_display_segmask(0xff, 0xff);
@@ -461,7 +461,7 @@ WRITE16_MEMBER(ti1250_state::write_r)
 	display_matrix(8, 9, m_o, data);
 }
 
-WRITE16_MEMBER(ti1250_state::write_o)
+void ti1250_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O1-O5,O7: input mux
 	// O0-O7: digit segments
@@ -469,7 +469,7 @@ WRITE16_MEMBER(ti1250_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(ti1250_state::read_k)
+uint8_t ti1250_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(6);
@@ -581,21 +581,21 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE16_MEMBER(ti1000_state::write_r)
+void ti1000_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R7: select digit
 	set_display_segmask(0xff, 0xff);
 	display_matrix(8, 8, m_o, data);
 }
 
-WRITE16_MEMBER(ti1000_state::write_o)
+void ti1000_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
@@ -603,7 +603,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
 }
 
-READ8_MEMBER(ti1000_state::read_k)
+uint8_t ti1000_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -678,14 +678,14 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE16_MEMBER(wizatron_state::write_r)
+void wizatron_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 6th digit is custom(not 7seg), for math symbols, like this:
 	//   \./    GAB
@@ -701,7 +701,7 @@ WRITE16_MEMBER(wizatron_state::write_r)
 	display_matrix(7, 9, m_o, data);
 }
 
-WRITE16_MEMBER(wizatron_state::write_o)
+void wizatron_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O1-O4: input mux
 	// O0-O6: digit segments A-G
@@ -710,7 +710,7 @@ WRITE16_MEMBER(wizatron_state::write_o)
 	m_o = data & 0x7f;
 }
 
-READ8_MEMBER(wizatron_state::read_k)
+uint8_t wizatron_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(4);
@@ -781,13 +781,13 @@ public:
 		: wizatron_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_o) override;
-	virtual DECLARE_READ8_MEMBER(read_k) override;
+	virtual void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 // handlers
 
-WRITE16_MEMBER(lilprof_state::write_o)
+void lilprof_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O1-O4,O7: input mux
 	// O0-O6: digit segments A-G
@@ -795,7 +795,7 @@ WRITE16_MEMBER(lilprof_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(lilprof_state::read_k)
+uint8_t lilprof_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -855,14 +855,14 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE16_MEMBER(lilprof78_state::write_r)
+void lilprof78_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// update leds state
 	uint8_t seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
@@ -878,7 +878,7 @@ WRITE16_MEMBER(lilprof78_state::write_r)
 	display_update();
 }
 
-WRITE16_MEMBER(lilprof78_state::write_o)
+void lilprof78_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O3,O5(?): input mux
 	// O0-O6: digit segments A-G
@@ -887,7 +887,7 @@ WRITE16_MEMBER(lilprof78_state::write_o)
 	m_o = data;
 }
 
-READ8_MEMBER(lilprof78_state::read_k)
+uint8_t lilprof78_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs
 	return read_inputs(5);
@@ -963,9 +963,9 @@ public:
 	{ }
 
 	virtual void prepare_display();
-	virtual DECLARE_WRITE16_MEMBER(write_o);
-	virtual DECLARE_WRITE16_MEMBER(write_r);
-	virtual DECLARE_READ8_MEMBER(read_k);
+	virtual void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -977,7 +977,7 @@ void dataman_state::prepare_display()
 	display_matrix(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff);
 }
 
-WRITE16_MEMBER(dataman_state::write_r)
+void dataman_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R4: input mux
 	// R0-R8: select digit
@@ -986,14 +986,14 @@ WRITE16_MEMBER(dataman_state::write_r)
 	prepare_display();
 }
 
-WRITE16_MEMBER(dataman_state::write_o)
+void dataman_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O6: digit segments A-G
 	m_o = BITSWAP8(data,7,1,6,5,4,3,2,0) & 0x7f;
 	prepare_display();
 }
 
-READ8_MEMBER(dataman_state::read_k)
+uint8_t dataman_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[5]->read() | read_inputs(5);
@@ -1077,12 +1077,12 @@ public:
 		: dataman_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+	virtual void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 // handlers
 
-WRITE16_MEMBER(mathmarv_state::write_r)
+void mathmarv_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R8: speaker out
 	m_speaker->level_w(data >> 8 & 1);
@@ -1158,14 +1158,14 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE16_MEMBER(ti30_state::write_r)
+void ti30_state::write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R0-R8: select digit
 	set_display_segmask(0x1fe, 0xff);
@@ -1173,7 +1173,7 @@ WRITE16_MEMBER(ti30_state::write_r)
 	display_matrix(8, 9, m_o, data);
 }
 
-WRITE16_MEMBER(ti30_state::write_o)
+void ti30_state::write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
@@ -1181,7 +1181,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	m_o = BITSWAP8(data,7,5,2,1,4,0,6,3);
 }
 
-READ8_MEMBER(ti30_state::read_k)
+uint8_t ti30_state::read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[7]->read() | read_inputs(7);

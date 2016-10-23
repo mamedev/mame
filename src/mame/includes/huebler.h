@@ -50,7 +50,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( keyboard_r );
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
 
 	void scan_keyboard();

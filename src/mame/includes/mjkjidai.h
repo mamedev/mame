@@ -36,10 +36,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_select_w);
-	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
-	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjkjidai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjkjidai_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;

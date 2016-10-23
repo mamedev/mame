@@ -145,22 +145,22 @@ public:
 
 	void init_hp9k();
 
-	DECLARE_READ16_MEMBER(buserror_r);
-	DECLARE_WRITE16_MEMBER(buserror_w);
+	uint16_t buserror_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void buserror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(hp9k_videoram_r);
-	DECLARE_WRITE16_MEMBER(hp9k_videoram_w);
+	uint16_t hp9k_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hp9k_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(hp9k_prom_r);
-	DECLARE_WRITE16_MEMBER(hp9k_prom_w);
+	uint16_t hp9k_prom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hp9k_prom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(keyboard_r);
-	DECLARE_WRITE16_MEMBER(keyboard_w);
+	uint16_t keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(leds_r);
-	DECLARE_WRITE16_MEMBER(leds_w);
+	uint16_t leds_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -192,29 +192,29 @@ void hp9k_state::calc_prom_crc(uint8_t* prom)
 	}
 }
 
-READ16_MEMBER( hp9k_state::keyboard_r )
+uint16_t hp9k_state::keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("keyboard read at [%x] mask [%x]\n",offset,mem_mask);
 	return 0x31;
 }
 
-WRITE16_MEMBER( hp9k_state::keyboard_w )
+void hp9k_state::keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("keyboard write of [%x] at [%x]\n",data,offset);
 }
 
-READ16_MEMBER( hp9k_state::leds_r )
+uint16_t hp9k_state::leds_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("warning: leds read at [%x] mm [%x]\n",offset,mem_mask);
 	return 0;
 }
 
-WRITE16_MEMBER( hp9k_state::leds_w )
+void hp9k_state::leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("warning: leds write of [%x] at [%x] mm [%x]\n",data,offset,mem_mask);
 }
 
-READ16_MEMBER( hp9k_state::hp9k_prom_r )
+uint16_t hp9k_state::hp9k_prom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//if (mem_mask!=0xff) printf("read of PROM at [%x] mem_mask [%x]\n",offset,mem_mask);
 	int k=prom16a[offset&0xff];
@@ -223,12 +223,12 @@ READ16_MEMBER( hp9k_state::hp9k_prom_r )
 	//return 0;
 }
 
-WRITE16_MEMBER( hp9k_state::hp9k_prom_w )
+void hp9k_state::hp9k_prom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("Error: write to prom\n");
 }
 
-READ16_MEMBER( hp9k_state::hp9k_videoram_r )
+uint16_t hp9k_state::hp9k_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset&=0x3fff;
 
@@ -252,7 +252,7 @@ READ16_MEMBER( hp9k_state::hp9k_videoram_r )
 	}
 }
 
-WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
+void hp9k_state::hp9k_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset&=0x3fff;
 
@@ -290,14 +290,14 @@ WRITE16_MEMBER( hp9k_state::hp9k_videoram_w )
 	}
 }
 
-READ16_MEMBER(hp9k_state::buserror_r)
+uint16_t hp9k_state::buserror_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	return 0;
 }
 
-WRITE16_MEMBER(hp9k_state::buserror_w)
+void hp9k_state::buserror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
@@ -385,7 +385,7 @@ uint32_t hp9k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-WRITE8_MEMBER( hp9k_state::kbd_put )
+void hp9k_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	kbdBit=data;
 }

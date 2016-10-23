@@ -543,26 +543,26 @@ void ncr5390_device::delay_cycles(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-READ8_MEMBER(ncr5390_device::tcount_lo_r)
+uint8_t ncr5390_device::tcount_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: tcount_lo_r %02x (%08x)\n", tag(), tcount & 0xff, space.device().safe_pc());
 	return tcount;
 }
 
-WRITE8_MEMBER(ncr5390_device::tcount_lo_w)
+void ncr5390_device::tcount_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tcount = (tcount & 0xff00) | data;
 	status &= ~S_TC0;
 	logerror("%s: tcount_lo_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 }
 
-READ8_MEMBER(ncr5390_device::tcount_hi_r)
+uint8_t ncr5390_device::tcount_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: tcount_hi_r %02x (%08x)\n", tag(), tcount >> 8, space.device().safe_pc());
 	return tcount >> 8;
 }
 
-WRITE8_MEMBER(ncr5390_device::tcount_hi_w)
+void ncr5390_device::tcount_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tcount = (tcount & 0x00ff) | (data << 8);
 	status &= ~S_TC0;
@@ -586,7 +586,7 @@ void ncr5390_device::fifo_push(uint8_t val)
 		drq_set();
 }
 
-READ8_MEMBER(ncr5390_device::fifo_r)
+uint8_t ncr5390_device::fifo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r;
 	if(fifo_pos) {
@@ -598,19 +598,19 @@ READ8_MEMBER(ncr5390_device::fifo_r)
 	return r;
 }
 
-WRITE8_MEMBER(ncr5390_device::fifo_w)
+void ncr5390_device::fifo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(fifo_pos != 16)
 		fifo[fifo_pos++] = data;
 }
 
-READ8_MEMBER(ncr5390_device::command_r)
+uint8_t ncr5390_device::command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: command_r (%08x)\n", tag(), space.device().safe_pc());
 	return command[0];
 }
 
-WRITE8_MEMBER(ncr5390_device::command_w)
+void ncr5390_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  logerror("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	if(command_pos == 2) {
@@ -747,7 +747,7 @@ void ncr5390_device::check_irq()
 
 }
 
-READ8_MEMBER(ncr5390_device::status_r)
+uint8_t ncr5390_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
@@ -757,13 +757,13 @@ READ8_MEMBER(ncr5390_device::status_r)
 	return res;
 }
 
-WRITE8_MEMBER(ncr5390_device::bus_id_w)
+void ncr5390_device::bus_id_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bus_id = data & 7;
 	logerror("%s: bus_id=%d\n", tag(), bus_id);
 }
 
-READ8_MEMBER(ncr5390_device::istatus_r)
+uint8_t ncr5390_device::istatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = istatus;
 	istatus = 0;
@@ -776,44 +776,44 @@ READ8_MEMBER(ncr5390_device::istatus_r)
 	return res;
 }
 
-WRITE8_MEMBER(ncr5390_device::timeout_w)
+void ncr5390_device::timeout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	select_timeout = data;
 }
 
-READ8_MEMBER(ncr5390_device::seq_step_r)
+uint8_t ncr5390_device::seq_step_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: seq_step_r %d (%08x)\n", tag(), seq, space.device().safe_pc());
 	return seq;
 }
 
-WRITE8_MEMBER(ncr5390_device::sync_period_w)
+void ncr5390_device::sync_period_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sync_period = data & 0x1f;
 }
 
-READ8_MEMBER(ncr5390_device::fifo_flags_r)
+uint8_t ncr5390_device::fifo_flags_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fifo_pos;
 }
 
-WRITE8_MEMBER(ncr5390_device::sync_offset_w)
+void ncr5390_device::sync_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sync_offset = data & 0x0f;
 }
 
-READ8_MEMBER(ncr5390_device::conf_r)
+uint8_t ncr5390_device::conf_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return config;
 }
 
-WRITE8_MEMBER(ncr5390_device::conf_w)
+void ncr5390_device::conf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	config = data;
 	scsi_id = data & 7;
 }
 
-WRITE8_MEMBER(ncr5390_device::clock_w)
+void ncr5390_device::clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	clock_conv = data & 0x07;
 }

@@ -96,8 +96,8 @@ public:
 	template<class _Object> static devcb_base &set_xaen_handler(device_t &device, _Object object)
 		{ return downcast<cr511b_device &>(device).m_xaen_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER ( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 	DECLARE_WRITE_LINE_MEMBER( cmd_w );

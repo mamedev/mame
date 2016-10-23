@@ -46,7 +46,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
 	DECLARE_READ_LINE_MEMBER( busy_r );
-	virtual DECLARE_WRITE8_MEMBER( port_w );
+	virtual void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void postload();
 
 protected:

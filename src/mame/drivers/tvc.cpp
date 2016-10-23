@@ -69,25 +69,25 @@ public:
 	void machine_reset() override;
 
 	void set_mem_page(uint8_t data);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(int_state_r);
-	DECLARE_WRITE8_MEMBER(flipflop_w);
-	DECLARE_WRITE8_MEMBER(border_color_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(cassette_w);
-	DECLARE_READ8_MEMBER(_5b_r);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t int_state_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flipflop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void border_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t _5b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(int_ff_set);
 	DECLARE_WRITE_LINE_MEMBER(centronics_ack);
 
 	// expansions
-	DECLARE_WRITE8_MEMBER(expansion_w);
-	DECLARE_READ8_MEMBER(expansion_r);
-	DECLARE_READ8_MEMBER(exp_id_r);
-	DECLARE_WRITE8_MEMBER(expint_ack_w);
+	void expansion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t expansion_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t exp_id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void expint_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
 
@@ -211,24 +211,24 @@ void tvc_state::set_mem_page(uint8_t data)
 }
 
 
-WRITE8_MEMBER(tvc_state::expansion_w)
+void tvc_state::expansion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_expansions[m_active_slot & 3]->write(space, offset, data);
 }
 
 
-READ8_MEMBER(tvc_state::expansion_r)
+uint8_t tvc_state::expansion_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_expansions[m_active_slot & 3]->read(space, offset);
 }
 
-WRITE8_MEMBER(tvc_state::bank_w)
+void tvc_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank = data;
 	set_mem_page(data);
 }
 
-WRITE8_MEMBER(tvc_state::vram_bank_w)
+void tvc_state::vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TVC 64+ only
 	if (m_vram->bytes() > 0x4000)
@@ -242,7 +242,7 @@ WRITE8_MEMBER(tvc_state::vram_bank_w)
 	}
 }
 
-WRITE8_MEMBER(tvc_state::palette_w)
+void tvc_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  0 I 0 G | 0 R 0 B
 	//  0 0 0 0 | I G R B
@@ -251,7 +251,7 @@ WRITE8_MEMBER(tvc_state::palette_w)
 	m_col[offset] = i;
 }
 
-WRITE8_MEMBER(tvc_state::keyboard_w)
+void tvc_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 6-7 - expansion select
 	// bit 0-3 - keyboard scan
@@ -260,12 +260,12 @@ WRITE8_MEMBER(tvc_state::keyboard_w)
 	m_active_slot = (data>>6) & 0x03;
 }
 
-READ8_MEMBER(tvc_state::keyboard_r)
+uint8_t tvc_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard[m_keyline & 0x0f]->read();
 }
 
-READ8_MEMBER(tvc_state::int_state_r)
+uint8_t tvc_state::int_state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    x--- ----   centronics ACK flipflop
@@ -283,32 +283,32 @@ READ8_MEMBER(tvc_state::int_state_r)
 	return 0x40 | (m_int_flipflop << 4) | (level > 0.01 ? 0x20 : 0x00) | (m_centronics_ff << 7) | (expint & 0x0f);
 }
 
-WRITE8_MEMBER(tvc_state::flipflop_w)
+void tvc_state::flipflop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// every write here clears the vblank flipflop
 	m_int_flipflop = 1;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(tvc_state::exp_id_r)
+uint8_t tvc_state::exp_id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// expansion slots ID
 	return  (m_expansions[0]->id_r()<<0) | (m_expansions[1]->id_r()<<2) |
 			(m_expansions[2]->id_r()<<4) | (m_expansions[3]->id_r()<<6);
 }
 
-WRITE8_MEMBER(tvc_state::expint_ack_w)
+void tvc_state::expint_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_expansions[offset & 3]->int_ack();
 }
 
-WRITE8_MEMBER(tvc_state::border_color_w)
+void tvc_state::border_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// x-x- x-x-    border color (I G R B)
 }
 
 
-WRITE8_MEMBER(tvc_state::sound_w)
+void tvc_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -332,13 +332,13 @@ WRITE8_MEMBER(tvc_state::sound_w)
 	m_sound->write(space, offset, data);
 }
 
-READ8_MEMBER(tvc_state::_5b_r)
+uint8_t tvc_state::_5b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound->reset_divider();
 	return 0xff;
 }
 
-WRITE8_MEMBER(tvc_state::cassette_w)
+void tvc_state::cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// writig here cause the toggle of the cassette flipflop
 	m_cassette_ff = !m_cassette_ff;

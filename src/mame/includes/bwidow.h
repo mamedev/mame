@@ -19,11 +19,11 @@ public:
 		m_dsw2(*this, "DSW2") { }
 
 	int m_lastdata;
-	DECLARE_READ8_MEMBER(spacduel_IN3_r);
-	DECLARE_READ8_MEMBER(bwidowp_in_r);
-	DECLARE_WRITE8_MEMBER(bwidow_misc_w);
-	DECLARE_WRITE8_MEMBER(spacduel_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	uint8_t spacduel_IN3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bwidowp_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bwidow_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spacduel_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 	required_device<cpu_device> m_maincpu;
 	optional_ioport m_in3;

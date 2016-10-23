@@ -200,7 +200,7 @@ int c64_cpm_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int r
 //  dma_r -
 //-------------------------------------------------
 
-READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
+uint8_t c64_cpm_cartridge_device::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -219,7 +219,7 @@ READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64_cpm_cartridge_device::dma_w )
+void c64_cpm_cartridge_device::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_enabled)
 	{

@@ -46,8 +46,8 @@ public:
 	}
 
 	void machine_reset_c8002();
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(portff05_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portff05_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t m_term_data;
@@ -56,14 +56,14 @@ private:
 };
 
 
-READ8_MEMBER( onyx_state::portff05_r )
+uint8_t onyx_state::portff05_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//return m_term_data;
 
 	return 4;
 }
 
-WRITE8_MEMBER( onyx_state::kbd_put )
+void onyx_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

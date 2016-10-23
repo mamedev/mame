@@ -23,7 +23,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
+void surpratk_state::surpratk_videobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0xf8)
 		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
@@ -37,7 +37,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 		m_bank0000->set_bank(BIT(data, 0));
 }
 
-WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
+void surpratk_state::surpratk_5fc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
@@ -157,7 +157,7 @@ void surpratk_state::machine_reset()
 	m_sprite_colorbase = 0;
 }
 
-WRITE8_MEMBER( surpratk_state::banking_callback )
+void surpratk_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: setlines %02x\n", machine().device("maincpu")->safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);

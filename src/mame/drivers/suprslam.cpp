@@ -93,7 +93,7 @@ EB26IC73.BIN    27C240      /  Main Program
 
 /*** SOUND *******************************************************************/
 
-WRITE16_MEMBER(suprslam_state::sound_command_w)
+void suprslam_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -104,18 +104,18 @@ WRITE16_MEMBER(suprslam_state::sound_command_w)
 }
 
 #if 0
-READ16_MEMBER(suprslam_state::pending_command_r)
+uint16_t suprslam_state::pending_command_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return pending_command;
 }
 #endif
 
-WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
+void suprslam_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
+void suprslam_state::suprslam_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }

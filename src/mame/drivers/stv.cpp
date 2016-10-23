@@ -92,7 +92,7 @@ offsets:
     0x001f PORT-AD
 */
 
-READ8_MEMBER(stv_state::stv_ioga_r)
+uint8_t stv_state::stv_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -116,7 +116,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::stv_ioga_w)
+void stv_state::stv_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 0x20 && !space.debugger_access())
 		printf("Writing to mirror %08x %02x?\n",offset,data);
@@ -136,7 +136,7 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	}
 }
 
-READ8_MEMBER(stv_state::critcrsh_ioga_r)
+uint8_t stv_state::critcrsh_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
@@ -157,7 +157,7 @@ READ8_MEMBER(stv_state::critcrsh_ioga_r)
 	return res;
 }
 
-READ8_MEMBER(stv_state::magzun_ioga_r)
+uint8_t stv_state::magzun_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -182,7 +182,7 @@ READ8_MEMBER(stv_state::magzun_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::magzun_ioga_w)
+void stv_state::magzun_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -192,7 +192,7 @@ WRITE8_MEMBER(stv_state::magzun_ioga_w)
 	}
 }
 
-READ8_MEMBER(stv_state::stvmp_ioga_r)
+uint8_t stv_state::stvmp_ioga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const mpnames[2][5] = {
 		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
@@ -224,7 +224,7 @@ READ8_MEMBER(stv_state::stvmp_ioga_r)
 	return res;
 }
 
-WRITE8_MEMBER(stv_state::stvmp_ioga_w)
+void stv_state::stvmp_ioga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -235,7 +235,7 @@ WRITE8_MEMBER(stv_state::stvmp_ioga_w)
 }
 
 /* remaps with a 8-bit handler because MAME can't install r/w handlers with a different bus parallelism than the CPU native one, shrug ... */
-READ32_MEMBER(stv_state::stv_ioga_r32)
+uint32_t stv_state::stv_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -251,7 +251,7 @@ READ32_MEMBER(stv_state::stv_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::stv_ioga_w32)
+void stv_state::stv_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		stv_ioga_w(space,offset*4+1,data >> 16);
@@ -264,7 +264,7 @@ WRITE32_MEMBER(stv_state::stv_ioga_w32)
 	return;
 }
 
-READ32_MEMBER(stv_state::critcrsh_ioga_r32)
+uint32_t stv_state::critcrsh_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -281,7 +281,7 @@ READ32_MEMBER(stv_state::critcrsh_ioga_r32)
 	return res;
 }
 
-READ32_MEMBER(stv_state::stvmp_ioga_r32)
+uint32_t stv_state::stvmp_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -298,7 +298,7 @@ READ32_MEMBER(stv_state::stvmp_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
+void stv_state::stvmp_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		stvmp_ioga_w(space,offset*4+1,data >> 16);
@@ -310,7 +310,7 @@ WRITE32_MEMBER(stv_state::stvmp_ioga_w32)
 				printf("Warning: IOGA writes to odd offset %02x (%08x) -> %08x!",offset*4,mem_mask,data);
 }
 
-READ32_MEMBER(stv_state::magzun_ioga_r32)
+uint32_t stv_state::magzun_ioga_r32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res;
 
@@ -327,7 +327,7 @@ READ32_MEMBER(stv_state::magzun_ioga_r32)
 	return res;
 }
 
-WRITE32_MEMBER(stv_state::magzun_ioga_w32)
+void stv_state::magzun_ioga_w32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_23)
 		magzun_ioga_w(space,offset*4+1,data >> 16);
@@ -422,7 +422,7 @@ void stv_state::init_critcrsh()
     TODO: game doesn't work if not in debugger?
 */
 
-READ32_MEMBER(stv_state::magzun_hef_hack_r)
+uint32_t stv_state::magzun_hef_hack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
 
@@ -431,7 +431,7 @@ READ32_MEMBER(stv_state::magzun_hef_hack_r)
 	return m_workram_h[0x08e830/4];
 }
 
-READ32_MEMBER(stv_state::magzun_rx_hack_r)
+uint32_t stv_state::magzun_rx_hack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(space.device().safe_pc()==0x604c006) return 0x40;
 
@@ -1054,7 +1054,7 @@ MACHINE_CONFIG_END
     Similar if not the same as Magic the Gathering, probably needs merging.
 */
 
-WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
+void stv_state::batmanfr_sound_comms_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_31)
 		m_soundlatch->write(space, 0, data >> 16, 0x0000ffff);
@@ -1062,7 +1062,7 @@ WRITE32_MEMBER( stv_state::batmanfr_sound_comms_w )
 		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
 
-READ16_MEMBER( stv_state::adsp_control_r )
+uint16_t stv_state::adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
@@ -1081,7 +1081,7 @@ READ16_MEMBER( stv_state::adsp_control_r )
 	return res;
 }
 
-WRITE16_MEMBER( stv_state::adsp_control_w )
+void stv_state::adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

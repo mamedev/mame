@@ -60,17 +60,17 @@
  *
  *************************************/
 
-WRITE8_MEMBER(blueprnt_state::dipsw_w)
+void blueprnt_state::dipsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dipsw = data;
 }
 
-READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
+uint8_t blueprnt_state::blueprnt_sh_dipsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dipsw;
 }
 
-READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
+uint8_t blueprnt_state::grasspin_sh_dipsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// judging from the disasm, it looks like simple protection was added
 	// d6: small possibility it's for comms? but the fact that there's a Freeze switch on the pcb rules this out
@@ -78,13 +78,13 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 	return (m_dipsw & 0x7f) | 0x80;
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
+void blueprnt_state::blueprnt_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
+void blueprnt_state::blueprnt_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

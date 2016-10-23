@@ -71,15 +71,15 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	void init_sbrain();
 	void machine_reset_sbrain();
-	DECLARE_READ8_MEMBER(ppi_pa_r);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_READ8_MEMBER(ppi_pb_r);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(baud_w);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fr_w);
 	DECLARE_WRITE_LINE_MEMBER(ft_w);
 private:
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( sbrain_subio, AS_IO, 8, sbrain_state )
 ADDRESS_MAP_END
 
 // bit 0 is wrong, maybe the whole byte is wrong
-READ8_MEMBER( sbrain_state::port08_r )
+uint8_t sbrain_state::port08_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port08;
 }
@@ -149,7 +149,7 @@ d4 : SEL D
 d5 : side select
 d6,7 : not used
 */
-WRITE8_MEMBER( sbrain_state::port08_w )
+void sbrain_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port08 = data | 0xc0;
 
@@ -177,13 +177,13 @@ WRITE_LINE_MEMBER( sbrain_state::ft_w )
 {
 }
 
-WRITE8_MEMBER( sbrain_state::baud_w )
+void sbrain_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_brg->str_w(data & 0x0f);
 	m_brg->stt_w(data >> 4);
 }
 
-READ8_MEMBER( sbrain_state::ppi_pa_r )
+uint8_t sbrain_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_porta;
 }
@@ -196,7 +196,7 @@ d5 : strike through
 d6 : 1=60hz 0=50hz
 d7 : reverse video
 */
-WRITE8_MEMBER( sbrain_state::ppi_pa_w )
+void sbrain_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
@@ -211,17 +211,17 @@ d5 : disk is busy
 d6 : Ring Indicator line from main rs232 port, 1=normal, 0=set
 d7 : cpu2 /busak line
 */
-READ8_MEMBER( sbrain_state::ppi_pb_r )
+uint8_t sbrain_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portb | 0x50 | m_vs->read() | (BIT(m_port08, 0) << 5) | ((uint8_t)BIT(m_portc, 5) << 7);
 }
 
-WRITE8_MEMBER( sbrain_state::ppi_pb_w )
+void sbrain_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portb = data & 8;
 }
 
-READ8_MEMBER( sbrain_state::ppi_pc_r )
+uint8_t sbrain_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portc;
 }
@@ -236,7 +236,7 @@ d5 : cpu2 /busreq line
 d6 : beeper
 d7 : keyboard, 1=enable comms, 0=reset
 */
-WRITE8_MEMBER( sbrain_state::ppi_pc_w )
+void sbrain_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portc = data;
 	m_beep->set_state(BIT(data, 6));

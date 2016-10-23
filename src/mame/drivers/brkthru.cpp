@@ -67,7 +67,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
+void brkthru_state::brkthru_1803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = ~data & 1;
@@ -78,7 +78,7 @@ WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::darwin_0803_w)
+void brkthru_state::darwin_0803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = NMI enable */
 	m_nmi_mask = data & 1;
@@ -91,7 +91,7 @@ WRITE8_MEMBER(brkthru_state::darwin_0803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
+void brkthru_state::brkthru_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

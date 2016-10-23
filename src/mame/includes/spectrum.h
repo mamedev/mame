@@ -118,27 +118,27 @@ public:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
-	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
-	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
-	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_df_r);
-	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	void spectrum_port_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_fe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_1f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_7f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_df_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_port_ula_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
+	void spectrum_128_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_128_ula_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
-	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_7ffd_w);
-	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_1ffd_w);
+	void spectrum_plus3_port_3ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_plus3_port_3ffd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spectrum_plus3_port_2ffd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spectrum_plus3_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spectrum_plus3_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
-	DECLARE_READ8_MEMBER(ts2068_port_ff_r);
-	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
-	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
+	uint8_t ts2068_port_f4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts2068_port_f4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ts2068_port_ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ts2068_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tc2048_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_spectrum();
 	void init_plus2();

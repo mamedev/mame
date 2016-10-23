@@ -41,7 +41,7 @@ void blstroid_state::update_interrupts()
 }
 
 
-WRITE16_MEMBER(blstroid_state::blstroid_halt_until_hblank_0_w)
+void blstroid_state::blstroid_halt_until_hblank_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	halt_until_hblank_0(space.device(), *m_screen);
 }

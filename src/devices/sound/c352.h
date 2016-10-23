@@ -33,8 +33,8 @@ public:
 	// inline configuration helpers
 	static void static_set_divider(device_t &device, int setting);
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	sound_stream *m_stream;
 

@@ -81,11 +81,11 @@ public:
 	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
 	void cd_w(address_space &space, offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
 
-	DECLARE_READ8_MEMBER( slot_r );
-	DECLARE_WRITE8_MEMBER( slot_w );
+	uint8_t slot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( modsel_r );
-	DECLARE_WRITE8_MEMBER( modsel_w );
+	uint8_t modsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void modsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

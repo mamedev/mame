@@ -119,30 +119,30 @@ public:
 	uint16_t m_vblank_bit;
 	uint16_t m_brasil_prot_latch;
 	uint16_t m_grancapi_prot_latch;
-	DECLARE_READ16_MEMBER(read0_r);
-	DECLARE_READ16_MEMBER(read1_r);
-	DECLARE_READ16_MEMBER(read2_r);
-	DECLARE_WRITE16_MEMBER(tv_vcf_bankselect_w);
-	DECLARE_WRITE16_MEMBER(write1_w);
-	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
-	DECLARE_WRITE16_MEMBER(tv_tcf_bankselect_w);
-	DECLARE_READ16_MEMBER(newmcard_status_r);
-	DECLARE_READ16_MEMBER(newmcard_vblank_r);
-	DECLARE_WRITE16_MEMBER(newmcard_vblank_w);
-	DECLARE_WRITE16_MEMBER(write2_w);
-	DECLARE_WRITE16_MEMBER(nyj_write2_w);
-	DECLARE_READ16_MEMBER(brasil_status_r);
-	DECLARE_WRITE16_MEMBER(brasil_status_w);
-	DECLARE_READ16_MEMBER(ciclone_status_r);
-	DECLARE_READ16_MEMBER(grancapi_status_r);
-	DECLARE_WRITE16_MEMBER(grancapi_status_w);
-	DECLARE_READ16_MEMBER(magicbom_status_r);
-	DECLARE_READ16_MEMBER(record_status_r);
-	DECLARE_WRITE16_MEMBER(fashion_output_w);
-	DECLARE_WRITE16_MEMBER(tv_oki6376_w);
-	DECLARE_READ16_MEMBER(tv_oki6376_r);
-	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_w);
-	DECLARE_WRITE16_MEMBER(tv_ncf_oki6376_st_w);
+	uint16_t read0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t read1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t read2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tv_vcf_bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tv_ncf_read1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tv_tcf_bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t newmcard_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t newmcard_vblank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void newmcard_vblank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nyj_write2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t brasil_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void brasil_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ciclone_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t grancapi_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void grancapi_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t magicbom_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t record_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fashion_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tv_oki6376_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tv_oki6376_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tv_ncf_oki6376_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tv_ncf_oki6376_st_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_fashion();
 	void init_ciclone();
 	void init_record();
@@ -225,23 +225,23 @@ uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb3
 
 
 
-READ16_MEMBER(highvdeo_state::read0_r)
+uint16_t highvdeo_state::read0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN0")->read();
 }
 
-READ16_MEMBER(highvdeo_state::read1_r)
+uint16_t highvdeo_state::read1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN1")->read();
 }
 
-READ16_MEMBER(highvdeo_state::read2_r)
+uint16_t highvdeo_state::read2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN2")->read();
 }
 
 
-WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
+void highvdeo_state::tv_vcf_bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t bankaddress;
 	uint8_t *ROM = memregion("user1")->base();
@@ -253,7 +253,7 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 }
 
 
-WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
+void highvdeo_state::tv_oki6376_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data)
@@ -264,7 +264,7 @@ WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 	}
 }
 
-READ16_MEMBER(highvdeo_state::tv_oki6376_r)
+uint16_t highvdeo_state::tv_oki6376_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -273,7 +273,7 @@ READ16_MEMBER(highvdeo_state::tv_oki6376_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(highvdeo_state::write1_w)
+void highvdeo_state::write1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     - Lbits -
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
+uint16_t highvdeo_state::tv_ncf_read1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static int resetpulse = 0;
 
@@ -328,7 +328,7 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 	return (ioport("IN1")->read() & 0xbf) | resetpulse;
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
+void highvdeo_state::tv_ncf_oki6376_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data) {
@@ -337,7 +337,7 @@ WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
 	}
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
+void highvdeo_state::tv_ncf_oki6376_st_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -393,7 +393,7 @@ static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
+void highvdeo_state::nyj_write2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     7654 3210
@@ -407,7 +407,7 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
 	machine().bookkeeping().coin_counter_w(1, ~data & 0x10); // Notes (all)
 }
 
-WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
+void highvdeo_state::tv_tcf_bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t bankaddress;
 	uint8_t *ROM = memregion("user1")->base();
@@ -441,7 +441,7 @@ ADDRESS_MAP_END
 *
 ****************************/
 
-READ16_MEMBER(highvdeo_state::newmcard_status_r)
+uint16_t highvdeo_state::newmcard_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -452,17 +452,17 @@ READ16_MEMBER(highvdeo_state::newmcard_status_r)
 }
 
 
-READ16_MEMBER(highvdeo_state::newmcard_vblank_r)
+uint16_t highvdeo_state::newmcard_vblank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vblank_bit; //0x80
 }
 
-WRITE16_MEMBER(highvdeo_state::newmcard_vblank_w)
+void highvdeo_state::newmcard_vblank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vblank_bit = data;
 }
 
-WRITE16_MEMBER(highvdeo_state::write2_w)
+void highvdeo_state::write2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -506,7 +506,7 @@ ADDRESS_MAP_END
 ****************************/
 
 
-READ16_MEMBER(highvdeo_state::brasil_status_r)
+uint16_t highvdeo_state::brasil_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static uint16_t resetpulse;
 
@@ -523,7 +523,7 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::brasil_status_w)
+void highvdeo_state::brasil_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t bankaddress;
 	uint8_t *ROM = memregion("user1")->base();
@@ -542,7 +542,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::grancapi_status_r)
+uint16_t highvdeo_state::grancapi_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static uint16_t resetpulse;
 
@@ -559,7 +559,7 @@ READ16_MEMBER(highvdeo_state::grancapi_status_r)
 }
 
 /*bankaddress might be incorrect.*/
-WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
+void highvdeo_state::grancapi_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t bankaddress;
 	uint8_t *ROM = memregion("user1")->base();
@@ -578,7 +578,7 @@ WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 //  popmessage("%04x",data);
 }
 
-READ16_MEMBER(highvdeo_state::magicbom_status_r)
+uint16_t highvdeo_state::magicbom_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static uint16_t resetpulse;
 
@@ -1494,7 +1494,7 @@ ROM_START( ciclone )
 ROM_END
 
 /*Ciclone*/
-READ16_MEMBER(highvdeo_state::ciclone_status_r)
+uint16_t highvdeo_state::ciclone_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)
@@ -1566,7 +1566,7 @@ ROM_START( fashion )
 	ROM_LOAD( "sound-fashion-v-1-memory4m.u16", 0x00000, 0x80000, CRC(2927c799) SHA1(f11cad096a23fee10bfdff5bf944c96e30f4a8b8) )
 ROM_END
 
-WRITE16_MEMBER(highvdeo_state::fashion_output_w)
+void highvdeo_state::fashion_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -1621,7 +1621,7 @@ ROM_START( record ) // do checks and expect something... pc=e8044
 	ROM_LOAD( "sound-record-hrc-vers1-memory-2m.ic16", 0x00000, 0x40000, CRC(8b72ffec) SHA1(fca5cf2594325e0c9fe446ddf2330c669f7f37a9) )
 ROM_END
 
-READ16_MEMBER(highvdeo_state::record_status_r)
+uint16_t highvdeo_state::record_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static uint16_t resetpulse;
 	switch(offset*2)

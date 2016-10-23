@@ -51,7 +51,7 @@ public:
 	uint8_t read_ctrl();
 	uint8_t read_start_sel();
 	void write_ctrlsel(uint8_t data);
-	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read_ctrl(); }
 
 protected:
 	// device-level overrides
@@ -71,8 +71,8 @@ public:
 	virtual ~device_neogeo_ctrl_edge_interface();
 
 	virtual uint8_t read_start_sel() { return 0xff; }
-	virtual DECLARE_READ8_MEMBER( in0_r ) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER( in1_r ) { return 0xff; }
+	virtual uint8_t in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
 	virtual void write_ctrlsel(uint8_t data) { }
 
 protected:
@@ -90,8 +90,8 @@ public:
 	virtual ~neogeo_ctrl_edge_port_device();
 
 	uint8_t read_start_sel();
-	DECLARE_READ8_MEMBER( in0_r );
-	DECLARE_READ8_MEMBER( in1_r );
+	uint8_t in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write_ctrlsel(uint8_t data);
 
 protected:

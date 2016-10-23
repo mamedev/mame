@@ -10,14 +10,14 @@
 /* The collision detection techniques use in this driver
    are well explained in the comments in the sprint2 driver */
 
-WRITE8_MEMBER(starcrus_state::s1_x_w){ m_s1_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::s1_y_w){ m_s1_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::s2_x_w){ m_s2_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::s2_y_w){ m_s2_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::p1_x_w){ m_p1_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::p1_y_w){ m_p1_y = data^0xff; }
-WRITE8_MEMBER(starcrus_state::p2_x_w){ m_p2_x = data^0xff; }
-WRITE8_MEMBER(starcrus_state::p2_y_w){ m_p2_y = data^0xff; }
+void starcrus_state::s1_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_s1_x = data^0xff; }
+void starcrus_state::s1_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_s1_y = data^0xff; }
+void starcrus_state::s2_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_s2_x = data^0xff; }
+void starcrus_state::s2_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_s2_y = data^0xff; }
+void starcrus_state::p1_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_p1_x = data^0xff; }
+void starcrus_state::p1_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_p1_y = data^0xff; }
+void starcrus_state::p2_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_p2_x = data^0xff; }
+void starcrus_state::p2_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_p2_y = data^0xff; }
 
 void starcrus_state::video_start()
 {
@@ -52,7 +52,7 @@ void starcrus_state::video_start()
 	save_item(NAME(m_launch2_sound_playing));
 }
 
-WRITE8_MEMBER(starcrus_state::ship_parm_1_w)
+void starcrus_state::ship_parm_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s1_sprite = data&0x1f;
 	m_engine1_on = ((data&0x20)>>5)^0x01;
@@ -75,7 +75,7 @@ WRITE8_MEMBER(starcrus_state::ship_parm_1_w)
 	}
 }
 
-WRITE8_MEMBER(starcrus_state::ship_parm_2_w)
+void starcrus_state::ship_parm_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s2_sprite = data&0x1f;
 	output().set_led_value(2,~data & 0x80);          /* game over lamp */
@@ -101,7 +101,7 @@ WRITE8_MEMBER(starcrus_state::ship_parm_2_w)
 
 }
 
-WRITE8_MEMBER(starcrus_state::proj_parm_1_w)
+void starcrus_state::proj_parm_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1_sprite = data&0x0f;
 	m_launch1_on = ((data&0x20)>>5)^0x01;
@@ -138,7 +138,7 @@ WRITE8_MEMBER(starcrus_state::proj_parm_1_w)
 	}
 }
 
-WRITE8_MEMBER(starcrus_state::proj_parm_2_w)
+void starcrus_state::proj_parm_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2_sprite = data&0x0f;
 	m_launch2_on = ((data&0x20)>>5)^0x01;
@@ -489,7 +489,7 @@ uint32_t starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(starcrus_state::coll_det_r)
+uint8_t starcrus_state::coll_det_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_collision_reg ^ 0xff;
 }

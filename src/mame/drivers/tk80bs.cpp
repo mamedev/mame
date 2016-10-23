@@ -42,11 +42,11 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(ppi_custom_r);
-	DECLARE_WRITE8_MEMBER(ppi_custom_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
+	uint8_t ppi_custom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
 private:
@@ -79,7 +79,7 @@ uint32_t tk80bs_state::screen_update_tk80bs(screen_device &screen, bitmap_ind16 
 }
 
 /* A0 and A1 are swapped at the 8255 chip */
-READ8_MEMBER( tk80bs_state::ppi_custom_r )
+uint8_t tk80bs_state::ppi_custom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -92,7 +92,7 @@ READ8_MEMBER( tk80bs_state::ppi_custom_r )
 	}
 }
 
-WRITE8_MEMBER( tk80bs_state::ppi_custom_w )
+void tk80bs_state::ppi_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( tk80bs )
 INPUT_PORTS_END
 
-READ8_MEMBER( tk80bs_state::port_a_r )
+uint8_t tk80bs_state::port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -132,7 +132,7 @@ READ8_MEMBER( tk80bs_state::port_a_r )
 }
 
 
-READ8_MEMBER( tk80bs_state::port_b_r )
+uint8_t tk80bs_state::port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_term_data)
 	{
@@ -143,7 +143,7 @@ READ8_MEMBER( tk80bs_state::port_b_r )
 		return 0;
 }
 
-WRITE8_MEMBER( tk80bs_state::kbd_put )
+void tk80bs_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x7f;
 	if (data > 0x5f) data-=0x20;

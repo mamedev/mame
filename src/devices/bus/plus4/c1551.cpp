@@ -56,7 +56,7 @@ const tiny_rom_entry *c1551_t::device_rom_region() const
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_t::port_r )
+uint8_t c1551_t::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -84,7 +84,7 @@ READ8_MEMBER( c1551_t::port_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_t::port_w )
+void c1551_t::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -119,7 +119,7 @@ WRITE8_MEMBER( c1551_t::port_w )
 //  tpi6525_interface tpi0_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_t::tcbm_data_r )
+uint8_t c1551_t::tcbm_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -139,7 +139,7 @@ READ8_MEMBER( c1551_t::tcbm_data_r )
 	return m_tcbm_data;
 }
 
-WRITE8_MEMBER( c1551_t::tcbm_data_w )
+void c1551_t::tcbm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER( c1551_t::tcbm_data_w )
 	m_tcbm_data = data;
 }
 
-READ8_MEMBER( c1551_t::tpi0_r )
+uint8_t c1551_t::tpi0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_tpi0->read(space, offset);
 
@@ -169,7 +169,7 @@ READ8_MEMBER( c1551_t::tpi0_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_t::tpi0_w )
+void c1551_t::tpi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tpi0->write(space, offset, data);
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER( c1551_t::tpi0_w )
 	m_ga->ted_w(1);
 }
 
-READ8_MEMBER( c1551_t::tpi0_pc_r )
+uint8_t c1551_t::tpi0_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -208,7 +208,7 @@ READ8_MEMBER( c1551_t::tpi0_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_t::tpi0_pc_w )
+void c1551_t::tpi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -242,7 +242,7 @@ WRITE8_MEMBER( c1551_t::tpi0_pc_w )
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
-READ8_MEMBER( c1551_t::tpi1_pb_r )
+uint8_t c1551_t::tpi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -262,7 +262,7 @@ READ8_MEMBER( c1551_t::tpi1_pb_r )
 	return m_status & 0x03;
 }
 
-READ8_MEMBER( c1551_t::tpi1_pc_r )
+uint8_t c1551_t::tpi1_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -287,7 +287,7 @@ READ8_MEMBER( c1551_t::tpi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1551_t::tpi1_pc_w )
+void c1551_t::tpi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

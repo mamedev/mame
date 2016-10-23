@@ -254,7 +254,7 @@ void bsmt2000_device::write_data(uint16_t data)
 //  the register select port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_register_r )
+uint16_t bsmt2000_device::tms_register_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_register_select;
 }
@@ -265,7 +265,7 @@ READ16_MEMBER( bsmt2000_device::tms_register_r )
 //  data port
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_data_r )
+uint16_t bsmt2000_device::tms_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// also implicitly clear the write pending flag
 	m_write_pending = false;
@@ -280,7 +280,7 @@ READ16_MEMBER( bsmt2000_device::tms_data_r )
 //  selected ROM bank and address
 //-------------------------------------------------
 
-READ16_MEMBER( bsmt2000_device::tms_rom_r )
+uint16_t bsmt2000_device::tms_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// underlying logic assumes this is a sign-extended value
 	return (int8_t)read_byte((m_rom_bank << 16) + m_rom_address);
@@ -292,7 +292,7 @@ READ16_MEMBER( bsmt2000_device::tms_rom_r )
 //  current ROM bank to access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
+void bsmt2000_device::tms_rom_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rom_address = data;
 }
@@ -303,7 +303,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_addr_w )
 //  access
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
+void bsmt2000_device::tms_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rom_bank = data;
 }
@@ -314,7 +314,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_rom_bank_w )
 //  DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_left_w )
+void bsmt2000_device::tms_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_stream->update();
 	m_left_data = data;
@@ -326,7 +326,7 @@ WRITE16_MEMBER( bsmt2000_device::tms_left_w )
 //  channel DAC
 //-------------------------------------------------
 
-WRITE16_MEMBER( bsmt2000_device::tms_right_w )
+void bsmt2000_device::tms_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_stream->update();
 	m_right_data = data;

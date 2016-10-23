@@ -49,16 +49,16 @@ public:
 	required_device<ay8910_device> m_ay8910;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);
-	DECLARE_WRITE8_MEMBER(kncljoe_control_w);
-	DECLARE_WRITE8_MEMBER(kncljoe_scroll_w);
-	DECLARE_WRITE8_MEMBER(m6803_port1_w);
-	DECLARE_WRITE8_MEMBER(m6803_port2_w);
-	DECLARE_READ8_MEMBER(m6803_port1_r);
-	DECLARE_READ8_MEMBER(m6803_port2_r);
-	DECLARE_WRITE8_MEMBER(unused_w);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kncljoe_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kncljoe_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kncljoe_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m6803_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m6803_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unused_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

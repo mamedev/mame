@@ -45,7 +45,7 @@ Manuals for both games define the controls as 4 push buttons:
 #include "includes/galspnbl.h"
 
 
-WRITE16_MEMBER(galspnbl_state::soundcommand_w)
+void galspnbl_state::soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

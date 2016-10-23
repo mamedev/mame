@@ -42,23 +42,23 @@ public:
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram;
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram_spare;
 	std::unique_ptr<uint16_t[]> m_mlc_buffered_spriteram;
-	DECLARE_READ32_MEMBER(test2_r);
-	DECLARE_READ32_MEMBER(mlc_440008_r);
-	DECLARE_READ32_MEMBER(mlc_44001c_r);
-	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
+	uint32_t test2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_440008_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_44001c_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mlc_44001c_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(avengrs_palette_w);
-	DECLARE_READ32_MEMBER(mlc_200000_r);
-	DECLARE_READ32_MEMBER(mlc_200004_r);
-	DECLARE_READ32_MEMBER(mlc_200070_r);
-	DECLARE_READ32_MEMBER(mlc_20007c_r);
-	DECLARE_READ32_MEMBER(mlc_scanline_r);
-	DECLARE_WRITE32_MEMBER(mlc_irq_w);
-	DECLARE_READ32_MEMBER(mlc_vram_r);
-	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
-	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
-	DECLARE_READ32_MEMBER(mlc_spriteram_r);
-	DECLARE_WRITE32_MEMBER(mlc_spriteram_w);
+	void avengrs_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_200000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_200004_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_200070_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_20007c_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_scanline_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mlc_irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t avengrgs_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void avengrs_eprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t mlc_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mlc_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 
 
@@ -80,6 +80,6 @@ public:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	required_region_ptr<uint8_t> m_gfx2;
 
-	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	uint16_t sh96_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sh96_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };

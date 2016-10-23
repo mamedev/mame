@@ -185,7 +185,7 @@ void turbo_state::video_start_buckrog()
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::turbo_videoram_w)
+void turbo_state::turbo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset < 0x400)
@@ -196,7 +196,7 @@ WRITE8_MEMBER(turbo_state::turbo_videoram_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_bitmap_w)
+void turbo_state::buckrog_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_buckrog_bitmap_ram[offset] = data & 1;
 }

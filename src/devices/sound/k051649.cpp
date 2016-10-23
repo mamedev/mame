@@ -150,7 +150,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 /********************************************************************************/
 
 
-WRITE8_MEMBER( k051649_device::k051649_waveform_w )
+void k051649_device::k051649_waveform_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// waveram is read-only?
 	if (m_test & 0x40 || (m_test & 0x80 && offset >= 0x60))
@@ -169,7 +169,7 @@ WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 }
 
 
-READ8_MEMBER ( k051649_device::k051649_waveform_r )
+uint8_t k051649_device::k051649_waveform_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// test-register bits 6/7 expose the internal counter
 	if (m_test & 0xc0)
@@ -185,7 +185,7 @@ READ8_MEMBER ( k051649_device::k051649_waveform_r )
 }
 
 
-WRITE8_MEMBER( k051649_device::k052539_waveform_w )
+void k051649_device::k052539_waveform_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// waveram is read-only?
 	if (m_test & 0x40)
@@ -196,7 +196,7 @@ WRITE8_MEMBER( k051649_device::k052539_waveform_w )
 }
 
 
-READ8_MEMBER ( k051649_device::k052539_waveform_r )
+uint8_t k051649_device::k052539_waveform_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// test-register bit 6 exposes the internal counter
 	if (m_test & 0x40)
@@ -208,14 +208,14 @@ READ8_MEMBER ( k051649_device::k052539_waveform_r )
 }
 
 
-WRITE8_MEMBER( k051649_device::k051649_volume_w )
+void k051649_device::k051649_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_channel_list[offset&0x7].volume=data&0xf;
 }
 
 
-WRITE8_MEMBER( k051649_device::k051649_frequency_w )
+void k051649_device::k051649_frequency_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int freq_hi = offset & 1;
 	offset >>= 1;
@@ -236,7 +236,7 @@ WRITE8_MEMBER( k051649_device::k051649_frequency_w )
 }
 
 
-WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
+void k051649_device::k051649_keyonoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	m_stream->update();
@@ -249,13 +249,13 @@ WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 }
 
 
-WRITE8_MEMBER( k051649_device::k051649_test_w )
+void k051649_device::k051649_test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_test = data;
 }
 
 
-READ8_MEMBER ( k051649_device::k051649_test_r )
+uint8_t k051649_device::k051649_test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// reading the test register sets it to $ff!
 	k051649_test_w(space, offset, 0xff);

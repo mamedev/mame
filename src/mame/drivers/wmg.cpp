@@ -86,20 +86,20 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(wmg_rombank_w);
+	void wmg_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_wmg();
 	void init_wmg();
 	uint8_t m_wmg_bank;
 	uint8_t m_wmg_def_bank;
 	uint8_t m_wmg_port_select;
 	uint8_t m_wmg_vram_bank;
-	DECLARE_READ8_MEMBER(wmg_nvram_r);
-	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
-	DECLARE_READ8_MEMBER(wmg_pia_0_r);
-	DECLARE_WRITE8_MEMBER(wmg_def_rombank_w);
+	uint8_t wmg_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wmg_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wmg_pia_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wmg_def_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
-	DECLARE_WRITE8_MEMBER(wmg_sound_reset_w);
-	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
+	void wmg_sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wmg_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 	void wmg_def_install_io_space(address_space &space);
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -111,12 +111,12 @@ public:
  *  NVRAM (8k x 8), banked
  *
  *************************************/
-READ8_MEMBER( wmg_state::wmg_nvram_r )
+uint8_t wmg_state::wmg_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_ram[offset+(m_wmg_bank<<10)];
 }
 
-WRITE8_MEMBER( wmg_state::wmg_nvram_w )
+void wmg_state::wmg_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_ram[offset+(m_wmg_bank<<10)] = data;
 }
@@ -130,7 +130,7 @@ WRITE8_MEMBER( wmg_state::wmg_nvram_w )
 /* switches the banks around when given a game number.
    The hardware has a lock feature, so that once a bank is selected, the next choice must be the menu */
 
-WRITE8_MEMBER( wmg_state::wmg_rombank_w )
+void wmg_state::wmg_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -147,13 +147,13 @@ WRITE8_MEMBER( wmg_state::wmg_rombank_w )
 	}
 }
 
-WRITE8_MEMBER( wmg_state::wmg_sound_reset_w )
+void wmg_state::wmg_sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This resets the sound card when bit 0 is low */
 	if (!BIT(data, 0)) m_soundcpu->reset();
 }
 
-WRITE8_MEMBER( wmg_state::wmg_vram_select_w )
+void wmg_state::wmg_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_wmg_vram_bank = BIT(data, 0);
@@ -183,7 +183,7 @@ void wmg_state::wmg_def_install_io_space(address_space &space)
 	membank("bank4")->set_base(m_generic_paletteram_8);
 }
 
-WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
+void wmg_state::wmg_def_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	data &= 15;
@@ -257,7 +257,7 @@ CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 	return ioport(tag)->read();
 }
 
-READ8_MEMBER( wmg_state::wmg_pia_0_r )
+uint8_t wmg_state::wmg_pia_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* if player presses P1 and P2 in a game, return to the menu.
     Since there is no code in rom to handle this, it must be a hardware feature

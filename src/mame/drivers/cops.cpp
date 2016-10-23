@@ -76,25 +76,25 @@ protected:
 	virtual void video_start() override;
 
 public:
-	DECLARE_WRITE8_MEMBER(io1_w);
-	DECLARE_READ8_MEMBER(io1_r);
-	DECLARE_READ8_MEMBER(io1_lm_r);
-	DECLARE_WRITE8_MEMBER(io2_w);
-	DECLARE_READ8_MEMBER(io2_r);
-	DECLARE_READ8_MEMBER(ldstatus_r);
+	void io1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t io1_lm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ldstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
 	DECLARE_WRITE_LINE_MEMBER(ld_w);
 	DECLARE_WRITE_LINE_MEMBER(via1_irq);
 	DECLARE_WRITE_LINE_MEMBER(via2_irq);
 	void dacia_receive(uint8_t data);
 	void update_dacia_irq();
-	DECLARE_WRITE8_MEMBER(dacia_w);
-	DECLARE_READ8_MEMBER(dacia_r);
-	DECLARE_WRITE8_MEMBER(via1_b_w);
-	DECLARE_WRITE8_MEMBER(via1_cb1_w);
-	DECLARE_WRITE8_MEMBER(cdrom_data_w);
-	DECLARE_WRITE8_MEMBER(cdrom_ctrl_w);
-	DECLARE_READ8_MEMBER(cdrom_data_r);
+	void dacia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dacia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via1_cb1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cdrom_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cdrom_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cdrom_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_cops();
 	int m_irq;
 
@@ -197,7 +197,7 @@ uint32_t cops_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-WRITE8_MEMBER(cops_state::cdrom_data_w)
+void cops_state::cdrom_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const char *regs[4] = { "CMD", "PARAM", "WRITE", "CTRL" };
 	m_cdrom_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
@@ -205,13 +205,13 @@ WRITE8_MEMBER(cops_state::cdrom_data_w)
 	if (LOG_CDROM) logerror("%s:cdrom_data_w(reg = %s, data = %02x)\n", machine().describe_context(), regs[reg & 0x03], m_cdrom_data);
 }
 
-WRITE8_MEMBER(cops_state::cdrom_ctrl_w)
+void cops_state::cdrom_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_CDROM) logerror("%s:cdrom_ctrl_w(%02x)\n", machine().describe_context(), data);
 	m_cdrom_ctrl = data;
 }
 
-READ8_MEMBER(cops_state::cdrom_data_r)
+uint8_t cops_state::cdrom_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *regs[4] = { "STATUS", "RESULT", "READ", "FIFOST" };
 	uint8_t reg = ((m_cdrom_ctrl & 4) >> 1) | ((m_cdrom_ctrl & 8) >> 3);
@@ -224,7 +224,7 @@ READ8_MEMBER(cops_state::cdrom_data_r)
  *
  *************************************/
 
-READ8_MEMBER(cops_state::ldstatus_r)
+uint8_t cops_state::ldstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ld->status_r();
 }
@@ -361,7 +361,7 @@ uint8_t cops_state::generate_isr2()
 	return isr2;
 }
 
-READ8_MEMBER(cops_state::dacia_r)
+uint8_t cops_state::dacia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 0x07)
 	{
@@ -426,7 +426,7 @@ READ8_MEMBER(cops_state::dacia_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::dacia_w)
+void cops_state::dacia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset & 0x07)
 	{
@@ -583,7 +583,7 @@ WRITE8_MEMBER(cops_state::dacia_w)
  *
  *************************************/
 
-READ8_MEMBER(cops_state::io1_r)
+uint8_t cops_state::io1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset & 0x0f )
 	{
@@ -599,7 +599,7 @@ READ8_MEMBER(cops_state::io1_r)
 	}
 }
 
-READ8_MEMBER(cops_state::io1_lm_r)
+uint8_t cops_state::io1_lm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset & 0x0f )
 	{
@@ -617,7 +617,7 @@ READ8_MEMBER(cops_state::io1_lm_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::io1_w)
+void cops_state::io1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	char output_name[16];
@@ -692,7 +692,7 @@ WRITE8_MEMBER(cops_state::io1_w)
 	}
 }
 
-READ8_MEMBER(cops_state::io2_r)
+uint8_t cops_state::io2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset & 0x0f )
 	{
@@ -704,7 +704,7 @@ READ8_MEMBER(cops_state::io2_r)
 	}
 }
 
-WRITE8_MEMBER(cops_state::io2_w)
+void cops_state::io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset & 0x0f )
 	{
@@ -755,7 +755,7 @@ WRITE_LINE_MEMBER(cops_state::via1_irq)
 	m_maincpu->set_input_line(M6502_IRQ_LINE, m_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cops_state::via1_b_w)
+void cops_state::via1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sn_data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 	if (m_sn_cb1)
@@ -764,7 +764,7 @@ WRITE8_MEMBER(cops_state::via1_b_w)
 	}
 }
 
-WRITE8_MEMBER(cops_state::via1_cb1_w)
+void cops_state::via1_cb1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sn_cb1 = data;
 }

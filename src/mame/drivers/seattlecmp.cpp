@@ -45,9 +45,9 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -75,14 +75,14 @@ static ADDRESS_MAP_START(seattle_io, AS_IO, 16, seattle_comp_state)
 	//AM_RANGE(0xfe, 0xff) Eprom disable bit, read sense switches (bank of 8 dipswitches)
 ADDRESS_MAP_END
 
-READ16_MEMBER( seattle_comp_state::read )
+uint16_t seattle_comp_state::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t status = (m_key_available) ? 0x300 : 0x100;
 	m_key_available = 0;
 	return m_term_data | status;
 }
 
-WRITE16_MEMBER( seattle_comp_state::write )
+void seattle_comp_state::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_terminal->write(space, 0, data&0x7f);
 }
@@ -98,7 +98,7 @@ void seattle_comp_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( seattle_comp_state::kbd_put )
+void seattle_comp_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_key_available = 1;

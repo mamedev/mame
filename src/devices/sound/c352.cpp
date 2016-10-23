@@ -316,12 +316,12 @@ void c352_device::device_reset()
 	m_control = 0;
 }
 
-READ16_MEMBER( c352_device::read )
+uint16_t c352_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(read_reg16(offset));
 }
 
-WRITE16_MEMBER( c352_device::write )
+void c352_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{

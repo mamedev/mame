@@ -64,13 +64,13 @@ void tms32082_mp_device::set_command_callback(write32_delegate callback)
 }
 
 
-READ32_MEMBER(tms32082_mp_device::mp_param_r)
+uint32_t tms32082_mp_device::mp_param_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
 	return m_param_ram[offset];
 }
 
-WRITE32_MEMBER(tms32082_mp_device::mp_param_w)
+void tms32082_mp_device::mp_param_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 

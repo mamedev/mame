@@ -29,7 +29,7 @@ TODO:
 #include "includes/mjkjidai.h"
 
 
-WRITE8_MEMBER(mjkjidai_state::adpcm_w)
+void mjkjidai_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (data & 0x07) * 0x1000 * 2;
 	m_adpcm_end = m_adpcm_pos + 0x1000 * 2;
@@ -66,7 +66,7 @@ CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
 	return res;
 }
 
-WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
+void mjkjidai_state::keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: keyboard_select %d = %02x\n",space.device().safe_pc(),offset,data);
 

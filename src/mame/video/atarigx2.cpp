@@ -88,7 +88,7 @@ void atarigx2_state::video_start_atarigx2()
  *
  *************************************/
 
-WRITE16_MEMBER( atarigx2_state::atarigx2_mo_control_w )
+void atarigx2_state::atarigx2_mo_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("MOCONT = %d (scan = %d)\n", data, m_screen->vpos());
 

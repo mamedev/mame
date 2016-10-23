@@ -72,9 +72,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( tdv2324_main_io_30 );
-	DECLARE_READ8_MEMBER( tdv2324_main_io_e6 );
-	DECLARE_WRITE8_MEMBER( tdv2324_main_io_e2 );
+	uint8_t tdv2324_main_io_30(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tdv2324_main_io_e6(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tdv2324_main_io_e2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_sub_status;
 	uint8_t m_sub_data;

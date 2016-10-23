@@ -63,7 +63,7 @@ Z80 CPU - 12MHz/2
 #include "sound/2203intf.h"
 #include "includes/gundealr.h"
 
-WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
+void gundealr_state::yamyam_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }

@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r )
+uint8_t mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -96,7 +96,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r )
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w )
+void mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -123,7 +123,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w )
 	}
 }
 
-READ8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r )
+uint8_t mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -144,7 +144,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r )
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w )
+void mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -171,7 +171,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w )
 	}
 }
 
-READ8_MEMBER( mcf5206e_peripheral_device::ICR13_r )
+uint8_t mcf5206e_peripheral_device::ICR13_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -188,7 +188,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR13_r )
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::ICR13_w )
+void mcf5206e_peripheral_device::ICR13_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -275,64 +275,64 @@ inline void mcf5206e_peripheral_device::CSCR_w(int which, int offset, uint16_t d
 
 
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR0_r) { return CSAR_r(0, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR0_w) {        CSAR_w(0, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR0_r) { return CSMR_r(0, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR0_w) {        CSMR_w(0, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR0_r) { return CSCR_r(0, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR0_w) {        CSCR_w(0, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR0_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(0, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(0, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR0_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(0, mem_mask); }
+void mcf5206e_peripheral_device::CSMR0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(0, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR0_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(0, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(0, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR1_r) { return CSAR_r(1, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR1_w) {        CSAR_w(1, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR1_r) { return CSMR_r(1, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR1_w) {        CSMR_w(1, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR1_r) { return CSCR_r(1, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR1_w) {        CSCR_w(1, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR1_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(1, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(1, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR1_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(1, mem_mask); }
+void mcf5206e_peripheral_device::CSMR1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(1, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR1_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(1, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(1, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR2_r) { return CSAR_r(2, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR2_w) {        CSAR_w(2, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR2_r) { return CSMR_r(2, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR2_w) {        CSMR_w(2, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR2_r) { return CSCR_r(2, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR2_w) {        CSCR_w(2, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR2_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(2, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(2, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR2_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(2, mem_mask); }
+void mcf5206e_peripheral_device::CSMR2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(2, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR2_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(2, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(2, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR3_r) { return CSAR_r(3, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR3_w) {        CSAR_w(3, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR3_r) { return CSMR_r(3, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR3_w) {        CSMR_w(3, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR3_r) { return CSCR_r(3, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR3_w) {        CSCR_w(3, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR3_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(3, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(3, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR3_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(3, mem_mask); }
+void mcf5206e_peripheral_device::CSMR3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(3, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR3_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(3, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(3, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR4_r) { return CSAR_r(4, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR4_w) {        CSAR_w(4, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR4_r) { return CSMR_r(4, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR4_w) {        CSMR_w(4, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR4_r) { return CSCR_r(4, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR4_w) {        CSCR_w(4, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR4_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(4, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(4, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR4_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(4, mem_mask); }
+void mcf5206e_peripheral_device::CSMR4_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(4, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR4_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(4, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(4, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR5_r) { return CSAR_r(5, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR5_w) {        CSAR_w(5, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR5_r) { return CSMR_r(5, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR5_w) {        CSMR_w(5, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR5_r) { return CSCR_r(5, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR5_w) {        CSCR_w(5, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR5_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(5, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(5, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR5_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(5, mem_mask); }
+void mcf5206e_peripheral_device::CSMR5_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(5, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR5_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(5, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(5, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR6_r) { return CSAR_r(6, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR6_w) {        CSAR_w(6, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR6_r) { return CSMR_r(6, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR6_w) {        CSMR_w(6, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR6_r) { return CSCR_r(6, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR6_w) {        CSCR_w(6, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR6_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(6, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(6, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR6_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(6, mem_mask); }
+void mcf5206e_peripheral_device::CSMR6_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(6, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR6_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(6, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(6, offset, data, mem_mask); }
 
-READ16_MEMBER(  mcf5206e_peripheral_device::CSAR7_r) { return CSAR_r(7, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSAR7_w) {        CSAR_w(7, offset, data, mem_mask); }
-READ32_MEMBER(  mcf5206e_peripheral_device::CSMR7_r) { return CSMR_r(7, mem_mask); }
-WRITE32_MEMBER( mcf5206e_peripheral_device::CSMR7_w) {        CSMR_w(7, data, mem_mask); }
-READ16_MEMBER(  mcf5206e_peripheral_device::CSCR7_r) { return CSCR_r(7, offset, mem_mask); }
-WRITE16_MEMBER( mcf5206e_peripheral_device::CSCR7_w) {        CSCR_w(7, offset, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSAR7_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSAR_r(7, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSAR7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSAR_w(7, offset, data, mem_mask); }
+uint32_t mcf5206e_peripheral_device::CSMR7_r(address_space &space, offs_t offset, uint32_t mem_mask) { return CSMR_r(7, mem_mask); }
+void mcf5206e_peripheral_device::CSMR7_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) {        CSMR_w(7, data, mem_mask); }
+uint16_t mcf5206e_peripheral_device::CSCR7_r(address_space &space, offs_t offset, uint16_t mem_mask) { return CSCR_r(7, offset, mem_mask); }
+void mcf5206e_peripheral_device::CSCR7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {        CSCR_w(7, offset, data, mem_mask); }
 
 
-READ16_MEMBER( mcf5206e_peripheral_device::DMCR_r)
+uint16_t mcf5206e_peripheral_device::DMCR_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -347,7 +347,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::DMCR_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::DMCR_w)
+void mcf5206e_peripheral_device::DMCR_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -363,7 +363,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::DMCR_w)
 }
 
 
-READ16_MEMBER( mcf5206e_peripheral_device::PAR_r)
+uint16_t mcf5206e_peripheral_device::PAR_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -378,7 +378,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::PAR_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::PAR_w)
+void mcf5206e_peripheral_device::PAR_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -395,7 +395,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::PAR_w)
 
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::PPDDR_r)
+uint8_t mcf5206e_peripheral_device::PPDDR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -412,7 +412,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDDR_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::PPDDR_w)
+void mcf5206e_peripheral_device::PPDDR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -428,7 +428,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDDR_w)
 	}
 }
 
-READ8_MEMBER( mcf5206e_peripheral_device::PPDAT_r)
+uint8_t mcf5206e_peripheral_device::PPDAT_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -445,7 +445,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDAT_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::PPDAT_w)
+void mcf5206e_peripheral_device::PPDAT_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -463,7 +463,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDAT_w)
 }
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::MBCR_r)
+uint8_t mcf5206e_peripheral_device::MBCR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -480,7 +480,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBCR_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::MBCR_w)
+void mcf5206e_peripheral_device::MBCR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -497,7 +497,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBCR_w)
 	}
 }
 
-READ8_MEMBER( mcf5206e_peripheral_device::MFDR_r)
+uint8_t mcf5206e_peripheral_device::MFDR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -514,7 +514,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MFDR_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::MFDR_w)
+void mcf5206e_peripheral_device::MFDR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -536,7 +536,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MFDR_w)
 
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
+uint8_t mcf5206e_peripheral_device::MBSR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int hack = 0x00;
 
@@ -558,7 +558,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::MBSR_w)
+void mcf5206e_peripheral_device::MBSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -578,7 +578,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBSR_w)
 
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::MBDR_r)
+uint8_t mcf5206e_peripheral_device::MBDR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int hack = 0x00;
 
@@ -600,7 +600,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBDR_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::MBDR_w)
+void mcf5206e_peripheral_device::MBDR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -619,7 +619,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBDR_w)
 
 
 
-READ16_MEMBER( mcf5206e_peripheral_device::IMR_r)
+uint16_t mcf5206e_peripheral_device::IMR_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -634,7 +634,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::IMR_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
+void mcf5206e_peripheral_device::IMR_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -676,7 +676,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 }
 
 
-READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
+uint16_t mcf5206e_peripheral_device::TMR1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -691,7 +691,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
+void mcf5206e_peripheral_device::TMR1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -719,7 +719,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 	}
 }
 
-READ16_MEMBER( mcf5206e_peripheral_device::TRR1_r)
+uint16_t mcf5206e_peripheral_device::TRR1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -734,7 +734,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TRR1_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::TRR1_w)
+void mcf5206e_peripheral_device::TRR1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -751,7 +751,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TRR1_w)
 
 
 
-READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
+uint8_t mcf5206e_peripheral_device::TER1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -768,7 +768,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
 	return 0;
 }
 
-WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
+void mcf5206e_peripheral_device::TER1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -785,7 +785,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
 	}
 }
 
-READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
+uint16_t mcf5206e_peripheral_device::TCN1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -801,7 +801,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
 	return 0;
 }
 
-WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
+void mcf5206e_peripheral_device::TCN1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -889,13 +889,13 @@ void mcf5206e_peripheral_device::device_reset()
 	m_timer1->adjust(attotime::never);
 }
 
-READ32_MEMBER(mcf5206e_peripheral_device::dev_r)
+uint32_t mcf5206e_peripheral_device::dev_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	address_space &reg_space = this->space();
 	return reg_space.read_dword(offset*4, mem_mask);
 }
 
-WRITE32_MEMBER(mcf5206e_peripheral_device::dev_w)
+void mcf5206e_peripheral_device::dev_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &reg_space = this->space();
 	reg_space.write_dword(offset*4, data, mem_mask);
@@ -909,12 +909,12 @@ enum {
 	CF_MBSR     =   0x1ec/4
 };
 
-WRITE32_MEMBER(mcf5206e_peripheral_device::seta2_coldfire_regs_w)
+void mcf5206e_peripheral_device::seta2_coldfire_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_coldfire_regs[offset] );
 }
 
-READ32_MEMBER(mcf5206e_peripheral_device::seta2_coldfire_regs_r)
+uint32_t mcf5206e_peripheral_device::seta2_coldfire_regs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch( offset )
 	{

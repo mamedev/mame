@@ -1056,29 +1056,29 @@ translation of Breath of Fire 2 to work. More weirdness: we might need to leave
 8 CPU cycles for division at first, since using 16 produces bugs (see e.g.
 Triforce pieces in Zelda 3 intro) */
 
-WRITE8_MEMBER( _5a22_device::wrmpya_w )
+void _5a22_device::wrmpya_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wrmpya = data;
 }
 
-WRITE8_MEMBER( _5a22_device::wrmpyb_w )
+void _5a22_device::wrmpyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wrmpyb = data;
 	m_rdmpy = m_wrmpya * m_wrmpyb;
 	/* TODO: m_rddiv == 0? */
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivl_w )
+void _5a22_device::wrdivl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wrdiv = (data) | (m_wrdiv & 0xff00);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdivh_w )
+void _5a22_device::wrdivh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wrdiv = (data << 8) | (m_wrdiv & 0xff);
 }
 
-WRITE8_MEMBER( _5a22_device::wrdvdd_w )
+void _5a22_device::wrdvdd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t quotient, remainder;
 
@@ -1091,27 +1091,27 @@ WRITE8_MEMBER( _5a22_device::wrdvdd_w )
 	m_rdmpy = remainder;
 }
 
-WRITE8_MEMBER( _5a22_device::memsel_w )
+void _5a22_device::memsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fastROM = data & 1;
 }
 
-READ8_MEMBER( _5a22_device::rddivl_r )
+uint8_t _5a22_device::rddivl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rddiv & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rddivh_r )
+uint8_t _5a22_device::rddivh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rddiv >> 8;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyl_r )
+uint8_t _5a22_device::rdmpyl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rdmpy & 0xff;
 }
 
-READ8_MEMBER( _5a22_device::rdmpyh_r )
+uint8_t _5a22_device::rdmpyh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rdmpy >> 8;
 }

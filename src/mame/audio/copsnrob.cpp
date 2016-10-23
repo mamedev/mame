@@ -687,7 +687,7 @@ DISCRETE_SOUND_START(copsnrob)
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(copsnrob_state::copsnrob_misc_w)
+void copsnrob_state::copsnrob_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t latched_data = m_ic_h3_data;
 	uint8_t special_data = data & 0x01;

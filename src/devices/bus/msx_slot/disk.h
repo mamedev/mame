@@ -131,8 +131,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	void post_load();
 
@@ -153,8 +153,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	void post_load();
 
@@ -170,8 +170,8 @@ class msx_slot_disk3_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -180,8 +180,8 @@ class msx_slot_disk4_device : public msx_slot_tc8566_disk_device
 public:
 	msx_slot_disk4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -193,8 +193,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
+	uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void post_load();
 
@@ -213,8 +213,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	void post_load();
 

@@ -94,39 +94,39 @@ public:
 		m_expansion(*this, "expansion"),
 		m_palette(*this, "palette"){ }
 
-	DECLARE_READ16_MEMBER(applix_inputs_r);
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_WRITE16_MEMBER(analog_latch_w);
-	DECLARE_WRITE16_MEMBER(dac_latch_w);
-	DECLARE_WRITE16_MEMBER(video_latch_w);
-	DECLARE_READ8_MEMBER(applix_pb_r);
-	DECLARE_WRITE8_MEMBER(applix_pa_w);
-	DECLARE_WRITE8_MEMBER(applix_pb_w);
+	uint16_t applix_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void analog_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dac_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void video_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t applix_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void applix_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void applix_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port08_r);
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port18_r);
-	DECLARE_READ8_MEMBER(port20_r);
-	DECLARE_READ8_MEMBER(port60_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port20_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_READ16_MEMBER(fdc_data_r);
-	DECLARE_READ16_MEMBER(fdc_stat_r);
-	DECLARE_WRITE16_MEMBER(fdc_data_w);
-	DECLARE_WRITE16_MEMBER(fdc_cmd_w);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port18_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port60_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t fdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t fdc_stat_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void fdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fdc_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_READ8_MEMBER( internal_data_read );
-	DECLARE_WRITE8_MEMBER( internal_data_write );
-	DECLARE_READ8_MEMBER( p1_read );
-	DECLARE_WRITE8_MEMBER( p1_write );
-	DECLARE_READ8_MEMBER( p2_read );
-	DECLARE_WRITE8_MEMBER( p2_write );
-	DECLARE_READ8_MEMBER( p3_read );
-	DECLARE_WRITE8_MEMBER( p3_write );
+	uint8_t internal_data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void internal_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
 	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -202,7 +202,7 @@ d3     = cassette LED, low=on
 d4,5,6 = audio select
 d7     = cassette relay, low=on
 */
-WRITE16_MEMBER( applix_state::analog_latch_w )
+void applix_state::analog_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= 0xff;
 	if (data != m_analog_latch)
@@ -214,7 +214,7 @@ WRITE16_MEMBER( applix_state::analog_latch_w )
 	}
 }
 
-WRITE16_MEMBER( applix_state::dac_latch_w )
+void applix_state::dac_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= 0xff;
 	m_dac_latch = data;
@@ -227,7 +227,7 @@ WRITE16_MEMBER( applix_state::dac_latch_w )
 }
 
 //cent = odd, video = even
-WRITE16_MEMBER( applix_state::palette_w )
+void applix_state::palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 4;
 	if (ACCESSING_BITS_0_7)
@@ -238,7 +238,7 @@ WRITE16_MEMBER( applix_state::palette_w )
 		m_palette_latch[offset] = (data >> 8) & 15;
 }
 
-WRITE16_MEMBER( applix_state::video_latch_w )
+void applix_state::video_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_video_latch = data;
@@ -250,12 +250,12 @@ d1   = cassette in
 d2,3 = joystick in
 d4-7 = SW2 dipswitch block
 */
-READ16_MEMBER( applix_state::applix_inputs_r )
+uint16_t applix_state::applix_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_io_dsw->read() | m_cass_data[2];
 }
 
-READ8_MEMBER( applix_state::applix_pb_r )
+uint8_t applix_state::applix_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pb;
 }
@@ -270,7 +270,7 @@ d5 = /(out) clear cass IRQ and output line
 d6 = /(out) reset keyboard by pulling kbd clock low
 d7 = /(out) reset keyboard flipflop
 */
-WRITE8_MEMBER( applix_state::applix_pa_w )
+void applix_state::applix_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Reset flipflop counter
 	if (!BIT(data, 7))
@@ -301,7 +301,7 @@ WRITE8_MEMBER( applix_state::applix_pa_w )
 d0-6 = user
 d7   = square wave output for cassette IRQ
 */
-WRITE8_MEMBER( applix_state::applix_pb_w )
+void applix_state::applix_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// low-to-high of PB7 when writing cassette - CLK on IC49
 	if (!BIT(m_pb, 7) && BIT(data, 7))
@@ -317,7 +317,7 @@ d1 = H if 68000 sent a byte
 d2 = H if 68000 has read last byte
 d3 = test switch
 */
-READ8_MEMBER( applix_state::port00_r )
+uint8_t applix_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (uint8_t)m_data_or_cmd | ((uint8_t)m_data << 1) | ((uint8_t)m_buffer_empty << 2) | m_io_fdc->read();
 }
@@ -332,7 +332,7 @@ d5 = SIDE
 d6 = BANK
 d7 = MAP
 */
-READ8_MEMBER( applix_state::port08_r )
+uint8_t applix_state::port08_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port08 | 3;
 }
@@ -342,7 +342,7 @@ d0 = /INUSE
 d1 = /EJECT
 d2-7 same as for port08_r
 */
-WRITE8_MEMBER( applix_state::port08_w )
+void applix_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port08 = data;
 	membank("bank1")->set_entry(BIT(data, 6));
@@ -360,47 +360,47 @@ WRITE8_MEMBER( applix_state::port08_w )
 	}
 }
 
-READ8_MEMBER( applix_state::port10_r )
+uint8_t applix_state::port10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port10_w )
+void applix_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( applix_state::port18_r )
+uint8_t applix_state::port18_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_data = 0;
 	return m_data_to_fdc;
 }
 
-WRITE8_MEMBER( applix_state::port18_w )
+void applix_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_from_fdc = data;
 	m_buffer_empty = 0;
 	m_fdc_cmd = BIT(offset, 2);
 }
 
-READ8_MEMBER( applix_state::port20_r )
+uint8_t applix_state::port20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port20_w )
+void applix_state::port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( applix_state::port60_r )
+uint8_t applix_state::port60_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( applix_state::port60_w )
+void applix_state::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ16_MEMBER( applix_state::fdc_stat_r )
+uint16_t applix_state::fdc_stat_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -412,20 +412,20 @@ READ16_MEMBER( applix_state::fdc_stat_r )
 	return data << 7;
 }
 
-READ16_MEMBER( applix_state::fdc_data_r )
+uint16_t applix_state::fdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_buffer_empty = 1;
 	return m_data_from_fdc;
 }
 
-WRITE16_MEMBER( applix_state::fdc_data_w )
+void applix_state::fdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
 	m_data_or_cmd = 0;
 }
 
-WRITE16_MEMBER( applix_state::fdc_cmd_w )
+void applix_state::fdc_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_data_to_fdc = data;
 	m_data = 1;
@@ -942,7 +942,7 @@ COMP( 1986, applix, 0,       0,     applix, applix, applix_state, applix, "Appli
 
 /**************************************************** KEYBOARD MODULE *****************************************/
 
-READ8_MEMBER( applix_state::internal_data_read )
+uint8_t applix_state::internal_data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_via->write_cb2( BIT(offset, 8) ); // data
 	bool cp = !BIT(offset, 9);
@@ -959,7 +959,7 @@ READ8_MEMBER( applix_state::internal_data_read )
 }
 
 
-WRITE8_MEMBER( applix_state::internal_data_write )
+void applix_state::internal_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Check for low->high transition on AD8 */
 	if ( ! ( m_last_write_addr & 0x0100 ) && ( offset & 0x0100 ) )
@@ -1058,31 +1058,31 @@ WRITE8_MEMBER( applix_state::internal_data_write )
 }
 
 
-READ8_MEMBER( applix_state::p1_read )
+uint8_t applix_state::p1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1 & m_p1_data;
 }
 
 
-WRITE8_MEMBER( applix_state::p1_write )
+void applix_state::p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 }
 
 
-READ8_MEMBER( applix_state::p2_read )
+uint8_t applix_state::p2_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
 
 
-WRITE8_MEMBER( applix_state::p2_write )
+void applix_state::p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
 
 
-READ8_MEMBER( applix_state::p3_read )
+uint8_t applix_state::p3_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p3;
 
@@ -1098,7 +1098,7 @@ READ8_MEMBER( applix_state::p3_read )
 }
 
 
-WRITE8_MEMBER( applix_state::p3_write )
+void applix_state::p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p3 = data;
 }

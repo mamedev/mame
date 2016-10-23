@@ -213,15 +213,15 @@ public:
 	std::unique_ptr<uint16_t[]> m_blit_buffer;
 	uint16_t m_blit_ram[0x10];
 	uint8_t m_irq_cause, m_irq_mask;
-	DECLARE_WRITE8_MEMBER(gunpey_status_w);
-	DECLARE_READ8_MEMBER(gunpey_status_r);
-	DECLARE_READ8_MEMBER(gunpey_inputs_r);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper_w);
-	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper2_w);
-	DECLARE_WRITE8_MEMBER(gunpey_output_w);
-	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
-	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
+	void gunpey_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gunpey_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gunpey_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gunpey_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunpey_blitter_upper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunpey_blitter_upper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunpey_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunpey_vram_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gunpey_vregs_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_gunpey();
 	virtual void video_start() override;
 	uint32_t screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -604,7 +604,7 @@ void gunpey_state::gunpey_irq_check(uint8_t irq_type)
 		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4);
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_status_w)
+void gunpey_state::gunpey_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1)
 	{
@@ -619,7 +619,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_status_w)
 	}
 }
 
-READ8_MEMBER(gunpey_state::gunpey_status_r)
+uint8_t gunpey_state::gunpey_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 1)
 		return m_irq_cause;
@@ -627,7 +627,7 @@ READ8_MEMBER(gunpey_state::gunpey_status_r)
 	return m_irq_mask;
 }
 
-READ8_MEMBER(gunpey_state::gunpey_inputs_r)
+uint8_t gunpey_state::gunpey_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset+0x7f40)
 	{
@@ -1074,7 +1074,7 @@ ooutcount was 51
 
 
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
+void gunpey_state::gunpey_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t *blit_ram = m_blit_ram;
 
@@ -1252,20 +1252,20 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	}
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper_w)
+void gunpey_state::gunpey_blitter_upper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("gunpey_blitter_upper_w %02x %02x\n", offset, data);
 
 }
 
-WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper2_w)
+void gunpey_state::gunpey_blitter_upper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
 
 }
 
 
-WRITE8_MEMBER(gunpey_state::gunpey_output_w)
+void gunpey_state::gunpey_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//bit 0 is coin counter
 //  popmessage("%02x",data);
@@ -1273,12 +1273,12 @@ WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 	m_oki->set_rom_bank((data & 0x70) >> 4);
 }
 
-WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
+void gunpey_state::gunpey_vram_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bank);
 }
 
-WRITE16_MEMBER(gunpey_state::gunpey_vregs_addr_w)
+void gunpey_state::gunpey_vregs_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vreg_addr);
 }

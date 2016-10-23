@@ -33,7 +33,7 @@ public:
 	sms_ctrl_adaptor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
-	DECLARE_READ32_MEMBER(pixel_r);
+	uint32_t pixel_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

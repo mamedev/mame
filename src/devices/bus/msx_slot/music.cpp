@@ -37,13 +37,13 @@ void msx_slot_music_device::device_start()
 }
 
 
-READ8_MEMBER(msx_slot_music_device::read)
+uint8_t msx_slot_music_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return msx_slot_rom_device::read(space, offset);
 }
 
 
-WRITE8_MEMBER(msx_slot_music_device::write_ym2413)
+void msx_slot_music_device::write_ym2413(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ym2413->write(space, offset & 1, data);
 }

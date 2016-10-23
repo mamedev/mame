@@ -225,8 +225,8 @@ public:
 	static void set_keyboard_callback(device_t &device, pokey_kb_cb_delegate callback) { downcast<pokey_device &>(device).m_keyboard_r = callback; }
 	static void set_interrupt_callback(device_t &device, pokey_int_cb_delegate callback) { downcast<pokey_device &>(device).m_irq_f = callback; }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t read(offs_t offset);
 	void  write(offs_t offset, uint8_t data);

@@ -16,7 +16,7 @@
 #include "sound/okim6295.h"
 #include "includes/goal92.h"
 
-WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
+void goal92_state::goal92_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -25,7 +25,7 @@ WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 	}
 }
 
-READ16_MEMBER(goal92_state::goal92_inputs_r)
+uint16_t goal92_state::goal92_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -68,14 +68,14 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-WRITE8_MEMBER(goal92_state::adpcm_control_w)
+void goal92_state::adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 
 	m_msm->reset_w(data & 0x08);
 }
 
-WRITE8_MEMBER(goal92_state::adpcm_data_w)
+void goal92_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }

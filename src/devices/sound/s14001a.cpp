@@ -217,7 +217,7 @@ READ_LINE_MEMBER(s14001a_device::busy_r)
 	return (m_bBusyP1) ? 1 : 0;
 }
 
-WRITE8_MEMBER(s14001a_device::data_w)
+void s14001a_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_uWord = data & 0x3f; // C0-C5

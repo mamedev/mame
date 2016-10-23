@@ -190,22 +190,22 @@ isa8_device::isa8_device(const machine_config &mconfig, device_type type, const 
 	m_allocspaces = false;
 }
 
-READ8_MEMBER(isa8_device::prog_r)
+uint8_t isa8_device::prog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prgspace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::prog_w)
+void isa8_device::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prgspace->write_byte(offset, data);
 }
 
-READ8_MEMBER(isa8_device::io_r)
+uint8_t isa8_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_iospace->read_byte(offset);
 }
 
-WRITE8_MEMBER(isa8_device::io_w)
+void isa8_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_iospace->write_byte(offset, data);
 }
@@ -534,27 +534,27 @@ void isa16_device::install16_device(offs_t start, offs_t end, read16_delegate rh
 	}
 }
 
-READ16_MEMBER(isa16_device::prog16_r)
+uint16_t isa16_device::prog16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_prgspace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_w)
+void isa16_device::prog16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prgspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_r)
+uint16_t isa16_device::io16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_iospace->read_word(offset<<1, mem_mask);
 }
 
-WRITE16_MEMBER(isa16_device::io16_w)
+void isa16_device::io16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iospace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::prog16_swap_r)
+uint16_t isa16_device::prog16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -564,14 +564,14 @@ READ16_MEMBER(isa16_device::prog16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::prog16_swap_w)
+void isa16_device::prog16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);
 	m_prgspace->write_word(offset<<1, data, mem_mask);
 }
 
-READ16_MEMBER(isa16_device::io16_swap_r)
+uint16_t isa16_device::io16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t rv;
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
@@ -581,7 +581,7 @@ READ16_MEMBER(isa16_device::io16_swap_r)
 	return (rv<<8) | (rv>>8);
 }
 
-WRITE16_MEMBER(isa16_device::io16_swap_w)
+void isa16_device::io16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = (mem_mask<<8) | (mem_mask>>8);
 	data = (data<<8) | (data>>8);

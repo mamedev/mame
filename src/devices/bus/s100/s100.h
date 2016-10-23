@@ -231,11 +231,11 @@ public:
 
 	void add_card(device_s100_card_interface *card);
 
-	DECLARE_READ8_MEMBER( smemr_r );
-	DECLARE_WRITE8_MEMBER( mwrt_w );
+	uint8_t smemr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mwrt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( sinp_r );
-	DECLARE_WRITE8_MEMBER( sout_w );
+	uint8_t sinp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }

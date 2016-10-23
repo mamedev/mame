@@ -62,41 +62,41 @@ void kyugo_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_fgvideoram_w)
+void kyugo_state::kyugo_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_bgvideoram_w)
+void kyugo_state::kyugo_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_bgattribram_w)
+void kyugo_state::kyugo_bgattribram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgattribram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(kyugo_state::kyugo_spriteram_2_r)
+uint8_t kyugo_state::kyugo_spriteram_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// only the lower nibble is connected
 	return m_spriteram_2[offset] | 0xf0;
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_scroll_x_lo_w)
+void kyugo_state::kyugo_scroll_x_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x_lo = data;
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_gfxctrl_w)
+void kyugo_state::kyugo_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is scroll MSB */
 	m_scroll_x_hi = data & 0x01;
@@ -121,13 +121,13 @@ WRITE8_MEMBER(kyugo_state::kyugo_gfxctrl_w)
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_scroll_y_w)
+void kyugo_state::kyugo_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y = data;
 }
 
 
-WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
+void kyugo_state::kyugo_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }

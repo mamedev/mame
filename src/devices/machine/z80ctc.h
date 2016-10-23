@@ -66,8 +66,8 @@ public:
 	template<class _Object> static devcb_base &set_zc2_callback(device_t &device, _Object object) { return downcast<z80ctc_device &>(device).m_zc2_cb.set_callback(object); }
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( trg0 );
 	DECLARE_WRITE_LINE_MEMBER( trg1 );
 	DECLARE_WRITE_LINE_MEMBER( trg2 );

@@ -103,7 +103,7 @@ void mbee_state::sy6545_cursor_configure()
 ************************************************************/
 
 
-READ8_MEMBER( mbee_state::video_low_r )
+uint8_t mbee_state::video_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_is_premium && ((m_1c & 0x9f) == 0x90))
 		return m_p_attribram[offset];
@@ -114,7 +114,7 @@ READ8_MEMBER( mbee_state::video_low_r )
 		return m_p_videoram[offset];
 }
 
-WRITE8_MEMBER( mbee_state::video_low_w )
+void mbee_state::video_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_1c, 4))
 	{
@@ -126,7 +126,7 @@ WRITE8_MEMBER( mbee_state::video_low_w )
 		m_p_videoram[offset] = data;
 }
 
-READ8_MEMBER( mbee_state::video_high_r )
+uint8_t mbee_state::video_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_08, 6))
 		return m_p_colorram[offset];
@@ -134,7 +134,7 @@ READ8_MEMBER( mbee_state::video_high_r )
 		return m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset];
 }
 
-WRITE8_MEMBER( mbee_state::video_high_w )
+void mbee_state::video_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_08, 6) && (~m_0b & 1))
 		m_p_colorram[offset] = data;
@@ -142,27 +142,27 @@ WRITE8_MEMBER( mbee_state::video_high_w )
 		m_p_gfxram[(((m_1c & 15) + 1) << 11) | offset] = data;
 }
 
-WRITE8_MEMBER( mbee_state::port0b_w )
+void mbee_state::port0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_0b = data & 1;
 }
 
-READ8_MEMBER( mbee_state::port08_r )
+uint8_t mbee_state::port08_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_08;
 }
 
-WRITE8_MEMBER( mbee_state::port08_w )
+void mbee_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_08 = data & 0x4e;
 }
 
-READ8_MEMBER( mbee_state::port1c_r )
+uint8_t mbee_state::port1c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_1c;
 }
 
-WRITE8_MEMBER( mbee_state::port1c_w )
+void mbee_state::port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 extended graphics (1=allow attributes and pcg banks)
     d5 bankswitch basic rom
@@ -251,14 +251,14 @@ void mbee_state::oldkb_scan( uint16_t param )
 
 ************************************************************/
 
-WRITE8_MEMBER ( mbee_state::m6545_index_w )
+void mbee_state::m6545_index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x1f;
 	m_sy6545_ind = data;
 	m_crtc->address_w( space, 0, data );
 }
 
-WRITE8_MEMBER ( mbee_state::m6545_data_w )
+void mbee_state::m6545_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t sy6545_mask[32]={0xff,0xff,0xff,0x0f,0x7f,0x1f,0x7f,0x7f,3,0x1f,0x7f,0x1f,0x3f,0xff,0x3f,0xff,0,0,0x3f,0xff};
 

@@ -23,15 +23,15 @@ public:
 	required_device<pc_keyboard_device> m_keyboard;
 	isa8_aga_device *m_aga;
 
-	DECLARE_WRITE8_MEMBER( europc_pio_w );
-	DECLARE_READ8_MEMBER( europc_pio_r );
+	void europc_pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t europc_pio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER ( europc_jim_w );
-	DECLARE_READ8_MEMBER ( europc_jim_r );
-	DECLARE_READ8_MEMBER ( europc_jim2_r );
+	void europc_jim_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t europc_jim_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t europc_jim2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( europc_rtc_r );
-	DECLARE_WRITE8_MEMBER( europc_rtc_w );
+	uint8_t europc_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void europc_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_europc();
 
@@ -134,7 +134,7 @@ public:
 
 */
 
-WRITE8_MEMBER( europc_pc_state::europc_jim_w )
+void europc_pc_state::europc_jim_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -172,7 +172,7 @@ WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 	m_jim_data[offset] = data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim_r )
+uint8_t europc_pc_state::europc_jim_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 	switch(offset)
@@ -184,7 +184,7 @@ READ8_MEMBER( europc_pc_state::europc_jim_r )
 	return data;
 }
 
-READ8_MEMBER( europc_pc_state::europc_jim2_r )
+uint8_t europc_pc_state::europc_jim2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_jim_state)
 	{
@@ -283,7 +283,7 @@ void europc_pc_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-READ8_MEMBER( europc_pc_state::europc_rtc_r )
+uint8_t europc_pc_state::europc_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0;
 	switch (m_rtc_state)
@@ -301,7 +301,7 @@ READ8_MEMBER( europc_pc_state::europc_rtc_r )
 	return data;
 }
 
-WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
+void europc_pc_state::europc_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_rtc_state)
 	{
@@ -351,7 +351,7 @@ void europc_pc_state::init_europc()
 
 }
 
-WRITE8_MEMBER( europc_pc_state::europc_pio_w )
+void europc_pc_state::europc_pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -369,7 +369,7 @@ WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 }
 
 
-READ8_MEMBER( europc_pc_state::europc_pio_r )
+uint8_t europc_pc_state::europc_pio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 	switch (offset)

@@ -171,7 +171,7 @@ public:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_prot->mslug5p_prot_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_prot->mslug5p_prot_r(space, offset, mem_mask); }
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_prot->mslug5p_bank_base(sel); }
 
 private:
@@ -193,7 +193,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual DECLARE_READ16_MEMBER(protection_r) override;
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override;
 	virtual int get_fixed_bank_type(void) override { return 0; }
 

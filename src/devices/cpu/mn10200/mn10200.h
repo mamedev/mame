@@ -67,8 +67,8 @@ public:
 	template<class _Object> static devcb_base &set_write_port3_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port3.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_port4_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port4.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(io_control_r);
-	DECLARE_WRITE8_MEMBER(io_control_w);
+	uint8_t io_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

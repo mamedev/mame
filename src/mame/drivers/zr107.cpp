@@ -238,15 +238,15 @@ public:
 	uint8_t m_sound_ctrl;
 	uint8_t m_sound_intck;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(ccu_r);
-	DECLARE_WRITE32_MEMBER(ccu_w);
-	DECLARE_WRITE32_MEMBER(jetwave_palette_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
-	DECLARE_WRITE16_MEMBER(sound_ctrl_w);
+	void paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t ccu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ccu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void jetwave_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_common();
 	void init_zr107();
@@ -294,7 +294,7 @@ uint32_t zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 
 
 /*****************************************************************************/
 
-WRITE32_MEMBER(zr107_state::paletteram32_w)
+void zr107_state::paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -338,7 +338,7 @@ uint32_t zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &b
 
 /******************************************************************/
 
-READ8_MEMBER(zr107_state::sysreg_r)
+uint8_t zr107_state::sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -365,7 +365,7 @@ READ8_MEMBER(zr107_state::sysreg_r)
 	return r;
 }
 
-WRITE8_MEMBER(zr107_state::sysreg_w)
+void zr107_state::sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -428,7 +428,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 	}
 }
 
-READ32_MEMBER(zr107_state::ccu_r)
+uint32_t zr107_state::ccu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	switch (offset)
@@ -453,7 +453,7 @@ READ32_MEMBER(zr107_state::ccu_r)
 	return r;
 }
 
-WRITE32_MEMBER(zr107_state::ccu_w)
+void zr107_state::ccu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 ADDRESS_MAP_END
 
 
-WRITE32_MEMBER(zr107_state::jetwave_palette_w)
+void zr107_state::jetwave_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -519,7 +519,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-WRITE16_MEMBER(zr107_state::sound_ctrl_w)
+void zr107_state::sound_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -543,12 +543,12 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-READ32_MEMBER(zr107_state::dsp_dataram_r)
+uint32_t zr107_state::dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sharc_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(zr107_state::dsp_dataram_w)
+void zr107_state::dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sharc_dataram[offset] = data;
 }

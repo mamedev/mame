@@ -108,13 +108,13 @@ TIMER_CALLBACK_MEMBER(bombjack_state::soundlatch_callback)
 	m_latch = param;
 }
 
-WRITE8_MEMBER(bombjack_state::bombjack_soundlatch_w)
+void bombjack_state::bombjack_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bombjack_state::soundlatch_callback),this), data);
 }
 
-READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)
+uint8_t bombjack_state::bombjack_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -130,7 +130,7 @@ READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)
  *
  *************************************/
 
-WRITE8_MEMBER(bombjack_state::irq_mask_w)
+void bombjack_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

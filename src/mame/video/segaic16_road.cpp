@@ -605,7 +605,7 @@ void segaic16_road_device::segaic16_road_draw(int which, bitmap_ind16 &bitmap, c
  *
  *************************************/
 
-READ16_MEMBER( segaic16_road_device::segaic16_road_control_0_r )
+uint16_t segaic16_road_device::segaic16_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	struct road_info *info = &segaic16_road[0];
 
@@ -628,7 +628,7 @@ READ16_MEMBER( segaic16_road_device::segaic16_road_control_0_r )
 }
 
 
-WRITE16_MEMBER( segaic16_road_device::segaic16_road_control_0_w )
+void segaic16_road_device::segaic16_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	struct road_info *info = &segaic16_road[0];
 

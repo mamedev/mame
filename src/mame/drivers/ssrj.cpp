@@ -49,7 +49,7 @@ void ssrj_state::machine_reset()
 	m_oldport = 0x80;
 }
 
-READ8_MEMBER(ssrj_state::wheel_r)
+uint8_t ssrj_state::wheel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int port = ioport("IN1")->read() - 0x80;
 	int retval = port - m_oldport;

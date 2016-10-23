@@ -103,18 +103,18 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override = 0;
 
-	DECLARE_READ8_MEMBER (sra_r);
-	DECLARE_READ8_MEMBER (srb_r);
-	DECLARE_READ8_MEMBER (dor_r);
-	DECLARE_WRITE8_MEMBER(dor_w);
-	DECLARE_READ8_MEMBER (tdr_r);
-	DECLARE_WRITE8_MEMBER(tdr_w);
-	DECLARE_READ8_MEMBER (msr_r);
-	DECLARE_WRITE8_MEMBER(dsr_w);
-	DECLARE_READ8_MEMBER (fifo_r);
-	DECLARE_WRITE8_MEMBER(fifo_w);
-	DECLARE_READ8_MEMBER (dir_r);
-	DECLARE_WRITE8_MEMBER(ccr_w);
+	uint8_t sra_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t srb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t msr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fifo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fifo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dir_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual uint8_t do_dir_r() override;
 
@@ -122,8 +122,8 @@ public:
 	void dma_w(uint8_t data) override;
 
 	// Same as the previous ones, but as memory-mappable members
-	DECLARE_READ8_MEMBER(mdma_r);
-	DECLARE_WRITE8_MEMBER(mdma_w);
+	uint8_t mdma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mdma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool get_irq() const;
 	bool get_drq() const;
@@ -493,7 +493,7 @@ public:
 	template<class _Object> static devcb_base &set_input_handler(device_t &device, _Object object) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
-	DECLARE_READ8_MEMBER( input_r );
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;
@@ -508,7 +508,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(map, 8) override;
 
-	DECLARE_WRITE8_MEMBER(cr1_w);
+	void cr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

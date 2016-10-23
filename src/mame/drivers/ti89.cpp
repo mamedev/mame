@@ -48,7 +48,7 @@ uint8_t ti68k_state::keypad_r()
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
+void ti68k_state::ti68k_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset & 0x0f)
 	{
@@ -91,7 +91,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io_r )
+uint16_t ti68k_state::ti68k_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -113,7 +113,7 @@ READ16_MEMBER ( ti68k_state::ti68k_io_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
+void ti68k_state::ti68k_io2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset & 0x7f)
 	{
@@ -129,7 +129,7 @@ WRITE16_MEMBER ( ti68k_state::ti68k_io2_w )
 }
 
 
-READ16_MEMBER ( ti68k_state::ti68k_io2_r )
+uint16_t ti68k_state::ti68k_io2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -142,14 +142,14 @@ READ16_MEMBER ( ti68k_state::ti68k_io2_r )
 }
 
 
-WRITE16_MEMBER ( ti68k_state::flash_w )
+void ti68k_state::flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// verification if it is flash memory
 	if (m_flash_mem)
 		m_flash->write(offset, data);
 }
 
-READ16_MEMBER ( ti68k_state::flash_r )
+uint16_t ti68k_state::flash_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_flash_mem)
 	{

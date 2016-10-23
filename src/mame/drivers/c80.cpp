@@ -120,7 +120,7 @@ INPUT_PORTS_END
 
 /* Z80-PIO Interface */
 
-READ8_MEMBER( c80_state::pio1_pa_r )
+uint8_t c80_state::pio1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -156,7 +156,7 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c80_state::pio1_pa_w )
+void c80_state::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -183,7 +183,7 @@ WRITE8_MEMBER( c80_state::pio1_pa_w )
 	m_cassette->output(BIT(data, 6) ? +1.0 : -1.0);
 }
 
-WRITE8_MEMBER( c80_state::pio1_pb_w )
+void c80_state::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

@@ -28,17 +28,17 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG) { }
 
-	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
-	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(llc1_port1_a_r);
-	DECLARE_READ8_MEMBER(llc1_port2_a_r);
-	DECLARE_READ8_MEMBER(llc1_port2_b_r);
-	DECLARE_WRITE8_MEMBER(llc1_port1_a_w);
-	DECLARE_WRITE8_MEMBER(llc1_port1_b_w);
-	DECLARE_READ8_MEMBER(llc2_port1_b_r);
-	DECLARE_READ8_MEMBER(llc2_port2_a_r);
-	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
+	void llc2_rom_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void llc2_basic_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t llc1_port1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t llc1_port2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t llc1_port2_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void llc1_port1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void llc1_port1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t llc2_port1_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t llc2_port2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void llc2_port1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	const uint8_t *m_p_chargen;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<uint8_t> m_p_videoram;

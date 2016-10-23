@@ -44,7 +44,7 @@ INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
 		device.execute().set_input_line(4, HOLD_LINE);
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
+void toaplan1_state::toaplan1_intenable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -53,7 +53,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
 }
 
 
-WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
+void toaplan1_state::demonwld_dsp_addrsel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
@@ -68,7 +68,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
 	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
-READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
+uint16_t toaplan1_state::demonwld_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
@@ -84,7 +84,7 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 	return input_data;
 }
 
-WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
+void toaplan1_state::demonwld_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	m_dsp_execute = 0;
@@ -98,7 +98,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", space.device().safe_pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
 }
 
-WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
+void toaplan1_state::demonwld_dsp_bio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* data 0xffff  means inhibit BIO line to DSP and enable */
 	/*              communication to main processor */
@@ -150,7 +150,7 @@ void toaplan1_state::demonwld_restore_dsp()
 	demonwld_dsp(m_dsp_on);
 }
 
-WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
+void toaplan1_state::demonwld_dsp_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	logerror("68000:%08x  Writing %08x to %08x.\n",space.device().safe_pc() ,data ,0xe0000a + offset);
@@ -172,14 +172,14 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 }
 
 
-READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
+uint16_t toaplan1_state::samesame_port_6_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
 	logerror("PC:%04x Warning !!! IO reading from $14000a\n",space.device().safe_pcbase());
 	return (0x80 | ioport("TJUMP")->read()) & 0xff;
 }
 
-READ16_MEMBER(toaplan1_state::vimana_system_port_r)
+uint16_t toaplan1_state::vimana_system_port_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const uint8_t vimana_region[16] =
 	{
@@ -250,7 +250,7 @@ READ16_MEMBER(toaplan1_state::vimana_system_port_r)
 	return p & 0xffff;
 }
 
-READ16_MEMBER(toaplan1_state::vimana_mcu_r)
+uint16_t toaplan1_state::vimana_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = 0 ;
 	switch (offset)
@@ -266,7 +266,7 @@ READ16_MEMBER(toaplan1_state::vimana_mcu_r)
 	return data & 0xff;
 }
 
-WRITE16_MEMBER(toaplan1_state::vimana_mcu_w)
+void toaplan1_state::vimana_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -282,12 +282,12 @@ WRITE16_MEMBER(toaplan1_state::vimana_mcu_w)
 	}
 }
 
-READ16_MEMBER(toaplan1_state::toaplan1_shared_r)
+uint16_t toaplan1_state::toaplan1_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sharedram[offset] & 0xff;
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_shared_w)
+void toaplan1_state::toaplan1_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -305,13 +305,13 @@ void toaplan1_state::toaplan1_reset_sound()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound_w)
+void toaplan1_state::toaplan1_reset_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && (data == 0)) toaplan1_reset_sound();
 }
 
 
-WRITE8_MEMBER(toaplan1_rallybik_state::rallybik_coin_w)
+void toaplan1_rallybik_state::rallybik_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data) {
 		case 0x08: if (m_coin_count) { machine().bookkeeping().coin_counter_w(0, 1); machine().bookkeeping().coin_counter_w(0, 0); } break;
@@ -326,7 +326,7 @@ WRITE8_MEMBER(toaplan1_rallybik_state::rallybik_coin_w)
 	}
 }
 
-WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
+void toaplan1_state::toaplan1_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Z80 writing %02x to coin control\n",data);
 	/* This still isnt too clear yet. */
@@ -356,7 +356,7 @@ WRITE8_MEMBER(toaplan1_state::toaplan1_coin_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
+void toaplan1_state::samesame_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

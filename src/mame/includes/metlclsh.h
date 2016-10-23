@@ -39,16 +39,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(metlclsh_cause_irq);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi);
-	DECLARE_WRITE8_MEMBER(metlclsh_cause_nmi2);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_irq2);
-	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi2);
-	DECLARE_WRITE8_MEMBER(metlclsh_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_rambank_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_bgram_w);
-	DECLARE_WRITE8_MEMBER(metlclsh_fgram_w);
+	void metlclsh_cause_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_ack_nmi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_cause_nmi2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_ack_irq2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_ack_nmi2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void metlclsh_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILEMAP_MAPPER_MEMBER(metlclsh_bgtilemap_scan);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

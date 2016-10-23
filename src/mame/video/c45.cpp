@@ -99,7 +99,7 @@ namco_c45_road_device::namco_c45_road_device(const machine_config &mconfig, cons
 //  read -- CPU read from our address space
 //-------------------------------------------------
 
-READ16_MEMBER( namco_c45_road_device::read )
+uint16_t namco_c45_road_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return device_memory_interface::space().read_word(offset*2);
 }
@@ -109,7 +109,7 @@ READ16_MEMBER( namco_c45_road_device::read )
 //  write -- CPU write to our address space
 //-------------------------------------------------
 
-WRITE16_MEMBER( namco_c45_road_device::write )
+void namco_c45_road_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	device_memory_interface::space().write_word(offset*2, data, mem_mask);
 }
@@ -119,7 +119,7 @@ WRITE16_MEMBER( namco_c45_road_device::write )
 //  tilemap_w -- write to tilemap RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( namco_c45_road_device::tilemap_w )
+void namco_c45_road_device::tilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tmapram[offset]);
 	m_tilemap->mark_tile_dirty(offset);
@@ -130,7 +130,7 @@ WRITE16_MEMBER( namco_c45_road_device::tilemap_w )
 //  tileram_w -- write to tile RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( namco_c45_road_device::tileram_w )
+void namco_c45_road_device::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tileram[offset]);
 	gfx(0)->mark_dirty(offset / WORDS_PER_ROAD_TILE);

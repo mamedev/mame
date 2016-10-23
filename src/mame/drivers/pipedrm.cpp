@@ -180,14 +180,14 @@ public:
 	void machine_reset_pipedrm();
 	void init_pipedrm();
 	void init_hatris();
-	DECLARE_WRITE8_MEMBER( pipedrm_bankswitch_w );
-	DECLARE_WRITE8_MEMBER( sound_bankswitch_w );
+	void pipedrm_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER( delayed_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_w );
-	DECLARE_WRITE8_MEMBER( sound_command_nonmi_w );
-	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
-	DECLARE_READ8_MEMBER( pending_command_r );
-	DECLARE_READ8_MEMBER( sound_command_r );
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_nonmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pending_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -197,7 +197,7 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
+void pipedrm_state::pipedrm_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Bit layout:
@@ -219,7 +219,7 @@ WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
+void pipedrm_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
@@ -245,32 +245,32 @@ TIMER_CALLBACK_MEMBER(pipedrm_state::delayed_command_w)
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_command_w )
+void pipedrm_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data | 0x100);
 }
 
 
-WRITE8_MEMBER(pipedrm_state::sound_command_nonmi_w )
+void pipedrm_state::sound_command_nonmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pipedrm_state::delayed_command_w),this), data);
 }
 
 
-WRITE8_MEMBER(pipedrm_state::pending_command_clear_w )
+void pipedrm_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-READ8_MEMBER(pipedrm_state::pending_command_r )
+uint8_t pipedrm_state::pending_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pending_command;
 }
 
 
-READ8_MEMBER(pipedrm_state::sound_command_r )
+uint8_t pipedrm_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_command;
 }

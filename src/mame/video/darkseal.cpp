@@ -38,13 +38,13 @@ void darkseal_state::update_24bitcol(int offset)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER(darkseal_state::palette_24bit_rg_w)
+void darkseal_state::palette_24bit_rg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	update_24bitcol(offset);
 }
 
-WRITE16_MEMBER(darkseal_state::palette_24bit_b_w)
+void darkseal_state::palette_24bit_b_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	update_24bitcol(offset);

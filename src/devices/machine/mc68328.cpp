@@ -598,7 +598,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
 	}
 }
 
-WRITE16_MEMBER( mc68328_device::write )
+void mc68328_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t address = offset << 1;
 	uint16_t temp16[4] = { 0 };
@@ -1792,7 +1792,7 @@ WRITE16_MEMBER( mc68328_device::write )
 	}
 }
 
-READ16_MEMBER( mc68328_device::read )
+uint16_t mc68328_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t temp16;
 	uint32_t address = offset << 1;

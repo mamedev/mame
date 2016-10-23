@@ -243,7 +243,7 @@ Todo:
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
-READ16_MEMBER(polepos_state::polepos2_ic25_r)
+uint16_t polepos_state::polepos2_ic25_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result;
 	/* protection states */
@@ -267,12 +267,12 @@ READ16_MEMBER(polepos_state::polepos2_ic25_r)
 }
 
 
-READ8_MEMBER(polepos_state::polepos_adc_r)
+uint8_t polepos_state::polepos_adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
 
-READ8_MEMBER(polepos_state::polepos_ready_r)
+uint8_t polepos_state::polepos_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = 0xff;
 
@@ -285,7 +285,7 @@ READ8_MEMBER(polepos_state::polepos_ready_r)
 }
 
 
-WRITE8_MEMBER(polepos_state::polepos_latch_w)
+void polepos_state::polepos_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 1;
 
@@ -332,7 +332,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 	}
 }
 
-WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
+void polepos_state::polepos_z8002_nvi_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= 1;
 
@@ -349,7 +349,7 @@ CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 	return m_auto_start_mask;
 }
 
-WRITE8_MEMBER(polepos_state::out_0)
+void polepos_state::out_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // no start lamps in pole position
 //  output().set_led_value(1,data & 1);
@@ -358,31 +358,31 @@ WRITE8_MEMBER(polepos_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(polepos_state::out_1)
+void polepos_state::out_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_rom_r)
+uint8_t polepos_state::namco_52xx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(polepos_state::namco_52xx_si_r)
+uint8_t polepos_state::namco_52xx_si_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* pulled to +5V */
 	return 1;
 }
 
-READ8_MEMBER(polepos_state::namco_53xx_k_r)
+uint8_t polepos_state::namco_53xx_k_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* hardwired to 0 */
 	return 0;
 }
 
-READ8_MEMBER(polepos_state::steering_changed_r)
+uint8_t polepos_state::steering_changed_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read the current steering value and update our delta */
 	uint8_t steer_new = ioport("STEER")->read();
@@ -404,7 +404,7 @@ READ8_MEMBER(polepos_state::steering_changed_r)
 	return m_steer_accum & 1;
 }
 
-READ8_MEMBER(polepos_state::steering_delta_r)
+uint8_t polepos_state::steering_delta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_steer_delta;
 }

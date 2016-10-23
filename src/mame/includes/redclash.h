@@ -21,13 +21,13 @@ public:
 	uint8_t      m_sraider_0x30;
 	uint8_t      m_sraider_0x38;
 
-	DECLARE_READ8_MEMBER(sraider_sound_low_r);
-	DECLARE_READ8_MEMBER(sraider_sound_high_r);
-	DECLARE_WRITE8_MEMBER(sraider_sound_low_w);
-	DECLARE_WRITE8_MEMBER(sraider_sound_high_w);
-	DECLARE_READ8_MEMBER(sraider_8005_r);
-	DECLARE_WRITE8_MEMBER(sraider_misc_w);
-	DECLARE_WRITE8_MEMBER(sraider_io_w);
+	uint8_t sraider_sound_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sraider_sound_high_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sraider_sound_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sraider_sound_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sraider_8005_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sraider_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sraider_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 	void init_redclash();
@@ -43,16 +43,16 @@ public:
 	uint32_t screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sraider(screen_device &screen, bool state);
 	void screen_eof_redclash(screen_device &screen, bool state);
-	DECLARE_WRITE8_MEMBER( redclash_videoram_w );
-	DECLARE_WRITE8_MEMBER( redclash_gfxbank_w );
-	DECLARE_WRITE8_MEMBER( redclash_flipscreen_w );
+	void redclash_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void redclash_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void redclash_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_WRITE8_MEMBER( redclash_star0_w );
-	DECLARE_WRITE8_MEMBER( redclash_star1_w );
-	DECLARE_WRITE8_MEMBER( redclash_star2_w );
-	DECLARE_WRITE8_MEMBER( redclash_star_reset_w );
-	DECLARE_WRITE8_MEMBER( irqack_w );
+	void redclash_star0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void redclash_star1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void redclash_star2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void redclash_star_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* sraider uses the zerohour star generator board */
 	void redclash_set_stars_enable(uint8_t on);

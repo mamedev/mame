@@ -38,14 +38,14 @@ public:
 
 	/* misc */
 	int         m_prot_toggle;
-	DECLARE_WRITE8_MEMBER(goindol_bankswitch_w);
-	DECLARE_READ8_MEMBER(prot_f422_r);
-	DECLARE_WRITE8_MEMBER(prot_fc44_w);
-	DECLARE_WRITE8_MEMBER(prot_fd99_w);
-	DECLARE_WRITE8_MEMBER(prot_fc66_w);
-	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
-	DECLARE_WRITE8_MEMBER(goindol_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(goindol_bg_videoram_w);
+	void goindol_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prot_f422_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prot_fc44_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prot_fd99_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prot_fc66_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prot_fcb0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goindol_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goindol_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_goindol();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

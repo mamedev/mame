@@ -57,7 +57,7 @@ ROMs 6A, 7A, 8A, 9A: 2764
  *
  *************************************/
 
-READ8_MEMBER(mrjong_state::io_0x03_r)
+uint8_t mrjong_state::io_0x03_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }

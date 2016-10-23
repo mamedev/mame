@@ -41,7 +41,7 @@ GP1 HDD data contents:
  *
  *************************************/
 
-READ16_MEMBER(qdrmfgp_state::inputs_r)
+uint16_t qdrmfgp_state::inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_control & 0x0080 ? m_inputs_port->read() : m_dsw_port->read();
 }
@@ -53,7 +53,7 @@ CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)
 }
 
 
-WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
+void qdrmfgp_state::gp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0        enable irq 1 (sound) */
 	/* bit 1        enable irq 2 (not used) */
@@ -96,7 +96,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
 	}
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
+void qdrmfgp_state::gp2_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 2        enable irq 3 (sound) */
 	/* bit 3        enable irq 4 (vblank) */
@@ -135,7 +135,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 }
 
 
-READ16_MEMBER(qdrmfgp_state::v_rom_r)
+uint16_t qdrmfgp_state::v_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *mem8 = memregion("gfx1")->base();
 	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
@@ -149,7 +149,7 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 }
 
 
-READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
+uint16_t qdrmfgp_state::gp2_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		return m_k056832->ram_word_r(space, offset * 2 + 1, mem_mask);
@@ -157,7 +157,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2, mem_mask);
 }
 
-READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
+uint16_t qdrmfgp_state::gp2_vram_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		return m_k056832->ram_word_r(space, offset * 2, mem_mask);
@@ -165,7 +165,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
+void qdrmfgp_state::gp2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		m_k056832->ram_word_w(space, offset * 2 + 1, data, mem_mask);
@@ -173,7 +173,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
-WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
+void qdrmfgp_state::gp2_vram_mirror_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x1000 / 2)
 		m_k056832->ram_word_w(space, offset * 2, data, mem_mask);
@@ -184,7 +184,7 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 
 /*************/
 
-READ16_MEMBER(qdrmfgp_state::sndram_r)
+uint16_t qdrmfgp_state::sndram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		return m_sndram[offset];
@@ -192,7 +192,7 @@ READ16_MEMBER(qdrmfgp_state::sndram_r)
 	return 0;
 }
 
-WRITE16_MEMBER(qdrmfgp_state::sndram_w)
+void qdrmfgp_state::sndram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -205,7 +205,7 @@ WRITE16_MEMBER(qdrmfgp_state::sndram_w)
 /*************/
 
 
-READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
+uint16_t qdrmfgp_state::gp2_ide_std_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x07)
 	{

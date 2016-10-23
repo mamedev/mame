@@ -83,37 +83,37 @@ public:
 
 	/* 16-bit accessors */
 
-	DECLARE_WRITE16_MEMBER( pf_control_0_w );
-	DECLARE_READ16_MEMBER( pf_control_1_r );
-	DECLARE_WRITE16_MEMBER( pf_control_1_w );
+	void pf_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pf_control_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pf_control_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( pf_data_w );
-	DECLARE_READ16_MEMBER( pf_data_r );
-	DECLARE_WRITE16_MEMBER( pf_rowscroll_w );
-	DECLARE_READ16_MEMBER( pf_rowscroll_r );
-	DECLARE_WRITE16_MEMBER( pf_colscroll_w );
-	DECLARE_READ16_MEMBER( pf_colscroll_r );
+	void pf_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pf_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pf_rowscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pf_rowscroll_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pf_colscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pf_colscroll_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	/* 8-bit accessors */
 
 	/* for dec8.c, pcktgal.c */
-	DECLARE_READ8_MEMBER( pf_data_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_data_8bit_w );
+	uint8_t pf_data_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pf_data_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( pf_control0_8bit_w );
-	DECLARE_READ8_MEMBER( pf_control1_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_control1_8bit_w );
+	void pf_control0_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pf_control1_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pf_control1_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( pf_rowscroll_8bit_r );
-	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_w );
+	uint8_t pf_rowscroll_8bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pf_rowscroll_8bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* for hippodrm (dec0.c) and actfancr / triothep (H6280 based games)*/
-	DECLARE_WRITE8_MEMBER( pf_control0_8bit_packed_w );
-	DECLARE_WRITE8_MEMBER( pf_control1_8bit_swap_w );
-	DECLARE_READ8_MEMBER( pf_data_8bit_swap_r );
-	DECLARE_WRITE8_MEMBER( pf_data_8bit_swap_w );
-	DECLARE_READ8_MEMBER( pf_rowscroll_8bit_swap_r );
-	DECLARE_WRITE8_MEMBER( pf_rowscroll_8bit_swap_w );
+	void pf_control0_8bit_packed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pf_control1_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pf_data_8bit_swap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pf_data_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pf_rowscroll_8bit_swap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pf_rowscroll_8bit_swap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

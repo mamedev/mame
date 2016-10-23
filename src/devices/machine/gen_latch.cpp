@@ -30,23 +30,23 @@ generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, co
 {
 }
 
-READ8_MEMBER( generic_latch_8_device::read )
+uint8_t generic_latch_8_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_latch_read = 1;
 	return m_latched_value;
 }
 
-WRITE8_MEMBER( generic_latch_8_device::write )
+void generic_latch_8_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_8_device::sync_callback), this), data);
 }
 
-WRITE8_MEMBER( generic_latch_8_device::preset_w )
+void generic_latch_8_device::preset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latched_value = 0xff;
 }
 
-WRITE8_MEMBER( generic_latch_8_device::clear_w )
+void generic_latch_8_device::clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latched_value = 0x00;
 }
@@ -112,23 +112,23 @@ generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, 
 {
 }
 
-READ16_MEMBER( generic_latch_16_device::read )
+uint16_t generic_latch_16_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_latch_read = 1;
 	return m_latched_value;
 }
 
-WRITE16_MEMBER( generic_latch_16_device::write )
+void generic_latch_16_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(generic_latch_16_device::sync_callback), this), data);
 }
 
-WRITE16_MEMBER( generic_latch_16_device::preset_w )
+void generic_latch_16_device::preset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_latched_value = 0xffff;
 }
 
-WRITE16_MEMBER( generic_latch_16_device::clear_w )
+void generic_latch_16_device::clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_latched_value = 0x0000;
 }

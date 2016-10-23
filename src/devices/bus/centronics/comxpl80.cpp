@@ -198,7 +198,7 @@ void comx_pl80_device::device_reset()
 //  pa_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx_pl80_device::pa_w )
+void comx_pl80_device::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -250,7 +250,7 @@ WRITE8_MEMBER( comx_pl80_device::pa_w )
 //  pb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx_pl80_device::pb_w )
+void comx_pl80_device::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -277,7 +277,7 @@ WRITE8_MEMBER( comx_pl80_device::pb_w )
 //  pc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx_pl80_device::pc_w )
+void comx_pl80_device::pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -307,7 +307,7 @@ WRITE8_MEMBER( comx_pl80_device::pc_w )
 //  pd_r -
 //-------------------------------------------------
 
-READ8_MEMBER( comx_pl80_device::pd_r )
+uint8_t comx_pl80_device::pd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

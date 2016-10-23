@@ -68,17 +68,17 @@ public:
 	uint8_t m_scrambler;
 	tilemap_t *m_tilemap;
 
-	DECLARE_WRITE8_MEMBER(aquarius_videoram_w);
-	DECLARE_WRITE8_MEMBER(aquarius_colorram_w);
-	DECLARE_READ8_MEMBER(cassette_r);
-	DECLARE_WRITE8_MEMBER(cassette_w);
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER(mapper_w);
-	DECLARE_READ8_MEMBER(printer_r);
-	DECLARE_WRITE8_MEMBER(printer_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(scrambler_w);
-	DECLARE_READ8_MEMBER(cartridge_r);
+	void aquarius_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aquarius_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scrambler_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_aquarius();
 	TILE_GET_INFO_MEMBER(aquarius_gettileinfo);
 	virtual void video_start() override;

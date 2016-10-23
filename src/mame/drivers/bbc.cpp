@@ -129,7 +129,7 @@ read:
 &E0-&FF Tube ULA        Tube system interface           32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
-READ8_MEMBER(bbc_state::bbc_fe_r)
+uint8_t bbc_state::bbc_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfe;
 }

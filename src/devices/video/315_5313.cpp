@@ -772,7 +772,7 @@ void sega315_5313_device::ctrl_port_w(int data)
 	}
 }
 
-WRITE16_MEMBER( sega315_5313_device::vdp_w )
+void sega315_5313_device::vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{
@@ -1186,7 +1186,7 @@ uint16_t sega315_5313_device::megadriv_read_hv_counters()
 
 }
 
-READ16_MEMBER( sega315_5313_device::vdp_r )
+uint16_t sega315_5313_device::vdp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retvalue = 0;
 

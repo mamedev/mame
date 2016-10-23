@@ -42,14 +42,14 @@ public:
 	virtual ~device_gba_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_ram) { return 0xffffffff; }
-	virtual DECLARE_READ32_MEMBER(read_gpio) { return 0; }
-	virtual DECLARE_READ32_MEMBER(read_tilt) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram) {};
-	virtual DECLARE_WRITE32_MEMBER(write_gpio) {};
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) {};
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) {};
+	virtual uint32_t read_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual uint32_t read_gpio(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0; }
+	virtual uint32_t read_tilt(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {};
+	virtual void write_gpio(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {};
+	virtual void write_tilt(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {};
+	virtual void write_mapper(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {};
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -113,14 +113,14 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom);
-	virtual DECLARE_READ32_MEMBER(read_ram);
-	virtual DECLARE_READ32_MEMBER(read_gpio);
-	virtual DECLARE_READ32_MEMBER(read_tilt) { if (m_cart) return m_cart->read_tilt(space, offset, mem_mask); else return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ram);
-	virtual DECLARE_WRITE32_MEMBER(write_gpio);
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
+	virtual uint32_t read_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_gpio(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_tilt(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { if (m_cart) return m_cart->read_tilt(space, offset, mem_mask); else return 0xffffffff; }
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	virtual void write_gpio(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	virtual void write_tilt(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
+	virtual void write_mapper(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
 
 
 protected:

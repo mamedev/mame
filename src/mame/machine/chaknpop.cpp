@@ -65,27 +65,27 @@ void chaknpop_state::mcu_update_seed( uint8_t data )
   Memory handlers
 ***************************************************************************/
 
-READ8_MEMBER(chaknpop_state::mcu_port_a_r)
+uint8_t chaknpop_state::mcu_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: MCU port_a read\n", space.device().safe_pc());
 	return m_mcu_result;
 }
 
 
-READ8_MEMBER(chaknpop_state::mcu_port_b_r)
+uint8_t chaknpop_state::mcu_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: MCU port_b read\n", space.device().safe_pc());
 
 	return 0xff;
 }
 
-READ8_MEMBER(chaknpop_state::mcu_port_c_r)
+uint8_t chaknpop_state::mcu_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: MCU port_c read\n", space.device().safe_pc());
 	return 0x00;
 }
 
-WRITE8_MEMBER(chaknpop_state::mcu_port_a_w)
+void chaknpop_state::mcu_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mcu_command;
 
@@ -133,12 +133,12 @@ WRITE8_MEMBER(chaknpop_state::mcu_port_a_w)
 	}
 }
 
-WRITE8_MEMBER(chaknpop_state::mcu_port_b_w)
+void chaknpop_state::mcu_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: MCU port_b write 0x%02x\n", space.device().safe_pc(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::mcu_port_c_w)
+void chaknpop_state::mcu_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: MCU port_c write 0x%02x\n", space.device().safe_pc(), data);
 }

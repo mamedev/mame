@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( a8sio_device::motor_w )
 	}
 }
 
-WRITE8_MEMBER( a8sio_device::audio_in_w )
+void a8sio_device::audio_in_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_audio_in_cb(data);
 }

@@ -222,7 +222,7 @@ void wd2010_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER(wd2010_device::read)
+uint8_t wd2010_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -262,7 +262,7 @@ READ8_MEMBER(wd2010_device::read)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER(wd2010_device::write)
+void wd2010_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_task_file[offset] = data;
 

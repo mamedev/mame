@@ -54,8 +54,8 @@ public:
 
 	uint8_t          m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(port_40_w);
-	DECLARE_WRITE8_MEMBER(port_80_w);
+	void port_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	INTERRUPT_GEN_MEMBER(vblank_irq);

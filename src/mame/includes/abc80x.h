@@ -117,9 +117,9 @@ public:
 	void bankswitch();
 	void clock_cassette(int state);
 
-	DECLARE_READ8_MEMBER( pling_r );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
+	uint8_t pling_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
@@ -177,7 +177,7 @@ public:
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	MC6845_UPDATE_ROW( abc800m_update_row );
 };
 
@@ -205,8 +205,8 @@ public:
 	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	uint8_t char_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	DECLARE_PALETTE_INIT( abc800c );
 };
 
@@ -238,11 +238,11 @@ public:
 
 	void bankswitch();
 
-	DECLARE_READ8_MEMBER( pling_r );
+	uint8_t pling_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -289,22 +289,22 @@ public:
 	void bankswitch();
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mai_r );
-	DECLARE_WRITE8_MEMBER( mao_w );
-	DECLARE_WRITE8_MEMBER( hrs_w );
-	DECLARE_WRITE8_MEMBER( hrc_w );
-	DECLARE_READ8_MEMBER( charram_r );
-	DECLARE_WRITE8_MEMBER( charram_w );
-	DECLARE_READ8_MEMBER( ami_r );
-	DECLARE_WRITE8_MEMBER( amo_w );
-	DECLARE_READ8_MEMBER( cli_r );
-	DECLARE_WRITE8_MEMBER( sso_w );
-	DECLARE_READ8_MEMBER( sti_r );
-	DECLARE_WRITE8_MEMBER( sto_w );
+	uint8_t mai_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mao_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t charram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ami_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cli_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sso_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sti_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sto_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
+	offs_t direct_update_handler(direct_read_data &direct, offs_t address);
 	DECLARE_PALETTE_INIT( abc806 );
 	MC6845_UPDATE_ROW( abc806_update_row );
 

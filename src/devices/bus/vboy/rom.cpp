@@ -43,19 +43,19 @@ vboy_eeprom_device::vboy_eeprom_device(const machine_config &mconfig, const char
  mapper specific handlers
  -------------------------------------------------*/
 
-READ32_MEMBER(vboy_rom_device::read_cart)
+uint32_t vboy_rom_device::read_cart(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_rom[offset & m_rom_mask];
 }
 
 
-READ32_MEMBER(vboy_eeprom_device::read_eeprom)
+uint32_t vboy_eeprom_device::read_eeprom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_eeprom[offset];
 }
 
 
-WRITE32_MEMBER(vboy_eeprom_device::write_eeprom)
+void vboy_eeprom_device::write_eeprom(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_eeprom[offset]);
 }

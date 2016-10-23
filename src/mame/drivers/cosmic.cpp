@@ -44,7 +44,7 @@ cosmicg - board can operate in b&w mode if there is no PROM, in this case
 
 /* Schematics show 12 triggers for discrete sound circuits */
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
+void cosmic_state::panic_sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -110,7 +110,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
+void cosmic_state::panic_sound_output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sound_enabled)
 	{
@@ -126,7 +126,7 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 #endif
 }
 
-WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
+void cosmic_state::cosmicg_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 12)
@@ -188,7 +188,7 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 }
 
 
-WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
+void cosmic_state::cosmica_sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -325,23 +325,23 @@ WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 	#endif
 }
 
-WRITE8_MEMBER(cosmic_state::dac_w)
+void cosmic_state::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(BIT(data, 7));
 }
 
-READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
+uint8_t cosmic_state::cosmica_pixel_clock_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_screen->vpos() >> 2) & 0x3f;
 }
 
-READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
+uint8_t cosmic_state::cosmicg_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
 }
 
-READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
+uint8_t cosmic_state::magspot_coinage_dip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_dsw.read_safe(0) & (1 << (7 - offset))) ? 0 : 1;
 }
@@ -349,7 +349,7 @@ READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 
 /* Has 8 way joystick, remap combinations to missing directions */
 
-READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
+uint8_t cosmic_state::nomnlnd_port_0_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int control = m_in_ports[offset]->read();
 	int fire = m_in_ports[3]->read();
@@ -368,7 +368,7 @@ READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 
 
 
-WRITE8_MEMBER(cosmic_state::flip_screen_w)
+void cosmic_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x80);
 }

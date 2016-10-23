@@ -31,9 +31,9 @@ public:
 	uint8_t           m_overall_volume;
 	uint8_t           m_adpcm_bank;
 	virtual void update_interrupts() override;
-	DECLARE_READ16_MEMBER(special_port2_r);
-	DECLARE_WRITE16_MEMBER(audio_control_w);
-	DECLARE_WRITE16_MEMBER(audio_volume_w);
+	uint16_t special_port2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void audio_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void audio_volume_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_relief();
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);

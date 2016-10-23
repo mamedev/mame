@@ -58,29 +58,29 @@ void cbasebal_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_textram_w)
+void cbasebal_state::cbasebal_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(cbasebal_state::cbasebal_textram_r)
+uint8_t cbasebal_state::cbasebal_textram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrollram_w)
+void cbasebal_state::cbasebal_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_MEMBER(cbasebal_state::cbasebal_scrollram_r)
+uint8_t cbasebal_state::cbasebal_scrollram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scrollram[offset];
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
+void cbasebal_state::cbasebal_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is unknown - toggles continuously */
 
@@ -110,13 +110,13 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
 	/* other bits unknown, but used */
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrollx_w)
+void cbasebal_state::cbasebal_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll_x[0] + 256 * m_scroll_x[1]);
 }
 
-WRITE8_MEMBER(cbasebal_state::cbasebal_scrolly_w)
+void cbasebal_state::cbasebal_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scroll_y[0] + 256 * m_scroll_y[1]);

@@ -60,17 +60,17 @@ static const uint8_t superman_code[40] =
  *
  *************************************/
 
-WRITE16_MEMBER( taitox_state::cchip1_ctrl_w )
+void taitox_state::cchip1_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER( taitox_state::cchip1_bank_w )
+void taitox_state::cchip1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER( taitox_state::cchip1_ram_w )
+void taitox_state::cchip1_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_current_bank == 0 && offset == 0x03)
 	{
@@ -94,7 +94,7 @@ WRITE16_MEMBER( taitox_state::cchip1_ram_w )
  *
  *************************************/
 
-READ16_MEMBER( taitox_state::cchip1_ctrl_r )
+uint16_t taitox_state::cchip1_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    Bit 2 = Error signal
@@ -103,7 +103,7 @@ READ16_MEMBER( taitox_state::cchip1_ctrl_r )
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER( taitox_state::cchip1_ram_r )
+uint16_t taitox_state::cchip1_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Check for input ports */
 	if (m_current_bank == 0)

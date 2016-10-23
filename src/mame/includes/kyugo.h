@@ -47,17 +47,17 @@ public:
 	required_device<palette_device> m_palette;
 
 	uint8_t       m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(kyugo_sub_cpu_control_w);
-	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(kyugo_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(kyugo_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(kyugo_bgattribram_w);
-	DECLARE_READ8_MEMBER(kyugo_spriteram_2_r);
-	DECLARE_WRITE8_MEMBER(kyugo_scroll_x_lo_w);
-	DECLARE_WRITE8_MEMBER(kyugo_gfxctrl_w);
-	DECLARE_WRITE8_MEMBER(kyugo_scroll_y_w);
-	DECLARE_WRITE8_MEMBER(kyugo_flipscreen_w);
+	void kyugo_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_sub_cpu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_bgattribram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kyugo_spriteram_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kyugo_scroll_x_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kyugo_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_srdmissn();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

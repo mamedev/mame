@@ -133,12 +133,12 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ16_MEMBER(ems_r);
-	DECLARE_WRITE16_MEMBER(ems_w);
-	DECLARE_READ16_MEMBER(emsram_r);
-	DECLARE_WRITE16_MEMBER(emsram_w);
-	DECLARE_READ8_MEMBER(vg230_io_r);
-	DECLARE_WRITE8_MEMBER(vg230_io_w);
+	uint16_t ems_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ems_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t emsram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void emsram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t vg230_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vg230_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	struct
 	{
@@ -219,7 +219,7 @@ void pasogo_state::machine_start()
 	m_vg230.bios_timer.data=0x7200; // HACK
 }
 
-READ8_MEMBER( pasogo_state::vg230_io_r )
+uint8_t pasogo_state::vg230_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int log = true;
 	uint8_t data = 0;
@@ -305,7 +305,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 }
 
 
-WRITE8_MEMBER( pasogo_state::vg230_io_w )
+void pasogo_state::vg230_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int log = true;
 
@@ -377,7 +377,7 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 }
 
 
-READ16_MEMBER( pasogo_state::ems_r )
+uint16_t pasogo_state::ems_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t data = 0;
 	uint8_t index;
@@ -397,7 +397,7 @@ READ16_MEMBER( pasogo_state::ems_r )
 }
 
 
-WRITE16_MEMBER( pasogo_state::ems_w )
+void pasogo_state::ems_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t index;
 
@@ -424,13 +424,13 @@ WRITE16_MEMBER( pasogo_state::ems_w )
 	}
 }
 
-READ16_MEMBER( pasogo_state::emsram_r )
+uint16_t pasogo_state::emsram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
 	return m_ems->read16(space, offset & 0x1fff, mem_mask);
 }
 
-WRITE16_MEMBER( pasogo_state::emsram_w )
+void pasogo_state::emsram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ems->set_bank(m_ems_bank[(offset >> 13) & 0x1f] & 0x7fff);
 	m_ems->write16(space, offset & 0x1fff, data, mem_mask);

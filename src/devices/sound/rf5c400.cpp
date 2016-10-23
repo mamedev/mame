@@ -341,7 +341,7 @@ void rf5c400_device::rf5c400_init_chip()
 /*****************************************************************************/
 
 static uint16_t rf5c400_status = 0;
-READ16_MEMBER( rf5c400_device::rf5c400_r )
+uint16_t rf5c400_device::rf5c400_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 	return 0;
 }
 
-WRITE16_MEMBER( rf5c400_device::rf5c400_w )
+void rf5c400_device::rf5c400_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x400)
 	{

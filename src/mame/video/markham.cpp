@@ -39,13 +39,13 @@ PALETTE_INIT_MEMBER(markham_state, markham)
 	}
 }
 
-WRITE8_MEMBER(markham_state::markham_videoram_w)
+void markham_state::markham_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(markham_state::markham_flipscreen_w)
+void markham_state::markham_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{

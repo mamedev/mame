@@ -149,7 +149,7 @@ void cgenie_fdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( cgenie_fdc_device::irq_r )
+uint8_t cgenie_fdc_device::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_irq_status;
 
@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
 	m_slot->int_w(m_irq_status ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( cgenie_fdc_device::select_w )
+void cgenie_fdc_device::select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::motor_w: 0x%02x\n", data);
@@ -215,7 +215,7 @@ WRITE8_MEMBER( cgenie_fdc_device::select_w )
 	}
 }
 
-WRITE8_MEMBER( cgenie_fdc_device::command_w )
+void cgenie_fdc_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// density select is encoded into this pseudo-command
 	if ((data & 0xfe) == 0xfe)

@@ -35,11 +35,11 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(out_w);
-	DECLARE_WRITE16_MEMBER(tx_tileram_w);
-	DECLARE_WRITE16_MEMBER(fg_tileram_w);
-	DECLARE_WRITE16_MEMBER(bg_tileram_w);
-	DECLARE_READ16_MEMBER(genix_prot_r);
+	void out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t genix_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 

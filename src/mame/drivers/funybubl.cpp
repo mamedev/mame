@@ -55,24 +55,24 @@ Note: SW2, SW3 & SW4 not populated
 #include "includes/funybubl.h"
 
 
-WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)
+void funybubl_state::funybubl_vidram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
+void funybubl_state::funybubl_cpurombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x3f);   // should we add a check that (data&0x3f) < #banks?
 }
 
 
-WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
+void funybubl_state::funybubl_soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(funybubl_state::funybubl_oki_bank_sw)
+void funybubl_state::funybubl_oki_bank_sw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }

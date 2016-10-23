@@ -108,45 +108,45 @@ public:
 	uint32_t m_igs029_mgcs_long;
 
 
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
-	DECLARE_READ16_MEMBER(mgcs_magic_r);
+	void input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mgcs_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mgcs_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	uint16_t mgcs_palette_bitswap(uint16_t bgr);
 	uint16_t lhzb2a_palette_bitswap(uint16_t bgr);
 	uint16_t tjsb_palette_bitswap(uint16_t bgr);
 	uint16_t slqz2_palette_bitswap(uint16_t bgr);
 
-	DECLARE_READ8_MEMBER(sdmg2_keys_r);
-	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
-	DECLARE_READ16_MEMBER(sdmg2_magic_r);
-	DECLARE_READ8_MEMBER(mgdh_keys_r);
-	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
-	DECLARE_READ16_MEMBER(mgdha_magic_r);
+	uint8_t sdmg2_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sdmg2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sdmg2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t mgdh_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mgdha_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mgdha_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(tjsb_output_w);
-	DECLARE_READ8_MEMBER(tjsb_input_r);
-	DECLARE_READ8_MEMBER(spkrform_input_r);
+	void tjsb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tjsb_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spkrform_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER(lhzb2a_input_r);
-	DECLARE_WRITE16_MEMBER(lhzb2a_input_addr_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_input_select_w);
+	uint16_t lhzb2a_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lhzb2a_input_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot_w);
-	DECLARE_READ16_MEMBER(lhzb2a_prot_r);
+	void lhzb2a_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2a_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_reset_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_inc_w);
-	DECLARE_WRITE16_MEMBER(lhzb2a_prot2_dec_w);
-	DECLARE_READ16_MEMBER(lhzb2a_prot2_r);
+	void lhzb2a_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lhzb2a_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2a_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(lhzb2_magic_w);
-	DECLARE_READ16_MEMBER(lhzb2_magic_r);
+	void lhzb2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lhzb2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(slqz2_magic_w);
-	DECLARE_READ16_MEMBER(slqz2_magic_r);
-	DECLARE_READ8_MEMBER(mgcs_keys_r);
+	void slqz2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t slqz2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t mgcs_keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_iqblocka();
 	void init_mgdh();
 	void init_slqz2();
@@ -1126,12 +1126,12 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(igs017_state::input_select_w)
+void igs017_state::input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data;
 }
 
-READ8_MEMBER(igs017_state::input_r)
+uint8_t igs017_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1311,7 +1311,7 @@ void igs017_state::mgcs_igs029_run()
 	m_igs029_send_len = 0;
 }
 
-WRITE16_MEMBER(igs017_state::mgcs_magic_w)
+void igs017_state::mgcs_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1394,7 +1394,7 @@ WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::mgcs_magic_r)
+uint16_t igs017_state::mgcs_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)
 		return m_igs_magic[0];
@@ -1428,7 +1428,7 @@ READ16_MEMBER(igs017_state::mgcs_magic_r)
 	return 0xffff;
 }
 
-READ8_MEMBER(igs017_state::mgcs_keys_r)
+uint8_t igs017_state::mgcs_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x08) return ioport("KEY0")->read();
 	if (~m_input_select & 0x10) return ioport("KEY1")->read();
@@ -1456,7 +1456,7 @@ ADDRESS_MAP_END
 
 // sdmg2
 
-READ8_MEMBER(igs017_state::sdmg2_keys_r)
+uint8_t igs017_state::sdmg2_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x01) return ioport("KEY0")->read();
 	if (~m_input_select & 0x02) return ioport("KEY1")->read();
@@ -1470,7 +1470,7 @@ READ8_MEMBER(igs017_state::sdmg2_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
+void igs017_state::sdmg2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1503,7 +1503,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::sdmg2_magic_r)
+uint16_t igs017_state::sdmg2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1539,7 +1539,7 @@ ADDRESS_MAP_END
 // mgdh, mgdha
 
 
-READ8_MEMBER(igs017_state::mgdh_keys_r)
+uint8_t igs017_state::mgdh_keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_input_select & 0x04) return ioport("KEY0")->read();
 	if (~m_input_select & 0x08) return ioport("KEY1")->read();
@@ -1553,7 +1553,7 @@ READ8_MEMBER(igs017_state::mgdh_keys_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(igs017_state::mgdha_magic_w)
+void igs017_state::mgdha_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1610,7 +1610,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::mgdha_magic_r)
+uint16_t igs017_state::mgdha_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1652,7 +1652,7 @@ ADDRESS_MAP_END
 // tjsb
 
 
-WRITE8_MEMBER(igs017_state::tjsb_output_w)
+void igs017_state::tjsb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(m_input_select)
 	{
@@ -1683,7 +1683,7 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 	logerror("%s: warning, writing to igs_magic %02x = %02x\n", machine().describe_context(), m_input_select, data);
 }
 
-READ8_MEMBER(igs017_state::tjsb_input_r)
+uint8_t igs017_state::tjsb_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1734,7 +1734,7 @@ static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(igs017_state::spkrform_input_r)
+uint8_t igs017_state::spkrform_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -1772,7 +1772,7 @@ ADDRESS_MAP_END
 // lhzb2
 
 
-WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
+void igs017_state::lhzb2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -1806,7 +1806,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2_magic_r)
+uint16_t igs017_state::lhzb2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{
@@ -1884,7 +1884,7 @@ ADDRESS_MAP_END
 
 // Bitswap protection
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
+void igs017_state::lhzb2a_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_prot_regs[offset]);
 
@@ -2013,7 +2013,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_prot_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::lhzb2a_prot_r)
+uint16_t igs017_state::lhzb2a_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_prot_regs[0])
 	{
@@ -2043,25 +2043,25 @@ READ16_MEMBER(igs017_state::lhzb2a_prot_r)
 
 // Protection 2
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_reset_w)
+void igs017_state::lhzb2a_prot2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2 = 0x00;
 	logerror("%s: prot2 reset -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_inc_w)
+void igs017_state::lhzb2a_prot2_inc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2++;
 	logerror("%s: prot2 inc -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_prot2_dec_w)
+void igs017_state::lhzb2a_prot2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot2--;
 	logerror("%s: prot2 dec -> %02x\n", machine().describe_context(), m_prot2);
 }
 
-READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
+uint16_t igs017_state::lhzb2a_prot2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t x     =   m_prot2;
 	uint8_t res   =   (BIT(x, 0) << 7) |
@@ -2075,7 +2075,7 @@ READ16_MEMBER(igs017_state::lhzb2a_prot2_r)
 
 
 
-READ16_MEMBER(igs017_state::lhzb2a_input_r)
+uint16_t igs017_state::lhzb2a_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset*2)
 	{
@@ -2104,7 +2104,7 @@ READ16_MEMBER(igs017_state::lhzb2a_input_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_input_addr_w)
+void igs017_state::lhzb2a_input_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Unmap previous address ranges
 	if (m_input_addr != -1)
@@ -2124,7 +2124,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_addr_w)
 	logerror("%s: inputs and protection remapped at %02xxxxx\n", machine().describe_context(), m_input_addr);
 }
 
-WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
+void igs017_state::lhzb2a_input_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2164,7 +2164,7 @@ ADDRESS_MAP_END
 // slqz2
 
 
-WRITE16_MEMBER(igs017_state::slqz2_magic_w)
+void igs017_state::slqz2_magic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_igs_magic[offset]);
 
@@ -2192,7 +2192,7 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 	}
 }
 
-READ16_MEMBER(igs017_state::slqz2_magic_r)
+uint16_t igs017_state::slqz2_magic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{

@@ -803,7 +803,7 @@ void lucky74_state::machine_reset()
 *    Read/Write  Handlers    *
 *****************************/
 
-READ8_MEMBER(lucky74_state::custom_09R81P_port_r)
+uint8_t lucky74_state::custom_09R81P_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset != 0x00)
 	{
@@ -815,12 +815,12 @@ READ8_MEMBER(lucky74_state::custom_09R81P_port_r)
 	}
 }
 
-WRITE8_MEMBER(lucky74_state::custom_09R81P_port_w)
+void lucky74_state::custom_09R81P_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_reg[offset] = data;
 }
 
-WRITE8_MEMBER(lucky74_state::ym2149_portb_w)
+void lucky74_state::ym2149_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
@@ -832,28 +832,28 @@ WRITE8_MEMBER(lucky74_state::ym2149_portb_w)
 	flip_screen_set(data & 0x01);
 }
 
-READ8_MEMBER(lucky74_state::usart_8251_r)
+uint8_t lucky74_state::usart_8251_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reads to USART 8251 port */
 	logerror("read from USART port.\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(lucky74_state::usart_8251_w)
+void lucky74_state::usart_8251_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writes to USART 8251 port */
 	m_usart_8251 = data;
 	logerror("write to USART port: %02x \n", m_usart_8251);
 }
 
-READ8_MEMBER(lucky74_state::copro_sm7831_r)
+uint8_t lucky74_state::copro_sm7831_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read from SM7831 co-processor */
 	logerror("read from co-processor.\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(lucky74_state::copro_sm7831_w)
+void lucky74_state::copro_sm7831_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write to SM7831 co-processor */
 	m_copro_sm7831 = data;
@@ -865,7 +865,7 @@ WRITE8_MEMBER(lucky74_state::copro_sm7831_w)
 *    Lamps    *
 **************/
 
-WRITE8_MEMBER(lucky74_state::lamps_a_w)
+void lucky74_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPSA:
 
@@ -880,7 +880,7 @@ WRITE8_MEMBER(lucky74_state::lamps_a_w)
 	output().set_lamp_value(11, (data >> 3) & 1);     /* SMALL */
 }
 
-WRITE8_MEMBER(lucky74_state::lamps_b_w)
+void lucky74_state::lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPSB:
 

@@ -294,23 +294,23 @@ public:
 
 	required_ioport_array<4> m_ports;
 
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_tile_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_char_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_char_w);
-	DECLARE_READ32_MEMBER(gticlub_k001604_reg_r);
-	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
-	DECLARE_READ8_MEMBER(sysreg_r);
-	DECLARE_WRITE8_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(dsp_dataram0_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
-	DECLARE_READ32_MEMBER(dsp_dataram1_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	void paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gticlub_k001604_tile_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gticlub_k001604_tile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gticlub_k001604_char_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gticlub_k001604_char_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gticlub_k001604_reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gticlub_k001604_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t dsp_dataram0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_dataram0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_dataram1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_dataram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_hangplt_common();
 	void init_hangplt();
@@ -338,7 +338,7 @@ private:
 };
 
 
-WRITE32_MEMBER(gticlub_state::paletteram32_w)
+void gticlub_state::paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -355,38 +355,38 @@ WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
+uint32_t gticlub_state::gticlub_k001604_tile_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	return k001604->tile_r(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
+void gticlub_state::gticlub_k001604_tile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	k001604->tile_w(space, offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
+uint32_t gticlub_state::gticlub_k001604_char_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	return k001604->char_r(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
+void gticlub_state::gticlub_k001604_char_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	k001604->char_w(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
+uint32_t gticlub_state::gticlub_k001604_reg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	return k001604->reg_r(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
+void gticlub_state::gticlub_k001604_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k001604_device *k001604 = (m_konppc->get_cgboard_id() ? m_k001604_2 : m_k001604_1);
 	k001604->reg_w(space, offset, data, mem_mask);
@@ -395,7 +395,7 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 
 /******************************************************************/
 
-READ8_MEMBER(gticlub_state::sysreg_r)
+uint8_t gticlub_state::sysreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -427,7 +427,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 	return 0;
 }
 
-WRITE8_MEMBER(gticlub_state::sysreg_w)
+void gticlub_state::sysreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -465,7 +465,7 @@ TIMER_CALLBACK_MEMBER(gticlub_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
+void gticlub_state::soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 1)
 	{
@@ -480,7 +480,7 @@ WRITE16_MEMBER(gticlub_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(gticlub_state::soundtimer_count_w)
+void gticlub_state::soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -549,22 +549,22 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-READ32_MEMBER(gticlub_state::dsp_dataram0_r)
+uint32_t gticlub_state::dsp_dataram0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sharc_dataram_0[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram0_w)
+void gticlub_state::dsp_dataram0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sharc_dataram_0[offset] = data;
 }
 
-READ32_MEMBER(gticlub_state::dsp_dataram1_r)
+uint32_t gticlub_state::dsp_dataram1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sharc_dataram_1[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
+void gticlub_state::dsp_dataram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sharc_dataram_1[offset] = data;
 }

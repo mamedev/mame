@@ -206,17 +206,17 @@ ADDRESS_MAP_END
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_10828_device::pio_pa_r )
+uint8_t luxor_55_10828_device::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pa_w )
+void luxor_55_10828_device::pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data = data;
 }
 
-READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
+uint8_t luxor_55_10828_device::pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -259,7 +259,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
+void luxor_55_10828_device::pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -571,7 +571,7 @@ void luxor_55_10828_device::abcbus_c3(uint8_t data)
 //  ctrl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
+void luxor_55_10828_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -620,7 +620,7 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
 //  status_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::status_w )
+void luxor_55_10828_device::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -648,7 +648,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 //  fdc_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_10828_device::fdc_r )
+uint8_t luxor_55_10828_device::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
@@ -665,7 +665,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 //  fdc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
+void luxor_55_10828_device::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{

@@ -86,7 +86,7 @@ williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mco
 //  latch
 //-------------------------------------------------
 
-WRITE16_MEMBER(williams_cvsd_sound_device::write)
+void williams_cvsd_sound_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	synchronize(0, data);
 }
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
 //  bank_select_w - change memory banks
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_cvsd_sound_device::bank_select_w)
+void williams_cvsd_sound_device::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("rombank")->set_entry(data & 0x0f);
 }
@@ -126,7 +126,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::bank_select_w)
 //  talkback_w - write to the talkback latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_cvsd_sound_device::talkback_w)
+void williams_cvsd_sound_device::talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_talkback = data;
 	logerror("CVSD Talkback = %02X\n", data);
@@ -138,7 +138,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::talkback_w)
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_digit_clock_clear_w)
+void williams_cvsd_sound_device::cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
@@ -149,7 +149,7 @@ WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_digit_clock_clear_w)
 //  cvsd_clock_set_w - set the clock on the HC55516
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_cvsd_sound_device::cvsd_clock_set_w)
+void williams_cvsd_sound_device::cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->clock_w(1);
 }
@@ -324,7 +324,7 @@ williams_narc_sound_device::williams_narc_sound_device(const machine_config &mco
 //  SYNC bits in bits 8 and 9
 //-------------------------------------------------
 
-READ16_MEMBER(williams_narc_sound_device::read)
+uint16_t williams_narc_sound_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_talkback | (m_audio_sync << 8);
 }
@@ -335,7 +335,7 @@ READ16_MEMBER(williams_narc_sound_device::read)
 //  latch
 //-------------------------------------------------
 
-WRITE16_MEMBER(williams_narc_sound_device::write)
+void williams_narc_sound_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	synchronize(TID_MASTER_COMMAND, data);
 }
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
 //  master CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::master_bank_select_w)
+void williams_narc_sound_device::master_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("masterbank")->set_entry(data & 0x0f);
 }
@@ -382,7 +382,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_bank_select_w)
 //  slave CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::slave_bank_select_w)
+void williams_narc_sound_device::slave_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("slavebank")->set_entry(data & 0x0f);
 }
@@ -393,7 +393,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_bank_select_w)
 //  agent
 //-------------------------------------------------
 
-READ8_MEMBER(williams_narc_sound_device::command_r)
+uint8_t williams_narc_sound_device::command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cpu0->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
@@ -406,7 +406,7 @@ READ8_MEMBER(williams_narc_sound_device::command_r)
 //  slave CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::command2_w)
+void williams_narc_sound_device::command2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(TID_SLAVE_COMMAND, data);
 }
@@ -417,7 +417,7 @@ WRITE8_MEMBER(williams_narc_sound_device::command2_w)
 //  CPU
 //-------------------------------------------------
 
-READ8_MEMBER(williams_narc_sound_device::command2_r)
+uint8_t williams_narc_sound_device::command2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cpu1->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 	return m_latch2;
@@ -429,7 +429,7 @@ READ8_MEMBER(williams_narc_sound_device::command2_r)
 //  talkback latch from the master CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::master_talkback_w)
+void williams_narc_sound_device::master_talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_talkback = data;
 	logerror("Master Talkback = %02X\n", data);
@@ -441,7 +441,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_talkback_w)
 //  SYNC register
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::master_sync_w)
+void williams_narc_sound_device::master_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x01);
 	m_audio_sync |= 0x01;
@@ -454,7 +454,7 @@ WRITE8_MEMBER(williams_narc_sound_device::master_sync_w)
 //  talkback latch from the slave CPU
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::slave_talkback_w)
+void williams_narc_sound_device::slave_talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Slave Talkback = %02X\n", data);
 }
@@ -465,7 +465,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_talkback_w)
 //  SYNC register
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
+void williams_narc_sound_device::slave_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_set(attotime::from_double(TIME_OF_74LS123(180000, 0.000001)), TID_SYNC_CLEAR, 0x02);
 	m_audio_sync |= 0x02;
@@ -478,7 +478,7 @@ WRITE8_MEMBER(williams_narc_sound_device::slave_sync_w)
 //  the HC55516 and clock the data
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::cvsd_digit_clock_clear_w)
+void williams_narc_sound_device::cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->digit_w(data);
 	m_hc55516->clock_w(0);
@@ -489,7 +489,7 @@ WRITE8_MEMBER(williams_narc_sound_device::cvsd_digit_clock_clear_w)
 //  cvsd_clock_set_w - set the clock on the HC55516
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_narc_sound_device::cvsd_clock_set_w)
+void williams_narc_sound_device::cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->clock_w(1);
 }
@@ -693,7 +693,7 @@ williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &m
 //  latch
 //-------------------------------------------------
 
-WRITE16_MEMBER(williams_adpcm_sound_device::write)
+void williams_adpcm_sound_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	synchronize(TID_COMMAND, data);
 }
@@ -734,7 +734,7 @@ READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
 //  bank
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
+void williams_adpcm_sound_device::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("rombank")->set_entry(data & 0x07);
 }
@@ -745,7 +745,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::bank_select_w)
 //  bank
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
+void williams_adpcm_sound_device::oki6295_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank")->set_entry(data & 7);
 }
@@ -756,7 +756,7 @@ WRITE8_MEMBER(williams_adpcm_sound_device::oki6295_bank_select_w)
 //  latch
 //-------------------------------------------------
 
-READ8_MEMBER(williams_adpcm_sound_device::command_r)
+uint8_t williams_adpcm_sound_device::command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
@@ -771,7 +771,7 @@ READ8_MEMBER(williams_adpcm_sound_device::command_r)
 //  talkback_w - write to the talkback latch
 //-------------------------------------------------
 
-WRITE8_MEMBER(williams_adpcm_sound_device::talkback_w)
+void williams_adpcm_sound_device::talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_talkback = data;
 	logerror("ADPCM Talkback = %02X\n", data);

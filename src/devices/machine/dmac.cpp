@@ -172,7 +172,7 @@ void dmac_device::start_dma()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ16_MEMBER( dmac_device::register_read )
+uint16_t dmac_device::register_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -258,7 +258,7 @@ READ16_MEMBER( dmac_device::register_read )
 	return data;
 }
 
-WRITE16_MEMBER( dmac_device::register_write )
+void dmac_device::register_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

@@ -39,19 +39,19 @@ void cedar_magnet_flop_device::device_reset()
 	m_floptrk = 0;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port60_r)
+uint8_t cedar_magnet_flop_device::port60_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_flopstat;
 	return ret;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port61_r)
+uint8_t cedar_magnet_flop_device::port61_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_curtrack;
 	return ret;
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::port63_r)
+uint8_t cedar_magnet_flop_device::port63_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = rand();
 
@@ -105,7 +105,7 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
+void cedar_magnet_flop_device::port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%s: port60_w (COMMAND) %02x\n", device().machine().describe_context(), data);
 	m_flopcmd = data;
@@ -152,7 +152,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
 
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
+void cedar_magnet_flop_device::port62_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%s: port62_w (SECTOR) %02x\n", device().machine().describe_context(), data);
 	m_flopsec = data;
@@ -165,7 +165,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port62_w)
 	m_flopsec -= 200;
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
+void cedar_magnet_flop_device::port63_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%s: port63_w (DATA) %02x\n", device().machine().describe_context(), data);
 	m_flopdat = data;
@@ -205,7 +205,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port63_w)
 
 }
 
-WRITE8_MEMBER(cedar_magnet_flop_device::write)
+void cedar_magnet_flop_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -217,7 +217,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::write)
 	}
 }
 
-READ8_MEMBER(cedar_magnet_flop_device::read)
+uint8_t cedar_magnet_flop_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{

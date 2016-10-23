@@ -85,15 +85,15 @@ public:
 	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_to_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( memory_r );
-	DECLARE_WRITE8_MEMBER( memory_w );
+	uint8_t memory_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ale_w );
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	void ale_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

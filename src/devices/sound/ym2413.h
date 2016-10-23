@@ -13,10 +13,10 @@ class ym2413_device : public device_t,
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( register_port_w );
-	DECLARE_WRITE8_MEMBER( data_port_w );
+	void register_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void _ym2413_update_request();
 

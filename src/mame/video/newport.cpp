@@ -229,7 +229,7 @@ uint32_t newport_video_device::screen_update(screen_device &device, bitmap_rgb32
 }
 
 
-WRITE32_MEMBER( newport_video_device::cmap0_w )
+void newport_video_device::cmap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -247,7 +247,7 @@ WRITE32_MEMBER( newport_video_device::cmap0_w )
 	}
 }
 
-READ32_MEMBER( newport_video_device::cmap0_r )
+uint32_t newport_video_device::cmap0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -263,7 +263,7 @@ READ32_MEMBER( newport_video_device::cmap0_r )
 	}
 }
 
-READ32_MEMBER( newport_video_device::cmap1_r )
+uint32_t newport_video_device::cmap1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (m_REX3.nDCBRegSelect)
 	{
@@ -279,7 +279,7 @@ READ32_MEMBER( newport_video_device::cmap1_r )
 	}
 }
 
-READ32_MEMBER( newport_video_device::xmap0_r )
+uint32_t newport_video_device::xmap0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t nModeIdx;
 
@@ -327,7 +327,7 @@ READ32_MEMBER( newport_video_device::xmap0_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( newport_video_device::xmap0_w )
+void newport_video_device::xmap0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t n8BitVal = data & 0x000000ff;
 
@@ -365,7 +365,7 @@ WRITE32_MEMBER( newport_video_device::xmap0_w )
 	}
 }
 
-READ32_MEMBER( newport_video_device::xmap1_r )
+uint32_t newport_video_device::xmap1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t nModeIdx;
 
@@ -413,7 +413,7 @@ READ32_MEMBER( newport_video_device::xmap1_r )
 	return 0x00000000;
 }
 
-WRITE32_MEMBER( newport_video_device::xmap1_w )
+void newport_video_device::xmap1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t n8BitVal = data & 0x000000ff;
 
@@ -451,7 +451,7 @@ WRITE32_MEMBER( newport_video_device::xmap1_w )
 	}
 }
 
-READ32_MEMBER( newport_video_device::vc2_r )
+uint32_t newport_video_device::vc2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t ret16;
 
@@ -475,7 +475,7 @@ READ32_MEMBER( newport_video_device::vc2_r )
 	}
 }
 
-WRITE32_MEMBER( newport_video_device::vc2_w )
+void newport_video_device::vc2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (m_REX3.nXFerWidth)
 	{
@@ -589,7 +589,7 @@ WRITE32_MEMBER( newport_video_device::vc2_w )
 	}
 }
 
-READ32_MEMBER( newport_video_device::rex3_r )
+uint32_t newport_video_device::rex3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  uint32_t nTemp;
 
@@ -963,7 +963,7 @@ void newport_video_device::DoREX3Command()
 	}
 }
 
-WRITE32_MEMBER( newport_video_device::rex3_w )
+void newport_video_device::rex3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t nTemp = 0;
 

@@ -62,13 +62,13 @@ PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
 	}
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_videoram_w)
+void hanaawas_state::hanaawas_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
+void hanaawas_state::hanaawas_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER(hanaawas_state::hanaawas_colorram_w)
 	m_bg_tilemap->mark_tile_dirty((offset + (flip_screen() ? -1 : 1)) & 0x03ff);
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_portB_w)
+void hanaawas_state::hanaawas_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 is flip screen */
 	if (flip_screen() != (~data & 0x80))

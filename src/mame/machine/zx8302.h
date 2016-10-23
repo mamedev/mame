@@ -116,16 +116,16 @@ public:
 	template<class _Object> static devcb_base &set_out_raw2_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_out_raw2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_in_raw2_callback(device_t &device, _Object object) { return downcast<zx8302_device &>(device).m_in_raw2_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( mdv_track_r );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( ipc_command_w );
-	DECLARE_WRITE8_MEMBER( mdv_control_w );
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_acknowledge_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mdv_track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ipc_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mdv_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_acknowledge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( vsync_w );
 	DECLARE_WRITE_LINE_MEMBER( comctl_w );
 	DECLARE_WRITE_LINE_MEMBER( comdata_w );

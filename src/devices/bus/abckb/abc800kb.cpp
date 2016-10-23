@@ -398,7 +398,7 @@ void abc800_keyboard_device::txd_w(int state)
 //  kb_p1_r - keyboard column data read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
+uint8_t abc800_keyboard_device::kb_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -418,7 +418,7 @@ READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
 //  kb_p1_w - keyboard row write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_keyboard_device::kb_p1_w )
+void abc800_keyboard_device::kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -447,7 +447,7 @@ WRITE8_MEMBER( abc800_keyboard_device::kb_p1_w )
 //  kb_p2_w - keyboard control write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc800_keyboard_device::kb_p2_w )
+void abc800_keyboard_device::kb_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER( abc800_keyboard_device::kb_p2_w )
 //  kb_t1_r - keyboard T1 timer read
 //-------------------------------------------------
 
-READ8_MEMBER( abc800_keyboard_device::kb_t1_r )
+uint8_t abc800_keyboard_device::kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_clk;
 }

@@ -37,10 +37,10 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
-	DECLARE_WRITE8_MEMBER( stateparam_w );
-	DECLARE_READ8_MEMBER( stateparam_r );
-	DECLARE_WRITE8_MEMBER( lut_w );
-	DECLARE_READ8_MEMBER( init_r );
+	void stateparam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stateparam_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t init_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void reset_common();
 

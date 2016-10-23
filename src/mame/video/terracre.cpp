@@ -145,19 +145,19 @@ PALETTE_INIT_MEMBER(terracre_state, terracre)
 	}
 }
 
-WRITE16_MEMBER(terracre_state::amazon_background_w)
+void terracre_state::amazon_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_bg_videoram[offset] );
 	m_background->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(terracre_state::amazon_foreground_w)
+void terracre_state::amazon_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_fg_videoram[offset] );
 	m_foreground->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
+void terracre_state::amazon_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -167,13 +167,13 @@ WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(terracre_state::amazon_scrolly_w)
+void terracre_state::amazon_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_yscroll);
 	m_background->set_scrolly(0,m_yscroll);
 }
 
-WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
+void terracre_state::amazon_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_xscroll);
 	m_background->set_scrollx(0,m_xscroll);

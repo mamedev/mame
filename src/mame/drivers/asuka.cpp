@@ -257,12 +257,12 @@ INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
             SOUND
 ************************************************/
 
-WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
+void asuka_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("audiobank")->set_entry(data & 0x03);
 }
 
-WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
+void asuka_state::sound_bankswitch_2151_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("audiobank")->set_entry(data & 0x03);
 }
@@ -284,28 +284,28 @@ WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 	}
 }
 
-WRITE8_MEMBER(asuka_state::asuka_msm5205_address_w)
+void asuka_state::asuka_msm5205_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(asuka_state::asuka_msm5205_start_w)
+void asuka_state::asuka_msm5205_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(asuka_state::asuka_msm5205_stop_w)
+void asuka_state::asuka_msm5205_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(1);
 	m_adpcm_pos &= 0xff00;
 }
 
-READ16_MEMBER(asuka_state::cadash_share_r)
+uint16_t asuka_state::cadash_share_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cadash_shared_ram[offset];
 }
 
-WRITE16_MEMBER(asuka_state::cadash_share_w)
+void asuka_state::cadash_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cadash_shared_ram[offset] = data & 0xff;
 }

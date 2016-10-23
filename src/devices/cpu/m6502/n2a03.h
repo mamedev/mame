@@ -27,10 +27,10 @@ public:
 	virtual void do_exec_partial() override;
 	virtual void device_clock_changed() override;
 
-	READ8_MEMBER(psg1_4014_r);
-	READ8_MEMBER(psg1_4015_r);
-	WRITE8_MEMBER(psg1_4015_w);
-	WRITE8_MEMBER(psg1_4017_w);
+	uint8_t psg1_4014_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t psg1_4015_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void psg1_4015_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void psg1_4017_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	class mi_2a03_normal : public memory_interface {

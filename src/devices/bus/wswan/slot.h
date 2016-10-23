@@ -30,13 +30,13 @@ public:
 	virtual ~device_ws_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom20) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom30) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom40) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
-	virtual DECLARE_READ8_MEMBER(read_io) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_io) {}
+	virtual uint8_t read_rom20(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_rom30(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_rom40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual uint8_t read_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void nvram_alloc(uint32_t size);
@@ -101,13 +101,13 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom20);
-	virtual DECLARE_READ8_MEMBER(read_rom30);
-	virtual DECLARE_READ8_MEMBER(read_rom40);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(read_io);
-	virtual DECLARE_WRITE8_MEMBER(write_io);
+	virtual uint8_t read_rom20(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_rom30(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_rom40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 

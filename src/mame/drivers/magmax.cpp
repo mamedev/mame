@@ -32,7 +32,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/magmax.h"
 
 
-WRITE16_MEMBER(magmax_state::magmax_sound_w)
+void magmax_state::magmax_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -41,18 +41,18 @@ WRITE16_MEMBER(magmax_state::magmax_sound_w)
 	}
 }
 
-READ8_MEMBER(magmax_state::magmax_sound_irq_ack)
+uint8_t magmax_state::magmax_sound_irq_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-READ8_MEMBER(magmax_state::magmax_sound_r)
+uint8_t magmax_state::magmax_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_sound_latch | m_LS74_q);
 }
 
-WRITE8_MEMBER(magmax_state::ay8910_portB_0_w)
+void magmax_state::ay8910_portB_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*bit 0 is input to CLR line of the LS74*/
 	m_LS74_clr = data & 1;
@@ -102,7 +102,7 @@ void magmax_state::machine_reset()
 
 
 
-WRITE8_MEMBER(magmax_state::ay8910_portA_0_w)
+void magmax_state::ay8910_portA_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
 ay8910_device *ay2 = machine().device<ay8910_device>("ay2");
@@ -183,7 +183,7 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 	ay3->set_output_gain(2, percent);
 }
 
-WRITE16_MEMBER(magmax_state::magmax_vreg_w)
+void magmax_state::magmax_vreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* VRAM CONTROL REGISTER */
 	/* bit0 - coin counter 1    */

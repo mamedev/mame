@@ -121,23 +121,23 @@ public:
 		ROM_EXT
 	};
 
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_w );
+	uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( battery_r );
-	DECLARE_READ8_MEMBER( counter_r );
+	uint8_t irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t battery_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( irq_mask_w );
-	DECLARE_WRITE8_MEMBER( dtmf_w );
-	DECLARE_WRITE8_MEMBER( power_w );
-	DECLARE_WRITE8_MEMBER( select_w );
-	DECLARE_WRITE8_MEMBER( counter_w );
-	DECLARE_WRITE8_MEMBER( contrast_w );
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dtmf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void power_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void contrast_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( iint_w );
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
@@ -152,7 +152,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
-	DECLARE_READ8_MEMBER(hd61830_rd_r);
+	uint8_t hd61830_rd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 };
 
@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER( portfolio_state::eint_w )
 //  irq_status_r - interrupt status read
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::irq_status_r )
+uint8_t portfolio_state::irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ip;
 }
@@ -224,7 +224,7 @@ READ8_MEMBER( portfolio_state::irq_status_r )
 //  irq_mask_w - interrupt enable mask
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::irq_mask_w )
+void portfolio_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ie = data;
 
@@ -332,7 +332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
 //  keyboard_r - keyboard scan code register
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::keyboard_r )
+uint8_t portfolio_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keylatch;
 }
@@ -347,7 +347,7 @@ READ8_MEMBER( portfolio_state::keyboard_r )
 //  dtmf_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::dtmf_w )
+void portfolio_state::dtmf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER( portfolio_state::dtmf_w )
 //  power_w - power management
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::power_w )
+void portfolio_state::power_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -412,7 +412,7 @@ WRITE8_MEMBER( portfolio_state::power_w )
 //  battery_r - battery status
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::battery_r )
+uint8_t portfolio_state::battery_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -445,7 +445,7 @@ READ8_MEMBER( portfolio_state::battery_r )
 //  select_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::select_w )
+void portfolio_state::select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -503,7 +503,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
 //  counter_r - counter register read
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::counter_r )
+uint8_t portfolio_state::counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -526,7 +526,7 @@ READ8_MEMBER( portfolio_state::counter_r )
 //  counter_w - counter register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::counter_w )
+void portfolio_state::counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -550,7 +550,7 @@ WRITE8_MEMBER( portfolio_state::counter_w )
 //  mem_r -
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::mem_r )
+uint8_t portfolio_state::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -604,7 +604,7 @@ READ8_MEMBER( portfolio_state::mem_r )
 //  mem_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::mem_w )
+void portfolio_state::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int iom = 0;
 	int bcom = 1;
@@ -642,7 +642,7 @@ WRITE8_MEMBER( portfolio_state::mem_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::io_r )
+uint8_t portfolio_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -700,7 +700,7 @@ READ8_MEMBER( portfolio_state::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::io_w )
+void portfolio_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int iom = 1;
 	int bcom = 1;
@@ -900,7 +900,7 @@ INPUT_PORTS_END
 //  contrast_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( portfolio_state::contrast_w )
+void portfolio_state::contrast_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s %s CONTRAST %02x\n", machine().time().as_string(), machine().describe_context(), data);
 }
@@ -921,7 +921,7 @@ PALETTE_INIT_MEMBER(portfolio_state, portfolio)
 //  HD61830_INTERFACE( lcdc_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( portfolio_state::hd61830_rd_r )
+uint8_t portfolio_state::hd61830_rd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO with real ROM: offs_t address = ((offset & 0xff) << 4) | ((offset >> 12) & 0x0f);
 	uint16_t address = ((offset & 0xff) << 3) | ((offset >> 12) & 0x07);

@@ -44,17 +44,17 @@ public:
 	// construction/destruction
 	serflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( flash_ready_r );
-	DECLARE_READ8_MEMBER( flash_io_r );
-	DECLARE_WRITE8_MEMBER( flash_addr_w );
-	DECLARE_WRITE8_MEMBER( flash_data_w );
-	DECLARE_WRITE8_MEMBER( flash_cmd_w );
-	DECLARE_WRITE8_MEMBER( flash_enab_w );
+	uint8_t flash_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t flash_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flash_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_enab_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flash_hard_reset();
 
-	DECLARE_READ8_MEMBER(n3d_flash_r);
-	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
-	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
+	uint8_t n3d_flash_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void n3d_flash_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void n3d_flash_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

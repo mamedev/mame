@@ -506,7 +506,7 @@ DISCRETE_SOUND_START(phoenix)
 	DISCRETE_OUTPUT(NODE_90, 1)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( phoenix_sound_device::control_a_w )
+void phoenix_sound_device::control_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
 	m_discrete->write(space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
@@ -519,7 +519,7 @@ WRITE8_MEMBER( phoenix_sound_device::control_a_w )
 	m_sound_latch_a = data;
 }
 
-WRITE8_MEMBER( phoenix_sound_device::control_b_w )
+void phoenix_sound_device::control_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
 	m_discrete->write(space, PHOENIX_EFFECT_1_FILT, data & 0x20);

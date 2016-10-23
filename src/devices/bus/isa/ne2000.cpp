@@ -42,7 +42,7 @@ void ne2000_device::device_reset() {
 	m_irq = ioport("CONFIG")->read() & 3;
 }
 
-READ16_MEMBER(ne2000_device::ne2000_port_r) {
+uint16_t ne2000_device::ne2000_port_r(address_space &space, offs_t offset, uint16_t mem_mask) {
 	offset <<= 1;
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -63,7 +63,7 @@ READ16_MEMBER(ne2000_device::ne2000_port_r) {
 	return 0;
 }
 
-WRITE16_MEMBER(ne2000_device::ne2000_port_w) {
+void ne2000_device::ne2000_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {
 	offset <<= 1;
 	if(offset < 16) {
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -107,7 +107,7 @@ WRITE_LINE_MEMBER(ne2000_device::ne2000_irq_w) {
 	}
 }
 
-READ8_MEMBER(ne2000_device::ne2000_mem_read) {
+uint8_t ne2000_device::ne2000_mem_read(address_space &space, offs_t offset, uint8_t mem_mask) {
 	offset &= ~0x8000;
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
@@ -117,7 +117,7 @@ READ8_MEMBER(ne2000_device::ne2000_mem_read) {
 	return m_board_ram[offset - (16*1024)];
 }
 
-WRITE8_MEMBER(ne2000_device::ne2000_mem_write) {
+void ne2000_device::ne2000_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	offset &= ~0x8000;
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
 		logerror("ne2000: invalid memory write %04X\n", offset);

@@ -130,7 +130,7 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
+void lastduel_state::lastduel_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
+void lastduel_state::mg_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }

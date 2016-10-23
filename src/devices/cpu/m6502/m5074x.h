@@ -88,10 +88,10 @@ public:
 	devcb_read8  read_p0, read_p1, read_p2, read_p3;
 	devcb_write8 write_p0, write_p1, write_p2, write_p3;
 
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(ports_w);
-	DECLARE_READ8_MEMBER(tmrirq_r);
-	DECLARE_WRITE8_MEMBER(tmrirq_w);
+	uint8_t ports_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tmrirq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmrirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool are_port_bits_output(uint8_t port, uint8_t mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 

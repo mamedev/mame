@@ -147,14 +147,14 @@ uint32_t voodoo_pci_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 }
 
 // PCI bus control
-READ32_MEMBER (voodoo_pci_device::pcictrl_r)
+uint32_t voodoo_pci_device::pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_pcictrl_reg[offset];
 	if (1)
 		logerror("%06X:voodoo_pci_device pcictrl_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset*4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
+void voodoo_pci_device::pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_pcictrl_reg[offset]);
 	switch (offset) {
@@ -170,7 +170,7 @@ WRITE32_MEMBER (voodoo_pci_device::pcictrl_w)
 }
 
 // VGA legacy accesses
-READ32_MEMBER(voodoo_pci_device::vga_r)
+uint32_t voodoo_pci_device::vga_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7)
@@ -185,7 +185,7 @@ READ32_MEMBER(voodoo_pci_device::vga_r)
 		logerror("%06X:voodoo_pci_device vga_r from offset %02X = %08X & %08X\n", space.device().safe_pc(), offset * 4, result, mem_mask);
 	return result;
 }
-WRITE32_MEMBER(voodoo_pci_device::vga_w)
+void voodoo_pci_device::vga_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		downcast<voodoo_banshee_device *>(m_voodoo.target())->banshee_vga_w(space, offset * 4 + 0 + 0xb0, data >> 0, mem_mask >> 0);

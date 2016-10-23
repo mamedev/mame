@@ -48,15 +48,15 @@ public:
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	DECLARE_READ8_MEMBER(palette_type1_r);
-	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_WRITE8_MEMBER(clutsel_w);
-	DECLARE_READ8_MEMBER(clut_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(vramsel_w);
-	DECLARE_WRITE8_MEMBER(romsel_w);
+	uint8_t palette_type1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_type1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clutsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t clut_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_togenkyo();
 	void init_ohpaipee();

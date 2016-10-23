@@ -110,7 +110,7 @@ void konppc_device::set_cgboard_texture_bank(int board, const char *bank, uint8_
 
 /* CG Board DSP interface for PowerPC */
 
-READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
+uint32_t konppc_device::cgboard_dsp_comm_r_ppc(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -123,7 +123,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_comm_r_ppc )
 	}
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
+void konppc_device::cgboard_dsp_comm_w_ppc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
 	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
@@ -168,7 +168,7 @@ WRITE32_MEMBER( konppc_device::cgboard_dsp_comm_w_ppc )
 
 
 
-READ32_MEMBER( konppc_device::cgboard_dsp_shared_r_ppc )
+uint32_t konppc_device::cgboard_dsp_shared_r_ppc(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -180,7 +180,7 @@ READ32_MEMBER( konppc_device::cgboard_dsp_shared_r_ppc )
 	}
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_dsp_shared_w_ppc )
+void konppc_device::cgboard_dsp_shared_w_ppc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -295,42 +295,42 @@ void konppc_device::dsp_shared_ram_w_sharc(int board, int offset, uint32_t data)
 	}
 }
 
-READ32_MEMBER( konppc_device::cgboard_0_comm_sharc_r )
+uint32_t konppc_device::cgboard_0_comm_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dsp_comm_sharc_r(0, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_0_comm_sharc_w )
+void konppc_device::cgboard_0_comm_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsp_comm_sharc_w(space, 0, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_0_shared_sharc_r )
+uint32_t konppc_device::cgboard_0_shared_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dsp_shared_ram_r_sharc(0, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_0_shared_sharc_w )
+void konppc_device::cgboard_0_shared_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsp_shared_ram_w_sharc(0, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_1_comm_sharc_r )
+uint32_t konppc_device::cgboard_1_comm_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dsp_comm_sharc_r(1, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_1_comm_sharc_w )
+void konppc_device::cgboard_1_comm_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsp_comm_sharc_w(space, 1, offset, data);
 }
 
-READ32_MEMBER( konppc_device::cgboard_1_shared_sharc_r )
+uint32_t konppc_device::cgboard_1_shared_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dsp_shared_ram_r_sharc(1, offset);
 }
 
-WRITE32_MEMBER( konppc_device::cgboard_1_shared_sharc_w )
+void konppc_device::cgboard_1_shared_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	dsp_shared_ram_w_sharc(1, offset, data);
 }
@@ -393,7 +393,7 @@ void konppc_device::nwk_fifo_w(int board, uint32_t data)
 
 /* Konami K033906 PCI bridge (most emulation is now in src/emu/machine/k033906.c ) */
 
-READ32_MEMBER( konppc_device::K033906_0_r )
+uint32_t konppc_device::K033906_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	k033906_device *k033906_1 = space.machine().device<k033906_device>("k033906_1");
 	if (nwk_device_sel[0] & 0x01)
@@ -402,13 +402,13 @@ READ32_MEMBER( konppc_device::K033906_0_r )
 		return k033906_1->read(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER( konppc_device::K033906_0_w )
+void konppc_device::K033906_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k033906_device *k033906_1 = space.machine().device<k033906_device>("k033906_1");
 	k033906_1->write(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER( konppc_device::K033906_1_r )
+uint32_t konppc_device::K033906_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	k033906_device *k033906_2 = space.machine().device<k033906_device>("k033906_2");
 	if (nwk_device_sel[1] & 0x01)
@@ -417,7 +417,7 @@ READ32_MEMBER( konppc_device::K033906_1_r )
 		return k033906_2->read(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER( konppc_device::K033906_1_w)
+void konppc_device::K033906_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	k033906_device *k033906_2 = space.machine().device<k033906_device>("k033906_2");
 	k033906_2->write(space, offset, data, mem_mask);
@@ -425,7 +425,7 @@ WRITE32_MEMBER( konppc_device::K033906_1_w)
 
 /*****************************************************************************/
 
-WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
+void konppc_device::nwk_fifo_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
@@ -443,7 +443,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_0_w)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
+void konppc_device::nwk_fifo_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo1");
 	if (nwk_device_sel[1] & 0x01)
@@ -461,7 +461,7 @@ WRITE32_MEMBER( konppc_device::nwk_fifo_1_w)
 	}
 }
 
-READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
+uint32_t konppc_device::nwk_voodoo_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo0");
 	if ((nwk_device_sel[0] == 0x4) && offset >= 0x100000 && offset < 0x200000)
@@ -474,7 +474,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_0_r)
 	}
 }
 
-READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
+uint32_t konppc_device::nwk_voodoo_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo1");
 	if ((nwk_device_sel[1] == 0x4) && offset >= 0x100000 && offset < 0x200000)
@@ -487,7 +487,7 @@ READ32_MEMBER( konppc_device::nwk_voodoo_1_r)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
+void konppc_device::nwk_voodoo_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[0] & 0x01)
@@ -505,7 +505,7 @@ WRITE32_MEMBER( konppc_device::nwk_voodoo_0_w)
 	}
 }
 
-WRITE32_MEMBER( konppc_device::nwk_voodoo_1_w)
+void konppc_device::nwk_voodoo_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	voodoo_device *device = space.machine().device<voodoo_device>("voodoo0");
 	if (nwk_device_sel[1] & 0x01)

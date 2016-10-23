@@ -25,7 +25,7 @@ hotd2o: bp 0xc0ba1f6, modify work RAM 0xc9c35a8 to be zero, bpclear
 #include "includes/naomi.h"
 #include "sound/aica.h"
 
-READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
+uint64_t naomi_state::naomi_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc04173c)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -36,7 +36,7 @@ READ64_MEMBER(naomi_state::naomi_biose_idle_skip_r )
 	return dc_ram[0x2ad238/8];
 }
 
-READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
+uint64_t naomi_state::naomi_biosh_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc045ffc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -46,7 +46,7 @@ READ64_MEMBER(naomi_state::naomi_biosh_idle_skip_r )
 	return dc_ram[0x2b0600/8];
 }
 
-READ64_MEMBER(naomi_state::naomi2_biose_idle_skip_r )
+uint64_t naomi_state::naomi2_biose_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc04637c)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -265,7 +265,7 @@ void naomi_state::init_naomigd_mp()
 }
 
 
-READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxxsla_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0x0c0c9adc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -279,7 +279,7 @@ void naomi_state::init_ggxxsla()
 	init_naomigd();
 }
 
-READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxx_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0b5c3c) // or 0xc0bab0c
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -294,7 +294,7 @@ void naomi_state::init_ggxx()
 	init_naomigd();
 }
 
-READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
+uint64_t naomi_state::naomigd_ggxxrl_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0b84bc) // or 0xc0bab0c
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -311,7 +311,7 @@ void naomi_state::init_ggxxrl()
 }
 
 /* at least speeds up the annoying copyright screens ;-) */
-READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
+uint64_t naomi_state::naomigd_sfz3ugd_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc36a2dc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -326,7 +326,7 @@ void naomi_state::init_sfz3ugd()
 }
 
 
-READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
+uint64_t naomi_state::hotd2_idle_skip_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  if (space.device().safe_pc()==0xc0cfcbc)
 //      space.device().execute().spin_until_time(attotime::from_usec(500));

@@ -33,8 +33,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint8_t syvalion_input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_syvalion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

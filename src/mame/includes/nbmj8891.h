@@ -53,25 +53,25 @@ public:
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
-	DECLARE_READ8_MEMBER(palette_type1_r);
-	DECLARE_WRITE8_MEMBER(palette_type1_w);
-	DECLARE_READ8_MEMBER(palette_type2_r);
-	DECLARE_WRITE8_MEMBER(palette_type2_w);
-	DECLARE_READ8_MEMBER(palette_type3_r);
-	DECLARE_WRITE8_MEMBER(palette_type3_w);
-	DECLARE_WRITE8_MEMBER(clutsel_w);
-	DECLARE_READ8_MEMBER(clut_r);
-	DECLARE_WRITE8_MEMBER(clut_w);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(vramsel_w);
-	DECLARE_WRITE8_MEMBER(romsel_w);
+	uint8_t palette_type1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_type1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palette_type2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_type2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palette_type3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_type3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clutsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t clut_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(taiwanmb_unk_r);
-	DECLARE_WRITE8_MEMBER(taiwanmb_blitter_w);
-	DECLARE_WRITE8_MEMBER(taiwanmb_gfxdraw_w);
-	DECLARE_WRITE8_MEMBER(taiwanmb_gfxflag_w);
-	DECLARE_WRITE8_MEMBER(taiwanmb_mcu_w);
+	uint8_t taiwanmb_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void taiwanmb_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void taiwanmb_gfxdraw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void taiwanmb_gfxflag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void taiwanmb_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);

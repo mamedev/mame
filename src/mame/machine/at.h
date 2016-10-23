@@ -20,27 +20,27 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	DECLARE_READ8_MEMBER(page8_r);
-	DECLARE_WRITE8_MEMBER(page8_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t page8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void page8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_READ8_MEMBER(dma8237_0_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_1_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_2_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_3_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_5_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_6_dack_r);
-	DECLARE_READ8_MEMBER(dma8237_7_dack_r);
-	DECLARE_WRITE8_MEMBER(dma8237_0_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_2_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_3_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_5_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_6_dack_w);
-	DECLARE_WRITE8_MEMBER(dma8237_7_dack_w);
+	uint8_t dma8237_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_5_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_6_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dma8237_7_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_5_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_6_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_7_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
@@ -50,14 +50,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dack5_w);
 	DECLARE_WRITE_LINE_MEMBER(dack6_w);
 	DECLARE_WRITE_LINE_MEMBER(dack7_w);
-	DECLARE_WRITE8_MEMBER(write_rtc);
+	void write_rtc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(shutdown);
 
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
-	DECLARE_READ8_MEMBER(dma_read_word);
-	DECLARE_WRITE8_MEMBER(dma_write_word);
+	uint8_t dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t a20_286(bool state);
 protected:

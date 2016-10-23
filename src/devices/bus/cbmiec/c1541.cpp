@@ -480,7 +480,7 @@ const tiny_rom_entry *indus_gt_t::device_rom_region() const
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( c1541_prologic_dos_classic_t::read )
+uint8_t c1541_prologic_dos_classic_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -490,7 +490,7 @@ READ8_MEMBER( c1541_prologic_dos_classic_t::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_t::write )
+void c1541_prologic_dos_classic_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -559,13 +559,13 @@ WRITE_LINE_MEMBER( c1541_base_t::via0_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1541_base_t::via0_pa_r )
+uint8_t c1541_base_t::via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// dummy read to acknowledge ATN IN interrupt
 	return m_parallel_data;
 }
 
-WRITE8_MEMBER( c1541_base_t::via0_pa_w )
+void c1541_base_t::via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_other != nullptr)
 	{
@@ -573,7 +573,7 @@ WRITE8_MEMBER( c1541_base_t::via0_pa_w )
 	}
 }
 
-READ8_MEMBER( c1541_base_t::via0_pb_r )
+uint8_t c1541_base_t::via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -607,7 +607,7 @@ READ8_MEMBER( c1541_base_t::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1541_base_t::via0_pb_w )
+void c1541_base_t::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -642,7 +642,7 @@ WRITE_LINE_MEMBER( c1541_base_t::via0_ca2_w )
 	}
 }
 
-READ8_MEMBER( c1541c_t::via0_pa_r )
+uint8_t c1541c_t::via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -670,7 +670,7 @@ WRITE_LINE_MEMBER( c1541_base_t::via1_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1541_base_t::via1_pb_r )
+uint8_t c1541_base_t::via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -698,7 +698,7 @@ READ8_MEMBER( c1541_base_t::via1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1541_base_t::via1_pb_w )
+void c1541_base_t::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -765,17 +765,17 @@ FLOPPY_FORMATS_MEMBER( c1541_base_t::floppy_formats )
 FLOPPY_FORMATS_END
 
 
-READ8_MEMBER( c1541_prologic_dos_classic_t::pia_r )
+uint8_t c1541_prologic_dos_classic_t::pia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia->read(space, (offset >> 2) & 0x03);
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_t::pia_w )
+void c1541_prologic_dos_classic_t::pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia->write(space, (offset >> 2) & 0x03, data);
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_t::pia_pa_w )
+void c1541_prologic_dos_classic_t::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -793,12 +793,12 @@ WRITE8_MEMBER( c1541_prologic_dos_classic_t::pia_pa_w )
 	*/
 }
 
-READ8_MEMBER( c1541_prologic_dos_classic_t::pia_pb_r )
+uint8_t c1541_prologic_dos_classic_t::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_parallel_data;
 }
 
-WRITE8_MEMBER( c1541_prologic_dos_classic_t::pia_pb_w )
+void c1541_prologic_dos_classic_t::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_parallel_data = data;
 

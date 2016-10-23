@@ -173,7 +173,7 @@ void nes_x1_017_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tc0190fmc_device::tc0190fmc_write)
+void nes_tc0190fmc_device::tc0190fmc_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("tc0190fmc_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -241,7 +241,7 @@ void nes_tc0190fmc_pal16r4_device::hblank_irq( int scanline, int vblank, int bla
 	}
 }
 
-WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
+void nes_tc0190fmc_pal16r4_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("tc0190fmc pal16r4 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER(nes_tc0190fmc_pal16r4_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_x1_005_device::write_m)
+void nes_x1_005_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("x1_005 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER(nes_x1_005_device::write_m)
 		m_x1_005_ram[offset & 0x7f] = data;
 }
 
-READ8_MEMBER(nes_x1_005_device::read_m)
+uint8_t nes_x1_005_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("x1_005 read_m, offset: %04x\n", offset));
 
@@ -400,7 +400,7 @@ void nes_x1_017_device::set_chr()
 	chr1_x(7 ^ m_latch, m_mmc_vrom_bank[5], CHRROM);
 }
 
-WRITE8_MEMBER(nes_x1_017_device::write_m)
+void nes_x1_017_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("x1017 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -454,7 +454,7 @@ WRITE8_MEMBER(nes_x1_017_device::write_m)
 		m_x1_017_ram[0x1000 + (offset & 0x3ff)] = data;
 }
 
-READ8_MEMBER(nes_x1_017_device::read_m)
+uint8_t nes_x1_017_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("x1017 read_m, offset: %04x\n", offset));
 

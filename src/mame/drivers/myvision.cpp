@@ -45,10 +45,10 @@ public:
 	{ }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	uint8_t ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	virtual void machine_start() override;
@@ -157,7 +157,7 @@ DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_a_r )
+uint8_t myvision_state::ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -185,19 +185,19 @@ READ8_MEMBER( myvision_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( myvision_state::ay_port_b_r )
+uint8_t myvision_state::ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( myvision_state::ay_port_a_w )
+void myvision_state::ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 
 // Upper 4 bits select column
-WRITE8_MEMBER( myvision_state::ay_port_b_w )
+void myvision_state::ay_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_column = data;
 }

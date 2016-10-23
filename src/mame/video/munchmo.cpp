@@ -32,12 +32,12 @@ PALETTE_INIT_MEMBER(munchmo_state, munchmo)
 	}
 }
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_palette_bank_w)
+void munchmo_state::mnchmobl_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = data & 0x3;
 }
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_flipscreen_w)
+void munchmo_state::mnchmobl_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data;
 }

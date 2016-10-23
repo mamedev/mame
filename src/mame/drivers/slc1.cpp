@@ -65,8 +65,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_digit;
 	bool m_kbd_type;
 	virtual void machine_reset() override;
@@ -82,7 +82,7 @@ public:
 
 ***************************************************************************/
 
-WRITE8_MEMBER( slc1_state::io_w )
+void slc1_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool segonoff = BIT(data, 7);
 	bool busyled = BIT(data, 4);
@@ -124,7 +124,7 @@ WRITE8_MEMBER( slc1_state::io_w )
 
 ***************************************************************************/
 
-READ8_MEMBER( slc1_state::io_r )
+uint8_t slc1_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff, upper = (offset >> 8) & 7;
 

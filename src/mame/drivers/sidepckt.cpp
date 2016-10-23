@@ -142,18 +142,18 @@ static const uint8_t sidepcktj_prot_table_2[0x10]={0x8e,0x42,0xb2,0x58,0xec,0x85
 static const uint8_t sidepcktj_prot_table_3[0x10]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
 
-WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
+void sidepckt_state::sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(sidepckt_state::i8751_r)
+uint8_t sidepckt_state::i8751_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8751_return;
 }
 
-WRITE8_MEMBER(sidepckt_state::i8751_w)
+void sidepckt_state::i8751_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 

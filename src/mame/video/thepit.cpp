@@ -152,14 +152,14 @@ void thepit_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(thepit_state::videoram_w)
+void thepit_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(thepit_state::colorram_w)
+void thepit_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -167,7 +167,7 @@ WRITE8_MEMBER(thepit_state::colorram_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::flip_screen_x_w)
+void thepit_state::flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int flip;
 
@@ -183,7 +183,7 @@ WRITE8_MEMBER(thepit_state::flip_screen_x_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::flip_screen_y_w)
+void thepit_state::flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int flip;
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(thepit_state::flip_screen_y_w)
 }
 
 
-WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
+void thepit_state::intrepid_graphics_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_graphics_bank != (data & 0x01))
 	{
@@ -210,7 +210,7 @@ WRITE8_MEMBER(thepit_state::intrepid_graphics_bank_w)
 }
 
 
-READ8_MEMBER(thepit_state::input_port_0_r)
+uint8_t thepit_state::input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Read either the real or the fake input ports depending on the
 	   horizontal flip switch. (This is how the real PCB does it) */

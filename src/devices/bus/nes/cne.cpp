@@ -112,7 +112,7 @@ void nes_cne_shlz_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cne_decathl_device::write_h)
+void nes_cne_decathl_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("cne_decathl_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -146,7 +146,7 @@ WRITE8_MEMBER(nes_cne_decathl_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cne_fsb_device::write_m)
+void nes_cne_fsb_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("cne_fsb write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -184,7 +184,7 @@ WRITE8_MEMBER(nes_cne_fsb_device::write_m)
 		m_battery[offset] = data;
 }
 
-READ8_MEMBER(nes_cne_fsb_device::read_m)
+uint8_t nes_cne_fsb_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("cne_fsb read_m, offset: %04x\n", offset));
 
@@ -211,7 +211,7 @@ READ8_MEMBER(nes_cne_fsb_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cne_shlz_device::write_l)
+void nes_cne_shlz_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("cne_shlz write_l, offset: %04x, data: %02x\n", offset, data));
 

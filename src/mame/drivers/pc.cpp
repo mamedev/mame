@@ -46,7 +46,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(unk_r);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_bondwell();
 
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 ADDRESS_MAP_END
 
-READ8_MEMBER(pc_state::unk_r)
+uint8_t pc_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

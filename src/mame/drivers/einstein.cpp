@@ -74,12 +74,12 @@
  * upper 8 bits define the offset in the row,
  * data bits define data to write
  */
-WRITE8_MEMBER(einstein_state::einstein_80col_ram_w)
+void einstein_state::einstein_80col_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)] = data;
 }
 
-READ8_MEMBER(einstein_state::einstein_80col_ram_r)
+uint8_t einstein_state::einstein_80col_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_crtc_ram[((offset & 0x07) << 8) | ((offset >> 8) & 0xff)];
 }
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
  * bit 2 - Jumper M002 0 = 50Hz, 1 = 60Hz
  * bit 3 - Jumper M001 0 = ???, 1=??? perminently wired high on both the boards I have seen - PHS.
  */
-READ8_MEMBER(einstein_state::einstein_80col_state_r)
+uint8_t einstein_state::einstein_80col_state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -188,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
 	}
 }
 
-WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
+void einstein_state::einstein_keyboard_line_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
@@ -199,7 +199,7 @@ WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 	einstein_scan_keyboard();
 }
 
-READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
+uint8_t einstein_state::einstein_keyboard_data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* re-scan the keyboard */
 	einstein_scan_keyboard();
@@ -215,7 +215,7 @@ READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
     FLOPPY DRIVES
 ***************************************************************************/
 
-WRITE8_MEMBER(einstein_state::einstein_drsel_w)
+void einstein_state::einstein_drsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(VERBOSE_DISK)
 		logerror("%s: einstein_drsel_w %02x\n", machine().describe_context(), data);
@@ -282,7 +282,7 @@ void einstein_state::einstein_page_rom()
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
-WRITE8_MEMBER(einstein_state::einstein_rom_w)
+void einstein_state::einstein_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_enabled ^= 1;
 	einstein_page_rom();
@@ -308,7 +308,7 @@ WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
+uint8_t einstein_state::einstein_kybintmsk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -332,7 +332,7 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 	return data;
 }
 
-WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
+void einstein_state::einstein_kybintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_kybintmsk_w %02x\n", machine().describe_context(), data);
 
@@ -351,7 +351,7 @@ WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /ADC interrupt */
-WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
+void einstein_state::einstein_adcintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_adcintmsk_w %02x\n", machine().describe_context(), data);
 
@@ -369,7 +369,7 @@ WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
 
 /* writing to this I/O port sets the state of the mask; D0 is used */
 /* writing 0 enables the /FIRE interrupt */
-WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
+void einstein_state::einstein_fire_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: einstein_fire_int_w %02x\n", machine().describe_context(), data);
 

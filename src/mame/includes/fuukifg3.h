@@ -59,17 +59,17 @@ public:
 	emu_timer   *m_raster_interrupt_timer;
 	uint8_t       m_shared_ram[16];
 
-	DECLARE_READ32_MEMBER(snd_020_r);
-	DECLARE_WRITE32_MEMBER(snd_020_w);
-	DECLARE_WRITE32_MEMBER(vregs_w);
-	DECLARE_WRITE8_MEMBER(sound_bw_w);
-	DECLARE_READ8_MEMBER(snd_z80_r);
-	DECLARE_WRITE8_MEMBER(snd_z80_w);
-	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
-	DECLARE_WRITE32_MEMBER(vram_0_w);
-	DECLARE_WRITE32_MEMBER(vram_1_w);
-	DECLARE_WRITE32_MEMBER(vram_2_w);
-	DECLARE_WRITE32_MEMBER(vram_3_w);
+	uint32_t snd_020_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void snd_020_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_bw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snd_z80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snd_z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_ymf278b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vram_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

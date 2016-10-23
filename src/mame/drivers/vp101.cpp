@@ -28,8 +28,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ32_MEMBER(tty_ready_r);
-	DECLARE_WRITE32_MEMBER(tty_w);
+	uint32_t tty_ready_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void tty_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -52,12 +52,12 @@ uint32_t vp10x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-READ32_MEMBER(vp10x_state::tty_ready_r)
+uint32_t vp10x_state::tty_ready_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x60;    // must return &0x20 for output at tty_w to continue
 }
 
-WRITE32_MEMBER(vp10x_state::tty_w)  // set breakpoint at bfc01430 to catch when it's printing things
+void vp10x_state::tty_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)  // set breakpoint at bfc01430 to catch when it's printing things
 {
 // uncomment to see startup messages - it says "RAM OK" and "EPI RSS Ver 4.5.1" followed by "<RSS active>" and then lots of dots
 // Special Forces also says "<inited tv_cap> = 00000032"

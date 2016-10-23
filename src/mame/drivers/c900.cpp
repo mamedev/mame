@@ -36,10 +36,10 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(port1e_r);
-	DECLARE_READ16_MEMBER(key_r);
-	DECLARE_READ16_MEMBER(stat_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t port1e_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t stat_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -66,24 +66,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( c900 )
 INPUT_PORTS_END
 
-READ16_MEMBER( c900_state::port1e_r )
+uint16_t c900_state::port1e_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-READ16_MEMBER( c900_state::key_r )
+uint16_t c900_state::key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ16_MEMBER( c900_state::stat_r )
+uint16_t c900_state::stat_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_term_data) ? 6 : 4;
 }
 
-WRITE8_MEMBER( c900_state::kbd_put )
+void c900_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

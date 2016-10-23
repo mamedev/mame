@@ -1014,7 +1014,7 @@ void ppu2c0x_device::update_scanline( void )
 *
 *************************************/
 
-WRITE8_MEMBER( ppu2c0x_device::palette_write )
+void ppu2c0x_device::palette_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int color_base = m_color_base;
 	int color_emphasis = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) * 2;
@@ -1045,7 +1045,7 @@ WRITE8_MEMBER( ppu2c0x_device::palette_write )
 	}
 }
 
-READ8_MEMBER( ppu2c0x_device::palette_read )
+uint8_t ppu2c0x_device::palette_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 		return (m_palette_ram[offset & 0x1f] & 0x30);
@@ -1060,7 +1060,7 @@ READ8_MEMBER( ppu2c0x_device::palette_read )
  *
  *************************************/
 
-READ8_MEMBER( ppu2c0x_device::read )
+uint8_t ppu2c0x_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= PPU_MAX_REG)
 	{
@@ -1124,7 +1124,7 @@ READ8_MEMBER( ppu2c0x_device::read )
  *
  *************************************/
 
-WRITE8_MEMBER( ppu2c0x_device::write )
+void ppu2c0x_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int color_base;
 

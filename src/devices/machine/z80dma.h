@@ -85,8 +85,8 @@ public:
 
 	uint8_t read();
 	void write(uint8_t data);
-	DECLARE_READ8_MEMBER( read ) { return read(); }
-	DECLARE_WRITE8_MEMBER( write ) { write(data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(data); }
 
 	DECLARE_WRITE_LINE_MEMBER(rdy_w);
 	DECLARE_WRITE_LINE_MEMBER(wait_w);

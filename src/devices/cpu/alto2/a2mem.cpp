@@ -481,7 +481,7 @@ uint32_t alto2_cpu_device::hamming_code(bool write, uint32_t dw_addr, uint32_t d
  * memory access. Note that MEAR is set whenever an error of
  * _any kind_ (single-bit or double-bit) is detected.
  */
-READ16_MEMBER( alto2_cpu_device::mear_r )
+uint16_t alto2_cpu_device::mear_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = m_mem.error ? m_mem.mear : m_mem.mar;
 	if (!space.debugger_access()) {
@@ -506,7 +506,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
  * MESR[14-15]  Bank number in which error occurred
  * </PRE>
  */
-READ16_MEMBER( alto2_cpu_device::mesr_r )
+uint16_t alto2_cpu_device::mesr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_mem.mesr ^ 0177777;
 	if (!space.debugger_access()) {
@@ -520,7 +520,7 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 	return data;
 }
 
-WRITE16_MEMBER( alto2_cpu_device::mesr_w )
+void alto2_cpu_device::mesr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
@@ -551,7 +551,7 @@ WRITE16_MEMBER( alto2_cpu_device::mesr_w )
  * MECR[15] Spare
  * </PRE>
  */
-WRITE16_MEMBER( alto2_cpu_device::mecr_w )
+void alto2_cpu_device::mecr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mem.mecr = data ^ 0177777;
 	// clear spare bits
@@ -570,7 +570,7 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 /**
  * @brief memory error control register read
  */
-READ16_MEMBER( alto2_cpu_device::mecr_r )
+uint16_t alto2_cpu_device::mecr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_mem.mecr ^ 0177777;
 	// all spare bits are set
@@ -590,7 +590,7 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
  * Note: This is for debugger access. Regular memory access is
  * only through load_mar, read_mem and write_mem.
  */
-READ16_MEMBER ( alto2_cpu_device::ioram_r )
+uint16_t alto2_cpu_device::ioram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offs_t dw_addr = offset / 2;
 	return static_cast<uint16_t>(offset & 1 ? GET_ODD(m_mem.ram[dw_addr]) : GET_EVEN(m_mem.ram[dw_addr]));
@@ -601,7 +601,7 @@ READ16_MEMBER ( alto2_cpu_device::ioram_r )
  * Note: This is for debugger access. Regular memory access is
  * only through load_mar, read_mem and write_mem.
  */
-WRITE16_MEMBER( alto2_cpu_device::ioram_w )
+void alto2_cpu_device::ioram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offs_t dw_addr = offset / 2;
 	if (offset & 1)

@@ -196,8 +196,8 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_io9400;
 	required_shared_ptr<uint8_t> m_io9401;
-	DECLARE_WRITE8_MEMBER(zvideoram_w);
-	DECLARE_READ8_MEMBER(spaceg_colorram_r);
+	void zvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spaceg_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(spaceg);
 	uint32_t screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -205,9 +205,9 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
 
-	DECLARE_WRITE8_MEMBER(sound1_w);
-	DECLARE_WRITE8_MEMBER(sound2_w);
-	DECLARE_WRITE8_MEMBER(sound3_w);
+	void sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_sound1;
 	uint8_t m_sound2;
 	uint8_t m_sound3;
@@ -256,7 +256,7 @@ PALETTE_INIT_MEMBER(spaceg_state, spaceg)
 	palette.set_pen_color (15, rgb_t(0x7f,0x7f,0x7f));//???
 }
 
-WRITE8_MEMBER(spaceg_state::zvideoram_w)
+void spaceg_state::zvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int col = m_colorram[0x400];
 	int xoff = *m_io9400 >> 5 & 7;
@@ -297,7 +297,7 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 }
 
 
-READ8_MEMBER(spaceg_state::spaceg_colorram_r)
+uint8_t spaceg_state::spaceg_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rgbcolor;
 
@@ -366,7 +366,7 @@ static const char *const invaders_sample_names[] =
 	nullptr
 };
 
-WRITE8_MEMBER(spaceg_state::sound1_w)
+void spaceg_state::sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(m_sound1, 1) && BIT(data, 1))
 		m_samples->start(1, 1); // Death
@@ -381,7 +381,7 @@ WRITE8_MEMBER(spaceg_state::sound1_w)
 	if (data & ~0x0e) logerror("spaceg sound3 unmapped %02x\n", data & ~0x0e);
 }
 
-WRITE8_MEMBER(spaceg_state::sound2_w)
+void spaceg_state::sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// game writes 0x01 at bootup & 0x11 when you start a game
 	m_sound2 = data;
@@ -389,7 +389,7 @@ WRITE8_MEMBER(spaceg_state::sound2_w)
 	if (data & ~0x11) logerror("spaceg sound2 unmapped %02x\n", data & ~0x11);
 }
 
-WRITE8_MEMBER(spaceg_state::sound3_w)
+void spaceg_state::sound3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(m_sound3, 0) && BIT(data, 0))
 		m_samples->start(4, 8); // Start of level

@@ -83,12 +83,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// internal map handlers
-	DECLARE_READ8_MEMBER(regs_r);
-	DECLARE_WRITE8_MEMBER(regs_w);
-	DECLARE_READ8_MEMBER(mram_r);
-	DECLARE_WRITE8_MEMBER(mram_w);
-	DECLARE_READ8_MEMBER(xram_r);
-	DECLARE_WRITE8_MEMBER(xram_w);
+	uint8_t regs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t xram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void xram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// static configuration helpers
 	static void static_set_cpu_clock(device_t &device, int _source, uint32_t _clock) { downcast<lc8670_cpu_device &>(device).m_clocks[_source] = _clock; }

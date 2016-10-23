@@ -174,7 +174,7 @@ From JP manual
                        CPU CONTROL
 **********************************************************/
 
-WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
+void topspeed_state::cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Written only twice; once on startup at 0x00 then 0xc3 after init
 	m_cpua_ctrl = data;
@@ -185,7 +185,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
                        GAME INPUTS
 **********************************************************/
 
-READ8_MEMBER(topspeed_state::input_bypass_r)
+uint8_t topspeed_state::input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read port number
 	uint8_t port = m_tc0220ioc->port_r(space, 0);
@@ -211,7 +211,7 @@ CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
 	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
-READ16_MEMBER(topspeed_state::motor_r)
+uint16_t topspeed_state::motor_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -239,7 +239,7 @@ READ16_MEMBER(topspeed_state::motor_r)
 	}
 }
 
-WRITE16_MEMBER(topspeed_state::motor_w)
+void topspeed_state::motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Writes $900000-25 and $900200-219
 	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
@@ -250,7 +250,7 @@ WRITE16_MEMBER(topspeed_state::motor_w)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)
+void topspeed_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("sndbank")->set_entry(data & 3);
 }
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER(topspeed_state::msm5205_1_vck)
 	msm5205_update(0);
 }
 
-WRITE8_MEMBER(topspeed_state::msm5205_command_w)
+void topspeed_state::msm5205_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int chip = (offset >> 12) & 1;
 	msm5205_device *msm = chip ? m_msm2 : m_msm1;
@@ -311,7 +311,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 	}
 }
 
-WRITE8_MEMBER(topspeed_state::volume_w)
+void topspeed_state::volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// The volume is controlled by two Taito TC0060DCA hybrid volume modules
 	filter_volume_device *filter = nullptr;

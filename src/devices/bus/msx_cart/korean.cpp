@@ -75,7 +75,7 @@ void msx_cart_korean_80in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_80in1::read_cart)
+uint8_t msx_cart_korean_80in1::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -86,7 +86,7 @@ READ8_MEMBER(msx_cart_korean_80in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_80in1::write_cart)
+void msx_cart_korean_80in1::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0x4004)
 	{
@@ -187,7 +187,7 @@ void msx_cart_korean_90in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_90in1::read_cart)
+uint8_t msx_cart_korean_90in1::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -198,7 +198,7 @@ READ8_MEMBER(msx_cart_korean_90in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_90in1::banking)
+void msx_cart_korean_90in1::banking(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_selected_bank = data;
 	restore_banks();
@@ -275,7 +275,7 @@ void msx_cart_korean_126in1::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_korean_126in1::read_cart)
+uint8_t msx_cart_korean_126in1::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -286,7 +286,7 @@ READ8_MEMBER(msx_cart_korean_126in1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_korean_126in1::write_cart)
+void msx_cart_korean_126in1::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0x4002)
 	{

@@ -59,17 +59,17 @@ public:
 	uint8_t m_audio_result;
 	uint8_t m_bank_val;
 	uint8_t m_vblank;
-	DECLARE_READ8_MEMBER(neoprint_calendar_r);
-	DECLARE_WRITE8_MEMBER(neoprint_calendar_w);
-	DECLARE_READ8_MEMBER(neoprint_unk_r);
-	DECLARE_READ8_MEMBER(neoprint_audio_result_r);
-	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_WRITE8_MEMBER(audio_result_w);
-	DECLARE_WRITE16_MEMBER(nprsp_palette_w);
-	DECLARE_WRITE8_MEMBER(nprsp_bank_w);
-	DECLARE_READ16_MEMBER(rom_window_r);
+	uint8_t neoprint_calendar_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void neoprint_calendar_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t neoprint_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t neoprint_audio_result_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_cpu_clear_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_result_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nprsp_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nprsp_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t rom_window_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_98best44();
 	void init_npcartv1();
 	void init_nprsp();
@@ -156,19 +156,19 @@ uint32_t neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16
 }
 
 
-READ8_MEMBER(neoprint_state::neoprint_calendar_r)
+uint8_t neoprint_state::neoprint_calendar_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_upd4990a->data_out_r() << 7) | (m_upd4990a->tp_r() << 6);
 }
 
-WRITE8_MEMBER(neoprint_state::neoprint_calendar_w)
+void neoprint_state::neoprint_calendar_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd4990a->data_in_w(data >> 0 & 1);
 	m_upd4990a->clk_w(data >> 1 & 1);
 	m_upd4990a->stb_w(data >> 2 & 1);
 }
 
-READ8_MEMBER(neoprint_state::neoprint_unk_r)
+uint8_t neoprint_state::neoprint_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
@@ -182,7 +182,7 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 	return m_vblank| 4 | 3;
 }
 
-READ8_MEMBER(neoprint_state::neoprint_audio_result_r)
+uint8_t neoprint_state::neoprint_audio_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_audio_result;
 }
@@ -193,12 +193,12 @@ void neoprint_state::audio_cpu_assert_nmi()
 }
 
 
-WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
+void neoprint_state::audio_cpu_clear_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(neoprint_state::audio_command_w)
+void neoprint_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 
@@ -211,7 +211,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 }
 
 
-READ8_MEMBER(neoprint_state::audio_command_r)
+uint8_t neoprint_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
@@ -225,7 +225,7 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 
 
 
-WRITE8_MEMBER(neoprint_state::audio_result_w)
+void neoprint_state::audio_result_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
 
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
+void neoprint_state::nprsp_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t r,g,b,i;
 
@@ -280,7 +280,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 	}
 }
 
-WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
+void neoprint_state::nprsp_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* this register seems flip-flop based ... */
 
@@ -293,7 +293,7 @@ WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
 	}
 }
 
-READ16_MEMBER(neoprint_state::rom_window_r)
+uint16_t neoprint_state::rom_window_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 

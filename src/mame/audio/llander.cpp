@@ -83,13 +83,13 @@ DISCRETE_SOUND_START(llander)
 	DISCRETE_OUTPUT(NODE_90, 65534.0/(9.2+9.2+600+1000))        // Take the output from the mixer
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(asteroid_state::llander_snd_reset_w)
+void asteroid_state::llander_snd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Resets the LFSR that is used for the white noise generator       */
 	m_discrete->write(space, LLANDER_NOISE_RESET, 0);                /* Reset */
 }
 
-WRITE8_MEMBER(asteroid_state::llander_sounds_w)
+void asteroid_state::llander_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, LLANDER_THRUST_DATA, data & 0x07);      /* Thrust volume */
 	m_discrete->write(space, LLANDER_TONE3K_EN, data & 0x10);        /* Tone 3KHz enable */

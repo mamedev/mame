@@ -185,12 +185,12 @@ public:
 	emu_timer *m_mk5_VSYNC_timer;
 	uint8_t m_ext_latch;
 	uint8_t m_flyback;
-	DECLARE_WRITE32_MEMBER(Ns5w48);
-	DECLARE_READ32_MEMBER(Ns5x58);
-	DECLARE_READ32_MEMBER(mk5_ioc_r);
-	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
-	DECLARE_READ32_MEMBER(Ns5r50);
-	DECLARE_WRITE32_MEMBER(sram_banksel_w);
+	void Ns5w48(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Ns5x58(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t mk5_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mk5_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Ns5r50(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sram_banksel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_aristmk5();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -205,7 +205,7 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 	m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
-WRITE32_MEMBER(aristmk5_state::Ns5w48)
+void aristmk5_state::Ns5w48(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
@@ -270,7 +270,7 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
 
 }
 
-READ32_MEMBER(aristmk5_state::Ns5x58)
+uint32_t aristmk5_state::Ns5x58(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	    1953.125 Hz for the operating system timer interrupt
@@ -299,7 +299,7 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 }
 
 /* same as plain AA but with the I2C unconnected */
-READ32_MEMBER(aristmk5_state::mk5_ioc_r)
+uint32_t aristmk5_state::mk5_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -322,7 +322,7 @@ READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 	return archimedes_ioc_r(space,offset,mem_mask);
 }
 
-WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
+void aristmk5_state::mk5_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -342,12 +342,12 @@ WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 	}
 }
 
-READ32_MEMBER(aristmk5_state::Ns5r50)
+uint32_t aristmk5_state::Ns5r50(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
+void aristmk5_state::sram_banksel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 

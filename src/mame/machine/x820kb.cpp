@@ -299,7 +299,7 @@ void xerox_820_keyboard_t::device_reset_after_children()
 //  kb_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_p1_r )
+uint8_t xerox_820_keyboard_t::kb_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1; // TODO: move to mcs48.c
 }
@@ -309,7 +309,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_p1_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( xerox_820_keyboard_t::kb_p1_w )
+void xerox_820_keyboard_t::kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER( xerox_820_keyboard_t::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
+uint8_t xerox_820_keyboard_t::kb_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_y[m_p1 & 0x0f]->read();
 }
@@ -346,7 +346,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_p2_r )
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
+uint8_t xerox_820_keyboard_t::kb_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 1;
 
@@ -364,7 +364,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( xerox_820_keyboard_t::kb_t1_r )
+uint8_t xerox_820_keyboard_t::kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1; // ??? if 0, toggle P17
 }
@@ -374,7 +374,7 @@ READ8_MEMBER( xerox_820_keyboard_t::kb_t1_r )
 //  kb_bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( xerox_820_keyboard_t::kb_bus_w )
+void xerox_820_keyboard_t::kb_bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus = data;
 }

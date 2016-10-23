@@ -35,14 +35,14 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 
-	DECLARE_READ16_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(b16_pcg_w);
-	DECLARE_WRITE8_MEMBER(b16_6845_address_w);
-	DECLARE_WRITE8_MEMBER(b16_6845_data_w);
-	DECLARE_READ8_MEMBER(unk_dev_r);
-	DECLARE_WRITE8_MEMBER(unk_dev_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	uint16_t vblank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void b16_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void b16_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void b16_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_dev_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unk_dev_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -111,7 +111,7 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-WRITE8_MEMBER( b16_state::b16_pcg_w )
+void b16_state::b16_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_rom[offset] = data;
 
@@ -127,18 +127,18 @@ static ADDRESS_MAP_START( b16_map, AS_PROGRAM, 16, b16_state)
 	AM_RANGE( 0xfc000, 0xfffff ) AM_ROM AM_REGION("ipl",0)
 ADDRESS_MAP_END
 
-READ16_MEMBER( b16_state::vblank_r )
+uint16_t b16_state::vblank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("SYSTEM")->read();
 }
 
-WRITE8_MEMBER( b16_state::b16_6845_address_w )
+void b16_state::b16_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_mc6845->address_w(space,offset, data);
 }
 
-WRITE8_MEMBER( b16_state::b16_6845_data_w )
+void b16_state::b16_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_mc6845->register_w(space, offset, data);
@@ -190,7 +190,7 @@ b6 (0e) W
 05 (06) W
 */
 
-READ8_MEMBER( b16_state::unk_dev_r )
+uint8_t b16_state::unk_dev_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int test;
 
@@ -205,7 +205,7 @@ READ8_MEMBER( b16_state::unk_dev_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( b16_state::unk_dev_w )
+void b16_state::unk_dev_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%02x (%02x) W\n",data,offset << 1);
 
@@ -255,13 +255,13 @@ void b16_state::machine_reset()
 }
 
 
-READ8_MEMBER(b16_state::memory_read_byte)
+uint8_t b16_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(b16_state::memory_write_byte)
+void b16_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);

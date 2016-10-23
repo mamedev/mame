@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( resetx_w );
 	DECLARE_WRITE_LINE_MEMBER( resety_w );
 
-	DECLARE_READ16_MEMBER( d_r );
+	uint16_t d_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER( cf_r );
 	DECLARE_READ_LINE_MEMBER( sf_r );
 

@@ -46,12 +46,12 @@ TODO:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(powerins_state::powerinsa_okibank_w)
+void powerins_state::powerinsa_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank")->set_entry(data & 7);
 }
 
-READ8_MEMBER(powerins_state::powerinsb_fake_ym2203_r)
+uint8_t powerins_state::powerinsb_fake_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x01;
 }

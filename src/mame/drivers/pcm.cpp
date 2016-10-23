@@ -87,9 +87,9 @@ public:
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER( pcm_85_r );
+	uint8_t pcm_85_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
-	DECLARE_WRITE8_MEMBER( pcm_85_w );
+	void pcm_85_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t *m_p_chargen;
 	bool m_cone;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -131,7 +131,7 @@ There is also a HALT LED, connected directly to the processor.
 */
 
 
-READ8_MEMBER( pcm_state::pcm_85_r )
+uint8_t pcm_state::pcm_85_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_85 & 0x7f;
 
@@ -141,7 +141,7 @@ READ8_MEMBER( pcm_state::pcm_85_r )
 	return data;
 }
 
-WRITE8_MEMBER( pcm_state::pcm_85_w )
+void pcm_state::pcm_85_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 5))
 		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);

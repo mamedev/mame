@@ -488,18 +488,18 @@ public:
 	int m_mux_data;
 	int m_flip_state;
 
-	DECLARE_WRITE8_MEMBER(rom_bank_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_WRITE8_MEMBER(fg_vram_w);
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(vidreg_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_READ8_MEMBER(mux_port2_r);
-	DECLARE_WRITE8_MEMBER(mux_sel_w);
-	DECLARE_WRITE8_MEMBER(lamps_a_w);
-	DECLARE_WRITE8_MEMBER(lamps_b_w);
-	DECLARE_WRITE8_MEMBER(pulses_w);
+	void rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vidreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pulses_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_majorpkr();
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
@@ -554,40 +554,40 @@ uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_in
 *         R/W Handlers        *
 ******************************/
 
-WRITE8_MEMBER(majorpkr_state::rom_bank_w)
+void majorpkr_state::rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank->set_entry(data & 0x3);
 	if (data & (0x3 ^ 0xff))
 		logerror("%s: accessing rom bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(majorpkr_state::palette_bank_w)
+void majorpkr_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank->set_bank(data & 0x3);
 	if (data & (0x3 ^ 0xff))
 		logerror("%s: accessing palette bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(majorpkr_state::vram_bank_w)
+void majorpkr_state::vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_bank->set_bank(data & 0x3);
 	if (data & (0x3 ^ 0xff))
 		logerror("%s: accessing vram bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(majorpkr_state::fg_vram_w)
+void majorpkr_state::fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_vram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(majorpkr_state::bg_vram_w)
+void majorpkr_state::bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_MEMBER(majorpkr_state::vidreg_w)
+void majorpkr_state::vidreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  If bit6 is active, the screen is drawn upside down.
     (also 0xfc and 0x11 are written to the CRTC registers 0x0c and 0x0d)
@@ -617,7 +617,7 @@ WRITE8_MEMBER(majorpkr_state::vidreg_w)
 
 /***** Multiplexed Ports *****/
 
-READ8_MEMBER(majorpkr_state::mux_port_r)
+uint8_t majorpkr_state::mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( (m_mux_data & 0xf0) )       // 00-10-20-30-0F-1F-2F-3F.
 	{
@@ -630,7 +630,7 @@ READ8_MEMBER(majorpkr_state::mux_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(majorpkr_state::mux_port2_r)
+uint8_t majorpkr_state::mux_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_mux_data & 0x0f) == 4)
 	{
@@ -642,7 +642,7 @@ READ8_MEMBER(majorpkr_state::mux_port2_r)
 	}
 }
 
-WRITE8_MEMBER(majorpkr_state::mux_sel_w)
+void majorpkr_state::mux_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;  // 00-10-20-30-0F-1F-2F-3F.
 }
@@ -652,7 +652,7 @@ WRITE8_MEMBER(majorpkr_state::mux_sel_w)
 *    Lamps and Pulses    *
 *************************/
 
-WRITE8_MEMBER(majorpkr_state::lamps_a_w)
+void majorpkr_state::lamps_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Lamps - Array A.
 
@@ -679,7 +679,7 @@ WRITE8_MEMBER(majorpkr_state::lamps_a_w)
 		logerror("Lamps A: Write to 13h: %02x\n", data);
 }
 
-WRITE8_MEMBER(majorpkr_state::lamps_b_w)
+void majorpkr_state::lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Lamps - Array B.
 
@@ -704,7 +704,7 @@ WRITE8_MEMBER(majorpkr_state::lamps_b_w)
 		logerror("Lamps B: Write to 14h: %02x\n", data);
 }
 
-WRITE8_MEMBER(majorpkr_state::pulses_w)
+void majorpkr_state::pulses_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Pulses...
 

@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(avigo_state::key_data_read_r)
+uint8_t avigo_state::key_data_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x0f;
 
@@ -210,7 +210,7 @@ READ8_MEMBER(avigo_state::key_data_read_r)
 
 /* set key line(s) to read */
 /* bit 0 set for line 0, bit 1 set for line 1, bit 2 set for line 2 */
-WRITE8_MEMBER(avigo_state::set_key_line_w)
+void avigo_state::set_key_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 5, 101, read back 3 */
 	m_key_line = data;
@@ -218,19 +218,19 @@ WRITE8_MEMBER(avigo_state::set_key_line_w)
 	m_warm_start = BIT(data, 3);
 }
 
-READ8_MEMBER(avigo_state::irq_r)
+uint8_t avigo_state::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq;
 }
 
-WRITE8_MEMBER(avigo_state::irq_w)
+void avigo_state::irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq &= data;
 
 	refresh_ints();
 }
 
-WRITE8_MEMBER(avigo_state::port2_w)
+void avigo_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit 4     LCD backlight on/off
@@ -243,17 +243,17 @@ WRITE8_MEMBER(avigo_state::port2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(avigo_state::bank1_r)
+uint8_t avigo_state::bank1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return offset ? m_bank1_h: m_bank1_l;
 }
 
-READ8_MEMBER(avigo_state::bank2_r)
+uint8_t avigo_state::bank2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return offset ? m_bank2_h: m_bank2_l;
 }
 
-WRITE8_MEMBER(avigo_state::bank1_w)
+void avigo_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -269,7 +269,7 @@ WRITE8_MEMBER(avigo_state::bank1_w)
 	m_bankdev1->set_bank(((m_bank1_h & 0x07) << 8) | m_bank1_l);
 }
 
-WRITE8_MEMBER(avigo_state::bank2_w)
+void avigo_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -285,14 +285,14 @@ WRITE8_MEMBER(avigo_state::bank2_w)
 	m_bankdev2->set_bank(((m_bank2_h & 0x07) << 8) | m_bank2_l);
 }
 
-READ8_MEMBER(avigo_state::ad_control_status_r)
+uint8_t avigo_state::ad_control_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("avigo ad control read %02x\n", (int) m_ad_control_status));
 	return m_ad_control_status;
 }
 
 
-WRITE8_MEMBER(avigo_state::ad_control_status_w)
+void avigo_state::ad_control_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("avigo ad control w %02x\n",data));
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 	m_ad_control_status = data | 1;
 }
 
-READ8_MEMBER(avigo_state::ad_data_r)
+uint8_t avigo_state::ad_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -470,7 +470,7 @@ READ8_MEMBER(avigo_state::ad_data_r)
 }
 
 
-WRITE8_MEMBER(avigo_state::speaker_w)
+void avigo_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Speaker output state */
 	m_speaker->level_w(BIT(data, 3));
@@ -483,7 +483,7 @@ WRITE8_MEMBER(avigo_state::speaker_w)
 
 	/* port 0x029:
 	port 0x02e */
-READ8_MEMBER(avigo_state::port_04_r)
+uint8_t avigo_state::port_04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* must be both 0 for it to boot! */
 	return 0x0ff^((1<<7) | (1<<5));

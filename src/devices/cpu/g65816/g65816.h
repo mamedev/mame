@@ -1531,16 +1531,16 @@ class _5a22_device : public g65816_device
 public:
 	_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( wrmpya_w );
-	DECLARE_WRITE8_MEMBER( wrmpyb_w );
-	DECLARE_WRITE8_MEMBER( wrdivl_w );
-	DECLARE_WRITE8_MEMBER( wrdivh_w );
-	DECLARE_WRITE8_MEMBER( wrdvdd_w );
-	DECLARE_WRITE8_MEMBER( memsel_w );
-	DECLARE_READ8_MEMBER( rddivl_r );
-	DECLARE_READ8_MEMBER( rddivh_r );
-	DECLARE_READ8_MEMBER( rdmpyl_r );
-	DECLARE_READ8_MEMBER( rdmpyh_r );
+	void wrmpya_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wrmpyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wrdivl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wrdivh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wrdvdd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void memsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rddivl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rddivh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rdmpyl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rdmpyh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_5a22_map();
 

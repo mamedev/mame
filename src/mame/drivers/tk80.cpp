@@ -62,13 +62,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_READ8_MEMBER(nd80z_key_r);
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
+	uint8_t key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nd80z_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mikrolab_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t display_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint8_t m_keyb_press;
 	uint8_t m_keyb_press_flag;
@@ -78,12 +78,12 @@ public:
 };
 
 
-READ8_MEMBER( tk80_state::display_r )
+uint8_t tk80_state::display_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return output().get_digit_value(offset);
 }
 
-WRITE8_MEMBER( tk80_state::display_w )
+void tk80_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(offset, data);
 }
@@ -191,7 +191,7 @@ INPUT_PORTS_START( ics8080 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RUN") PORT_CODE(KEYCODE_O)
 INPUT_PORTS_END
 
-READ8_MEMBER( tk80_state::key_matrix_r )
+uint8_t tk80_state::key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // PA0-7 keyscan in
 
@@ -207,7 +207,7 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::nd80z_key_r )
+uint8_t tk80_state::nd80z_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // PA0-7 keyscan in
 
@@ -224,7 +224,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 	return data;
 }
 
-READ8_MEMBER( tk80_state::serial_r )
+uint8_t tk80_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // PB0 - serial in
 	//printf("B R\n");
@@ -232,7 +232,7 @@ READ8_MEMBER( tk80_state::serial_r )
 	return 0;
 }
 
-WRITE8_MEMBER( tk80_state::serial_w )
+void tk80_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PC0 - serial out
 // PC4-6 keyscan out
@@ -240,7 +240,7 @@ WRITE8_MEMBER( tk80_state::serial_w )
 	m_ppi_portc = data ^ 0x70;
 }
 
-WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
+void tk80_state::mikrolab_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PC0 - serial out
 // PC4-6 keyscan out

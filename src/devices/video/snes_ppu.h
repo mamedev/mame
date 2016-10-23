@@ -261,12 +261,12 @@ public:
 	uint8_t read(address_space &space, uint32_t offset, uint8_t wrio_bit7);
 	void write(address_space &space, uint32_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( oam_read );
-	DECLARE_WRITE8_MEMBER( oam_write );
-	DECLARE_READ8_MEMBER( cgram_read );
-	DECLARE_WRITE8_MEMBER( cgram_write );
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
+	uint8_t oam_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void oam_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cgram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cgram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	std::unique_ptr<uint16_t[]> m_oam_ram;     /* Object Attribute Memory */
 	std::unique_ptr<uint16_t[]> m_cgram;   /* Palette RAM */
 	std::unique_ptr<uint8_t[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */

@@ -75,7 +75,7 @@ void primo_state::primo_update_memory()
 
 *******************************************************************************/
 
-READ8_MEMBER(primo_state::primo_be_1_r)
+uint8_t primo_state::primo_be_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -101,7 +101,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	return data;
 }
 
-READ8_MEMBER(primo_state::primo_be_2_r)
+uint8_t primo_state::primo_be_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -131,7 +131,7 @@ READ8_MEMBER(primo_state::primo_be_2_r)
 	return data;
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_1_w)
+void primo_state::primo_ki_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7 - NMI generator enable/disable
 	m_nmi = (data & 0x80) ? 1 : 0;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	}
 }
 
-WRITE8_MEMBER(primo_state::primo_ki_2_w)
+void primo_state::primo_ki_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7, 6 - not used
 
@@ -190,7 +190,7 @@ WRITE8_MEMBER(primo_state::primo_ki_2_w)
 //  logerror ("IOW KI-2 data:%02x\n", data);
 }
 
-WRITE8_MEMBER(primo_state::primo_FD_w)
+void primo_state::primo_FD_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!ioport("MEMORY_EXPANSION")->read())
 	{

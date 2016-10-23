@@ -74,10 +74,10 @@ public:
 
 	required_device<m68000_base_device> m_maincpu;
 	void init_symbolics();
-	DECLARE_READ16_MEMBER(buserror_r);
-	DECLARE_READ16_MEMBER(fep_paddle_id_prom_r);
-	//DECLARE_READ16_MEMBER(ram_parity_hack_r);
-	//DECLARE_WRITE16_MEMBER(ram_parity_hack_w);
+	uint16_t buserror_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t fep_paddle_id_prom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//uint16_t ram_parity_hack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//void ram_parity_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	//bool m_parity_error_has_occurred[0x20000];
 
 	// overrides
@@ -88,7 +88,7 @@ public:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-READ16_MEMBER(symbolics_state::buserror_r)
+uint16_t symbolics_state::buserror_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -98,12 +98,12 @@ READ16_MEMBER(symbolics_state::buserror_r)
 	return 0;
 }
 
-READ16_MEMBER(symbolics_state::fep_paddle_id_prom_r) // bits 8 and 9 do something special if both are set.
+uint16_t symbolics_state::fep_paddle_id_prom_r(address_space &space, offs_t offset, uint16_t mem_mask) // bits 8 and 9 do something special if both are set.
 {
 	return 0x0300;
 }
 /*
-READ16_MEMBER(symbolics_state::ram_parity_hack_r)
+uint16_t symbolics_state::ram_parity_hack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     //m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
@@ -118,7 +118,7 @@ READ16_MEMBER(symbolics_state::ram_parity_hack_r)
     return *ram;
 }
 
-WRITE16_MEMBER(symbolics_state::ram_parity_hack_w)
+void symbolics_state::ram_parity_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     uint16_t *ram = (uint16_t *)(memregion("fepdram")->base());
     m_maincpu->set_input_line_and_vector(M68K_IRQ_7, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);

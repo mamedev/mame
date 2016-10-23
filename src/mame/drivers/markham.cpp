@@ -16,7 +16,7 @@
 #include "includes/markham.h"
 
 
-READ8_MEMBER(markham_state::markham_e004_r)
+uint8_t markham_state::markham_e004_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

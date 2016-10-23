@@ -15,7 +15,7 @@ public:
 
 	uint8_t get_fifo_space();
 	void advance_state() override;
-	virtual DECLARE_WRITE8_MEMBER(port_w) override;
+	virtual void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	uint8_t       m_fifo_data[0x40];
 	uint8_t       m_fifo_read;    // last read offset (will read in m_fifo_read+1)

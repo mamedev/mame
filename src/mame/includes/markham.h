@@ -25,9 +25,9 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(markham_e004_r);
-	DECLARE_WRITE8_MEMBER(markham_videoram_w);
-	DECLARE_WRITE8_MEMBER(markham_flipscreen_w);
+	uint8_t markham_e004_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void markham_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void markham_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(markham);

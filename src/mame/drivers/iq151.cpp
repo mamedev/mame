@@ -79,15 +79,15 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 
-	DECLARE_READ8_MEMBER(keyboard_row_r);
-	DECLARE_READ8_MEMBER(keyboard_column_r);
-	DECLARE_READ8_MEMBER(ppi_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_portc_w);
-	DECLARE_WRITE8_MEMBER(boot_bank_w);
-	DECLARE_READ8_MEMBER(cartslot_r);
-	DECLARE_WRITE8_MEMBER(cartslot_w);
-	DECLARE_READ8_MEMBER(cartslot_io_r);
-	DECLARE_WRITE8_MEMBER(cartslot_io_w);
+	uint8_t keyboard_row_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_column_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cartslot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cartslot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cartslot_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cartslot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -101,7 +101,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
 };
 
-READ8_MEMBER(iq151_state::keyboard_row_r)
+uint8_t iq151_state::keyboard_row_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -115,7 +115,7 @@ READ8_MEMBER(iq151_state::keyboard_row_r)
 	return data;
 }
 
-READ8_MEMBER(iq151_state::keyboard_column_r)
+uint8_t iq151_state::keyboard_column_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	uint8_t data = 0x00;
@@ -130,7 +130,7 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 	return data;
 }
 
-READ8_MEMBER(iq151_state::ppi_portc_r)
+uint8_t iq151_state::ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 
@@ -150,13 +150,13 @@ READ8_MEMBER(iq151_state::ppi_portc_r)
 }
 
 
-WRITE8_MEMBER(iq151_state::ppi_portc_w)
+void iq151_state::ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 3));
 	m_cassette_data = data;
 }
 
-WRITE8_MEMBER(iq151_state::boot_bank_w)
+void iq151_state::boot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("boot")->set_entry(data & 1);
 }
@@ -166,7 +166,7 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 //  Cartridge slot emulation
 //**************************************************************************
 
-READ8_MEMBER(iq151_state::cartslot_r)
+uint8_t iq151_state::cartslot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -176,13 +176,13 @@ READ8_MEMBER(iq151_state::cartslot_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_w)
+void iq151_state::cartslot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (auto & elem : m_carts)
 		elem->write(offset, data);
 }
 
-READ8_MEMBER(iq151_state::cartslot_io_r)
+uint8_t iq151_state::cartslot_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -192,7 +192,7 @@ READ8_MEMBER(iq151_state::cartslot_io_r)
 	return data;
 }
 
-WRITE8_MEMBER(iq151_state::cartslot_io_w)
+void iq151_state::cartslot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (auto & elem : m_carts)
 		elem->io_write(offset, data);

@@ -29,17 +29,17 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8275_device> m_crtc;
 	required_device<palette_device> m_palette;
-	DECLARE_READ8_MEMBER(ipds_b0_r);
-	DECLARE_READ8_MEMBER(ipds_b1_r);
-	DECLARE_READ8_MEMBER(ipds_c0_r);
-	DECLARE_WRITE8_MEMBER(ipds_b1_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t ipds_b0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ipds_b1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ipds_c0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ipds_b1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( ipds_state::ipds_b0_r )
+uint8_t ipds_state::ipds_b0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_term_data)
 		return 0xc0;
@@ -47,16 +47,16 @@ READ8_MEMBER( ipds_state::ipds_b0_r )
 		return 0x80;
 }
 
-READ8_MEMBER( ipds_state::ipds_b1_r )
+uint8_t ipds_state::ipds_b1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ipds_state::ipds_c0_r ) { return 0x55; }
+uint8_t ipds_state::ipds_c0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x55; }
 
-WRITE8_MEMBER( ipds_state::ipds_b1_w )
+void ipds_state::ipds_b1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -121,7 +121,7 @@ static GFXDECODE_START( ipds )
 GFXDECODE_END
 
 
-WRITE8_MEMBER( ipds_state::kbd_put )
+void ipds_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

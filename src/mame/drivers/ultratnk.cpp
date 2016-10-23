@@ -80,81 +80,81 @@ void ultratnk_state::machine_reset()
 }
 
 
-READ8_MEMBER(ultratnk_state::ultratnk_wram_r)
+uint8_t ultratnk_state::ultratnk_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
 
-READ8_MEMBER(ultratnk_state::ultratnk_analog_r)
+uint8_t ultratnk_state::ultratnk_analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::ultratnk_coin_r)
+uint8_t ultratnk_state::ultratnk_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(ultratnk_state::ultratnk_collision_r)
+uint8_t ultratnk_state::ultratnk_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
-READ8_MEMBER(ultratnk_state::ultratnk_options_r)
+uint8_t ultratnk_state::ultratnk_options_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_wram_w)
+void ultratnk_state::ultratnk_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_collision_reset_w)
+void ultratnk_state::ultratnk_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_da_latch_w)
+void ultratnk_state::ultratnk_da_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_da_latch = data & 15;
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_led_1_w)
+void ultratnk_state::ultratnk_led_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset & 1); /* left player start */
 }
-WRITE8_MEMBER(ultratnk_state::ultratnk_led_2_w)
+void ultratnk_state::ultratnk_led_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, offset & 1); /* right player start */
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
+void ultratnk_state::ultratnk_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 
 
-WRITE8_MEMBER(ultratnk_state::ultratnk_fire_1_w)
+void ultratnk_state::ultratnk_fire_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ULTRATNK_FIRE_EN_1, offset & 1);
 }
-WRITE8_MEMBER(ultratnk_state::ultratnk_fire_2_w)
+void ultratnk_state::ultratnk_fire_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ULTRATNK_FIRE_EN_2, offset & 1);
 }
-WRITE8_MEMBER(ultratnk_state::ultratnk_attract_w)
+void ultratnk_state::ultratnk_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ULTRATNK_ATTRACT_EN, data & 1);
 }
-WRITE8_MEMBER(ultratnk_state::ultratnk_explosion_w)
+void ultratnk_state::ultratnk_explosion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, ULTRATNK_EXPLOSION_DATA, data & 15);
 }

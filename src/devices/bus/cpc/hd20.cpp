@@ -78,7 +78,7 @@ void cpc_hd20_device::device_reset()
 	// TODO
 }
 
-READ8_MEMBER(cpc_hd20_device::hdc_r)
+uint8_t cpc_hd20_device::hdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -102,7 +102,7 @@ READ8_MEMBER(cpc_hd20_device::hdc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cpc_hd20_device::hdc_w)
+void cpc_hd20_device::hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

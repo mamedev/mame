@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::m2_w )
 //  kb_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
+uint8_t pc1512_keyboard_t::kb_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -379,7 +379,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_bus_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_t::kb_p1_w )
+void pc1512_keyboard_t::kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -404,7 +404,7 @@ WRITE8_MEMBER( pc1512_keyboard_t::kb_p1_w )
 //  kb_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_p2_r )
+uint8_t pc1512_keyboard_t::kb_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -434,7 +434,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_p2_r )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_keyboard_t::kb_p2_w )
+void pc1512_keyboard_t::kb_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -475,7 +475,7 @@ WRITE8_MEMBER( pc1512_keyboard_t::kb_p2_w )
 //  kb_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_t0_r )
+uint8_t pc1512_keyboard_t::kb_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_m1;
 }
@@ -485,7 +485,7 @@ READ8_MEMBER( pc1512_keyboard_t::kb_t0_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_keyboard_t::kb_t1_r )
+uint8_t pc1512_keyboard_t::kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_m2;
 }

@@ -175,7 +175,7 @@ void zaxxon_state::video_start_congo()
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
+void zaxxon_state::zaxxon_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(~data & 1);
@@ -183,7 +183,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
+void zaxxon_state::zaxxon_fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit selects high color palette index */
 	m_fg_color = (data & 1) * 0x80;
@@ -191,7 +191,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
+void zaxxon_state::zaxxon_bg_position_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
@@ -201,21 +201,21 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_color_w)
+void zaxxon_state::zaxxon_bg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit selects high color palette index */
 	m_bg_color = (data & 1) * 0x80;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_bg_enable_w)
+void zaxxon_state::zaxxon_bg_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit enables/disables the background layer */
 	m_bg_enable = data & 1;
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
+void zaxxon_state::congo_fg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls the topmost character bit */
 	m_congo_fg_bank = data & 1;
@@ -223,7 +223,7 @@ WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
+void zaxxon_state::congo_color_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low bit controls the topmost bit into the color PROM */
 	m_congo_color_bank = data & 1;
@@ -238,14 +238,14 @@ WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
+void zaxxon_state::zaxxon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
+void zaxxon_state::congo_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
+void zaxxon_state::congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *spriteram = m_spriteram;
 

@@ -38,7 +38,7 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 	}
 }
 
-WRITE8_MEMBER(cheekyms_state::port_40_w)
+void cheekyms_state::port_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac0->write(BIT(data, 7)); // tune
 	m_dac1->write(BIT(data, 6)); // mouse eating cheese
@@ -51,7 +51,7 @@ WRITE8_MEMBER(cheekyms_state::port_40_w)
 }
 
 
-WRITE8_MEMBER(cheekyms_state::port_80_w)
+void cheekyms_state::port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */

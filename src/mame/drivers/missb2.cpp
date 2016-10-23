@@ -35,7 +35,7 @@ public:
 
 	required_shared_ptr<uint8_t> m_bgvram;
 	required_device<palette_device> m_bgpalette;
-	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
+	void missb2_bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void init_missb2();
 	void machine_start_missb2();
@@ -143,7 +143,7 @@ uint32_t missb2_state::screen_update_missb2(screen_device &screen, bitmap_rgb32 
 }
 
 
-WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
+void missb2_state::missb2_bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 

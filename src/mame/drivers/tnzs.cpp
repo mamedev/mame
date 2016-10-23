@@ -671,7 +671,7 @@ SAMPLES_START_CB_MEMBER(tnzs_state::kageki_init_samples)
 }
 
 
-READ8_MEMBER(tnzs_state::kageki_csport_r)
+uint8_t tnzs_state::kageki_csport_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int dsw, dsw1, dsw2;
 
@@ -700,7 +700,7 @@ READ8_MEMBER(tnzs_state::kageki_csport_r)
 	return (dsw & 0xff);
 }
 
-WRITE8_MEMBER(tnzs_state::kageki_csport_w)
+void tnzs_state::kageki_csport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	char mess[80];
 
@@ -727,7 +727,7 @@ WRITE8_MEMBER(tnzs_state::kageki_csport_w)
 	}
 }
 
-WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
+void tnzs_state::kabukiz_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
@@ -792,7 +792,7 @@ ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
 
-WRITE8_MEMBER(tnzs_state::tnzsb_sound_command_w)
+void tnzs_state::tnzsb_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -867,7 +867,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
+void tnzs_state::jpopnics_subbankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-1 select ROM bank */
 	m_subbank->set_entry(data & 0x03);

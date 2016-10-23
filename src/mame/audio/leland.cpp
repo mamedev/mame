@@ -428,7 +428,7 @@ wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, co
 	m_type = TYPE_WSF;
 }
 
-WRITE16_MEMBER(leland_80186_sound_device::peripheral_ctrl)
+void leland_80186_sound_device::peripheral_ctrl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -462,7 +462,7 @@ WRITE16_MEMBER(leland_80186_sound_device::peripheral_ctrl)
  *
  *************************************/
 
-WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
+void leland_80186_sound_device::leland_80186_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* see if anything changed */
 	int diff = (m_last_control ^ data) & 0xf8;
@@ -516,13 +516,13 @@ void leland_80186_sound_device::command_lo_sync(void *ptr, int param)
 }
 
 
-WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_lo_w )
+void leland_80186_sound_device::leland_80186_command_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_80186_sound_device::command_lo_sync), this), data);
 }
 
 
-WRITE8_MEMBER( leland_80186_sound_device::leland_80186_command_hi_w )
+void leland_80186_sound_device::leland_80186_command_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_COMM) logerror("%04X:Write sound command latch hi = %02X\n", m_audiocpu->device_t::safe_pc(), data);
 	m_sound_command = (m_sound_command & 0x00ff) | (data << 8);
@@ -562,7 +562,7 @@ void leland_80186_sound_device::delayed_response_r(void *ptr, int param)
 }
 
 
-READ8_MEMBER( leland_80186_sound_device::leland_80186_response_r )
+uint8_t leland_80186_sound_device::leland_80186_response_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	cpu_device *master = machine().device<cpu_device>("master");
 	offs_t pc = master->device_t::safe_pcbase();
@@ -582,7 +582,7 @@ READ8_MEMBER( leland_80186_sound_device::leland_80186_response_r )
  *
  *************************************/
 
-WRITE16_MEMBER( leland_80186_sound_device::dac_w )
+void leland_80186_sound_device::dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int dac = offset & 7;
 
@@ -654,12 +654,12 @@ WRITE16_MEMBER( leland_80186_sound_device::dac_w )
 }
 
 
-WRITE16_MEMBER( redline_80186_sound_device::redline_dac_w )
+void redline_80186_sound_device::redline_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	dac_w(space, (offset >> 8) & 7, (data & 0xff) | (offset << 8), 0xffff);
 }
 
-WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
+void leland_80186_sound_device::ataxx_dac_control(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -728,7 +728,7 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
  *
  *************************************/
 
-READ16_MEMBER( leland_80186_sound_device::peripheral_r )
+uint16_t leland_80186_sound_device::peripheral_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int select = offset / 0x40;
 	offset &= 0x3f;
@@ -784,7 +784,7 @@ READ16_MEMBER( leland_80186_sound_device::peripheral_r )
 }
 
 
-WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
+void leland_80186_sound_device::peripheral_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int select = offset / 0x40;
 	offset &= 0x3f;
@@ -843,7 +843,7 @@ WRITE16_MEMBER( leland_80186_sound_device::peripheral_w )
  *
  *************************************/
 
-WRITE8_MEMBER( leland_80186_sound_device::ataxx_80186_control_w )
+void leland_80186_sound_device::ataxx_80186_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* compute the bit-shuffled variants of the bits and then write them */
 	int modified =  ((data & 0x01) << 7) |

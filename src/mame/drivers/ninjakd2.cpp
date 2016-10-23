@@ -191,7 +191,7 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 	m_sampledata = sampledata;
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
+void ninjakd2_state::ninjakd2_pcm_play_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// only Ninja Kid II uses this
 	if (m_pcm_region == nullptr)
@@ -246,7 +246,7 @@ void ninjakd2_state::omegaf_io_protection_reset()
 	m_omegaf_io_protection_tic = 0;
 }
 
-READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
+uint8_t ninjakd2_state::omegaf_io_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -329,7 +329,7 @@ READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 	return result;
 }
 
-WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
+void ninjakd2_state::omegaf_io_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// load parameter on c006 bit 0 rise transition
 	if (offset == 2 && (data & 1) && !(m_omegaf_io_protection[2] & 1))
@@ -345,12 +345,12 @@ WRITE8_MEMBER(ninjakd2_state::omegaf_io_protection_w)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
+void ninjakd2_state::ninjakd2_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & m_rom_bank_mask);
 }
 
-WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
+void ninjakd2_state::ninjakd2_soundreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 4 resets sound CPU
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -1644,7 +1644,7 @@ void ninjakd2_state::init_mnight()
 
 /*****************************************************************************/
 
-READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
+uint8_t ninjakd2_state::robokid_motion_error_verbose_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("%s MOTION ERROR, contact MAMEdev", machine().system().name);
 	logerror("maincpu %04x MOTION ERROR\n", space.device().safe_pc());

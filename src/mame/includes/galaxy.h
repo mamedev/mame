@@ -32,8 +32,8 @@ public:
 	uint32_t m_start_addr;
 	emu_timer *m_gal_video_timer;
 	bitmap_ind16 m_bitmap;
-	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
-	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
+	uint8_t galaxy_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void galaxy_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_galaxy();
 	void init_galaxyp();
 	virtual void video_start() override;

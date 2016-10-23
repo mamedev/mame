@@ -114,7 +114,7 @@ void deniam_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(deniam_state::deniam_videoram_w)
+void deniam_state::deniam_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int page, i;
 	COMBINE_DATA(&m_videoram[offset]);
@@ -130,14 +130,14 @@ WRITE16_MEMBER(deniam_state::deniam_videoram_w)
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_textram_w)
+void deniam_state::deniam_textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_palette_w)
+void deniam_state::deniam_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b;
 
@@ -149,12 +149,12 @@ WRITE16_MEMBER(deniam_state::deniam_palette_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-READ16_MEMBER(deniam_state::deniam_coinctrl_r)
+uint16_t deniam_state::deniam_coinctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_coinctrl;
 }
 
-WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
+void deniam_state::deniam_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_coinctrl);
 

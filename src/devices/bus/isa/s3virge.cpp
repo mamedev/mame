@@ -606,7 +606,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 }
 
 
-READ8_MEMBER(s3virge_vga_device::port_03b0_r)
+uint8_t s3virge_vga_device::port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -626,7 +626,7 @@ READ8_MEMBER(s3virge_vga_device::port_03b0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
+void s3virge_vga_device::port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -643,7 +643,7 @@ WRITE8_MEMBER(s3virge_vga_device::port_03b0_w)
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03c0_r)
+uint8_t s3virge_vga_device::port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -657,7 +657,7 @@ READ8_MEMBER(s3virge_vga_device::port_03c0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03c0_w)
+void s3virge_vga_device::port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -667,7 +667,7 @@ WRITE8_MEMBER(s3virge_vga_device::port_03c0_w)
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::port_03d0_r)
+uint8_t s3virge_vga_device::port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -687,7 +687,7 @@ READ8_MEMBER(s3virge_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
+void s3virge_vga_device::port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -704,7 +704,7 @@ WRITE8_MEMBER(s3virge_vga_device::port_03d0_w)
 	}
 }
 
-READ8_MEMBER(s3virge_vga_device::mem_r)
+uint8_t s3virge_vga_device::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
@@ -738,7 +738,7 @@ READ8_MEMBER(s3virge_vga_device::mem_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(s3virge_vga_device::mem_w)
+void s3virge_vga_device::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 4 of CR53 enables memory-mapped I/O
 	if(s3.cr53 & 0x10)

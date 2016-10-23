@@ -80,7 +80,7 @@ void tms57002_device::device_reset()
 	cache_flush();
 }
 
-WRITE8_MEMBER(tms57002_device::data_w)
+void tms57002_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(sti & (IN_PLOAD|IN_CLOAD)) {
 	case 0:
@@ -135,7 +135,7 @@ WRITE8_MEMBER(tms57002_device::data_w)
 	};
 }
 
-READ8_MEMBER(tms57002_device::data_r)
+uint8_t tms57002_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	if(!(sti & S_HOST))

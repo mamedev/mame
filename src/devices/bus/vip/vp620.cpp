@@ -21,7 +21,7 @@ const device_type VP620 = &device_creator<vp620_device>;
 //  ASCII_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp620_device::kb_w )
+void vp620_device::kb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keydata = data;
 

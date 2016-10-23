@@ -56,7 +56,7 @@ Device Control (out)        14              7
 #include "xtide.h"
 
 
-READ8_MEMBER( xtide_device::read )
+uint8_t xtide_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -84,7 +84,7 @@ READ8_MEMBER( xtide_device::read )
 	return result;
 }
 
-WRITE8_MEMBER( xtide_device::write )
+void xtide_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%s xtide_device::write: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
 

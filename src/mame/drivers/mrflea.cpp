@@ -77,39 +77,39 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *
  *************************************/
 
-WRITE8_MEMBER(mrflea_state::mrflea_main_w)
+void mrflea_state::mrflea_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status |= 0x01; // pending command to main CPU
 	m_main = data;
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_io_w)
+void mrflea_state::mrflea_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status |= 0x08; // pending command to IO CPU
 	m_io = data;
 	m_subcpu->set_input_line(0, HOLD_LINE );
 }
 
-READ8_MEMBER(mrflea_state::mrflea_main_r)
+uint8_t mrflea_state::mrflea_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_status &= ~0x01; // main CPU command read
 	return m_main;
 }
 
-READ8_MEMBER(mrflea_state::mrflea_io_r)
+uint8_t mrflea_state::mrflea_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_status &= ~0x08; // IO CPU command read
 	return m_io;
 }
 
-READ8_MEMBER(mrflea_state::mrflea_main_status_r)
+uint8_t mrflea_state::mrflea_main_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  0x01: main CPU command pending
 	    0x08: io cpu ready */
 	return m_status ^ 0x08;
 }
 
-READ8_MEMBER(mrflea_state::mrflea_io_status_r)
+uint8_t mrflea_state::mrflea_io_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  0x08: IO CPU command pending
 	    0x01: main cpu ready */
@@ -124,7 +124,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mrflea_state::mrflea_slave_interrupt)
 		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(mrflea_state::mrflea_interrupt_type_r)
+uint8_t mrflea_state::mrflea_interrupt_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* there are two interrupt types:
     1. triggered (in response to sound command)
@@ -137,17 +137,17 @@ READ8_MEMBER(mrflea_state::mrflea_interrupt_type_r)
 	return 0x01; /* music/sound update? */
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_select1_w)
+void mrflea_state::mrflea_select1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_select1 = data;
 }
 
-READ8_MEMBER(mrflea_state::mrflea_input1_r)
+uint8_t mrflea_state::mrflea_input1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
+void mrflea_state::mrflea_data1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

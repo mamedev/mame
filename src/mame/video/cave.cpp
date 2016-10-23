@@ -341,15 +341,15 @@ TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(tileinfo, tile_
 TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
 TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
-WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(space, offset, data, mem_mask, 3); }
+void cave_state::cave_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 0); }
+void cave_state::cave_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 1); }
+void cave_state::cave_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 2); }
+void cave_state::cave_vram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 3); }
 
-WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(space, offset, data, mem_mask, 3); }
+void cave_state::cave_vram_0_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_8x8_w(space, offset, data, mem_mask, 0); }
+void cave_state::cave_vram_1_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_8x8_w(space, offset, data, mem_mask, 1); }
+void cave_state::cave_vram_2_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_8x8_w(space, offset, data, mem_mask, 2); }
+void cave_state::cave_vram_3_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_8x8_w(space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

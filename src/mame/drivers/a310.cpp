@@ -89,8 +89,8 @@ public:
 
 	required_shared_ptr<uint32_t> m_physram;
 
-	DECLARE_READ32_MEMBER(a310_psy_wram_r);
-	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
+	uint32_t a310_psy_wram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void a310_psy_wram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
 	void init_a310();
@@ -127,12 +127,12 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
-READ32_MEMBER(a310_state::a310_psy_wram_r)
+uint32_t a310_state::a310_psy_wram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_physram[offset];
 }
 
-WRITE32_MEMBER(a310_state::a310_psy_wram_w)
+void a310_state::a310_psy_wram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_physram[offset]);
 }

@@ -44,8 +44,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	// device references
@@ -56,7 +56,7 @@ private:
 	uint8_t m_select;
 
 	// methods
-	DECLARE_WRITE8_MEMBER(ff7f_write);
+	void ff7f_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	cococart_slot_device *active_scs_slot(void);
 	cococart_slot_device *active_cts_slot(void);
 	void set_select(uint8_t new_select);

@@ -57,18 +57,18 @@ public:
 	int m_dsc0;
 	int m_dsc1;
 
-	DECLARE_READ8_MEMBER(wiz_protection_r);
-	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(wiz_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(wiz_char_bank_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipx_w);
-	DECLARE_WRITE8_MEMBER(wiz_flipy_w);
-	DECLARE_WRITE8_MEMBER(stinger_explosion_w);
-	DECLARE_WRITE8_MEMBER(stinger_shot_w);
+	uint8_t wiz_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wiz_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_main_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_sprite_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wiz_flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stinger_explosion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stinger_shot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_stinger();
 

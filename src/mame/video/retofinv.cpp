@@ -118,19 +118,19 @@ void retofinv_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(retofinv_state::bg_videoram_w)
+void retofinv_state::bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::fg_videoram_w)
+void retofinv_state::fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(retofinv_state::gfx_ctrl_w)
+void retofinv_state::gfx_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

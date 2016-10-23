@@ -70,14 +70,14 @@ public:
 	bitmap_ind16 m_bitmap;
 	uint16_t     m_screen_enable;
 	uint16_t     m_draw_sprites;
-	DECLARE_WRITE16_MEMBER(astrocorp_draw_sprites_w);
-	DECLARE_WRITE16_MEMBER(astrocorp_eeprom_w);
-	DECLARE_WRITE16_MEMBER(showhand_outputs_w);
-	DECLARE_WRITE16_MEMBER(skilldrp_outputs_w);
-	DECLARE_WRITE16_MEMBER(astrocorp_screen_enable_w);
-	DECLARE_READ16_MEMBER(astrocorp_unk_r);
-	DECLARE_WRITE16_MEMBER(astrocorp_sound_bank_w);
-	DECLARE_WRITE16_MEMBER(skilldrp_sound_bank_w);
+	void astrocorp_draw_sprites_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void astrocorp_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void showhand_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void skilldrp_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void astrocorp_screen_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t astrocorp_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void astrocorp_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void skilldrp_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_astoneag();
 	void init_showhanc();
 	void init_showhand();
@@ -184,7 +184,7 @@ uint32_t astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_
                                 Memory Maps
 ***************************************************************************/
 
-WRITE16_MEMBER(astrocorp_state::astrocorp_draw_sprites_w)
+void astrocorp_state::astrocorp_draw_sprites_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = m_draw_sprites;
 	uint16_t now = COMBINE_DATA(&m_draw_sprites);
@@ -193,7 +193,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_draw_sprites_w)
 		draw_sprites(m_bitmap, m_screen->visible_area());
 }
 
-WRITE16_MEMBER(astrocorp_state::astrocorp_eeprom_w)
+void astrocorp_state::astrocorp_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -201,7 +201,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
+void astrocorp_state::astrocorp_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -210,7 +210,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_sound_bank_w)
 	}
 }
 
-WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
+void astrocorp_state::skilldrp_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -219,7 +219,7 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_sound_bank_w)
 	}
 }
 
-WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
+void astrocorp_state::showhand_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -239,7 +239,7 @@ WRITE16_MEMBER(astrocorp_state::showhand_outputs_w)
 //  popmessage("%04X",data);
 }
 
-WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
+void astrocorp_state::skilldrp_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// key in          (0001)
 	// coin in         (0002)
@@ -281,7 +281,7 @@ WRITE16_MEMBER(astrocorp_state::skilldrp_outputs_w)
 //  popmessage("%04X",data);
 }
 
-WRITE16_MEMBER(astrocorp_state::astrocorp_screen_enable_w)
+void astrocorp_state::astrocorp_screen_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_screen_enable);
 //  popmessage("%04X",data);
@@ -289,7 +289,7 @@ WRITE16_MEMBER(astrocorp_state::astrocorp_screen_enable_w)
 		logerror("CPU #0 PC %06X: screen enable = %04X\n", space.device().safe_pc(), m_screen_enable);
 }
 
-READ16_MEMBER(astrocorp_state::astrocorp_unk_r)
+uint16_t astrocorp_state::astrocorp_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;  // bit 3?
 }

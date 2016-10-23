@@ -34,8 +34,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( dma_r );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

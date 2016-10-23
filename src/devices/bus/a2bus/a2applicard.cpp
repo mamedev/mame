@@ -182,7 +182,7 @@ void a2bus_applicard_device::write_c0nx(address_space &space, uint8_t offset, ui
 	}
 }
 
-READ8_MEMBER( a2bus_applicard_device::z80_io_r )
+uint8_t a2bus_applicard_device::z80_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tmp = 0;
 
@@ -212,7 +212,7 @@ READ8_MEMBER( a2bus_applicard_device::z80_io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( a2bus_applicard_device::z80_io_w )
+void a2bus_applicard_device::z80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -238,7 +238,7 @@ WRITE8_MEMBER( a2bus_applicard_device::z80_io_w )
 //  dma_r -
 //-------------------------------------------------
 
-READ8_MEMBER( a2bus_applicard_device::dma_r )
+uint8_t a2bus_applicard_device::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x8000)
 	{
@@ -264,7 +264,7 @@ READ8_MEMBER( a2bus_applicard_device::dma_r )
 //  dma_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( a2bus_applicard_device::dma_w )
+void a2bus_applicard_device::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x8000)
 	{

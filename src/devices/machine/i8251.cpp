@@ -339,7 +339,7 @@ void i8251_device::device_reset()
     control_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::command_w)
+void i8251_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* command */
 	LOG(("I8251: Command byte\n"));
@@ -438,7 +438,7 @@ WRITE8_MEMBER(i8251_device::command_w)
 		update_tx_empty();
 }
 
-WRITE8_MEMBER(i8251_device::mode_w)
+void i8251_device::mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("I8251: Mode byte\n"));
 
@@ -597,7 +597,7 @@ WRITE8_MEMBER(i8251_device::mode_w)
 	}
 }
 
-WRITE8_MEMBER(i8251_device::control_w)
+void i8251_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flags & I8251_EXPECTING_MODE)
 	{
@@ -635,7 +635,7 @@ WRITE8_MEMBER(i8251_device::control_w)
     status_r
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::status_r)
+uint8_t i8251_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t status = (m_dsr << 7) | m_status;
 
@@ -649,7 +649,7 @@ READ8_MEMBER(i8251_device::status_r)
     data_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER(i8251_device::data_w)
+void i8251_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tx_data = data;
 
@@ -701,7 +701,7 @@ void i8251_device::receive_character(uint8_t ch)
     data_r - read data
 -------------------------------------------------*/
 
-READ8_MEMBER(i8251_device::data_r)
+uint8_t i8251_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("read data: %02x, STATUS=%02x\n",m_rx_data,m_status));
 	/* reading clears */

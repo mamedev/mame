@@ -55,18 +55,18 @@ public:
 	uint8_t m_old_keydata;
 	uint8_t m_freq_reg[2];
 	emu_timer *m_timer_d;
-	DECLARE_READ8_MEMBER(jr200_pcg_1_r);
-	DECLARE_READ8_MEMBER(jr200_pcg_2_r);
-	DECLARE_WRITE8_MEMBER(jr200_pcg_1_w);
-	DECLARE_WRITE8_MEMBER(jr200_pcg_2_w);
-	DECLARE_READ8_MEMBER(jr200_bios_char_r);
-	DECLARE_WRITE8_MEMBER(jr200_bios_char_w);
-	DECLARE_READ8_MEMBER(mcu_keyb_r);
-	DECLARE_WRITE8_MEMBER(jr200_beep_w);
-	DECLARE_WRITE8_MEMBER(jr200_beep_freq_w);
-	DECLARE_WRITE8_MEMBER(jr200_border_col_w);
-	DECLARE_READ8_MEMBER(mn1271_io_r);
-	DECLARE_WRITE8_MEMBER(mn1271_io_w);
+	uint8_t jr200_pcg_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t jr200_pcg_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jr200_pcg_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jr200_pcg_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jr200_bios_char_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jr200_bios_char_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jr200_beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jr200_beep_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jr200_border_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mn1271_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mn1271_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -210,35 +210,35 @@ uint32_t jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-READ8_MEMBER(jr200_state::jr200_pcg_1_r)
+uint8_t jr200_state::jr200_pcg_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pcg->base()[offset+0x000];
 }
 
-READ8_MEMBER(jr200_state::jr200_pcg_2_r)
+uint8_t jr200_state::jr200_pcg_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pcg->base()[offset+0x400];
 }
 
-WRITE8_MEMBER(jr200_state::jr200_pcg_1_w)
+void jr200_state::jr200_pcg_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pcg->base()[offset+0x000] = data;
 	m_gfxdecode->gfx(1)->mark_dirty((offset+0x000) >> 3);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_pcg_2_w)
+void jr200_state::jr200_pcg_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pcg->base()[offset+0x400] = data;
 	m_gfxdecode->gfx(1)->mark_dirty((offset+0x400) >> 3);
 }
 
-READ8_MEMBER(jr200_state::jr200_bios_char_r)
+uint8_t jr200_state::jr200_bios_char_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfx_ram->base()[offset];
 }
 
 
-WRITE8_MEMBER(jr200_state::jr200_bios_char_w)
+void jr200_state::jr200_bios_char_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: writing is presumably controlled by an I/O bit */
 //  m_gfx_ram->base()[offset] = data;
@@ -251,7 +251,7 @@ I/O Device
 
 */
 
-READ8_MEMBER(jr200_state::mcu_keyb_r)
+uint8_t jr200_state::mcu_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int row, col, table = 0;
 	uint8_t keydata = 0;
@@ -298,13 +298,13 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	return keydata;
 }
 
-WRITE8_MEMBER(jr200_state::jr200_beep_w)
+void jr200_state::jr200_beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
 	m_beeper->set_state(((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
+void jr200_state::jr200_beep_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t beep_freq;
 
@@ -315,7 +315,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 	m_beeper->set_clock(84000 / beep_freq);
 }
 
-WRITE8_MEMBER(jr200_state::jr200_border_col_w)
+void jr200_state::jr200_border_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_border_col = data;
 }
@@ -326,7 +326,7 @@ TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(jr200_state::mn1271_io_r)
+uint8_t jr200_state::mn1271_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = m_mn1271_ram[offset];
 	if((offset+0xc800) > 0xca00)
@@ -349,7 +349,7 @@ READ8_MEMBER(jr200_state::mn1271_io_r)
 	return retVal;
 }
 
-WRITE8_MEMBER(jr200_state::mn1271_io_w)
+void jr200_state::mn1271_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mn1271_ram[offset] = data;
 	switch(offset+0xc800)

@@ -79,7 +79,7 @@ uint8_t* z88_1024k_flash_device::get_cart_base()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(z88_1024k_flash_device::read)
+uint8_t z88_1024k_flash_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_flash->read(offset & (get_cart_size() - 1));
 }
@@ -88,7 +88,7 @@ READ8_MEMBER(z88_1024k_flash_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(z88_1024k_flash_device::write)
+void z88_1024k_flash_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash->write(offset & (get_cart_size() - 1), data);
 }

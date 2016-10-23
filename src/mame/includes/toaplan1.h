@@ -84,42 +84,42 @@ public:
 	tilemap_t *m_pf3_tilemap;
 	tilemap_t *m_pf4_tilemap;
 
-	DECLARE_WRITE16_MEMBER(toaplan1_intenable_w);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_addrsel_w);
-	DECLARE_READ16_MEMBER(demonwld_dsp_r);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_w);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_bio_w);
+	void toaplan1_intenable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void demonwld_dsp_addrsel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t demonwld_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void demonwld_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void demonwld_dsp_bio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
-	DECLARE_WRITE16_MEMBER(demonwld_dsp_ctrl_w);
-	DECLARE_READ16_MEMBER(samesame_port_6_word_r);
-	DECLARE_READ16_MEMBER(vimana_system_port_r);
-	DECLARE_READ16_MEMBER(vimana_mcu_r);
-	DECLARE_WRITE16_MEMBER(vimana_mcu_w);
-	DECLARE_READ16_MEMBER(toaplan1_shared_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_shared_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_reset_sound_w);
-	DECLARE_WRITE8_MEMBER(toaplan1_coin_w);
-	DECLARE_WRITE16_MEMBER(samesame_coin_w);
+	void demonwld_dsp_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t samesame_port_6_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vimana_system_port_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vimana_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vimana_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_shared_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_reset_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void samesame_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(toaplan1_frame_done_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tile_offsets_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bcu_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_fcu_flipscreen_w);
-	DECLARE_READ16_MEMBER(toaplan1_spriteram_offs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spriteram_offs_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bgpalette_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_fgpalette_w);
-	DECLARE_READ16_MEMBER(toaplan1_spriteram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spriteram16_w);
-	DECLARE_READ16_MEMBER(toaplan1_spritesizeram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_spritesizeram16_w);
-	DECLARE_WRITE16_MEMBER(toaplan1_bcu_control_w);
-	DECLARE_READ16_MEMBER(toaplan1_tileram_offs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tileram_offs_w);
-	DECLARE_READ16_MEMBER(toaplan1_tileram16_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_tileram16_w);
-	DECLARE_READ16_MEMBER(toaplan1_scroll_regs_r);
-	DECLARE_WRITE16_MEMBER(toaplan1_scroll_regs_w);
+	uint16_t toaplan1_frame_done_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_tile_offsets_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_bcu_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_fcu_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_spriteram_offs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_spriteram_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_bgpalette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_fgpalette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_spriteram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_spritesizeram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_spritesizeram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void toaplan1_bcu_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_tileram_offs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_tileram_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_tileram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_tileram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t toaplan1_scroll_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void toaplan1_scroll_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_toaplan1();
 	void init_demonwld();
@@ -170,8 +170,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(rallybik_coin_w);
-	DECLARE_READ16_MEMBER(rallybik_tileram16_r);
+	void rallybik_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t rallybik_tileram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void video_start_rallybik();
 	uint32_t screen_update_rallybik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_rallybik(screen_device &screen, bool state);

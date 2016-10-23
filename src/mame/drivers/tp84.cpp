@@ -80,7 +80,7 @@ void tp84_state::machine_start()
 }
 
 
-READ8_MEMBER(tp84_state::tp84_sh_timer_r)
+uint8_t tp84_state::tp84_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* main xtal 14.318MHz, divided by 4 to get the CPU clock, further */
 	/* divided by 2048 to get this timer */
@@ -90,7 +90,7 @@ READ8_MEMBER(tp84_state::tp84_sh_timer_r)
 }
 
 
-WRITE8_MEMBER(tp84_state::tp84_filter_w)
+void tp84_state::tp84_filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int C;
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	dynamic_cast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
-WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
+void tp84_state::tp84_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0,HOLD_LINE,0xff);
 }
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
+void tp84_state::sub_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sub_irq_mask = data & 1;
 }

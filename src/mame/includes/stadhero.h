@@ -31,8 +31,8 @@ public:
 
 	tilemap_t *m_pf1_tilemap;
 
-	DECLARE_WRITE16_MEMBER(stadhero_control_w);
-	DECLARE_WRITE16_MEMBER(stadhero_pf1_data_w);
+	void stadhero_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stadhero_pf1_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void video_start() override;
 

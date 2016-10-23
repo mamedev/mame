@@ -242,18 +242,18 @@ public:
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
 
-	DECLARE_READ32_MEMBER( tl_mmu_r );
-	DECLARE_WRITE32_MEMBER( tl_mmu_w );
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
-	DECLARE_READ32_MEMBER( parity_r );
-	DECLARE_WRITE32_MEMBER( parity_w );
-	DECLARE_READ32_MEMBER( ecc_r );
-	DECLARE_WRITE32_MEMBER( ecc_w );
-	DECLARE_READ32_MEMBER( irqctrl_r );
-	DECLARE_WRITE32_MEMBER( irqctrl_w );
-	DECLARE_READ8_MEMBER( rtc7170_r );
-	DECLARE_WRITE8_MEMBER( rtc7170_w );
+	uint32_t tl_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void tl_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t parity_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void parity_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ecc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ecc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t irqctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t rtc7170_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc7170_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -276,7 +276,7 @@ private:
 	uint32_t m_cache_tags[0x4000], m_cache_data[0x4000];
 };
 
-READ32_MEMBER( sun3_state::ram_r )
+uint32_t sun3_state::ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_ecc[0] == 0x10c00000)
 	{
@@ -312,7 +312,7 @@ READ32_MEMBER( sun3_state::ram_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::ram_w )
+void sun3_state::ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// if writing bad parity is enabled
 	if (((m_parregs[0] & 0x20000000) == 0x20000000) &&
@@ -383,7 +383,7 @@ WRITE32_MEMBER( sun3_state::ram_w )
 	}
 }
 
-READ32_MEMBER( sun3_state::tl_mmu_r )
+uint32_t sun3_state::tl_mmu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -520,7 +520,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER( sun3_state::tl_mmu_w )
+void sun3_state::tl_mmu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t fc = m_maincpu->get_fc();
 
@@ -668,7 +668,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	logerror("sun3: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<2);
 }
 
-READ32_MEMBER(sun3_state::parity_r)
+uint32_t sun3_state::parity_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t rv = m_parregs[offset];
 
@@ -681,7 +681,7 @@ READ32_MEMBER(sun3_state::parity_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::parity_w)
+void sun3_state::parity_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to parity registers @ %x (mask %08x)\n", data, offset, mem_mask);
 
@@ -738,12 +738,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 32, sun3_state)
 ADDRESS_MAP_END
 
-READ32_MEMBER(sun3_state::irqctrl_r)
+uint32_t sun3_state::irqctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_irqctrl;
 }
 
-WRITE32_MEMBER(sun3_state::irqctrl_w)
+void sun3_state::irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("sun3: %08x to interrupt control (mask %08x)\n", data, mem_mask);
 	COMBINE_DATA(&m_irqctrl);
@@ -775,14 +775,14 @@ WRITE32_MEMBER(sun3_state::irqctrl_w)
 	}
 }
 
-READ8_MEMBER(sun3_state::rtc7170_r)
+uint8_t sun3_state::rtc7170_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("read 7170 @ %x, PC=%x\n", offset, m_maincpu->pc);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(sun3_state::rtc7170_w)
+void sun3_state::rtc7170_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%02x to 7170 @ %x\n", data, offset);
 
@@ -795,7 +795,7 @@ WRITE8_MEMBER(sun3_state::rtc7170_w)
 	}
 }
 
-READ32_MEMBER(sun3_state::ecc_r)
+uint32_t sun3_state::ecc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//printf("read ECC @ %x, PC=%x\n", offset, m_maincpu->pc);
 	// fefc34a
@@ -818,7 +818,7 @@ READ32_MEMBER(sun3_state::ecc_r)
 	return rv;
 }
 
-WRITE32_MEMBER(sun3_state::ecc_w)
+void sun3_state::ecc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("%08x to ecc @ %x, mask %08x\n", data, offset, mem_mask);
 

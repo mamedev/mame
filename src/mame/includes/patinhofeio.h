@@ -12,15 +12,15 @@ public:
 	{ }
 
 	void init_patinho_feio();
-	DECLARE_READ16_MEMBER(rc_r);
-	DECLARE_READ16_MEMBER(buttons_r);
+	uint16_t rc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t buttons_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER(decwriter_data_w);
-	DECLARE_WRITE8_MEMBER(decwriter_kbd_input);
+	void decwriter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decwriter_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(decwriter_callback);
 
-	DECLARE_WRITE8_MEMBER(teletype_data_w);
-	DECLARE_WRITE8_MEMBER(teletype_kbd_input);
+	void teletype_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void teletype_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(teletype_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );

@@ -25,10 +25,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	uint8_t m_irq_mask;
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
-	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
-	DECLARE_WRITE8_MEMBER(audio_dac_w);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trucocl_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trucocl_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_trucocl();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;

@@ -35,12 +35,12 @@ class h8_dma_device : public device_t {
 public:
 	h8_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(dmawer_r);
-	DECLARE_WRITE8_MEMBER(dmawer_w);
-	DECLARE_READ8_MEMBER(dmatcr_r);
-	DECLARE_WRITE8_MEMBER(dmatcr_w);
-	DECLARE_READ16_MEMBER(dmabcr_r);
-	DECLARE_WRITE16_MEMBER(dmabcr_w);
+	uint8_t dmawer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmawer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmatcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmatcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dmabcr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dmabcr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	bool trigger_dma(int vector);
 	void count_done(int id);
@@ -77,24 +77,24 @@ public:
 
 	void set_info(const char *intc, int irq_base, int v0, int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int va, int vb, int vc, int vd, int ve, int vf);
 
-	DECLARE_READ16_MEMBER(marah_r);
-	DECLARE_WRITE16_MEMBER(marah_w);
-	DECLARE_READ16_MEMBER(maral_r);
-	DECLARE_WRITE16_MEMBER(maral_w);
-	DECLARE_READ16_MEMBER(ioara_r);
-	DECLARE_WRITE16_MEMBER(ioara_w);
-	DECLARE_READ16_MEMBER(etcra_r);
-	DECLARE_WRITE16_MEMBER(etcra_w);
-	DECLARE_READ16_MEMBER(marbh_r);
-	DECLARE_WRITE16_MEMBER(marbh_w);
-	DECLARE_READ16_MEMBER(marbl_r);
-	DECLARE_WRITE16_MEMBER(marbl_w);
-	DECLARE_READ16_MEMBER(ioarb_r);
-	DECLARE_WRITE16_MEMBER(ioarb_w);
-	DECLARE_READ16_MEMBER(etcrb_r);
-	DECLARE_WRITE16_MEMBER(etcrb_w);
-	DECLARE_READ16_MEMBER(dmacr_r);
-	DECLARE_WRITE16_MEMBER(dmacr_w);
+	uint16_t marah_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void marah_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t maral_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void maral_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ioara_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ioara_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t etcra_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void etcra_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t marbh_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void marbh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t marbl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void marbl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ioarb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ioarb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t etcrb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void etcrb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dmacr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dmacr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void set_id(int id);
 	void set_bcr(bool fae, bool sae, uint8_t dta, uint8_t dte, uint8_t dtie);

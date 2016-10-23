@@ -431,7 +431,7 @@ int c2040_fdc_t::get_next_bit(attotime &tm, const attotime &limit)
 	return bit && cur_live.rw_sel;
 }
 
-READ8_MEMBER( c2040_fdc_t::read )
+uint8_t c2040_fdc_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -443,7 +443,7 @@ READ8_MEMBER( c2040_fdc_t::read )
 	return data;
 }
 
-WRITE8_MEMBER( c2040_fdc_t::write )
+void c2040_fdc_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pi != data)
 	{

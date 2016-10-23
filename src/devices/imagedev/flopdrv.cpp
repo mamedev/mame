@@ -573,7 +573,7 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds3_w )
 }
 
 /* shortcut to write all four ds lines */
-WRITE8_MEMBER( legacy_floppy_image_device::floppy_ds_w )
+void legacy_floppy_image_device::floppy_ds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_ds0_w(BIT(data, 0));
 	floppy_ds1_w(BIT(data, 1));

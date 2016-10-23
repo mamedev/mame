@@ -18,10 +18,10 @@ public:
 	wpc_out_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_out_device();
 
-	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(out4_w); // fixed offset 4
-	DECLARE_WRITE8_MEMBER(gi_w);
-	DECLARE_WRITE8_MEMBER(led_w);
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // fixed offset 4
+	void gi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void set_names(const char *const *names);
 	void set_handler(handler_t cb);

@@ -254,42 +254,42 @@ void maple_dc_device::maple_hw_trigger()
 	}
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdstar_r)
+uint32_t maple_dc_device::sb_mdstar_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return mdstar;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdstar_w)
+void maple_dc_device::sb_mdstar_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	mdstar = data & ~31;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mden_r)
+uint32_t maple_dc_device::sb_mden_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return mden;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mden_w)
+void maple_dc_device::sb_mden_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	mden = data & 1;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdtsel_r)
+uint32_t maple_dc_device::sb_mdtsel_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return mdtsel;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdtsel_w)
+void maple_dc_device::sb_mdtsel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	mdtsel = data & 1;
 }
 
-READ32_MEMBER(maple_dc_device::sb_mdst_r)
+uint32_t maple_dc_device::sb_mdst_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dma_state != DMA_IDLE ? 1 : 0;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
+void maple_dc_device::sb_mdst_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = mdst;
 	mdst = data & 1;
@@ -301,16 +301,16 @@ WRITE32_MEMBER(maple_dc_device::sb_mdst_w)
 	}
 }
 
-READ32_MEMBER(maple_dc_device::sb_msys_r)
+uint32_t maple_dc_device::sb_msys_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return msys;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_msys_w)
+void maple_dc_device::sb_msys_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	msys = data;
 }
 
-WRITE32_MEMBER(maple_dc_device::sb_mdapro_w)
+void maple_dc_device::sb_mdapro_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }

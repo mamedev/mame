@@ -69,19 +69,19 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(m1080_r);
-	DECLARE_WRITE8_MEMBER(m1080_w);
-	DECLARE_READ8_MEMBER(m1084_r);
-	DECLARE_WRITE8_MEMBER(m1084_w);
-	DECLARE_READ8_MEMBER(m1088_r);
-	DECLARE_WRITE8_MEMBER(m1088_w);
-	DECLARE_READ8_MEMBER(m108c_r);
-	DECLARE_WRITE8_MEMBER(m108c_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_WRITE8_MEMBER(audioen_w);
-	DECLARE_WRITE8_MEMBER(audiores_w);
-	DECLARE_WRITE8_MEMBER(midearth_w);
+	uint8_t m1080_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m1080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m1084_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m1084_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m1088_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m1088_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m108c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m108c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audioen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audiores_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void midearth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
@@ -277,22 +277,22 @@ static INPUT_PORTS_START( atari_s1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )
 INPUT_PORTS_END
 
-READ8_MEMBER( atari_s1_state::m1080_r )
+uint8_t atari_s1_state::m1080_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_1080 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1080_w )
+void atari_s1_state::m1080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_1080 = data;
 }
 
-READ8_MEMBER( atari_s1_state::m1084_r )
+uint8_t atari_s1_state::m1084_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_1084 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1084_w )
+void atari_s1_state::m1084_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_1084 = data;
 
@@ -306,33 +306,33 @@ WRITE8_MEMBER( atari_s1_state::m1084_w )
 	}
 }
 
-READ8_MEMBER( atari_s1_state::m1088_r )
+uint8_t atari_s1_state::m1088_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_1088 & 0xf0;
 }
 
-WRITE8_MEMBER( atari_s1_state::m1088_w )
+void atari_s1_state::m1088_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_1088 = data;
 }
 
-READ8_MEMBER( atari_s1_state::m108c_r )
+uint8_t atari_s1_state::m108c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_108c;
 }
 
-WRITE8_MEMBER( atari_s1_state::m108c_w )
+void atari_s1_state::m108c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_108c = data;
 }
 
-WRITE8_MEMBER( atari_s1_state::meter_w )
+void atari_s1_state::meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // time2000 has optional coin counters etc
 }
 
 // midearth has a ram mirror that goes on top of the output ports
-WRITE8_MEMBER( atari_s1_state::midearth_w )
+void atari_s1_state::midearth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p_ram[offset] = data;
 
@@ -353,7 +353,7 @@ WRITE8_MEMBER( atari_s1_state::midearth_w )
 	}
 }
 
-READ8_MEMBER( atari_s1_state::switch_r )
+uint8_t atari_s1_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (BIT(m_switch[offset>>3]->read(), offset&7 ) << 7) | (BIT(m_bit6, 1) << 6); // switch bit | BIT6_CLK
 }
@@ -411,11 +411,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::timer_s )
 	}
 }
 
-WRITE8_MEMBER( atari_s1_state::audioen_w )
+void atari_s1_state::audioen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( atari_s1_state::audiores_w )
+void atari_s1_state::audiores_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data==0x5b) data=0; // spcrider
 	m_audiores = (data) ? 0 : 1;

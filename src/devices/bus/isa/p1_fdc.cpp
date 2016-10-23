@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
 		maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-READ8_MEMBER( p1_fdc_device::p1_fdc_r )
+uint8_t p1_fdc_device::p1_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -159,7 +159,7 @@ READ8_MEMBER( p1_fdc_device::p1_fdc_r )
 	return data;
 }
 
-WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
+void p1_fdc_device::p1_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset )
 	{

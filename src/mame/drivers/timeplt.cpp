@@ -71,7 +71,7 @@ INTERRUPT_GEN_MEMBER(timeplt_state::interrupt)
 }
 
 
-WRITE8_MEMBER(timeplt_state::nmi_enable_w)
+void timeplt_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 1;
 	if (!m_nmi_enable)
@@ -86,18 +86,18 @@ WRITE8_MEMBER(timeplt_state::nmi_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(timeplt_state::coincounter_w)
+void timeplt_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset >> 1, data);
 }
 
-READ8_MEMBER(timeplt_state::psurge_protection_r)
+uint8_t timeplt_state::psurge_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;
 }
 
 // chkun has access to an extra soundchip via ay2 port a
-WRITE8_MEMBER(timeplt_state::chkun_sound_w)
+void timeplt_state::chkun_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: P0-P3
 	// d5: /R (unused?)

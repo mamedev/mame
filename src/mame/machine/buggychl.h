@@ -6,18 +6,18 @@ public:
 	buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~buggychl_mcu_device() {}
 
-	DECLARE_WRITE8_MEMBER( buggychl_mcu_w );
-	DECLARE_READ8_MEMBER( buggychl_mcu_r );
-	DECLARE_READ8_MEMBER( buggychl_mcu_status_r );
-	DECLARE_READ8_MEMBER( buggychl_68705_port_a_r );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_port_a_w );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_ddr_a_w );
-	DECLARE_READ8_MEMBER( buggychl_68705_port_b_r );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_port_b_w );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_ddr_b_w );
-	DECLARE_READ8_MEMBER( buggychl_68705_port_c_r );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_port_c_w );
-	DECLARE_WRITE8_MEMBER( buggychl_68705_ddr_c_w );
+	void buggychl_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t buggychl_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t buggychl_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t buggychl_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void buggychl_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void buggychl_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t buggychl_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void buggychl_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void buggychl_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t buggychl_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void buggychl_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void buggychl_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -118,17 +118,17 @@ public:
 	emu_timer *m_cassette_timer;
 	z80ne_cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
-	DECLARE_READ8_MEMBER(lx383_r);
-	DECLARE_WRITE8_MEMBER(lx383_w);
-	DECLARE_READ8_MEMBER(lx385_data_r);
-	DECLARE_READ8_MEMBER(lx385_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lx385_data_w);
-	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
-	DECLARE_READ8_MEMBER(lx388_data_r);
-	DECLARE_READ8_MEMBER(lx388_read_field_sync);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_default);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_nmi_delay_count);
-	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_reset_delay_count);
+	uint8_t lx383_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lx383_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lx385_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lx385_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lx385_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lx385_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lx388_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lx388_read_field_sync(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	offs_t z80ne_default(direct_read_data &direct, offs_t address);
+	offs_t z80ne_nmi_delay_count(direct_read_data &direct, offs_t address);
+	offs_t z80ne_reset_delay_count(direct_read_data &direct, offs_t address);
 	void init_z80netf();
 	void init_z80net();
 	void init_z80netb();
@@ -146,11 +146,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
 	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
 	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
-	DECLARE_READ8_MEMBER(lx388_mc6847_videoram_r);
-	DECLARE_WRITE8_MEMBER(lx390_motor_w);
-	DECLARE_READ8_MEMBER(lx390_reset_bank);
-	DECLARE_READ8_MEMBER(lx390_fdc_r);
-	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
+	uint8_t lx388_mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lx390_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lx390_reset_bank(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lx390_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lx390_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<cpu_device> m_maincpu;

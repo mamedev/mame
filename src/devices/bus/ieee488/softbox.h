@@ -40,15 +40,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE8_MEMBER( dbrg_w );
+	void dbrg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ppi0_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi0_pb_w );
+	uint8_t ppi0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ppi1_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pb_w );
-	DECLARE_READ8_MEMBER( ppi1_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+	uint8_t ppi1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

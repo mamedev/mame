@@ -108,13 +108,13 @@ void jedi_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::jedi_vscroll_w)
+void jedi_state::jedi_vscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vscroll = data | (offset << 8);
 }
 
 
-WRITE8_MEMBER(jedi_state::jedi_hscroll_w)
+void jedi_state::jedi_hscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hscroll = data | (offset << 8);
 }

@@ -30,7 +30,7 @@ Notes:
 #include "includes/gng.h"
 
 
-WRITE8_MEMBER(gng_state::gng_bankswitch_w)
+void gng_state::gng_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 4)
 		membank("bank1")->set_entry(4);
@@ -38,7 +38,7 @@ WRITE8_MEMBER(gng_state::gng_bankswitch_w)
 		membank("bank1")->set_entry((data & 0x03));
 }
 
-WRITE8_MEMBER(gng_state::gng_coin_counter_w)
+void gng_state::gng_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
@@ -769,7 +769,7 @@ ROM_END
 
 
 
-READ8_MEMBER(gng_state::diamond_hack_r)
+uint8_t gng_state::diamond_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

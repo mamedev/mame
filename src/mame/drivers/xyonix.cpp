@@ -36,7 +36,7 @@ void xyonix_state::machine_start()
 	save_item(NAME(m_prev_coin));
 }
 
-WRITE8_MEMBER(xyonix_state::irqack_w)
+void xyonix_state::irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -82,7 +82,7 @@ void xyonix_state::handle_coins(int coin)
 }
 
 
-READ8_MEMBER(xyonix_state::io_r)
+uint8_t xyonix_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int regPC = space.device().safe_pc();
 
@@ -133,7 +133,7 @@ READ8_MEMBER(xyonix_state::io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(xyonix_state::io_w)
+void xyonix_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, space.device().safe_pc());
 	m_e0_data = data;

@@ -212,7 +212,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 //  write - write to the chip's registers
 //---------------------------------------
 
-WRITE8_MEMBER( vrc6snd_device::write )
+void vrc6snd_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset >> 8)
 	{

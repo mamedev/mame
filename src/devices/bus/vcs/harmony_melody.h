@@ -21,11 +21,11 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) override;
-	virtual DECLARE_WRITE8_MEMBER(write_bank) override;
+	virtual uint8_t read_rom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 
-	DECLARE_READ8_MEMBER(read8_r);
+	uint8_t read8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void check_bankswitch(offs_t offset);
 

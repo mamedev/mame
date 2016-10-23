@@ -122,17 +122,17 @@ WRITE_LINE_MEMBER( wdxt_gen_device::mr_w )
 	}
 }
 
-READ8_MEMBER( wdxt_gen_device::rd322_r )
+uint8_t wdxt_gen_device::rd322_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( wdxt_gen_device::ram_r )
+uint8_t wdxt_gen_device::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( wdxt_gen_device::ram_w )
+void wdxt_gen_device::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 }
@@ -246,7 +246,7 @@ void wdxt_gen_device::dack_w(int line, uint8_t data)
 //  wd1015_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
+uint8_t wdxt_gen_device::wd1015_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_host->busy_r();
 }
@@ -256,7 +256,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_t0_r )
 //  wd1015_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_t1_r )
+uint8_t wdxt_gen_device::wd1015_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; // TODO
 }
@@ -266,7 +266,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_t1_r )
 //  wd1015_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
+uint8_t wdxt_gen_device::wd1015_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -295,7 +295,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p1_r )
 //  wd1015_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
+void wdxt_gen_device::wd1015_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -322,7 +322,7 @@ WRITE8_MEMBER( wdxt_gen_device::wd1015_p1_w )
 //  wd1015_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
+uint8_t wdxt_gen_device::wd1015_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -353,7 +353,7 @@ READ8_MEMBER( wdxt_gen_device::wd1015_p2_r )
 //  wd1015_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wdxt_gen_device::wd1015_p2_w )
+void wdxt_gen_device::wd1015_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

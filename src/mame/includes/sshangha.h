@@ -49,21 +49,21 @@ public:
 	int m_video_control;
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
-	DECLARE_READ16_MEMBER( sshangha_protection_region_8_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_8_146_w );
-	DECLARE_READ16_MEMBER( sshangha_protection_region_d_146_r );
-	DECLARE_WRITE16_MEMBER( sshangha_protection_region_d_146_w );
+	uint16_t sshangha_protection_region_8_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sshangha_protection_region_8_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sshangha_protection_region_d_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sshangha_protection_region_d_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
-	DECLARE_READ16_MEMBER(sshanghb_protection16_r);
-	DECLARE_READ16_MEMBER(deco_71_r);
-	DECLARE_READ8_MEMBER(sshangha_sound_shared_r);
-	DECLARE_WRITE8_MEMBER(sshangha_sound_shared_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_sprites2_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_sprites_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilelow_w);
-	DECLARE_WRITE16_MEMBER(paletteram16_xbgr_word_be_tilehigh_w);
-	DECLARE_WRITE16_MEMBER(sshangha_video_w);
+	uint16_t sshanghb_protection16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t deco_71_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t sshangha_sound_shared_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sshangha_sound_shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram16_xbgr_word_be_sprites2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram16_xbgr_word_be_sprites_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram16_xbgr_word_be_tilelow_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram16_xbgr_word_be_tilehigh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sshangha_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_sshangha();
 	virtual void machine_reset() override;
 	virtual void video_start() override;

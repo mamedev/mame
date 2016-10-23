@@ -45,17 +45,17 @@ K053246_CB_MEMBER(simpsons_state::sprite_callback)
 
 ***************************************************************************/
 
-READ8_MEMBER(simpsons_state::simpsons_k052109_r)
+uint8_t simpsons_state::simpsons_k052109_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_k052109->read(space, offset + 0x2000);
 }
 
-WRITE8_MEMBER(simpsons_state::simpsons_k052109_w)
+void simpsons_state::simpsons_k052109_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k052109->write(space, offset + 0x2000, data);
 }
 
-READ8_MEMBER(simpsons_state::simpsons_k053247_r)
+uint8_t simpsons_state::simpsons_k053247_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int offs = offset >> 1;
 
@@ -65,7 +65,7 @@ READ8_MEMBER(simpsons_state::simpsons_k053247_r)
 		return(m_spriteram[offs] >> 8);
 }
 
-WRITE8_MEMBER(simpsons_state::simpsons_k053247_w)
+void simpsons_state::simpsons_k053247_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int offs = offset >> 1;
 

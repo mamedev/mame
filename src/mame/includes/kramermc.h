@@ -25,9 +25,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_kramermc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(kramermc_port_a_r);
-	DECLARE_READ8_MEMBER(kramermc_port_b_r);
-	DECLARE_WRITE8_MEMBER(kramermc_port_a_w);
+	uint8_t kramermc_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kramermc_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kramermc_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -27,7 +27,7 @@ void sf_state::write_dword( address_space &space, offs_t offset, uint32_t data )
 	space.write_word(offset + 2, data);
 }
 
-WRITE16_MEMBER(sf_state::protection_w)
+void sf_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const int maplist[4][10] = {
 		{ 1, 0, 3, 2, 4, 5, 6, 7, 8, 9 },
@@ -120,7 +120,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 }
 
 
-WRITE8_MEMBER(sf_state::coin_w)
+void sf_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,  data & 0x01);
 	machine().bookkeeping().coin_counter_w(1,  data & 0x02);
@@ -129,18 +129,18 @@ WRITE8_MEMBER(sf_state::coin_w)
 	machine().bookkeeping().coin_lockout_w(2, ~data & 0x40); /* is there a third coin input? */
 }
 
-WRITE8_MEMBER(sf_state::soundcmd_w)
+void sf_state::soundcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(sf_state::sound2_bank_w)
+void sf_state::sound2_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(sf_state::msm1_5205_w)
+void sf_state::msm1_5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
@@ -149,7 +149,7 @@ WRITE8_MEMBER(sf_state::msm1_5205_w)
 	m_msm1->vclk_w(0);
 }
 
-WRITE8_MEMBER(sf_state::msm2_5205_w)
+void sf_state::msm2_5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */

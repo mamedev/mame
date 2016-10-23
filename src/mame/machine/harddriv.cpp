@@ -110,7 +110,7 @@ INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_irq_ack_w )
+void harddriv_state::hd68k_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_irq_state = 0;
 	update_interrupts();
@@ -138,7 +138,7 @@ WRITE_LINE_MEMBER(harddriv_state::hdmsp_irq_gen)
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
+uint16_t harddriv_state::hd68k_gsp_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
@@ -149,7 +149,7 @@ READ16_MEMBER( harddriv_state::hd68k_gsp_io_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
+void harddriv_state::hd68k_gsp_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset / 2) ^ 1;
 	m_hd34010_host_access = true;
@@ -165,7 +165,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_gsp_io_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
+uint16_t harddriv_state::hd68k_msp_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result;
 	offset = (offset / 2) ^ 1;
@@ -176,7 +176,7 @@ READ16_MEMBER( harddriv_state::hd68k_msp_io_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
+void harddriv_state::hd68k_msp_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset / 2) ^ 1;
 	if (m_msp.found())
@@ -195,12 +195,12 @@ WRITE16_MEMBER( harddriv_state::hd68k_msp_io_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_a80000_r )
+uint16_t harddriv_state::hd68k_a80000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_a80000->read();
 }
 
-READ16_MEMBER( harddriv_state::hd68k_port0_r )
+uint16_t harddriv_state::hd68k_port0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* port is as follows:
 
@@ -226,7 +226,7 @@ READ16_MEMBER( harddriv_state::hd68k_port0_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hdc68k_port1_r )
+uint16_t harddriv_state::hdc68k_port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_a80000->read();
 	uint16_t diff = result ^ m_hdc68k_last_port1;
@@ -254,7 +254,7 @@ READ16_MEMBER( harddriv_state::hdc68k_port1_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hda68k_port1_r )
+uint16_t harddriv_state::hda68k_port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_a80000->read();
 
@@ -266,7 +266,7 @@ READ16_MEMBER( harddriv_state::hda68k_port1_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
+uint16_t harddriv_state::hdc68k_wheel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* grab the new wheel value */
 	uint16_t new_wheel = m_12badc[0].read_safe(0xffff);
@@ -285,19 +285,19 @@ READ16_MEMBER( harddriv_state::hdc68k_wheel_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_adc8_r )
+uint16_t harddriv_state::hd68k_adc8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_adc8_data;
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_adc12_r )
+uint16_t harddriv_state::hd68k_adc12_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_adc12_byte ? ((m_adc12_data >> 8) & 0x0f) : (m_adc12_data & 0xff);
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_sound_reset_r )
+uint16_t harddriv_state::hd68k_sound_reset_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_jsa.found())
 		m_jsa->reset();
@@ -312,7 +312,7 @@ READ16_MEMBER( harddriv_state::hd68k_sound_reset_r )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
+void harddriv_state::hd68k_adc_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_adc_control);
 
@@ -335,7 +335,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adc_control_w )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
+void harddriv_state::hd68k_wr0_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 3 selects the value; data is ignored */
 	data = (offset >> 3) & 1;
@@ -360,7 +360,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr0_write )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_wr1_write )
+void harddriv_state::hd68k_wr1_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0) { //   logerror("Shifter Interface Latch = %02X\n", data);
 	} else {                logerror("/WR1(%04X)=%02X\n", offset, data);
@@ -368,7 +368,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr1_write )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_wr2_write )
+void harddriv_state::hd68k_wr2_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0) { //   logerror("Steering Wheel Latch = %02X\n", data);
 	} else {                logerror("/WR2(%04X)=%02X\n", offset, data);
@@ -376,7 +376,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_wr2_write )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
+void harddriv_state::hd68k_nwr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 3 selects the value; data is ignored */
 	data = (offset >> 3) & 1;
@@ -413,7 +413,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_nwr_w )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdc68k_wheel_edge_reset_w )
+void harddriv_state::hdc68k_wheel_edge_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* reset the edge latch */
 	m_hdc68k_wheel_edge = 0;
@@ -427,7 +427,7 @@ WRITE16_MEMBER( harddriv_state::hdc68k_wheel_edge_reset_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_zram_r )
+uint16_t harddriv_state::hd68k_zram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -441,7 +441,7 @@ READ16_MEMBER( harddriv_state::hd68k_zram_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_zram_w )
+void harddriv_state::hd68k_zram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_m68k_zp1 == 0 && m_m68k_zp2 == 1)
 	{
@@ -474,7 +474,7 @@ WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
+void harddriv_state::hdgsp_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* detect an enabling of the shift register and force yielding */
 	if (offset == REG_DPYCTL)
@@ -505,7 +505,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_io_w )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hdgsp_protection_w )
+void harddriv_state::hdgsp_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this memory address is incremented whenever a protection check fails */
 	/* after it reaches a certain value, the GSP will randomly trash a */
@@ -525,14 +525,14 @@ WRITE16_MEMBER( harddriv_state::hdgsp_protection_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_adsp_program_r )
+uint16_t harddriv_state::hd68k_adsp_program_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t word = m_adsp_pgm_memory[offset/2];
 	return (!(offset & 1)) ? (word >> 16) : (word & 0xffff);
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_adsp_program_w )
+void harddriv_state::hd68k_adsp_program_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t *base = &m_adsp_pgm_memory[offset/2];
 	uint32_t oldword = *base;
@@ -561,13 +561,13 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_program_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_adsp_data_r )
+uint16_t harddriv_state::hd68k_adsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_adsp_data_memory[offset];
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_adsp_data_w )
+void harddriv_state::hd68k_adsp_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_adsp_data_memory[offset]);
 
@@ -590,14 +590,14 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_data_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_adsp_buffer_r )
+uint16_t harddriv_state::hd68k_adsp_buffer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*  logerror("hd68k_adsp_buffer_r(%04X)\n", offset);*/
 	return m_som_memory[m_m68k_adsp_buffer_bank * 0x2000 + offset];
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_adsp_buffer_w )
+void harddriv_state::hd68k_adsp_buffer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_som_memory[m_m68k_adsp_buffer_bank * 0x2000 + offset]);
 }
@@ -661,7 +661,7 @@ TIMER_CALLBACK_MEMBER(harddriv_state::deferred_adsp_bank_switch)
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_adsp_control_w )
+void harddriv_state::hd68k_adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 3 selects the value; data is ignored */
 	int val = (offset >> 3) & 1;
@@ -727,7 +727,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_control_w )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_adsp_irq_clear_w )
+void harddriv_state::hd68k_adsp_irq_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06X:68k clears ADSP interrupt\n", space.device().safe_pcbase());
 	m_adsp_irq_state = 0;
@@ -735,7 +735,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_adsp_irq_clear_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_adsp_irq_state_r )
+uint16_t harddriv_state::hd68k_adsp_irq_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0xfffd;
 	if (m_adsp_xflag) result ^= 2;
@@ -752,7 +752,7 @@ READ16_MEMBER( harddriv_state::hd68k_adsp_irq_state_r )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdadsp_special_r )
+uint16_t harddriv_state::hdadsp_special_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -779,7 +779,7 @@ READ16_MEMBER( harddriv_state::hdadsp_special_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdadsp_special_w )
+void harddriv_state::hdadsp_special_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -848,7 +848,7 @@ void harddriv_state::update_ds3_sirq()
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
+void harddriv_state::hd68k_ds3_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int val = (offset >> 3) & 1;
 
@@ -933,7 +933,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_control_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_ds3_girq_state_r )
+uint16_t harddriv_state::hd68k_ds3_girq_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0x0fff;
 	if (m_ds3_g68flag) result ^= 0x8000;
@@ -944,7 +944,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_girq_state_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_ds3_gdata_r )
+uint16_t harddriv_state::hd68k_ds3_gdata_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offs_t pc = space.device().safe_pc();
 
@@ -991,7 +991,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_gdata_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_ds3_gdata_w )
+void harddriv_state::hd68k_ds3_gdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06X:hd68k_ds3_gdata_w(%04X)\n", space.device().safe_pcbase(), m_ds3_gdata);
 
@@ -1010,7 +1010,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_gdata_w )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hd68k_ds3_sirq_clear_w )
+void harddriv_state::hd68k_ds3_sirq_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06X:68k clears ADSP interrupt\n", space.device().safe_pcbase());
 	m_sound_int_state = 0;
@@ -1018,7 +1018,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_sirq_clear_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_ds3_sirq_state_r )
+uint16_t harddriv_state::hd68k_ds3_sirq_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0x0fff;
 	if (m_ds3_s68flag) result ^= 0x8000;
@@ -1029,7 +1029,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_sirq_state_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_ds3_sdata_r )
+uint16_t harddriv_state::hd68k_ds3_sdata_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_ds3_sflag = 0;
 	update_ds3_sirq();
@@ -1044,7 +1044,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_sdata_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_ds3_sdata_w )
+void harddriv_state::hd68k_ds3_sdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ds3_s68data);
 	m_ds3_s68flag = 1;
@@ -1055,7 +1055,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_sdata_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hdds3_sdsp_special_r )
+uint16_t harddriv_state::hdds3_sdsp_special_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result;
 
@@ -1093,7 +1093,7 @@ READ16_MEMBER( harddriv_state::hdds3_sdsp_special_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdds3_sdsp_special_w )
+void harddriv_state::hdds3_sdsp_special_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Note: DS IV is slightly different */
 	switch (offset & 7)
@@ -1139,7 +1139,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_special_w )
 	}
 }
 
-READ16_MEMBER( harddriv_state::hdds3_sdsp_control_r )
+uint16_t harddriv_state::hdds3_sdsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1149,7 +1149,7 @@ READ16_MEMBER( harddriv_state::hdds3_sdsp_control_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
+void harddriv_state::hdds3_sdsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1202,7 +1202,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_sdsp_control_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hdds3_xdsp_control_r )
+uint16_t harddriv_state::hdds3_xdsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1215,7 +1215,7 @@ READ16_MEMBER( harddriv_state::hdds3_xdsp_control_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdds3_xdsp_control_w )
+void harddriv_state::hdds3_xdsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1305,7 +1305,7 @@ TIMER_CALLBACK_MEMBER(harddriv_state::xsdp_sport1_irq_off_callback)
 }
 
 
-WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
+void harddriv_state::hdds3sdsp_serial_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
@@ -1317,7 +1317,7 @@ WRITE32_MEMBER(harddriv_state::hdds3sdsp_serial_tx_callback)
 }
 
 
-READ32_MEMBER(harddriv_state::hdds3sdsp_serial_rx_callback)
+uint32_t harddriv_state::hdds3sdsp_serial_rx_callback(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if ((m_ds3sdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return 0xff;
@@ -1326,7 +1326,7 @@ READ32_MEMBER(harddriv_state::hdds3sdsp_serial_rx_callback)
 }
 
 
-WRITE32_MEMBER(harddriv_state::hdds3xdsp_serial_tx_callback)
+void harddriv_state::hdds3xdsp_serial_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((m_ds3xdsp_regs[0x1f] & 0xc00) != 0xc00)
 		return;
@@ -1335,7 +1335,7 @@ WRITE32_MEMBER(harddriv_state::hdds3xdsp_serial_tx_callback)
 }
 
 
-READ32_MEMBER(harddriv_state::hdds3xdsp_serial_rx_callback)
+uint32_t harddriv_state::hdds3xdsp_serial_rx_callback(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, ASSERT_LINE);
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
@@ -1351,7 +1351,7 @@ READ32_MEMBER(harddriv_state::hdds3xdsp_serial_rx_callback)
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdds3_special_r )
+uint16_t harddriv_state::hdds3_special_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result;
 
@@ -1380,7 +1380,7 @@ READ16_MEMBER( harddriv_state::hdds3_special_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdds3_special_w )
+void harddriv_state::hdds3_special_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* IMPORTANT! these data values also write through to the underlying RAM */
 	m_adsp_data_memory[offset] = data;
@@ -1424,14 +1424,14 @@ WRITE16_MEMBER( harddriv_state::hdds3_special_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hdds3_control_r )
+uint16_t harddriv_state::hdds3_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("adsp2101 control r @ %04X\n", 0x3fe0 + offset);
 	return 0;
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdds3_control_w )
+void harddriv_state::hdds3_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset != 0x1e && offset != 0x1f)
 		logerror("adsp2101 control w @ %04X = %04X\n", 0x3fe0 + offset, data);
@@ -1445,7 +1445,7 @@ WRITE16_MEMBER( harddriv_state::hdds3_control_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_ds3_program_r )
+uint16_t harddriv_state::hd68k_ds3_program_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t *base = &m_adsp_pgm_memory[offset & 0x1fff];
 	uint32_t word = *base;
@@ -1453,7 +1453,7 @@ READ16_MEMBER( harddriv_state::hd68k_ds3_program_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_ds3_program_w )
+void harddriv_state::hd68k_ds3_program_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t *base = &m_adsp_pgm_memory[offset & 0x1fff];
 	uint32_t oldword = *base;
@@ -1487,7 +1487,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_ds3_program_w )
  *
  *************************************/
 
-WRITE32_MEMBER(harddriv_state::hddsk_update_pif)
+void harddriv_state::hddsk_update_pif(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sound_int_state = ((data & DSP32_OUTPUT_PIF) != 0);
 	update_interrupts();
@@ -1501,7 +1501,7 @@ WRITE32_MEMBER(harddriv_state::hddsk_update_pif)
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hd68k_dsk_control_w )
+void harddriv_state::hd68k_dsk_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int val = (offset >> 3) & 1;
 	switch (offset & 7)
@@ -1541,25 +1541,25 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_control_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hd68k_dsk_ram_r )
+uint16_t harddriv_state::hd68k_dsk_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsk_ram[offset];
 }
 
 
-WRITE16_MEMBER( harddriv_state::hd68k_dsk_ram_w )
+void harddriv_state::hd68k_dsk_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsk_ram[offset]);
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_dsk_small_rom_r )
+uint16_t harddriv_state::hd68k_dsk_small_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsk_rom[offset & 0x1ffff];
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_dsk_rom_r )
+uint16_t harddriv_state::hd68k_dsk_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsk_rom[offset];
 }
@@ -1572,7 +1572,7 @@ READ16_MEMBER( harddriv_state::hd68k_dsk_rom_r )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hd68k_dsk_dsp32_w )
+void harddriv_state::hd68k_dsk_dsp32_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsk_pio_access = true;
 	if (m_dsp32.found()) m_dsp32->pio_w(offset, data);
@@ -1580,7 +1580,7 @@ WRITE16_MEMBER( harddriv_state::hd68k_dsk_dsp32_w )
 }
 
 
-READ16_MEMBER( harddriv_state::hd68k_dsk_dsp32_r )
+uint16_t harddriv_state::hd68k_dsk_dsp32_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result;
 	m_dsk_pio_access = true;
@@ -1604,7 +1604,7 @@ TIMER_CALLBACK_MEMBER(harddriv_state::rddsp32_sync_cb)
 }
 
 
-WRITE32_MEMBER( harddriv_state::rddsp32_sync0_w )
+void harddriv_state::rddsp32_sync0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_dsk_pio_access)
 	{
@@ -1620,7 +1620,7 @@ WRITE32_MEMBER( harddriv_state::rddsp32_sync0_w )
 }
 
 
-WRITE32_MEMBER( harddriv_state::rddsp32_sync1_w )
+void harddriv_state::rddsp32_sync1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_dsk_pio_access)
 	{
@@ -1648,7 +1648,7 @@ WRITE32_MEMBER( harddriv_state::rddsp32_sync1_w )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::hddspcom_control_w )
+void harddriv_state::hddspcom_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int val = (offset >> 3) & 1;
 	switch (offset & 7)
@@ -1676,13 +1676,13 @@ WRITE16_MEMBER( harddriv_state::hddspcom_control_w )
  *
  *************************************/
 
-WRITE16_MEMBER( harddriv_state::rd68k_slapstic_w )
+void harddriv_state::rd68k_slapstic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slapstic_device->slapstic_tweak(space, offset & 0x3fff);
 }
 
 
-READ16_MEMBER( harddriv_state::rd68k_slapstic_r )
+uint16_t harddriv_state::rd68k_slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int bank = m_slapstic_device->slapstic_tweak(space, offset & 0x3fff) * 0x4000;
 	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
@@ -1723,20 +1723,20 @@ int harddriv_state::st68k_sloop_tweak(offs_t offset)
 }
 
 
-WRITE16_MEMBER( harddriv_state::st68k_sloop_w )
+void harddriv_state::st68k_sloop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	st68k_sloop_tweak(offset & 0x3fff);
 }
 
 
-READ16_MEMBER( harddriv_state::st68k_sloop_r )
+uint16_t harddriv_state::st68k_sloop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int bank = st68k_sloop_tweak(offset) * 0x4000;
 	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
 }
 
 
-READ16_MEMBER( harddriv_state::st68k_sloop_alt_r )
+uint16_t harddriv_state::st68k_sloop_alt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_st68k_last_alt_sloop_offset == 0x00fe)
 	{
@@ -1788,13 +1788,13 @@ int harddriv_state::st68k_protosloop_tweak(offs_t offset)
 }
 
 
-WRITE16_MEMBER( harddriv_state::st68k_protosloop_w )
+void harddriv_state::st68k_protosloop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	st68k_protosloop_tweak(offset & 0x3fff);
 }
 
 
-READ16_MEMBER( harddriv_state::st68k_protosloop_r )
+uint16_t harddriv_state::st68k_protosloop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int bank = st68k_protosloop_tweak(offset) * 0x4000;
 	return m_m68k_slapstic_base[bank + (offset & 0x3fff)];
@@ -1816,7 +1816,7 @@ READ16_MEMBER( harddriv_state::st68k_protosloop_r )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdgsp_speedup_r )
+uint16_t harddriv_state::hdgsp_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = m_gsp_speedup_addr[0][offset];
 
@@ -1833,7 +1833,7 @@ READ16_MEMBER( harddriv_state::hdgsp_speedup_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_speedup1_w )
+void harddriv_state::hdgsp_speedup1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gsp_speedup_addr[0][offset]);
 
@@ -1843,7 +1843,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_speedup1_w )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdgsp_speedup2_w )
+void harddriv_state::hdgsp_speedup2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gsp_speedup_addr[1][offset]);
 
@@ -1862,7 +1862,7 @@ WRITE16_MEMBER( harddriv_state::hdgsp_speedup2_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::rdgsp_speedup1_r )
+uint16_t harddriv_state::rdgsp_speedup1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = m_gsp_speedup_addr[0][offset];
 
@@ -1878,7 +1878,7 @@ READ16_MEMBER( harddriv_state::rdgsp_speedup1_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::rdgsp_speedup1_w )
+void harddriv_state::rdgsp_speedup1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gsp_speedup_addr[0][offset]);
 	if (&space.device() != m_gsp)
@@ -1898,7 +1898,7 @@ WRITE16_MEMBER( harddriv_state::rdgsp_speedup1_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdmsp_speedup_r )
+uint16_t harddriv_state::hdmsp_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = m_msp_speedup_addr[offset];
 
@@ -1912,7 +1912,7 @@ READ16_MEMBER( harddriv_state::hdmsp_speedup_r )
 }
 
 
-WRITE16_MEMBER( harddriv_state::hdmsp_speedup_w )
+void harddriv_state::hdmsp_speedup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_msp_speedup_addr[offset]);
 	if (offset == 0 && m_msp_speedup_addr[offset] != 0)
@@ -1931,7 +1931,7 @@ WRITE16_MEMBER( harddriv_state::hdmsp_speedup_w )
  *
  *************************************/
 
-READ16_MEMBER( harddriv_state::hdadsp_speedup_r )
+uint16_t harddriv_state::hdadsp_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = m_adsp_data_memory[0x1fff];
 
@@ -1945,7 +1945,7 @@ READ16_MEMBER( harddriv_state::hdadsp_speedup_r )
 }
 
 
-READ16_MEMBER( harddriv_state::hdds3_speedup_r )
+uint16_t harddriv_state::hdds3_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data = *m_ds3_speedup_addr;
 

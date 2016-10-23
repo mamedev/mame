@@ -80,18 +80,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(kb_row_r);
-	DECLARE_WRITE8_MEMBER(kb_col_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
+	uint8_t kb_row_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
+	uint8_t unknown_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return machine().rand(); }
 
 private:
 	uint8_t m_kb_col;
 };
 
 
-READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
+uint8_t midcoin24cdjuke_state::kb_row_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -107,12 +107,12 @@ READ8_MEMBER(midcoin24cdjuke_state::kb_row_r)
 	return data;
 }
 
-WRITE8_MEMBER(midcoin24cdjuke_state::kb_col_w)
+void midcoin24cdjuke_state::kb_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_col = data & 0xf0;
 }
 
-WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
+void midcoin24cdjuke_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 

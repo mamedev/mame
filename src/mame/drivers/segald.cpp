@@ -50,16 +50,16 @@ public:
 	uint8_t m_ldv1000_input_latch;
 	uint8_t m_ldv1000_output_latch;
 
-	DECLARE_READ8_MEMBER(astron_DISC_read);
-	DECLARE_READ8_MEMBER(astron_OUT_read);
-	DECLARE_READ8_MEMBER(astron_OBJ_read);
-	DECLARE_READ8_MEMBER(astron_COLOR_read);
-	DECLARE_WRITE8_MEMBER(astron_DISC_write);
-	DECLARE_WRITE8_MEMBER(astron_OUT_write);
-	DECLARE_WRITE8_MEMBER(astron_OBJ_write);
-	DECLARE_WRITE8_MEMBER(astron_COLOR_write);
-	DECLARE_WRITE8_MEMBER(astron_FIX_write);
-	DECLARE_WRITE8_MEMBER(astron_io_bankswitch_w);
+	uint8_t astron_DISC_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t astron_OUT_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t astron_OBJ_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t astron_COLOR_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void astron_DISC_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astron_OUT_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astron_OBJ_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astron_COLOR_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astron_FIX_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astron_io_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_astron();
 	virtual void machine_start() override;
 	uint32_t screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -128,7 +128,7 @@ uint32_t segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_MEMBER(segald_state::astron_DISC_read)
+uint8_t segald_state::astron_DISC_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_nmi_enable)
 		m_ldv1000_input_latch = m_laserdisc->status_r();
@@ -138,19 +138,19 @@ READ8_MEMBER(segald_state::astron_DISC_read)
 	return m_ldv1000_input_latch;
 }
 
-READ8_MEMBER(segald_state::astron_OUT_read)
+uint8_t segald_state::astron_OUT_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_ram[offset], offset, space.device().safe_pc());
 	return m_out_ram[offset];
 }
 
-READ8_MEMBER(segald_state::astron_OBJ_read)
+uint8_t segald_state::astron_OBJ_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_ram[offset], offset, space.device().safe_pc());
 	return m_obj_ram[offset];
 }
 
-READ8_MEMBER(segald_state::astron_COLOR_read)
+uint8_t segald_state::astron_COLOR_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_ram[offset], offset, space.device().safe_pc());
 	return m_color_ram[offset];
@@ -158,7 +158,7 @@ READ8_MEMBER(segald_state::astron_COLOR_read)
 
 
 /* WRITES */
-WRITE8_MEMBER(segald_state::astron_DISC_write)
+void segald_state::astron_DISC_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 
@@ -168,7 +168,7 @@ WRITE8_MEMBER(segald_state::astron_DISC_write)
 		m_laserdisc->data_w(m_ldv1000_output_latch);
 }
 
-WRITE8_MEMBER(segald_state::astron_OUT_write)
+void segald_state::astron_OUT_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 
@@ -204,13 +204,13 @@ WRITE8_MEMBER(segald_state::astron_OUT_write)
 	m_out_ram[offset] = data;
 }
 
-WRITE8_MEMBER(segald_state::astron_OBJ_write)
+void segald_state::astron_OBJ_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_obj_ram[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(segald_state::astron_COLOR_write)
+void segald_state::astron_COLOR_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t r, g, b, a;
 	uint8_t highBits, lowBits;
@@ -233,13 +233,13 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(segald_state::astron_FIX_write)
+void segald_state::astron_FIX_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fix_ram[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc()); */
 }
 
-WRITE8_MEMBER(segald_state::astron_io_bankswitch_w)
+void segald_state::astron_io_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Banking 0x%x\n", data);
 	membank("bank1")->set_entry(data & 0xff);

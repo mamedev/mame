@@ -45,7 +45,7 @@ TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
 
 /* ----------------------------------------------------------------------- */
 
-READ8_MEMBER( latch8_device::read )
+uint8_t latch8_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -71,7 +71,7 @@ READ8_MEMBER( latch8_device::read )
 }
 
 
-WRITE8_MEMBER( latch8_device::write )
+void latch8_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset == 0);
 
@@ -82,7 +82,7 @@ WRITE8_MEMBER( latch8_device::write )
 }
 
 
-WRITE8_MEMBER( latch8_device::reset_w )
+void latch8_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset == 0);
 
@@ -99,23 +99,23 @@ uint8_t latch8_device::bitx_r( offs_t offset, int bit)
 	return (m_value >> bit) & 0x01;
 }
 
-READ8_MEMBER( latch8_device::bit0_r) { return bitx_r(offset, 0); }
-READ8_MEMBER( latch8_device::bit1_r) { return bitx_r(offset, 1); }
-READ8_MEMBER( latch8_device::bit2_r) { return bitx_r(offset, 2); }
-READ8_MEMBER( latch8_device::bit3_r) { return bitx_r(offset, 3); }
-READ8_MEMBER( latch8_device::bit4_r) { return bitx_r(offset, 4); }
-READ8_MEMBER( latch8_device::bit5_r) { return bitx_r(offset, 5); }
-READ8_MEMBER( latch8_device::bit6_r) { return bitx_r(offset, 6); }
-READ8_MEMBER( latch8_device::bit7_r) { return bitx_r(offset, 7); }
+uint8_t latch8_device::bit0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 0); }
+uint8_t latch8_device::bit1_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 1); }
+uint8_t latch8_device::bit2_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 2); }
+uint8_t latch8_device::bit3_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 3); }
+uint8_t latch8_device::bit4_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 4); }
+uint8_t latch8_device::bit5_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 5); }
+uint8_t latch8_device::bit6_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 6); }
+uint8_t latch8_device::bit7_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 7); }
 
-READ8_MEMBER( latch8_device::bit0_q_r) { return bitx_r(offset, 0) ^ 1; }
-READ8_MEMBER( latch8_device::bit1_q_r) { return bitx_r(offset, 1) ^ 1; }
-READ8_MEMBER( latch8_device::bit2_q_r) { return bitx_r(offset, 2) ^ 1; }
-READ8_MEMBER( latch8_device::bit3_q_r) { return bitx_r(offset, 3) ^ 1; }
-READ8_MEMBER( latch8_device::bit4_q_r) { return bitx_r(offset, 4) ^ 1; }
-READ8_MEMBER( latch8_device::bit5_q_r) { return bitx_r(offset, 5) ^ 1; }
-READ8_MEMBER( latch8_device::bit6_q_r) { return bitx_r(offset, 6) ^ 1; }
-READ8_MEMBER( latch8_device::bit7_q_r) { return bitx_r(offset, 7) ^ 1; }
+uint8_t latch8_device::bit0_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 0) ^ 1; }
+uint8_t latch8_device::bit1_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 1) ^ 1; }
+uint8_t latch8_device::bit2_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 2) ^ 1; }
+uint8_t latch8_device::bit3_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 3) ^ 1; }
+uint8_t latch8_device::bit4_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 4) ^ 1; }
+uint8_t latch8_device::bit5_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 5) ^ 1; }
+uint8_t latch8_device::bit6_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 6) ^ 1; }
+uint8_t latch8_device::bit7_q_r(address_space &space, offs_t offset, uint8_t mem_mask) { return bitx_r(offset, 7) ^ 1; }
 
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
@@ -134,14 +134,14 @@ void latch8_device::bitx_w(int bit, offs_t offset, uint8_t data)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(latch8_device::timerproc),this), (mask << 8) | masked_data);
 }
 
-WRITE8_MEMBER( latch8_device::bit0_w ) { bitx_w(0, offset, data); }
-WRITE8_MEMBER( latch8_device::bit1_w ) { bitx_w(1, offset, data); }
-WRITE8_MEMBER( latch8_device::bit2_w ) { bitx_w(2, offset, data); }
-WRITE8_MEMBER( latch8_device::bit3_w ) { bitx_w(3, offset, data); }
-WRITE8_MEMBER( latch8_device::bit4_w ) { bitx_w(4, offset, data); }
-WRITE8_MEMBER( latch8_device::bit5_w ) { bitx_w(5, offset, data); }
-WRITE8_MEMBER( latch8_device::bit6_w ) { bitx_w(6, offset, data); }
-WRITE8_MEMBER( latch8_device::bit7_w ) { bitx_w(7, offset, data); }
+void latch8_device::bit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(0, offset, data); }
+void latch8_device::bit1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(1, offset, data); }
+void latch8_device::bit2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(2, offset, data); }
+void latch8_device::bit3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(3, offset, data); }
+void latch8_device::bit4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(4, offset, data); }
+void latch8_device::bit5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(5, offset, data); }
+void latch8_device::bit6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(6, offset, data); }
+void latch8_device::bit7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { bitx_w(7, offset, data); }
 
 const device_type LATCH8 = &device_creator<latch8_device>;
 

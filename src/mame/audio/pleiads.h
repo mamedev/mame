@@ -48,9 +48,9 @@ public:
 	pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~pleiads_sound_device() {}
 
-	DECLARE_WRITE8_MEMBER( control_a_w );
-	DECLARE_WRITE8_MEMBER( control_b_w );
-	DECLARE_WRITE8_MEMBER( control_c_w );
+	void control_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -28,10 +28,10 @@ public:
 	virtual void set_mapping(uint8_t type) override;
 	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
 
-	DECLARE_WRITE8_MEMBER(motor_w);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

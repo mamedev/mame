@@ -60,12 +60,12 @@ public:
 	/* devices */
 	required_device<okim6295_device> m_adpcm;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
-	DECLARE_WRITE16_MEMBER(kickgoal_eeprom_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_fgram_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_bgram_w);
-	DECLARE_WRITE16_MEMBER(kickgoal_bg2ram_w);
-	DECLARE_WRITE16_MEMBER(actionhw_snd_w);
+	uint16_t kickgoal_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kickgoal_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kickgoal_fgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kickgoal_bgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kickgoal_bg2ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void actionhw_snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_kickgoal();
 	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_kickgoal_bg_tile_info);

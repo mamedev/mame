@@ -23,18 +23,18 @@ public:
 
 	uint8_t m_avalance_video_inverted;
 
-	DECLARE_WRITE8_MEMBER(avalance_video_invert_w);
-	DECLARE_WRITE8_MEMBER(catch_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(avalance_credit_1_lamp_w);
-	DECLARE_WRITE8_MEMBER(avalance_credit_2_lamp_w);
-	DECLARE_WRITE8_MEMBER(avalance_start_lamp_w);
+	void avalance_video_invert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void catch_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avalance_credit_1_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avalance_credit_2_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avalance_start_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(avalnche_noise_amplitude_w);
-	DECLARE_WRITE8_MEMBER(avalnche_attract_enable_w);
-	DECLARE_WRITE8_MEMBER(avalnche_audio_w);
-	DECLARE_WRITE8_MEMBER(catch_audio_w);
+	void avalnche_noise_amplitude_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avalnche_attract_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avalnche_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void catch_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 };
 

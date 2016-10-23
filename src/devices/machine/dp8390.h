@@ -45,8 +45,8 @@ public:
 	template<class _Object> static devcb_base &set_mem_read_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_mem_write_callback(device_t &device, _Object object) { return downcast<dp8390_device &>(device).m_mem_write_cb.set_callback(object); }
 
-	DECLARE_WRITE16_MEMBER( dp8390_w );
-	DECLARE_READ16_MEMBER( dp8390_r );
+	void dp8390_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dp8390_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
 	void recv_cb(uint8_t *buf, int len) override;

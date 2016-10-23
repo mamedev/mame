@@ -41,9 +41,9 @@ public:
 	{ }
 
 	required_device<v9938_device> m_v9938;
-	DECLARE_WRITE8_MEMBER(tonton_outport_w);
-	DECLARE_WRITE8_MEMBER(ay_aout_w);
-	DECLARE_WRITE8_MEMBER(ay_bout_w);
+	void tonton_outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -62,7 +62,7 @@ public:
 *          Multi-Purpose Output Port             *
 *************************************************/
 
-WRITE8_MEMBER(tonton_state::tonton_outport_w)
+void tonton_state::tonton_outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 	machine().bookkeeping().coin_lockout_global_w(data & 0x02);  /* Coin Lock */
@@ -195,12 +195,12 @@ void tonton_state::machine_reset()
 *      R/W Handlers and Interrupt Routines       *
 *************************************************/
 
-WRITE8_MEMBER(tonton_state::ay_aout_w)
+void tonton_state::ay_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("AY8910: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(tonton_state::ay_bout_w)
+void tonton_state::ay_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("AY8910: Port B out: %02X\n", data);
 }

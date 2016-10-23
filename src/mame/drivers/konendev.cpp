@@ -61,16 +61,16 @@ public:
 	void init_konendev();
 	void init_enchlamp();
 
-	DECLARE_READ32_MEMBER(mcu2_r);
-	DECLARE_READ32_MEMBER(ifu2_r);
-	DECLARE_READ32_MEMBER(ctrl0_r);
-	DECLARE_READ32_MEMBER(ctrl1_r);
-	DECLARE_READ32_MEMBER(ctrl2_r);
-	DECLARE_READ32_MEMBER(rtc_r);
-	DECLARE_WRITE32_MEMBER(rtc_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_READ32_MEMBER(sound_data_r);
-	DECLARE_WRITE32_MEMBER(sound_data_w);
+	uint32_t mcu2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ifu2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ctrl0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ctrl1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t ctrl2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t rtc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
 	INTERRUPT_GEN_MEMBER(vbl_interrupt);
@@ -85,7 +85,7 @@ uint32_t konendev_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return m_gcu->draw(screen, bitmap, cliprect);
 }
 
-READ32_MEMBER(konendev_state::mcu2_r)
+uint32_t konendev_state::mcu2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -116,7 +116,7 @@ READ32_MEMBER(konendev_state::mcu2_r)
 	return r;
 }
 
-READ32_MEMBER(konendev_state::ifu2_r)
+uint32_t konendev_state::ifu2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -151,7 +151,7 @@ uint8_t konendev_state::rtc_dev_r(uint32_t reg)
 	return 0;
 }
 
-READ32_MEMBER(konendev_state::rtc_r)
+uint32_t konendev_state::rtc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -167,16 +167,16 @@ READ32_MEMBER(konendev_state::rtc_r)
 	return r;
 }
 
-WRITE32_MEMBER(konendev_state::rtc_w)
+void konendev_state::rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(konendev_state::ctrl0_r)
+uint32_t konendev_state::ctrl0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return ((uint32_t)(ioport("IN1")->read() & 0xffff) << 16) | 0xffff;
 }
 
-READ32_MEMBER(konendev_state::ctrl1_r)
+uint32_t konendev_state::ctrl1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// 0x01000000 = main door optic
 	// 0x00000010 = hard meter access
@@ -184,12 +184,12 @@ READ32_MEMBER(konendev_state::ctrl1_r)
 	return 0xfeffffef;
 }
 
-READ32_MEMBER(konendev_state::ctrl2_r)
+uint32_t konendev_state::ctrl2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return ((uint32_t)(ioport("IN0")->read() & 0xffff) << 16) | 0xffff;
 }
 
-WRITE32_MEMBER(konendev_state::eeprom_w)
+void konendev_state::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -199,12 +199,12 @@ WRITE32_MEMBER(konendev_state::eeprom_w)
 	}
 }
 
-READ32_MEMBER(konendev_state::sound_data_r)
+uint32_t konendev_state::sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(konendev_state::sound_data_w)
+void konendev_state::sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 

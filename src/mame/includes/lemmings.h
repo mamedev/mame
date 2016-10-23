@@ -51,13 +51,13 @@ public:
 	required_shared_ptr<uint16_t> m_pixel_0_data;
 	required_shared_ptr<uint16_t> m_pixel_1_data;
 
-	DECLARE_WRITE16_MEMBER(lemmings_control_w);
-	DECLARE_READ16_MEMBER(lemmings_trackball_r);
+	void lemmings_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lemmings_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void lemmings_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
-	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
-	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
-	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
+	void lemmings_sound_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lemmings_pixel_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lemmings_pixel_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lemmings_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -65,6 +65,6 @@ public:
 	void screen_eof_lemmings(screen_device &screen, bool state);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 
-	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );
+	uint16_t lem_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lem_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };

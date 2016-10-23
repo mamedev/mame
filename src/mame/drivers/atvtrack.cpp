@@ -103,16 +103,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu") { }
 
-	DECLARE_READ64_MEMBER(control_r);
-	DECLARE_WRITE64_MEMBER(control_w);
-	DECLARE_READ64_MEMBER(area2_r);
-	DECLARE_WRITE64_MEMBER(area2_w);
-	DECLARE_READ64_MEMBER(area3_r);
-	DECLARE_WRITE64_MEMBER(area3_w);
-	DECLARE_READ64_MEMBER(area4_r);
-	DECLARE_WRITE64_MEMBER(area4_w);
-	DECLARE_READ64_MEMBER(ioport_r);
-	DECLARE_WRITE64_MEMBER(ioport_w);
+	uint64_t control_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void control_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t area2_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void area2_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t area3_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void area3_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t area4_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void area4_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t ioport_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void ioport_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -171,7 +171,7 @@ inline uint32_t atvtrack_state::decode64_32(offs_t offset64, uint64_t data, uint
 	return 0;
 }
 
-READ64_MEMBER(atvtrack_state::control_r)
+uint64_t atvtrack_state::control_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint32_t addr;
 
@@ -184,7 +184,7 @@ READ64_MEMBER(atvtrack_state::control_r)
 	return -1;
 }
 
-WRITE64_MEMBER(atvtrack_state::control_w)
+void atvtrack_state::control_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t addr, dat; //, old;
 
@@ -203,7 +203,7 @@ WRITE64_MEMBER(atvtrack_state::control_w)
 	logerror("\n");
 }
 
-READ64_MEMBER(atvtrack_state::area2_r)
+uint64_t atvtrack_state::area2_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint32_t addr, dat;
 	int c;
@@ -227,7 +227,7 @@ READ64_MEMBER(atvtrack_state::area2_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::area2_w)
+void atvtrack_state::area2_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  uint32_t addr, dat;
 
@@ -239,7 +239,7 @@ WRITE64_MEMBER(atvtrack_state::area2_w)
 //      ;
 }
 
-READ64_MEMBER(atvtrack_state::area3_r)
+uint64_t atvtrack_state::area3_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  uint32_t addr, dat;
 
@@ -252,7 +252,7 @@ READ64_MEMBER(atvtrack_state::area3_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::area3_w)
+void atvtrack_state::area3_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t addr; //, dat;
 	int c;
@@ -286,7 +286,7 @@ WRITE64_MEMBER(atvtrack_state::area3_w)
 	}
 }
 
-READ64_MEMBER(atvtrack_state::area4_r)
+uint64_t atvtrack_state::area4_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  uint32_t addr, dat;
 
@@ -299,7 +299,7 @@ READ64_MEMBER(atvtrack_state::area4_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::area4_w)
+void atvtrack_state::area4_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t addr; //, dat;
 	int c;
@@ -323,7 +323,7 @@ WRITE64_MEMBER(atvtrack_state::area4_w)
 	}
 }
 
-READ64_MEMBER(atvtrack_state::ioport_r)
+uint64_t atvtrack_state::ioport_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (offset == SH4_IOPORT_16/8) {
 		// much simplified way
@@ -339,7 +339,7 @@ READ64_MEMBER(atvtrack_state::ioport_r)
 	return 0;
 }
 
-WRITE64_MEMBER(atvtrack_state::ioport_w)
+void atvtrack_state::ioport_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 #ifdef SPECIALMODE
 	uint64_t d;

@@ -157,17 +157,17 @@ void k05324x_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER( k05324x_device::k053245_word_r )
+uint16_t k05324x_device::k053245_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( k05324x_device::k053245_word_w )
+void k05324x_device::k053245_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_ram.get() + offset);
 }
 
-READ8_MEMBER( k05324x_device::k053245_r )
+uint8_t k05324x_device::k053245_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset & 1)
 		return m_ram[offset >> 1] & 0xff;
@@ -176,7 +176,7 @@ READ8_MEMBER( k05324x_device::k053245_r )
 }
 
 
-WRITE8_MEMBER( k05324x_device::k053245_w )
+void k05324x_device::k053245_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 1)
 		m_ram[offset >> 1] = (m_ram[offset >> 1] & 0xff00) | data;
@@ -197,7 +197,7 @@ void k05324x_device::update_buffer()
 	memcpy(m_buffer.get(), m_ram.get(), m_ramsize);
 }
 
-READ8_MEMBER( k05324x_device::k053244_r )
+uint8_t k05324x_device::k053244_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_regs[5] & 0x10) && offset >= 0x0c && offset < 0x10)
 	{
@@ -224,7 +224,7 @@ READ8_MEMBER( k05324x_device::k053244_r )
 	}
 }
 
-WRITE8_MEMBER( k05324x_device::k053244_w )
+void k05324x_device::k053244_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 
@@ -245,23 +245,23 @@ WRITE8_MEMBER( k05324x_device::k053244_w )
 }
 
 
-READ16_MEMBER( k05324x_device::k053244_lsb_r )
+uint16_t k05324x_device::k053244_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return k053244_r(space, offset);
 }
 
-WRITE16_MEMBER( k05324x_device::k053244_lsb_w )
+void k05324x_device::k053244_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		k053244_w(space, offset, data & 0xff);
 }
 
-READ16_MEMBER( k05324x_device::k053244_word_r )
+uint16_t k05324x_device::k053244_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (k053244_r(space, offset * 2) << 8) | k053244_r(space, offset * 2 + 1);
 }
 
-WRITE16_MEMBER( k05324x_device::k053244_word_w )
+void k05324x_device::k053244_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		k053244_w(space, offset * 2, (data >> 8) & 0xff);

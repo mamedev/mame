@@ -31,15 +31,15 @@ public:
 	uint8_t m_gfxbank;
 	uint8_t m_scrollx;
 
-	DECLARE_READ8_MEMBER(sensors1_r);
-	DECLARE_READ8_MEMBER(sensors2_r);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(vram_fg_w);
-	DECLARE_WRITE8_MEMBER(vram_bg_w);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
+	uint8_t sensors1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sensors2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);

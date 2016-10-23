@@ -94,12 +94,12 @@ void thief_state::tape_set_motor( int bOn )
 
 /***********************************************************/
 
-WRITE8_MEMBER(thief_state::thief_input_select_w)
+void thief_state::thief_input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data;
 }
 
-WRITE8_MEMBER(thief_state::tape_control_w)
+void thief_state::tape_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( data )
 	{
@@ -138,7 +138,7 @@ WRITE8_MEMBER(thief_state::tape_control_w)
 	}
 }
 
-READ8_MEMBER(thief_state::thief_io_r)
+uint8_t thief_state::thief_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_input_select )
 	{

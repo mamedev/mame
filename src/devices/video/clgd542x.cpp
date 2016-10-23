@@ -924,7 +924,7 @@ void cirrus_gd5428_device::cirrus_gc_reg_write(uint8_t index, uint8_t data)
 	}
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
+uint8_t cirrus_gd5428_device::port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -972,7 +972,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03c0_r)
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
+void cirrus_gd5428_device::port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1016,7 +1016,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03c0_w)
 	cirrus_define_video_mode();
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
+uint8_t cirrus_gd5428_device::port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -1036,7 +1036,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03b0_r)
 	return res;
 }
 
-READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
+uint8_t cirrus_gd5428_device::port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -1056,7 +1056,7 @@ READ8_MEMBER(cirrus_gd5428_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03b0_w)
+void cirrus_gd5428_device::port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -1074,7 +1074,7 @@ WRITE8_MEMBER(cirrus_gd5428_device::port_03b0_w)
 	cirrus_define_video_mode();
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::port_03d0_w)
+void cirrus_gd5428_device::port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -1195,7 +1195,7 @@ inline uint8_t cirrus_gd5428_device::cirrus_vga_latch_write(int offs, uint8_t da
 	return res;
 }
 
-READ8_MEMBER(cirrus_gd5428_device::mem_r)
+uint8_t cirrus_gd5428_device::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t addr;
 	uint8_t bank;
@@ -1326,7 +1326,7 @@ READ8_MEMBER(cirrus_gd5428_device::mem_r)
 	}
 }
 
-WRITE8_MEMBER(cirrus_gd5428_device::mem_w)
+void cirrus_gd5428_device::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t addr;
 	uint8_t bank;

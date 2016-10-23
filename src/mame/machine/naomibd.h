@@ -20,18 +20,18 @@ public:
 	// Can be patched in the underlying class
 	virtual DECLARE_ADDRESS_MAP(submap, 16);
 
-	DECLARE_WRITE16_MEMBER(rom_offseth_w);          // 5f7000
-	DECLARE_WRITE16_MEMBER(rom_offsetl_w);          // 5f7004
-	DECLARE_READ16_MEMBER( rom_data_r);             // 5f7008
-	DECLARE_WRITE16_MEMBER(rom_data_w);             // 5f7008
-	DECLARE_WRITE16_MEMBER(dma_offseth_w);          // 5f700c
-	DECLARE_WRITE16_MEMBER(dma_offsetl_w);          // 5f7010
-	DECLARE_WRITE16_MEMBER(dma_count_w);            // 5f7014
+	void rom_offseth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);          // 5f7000
+	void rom_offsetl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);          // 5f7004
+	uint16_t rom_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);             // 5f7008
+	void rom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);             // 5f7008
+	void dma_offseth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);          // 5f700c
+	void dma_offsetl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);          // 5f7010
+	void dma_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);            // 5f7014
 
-	DECLARE_WRITE16_MEMBER(boardid_w);              // 5f7078
-	DECLARE_READ16_MEMBER( boardid_r);              // 5f707c
+	void boardid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);              // 5f7078
+	uint16_t boardid_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);              // 5f707c
 
-	DECLARE_READ16_MEMBER( default_r);
+	uint16_t default_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

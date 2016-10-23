@@ -60,9 +60,9 @@ public:
 
 	/* misc */
 	int      m_ay_data;
-	DECLARE_WRITE8_MEMBER(dynadice_videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void dynadice_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_dynadice();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
@@ -74,19 +74,19 @@ public:
 };
 
 
-WRITE8_MEMBER(dynadice_state::dynadice_videoram_w)
+void dynadice_state::dynadice_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_top_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(dynadice_state::sound_data_w)
+void dynadice_state::sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay_data = data;
 }
 
-WRITE8_MEMBER(dynadice_state::sound_control_w)
+void dynadice_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 /*

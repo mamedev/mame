@@ -219,9 +219,9 @@ public:
 
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	virtual void video_start() override;
@@ -236,13 +236,13 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER(gluck2_state::videoram_w)
+void gluck2_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gluck2_state::colorram_w)
+void gluck2_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -320,7 +320,7 @@ PALETTE_INIT_MEMBER(gluck2_state, gluck2)
 *                R/W Handlers                 *
 **********************************************/
 
-WRITE8_MEMBER(gluck2_state::counters_w)
+void gluck2_state::counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210

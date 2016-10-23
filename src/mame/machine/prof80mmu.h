@@ -39,7 +39,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 
-	DECLARE_WRITE8_MEMBER( par_w );
+	void par_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( mme_w );
 
 protected:
@@ -49,8 +49,8 @@ protected:
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 
-	DECLARE_READ8_MEMBER( program_r );
-	DECLARE_WRITE8_MEMBER( program_w );
+	uint8_t program_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	const address_space_config m_program_space_config;

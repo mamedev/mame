@@ -247,17 +247,17 @@ protected:
 	virtual void machine_reset() override;
 public:
 
-	DECLARE_READ8_MEMBER(vsync_r);
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(kbd_matrix_r);
-	DECLARE_WRITE8_MEMBER(kbd_matrix_w);
-	DECLARE_READ8_MEMBER(kbd_port2_r);
-	DECLARE_WRITE8_MEMBER(kbd_port2_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_stat_r);
-	DECLARE_WRITE8_MEMBER(fdc_cmd_w);
+	uint8_t vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
@@ -274,7 +274,7 @@ private:
 	floppy_connector *m_con1, *m_con2, *m_con3;
 };
 
-READ8_MEMBER(itt3030_state::vsync_r)
+uint8_t itt3030_state::vsync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -291,12 +291,12 @@ READ8_MEMBER(itt3030_state::vsync_r)
 	return ret;
 }
 
-WRITE8_MEMBER( itt3030_state::beep_w )
+void itt3030_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beep->set_state(data&1);
 }
 
-WRITE8_MEMBER(itt3030_state::bank_w)
+void itt3030_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = 8;
 
@@ -355,7 +355,7 @@ WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
     1 Write protect (the disk in the selected drive is write protected)
     0 HLT (Halt signal during head load and track change)
 */
-READ8_MEMBER(itt3030_state::fdc_stat_r)
+uint8_t itt3030_state::fdc_stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0;
 	floppy_image_device *floppy1 = m_con1 ? m_con1->get_device() : nullptr;
@@ -374,12 +374,12 @@ READ8_MEMBER(itt3030_state::fdc_stat_r)
 }
 
 /* As far as we can tell, the mess of ttl de-inverts the bus */
-READ8_MEMBER(itt3030_state::fdc_r)
+uint8_t itt3030_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER(itt3030_state::fdc_w)
+void itt3030_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->gen_w(offset, data ^ 0xff);
 }
@@ -394,7 +394,7 @@ WRITE8_MEMBER(itt3030_state::fdc_w)
     1 KOMP - write comp on/off
     0 RG J - Change separator stage to read
 */
-WRITE8_MEMBER(itt3030_state::fdc_cmd_w)
+void itt3030_state::fdc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -457,12 +457,12 @@ static ADDRESS_MAP_START( itt3030_io, AS_IO, 8, itt3030_state )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(itt3030_state::kbd_matrix_r)
+uint8_t itt3030_state::kbd_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_kbdread;
 }
 
-WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
+void itt3030_state::kbd_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
 	int tmp_read;
@@ -479,12 +479,12 @@ WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 }
 
 // bit 2 is UPI-41 host IRQ to Z80
-WRITE8_MEMBER(itt3030_state::kbd_port2_w)
+void itt3030_state::kbd_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdport2 = data;
 }
 
-READ8_MEMBER(itt3030_state::kbd_port2_r)
+uint8_t itt3030_state::kbd_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_kbdport2;
 }

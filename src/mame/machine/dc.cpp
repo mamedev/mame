@@ -100,7 +100,7 @@ TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE8_MEMBER(dc_state::g1_irq)
+void dc_state::g1_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data) {
 	case naomi_g1_device::DMA_GDROM_IRQ:
@@ -110,7 +110,7 @@ WRITE8_MEMBER(dc_state::g1_irq)
 	dc_update_interrupt_status();
 }
 
-WRITE8_MEMBER(dc_state::pvr_irq)
+void dc_state::pvr_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data) {
 	case powervr2_device::EOXFER_YUV_IRQ:
@@ -364,7 +364,7 @@ void dc_state::dc_update_interrupt_status()
 	}
 }
 
-READ64_MEMBER(dc_state::dc_sysctrl_r )
+uint64_t dc_state::dc_sysctrl_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -381,7 +381,7 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	return (uint64_t)dc_sysctrl_regs[reg] << shift;
 }
 
-WRITE64_MEMBER(dc_state::dc_sysctrl_w )
+void dc_state::dc_sysctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -477,7 +477,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 	#endif
 }
 
-READ64_MEMBER(dc_state::dc_gdrom_r )
+uint64_t dc_state::dc_gdrom_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint32_t off;
 
@@ -498,7 +498,7 @@ READ64_MEMBER(dc_state::dc_gdrom_r )
 	return 0;
 }
 
-WRITE64_MEMBER(dc_state::dc_gdrom_w )
+void dc_state::dc_gdrom_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t dat,off;
 
@@ -516,7 +516,7 @@ WRITE64_MEMBER(dc_state::dc_gdrom_w )
 	osd_printf_verbose("%s",string_format("GDROM: [%08x=%x]write %I64x to %x, mask %I64x\n", 0x5f7000+off*4, dat, data, offset, mem_mask).c_str());
 }
 
-READ64_MEMBER(dc_state::dc_g2_ctrl_r )
+uint64_t dc_state::dc_g2_ctrl_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -526,7 +526,7 @@ READ64_MEMBER(dc_state::dc_g2_ctrl_r )
 	return (uint64_t)g2bus_regs[reg] << shift;
 }
 
-WRITE64_MEMBER(dc_state::dc_g2_ctrl_w )
+void dc_state::dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -606,7 +606,7 @@ int dc_state::decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 	return reg;
 }
 
-READ64_MEMBER(dc_state::dc_modem_r )
+uint64_t dc_state::dc_modem_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -624,7 +624,7 @@ READ64_MEMBER(dc_state::dc_modem_r )
 	return 0;
 }
 
-WRITE64_MEMBER(dc_state::dc_modem_w )
+void dc_state::dc_modem_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg;
 	uint64_t shift;
@@ -672,7 +672,7 @@ void dc_state::machine_reset()
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;
 }
 
-READ32_MEMBER(dc_state::dc_aica_reg_r)
+uint32_t dc_state::dc_aica_reg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  osd_printf_verbose("%s",string_format("AICA REG: [%08x] read %I64x, mask %I64x\n", 0x700000+reg*4, (uint64_t)offset, mem_mask).c_str());
 
@@ -682,7 +682,7 @@ READ32_MEMBER(dc_state::dc_aica_reg_r)
 	return m_aica->read(space, offset*2, 0xffff);
 }
 
-WRITE32_MEMBER(dc_state::dc_aica_reg_w)
+void dc_state::dc_aica_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == (0x2c00/4))
 	{
@@ -708,12 +708,12 @@ WRITE32_MEMBER(dc_state::dc_aica_reg_w)
 //  osd_printf_verbose("%s",string_format("AICA REG: [%08x=%x] write %x to %x, mask %I64x\n", 0x700000+reg*4, data, offset, mem_mask).c_str());
 }
 
-READ32_MEMBER(dc_state::dc_arm_aica_r)
+uint32_t dc_state::dc_arm_aica_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_aica->read(space, offset*2, 0xffff) & 0xffff;
 }
 
-WRITE32_MEMBER(dc_state::dc_arm_aica_w)
+void dc_state::dc_arm_aica_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_aica->write(space, offset*2, data, mem_mask&0xffff);
 }

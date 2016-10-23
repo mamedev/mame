@@ -30,16 +30,16 @@
 static const uint8_t laser_fdc_wrprot[2] = {0x80, 0x80};
 
 /* wrappers for bank #1 to #4 */
-WRITE8_MEMBER(vtech2_state::mwa_bank1 ) { mwa_bank(0,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank2 ) { mwa_bank(1,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank3 ) { mwa_bank(2,offset,data); }
-WRITE8_MEMBER(vtech2_state::mwa_bank4 ) { mwa_bank(3,offset,data); }
+void vtech2_state::mwa_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mwa_bank(0,offset,data); }
+void vtech2_state::mwa_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mwa_bank(1,offset,data); }
+void vtech2_state::mwa_bank3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mwa_bank(2,offset,data); }
+void vtech2_state::mwa_bank4(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mwa_bank(3,offset,data); }
 
 /* wrappers for bank #1 to #4 */
-READ8_MEMBER(vtech2_state::mra_bank1 ) { return mra_bank(0,offset); }
-READ8_MEMBER(vtech2_state::mra_bank2 ) { return mra_bank(1,offset); }
-READ8_MEMBER(vtech2_state::mra_bank3 ) { return mra_bank(2,offset); }
-READ8_MEMBER(vtech2_state::mra_bank4 ) { return mra_bank(3,offset); }
+uint8_t vtech2_state::mra_bank1(address_space &space, offs_t offset, uint8_t mem_mask) { return mra_bank(0,offset); }
+uint8_t vtech2_state::mra_bank2(address_space &space, offs_t offset, uint8_t mem_mask) { return mra_bank(1,offset); }
+uint8_t vtech2_state::mra_bank3(address_space &space, offs_t offset, uint8_t mem_mask) { return mra_bank(2,offset); }
+uint8_t vtech2_state::mra_bank4(address_space &space, offs_t offset, uint8_t mem_mask) { return mra_bank(3,offset); }
 
 /* read banked memory (plain ROM/RAM) */
 static const char *const mra_bank_hard[4] =
@@ -114,7 +114,7 @@ void vtech2_state::machine_reset_laser700()
 }
 
 
-WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
+void vtech2_state::laser_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const bank_name[16] = {
 		"ROM lo","ROM hi","MM I/O","Video RAM lo",
@@ -352,7 +352,7 @@ void vtech2_state::laser_put_track()
 #define PHI2(n) (((n)>>2)&1)
 #define PHI3(n) (((n)>>3)&1)
 
-READ8_MEMBER(vtech2_state::laser_fdc_r)
+uint8_t vtech2_state::laser_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	switch( offset )
@@ -396,7 +396,7 @@ READ8_MEMBER(vtech2_state::laser_fdc_r)
 	return data;
 }
 
-WRITE8_MEMBER(vtech2_state::laser_fdc_w)
+void vtech2_state::laser_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int drive;
 

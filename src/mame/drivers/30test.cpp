@@ -60,14 +60,14 @@ public:
 
 	uint8_t m_mux_data;
 	uint8_t m_oki_bank;
-	DECLARE_WRITE8_MEMBER(namco_30test_led_w);
-	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
-	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
-	DECLARE_READ8_MEMBER(namco_30test_mux_r);
-	DECLARE_READ8_MEMBER(hc11_mux_r);
-	DECLARE_WRITE8_MEMBER(hc11_mux_w);
-	DECLARE_READ8_MEMBER(hc11_okibank_r);
-	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
+	void namco_30test_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void namco_30test_led_rank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void namco_30test_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namco_30test_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hc11_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hc11_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hc11_okibank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hc11_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -78,26 +78,26 @@ public:
 static const uint8_t led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
+void namco_30test_state::namco_30test_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
 	output().set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
-WRITE8_MEMBER(namco_30test_state::namco_30test_led_rank_w)
+void namco_30test_state::namco_30test_led_rank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
 	output().set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
-WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
+void namco_30test_state::namco_30test_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
 		output().set_lamp_value(i, data >> i & 1);
 }
 
-READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
+uint8_t namco_30test_state::namco_30test_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -112,22 +112,22 @@ READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
 	return res;
 }
 
-READ8_MEMBER(namco_30test_state::hc11_mux_r)
+uint8_t namco_30test_state::hc11_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_data;
 }
 
-WRITE8_MEMBER(namco_30test_state::hc11_mux_w)
+void namco_30test_state::hc11_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;
 }
 
-READ8_MEMBER(namco_30test_state::hc11_okibank_r)
+uint8_t namco_30test_state::hc11_okibank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_oki_bank;
 }
 
-WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
+void namco_30test_state::hc11_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki_bank = data;
 	m_oki->set_rom_bank(data & 1);

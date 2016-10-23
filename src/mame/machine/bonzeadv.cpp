@@ -368,17 +368,17 @@ void asuka_state::WriteRestartPos(int level )
  *
  *************************************/
 
-WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_w)
+void asuka_state::bonzeadv_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER(asuka_state::bonzeadv_cchip_bank_w)
+void asuka_state::bonzeadv_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ram_w)
+void asuka_state::bonzeadv_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if (space.device().safe_pc()!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", space.device().safe_pc(), offset, data);
@@ -424,7 +424,7 @@ WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ram_w)
  *
  *************************************/
 
-READ16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_r)
+uint16_t asuka_state::bonzeadv_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    Bit 2 = Error signal
@@ -433,7 +433,7 @@ READ16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_r)
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER(asuka_state::bonzeadv_cchip_ram_r)
+uint16_t asuka_state::bonzeadv_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("%08x:  read %04x cchip\n", space.device().safe_pc(), offset);
 

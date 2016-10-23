@@ -120,7 +120,7 @@ driver modified by Hau
 
 ***************************************************************************/
 
-READ16_MEMBER(metro_state::metro_irq_cause_r)
+uint16_t metro_state::metro_irq_cause_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* interrupt cause, used by
 
@@ -183,7 +183,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 }
 
 
-WRITE16_MEMBER(metro_state::metro_irq_cause_w)
+void metro_state::metro_irq_cause_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
 
@@ -241,7 +241,7 @@ INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 	update_irq_state();
 }
 
-WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
+void metro_state::mouja_irq_timer_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	double freq = 58.0 + (0xff - (data & 0xff)) / 2.2; /* 0xff=58Hz, 0x80=116Hz? */
 
@@ -275,7 +275,7 @@ READ_LINE_MEMBER(metro_state::metro_rxd_r)
 
 }
 
-WRITE16_MEMBER(metro_state::metro_soundlatch_w)
+void metro_state::metro_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -287,7 +287,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 }
 
 
-READ16_MEMBER(metro_state::metro_soundstatus_r)
+uint16_t metro_state::metro_soundstatus_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
@@ -297,14 +297,14 @@ CUSTOM_INPUT_MEMBER(metro_state::custom_soundstatus_r)
 	return (m_busy_sndcpu ? 0x01 : 0x00);
 }
 
-WRITE16_MEMBER(metro_state::metro_soundstatus_w)
+void metro_state::metro_soundstatus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundstatus = data & 0x01;
 }
 
 
-WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
+void metro_state::metro_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bankaddress;
 	uint8_t *ROM = memregion("audiocpu")->base();
@@ -315,7 +315,7 @@ WRITE8_MEMBER(metro_state::metro_sound_rombank_w)
 	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
-WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
+void metro_state::daitorid_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bankaddress;
 	uint8_t *ROM = memregion("audiocpu")->base();
@@ -327,17 +327,17 @@ WRITE8_MEMBER(metro_state::daitorid_sound_rombank_w)
 }
 
 
-READ8_MEMBER(metro_state::metro_porta_r)
+uint8_t metro_state::metro_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_porta;
 }
 
-WRITE8_MEMBER(metro_state::metro_porta_w)
+void metro_state::metro_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER(metro_state::metro_portb_w)
+void metro_state::metro_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -379,7 +379,7 @@ WRITE8_MEMBER(metro_state::metro_portb_w)
 }
 
 
-WRITE8_MEMBER(metro_state::daitorid_portb_w)
+void metro_state::daitorid_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port B layout:
 	   7 !clock latch for message to main CPU
@@ -445,7 +445,7 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 /* IT DOESN'T WORK PROPERLY */
 
-WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
+void metro_state::metro_coin_lockout_1word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -456,7 +456,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 }
 
 
-WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
+void metro_state::metro_coin_lockout_4words_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
@@ -481,7 +481,7 @@ WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
     that the blitter can readily use (which is a form of compression)
 */
 
-READ16_MEMBER(metro_state::metro_bankedrom_r)
+uint16_t metro_state::metro_bankedrom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t *ROM = memregion("gfx1")->base();
 	size_t len = memregion("gfx1")->bytes();
@@ -566,7 +566,7 @@ void metro_state::blt_write( address_space &space, const int tmap, const offs_t 
 }
 
 
-WRITE16_MEMBER(metro_state::metro_blitter_w)
+void metro_state::metro_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_regs[offset]);
 
@@ -737,7 +737,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* Really weird way of mapping 3 DSWs */
-READ16_MEMBER(metro_state::balcube_dsw_r)
+uint16_t metro_state::balcube_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t dsw1 = ioport("DSW0")->read() >> 0;
 	uint16_t dsw2 = ioport("DSW0")->read() >> 8;
@@ -1018,13 +1018,13 @@ ADDRESS_MAP_END
 
 #define KARATOUR_OFFS( _x_ ) ((_x_) & (0x3f)) + (((_x_) & ~(0x3f)) * (0x100 / 0x40))
 
-READ16_MEMBER(metro_state::karatour_vram_0_r){ return m_vram_0[KARATOUR_OFFS(offset)]; }
-READ16_MEMBER(metro_state::karatour_vram_1_r){ return m_vram_1[KARATOUR_OFFS(offset)]; }
-READ16_MEMBER(metro_state::karatour_vram_2_r){ return m_vram_2[KARATOUR_OFFS(offset)]; }
+uint16_t metro_state::karatour_vram_0_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vram_0[KARATOUR_OFFS(offset)]; }
+uint16_t metro_state::karatour_vram_1_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vram_1[KARATOUR_OFFS(offset)]; }
+uint16_t metro_state::karatour_vram_2_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vram_2[KARATOUR_OFFS(offset)]; }
 
-WRITE16_MEMBER(metro_state::karatour_vram_0_w){ metro_vram_0_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
-WRITE16_MEMBER(metro_state::karatour_vram_1_w){ metro_vram_1_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
-WRITE16_MEMBER(metro_state::karatour_vram_2_w){ metro_vram_2_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
+void metro_state::karatour_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_0_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
+void metro_state::karatour_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_1_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
+void metro_state::karatour_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_2_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
 
 static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
@@ -1174,7 +1174,7 @@ void metro_state::gakusai_oki_bank_set()
 	m_oki->set_rom_bank(bank);
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
+void metro_state::gakusai_oki_bank_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1183,7 +1183,7 @@ WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 	}
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
+void metro_state::gakusai_oki_bank_lo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1193,7 +1193,7 @@ WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 }
 
 
-READ16_MEMBER(metro_state::gakusai_input_r)
+uint16_t metro_state::gakusai_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t input_sel = (*m_input_sel) ^ 0x3e;
 	// Bit 0 ??
@@ -1205,12 +1205,12 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(metro_state::gakusai_eeprom_r)
+uint16_t metro_state::gakusai_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
+void metro_state::gakusai_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1302,7 +1302,7 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ16_MEMBER(metro_state::dokyusp_eeprom_r)
+uint16_t metro_state::dokyusp_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(CLEAR_LINE);
@@ -1311,7 +1311,7 @@ READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
+void metro_state::dokyusp_eeprom_bit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1324,7 +1324,7 @@ WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 	}
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
+void metro_state::dokyusp_eeprom_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1588,13 +1588,13 @@ ADDRESS_MAP_END
                             Blazing Tornado
 ***************************************************************************/
 
-WRITE16_MEMBER(metro_state::blzntrnd_sound_w)
+void metro_state::blzntrnd_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data >> 8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
+void metro_state::blzntrnd_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("audiocpu")->base();
 	int bankaddress;
@@ -1654,7 +1654,7 @@ ADDRESS_MAP_END
                                     Mouja
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
+void metro_state::mouja_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank")->set_entry((data >> 3) & 0x07);
 }
@@ -1784,14 +1784,14 @@ WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
 }
 
 
-WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
+void metro_state::puzzlet_irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		*m_irq_enable = data ^ 0xffff;
 }
 
 /* FIXME: algorithm not yet understood. */
-WRITE16_MEMBER(metro_state::vram_0_clr_w)
+void metro_state::vram_0_clr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int i;
 
@@ -1800,7 +1800,7 @@ WRITE16_MEMBER(metro_state::vram_0_clr_w)
 		m_vram_0[(offset*0x10+i)/2] = 0xffff;
 }
 
-WRITE16_MEMBER(metro_state::vram_1_clr_w)
+void metro_state::vram_1_clr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int i;
 
@@ -1809,7 +1809,7 @@ WRITE16_MEMBER(metro_state::vram_1_clr_w)
 		m_vram_1[(offset*0x10+i)/2] = 0xffff;
 }
 
-WRITE16_MEMBER(metro_state::vram_2_clr_w)
+void metro_state::vram_2_clr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static int i;
 
@@ -1859,7 +1859,7 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(metro_state::puzzlet_portb_w)
+void metro_state::puzzlet_portb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("PORTB %02x", data);
 }
@@ -1874,7 +1874,7 @@ ADDRESS_MAP_END
                                 Varia Metal
 ***************************************************************************/
 
-WRITE8_MEMBER(metro_state::vmetal_control_w)
+void metro_state::vmetal_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
@@ -1897,7 +1897,7 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER(metro_state::vmetal_es8712_w)
+void metro_state::vmetal_es8712_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Many samples in the ADPCM ROM are actually not used.
 

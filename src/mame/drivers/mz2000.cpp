@@ -91,35 +91,35 @@ public:
 
 	uint8_t m_porta_latch;
 	uint8_t m_tape_ctrl;
-	DECLARE_READ8_MEMBER(mz2000_ipl_r);
-	DECLARE_READ8_MEMBER(mz2000_wram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_wram_w);
-	DECLARE_READ8_MEMBER(mz2000_tvram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_tvram_w);
-	DECLARE_READ8_MEMBER(mz2000_gvram_r);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_w);
-	DECLARE_READ8_MEMBER(mz2000_mem_r);
-	DECLARE_WRITE8_MEMBER(mz2000_mem_w);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_bank_w);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
-	DECLARE_WRITE8_MEMBER(floppy_side_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_WRITE8_MEMBER(mz2000_tvram_attr_w);
-	DECLARE_WRITE8_MEMBER(mz2000_gvram_mask_w);
+	uint8_t mz2000_ipl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2000_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_tvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2000_tvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_gvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2000_gvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2000_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_gvram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void floppy_side_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_tvram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_gvram_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(mz2000_porta_r);
-	DECLARE_READ8_MEMBER(mz2000_portb_r);
-	DECLARE_READ8_MEMBER(mz2000_portc_r);
-	DECLARE_WRITE8_MEMBER(mz2000_porta_w);
-	DECLARE_WRITE8_MEMBER(mz2000_portb_w);
-	DECLARE_WRITE8_MEMBER(mz2000_portc_w);
-	DECLARE_WRITE8_MEMBER(mz2000_pio1_porta_w);
-	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
-	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz2000_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz2000_pio1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_pio1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz2000_pio1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -240,43 +240,43 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_ipl_r)
+uint8_t mz2000_state::mz2000_ipl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_region_ipl->base()[offset];
 }
 
-READ8_MEMBER(mz2000_state::mz2000_wram_r)
+uint8_t mz2000_state::mz2000_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_region_wram->base()[offset];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_wram_w)
+void mz2000_state::mz2000_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_wram->base()[offset] = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_tvram_r)
+uint8_t mz2000_state::mz2000_tvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_region_tvram->base()[offset];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_tvram_w)
+void mz2000_state::mz2000_tvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_tvram->base()[offset] = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_gvram_r)
+uint8_t mz2000_state::mz2000_gvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_region_gvram->base()[offset+m_gvram_bank*0x4000];
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
+void mz2000_state::mz2000_gvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_region_gvram->base()[offset+m_gvram_bank*0x4000] = data;
 }
 
 
-READ8_MEMBER(mz2000_state::mz2000_mem_r)
+uint8_t mz2000_state::mz2000_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t page_mem;
 
@@ -304,7 +304,7 @@ READ8_MEMBER(mz2000_state::mz2000_mem_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
+void mz2000_state::mz2000_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t page_mem;
 
@@ -328,12 +328,12 @@ WRITE8_MEMBER(mz2000_state::mz2000_mem_w)
 	}
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
+void mz2000_state::mz2000_gvram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gvram_bank = data & 3;
 }
 
-READ8_MEMBER(mz2000_state::fdc_r)
+uint8_t mz2000_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_has_fdc)
 		return m_mb8877a->read(space, offset) ^ 0xff;
@@ -341,13 +341,13 @@ READ8_MEMBER(mz2000_state::fdc_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::fdc_w)
+void mz2000_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_has_fdc)
 		m_mb8877a->write(space, offset, data ^ 0xff);
 }
 
-WRITE8_MEMBER(mz2000_state::floppy_select_w)
+void mz2000_state::floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data & 0x03)
 	{
@@ -365,13 +365,13 @@ WRITE8_MEMBER(mz2000_state::floppy_select_w)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER(mz2000_state::floppy_side_w)
+void mz2000_state::floppy_side_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
 }
 
-WRITE8_MEMBER(mz2000_state::timer_w)
+void mz2000_state::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit8253->write_gate0(1);
 	m_pit8253->write_gate1(1);
@@ -381,12 +381,12 @@ WRITE8_MEMBER(mz2000_state::timer_w)
 	m_pit8253->write_gate1(1);
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
+void mz2000_state::mz2000_tvram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tvram_attr = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_gvram_mask_w)
+void mz2000_state::mz2000_gvram_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gvram_mask = data;
 }
@@ -682,13 +682,13 @@ static GFXDECODE_START( mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(mz2000_state::mz2000_porta_r)
+uint8_t mz2000_state::mz2000_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("A R\n");
 	return 0xff;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_portb_r)
+uint8_t mz2000_state::mz2000_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- break key
@@ -714,13 +714,13 @@ READ8_MEMBER(mz2000_state::mz2000_portb_r)
 	return res;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_portc_r)
+uint8_t mz2000_state::mz2000_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("C R\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_porta_w)
+void mz2000_state::mz2000_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	These are enabled thru a 0->1 transition
@@ -779,14 +779,14 @@ WRITE8_MEMBER(mz2000_state::mz2000_porta_w)
 	m_tape_ctrl = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_portb_w)
+void mz2000_state::mz2000_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("B W %02x\n",data);
 
 	// ...
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
+void mz2000_state::mz2000_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    x--- ---- tape data write
@@ -814,7 +814,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	m_old_portc = data;
 }
 
-WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
+void mz2000_state::mz2000_pio1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tvram_enable = ((data & 0xc0) == 0xc0);
 	m_gvram_enable = ((data & 0xc0) == 0x80);
@@ -824,7 +824,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 	m_porta_latch = data;
 }
 
-READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
+uint8_t mz2000_state::mz2000_pio1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -840,7 +840,7 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
-READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
+uint8_t mz2000_state::mz2000_pio1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_porta_latch;
 }

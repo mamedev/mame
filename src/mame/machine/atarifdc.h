@@ -15,8 +15,8 @@ class atari_fdc_device : public device_t
 public:
 	atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( serin_r );
-	DECLARE_WRITE8_MEMBER( serout_w );
+	uint8_t serin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 	void atari_load_proc(device_image_interface &image, bool is_created);
 

@@ -385,7 +385,7 @@ static DISCRETE_SOUND_START(bzone)
 
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(bzone_state::bzone_sounds_w)
+void bzone_state::bzone_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, BZ_INPUT, data);
 

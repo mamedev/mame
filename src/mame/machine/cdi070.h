@@ -153,8 +153,8 @@ public:
 
 	void mcu_frame();
 
-	DECLARE_READ16_MEMBER(periphs_r);
-	DECLARE_WRITE16_MEMBER(periphs_w);
+	uint16_t periphs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void periphs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TIMER_CALLBACK_MEMBER( timer0_callback );
 	TIMER_CALLBACK_MEMBER( rx_callback );

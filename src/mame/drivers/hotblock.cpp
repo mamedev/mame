@@ -65,11 +65,11 @@ public:
 	/* memory */
 	uint8_t    m_pal[0x10000];
 
-	DECLARE_READ8_MEMBER(video_read);
-	DECLARE_READ8_MEMBER(port4_r);
-	DECLARE_WRITE8_MEMBER(port4_w);
-	DECLARE_WRITE8_MEMBER(port0_w);
-	DECLARE_WRITE8_MEMBER(video_write);
+	uint8_t video_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 
@@ -78,7 +78,7 @@ public:
 
 
 
-READ8_MEMBER(hotblock_state::video_read)
+uint8_t hotblock_state::video_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* right?, anything else?? */
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
@@ -92,14 +92,14 @@ READ8_MEMBER(hotblock_state::video_read)
 }
 
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
-READ8_MEMBER(hotblock_state::port4_r)
+uint8_t hotblock_state::port4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  osd_printf_debug("port4_r\n");
 	return 0x00;
 }
 
 
-WRITE8_MEMBER(hotblock_state::port4_w)
+void hotblock_state::port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  osd_printf_debug("port4_w: pc = %06x : data %04x\n", space.device().safe_pc(), data);
 //  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
@@ -109,14 +109,14 @@ WRITE8_MEMBER(hotblock_state::port4_w)
 
 
 
-WRITE8_MEMBER(hotblock_state::port0_w)
+void hotblock_state::port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
 
 	m_port0 = data;
 }
 
-WRITE8_MEMBER(hotblock_state::video_write)
+void hotblock_state::video_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* right?, anything else?? */
 	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette

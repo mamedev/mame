@@ -315,15 +315,15 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(rom8_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_upper_w);
-	DECLARE_WRITE16_MEMBER(rom8_64_w);
-	DECLARE_WRITE16_MEMBER(lightgun_w);
-	DECLARE_READ16_MEMBER(lightgun_r);
-	DECLARE_READ16_MEMBER(c76_shared_r);
-	DECLARE_WRITE16_MEMBER(c76_shared_w);
-	DECLARE_READ16_MEMBER(c76_speedup_r);
-	DECLARE_WRITE16_MEMBER(c76_speedup_w);
+	void rom8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rom8_64_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rom8_64_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lightgun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t c76_shared_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c76_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c76_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c76_speedup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
@@ -356,19 +356,19 @@ inline void ATTR_PRINTF(3,4) namcos11_state::verboselog( int n_level, const char
 	}
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_w)
+void namcos11_state::rom8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bank[ offset ]->set_entry( ( ( data & 0xc0 ) >> 4 ) + ( data & 0x03 ) );
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_64_upper_w)
+void namcos11_state::rom8_64_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(2, "rom8_64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	m_n_bankoffset = offset * 16;
 }
 
-WRITE16_MEMBER(namcos11_state::rom8_64_w)
+void namcos11_state::rom8_64_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(2, "rom8_64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
@@ -376,7 +376,7 @@ WRITE16_MEMBER(namcos11_state::rom8_64_w)
 	m_bank[ offset ]->set_entry( ( ( ( ( data & 0xc0 ) >> 3 ) + ( data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
-WRITE16_MEMBER(namcos11_state::lightgun_w)
+void namcos11_state::lightgun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -395,7 +395,7 @@ WRITE16_MEMBER(namcos11_state::lightgun_w)
 	}
 }
 
-READ16_MEMBER(namcos11_state::lightgun_r)
+uint16_t namcos11_state::lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -429,12 +429,12 @@ READ16_MEMBER(namcos11_state::lightgun_r)
 	return data;
 }
 
-READ16_MEMBER( namcos11_state::c76_shared_r )
+uint16_t namcos11_state::c76_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sharedram.target()[ offset ];
 }
 
-WRITE16_MEMBER( namcos11_state::c76_shared_w )
+void namcos11_state::c76_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_sharedram.target()[ offset ] );
 }
@@ -509,7 +509,7 @@ ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )
 	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
-READ16_MEMBER(namcos11_state::c76_speedup_r)
+uint16_t namcos11_state::c76_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
@@ -519,7 +519,7 @@ READ16_MEMBER(namcos11_state::c76_speedup_r)
 	return m_su_83;
 }
 
-WRITE16_MEMBER(namcos11_state::c76_speedup_w)
+void namcos11_state::c76_speedup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_su_83);
 }

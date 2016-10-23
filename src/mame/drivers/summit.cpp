@@ -34,7 +34,7 @@ public:
 
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
-	DECLARE_WRITE8_MEMBER(out_w);
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(summit);
 	uint32_t screen_update_summit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -69,7 +69,7 @@ uint32_t summit_state::screen_update_summit(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(summit_state::out_w)
+void summit_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

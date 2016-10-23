@@ -225,12 +225,12 @@ void nubus_image_device::device_reset()
 {
 }
 
-WRITE32_MEMBER( nubus_image_device::image_status_w )
+void nubus_image_device::image_status_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_image->m_ejected = true;
 }
 
-READ32_MEMBER( nubus_image_device::image_status_r )
+uint32_t nubus_image_device::image_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_image->m_ejected) {
 		return 0;
@@ -242,16 +242,16 @@ READ32_MEMBER( nubus_image_device::image_status_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_w )
+void nubus_image_device::image_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER( nubus_image_device::image_r )
+uint32_t nubus_image_device::image_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_image->m_size;
 }
 
-WRITE32_MEMBER( nubus_image_device::image_super_w )
+void nubus_image_device::image_super_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
@@ -260,14 +260,14 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 	COMBINE_DATA(&image[offset]);
 }
 
-READ32_MEMBER( nubus_image_device::image_super_r )
+uint32_t nubus_image_device::image_super_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	uint32_t data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
 
-WRITE32_MEMBER( nubus_image_device::file_cmd_w )
+void nubus_image_device::file_cmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const osd::directory::entry *dp;
 	char fullpath[1024];
@@ -321,12 +321,12 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_cmd_r )
+uint32_t nubus_image_device::file_cmd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_data_w )
+void nubus_image_device::file_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	std::uint32_t count = 4;
 	std::uint32_t actualcount = 0;
@@ -344,7 +344,7 @@ WRITE32_MEMBER( nubus_image_device::file_data_w )
 	}
 }
 
-READ32_MEMBER( nubus_image_device::file_data_r )
+uint32_t nubus_image_device::file_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(filectx.fd) {
 		std::uint32_t ret;
@@ -359,23 +359,23 @@ READ32_MEMBER( nubus_image_device::file_data_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_len_w )
+void nubus_image_device::file_len_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.filelen = ni_ntohl(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_len_r )
+uint32_t nubus_image_device::file_len_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return filectx.filelen;
 }
 
-WRITE32_MEMBER( nubus_image_device::file_name_w )
+void nubus_image_device::file_name_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	((uint32_t*)(filectx.filename))[offset] = ni_ntohl(data);
 }
 
-READ32_MEMBER( nubus_image_device::file_name_r )
+uint32_t nubus_image_device::file_name_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret;
 	ret = ni_htonl(((uint32_t*)(filectx.filename))[offset]);

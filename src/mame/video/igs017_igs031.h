@@ -37,8 +37,8 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// the gfx roms were often hooked up with the bits backwards, allow us to handle it here to save doing it in every driver.
 	int m_revbits;
@@ -60,17 +60,17 @@ public:
 	int m_irq_enable;
 
 
-	DECLARE_WRITE8_MEMBER(palram_w);
-	DECLARE_READ8_MEMBER(i8255_r);
+	void palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(video_disable_w);
+	void video_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(fg_w);
-	DECLARE_WRITE8_MEMBER(bg_w);
+	void fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void space_w(int offset, uint8_t data);
 	uint8_t space_r(int offset);
@@ -80,8 +80,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int debug_viewer(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start();
 
 protected:

@@ -36,20 +36,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
 }
 
 
-WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
+void finalizr_state::finalizr_videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charbank = data & 3;
 	m_spriterambank = data & 8;
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(finalizr_state::finalizr_coin_w)
+void finalizr_state::finalizr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
+void finalizr_state::finalizr_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
@@ -57,12 +57,12 @@ WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 	flip_screen_set(~data & 0x08);
 }
 
-WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
+void finalizr_state::finalizr_i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
+void finalizr_state::i8039_irqen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  bit 0x80 goes active low, indicating that the
 	    external IRQ being serviced is complete
@@ -73,7 +73,7 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(finalizr_state::i8039_T1_r)
+uint8_t finalizr_state::i8039_T1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
 	    here (See the i8039_T0_w handler below).
@@ -90,7 +90,7 @@ READ8_MEMBER(finalizr_state::i8039_T1_r)
 	return (!(m_T1_line % 3) && (m_T1_line > 0));
 }
 
-WRITE8_MEMBER(finalizr_state::i8039_T0_w)
+void finalizr_state::i8039_T0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*  This becomes a clock output at a frequency of 3.072MHz (derived
 	    by internally dividing the main xtal clock input by a factor of 3).

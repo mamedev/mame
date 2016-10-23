@@ -100,7 +100,7 @@ enum
 //  bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::bus_r )
+uint8_t abc1600_state::bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -242,7 +242,7 @@ READ8_MEMBER( abc1600_state::bus_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_state::bus_w )
+void abc1600_state::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cs = (m_cs7 << 7) | ((offset >> 5) & 0x3f);
 
@@ -338,7 +338,7 @@ WRITE8_MEMBER( abc1600_state::bus_w )
 //  fw0_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_state::fw0_w )
+void abc1600_state::fw0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 //  fw1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_state::fw1_w )
+void abc1600_state::fw1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -406,7 +406,7 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 //  spec_contr_reg_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_state::spec_contr_reg_w )
+void abc1600_state::spec_contr_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int state = BIT(data, 3);
 
@@ -576,12 +576,12 @@ void abc1600_state::update_drdy2()
 //  Z80DART
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::dart_r )
+uint8_t abc1600_state::dart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dart->ba_cd_r(space, A2_A1 ^ 0x03);
 }
 
-WRITE8_MEMBER( abc1600_state::dart_w )
+void abc1600_state::dart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dart->ba_cd_w(space, A2_A1 ^ 0x03, data);
 }
@@ -590,12 +590,12 @@ WRITE8_MEMBER( abc1600_state::dart_w )
 //  SCC8530_INTERFACE( sc_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::scc_r )
+uint8_t abc1600_state::scc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scc->reg_r(space, A1_A2);
 }
 
-WRITE8_MEMBER( abc1600_state::scc_w )
+void abc1600_state::scc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scc->reg_w(space, A1_A2, data);
 }
@@ -605,17 +605,17 @@ WRITE8_MEMBER( abc1600_state::scc_w )
 //  Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_state::cio_r )
+uint8_t abc1600_state::cio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cio->read(space, A2_A1);
 }
 
-WRITE8_MEMBER( abc1600_state::cio_w )
+void abc1600_state::cio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cio->write(space, A2_A1, data);
 }
 
-READ8_MEMBER( abc1600_state::cio_pa_r )
+uint8_t abc1600_state::cio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -646,7 +646,7 @@ READ8_MEMBER( abc1600_state::cio_pa_r )
 	return data;
 }
 
-READ8_MEMBER( abc1600_state::cio_pb_r )
+uint8_t abc1600_state::cio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -674,7 +674,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc1600_state::cio_pb_w )
+void abc1600_state::cio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -698,7 +698,7 @@ WRITE8_MEMBER( abc1600_state::cio_pb_w )
 	m_dart->rxca_w(prbr);
 }
 
-READ8_MEMBER( abc1600_state::cio_pc_r )
+uint8_t abc1600_state::cio_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -719,7 +719,7 @@ READ8_MEMBER( abc1600_state::cio_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc1600_state::cio_pc_w )
+void abc1600_state::cio_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

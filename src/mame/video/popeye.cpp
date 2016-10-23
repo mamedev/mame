@@ -280,19 +280,19 @@ void popeye_state::set_background_palette(int bank)
 #endif
 }
 
-WRITE8_MEMBER(popeye_state::popeye_videoram_w)
+void popeye_state::popeye_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_colorram_w)
+void popeye_state::popeye_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
+void popeye_state::popeye_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx,sy,x,y,colour;
 
@@ -334,7 +334,7 @@ WRITE8_MEMBER(popeye_state::popeye_bitmap_w)
 	}
 }
 
-WRITE8_MEMBER(popeye_state::skyskipr_bitmap_w)
+void popeye_state::skyskipr_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = ((offset & 0xfc0) << 1) | (offset & 0x03f);
 	if (data & 0x80)

@@ -148,12 +148,12 @@ void i6300esb_lpc_device::reset_all_mappings()
 	rtc_conf = 0x00;
 }
 
-READ32_MEMBER (i6300esb_lpc_device::pmbase_r)
+uint32_t i6300esb_lpc_device::pmbase_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return pmbase | 1;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::pmbase_w)
+void i6300esb_lpc_device::pmbase_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&pmbase);
 	pmbase &= 0x0000ff80;
@@ -161,47 +161,47 @@ WRITE32_MEMBER(i6300esb_lpc_device::pmbase_w)
 	remap_cb();
 }
 
-READ8_MEMBER (i6300esb_lpc_device::acpi_cntl_r)
+uint8_t i6300esb_lpc_device::acpi_cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return acpi_cntl;
 }
 
-WRITE8_MEMBER(i6300esb_lpc_device::acpi_cntl_w)
+void i6300esb_lpc_device::acpi_cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	acpi_cntl = data;
 	logerror("%s: acpi_cntl = %08x\n", tag(), acpi_cntl);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::bios_cntl_r)
+uint16_t i6300esb_lpc_device::bios_cntl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return pmbase | 1;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::bios_cntl_w)
+void i6300esb_lpc_device::bios_cntl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&bios_cntl);
 	logerror("%s: bios_cntl = %08x\n", tag(), bios_cntl);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::tco_cntl_r)
+uint8_t i6300esb_lpc_device::tco_cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tco_cntl;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::tco_cntl_w)
+void i6300esb_lpc_device::tco_cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tco_cntl = data;
 	logerror("%s: tco_cntl = %02x\n", tag(), tco_cntl);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::gpio_base_r)
+uint32_t i6300esb_lpc_device::gpio_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gpio_base | 1;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::gpio_base_w)
+void i6300esb_lpc_device::gpio_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gpio_base);
 	gpio_base &= 0x0000ffc0;
@@ -209,405 +209,405 @@ WRITE32_MEMBER(i6300esb_lpc_device::gpio_base_w)
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::gpio_cntl_r)
+uint8_t i6300esb_lpc_device::gpio_cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gpio_cntl;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::gpio_cntl_w)
+void i6300esb_lpc_device::gpio_cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gpio_cntl = data;
 	logerror("%s: gpio_cntl = %02x\n", tag(), gpio_cntl);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::pirq_rout_r)
+uint8_t i6300esb_lpc_device::pirq_rout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pirq_rout[offset];
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::pirq_rout_w)
+void i6300esb_lpc_device::pirq_rout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pirq_rout[offset] = data;
 	logerror("%s: pirq_rout[%d] = %02x\n", tag(), offset, pirq_rout[offset]);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::serirq_cntl_r)
+uint8_t i6300esb_lpc_device::serirq_cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return serirq_cntl;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::serirq_cntl_w)
+void i6300esb_lpc_device::serirq_cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	serirq_cntl = data;
 	logerror("%s: serirq_cntl = %02x\n", tag(), serirq_cntl);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::pirq2_rout_r)
+uint8_t i6300esb_lpc_device::pirq2_rout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pirq_rout_r(space, offset+4);
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::pirq2_rout_w)
+void i6300esb_lpc_device::pirq2_rout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pirq_rout_w(space, offset+4, data);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::d31_err_cfg_r)
+uint8_t i6300esb_lpc_device::d31_err_cfg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return d31_err_cfg;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::d31_err_cfg_w)
+void i6300esb_lpc_device::d31_err_cfg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	d31_err_cfg = data;
 	logerror("%s: d31_err_cfg = %02x\n", tag(), d31_err_cfg);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::d31_err_sts_r)
+uint8_t i6300esb_lpc_device::d31_err_sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return d31_err_sts;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::d31_err_sts_w)
+void i6300esb_lpc_device::d31_err_sts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	d31_err_sts &= ~data;
 	logerror("%s: d31_err_sts = %02x\n", tag(), d31_err_sts);
 }
 
-READ16_MEMBER (i6300esb_lpc_device::pci_dma_cfg_r)
+uint16_t i6300esb_lpc_device::pci_dma_cfg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return pci_dma_cfg;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::pci_dma_cfg_w)
+void i6300esb_lpc_device::pci_dma_cfg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&pci_dma_cfg);
 	logerror("%s: pci_dma_cfg = %04x\n", tag(), pci_dma_cfg);
 }
 
-READ16_MEMBER (i6300esb_lpc_device::gen_pmcon_1_r)
+uint16_t i6300esb_lpc_device::gen_pmcon_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return gen_pmcon_1;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::gen_pmcon_1_w)
+void i6300esb_lpc_device::gen_pmcon_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&gen_pmcon_1);
 	logerror("%s: gen_pmcon_1 = %04x\n", tag(), gen_pmcon_1);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_2_r)
+uint8_t i6300esb_lpc_device::gen_pmcon_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gen_pmcon_2;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_2_w)
+void i6300esb_lpc_device::gen_pmcon_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gen_pmcon_2 = data;
 	logerror("%s: gen_pmcon_2 = %02x\n", tag(), gen_pmcon_2);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::gen_pmcon_3_r)
+uint8_t i6300esb_lpc_device::gen_pmcon_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gen_pmcon_3;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::gen_pmcon_3_w)
+void i6300esb_lpc_device::gen_pmcon_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gen_pmcon_3 = data;
 	logerror("%s: gen_pmcon_3 = %02x\n", tag(), gen_pmcon_3);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::rst_cnt2_r)
+uint32_t i6300esb_lpc_device::rst_cnt2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return rst_cnt2;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::rst_cnt2_w)
+void i6300esb_lpc_device::rst_cnt2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&rst_cnt2);
 	logerror("%s: rst_cnt2 = %08x\n", tag(), rst_cnt2);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::apm_cnt_r)
+uint8_t i6300esb_lpc_device::apm_cnt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return apm_cnt;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::apm_cnt_w)
+void i6300esb_lpc_device::apm_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apm_cnt = data;
 	logerror("%s: apm_cnt = %02x\n", tag(), apm_cnt);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::apm_sts_r)
+uint8_t i6300esb_lpc_device::apm_sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return apm_sts;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::apm_sts_w)
+void i6300esb_lpc_device::apm_sts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apm_sts = data;
 	logerror("%s: apm_sts = %02x\n", tag(), apm_sts);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::gpi_rout_r)
+uint32_t i6300esb_lpc_device::gpi_rout_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gpi_rout;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::gpi_rout_w)
+void i6300esb_lpc_device::gpi_rout_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gpi_rout);
 	logerror("%s: gpi_rout = %08x\n", tag(), gpi_rout);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::mon_fwd_en_r)
+uint8_t i6300esb_lpc_device::mon_fwd_en_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return mon_fwd_en;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::mon_fwd_en_w)
+void i6300esb_lpc_device::mon_fwd_en_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mon_fwd_en = data;
 	logerror("%s: mon_fwd_en = %02x\n", tag(), mon_fwd_en);
 }
 
-READ16_MEMBER (i6300esb_lpc_device::mon_trp_rng_r)
+uint16_t i6300esb_lpc_device::mon_trp_rng_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mon_trp_rng[offset];
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_rng_w)
+void i6300esb_lpc_device::mon_trp_rng_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&mon_trp_rng[offset]);
 	logerror("%s: mon_trp_rng[%d] = %04x\n", tag(), 4+offset, mon_trp_rng[offset]);
 }
 
-READ16_MEMBER (i6300esb_lpc_device::mon_trp_msk_r)
+uint16_t i6300esb_lpc_device::mon_trp_msk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mon_trp_msk;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::mon_trp_msk_w)
+void i6300esb_lpc_device::mon_trp_msk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&mon_trp_msk);
 	logerror("%s: mon_trp_msk = %04x\n", tag(), mon_trp_msk);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::gen_cntl_r)
+uint32_t i6300esb_lpc_device::gen_cntl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gen_cntl;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::gen_cntl_w)
+void i6300esb_lpc_device::gen_cntl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gen_cntl);
 	logerror("%s: gen_cntl = %08x\n", tag(), gen_cntl);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::gen_sta_r)
+uint8_t i6300esb_lpc_device::gen_sta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gen_sta;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::gen_sta_w)
+void i6300esb_lpc_device::gen_sta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	gen_sta = data;
 	logerror("%s: gen_sta = %02x\n", tag(), gen_sta);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::back_cntl_r)
+uint8_t i6300esb_lpc_device::back_cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return back_cntl;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::back_cntl_w)
+void i6300esb_lpc_device::back_cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	back_cntl = data;
 	logerror("%s: back_cntl = %02x\n", tag(), back_cntl);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::rtc_conf_r)
+uint8_t i6300esb_lpc_device::rtc_conf_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rtc_conf;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::rtc_conf_w)
+void i6300esb_lpc_device::rtc_conf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rtc_conf = data;
 	logerror("%s: rtc_conf = %02x\n", tag(), rtc_conf);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::lpc_if_com_range_r)
+uint8_t i6300esb_lpc_device::lpc_if_com_range_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return lpc_if_com_range;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_com_range_w)
+void i6300esb_lpc_device::lpc_if_com_range_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	lpc_if_com_range = data;
 	logerror("%s: lpc_if_com_range = %02x\n", tag(), lpc_if_com_range);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::lpc_if_fdd_lpt_range_r)
+uint8_t i6300esb_lpc_device::lpc_if_fdd_lpt_range_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return lpc_if_fdd_lpt_range;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_fdd_lpt_range_w)
+void i6300esb_lpc_device::lpc_if_fdd_lpt_range_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&lpc_if_fdd_lpt_range);
 	logerror("%s: lpc_if_fdd_lpt_range  = %02x\n", tag(), lpc_if_fdd_lpt_range);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::lpc_if_sound_range_r)
+uint8_t i6300esb_lpc_device::lpc_if_sound_range_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return lpc_if_sound_range;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::lpc_if_sound_range_w)
+void i6300esb_lpc_device::lpc_if_sound_range_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	COMBINE_DATA(&lpc_if_sound_range);
 	logerror("%s: lpc_if_sound_range  = %02x\n", tag(), lpc_if_sound_range);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::fwh_dec_en1_r)
+uint8_t i6300esb_lpc_device::fwh_dec_en1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fwh_dec_en1;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::fwh_dec_en1_w)
+void i6300esb_lpc_device::fwh_dec_en1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fwh_dec_en1 = data | 0x80;
 	logerror("%s: fwh_dec_en1  = %02x\n", tag(), fwh_dec_en1);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::gen1_dec_r)
+uint16_t i6300esb_lpc_device::gen1_dec_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return gen1_dec;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::gen1_dec_w)
+void i6300esb_lpc_device::gen1_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&gen1_dec);
 	logerror("%s: gen1_dec = %04x\n", tag(), gen1_dec);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::lpc_en_r)
+uint16_t i6300esb_lpc_device::lpc_en_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return lpc_en;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::lpc_en_w)
+void i6300esb_lpc_device::lpc_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&lpc_en);
 	logerror("%s: lpc_en = %04x\n", tag(), lpc_en);
 	remap_cb();
 }
 
-READ32_MEMBER (i6300esb_lpc_device::fwh_sel1_r)
+uint32_t i6300esb_lpc_device::fwh_sel1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return fwh_sel1;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::fwh_sel1_w)
+void i6300esb_lpc_device::fwh_sel1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&fwh_sel1);
 	logerror("%s: fwh_sel1 = %08x\n", tag(), fwh_sel1);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::gen2_dec_r)
+uint16_t i6300esb_lpc_device::gen2_dec_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return gen2_dec;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::gen2_dec_w)
+void i6300esb_lpc_device::gen2_dec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&gen2_dec);
 	logerror("%s: gen2_dec = %04x\n", tag(), gen2_dec);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::fwh_sel2_r)
+uint16_t i6300esb_lpc_device::fwh_sel2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return fwh_sel2;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::fwh_sel2_w)
+void i6300esb_lpc_device::fwh_sel2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&fwh_sel2);
 	logerror("%s: fwh_sel2 = %04x\n", tag(), fwh_sel2);
 	remap_cb();
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::fwh_dec_en2_r)
+uint8_t i6300esb_lpc_device::fwh_dec_en2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fwh_dec_en2;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::fwh_dec_en2_w)
+void i6300esb_lpc_device::fwh_dec_en2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fwh_dec_en2 = data;
 	logerror("%s: fwh_dec_en2  = %02x\n", tag(), fwh_dec_en2);
 	remap_cb();
 }
 
-READ16_MEMBER (i6300esb_lpc_device::func_dis_r)
+uint16_t i6300esb_lpc_device::func_dis_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return func_dis;
 }
 
-WRITE16_MEMBER(i6300esb_lpc_device::func_dis_w)
+void i6300esb_lpc_device::func_dis_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&func_dis);
 	logerror("%s: func_dis = %04x\n", tag(), func_dis);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::etr1_r)
+uint32_t i6300esb_lpc_device::etr1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return etr1;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::etr1_w)
+void i6300esb_lpc_device::etr1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&etr1);
 	logerror("%s: etr1 = %08x\n", tag(), etr1);
 }
 
-READ32_MEMBER (i6300esb_lpc_device::mfid_r)
+uint32_t i6300esb_lpc_device::mfid_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xf66;
 }
 
-READ32_MEMBER (i6300esb_lpc_device::unk_fc_r)
+uint32_t i6300esb_lpc_device::unk_fc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: read undocumented config reg fc\n", tag());
 	return 0;
 }
 
-WRITE32_MEMBER(i6300esb_lpc_device::unk_fc_w)
+void i6300esb_lpc_device::unk_fc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%s: write undocumented config reg fc (%08x)\n", tag(), data);
 }
 
 
 
-READ8_MEMBER  (i6300esb_lpc_device::siu_config_port_r)
+uint8_t i6300esb_lpc_device::siu_config_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return siu_config_port;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::siu_config_port_w)
+void i6300esb_lpc_device::siu_config_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	siu_config_port = data;
 	switch(siu_config_state) {
@@ -630,13 +630,13 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_config_port_w)
 	}
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::siu_data_port_r)
+uint8_t i6300esb_lpc_device::siu_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: siu config read port %02x\n", tag(), siu_config_port);
 	return 0xff;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::siu_data_port_w)
+void i6300esb_lpc_device::siu_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(siu_config_state < 2) {
 		logerror("%s: siu config write port with config disabled (port=%02x, data=%02x)\n", tag(), siu_config_port, data);
@@ -645,20 +645,20 @@ WRITE8_MEMBER (i6300esb_lpc_device::siu_data_port_w)
 	logerror("%s: siu config write port %02x, %02x\n", tag(), siu_config_port, data);
 }
 
-READ8_MEMBER  (i6300esb_lpc_device::nmi_sc_r)
+uint8_t i6300esb_lpc_device::nmi_sc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	nmi_sc ^= 0x10;
 	return nmi_sc;
 }
 
-WRITE8_MEMBER (i6300esb_lpc_device::nmi_sc_w)
+void i6300esb_lpc_device::nmi_sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	nmi_sc = data;
 	logerror("%s: nmi_sc = %02x\n", tag(), nmi_sc);
 }
 
 
-WRITE8_MEMBER (i6300esb_lpc_device::nop_w)
+void i6300esb_lpc_device::nop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

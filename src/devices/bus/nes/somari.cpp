@@ -159,7 +159,7 @@ void nes_somari_device::pcb_reset()
  -------------------------------------------------*/
 
 // MMC1 Mode emulation
-WRITE8_MEMBER(nes_somari_device::mmc1_w)
+void nes_somari_device::mmc1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(m_board_mode == 2);
 
@@ -193,7 +193,7 @@ WRITE8_MEMBER(nes_somari_device::mmc1_w)
 }
 
 // MMC3 Mode emulation
-WRITE8_MEMBER(nes_somari_device::mmc3_w)
+void nes_somari_device::mmc3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mmc_helper, cmd;
 
@@ -242,7 +242,7 @@ WRITE8_MEMBER(nes_somari_device::mmc3_w)
 }
 
 // VRC2 Mode emulation
-WRITE8_MEMBER(nes_somari_device::vrc2_w)
+void nes_somari_device::vrc2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank, shift;
 
@@ -383,7 +383,7 @@ void nes_somari_device::update_mirror()
 }
 
 
-WRITE8_MEMBER(nes_somari_device::write_h)
+void nes_somari_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("somari write_h, mode %d, offset: %04x, data: %02x\n", m_board_mode, offset, data));
 
@@ -411,7 +411,7 @@ void nes_somari_device::bank_update_switchmode()
 	update_chr();
 }
 
-WRITE8_MEMBER(nes_somari_device::write_m)
+void nes_somari_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("somari write_m, offset: %04x, data: %02x\n", offset, data));
 

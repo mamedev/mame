@@ -177,13 +177,13 @@ void champbas_state::video_start_exctsccr()
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::tilemap_w)
+void champbas_state::tilemap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(champbas_state::gfxbank_w)
+void champbas_state::gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 
@@ -194,13 +194,13 @@ WRITE8_MEMBER(champbas_state::gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(champbas_state::palette_bank_w)
+void champbas_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = data & 1;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_MEMBER(champbas_state::flipscreen_w)
+void champbas_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }

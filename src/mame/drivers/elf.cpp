@@ -31,7 +31,7 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( elf2_state::dispon_r )
+uint8_t elf2_state::dispon_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -39,18 +39,18 @@ READ8_MEMBER( elf2_state::dispon_r )
 	return 0xff;
 }
 
-READ8_MEMBER( elf2_state::data_r )
+uint8_t elf2_state::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( elf2_state::data_w )
+void elf2_state::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_led_l->a_w(data & 0x0f);
 	m_led_h->a_w(data >> 4);
 }
 
-WRITE8_MEMBER( elf2_state::memory_w )
+void elf2_state::memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOAD)
 	{
@@ -154,12 +154,12 @@ WRITE_LINE_MEMBER( elf2_state::q_w )
 	output().set_led_value(0, state);
 }
 
-READ8_MEMBER( elf2_state::dma_r )
+uint8_t elf2_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( elf2_state::sc_w )
+void elf2_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{

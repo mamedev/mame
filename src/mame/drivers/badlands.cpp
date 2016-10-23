@@ -253,7 +253,7 @@ INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
  *
  *************************************/
 
-READ16_MEMBER(badlands_state::sound_busy_r)
+uint16_t badlands_state::sound_busy_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = 0xfeff;
 	if (m_soundcomm->main_to_sound_ready()) temp ^= 0x0100;
@@ -261,13 +261,13 @@ READ16_MEMBER(badlands_state::sound_busy_r)
 }
 
 
-READ16_MEMBER(badlands_state::pedal_0_r)
+uint16_t badlands_state::pedal_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pedal_value[0];
 }
 
 
-READ16_MEMBER(badlands_state::pedal_1_r)
+uint16_t badlands_state::pedal_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pedal_value[1];
 }
@@ -280,7 +280,7 @@ READ16_MEMBER(badlands_state::pedal_1_r)
  *
  *************************************/
 
-READ8_MEMBER(badlands_state::audio_io_r)
+uint8_t badlands_state::audio_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0xff;
 
@@ -326,7 +326,7 @@ READ8_MEMBER(badlands_state::audio_io_r)
 }
 
 
-WRITE8_MEMBER(badlands_state::audio_io_w)
+void badlands_state::audio_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x206)
 	{
@@ -632,7 +632,7 @@ GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "At
 
 */
 
-READ16_MEMBER(badlands_state::badlandsb_unk_r)
+uint16_t badlands_state::badlandsb_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }

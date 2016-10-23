@@ -28,12 +28,12 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(strnskil_irq);
 
-	DECLARE_READ8_MEMBER(strnskil_d800_r);
-	DECLARE_READ8_MEMBER(pettanp_protection_r);
-	DECLARE_READ8_MEMBER(banbam_protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_WRITE8_MEMBER(strnskil_videoram_w);
-	DECLARE_WRITE8_MEMBER(strnskil_scrl_ctrl_w);
+	uint8_t strnskil_d800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pettanp_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t banbam_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strnskil_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strnskil_scrl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_banbam();
 	void init_pettanp();

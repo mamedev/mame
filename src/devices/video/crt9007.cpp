@@ -666,7 +666,7 @@ const address_space_config *crt9007_t::memory_space_config(address_spacenum spac
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( crt9007_t::read )
+uint8_t crt9007_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -722,7 +722,7 @@ READ8_MEMBER( crt9007_t::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( crt9007_t::write )
+void crt9007_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg[offset] = data;
 

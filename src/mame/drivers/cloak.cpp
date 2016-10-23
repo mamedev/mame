@@ -129,31 +129,31 @@
  *
  *************************************/
 
-WRITE8_MEMBER(cloak_state::cloak_led_w)
+void cloak_state::cloak_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1 - offset, ~data & 0x80);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_coin_counter_w)
+void cloak_state::cloak_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1 - offset, data & 0x80);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_custom_w)
+void cloak_state::cloak_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(cloak_state::cloak_irq_reset_0_w)
+void cloak_state::cloak_irq_reset_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_irq_reset_1_w)
+void cloak_state::cloak_irq_reset_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
+void cloak_state::cloak_nvram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_enabled = data & 0x01;
 }

@@ -141,23 +141,23 @@ public:
 	uint8_t dma_channel1() { return m_dma_channel1; }
 	uint8_t dma_channel2() { if(m_dma_combine == 0) return m_dma_channel2; else return m_dma_channel1; }
 
-	DECLARE_READ8_MEMBER(global_reg_select_r);
-	DECLARE_WRITE8_MEMBER(global_reg_select_w);
-	DECLARE_READ8_MEMBER(global_reg_data_r);
-	DECLARE_WRITE8_MEMBER(global_reg_data_w);
-	DECLARE_READ8_MEMBER(dram_r);
-	DECLARE_WRITE8_MEMBER(dram_w);
-	DECLARE_READ8_MEMBER(adlib_r);
-	DECLARE_WRITE8_MEMBER(adlib_w);
-	DECLARE_READ8_MEMBER(adlib_cmd_r);
-	DECLARE_WRITE8_MEMBER(adlib_cmd_w);
-	DECLARE_READ8_MEMBER(mix_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mix_ctrl_w);
-	DECLARE_READ8_MEMBER(stat_r);
-	DECLARE_WRITE8_MEMBER(stat_w);
-	DECLARE_READ8_MEMBER(sb_r);
-	DECLARE_WRITE8_MEMBER(sb_w);
-	DECLARE_WRITE8_MEMBER(sb2x6_w);
+	uint8_t global_reg_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void global_reg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t global_reg_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void global_reg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adlib_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adlib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adlib_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adlib_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mix_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mix_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sb2x6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// DMA signals
 	uint8_t dack_r(int line);
@@ -273,14 +273,14 @@ public:
 	void set_midi_irq(uint8_t source);
 	void reset_midi_irq(uint8_t source);
 
-	DECLARE_READ8_MEMBER(board_r);
-	DECLARE_READ8_MEMBER(synth_r);
-	DECLARE_WRITE8_MEMBER(board_w);
-	DECLARE_WRITE8_MEMBER(synth_w);
-	DECLARE_READ8_MEMBER(adlib_r);
-	DECLARE_WRITE8_MEMBER(adlib_w);
-	DECLARE_READ8_MEMBER(joy_r);
-	DECLARE_WRITE8_MEMBER(joy_w);
+	uint8_t board_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t synth_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void synth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adlib_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adlib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t joy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void joy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(midi_txirq);
 	DECLARE_WRITE_LINE_MEMBER(midi_rxirq);
 	DECLARE_WRITE_LINE_MEMBER(wavetable_irq);

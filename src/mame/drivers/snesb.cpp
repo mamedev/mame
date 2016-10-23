@@ -158,21 +158,21 @@ public:
 	std::unique_ptr<int8_t[]> m_shared_ram;
 	uint8_t m_cnt;
 	std::unique_ptr<int8_t[]> m_shared_ram2;
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
-	DECLARE_READ8_MEMBER(sb2b_75bd37_r);
-	DECLARE_READ8_MEMBER(sb2b_6a6xxx_r);
-	DECLARE_READ8_MEMBER(sb2b_7xxx_r);
-	DECLARE_READ8_MEMBER(endless_580xxx_r);
-	DECLARE_READ8_MEMBER(endless_624b7f_r);
-	DECLARE_READ8_MEMBER(endless_800b_r);
-	DECLARE_READ8_MEMBER(sharedram2_r);
-	DECLARE_WRITE8_MEMBER(sharedram2_w);
-	DECLARE_READ8_MEMBER(snesb_dsw1_r);
-	DECLARE_READ8_MEMBER(snesb_dsw2_r);
-	DECLARE_READ8_MEMBER(snesb_coin_r);
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	uint8_t sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sb2b_75bd37_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sb2b_6a6xxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sb2b_7xxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t endless_580xxx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t endless_624b7f_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t endless_800b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sharedram2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snesb_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snesb_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t snesb_coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_iron();
 	void init_denseib();
 	void init_kinstb();
@@ -185,24 +185,24 @@ public:
 
 
 /* Killer Instinct */
-READ8_MEMBER(snesb_state::sharedram_r)
+uint8_t snesb_state::sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(snesb_state::sharedram_w)
+void snesb_state::sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared_ram[offset]=data;
 }
 
 /* Sonic Blast Man 2 Special Turbo */
-READ8_MEMBER(snesb_state::sb2b_75bd37_r)
+uint8_t snesb_state::sb2b_75bd37_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* protection check */
 	return ++m_cnt;
 }
 
-READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
+uint8_t snesb_state::sb2b_6a6xxx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* protection checks */
 	switch(offset)
@@ -220,14 +220,14 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 	return 0;
 }
 
-READ8_MEMBER(snesb_state::sb2b_7xxx_r)
+uint8_t snesb_state::sb2b_7xxx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.read_byte(0xc07000 + offset);
 }
 
 
 /* Endless Duel */
-READ8_MEMBER(snesb_state::endless_580xxx_r)
+uint8_t snesb_state::endless_580xxx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* protection checks */
 	switch(offset)
@@ -244,13 +244,13 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 	return 0;
 }
 
-READ8_MEMBER(snesb_state::endless_624b7f_r)
+uint8_t snesb_state::endless_624b7f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* protection check */
 	return ++m_cnt;
 }
 
-READ8_MEMBER(snesb_state::endless_800b_r)
+uint8_t snesb_state::endless_800b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!offset)
 	{
@@ -260,28 +260,28 @@ READ8_MEMBER(snesb_state::endless_800b_r)
 	return 0xe8;
 }
 
-READ8_MEMBER(snesb_state::sharedram2_r)
+uint8_t snesb_state::sharedram2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared_ram2[offset];
 }
 
-WRITE8_MEMBER(snesb_state::sharedram2_w)
+void snesb_state::sharedram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared_ram2[offset]=data;
 }
 
 /* Generic read handlers for Dip Switches and coins inputs */
-READ8_MEMBER(snesb_state::snesb_dsw1_r)
+uint8_t snesb_state::snesb_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("DSW1")->read();
 }
 
-READ8_MEMBER(snesb_state::snesb_dsw2_r)
+uint8_t snesb_state::snesb_dsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("DSW2")->read();
 }
 
-READ8_MEMBER(snesb_state::snesb_coin_r)
+uint8_t snesb_state::snesb_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("COIN")->read();
 }
@@ -293,12 +293,12 @@ static ADDRESS_MAP_START( snesb_map, AS_PROGRAM, 8, snesb_state )
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
-READ8_MEMBER(snesb_state::spc_ram_100_r)
+uint8_t snesb_state::spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spc700->spc_ram_r(space, offset + 0x100);
 }
 
-WRITE8_MEMBER(snesb_state::spc_ram_100_w)
+void snesb_state::spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }

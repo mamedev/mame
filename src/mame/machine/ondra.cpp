@@ -14,7 +14,7 @@
 #include "includes/ondra.h"
 
 
-READ8_MEMBER(ondra_state::ondra_keyboard_r)
+uint8_t ondra_state::ondra_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0x00;
 	double valcas = m_cassette->input();
@@ -63,7 +63,7 @@ void ondra_state::ondra_update_banks()
 	}
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_03_w)
+void ondra_state::ondra_port_03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_enable = data & 1;
 	m_bank1_status = (data >> 1) & 1;
@@ -72,11 +72,11 @@ WRITE8_MEMBER(ondra_state::ondra_port_03_w)
 	m_cassette->output(((data >> 3) & 1) ? -1.0 : +1.0);
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_09_w)
+void ondra_state::ondra_port_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(ondra_state::ondra_port_0a_w)
+void ondra_state::ondra_port_0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

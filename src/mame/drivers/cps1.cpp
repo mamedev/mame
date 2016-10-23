@@ -250,70 +250,70 @@ Stephh's log (2006.09.20) :
 
 
 
-READ16_MEMBER(cps_state::cps1_dsw_r)
+uint16_t cps_state::cps1_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
 	int in = ioport(dswname[offset])->read();
 	return (in << 8) | 0xff;
 }
 
-READ16_MEMBER(cps_state::cps1_hack_dsw_r)
+uint16_t cps_state::cps1_hack_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
 	int in = ioport(dswname[offset])->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in1_r)
+uint16_t cps_state::cps1_in1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN1")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in2_r)
+uint16_t cps_state::cps1_in2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN2")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::cps1_in3_r)
+uint16_t cps_state::cps1_in3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int in = ioport("IN3")->read();
 	return (in << 8) | in;
 }
 
-READ16_MEMBER(cps_state::forgottn_dial_0_r)
+uint16_t cps_state::forgottn_dial_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("DIAL0")->read() - m_dial[0]) >> (8 * offset)) & 0xff;
 }
 
-READ16_MEMBER(cps_state::forgottn_dial_1_r)
+uint16_t cps_state::forgottn_dial_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((ioport("DIAL1")->read() - m_dial[1]) >> (8 * offset)) & 0xff;
 }
 
-WRITE16_MEMBER(cps_state::forgottn_dial_0_reset_w)
+void cps_state::forgottn_dial_0_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dial[0] = ioport("DIAL0")->read();
 }
 
-WRITE16_MEMBER(cps_state::forgottn_dial_1_reset_w)
+void cps_state::forgottn_dial_1_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dial[1] = ioport("DIAL1")->read();
 }
 
 
-WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
+void cps_state::cps1_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(cps_state::cps1_oki_pin7_w)
+void cps_state::cps1_oki_pin7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_pin7(data & 1);
 }
 
-WRITE16_MEMBER(cps_state::cps1_soundlatch_w)
+void cps_state::cps1_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
@@ -321,13 +321,13 @@ WRITE16_MEMBER(cps_state::cps1_soundlatch_w)
 		m_soundlatch->write(space, 0, data >> 8);
 }
 
-WRITE16_MEMBER(cps_state::cps1_soundlatch2_w)
+void cps_state::cps1_soundlatch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch2->write(space, 0, data & 0xff);
 }
 
-WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
+void cps_state::cps1_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -340,7 +340,7 @@ WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::cpsq_coinctrl2_w)
+void cps_state::cpsq_coinctrl2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -375,7 +375,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 *
 ********************************************************************/
 
-READ16_MEMBER(cps_state::qsound_rom_r)
+uint16_t cps_state::qsound_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (memregion("user1") != nullptr)
 	{
@@ -389,29 +389,29 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 	}
 }
 
-READ16_MEMBER(cps_state::qsound_sharedram1_r)
+uint16_t cps_state::qsound_sharedram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_qsound_sharedram1[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(cps_state::qsound_sharedram1_w)
+void cps_state::qsound_sharedram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram1[offset] = data;
 }
 
-READ16_MEMBER(cps_state::qsound_sharedram2_r)
+uint16_t cps_state::qsound_sharedram2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_qsound_sharedram2[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(cps_state::qsound_sharedram2_w)
+void cps_state::qsound_sharedram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram2[offset] = data;
 }
 
-WRITE8_MEMBER(cps_state::qsound_banksw_w)
+void cps_state::qsound_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Z80 bank register for music note data. It's odd that it isn't encrypted though. */
 	int bank = data & 0x0f;
@@ -11917,7 +11917,7 @@ void cps_state::init_forgottn()
 	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2rb_prot_r)
+uint16_t cps_state::sf2rb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -11938,7 +11938,7 @@ void cps_state::init_sf2rb()
 	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2rb2_prot_r)
+uint16_t cps_state::sf2rb2_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -11986,7 +11986,7 @@ void cps_state::init_sf2hack()
 }
 
 
-READ16_MEMBER(cps_state::sf2dongb_prot_r)
+uint16_t cps_state::sf2dongb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -12006,7 +12006,7 @@ void cps_state::init_sf2dongb()
 	init_cps1();
 }
 
-READ16_MEMBER(cps_state::sf2ceblp_prot_r)
+uint16_t cps_state::sf2ceblp_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (sf2ceblp_prot == 0x0)
 		return 0x1992;
@@ -12015,7 +12015,7 @@ READ16_MEMBER(cps_state::sf2ceblp_prot_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(cps_state::sf2ceblp_prot_w)
+void cps_state::sf2ceblp_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sf2ceblp_prot = data;
 }
@@ -12116,7 +12116,7 @@ void cps_state::init_pang3()
 	init_pang3b();
 }
 
-READ16_MEMBER(cps_state::ganbare_ram_r)
+uint16_t cps_state::ganbare_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0xffff;
 
@@ -12128,7 +12128,7 @@ READ16_MEMBER(cps_state::ganbare_ram_r)
 	return result;
 }
 
-WRITE16_MEMBER(cps_state::ganbare_ram_w)
+void cps_state::ganbare_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 
@@ -12144,7 +12144,7 @@ void cps_state::init_ganbare()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }
 
-READ16_MEMBER(cps_state::dinohunt_sound_r)
+uint16_t cps_state::dinohunt_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*TODO: understand what's really going on here. According to MT05805;
 	"I think that the values written are only qsound leftovers (after a lot of 0xFF values,
@@ -12162,7 +12162,7 @@ void cps_state::init_dinohunt()
 	init_cps1();
 }
 
-WRITE16_MEMBER( cps_state::sf2m3_layer_w )
+void cps_state::sf2m3_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cps1_cps_b_w(space,0x0a,data);
 }

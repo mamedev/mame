@@ -51,7 +51,7 @@ To Do:
 
 
 /* Read 4 ten bit dip switches */
-READ16_MEMBER(realbrk_state::realbrk_dsw_r)
+uint16_t realbrk_state::realbrk_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t sel = ~m_dsw_select[0];
 	if (sel & 0x01) return  (ioport("SW1")->read() & 0x00ff) << 8;      // DSW1 low bits
@@ -68,7 +68,7 @@ READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnsh_input_r)
+uint16_t realbrk_state::pkgnsh_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -86,7 +86,7 @@ READ16_MEMBER(realbrk_state::pkgnsh_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
+uint16_t realbrk_state::pkgnshdx_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t sel = ~m_dsw_select[0];
 
@@ -120,7 +120,7 @@ READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_r)
+uint16_t realbrk_state::backup_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -131,7 +131,7 @@ READ16_MEMBER(realbrk_state::backup_ram_r)
 }
 
 
-READ16_MEMBER(realbrk_state::backup_ram_dx_r)
+uint16_t realbrk_state::backup_ram_dx_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
@@ -141,7 +141,7 @@ READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 		return m_backup_ram[offset];
 }
 
-WRITE16_MEMBER(realbrk_state::backup_ram_w)
+void realbrk_state::backup_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_backup_ram[offset]);
 }

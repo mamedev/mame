@@ -32,19 +32,19 @@ class ti_rs232_pio_device : public ti_expansion_card_device
 public:
 	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_WRITE_LINE_MEMBER( int0_callback );
 	DECLARE_WRITE_LINE_MEMBER( int1_callback );
 	DECLARE_WRITE_LINE_MEMBER( rcv0_callback );
 	DECLARE_WRITE_LINE_MEMBER( rcv1_callback );
-	DECLARE_WRITE8_MEMBER( xmit0_callback );
-	DECLARE_WRITE8_MEMBER( xmit1_callback );
-	DECLARE_WRITE8_MEMBER( ctrl0_callback );
-	DECLARE_WRITE8_MEMBER( ctrl1_callback );
+	void xmit0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xmit1_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl1_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start(void) override;

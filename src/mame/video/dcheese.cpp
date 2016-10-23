@@ -233,25 +233,25 @@ void dcheese_state::do_blit(  )
  *
  *************************************/
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_color_w)
+void dcheese_state::madmax_blitter_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_color[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_xparam_w)
+void dcheese_state::madmax_blitter_xparam_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_xparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_yparam_w)
+void dcheese_state::madmax_blitter_yparam_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_yparam[offset]);
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
+void dcheese_state::madmax_blitter_vidparam_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_blitter_vidparam[offset]);
 
@@ -295,14 +295,14 @@ WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
 }
 
 
-WRITE16_MEMBER(dcheese_state::madmax_blitter_unknown_w)
+void dcheese_state::madmax_blitter_unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* written to just before the blitter command register is written */
 	logerror("%06X:write to %06X = %04X & %04X\n", space.device().safe_pc(), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
-READ16_MEMBER(dcheese_state::madmax_blitter_vidparam_r)
+uint16_t dcheese_state::madmax_blitter_vidparam_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)

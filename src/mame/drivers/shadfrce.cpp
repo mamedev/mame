@@ -147,7 +147,7 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "includes/shadfrce.h"
 
 
-WRITE16_MEMBER(shadfrce_state::flip_screen)
+void shadfrce_state::flip_screen(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -232,7 +232,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 */
 
 
-READ16_MEMBER(shadfrce_state::input_ports_r)
+uint16_t shadfrce_state::input_ports_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -256,7 +256,7 @@ READ16_MEMBER(shadfrce_state::input_ports_r)
 }
 
 
-WRITE16_MEMBER(shadfrce_state::sound_brt_w)
+void shadfrce_state::sound_brt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -273,12 +273,12 @@ WRITE16_MEMBER(shadfrce_state::sound_brt_w)
 	}
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_ack_w)
+void shadfrce_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(shadfrce_state::irq_w)
+void shadfrce_state::irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
 	m_video_enable = data & 8;  /* probably */
@@ -298,7 +298,7 @@ WRITE16_MEMBER(shadfrce_state::irq_w)
 	m_prev_value = data;
 }
 
-WRITE16_MEMBER(shadfrce_state::scanline_w)
+void shadfrce_state::scanline_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
@@ -386,7 +386,7 @@ ADDRESS_MAP_END
 
 /* and the sound cpu */
 
-WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
+void shadfrce_state::oki_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }

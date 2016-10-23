@@ -53,18 +53,18 @@ public:
 	template<class _Object> static devcb_base &set_layer_scroll_base_callback(device_t &device, _Object object) { return downcast<seibu_crtc_device &>(device).m_layer_scroll_base_cb.set_callback(object); }
 
 	// I/O operations
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_WRITE16_MEMBER( write_alt );
-	DECLARE_WRITE16_MEMBER( write_xor );
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_READ16_MEMBER( read_alt );
-	DECLARE_READ16_MEMBER( read_xor );
-	DECLARE_WRITE16_MEMBER(decrypt_key_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_READ16_MEMBER(reg_1a_r);
-	DECLARE_WRITE16_MEMBER(reg_1a_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_base_w);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_alt(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_xor(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t read_alt(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t read_xor(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void decrypt_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t reg_1a_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reg_1a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_scroll_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

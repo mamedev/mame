@@ -13,12 +13,12 @@
 
 const device_type DECODMD3 = &device_creator<decodmd_type3_device>;
 
-WRITE8_MEMBER( decodmd_type3_device::data_w )
+void decodmd_type3_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type3_device::busy_r )
+uint8_t decodmd_type3_device::busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -30,7 +30,7 @@ READ8_MEMBER( decodmd_type3_device::busy_r )
 		return 0x00 | ret;
 }
 
-WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
+void decodmd_type3_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(m_ctrl & 0x01) && (data & 0x01))
 	{
@@ -46,17 +46,17 @@ WRITE8_MEMBER( decodmd_type3_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ16_MEMBER( decodmd_type3_device::status_r )
+uint16_t decodmd_type3_device::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_status;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::status_w )
+void decodmd_type3_device::status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_status = data & 0x0f;
 }
 
-READ16_MEMBER( decodmd_type3_device::latch_r )
+uint16_t decodmd_type3_device::latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// clear IRQ?
 	m_cpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
@@ -69,7 +69,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type3_device::dmd_irq)
 	m_cpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
+void decodmd_type3_device::crtc_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -78,7 +78,7 @@ WRITE16_MEMBER( decodmd_type3_device::crtc_address_w )
 	}
 }
 
-READ16_MEMBER( decodmd_type3_device::crtc_status_r )
+uint16_t decodmd_type3_device::crtc_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 		return m_mc6845->register_r(space,offset);
@@ -86,7 +86,7 @@ READ16_MEMBER( decodmd_type3_device::crtc_status_r )
 		return 0xff;
 }
 
-WRITE16_MEMBER( decodmd_type3_device::crtc_register_w )
+void decodmd_type3_device::crtc_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{

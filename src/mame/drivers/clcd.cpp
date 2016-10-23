@@ -167,7 +167,7 @@ public:
 		return 0;
 	}
 
-	READ8_MEMBER(ram_r)
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		if (offset < m_ram->size())
 		{
@@ -177,7 +177,7 @@ public:
 		return 0xff;
 	}
 
-	WRITE8_MEMBER(ram_w)
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (offset < m_ram->size())
 		{
@@ -306,37 +306,37 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(mmu_mode_kern_w)
+	void mmu_mode_kern_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		update_mmu_mode(MMU_MODE_KERN);
 	}
 
-	WRITE8_MEMBER(mmu_mode_appl_w)
+	void mmu_mode_appl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		update_mmu_mode(MMU_MODE_APPL);
 	}
 
-	WRITE8_MEMBER(mmu_mode_ram_w)
+	void mmu_mode_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		update_mmu_mode(MMU_MODE_RAM);
 	}
 
-	WRITE8_MEMBER(mmu_mode_recall_w)
+	void mmu_mode_recall_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		update_mmu_mode(m_mmu_saved_mode);
 	}
 
-	WRITE8_MEMBER(mmu_mode_save_w)
+	void mmu_mode_save_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_mmu_saved_mode = m_mmu_mode;
 	}
 
-	WRITE8_MEMBER(mmu_mode_test_w)
+	void mmu_mode_test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		update_mmu_mode(MMU_MODE_TEST);
 	}
 
-	WRITE8_MEMBER(mmu_offset1_w)
+	void mmu_offset1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (m_mmu_offset1 != data)
 		{
@@ -345,7 +345,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(mmu_offset2_w)
+	void mmu_offset2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (m_mmu_offset2 != data)
 		{
@@ -354,7 +354,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(mmu_offset3_w)
+	void mmu_offset3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (m_mmu_offset3 != data)
 		{
@@ -363,7 +363,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(mmu_offset4_w)
+	void mmu_offset4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (m_mmu_offset4 != data)
 		{
@@ -372,7 +372,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(mmu_offset5_w)
+	void mmu_offset5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		if (m_mmu_offset5 != data)
 		{
@@ -381,52 +381,52 @@ public:
 		}
 	}
 
-	READ8_MEMBER(mmu_offset1_r)
+	uint8_t mmu_offset1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		return m_mmu_offset1;
 	}
 
-	READ8_MEMBER(mmu_offset2_r)
+	uint8_t mmu_offset2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		return m_mmu_offset2;
 	}
 
-	READ8_MEMBER(mmu_offset3_r)
+	uint8_t mmu_offset3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		return m_mmu_offset3;
 	}
 
-	READ8_MEMBER(mmu_offset4_r)
+	uint8_t mmu_offset4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		return m_mmu_offset4;
 	}
 
-	READ8_MEMBER(mmu_offset5_r)
+	uint8_t mmu_offset5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	{
 		return m_mmu_offset5;
 	}
 
-	WRITE8_MEMBER(lcd_scrollx_w)
+	void lcd_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_lcd_scrollx = data;
 	}
 
-	WRITE8_MEMBER(lcd_scrolly_w)
+	void lcd_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_lcd_scrolly = data;
 	}
 
-	WRITE8_MEMBER(lcd_mode_w)
+	void lcd_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_lcd_mode = data;
 	}
 
-	WRITE8_MEMBER(lcd_size_w)
+	void lcd_size_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_lcd_size = data;
 	}
 
-	WRITE8_MEMBER(via0_pa_w)
+	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_key_column = data;
 	}
@@ -463,7 +463,7 @@ public:
 		return 0;
 	}
 
-	WRITE8_MEMBER(via0_pb_w)
+	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		write_key_poll((data >> 0) & 1);
 		m_rtc->cs2_w((data >> 1) & 1);
@@ -512,7 +512,7 @@ public:
 		}
 	}
 
-	WRITE8_MEMBER(via1_pa_w)
+	void via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		m_rtc->d0_w(BIT(data, 0));
 		m_centronics->write_data0(BIT(data, 0));
@@ -538,7 +538,7 @@ public:
 		m_centronics->write_data7(BIT(data, 7));
 	}
 
-	WRITE8_MEMBER(via1_pb_w)
+	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 	{
 		//int centronics_unknown = !BIT(data,5);
 	}

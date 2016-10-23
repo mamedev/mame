@@ -216,7 +216,7 @@ public:
 
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
-	DECLARE_READ32_MEMBER(rom_switch_r);
+	uint32_t rom_switch_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
@@ -310,64 +310,64 @@ public:
 	void set_adb_line(int linestate);
 	void update_volume();
 
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_via2_r );
-	DECLARE_WRITE16_MEMBER ( mac_via2_w );
-	DECLARE_READ16_MEMBER ( mac_autovector_r );
-	DECLARE_WRITE16_MEMBER ( mac_autovector_w );
-	DECLARE_READ16_MEMBER ( mac_iwm_r );
-	DECLARE_WRITE16_MEMBER ( mac_iwm_w );
-	DECLARE_READ16_MEMBER ( mac_scc_r );
-	DECLARE_WRITE16_MEMBER ( mac_scc_w );
-	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
-	DECLARE_READ16_MEMBER ( macplus_scsi_r );
-	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
-	DECLARE_WRITE16_MEMBER ( macii_scsi_w );
-	DECLARE_READ32_MEMBER (macii_scsi_drq_r);
-	DECLARE_WRITE32_MEMBER (macii_scsi_drq_w);
+	uint16_t mac_via_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mac_via2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_via2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mac_autovector_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_autovector_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mac_iwm_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_iwm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mac_scc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mac_scc_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t macplus_scsi_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void macplus_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void macii_scsi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t macii_scsi_drq_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void macii_scsi_drq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER( rbv_ramdac_r );
-	DECLARE_WRITE32_MEMBER( rbv_ramdac_w );
-	DECLARE_WRITE32_MEMBER( ariel_ramdac_w );
-	DECLARE_READ8_MEMBER( mac_sonora_vctl_r );
-	DECLARE_WRITE8_MEMBER( mac_sonora_vctl_w );
-	DECLARE_READ8_MEMBER ( mac_rbv_r );
-	DECLARE_WRITE8_MEMBER ( mac_rbv_w );
+	uint32_t rbv_ramdac_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void rbv_ramdac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ariel_ramdac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t mac_sonora_vctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_sonora_vctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mac_rbv_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_rbv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ32_MEMBER(mac_read_id);
+	uint32_t mac_read_id(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ16_MEMBER(mac_config_r);
+	uint16_t mac_config_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER(biu_r);
-	DECLARE_WRITE32_MEMBER(biu_w);
-	DECLARE_READ8_MEMBER(oss_r);
-	DECLARE_WRITE8_MEMBER(oss_w);
-	DECLARE_READ32_MEMBER(buserror_r);
-	DECLARE_READ8_MEMBER(swimiop_r);
-	DECLARE_WRITE8_MEMBER(swimiop_w);
-	DECLARE_READ8_MEMBER(scciop_r);
-	DECLARE_WRITE8_MEMBER(scciop_w);
+	uint32_t biu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void biu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t oss_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void oss_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t buserror_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t swimiop_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void swimiop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scciop_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scciop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(hmc_r);
-	DECLARE_WRITE8_MEMBER(hmc_w);
-	DECLARE_READ8_MEMBER(amic_dma_r);
-	DECLARE_WRITE8_MEMBER(amic_dma_w);
-	DECLARE_READ8_MEMBER(pmac_diag_r);
+	uint8_t hmc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hmc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amic_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amic_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pmac_diag_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(mac_gsc_r);
-	DECLARE_WRITE8_MEMBER(mac_gsc_w);
+	uint8_t mac_gsc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_gsc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_5396_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ32_MEMBER(dafb_r);
-	DECLARE_WRITE32_MEMBER(dafb_w);
-	DECLARE_READ32_MEMBER(dafb_dac_r);
-	DECLARE_WRITE32_MEMBER(dafb_dac_w);
+	uint32_t dafb_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dafb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dafb_dac_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dafb_dac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(macwd_r);
-	DECLARE_WRITE32_MEMBER(macwd_w);
+	uint32_t macwd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void macwd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
@@ -491,27 +491,27 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
 	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
-	DECLARE_READ8_MEMBER(mac_via_in_a);
-	DECLARE_READ8_MEMBER(mac_via_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b);
-	DECLARE_READ8_MEMBER(mac_via_in_a_pmu);
-	DECLARE_READ8_MEMBER(mac_via_in_b_pmu);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a_pmu);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b_pmu);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b_bbadb);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b_egadb);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b_cdadb);
-	DECLARE_READ8_MEMBER(mac_via_in_b_via2pmu);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b_via2pmu);
-	DECLARE_READ8_MEMBER(mac_via2_in_a);
-	DECLARE_READ8_MEMBER(mac_via2_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via2_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via2_out_b);
-	DECLARE_READ8_MEMBER(mac_via2_in_a_pmu);
-	DECLARE_READ8_MEMBER(mac_via2_in_b_pmu);
-	DECLARE_WRITE8_MEMBER(mac_via2_out_a_pmu);
-	DECLARE_WRITE8_MEMBER(mac_via2_out_b_pmu);
+	uint8_t mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mac_via_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_via_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b_bbadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b_egadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b_cdadb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mac_via_in_b_via2pmu(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via_out_b_via2pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mac_via2_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_via2_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via2_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via2_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mac_via2_in_a_pmu(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_via2_in_b_pmu(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via2_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via2_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mac_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);

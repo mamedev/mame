@@ -47,15 +47,15 @@ public:
 
 	uint8_t m_hop_io;
 	uint8_t m_bell_io;
-	DECLARE_WRITE8_MEMBER(output_0_w);
-	DECLARE_READ8_MEMBER(input_1_r);
-	DECLARE_WRITE8_MEMBER(output_1_w);
+	void output_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_cchance();
 	void machine_reset_cchance();
 };
 
 
-WRITE8_MEMBER(cchance_state::output_0_w)
+void cchance_state::output_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//---- --x- divider?
 	machine().bookkeeping().coin_lockout_w(0, ~data & 1);
@@ -64,12 +64,12 @@ WRITE8_MEMBER(cchance_state::output_0_w)
 }
 
 
-READ8_MEMBER(cchance_state::input_1_r)
+uint8_t cchance_state::input_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
-WRITE8_MEMBER(cchance_state::output_1_w)
+void cchance_state::output_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hop_io = (data & 0x40)>>4;
 	m_bell_io = (data & 0x80)>>4;

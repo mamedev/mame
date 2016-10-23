@@ -34,10 +34,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( octave_w );
-	DECLARE_WRITE8_MEMBER( vlmna_w );
-	DECLARE_WRITE8_MEMBER( vlmnb_w );
-	DECLARE_WRITE8_MEMBER( sync_w );
+	void octave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vlmna_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vlmnb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

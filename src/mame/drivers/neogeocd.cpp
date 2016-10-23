@@ -78,12 +78,12 @@ public:
 	void NeoCDDoDMA(address_space& curr_space);
 	void set_DMA_regs(int offset, uint16_t wordValue);
 
-	DECLARE_READ16_MEMBER(neocd_memcard_r);
-	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
-	DECLARE_READ16_MEMBER(neocd_control_r);
-	DECLARE_WRITE16_MEMBER(neocd_control_w);
-	DECLARE_READ8_MEMBER(neocd_transfer_r);
-	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
+	uint16_t neocd_memcard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void neocd_memcard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t neocd_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void neocd_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t neocd_transfer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void neocd_transfer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 
@@ -149,13 +149,13 @@ protected:
 
 
 /* The NeoCD has an 8kB internal memory card, instead of memcard slots like the MVS and AES */
-READ16_MEMBER(ngcd_state::neocd_memcard_r)
+uint16_t ngcd_state::neocd_memcard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_meminternal_data[offset] | 0xff00;
 }
 
 
-WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
+void ngcd_state::neocd_memcard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -170,7 +170,7 @@ WRITE16_MEMBER(ngcd_state::neocd_memcard_w)
  *
  *************************************/
 
-READ16_MEMBER(ngcd_state::neocd_control_r)
+uint16_t ngcd_state::neocd_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 
@@ -199,7 +199,7 @@ READ16_MEMBER(ngcd_state::neocd_control_r)
 }
 
 
-WRITE16_MEMBER(ngcd_state::neocd_control_w)
+void ngcd_state::neocd_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t sekAddress = 0xff0000+ (offset*2);
 	uint16_t wordValue = data;
@@ -398,7 +398,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
  */
 
 
-READ8_MEMBER(ngcd_state::neocd_transfer_r)
+uint8_t ngcd_state::neocd_transfer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t sekAddress = 0xe00000+ (offset);
 	int address;
@@ -428,7 +428,7 @@ READ8_MEMBER(ngcd_state::neocd_transfer_r)
 
 }
 
-WRITE8_MEMBER(ngcd_state::neocd_transfer_w)
+void ngcd_state::neocd_transfer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t byteValue = data;
 	uint32_t sekAddress = 0xe00000+ (offset);

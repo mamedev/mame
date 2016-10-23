@@ -58,13 +58,13 @@ void mosaic_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(mosaic_state::fgvideoram_w)
+void mosaic_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mosaic_state::bgvideoram_w)
+void mosaic_state::bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);

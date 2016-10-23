@@ -42,8 +42,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(plan80_04_r);
-	DECLARE_WRITE8_MEMBER(plan80_09_w);
+	uint8_t plan80_04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void plan80_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	const uint8_t* m_p_chargen;
 	uint8_t m_kbd_row;
@@ -56,7 +56,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-READ8_MEMBER( plan80_state::plan80_04_r )
+uint8_t plan80_state::plan80_04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -78,7 +78,7 @@ READ8_MEMBER( plan80_state::plan80_04_r )
 	return data;
 }
 
-WRITE8_MEMBER( plan80_state::plan80_09_w )
+void plan80_state::plan80_09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd_row = data;
 }

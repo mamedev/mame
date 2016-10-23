@@ -34,12 +34,12 @@ INTERRUPT_GEN_MEMBER(battlnts_state::battlnts_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
+void battlnts_state::battlnts_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
+void battlnts_state::battlnts_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 6 & 7 = bank number */
 	m_rombank->set_entry((data & 0xc0) >> 6);

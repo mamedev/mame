@@ -58,7 +58,7 @@ starfira has one less rom in total than starfire but everything passes as
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_scratch_w)
+void starfire_state::starfire_scratch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
@@ -78,7 +78,7 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 }
 
 
-READ8_MEMBER(starfire_state::starfire_scratch_r)
+uint8_t starfire_state::starfire_scratch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
@@ -97,7 +97,7 @@ READ8_MEMBER(starfire_state::starfire_scratch_r)
  *
  *************************************/
 
-WRITE8_MEMBER(starfire_state::starfire_sound_w)
+void starfire_state::starfire_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// starfire sound samples (preliminary)
 	uint8_t rise = data & ~m_prev_sound;
@@ -125,14 +125,14 @@ WRITE8_MEMBER(starfire_state::starfire_sound_w)
 	else if (rise & 0x10) m_samples->start(4, 4);
 }
 
-WRITE8_MEMBER(starfire_state::fireone_sound_w)
+void starfire_state::fireone_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: sound
 	m_fireone_select = (data & 0x8) ? 0 : 1;
 }
 
 
-READ8_MEMBER(starfire_state::starfire_input_r)
+uint8_t starfire_state::starfire_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 15)
 	{
@@ -153,7 +153,7 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 	}
 }
 
-READ8_MEMBER(starfire_state::fireone_input_r)
+uint8_t starfire_state::fireone_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t fireone_paddle_map[64] =
 	{

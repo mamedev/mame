@@ -147,14 +147,14 @@ void nes_jy_typea_device::pcb_reset()
  -------------------------------------------------*/
 
 
-READ8_MEMBER(nes_jy_typea_device::nt_r)
+uint8_t nes_jy_typea_device::nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	irq_clock(0, 2);
 	return m_nt_access[page][offset & 0x3ff];
 }
 
-READ8_MEMBER(nes_jy_typea_device::chr_r)
+uint8_t nes_jy_typea_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 	irq_clock(0, 2);
@@ -244,7 +244,7 @@ void nes_jy_typea_device::scanline_irq(int scanline, int vblank, int blanked)
 
 
 // 0x5000-0x5fff : sort of protection?
-READ8_MEMBER(nes_jy_typea_device::read_l)
+uint8_t nes_jy_typea_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x\n", offset));
 	offset += 0x100;
@@ -268,7 +268,7 @@ READ8_MEMBER(nes_jy_typea_device::read_l)
 	return m_open_bus;   // open bus
 }
 
-WRITE8_MEMBER(nes_jy_typea_device::write_l)
+void nes_jy_typea_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -285,7 +285,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_l)
 }
 
 // 0x6000-0x7fff : WRAM or open bus
-READ8_MEMBER(nes_jy_typea_device::read_m)
+uint8_t nes_jy_typea_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x\n", offset));
 
@@ -428,7 +428,7 @@ void nes_jy_typea_device::update_banks(int reg)
 }
 
 
-WRITE8_MEMBER(nes_jy_typea_device::write_h)
+void nes_jy_typea_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("JY Company write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -572,7 +572,7 @@ void nes_jy_typec_device::update_mirror_typec()
 		update_mirror_typea();
 }
 
-READ8_MEMBER(nes_jy_typec_device::chr_r)
+uint8_t nes_jy_typec_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 

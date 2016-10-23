@@ -153,9 +153,9 @@ public:
 
 	uint8_t m_laserdisc_data;
 	int m_nmimask;
-	DECLARE_READ8_MEMBER(acia_status_hack_r);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(decold_sound_cmd_w);
+	uint8_t acia_status_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decold_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
@@ -247,20 +247,20 @@ uint32_t deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_ind
 }
 
 
-WRITE8_MEMBER(deco_ld_state::decold_sound_cmd_w)
+void deco_ld_state::decold_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* unknown, but certainly related to audiocpu somehow */
-READ8_MEMBER(deco_ld_state::sound_status_r)
+uint8_t deco_ld_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff ^ 0x40;
 }
 
 // TODO: needs LD BIOS dumped
-READ8_MEMBER(deco_ld_state::acia_status_hack_r)
+uint8_t deco_ld_state::acia_status_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -291,7 +291,7 @@ ADDRESS_MAP_END
 /* sound arrangement is pratically identical to Zero Target. */
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(deco_ld_state::nmimask_w)
+void deco_ld_state::nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmimask = data & 0x80;
 }

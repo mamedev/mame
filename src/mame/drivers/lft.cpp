@@ -21,10 +21,10 @@ public:
 		, m_terminal(*this, "terminal")
 	{}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE16_MEMBER(term_w);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void term_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t keyin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 private:
 	uint8_t m_term_data;
@@ -55,24 +55,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( lft )
 INPUT_PORTS_END
 
-READ16_MEMBER( lft_state::keyin_r )
+uint16_t lft_state::keyin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ16_MEMBER( lft_state::status_r )
+uint16_t lft_state::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_term_data) ? 5 : 4;
 }
 
-WRITE8_MEMBER( lft_state::kbd_put )
+void lft_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
 
-WRITE16_MEMBER( lft_state::term_w )
+void lft_state::term_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_terminal->write(space, 0, data & 0x7f); // fix backspace
 }

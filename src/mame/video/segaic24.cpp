@@ -526,24 +526,24 @@ void segas24_tile::draw(screen_device &screen, bitmap_ind16 &bitmap, const recta
 void segas24_tile::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int lpri, int flags)
 { draw_common(screen, bitmap, cliprect, layer, lpri, flags); }
 
-READ16_MEMBER(segas24_tile::tile_r)
+uint16_t segas24_tile::tile_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return tile_ram[offset];
 }
 
-READ16_MEMBER(segas24_tile::char_r)
+uint16_t segas24_tile::char_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return char_ram[offset];
 }
 
-WRITE16_MEMBER(segas24_tile::tile_w)
+void segas24_tile::tile_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(tile_ram.get() + offset);
 	if(offset < 0x4000)
 		tile_layer[offset >> 12]->mark_tile_dirty(offset & 0xfff);
 }
 
-WRITE16_MEMBER(segas24_tile::char_w)
+void segas24_tile::char_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old = char_ram[offset];
 	COMBINE_DATA(char_ram.get() + offset);
@@ -551,23 +551,23 @@ WRITE16_MEMBER(segas24_tile::char_w)
 		gfx(char_gfx_index)->mark_dirty(offset / 16);
 }
 
-READ32_MEMBER(segas24_tile::tile32_r)
+uint32_t segas24_tile::tile32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return tile_r(space, offset*2, mem_mask&0xffff) | tile_r(space, (offset*2)+1, mem_mask>>16)<<16;
 }
 
-READ32_MEMBER(segas24_tile::char32_r)
+uint32_t segas24_tile::char32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return char_r(space, offset*2, mem_mask&0xffff) | char_r(space, (offset*2)+1, mem_mask>>16)<<16;
 }
 
-WRITE32_MEMBER(segas24_tile::tile32_w)
+void segas24_tile::tile32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	tile_w(space, offset*2, data&0xffff, mem_mask&0xffff);
 	tile_w(space, (offset*2)+1, data>>16, mem_mask>>16);
 }
 
-WRITE32_MEMBER(segas24_tile::char32_w)
+void segas24_tile::char32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	char_w(space, offset*2, data&0xffff, mem_mask&0xffff);
 	char_w(space, (offset*2)+1, data>>16, mem_mask>>16);
@@ -808,12 +808,12 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitma
 }
 
 
-WRITE16_MEMBER(segas24_sprite::write)
+void segas24_sprite::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(sprite_ram.get() + offset);
 }
 
-READ16_MEMBER(segas24_sprite::read)
+uint16_t segas24_sprite::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return sprite_ram[offset];
 }
@@ -830,12 +830,12 @@ void segas24_mixer::device_start()
 	save_item(NAME(mixer_reg));
 }
 
-WRITE16_MEMBER(segas24_mixer::write)
+void segas24_mixer::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(mixer_reg + offset);
 }
 
-READ16_MEMBER(segas24_mixer::read)
+uint16_t segas24_mixer::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mixer_reg[offset];
 }

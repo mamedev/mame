@@ -54,13 +54,13 @@ public:
 
 	void late_setup();
 
-	DECLARE_WRITE8_MEMBER(bram_w);
-	DECLARE_WRITE8_MEMBER(intf_w);
-	DECLARE_WRITE8_MEMBER(acard_w);
+	void bram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
-	DECLARE_READ8_MEMBER(bram_r);
-	DECLARE_READ8_MEMBER(intf_r);
-	DECLARE_READ8_MEMBER(acard_r);
+	uint8_t bram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t intf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t acard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 

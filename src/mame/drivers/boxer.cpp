@@ -54,14 +54,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(boxer_input_r);
-	DECLARE_READ8_MEMBER(boxer_misc_r);
-	DECLARE_WRITE8_MEMBER(boxer_bell_w);
-	DECLARE_WRITE8_MEMBER(boxer_sound_w);
-	DECLARE_WRITE8_MEMBER(boxer_pot_w);
-	DECLARE_WRITE8_MEMBER(boxer_irq_reset_w);
-	DECLARE_WRITE8_MEMBER(boxer_crowd_w);
-	DECLARE_WRITE8_MEMBER(boxer_led_w);
+	uint8_t boxer_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t boxer_misc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void boxer_bell_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boxer_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boxer_pot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boxer_irq_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boxer_crowd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void boxer_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(boxer);
@@ -238,7 +238,7 @@ uint32_t boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &b
  *
  *************************************/
 
-READ8_MEMBER(boxer_state::boxer_input_r)
+uint8_t boxer_state::boxer_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = ioport("IN0")->read();
 
@@ -249,7 +249,7 @@ READ8_MEMBER(boxer_state::boxer_input_r)
 }
 
 
-READ8_MEMBER(boxer_state::boxer_misc_r)
+uint8_t boxer_state::boxer_misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -278,17 +278,17 @@ READ8_MEMBER(boxer_state::boxer_misc_r)
 
 
 
-WRITE8_MEMBER(boxer_state::boxer_bell_w)
+void boxer_state::boxer_bell_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 
-WRITE8_MEMBER(boxer_state::boxer_sound_w)
+void boxer_state::boxer_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 
-WRITE8_MEMBER(boxer_state::boxer_pot_w)
+void boxer_state::boxer_pot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => HPOT1 */
 	/* BIT1 => VPOT1 */
@@ -303,13 +303,13 @@ WRITE8_MEMBER(boxer_state::boxer_pot_w)
 }
 
 
-WRITE8_MEMBER(boxer_state::boxer_irq_reset_w)
+void boxer_state::boxer_irq_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(boxer_state::boxer_crowd_w)
+void boxer_state::boxer_crowd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => ATTRACT */
 	/* BIT1 => CROWD-1 */
@@ -320,7 +320,7 @@ WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 }
 
 
-WRITE8_MEMBER(boxer_state::boxer_led_w)
+void boxer_state::boxer_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, !(data & 1));
 	output().set_led_value(0, !(data & 2));

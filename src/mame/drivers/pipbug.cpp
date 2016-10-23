@@ -53,13 +53,13 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
+	void pipbug_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<rs232_port_device> m_rs232;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
 };
 
-WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
+void pipbug_state::pipbug_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // 0x80 is written here - not connected in the baby 2650
 }

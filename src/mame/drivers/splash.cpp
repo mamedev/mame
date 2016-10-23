@@ -50,7 +50,7 @@ More notes about Funny Strip protection issues at the bottom of source file (DRI
 #include "sound/3812intf.h"
 #include "includes/splash.h"
 
-WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
+void splash_state::splash_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -59,7 +59,7 @@ WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
 	}
 }
 
-WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
+void splash_state::roldf_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -71,7 +71,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
-WRITE16_MEMBER(splash_state::coin_w)
+void splash_state::coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM                                                 /* Work RAM */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
+void splash_state::splash_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data = data;
 }
@@ -129,13 +129,13 @@ ADDRESS_MAP_END
 /* Return of Lady Frog Maps */
 /* note, sprite ram has moved, extra protection ram, and extra write for the pixel layer */
 
-READ16_MEMBER(splash_state::roldfrog_bombs_r)
+uint16_t splash_state::roldfrog_bombs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_ret ^= 0x100;
 	return m_ret;
 }
 
-WRITE8_MEMBER(splash_state::sound_bank_w)
+void splash_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("sound_bank")->set_entry(data & 0xf);
 }
@@ -147,7 +147,7 @@ void splash_state::roldfrog_update_irq(  )
 	m_audiocpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
-WRITE8_MEMBER(splash_state::roldfrog_vblank_ack_w)
+void splash_state::roldfrog_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vblank_irq = 0;
 	roldfrog_update_irq();
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( roldfrog_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
 ADDRESS_MAP_END
 
-READ8_MEMBER(splash_state::roldfrog_unk_r)
+uint8_t splash_state::roldfrog_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// dragon punch leftovers
 	return 0xff;
@@ -204,18 +204,18 @@ static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
 
-READ16_MEMBER(splash_state::spr_read)
+uint16_t splash_state::spr_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset]|0xff00;
 }
 
-WRITE16_MEMBER(splash_state::spr_write)
+void splash_state::spr_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 	m_spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
 }
 
-WRITE16_MEMBER(splash_state::funystrp_sh_irqtrigger_w)
+void splash_state::funystrp_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data>>8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -246,29 +246,29 @@ static ADDRESS_MAP_START( funystrp_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
 ADDRESS_MAP_END
 
-READ8_MEMBER(splash_state::int_source_r)
+uint8_t splash_state::int_source_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ~m_msm_source;
 }
 
-WRITE8_MEMBER(splash_state::msm1_data_w)
+void splash_state::msm1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data1=data;
 	m_msm_source&=~1;
 	m_msm_toggle1=0;
 }
 
-WRITE8_MEMBER(splash_state::msm1_interrupt_w)
+void splash_state::msm1_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_interrupt_enable1=~data;
 }
 
-WRITE8_MEMBER(splash_state::msm2_interrupt_w)
+void splash_state::msm2_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_interrupt_enable2=~data;
 }
 
-WRITE8_MEMBER(splash_state::msm2_data_w)
+void splash_state::msm2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data2=data;
 	m_msm_source&=~2;
@@ -1081,7 +1081,7 @@ void splash_state::init_rebus()
 
 
 
-READ16_MEMBER(splash_state::funystrp_protection_r)
+uint16_t splash_state::funystrp_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -1362,7 +1362,7 @@ READ16_MEMBER(splash_state::funystrp_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(splash_state::funystrp_protection_w)
+void splash_state::funystrp_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int ofst = (0x100000/2)+offset;
 

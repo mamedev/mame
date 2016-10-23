@@ -38,8 +38,8 @@ public:
 		dev.m_channel[1].m_read_ch = readcb;
 	}
 
-	DECLARE_READ32_MEMBER(decathlt_prot1_r);
-	DECLARE_READ32_MEMBER(decathlt_prot2_r);
+	uint32_t decathlt_prot1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t decathlt_prot2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t genericdecathlt_prot_r(uint32_t mem_mask, int channel);
 
 	void write_prot_data(uint32_t data, uint32_t mem_mask, int channel, int rev_words);
@@ -48,17 +48,17 @@ public:
 	void set_upload_mode(uint16_t data, int channel);
 	void set_prot_addr(uint32_t data, uint32_t mem_mask, int channel);
 
-	DECLARE_WRITE32_MEMBER(decathlt_prot1_w_doa);
-	DECLARE_WRITE32_MEMBER(decathlt_prot1_w);
-	DECLARE_WRITE32_MEMBER(decathlt_prot2_w);
-	DECLARE_WRITE32_MEMBER(decathlt_prot1_srcaddr_w);
-	DECLARE_WRITE32_MEMBER(decathlt_prot2_srcaddr_w);
+	void decathlt_prot1_w_doa(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void decathlt_prot1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void decathlt_prot2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void decathlt_prot1_srcaddr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void decathlt_prot2_srcaddr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void install_decathlt_protection();
 	void install_doa_protection();
 
-	DECLARE_READ32_MEMBER(doa_prot_r);
-	DECLARE_WRITE32_MEMBER(doa_prot_w);
+	uint32_t doa_prot_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void doa_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_start() override;

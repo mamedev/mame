@@ -62,13 +62,13 @@ void espial_state::machine_start()
 }
 
 
-WRITE8_MEMBER(espial_state::espial_master_interrupt_mask_w)
+void espial_state::espial_master_interrupt_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_nmi_enabled = ~(data & 1);
 }
 
 
-WRITE8_MEMBER(espial_state::espial_sound_nmi_mask_w)
+void espial_state::espial_sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enabled = data & 1;
 }
@@ -92,7 +92,7 @@ INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 }
 
 
-WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
+void espial_state::espial_master_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

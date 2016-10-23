@@ -49,10 +49,10 @@ public:
 	int         m_sprites_scrolldx;
 	int         m_sprites_scrolldy;
 
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
-	DECLARE_WRITE16_MEMBER(magicbub_sound_command_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
+	void sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magicbub_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_magicbub();
 	void machine_start_shocking();
 	void machine_reset_shocking();

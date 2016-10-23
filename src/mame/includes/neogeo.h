@@ -65,19 +65,19 @@ public:
 		m_slot6(*this, "cslot6")
 	{ }
 
-	DECLARE_READ16_MEMBER(memcard_r);
-	DECLARE_WRITE16_MEMBER(memcard_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_READ8_MEMBER(audio_cpu_bank_select_r);
-	DECLARE_WRITE8_MEMBER(audio_cpu_enable_nmi_w);
-	DECLARE_READ16_MEMBER(unmapped_r);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_READ16_MEMBER(video_register_r);
-	DECLARE_WRITE16_MEMBER(video_register_w);
-	DECLARE_READ16_MEMBER(in0_r);
-	DECLARE_READ16_MEMBER(in1_r);
+	uint16_t memcard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void memcard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t audio_cpu_bank_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_cpu_enable_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t unmapped_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t video_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void video_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t in0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t in1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
@@ -87,21 +87,21 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 
 	// MVS-specific
-	DECLARE_WRITE16_MEMBER(save_ram_w);
+	void save_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
 
 	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(io_control_w);
-	DECLARE_WRITE8_MEMBER(system_control_w);
-	DECLARE_READ16_MEMBER(banked_vectors_r);
-	DECLARE_WRITE16_MEMBER(write_banksel);
-	DECLARE_WRITE16_MEMBER(write_bankprot);
-	DECLARE_WRITE16_MEMBER(write_bankprot_pvc);
-	DECLARE_WRITE16_MEMBER(write_bankprot_ms5p);
-	DECLARE_WRITE16_MEMBER(write_bankprot_kf2k3bl);
-	DECLARE_WRITE16_MEMBER(write_bankprot_kof10th);
-	DECLARE_READ16_MEMBER(read_lorom_kof10th);
+	void io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void system_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t banked_vectors_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_banksel(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_bankprot(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_bankprot_pvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_bankprot_ms5p(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_bankprot_kf2k3bl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_bankprot_kof10th(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_lorom_kof10th(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void init_neogeo();
 
@@ -247,7 +247,7 @@ class aes_state : public neogeo_state
 			, m_io_in2(*this, "IN2")
 	{}
 
-	DECLARE_READ16_MEMBER(aes_in2_r);
+	uint16_t aes_in2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
 	void machine_start_aes();
 
@@ -273,7 +273,7 @@ class neopcb_state : public neogeo_state
 	// device overrides
 	virtual void machine_start() override;
 
-	DECLARE_WRITE16_MEMBER(write_bankpvc);
+	void write_bankpvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
 

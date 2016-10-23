@@ -65,27 +65,27 @@ public:
 
 	required_device<fd1793_t> m_fdc;
 
-	DECLARE_READ8_MEMBER(orion128_system_r);
-	DECLARE_WRITE8_MEMBER(orion128_system_w);
-	DECLARE_READ8_MEMBER(orion128_romdisk_r);
-	DECLARE_WRITE8_MEMBER(orion128_romdisk_w);
-	DECLARE_WRITE8_MEMBER(orion128_video_mode_w);
-	DECLARE_WRITE8_MEMBER(orion128_video_page_w);
-	DECLARE_WRITE8_MEMBER(orion128_memory_page_w);
-	DECLARE_WRITE8_MEMBER(orion_disk_control_w);
-	DECLARE_READ8_MEMBER(orion128_floppy_r);
-	DECLARE_WRITE8_MEMBER(orion128_floppy_w);
-	DECLARE_READ8_MEMBER(orionz80_floppy_rtc_r);
-	DECLARE_WRITE8_MEMBER(orionz80_floppy_rtc_w);
-	DECLARE_WRITE8_MEMBER(orionz80_sound_w);
-	DECLARE_WRITE8_MEMBER(orionz80_sound_fe_w);
-	DECLARE_WRITE8_MEMBER(orionz80_memory_page_w);
-	DECLARE_WRITE8_MEMBER(orionz80_dispatcher_w);
-	DECLARE_READ8_MEMBER(orionz80_io_r);
-	DECLARE_WRITE8_MEMBER(orionz80_io_w);
-	DECLARE_WRITE8_MEMBER(orionpro_memory_page_w);
-	DECLARE_READ8_MEMBER(orionpro_io_r);
-	DECLARE_WRITE8_MEMBER(orionpro_io_w);
+	uint8_t orion128_system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orion128_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t orion128_romdisk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orion128_romdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orion128_video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orion128_video_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orion128_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orion_disk_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t orion128_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orion128_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t orionz80_floppy_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orionz80_floppy_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orionz80_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orionz80_sound_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orionz80_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orionz80_dispatcher_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t orionz80_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orionz80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orionpro_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t orionpro_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orionpro_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_orion128();
 	void machine_reset_orion128();
 	void video_start_orion128();
@@ -95,9 +95,9 @@ public:
 	void machine_reset_orionpro();
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
-	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
-	DECLARE_WRITE8_MEMBER(orion_romdisk_portb_w);
-	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
+	uint8_t orion_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orion_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orion_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 
 protected:

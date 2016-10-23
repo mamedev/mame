@@ -90,7 +90,7 @@ void super6_state::bankswitch()
 //  s100_w - S-100 bus extended address A16-A23
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::s100_w )
+void super6_state::s100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -115,7 +115,7 @@ WRITE8_MEMBER( super6_state::s100_w )
 //  bank0_w - on-board memory control port #0
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank0_w )
+void super6_state::bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -142,7 +142,7 @@ WRITE8_MEMBER( super6_state::bank0_w )
 //  bank1_w - on-board memory control port #1
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::bank1_w )
+void super6_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -174,7 +174,7 @@ WRITE8_MEMBER( super6_state::bank1_w )
 //  floppy_r - FDC synchronization/drive/density
 //-------------------------------------------------
 
-READ8_MEMBER( super6_state::fdc_r )
+uint8_t super6_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -203,7 +203,7 @@ READ8_MEMBER( super6_state::fdc_r )
 //  floppy_w - FDC synchronization/drive/density
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::fdc_w )
+void super6_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -244,7 +244,7 @@ WRITE8_MEMBER( super6_state::fdc_w )
 //  baud_w - baud rate
 //-------------------------------------------------
 
-WRITE8_MEMBER( super6_state::baud_w )
+void super6_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -362,25 +362,25 @@ TIMER_DEVICE_CALLBACK_MEMBER( super6_state::ctc_tick )
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER(super6_state::memory_read_byte)
+uint8_t super6_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::memory_write_byte)
+void super6_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(super6_state::io_read_byte)
+uint8_t super6_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(super6_state::io_write_byte)
+void super6_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

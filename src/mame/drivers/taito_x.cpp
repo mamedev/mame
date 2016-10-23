@@ -325,7 +325,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/2610intf.h"
 #include "sound/ym2151.h"
 
-READ16_MEMBER(taitox_state::superman_dsw_input_r)
+uint16_t taitox_state::superman_dsw_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -343,7 +343,7 @@ READ16_MEMBER(taitox_state::superman_dsw_input_r)
 	}
 }
 
-READ16_MEMBER(taitox_state::daisenpu_input_r)
+uint16_t taitox_state::daisenpu_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -360,7 +360,7 @@ READ16_MEMBER(taitox_state::daisenpu_input_r)
 	}
 }
 
-WRITE16_MEMBER(taitox_state::daisenpu_input_w)
+void taitox_state::daisenpu_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -378,7 +378,7 @@ WRITE16_MEMBER(taitox_state::daisenpu_input_w)
 }
 
 
-WRITE16_MEMBER(taitox_state::kyustrkr_input_w)
+void taitox_state::kyustrkr_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -398,7 +398,7 @@ WRITE16_MEMBER(taitox_state::kyustrkr_input_w)
 
 /**************************************************************************/
 
-WRITE8_MEMBER(taitox_state::sound_bankswitch_w)
+void taitox_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 3);
 }

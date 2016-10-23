@@ -242,10 +242,10 @@ public:
 	required_device<dvg_device> m_dvg;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
-	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
-	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
-	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
+	uint8_t omegrace_vg_go_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t omegrace_spinner1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void omegrace_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void omegrace_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_omegrace();
 	virtual void machine_reset() override;
 };
@@ -272,7 +272,7 @@ void omegrace_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
+uint8_t omegrace_state::omegrace_vg_go_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_dvg->go_w(space, 0, 0);
 	return 0;
@@ -310,7 +310,7 @@ static const uint8_t spinnerTable[64] =
 };
 
 
-READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
+uint8_t omegrace_state::omegrace_spinner1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (spinnerTable[ioport("SPIN0")->read() & 0x3f]);
 }
@@ -323,7 +323,7 @@ READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
  *
  *************************************/
 
-WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
+void omegrace_state::omegrace_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -339,7 +339,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 }
 
 
-WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
+void omegrace_state::omegrace_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

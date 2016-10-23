@@ -104,7 +104,7 @@
 
 /***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
+void segas1x_bootleg_state::sound_command_nmi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -113,7 +113,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 	}
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
+void segas1x_bootleg_state::sound_command_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
+void segas1x_bootleg_state::sys16_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -197,7 +197,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-READ16_MEMBER(segas1x_bootleg_state::passht4b_service_r)
+uint16_t segas1x_bootleg_state::passht4b_service_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t val = ioport("SERVICE")->read();
 
@@ -234,17 +234,17 @@ READ16_MEMBER(segas1x_bootleg_state::passht4b_service_r)
 	return val;
 }
 
-READ16_MEMBER(segas1x_bootleg_state::passht4b_io1_r)
+uint16_t segas1x_bootleg_state::passht4b_io1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_passht4b_io1_val;
 }
 
-READ16_MEMBER(segas1x_bootleg_state::passht4b_io2_r)
+uint16_t segas1x_bootleg_state::passht4b_io2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_passht4b_io2_val;
 }
 
-READ16_MEMBER(segas1x_bootleg_state::passht4b_io3_r)
+uint16_t segas1x_bootleg_state::passht4b_io3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_passht4b_io3_val;
 }
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
+void segas1x_bootleg_state::sys16_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -351,7 +351,7 @@ ADDRESS_MAP_END
     There seems to be more data in the high bits of the ROM bank control word which may be related.
 ***************************************************************************/
 
-WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
+void segas1x_bootleg_state::tturfbl_msm5205_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_buffer = data;
 }
@@ -366,14 +366,14 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
+uint8_t segas1x_bootleg_state::tturfbl_soundbank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_soundbank_ptr)
 		return m_soundbank_ptr[offset & 0x3fff];
 	return 0x80;
 }
 
-WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_w)
+void segas1x_bootleg_state::tturfbl_soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *mem = memregion("soundcpu")->base();
 
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
+void segas1x_bootleg_state::upd7759_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)//*
 {
 	int offs, size = memregion("soundcpu")->bytes() - 0x10000;
 
@@ -529,17 +529,17 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgpage_w)
+void segas1x_bootleg_state::s16bl_bgpage_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	set_bg_page(data);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgpage_w)
+void segas1x_bootleg_state::s16bl_fgpage_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	set_fg_page(data);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)
+void segas1x_bootleg_state::s16bl_fgscrollx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0x1ff;
 	int bank = (data & 0xc000) >> 14;
@@ -551,7 +551,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)
 	m_fg_scrollx = -scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_w)
+void segas1x_bootleg_state::s16bl_fgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0x1ff;
 
@@ -562,14 +562,14 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_w)
 }
 
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrolly_w)
+void segas1x_bootleg_state::s16bl_fgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0xff;
 
 	m_fg_scrolly = scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrollx_w)
+void segas1x_bootleg_state::s16bl_bgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0x1ff;
 
@@ -578,7 +578,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrollx_w)
 	m_bg_scrollx = -scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgscrolly_w)
+void segas1x_bootleg_state::s16bl_bgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0xff;
 
@@ -656,25 +656,25 @@ void segas1x_bootleg_state::datsu_set_pages(  )
 	set_bg_page(page);
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page0_w)
+void segas1x_bootleg_state::datsu_page0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_datsu_page[0]);
 	datsu_set_pages();
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page1_w)
+void segas1x_bootleg_state::datsu_page1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_datsu_page[1]);
 	datsu_set_pages();
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page2_w)
+void segas1x_bootleg_state::datsu_page2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_datsu_page[2]);
 	datsu_set_pages();
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
+void segas1x_bootleg_state::datsu_page3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_datsu_page[3]);
 	datsu_set_pages();
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)
+void segas1x_bootleg_state::goldnaxeb2_fgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0x1ff;
 	int bank = (data & 0xc000) >> 14;
@@ -742,7 +742,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)
 	m_fg_scrollx = -scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w)
+void segas1x_bootleg_state::goldnaxeb2_bgscrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0x1ff;
 
@@ -752,7 +752,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgscrollx_w)
 }
 
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w)
+void segas1x_bootleg_state::goldnaxeb2_fgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0xff;
 
@@ -760,7 +760,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgscrolly_w)
 	m_fg_scrolly = scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w)
+void segas1x_bootleg_state::goldnaxeb2_bgscrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int scroll = data & 0xff;
 
@@ -768,7 +768,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgscrolly_w)
 	m_bg_scrolly = scroll;
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgpage_w)
+void segas1x_bootleg_state::goldnaxeb2_fgpage_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t page;
 
@@ -783,7 +783,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgpage_w)
 
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
+void segas1x_bootleg_state::goldnaxeb2_bgpage_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t page;
 
@@ -825,7 +825,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 
-WRITE16_MEMBER(segas1x_bootleg_state::eswat_tilebank0_w)
+void segas1x_bootleg_state::eswat_tilebank0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -889,7 +889,7 @@ static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(segas1x_bootleg_state::beautyb_unkx_r)
+uint16_t segas1x_bootleg_state::beautyb_unkx_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_beautyb_unkx++;
 	m_beautyb_unkx &= 0x7f;
@@ -959,7 +959,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys18_refreshenable_w)
+void segas1x_bootleg_state::sys18_refreshenable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -967,7 +967,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_refreshenable_w)
 	}
 }
 
-WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
+void segas1x_bootleg_state::sys18_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -976,7 +976,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 	}
 }
 
-READ8_MEMBER(segas1x_bootleg_state::system18_bank_r)
+uint8_t segas1x_bootleg_state::system18_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_sound_bank != nullptr)
 		return m_sound_bank[offset];
@@ -994,7 +994,7 @@ static ADDRESS_MAP_START( sound_18_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(segas1x_bootleg_state::sys18_soundbank_w)
+void segas1x_bootleg_state::sys18_soundbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *mem = memregion("soundcpu")->base();
 	int rom = (data >> 6) & 3;
@@ -1136,7 +1136,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
+void segas1x_bootleg_state::shdancbl_msm5205_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_buffer = data;
 }
@@ -1151,14 +1151,14 @@ WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
+uint8_t segas1x_bootleg_state::shdancbl_soundbank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_soundbank_ptr)
 		return m_soundbank_ptr[offset & 0x3fff];
 	return 0xff;
 }
 
-WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_bankctrl_w)
+void segas1x_bootleg_state::shdancbl_bankctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *mem = memregion("soundcpu")->base();
 
@@ -1303,7 +1303,7 @@ static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(segas1x_bootleg_state::ddcrewbl_spritebank_w)
+void segas1x_bootleg_state::ddcrewbl_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("banking write %08x: %04x (%04x %04x)\n", space.device().safe_pc(), offset*2, data&mem_mask, mem_mask);
 
@@ -3708,7 +3708,7 @@ void segas1x_bootleg_state::init_ddcrewbl()
 }
 
 
-WRITE16_MEMBER(segas1x_bootleg_state::altbeastbl_gfx_w)
+void segas1x_bootleg_state::altbeastbl_gfx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset) {
 		case 0x00: {

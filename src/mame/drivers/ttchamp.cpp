@@ -116,23 +116,23 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
-	DECLARE_WRITE16_MEMBER(paloff_w);
-	DECLARE_WRITE16_MEMBER(paldat_w);
+	void paloff_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paldat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(port10_w);
+	void port10_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(port20_w);
-	DECLARE_WRITE16_MEMBER(port62_w);
+	void port20_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void port62_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(port1e_r);
+	uint16_t port1e_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(pic_r);
-	DECLARE_WRITE16_MEMBER(pic_w);
+	uint16_t pic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(blit_start_r);
+	uint16_t blit_start_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(mem_r);
-	DECLARE_WRITE16_MEMBER(mem_w);
+	uint16_t mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -264,19 +264,19 @@ uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE16_MEMBER(ttchamp_state::paloff_w)
+void ttchamp_state::paloff_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paloff);
 }
 
 
-WRITE16_MEMBER(ttchamp_state::paldat_w)
+void ttchamp_state::paldat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 0x8000 of offset is sometimes set
 	m_palette->set_pen_color(m_paloff & 0x3ff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
-READ16_MEMBER(ttchamp_state::pic_r)
+uint16_t ttchamp_state::pic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  printf("%06x: read from PIC (%04x)\n", space.device().safe_pc(),mem_mask);
 	if (m_picmodex == PIC_SET_READLATCH)
@@ -291,7 +291,7 @@ READ16_MEMBER(ttchamp_state::pic_r)
 
 }
 
-WRITE16_MEMBER(ttchamp_state::pic_w)
+void ttchamp_state::pic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("%06x: write to PIC %04x (%04x) (%d)\n", space.device().safe_pc(),data,mem_mask, m_picmodex);
 	if (m_picmodex == PIC_IDLE)
@@ -350,7 +350,7 @@ WRITE16_MEMBER(ttchamp_state::pic_w)
 }
 
 
-READ16_MEMBER(ttchamp_state::mem_r)
+uint16_t ttchamp_state::mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bits 0xf0 are used too, so this is likely wrong.
 
@@ -382,7 +382,7 @@ READ16_MEMBER(ttchamp_state::mem_r)
 	}
 }
 
-WRITE16_MEMBER(ttchamp_state::mem_w)
+void ttchamp_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// this is very strange, we use the offset (address bits) not data bits to set values..
 	// I get the impression this might actually overlay the entire address range, including RAM and regular VRAM?
@@ -503,20 +503,20 @@ static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
 ADDRESS_MAP_END
 
 /* Re-use same parameters as before (one-shot) */
-READ16_MEMBER(ttchamp_state::port1e_r)
+uint16_t ttchamp_state::port1e_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_spritesinit = 3;
 	return 0xff;
 }
 
-READ16_MEMBER(ttchamp_state::blit_start_r)
+uint16_t ttchamp_state::blit_start_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_spritesinit = 1;
 	return 0xff;
 }
 
 /* blitter mode select */
-WRITE16_MEMBER(ttchamp_state::port10_w)
+void ttchamp_state::port10_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	 --xx ---- fill enable
@@ -527,14 +527,14 @@ WRITE16_MEMBER(ttchamp_state::port10_w)
 }
 
 /* selects upper bank for the blitter */
-WRITE16_MEMBER(ttchamp_state::port20_w)
+void ttchamp_state::port20_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%06x: port20_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 1;
 }
 
 /* selects lower bank for the blitter */
-WRITE16_MEMBER(ttchamp_state::port62_w)
+void ttchamp_state::port62_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%06x: port62_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
 	m_rombank = 0;

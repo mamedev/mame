@@ -66,17 +66,17 @@ public:
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(irq_1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(irq_3_ctrl_w);
-	DECLARE_WRITE8_MEMBER(sreset_w);
-	DECLARE_WRITE8_MEMBER(freset_w);
-	DECLARE_WRITE8_MEMBER(customio_3_w);
-	DECLARE_READ8_MEMBER(customio_3_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(starfield_control_w);
-	DECLARE_WRITE8_MEMBER(out_lamps0);
-	DECLARE_WRITE8_MEMBER(out_lamps1);
+	void irq_1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_3_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void freset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void customio_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t customio_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void starfield_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_lamps0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out_lamps1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_gaplus();
 	void init_gaplusd();

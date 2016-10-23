@@ -458,7 +458,7 @@ static const int dendego_pressure_table[0x100] =
 ***************************************************************************/
 
 // dsp common ram has similar interrupt capability as MB8421
-WRITE16_MEMBER(taitojc_state::dsp_to_main_7fe_w)
+void taitojc_state::dsp_to_main_7fe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 
@@ -467,7 +467,7 @@ WRITE16_MEMBER(taitojc_state::dsp_to_main_7fe_w)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-READ16_MEMBER(taitojc_state::dsp_to_main_7fe_r)
+uint16_t taitojc_state::dsp_to_main_7fe_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -475,7 +475,7 @@ READ16_MEMBER(taitojc_state::dsp_to_main_7fe_r)
 	return m_dsp_shared_ram[0x7fe];
 }
 
-WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
+void taitojc_state::main_to_dsp_7ff_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[0x7ff]);
 
@@ -514,7 +514,7 @@ INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
 }
 
-WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
+void taitojc_state::jc_irq_unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// gets written to at the end of irq6 routine
 	// writes $02 or $06, depending on a value in DSP RAM, what does it mean?
@@ -527,18 +527,18 @@ WRITE8_MEMBER(taitojc_state::jc_irq_unk_w)
 
 ***************************************************************************/
 
-READ16_MEMBER(taitojc_state::dsp_shared_r)
+uint16_t taitojc_state::dsp_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_shared_ram[offset];
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_shared_w)
+void taitojc_state::dsp_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[offset]);
 }
 
 
-READ8_MEMBER(taitojc_state::mcu_comm_r)
+uint8_t taitojc_state::mcu_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -556,7 +556,7 @@ READ8_MEMBER(taitojc_state::mcu_comm_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitojc_state::mcu_comm_w)
+void taitojc_state::mcu_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -575,7 +575,7 @@ WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 	}
 }
 
-READ32_MEMBER(taitojc_state::snd_share_r)
+uint32_t taitojc_state::snd_share_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -588,7 +588,7 @@ READ32_MEMBER(taitojc_state::snd_share_r)
 	return 0;
 }
 
-WRITE32_MEMBER(taitojc_state::snd_share_w)
+void taitojc_state::snd_share_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -603,7 +603,7 @@ WRITE32_MEMBER(taitojc_state::snd_share_w)
 }
 
 
-READ8_MEMBER(taitojc_state::jc_pcbid_r)
+uint8_t taitojc_state::jc_pcbid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char pcb_id[0x40] =
 	{ "DEV=TC0870HVP   SYS=CG  VER=1.0"};
@@ -623,12 +623,12 @@ Not emulated yet...
 
 */
 
-READ8_MEMBER(taitojc_state::jc_lan_r)
+uint8_t taitojc_state::jc_lan_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(taitojc_state::jc_lan_w)
+void taitojc_state::jc_lan_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -664,7 +664,7 @@ The OKI is used for seat vibration effects.
 
 */
 
-WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
+void taitojc_state::dendego_speedmeter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_speed_meter != dendego_odometer_table[data])
 	{
@@ -674,7 +674,7 @@ WRITE8_MEMBER(taitojc_state::dendego_speedmeter_w)
 	}
 }
 
-WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
+void taitojc_state::dendego_brakemeter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_brake_meter != dendego_pressure_table[data])
 	{
@@ -699,33 +699,33 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-READ8_MEMBER(taitojc_state::hc11_comm_r)
+uint8_t taitojc_state::hc11_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_comm_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_comm_w)
+void taitojc_state::hc11_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(taitojc_state::hc11_data_r)
+uint8_t taitojc_state::hc11_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mcu_comm_hc11 |= 0x04;
 	m_mcu_comm_main |= 0x20;
 	return m_mcu_data_hc11;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_data_w)
+void taitojc_state::hc11_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_data_main = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_output_r)
+uint8_t taitojc_state::hc11_output_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_output;
 }
 
-WRITE8_MEMBER(taitojc_state::hc11_output_w)
+void taitojc_state::hc11_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     cabinet lamps, active high
@@ -752,7 +752,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 	m_mcu_output = data;
 }
 
-READ8_MEMBER(taitojc_state::hc11_analog_r)
+uint8_t taitojc_state::hc11_analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_analog_ports[offset].read_safe(0);
 }
@@ -802,37 +802,37 @@ ADDRESS_MAP_END
     0x703b: Unknown read/write
 */
 
-WRITE16_MEMBER(taitojc_state::dsp_math_projection_w)
+void taitojc_state::dsp_math_projection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_projection_data[offset] = data;
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_math_viewport_w)
+void taitojc_state::dsp_math_viewport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_viewport_data[offset] = data;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_projection_y_r)
+uint16_t taitojc_state::dsp_math_projection_y_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_projection_data[2] != 0) ? (m_projection_data[0] * m_viewport_data[0]) / m_projection_data[2] : 0;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_projection_x_r)
+uint16_t taitojc_state::dsp_math_projection_x_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_projection_data[2] != 0) ? (m_projection_data[1] * m_viewport_data[1]) / m_projection_data[2] : 0;
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_math_intersection_w)
+void taitojc_state::dsp_math_intersection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_intersection_data[offset] = data;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_intersection_r)
+uint16_t taitojc_state::dsp_math_intersection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_intersection_data[2] != 0) ? (m_intersection_data[0] * m_intersection_data[1]) / m_intersection_data[2] : 0;
 }
 
-READ16_MEMBER(taitojc_state::dsp_math_unk_r)
+uint16_t taitojc_state::dsp_math_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x7fff;
 }
@@ -840,13 +840,13 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 
 /**************************************************************************/
 
-READ16_MEMBER(taitojc_state::dsp_rom_r)
+uint16_t taitojc_state::dsp_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	assert (m_dsp_rom_pos < 0x800000); // never happens
 	return ((uint16_t*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
-WRITE16_MEMBER(taitojc_state::dsp_rom_w)
+void taitojc_state::dsp_rom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1151,7 +1151,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
+uint16_t taitojc_state::taitojc_dsp_idle_skip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x404c)
 		space.device().execute().spin_until_time(attotime::from_usec(500));
@@ -1159,7 +1159,7 @@ READ16_MEMBER(taitojc_state::taitojc_dsp_idle_skip_r)
 	return m_dsp_shared_ram[0x7f0];
 }
 
-READ16_MEMBER(taitojc_state::dendego2_dsp_idle_skip_r)
+uint16_t taitojc_state::dendego2_dsp_idle_skip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x402e)
 		space.device().execute().spin_until_time(attotime::from_usec(500));

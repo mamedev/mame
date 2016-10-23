@@ -9,7 +9,7 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 {
 }
 
-READ8_MEMBER(fdc37c665gt_device::read)
+uint8_t fdc37c665gt_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -28,7 +28,7 @@ READ8_MEMBER(fdc37c665gt_device::read)
 	return data;
 }
 
-WRITE8_MEMBER(fdc37c665gt_device::write)
+void fdc37c665gt_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0x3f8) == 0x3f8)
 	{

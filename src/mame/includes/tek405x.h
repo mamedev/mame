@@ -73,46 +73,46 @@ public:
 	void update_nmi();
 	void scan_keyboard();
 
-	DECLARE_WRITE8_MEMBER( lbs_w );
+	void lbs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( x_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( x_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( x_pia_pb_w );
+	uint8_t x_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void x_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void x_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( adot_w );
 	DECLARE_WRITE_LINE_MEMBER( bufclk_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( x_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( sa_r );
-	DECLARE_WRITE8_MEMBER( y_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( sb_w );
+	uint8_t sa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void y_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( sot_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( y_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( kb_pia_pa_r );
-	DECLARE_READ8_MEMBER( kb_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( kb_pia_pb_w );
+	uint8_t kb_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( kb_halt_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqb_w );
 
-	DECLARE_READ8_MEMBER( tape_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( tape_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( tape_pia_pb_w );
+	uint8_t tape_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tape_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tape_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqb_w );
 
-	DECLARE_WRITE8_MEMBER( dio_w );
-	DECLARE_READ8_MEMBER( gpib_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( gpib_pia_pb_w );
+	void dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gpib_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gpib_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( talk_w );
 	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqb_w );
 
-	DECLARE_WRITE8_MEMBER( com_pia_pa_w );
-	DECLARE_READ8_MEMBER( com_pia_pb_r );
-	DECLARE_WRITE8_MEMBER( com_pia_pb_w );
+	void com_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t com_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void com_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( com_pia_irqb_w );
 	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );

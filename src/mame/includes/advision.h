@@ -49,16 +49,16 @@ public:
 	void vh_write(int data);
 	void vh_update(int x);
 
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_READ8_MEMBER( ext_ram_r );
-	DECLARE_WRITE8_MEMBER( ext_ram_w );
-	DECLARE_READ8_MEMBER( controller_r );
-	DECLARE_WRITE8_MEMBER( bankswitch_w );
-	DECLARE_WRITE8_MEMBER( av_control_w );
-	DECLARE_READ8_MEMBER( vsync_r );
-	DECLARE_READ8_MEMBER( sound_cmd_r );
-	DECLARE_WRITE8_MEMBER( sound_g_w );
-	DECLARE_WRITE8_MEMBER( sound_d_w );
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ext_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ext_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t controller_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void av_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vsync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	memory_region *m_cart_rom;
 

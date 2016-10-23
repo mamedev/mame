@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( isa8_mda_device::vsync_changed )
 /*
  *  rW  MDA mode control register (see #P138)
  */
-WRITE8_MEMBER( isa8_mda_device::mode_control_w )
+void isa8_mda_device::mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mode_control = data;
 
@@ -450,7 +450,7 @@ WRITE8_MEMBER( isa8_mda_device::mode_control_w )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_mda_device::status_r)
+uint8_t isa8_mda_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Faking pixel stream here
 	m_pixel++;
@@ -465,7 +465,7 @@ READ8_MEMBER( isa8_mda_device::status_r)
  *      monochrome display adapter
  *
  *************************************************************************/
-WRITE8_MEMBER( isa8_mda_device::io_write)
+void isa8_mda_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
 	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
@@ -486,7 +486,7 @@ WRITE8_MEMBER( isa8_mda_device::io_write)
 	}
 }
 
-READ8_MEMBER( isa8_mda_device::io_read)
+uint8_t isa8_mda_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	mc6845_device *mc6845 = subdevice<mc6845_device>(MDA_MC6845_NAME);
@@ -664,7 +664,7 @@ MC6845_UPDATE_ROW( isa8_hercules_device::hercules_gfx_update_row )
 }
 
 
-WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
+void isa8_hercules_device::mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
 
@@ -691,7 +691,7 @@ WRITE8_MEMBER( isa8_hercules_device::mode_control_w )
 }
 
 
-WRITE8_MEMBER( isa8_hercules_device::io_write )
+void isa8_hercules_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
 	pc_lpt_device *lpt = subdevice<pc_lpt_device>("lpt");
@@ -727,7 +727,7 @@ WRITE8_MEMBER( isa8_hercules_device::io_write )
  *      2-1  reserved
  *      0    horizontal drive enable
  */
-READ8_MEMBER( isa8_hercules_device::status_r )
+uint8_t isa8_hercules_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Faking pixel stream here
 	m_pixel++;
@@ -736,7 +736,7 @@ READ8_MEMBER( isa8_hercules_device::status_r )
 }
 
 
-READ8_MEMBER( isa8_hercules_device::io_read )
+uint8_t isa8_hercules_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	mc6845_device *mc6845 = subdevice<mc6845_device>(HERCULES_MC6845_NAME);
@@ -955,7 +955,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::mda_lowres_text_blink_update_row )
 	}
 }
 
-WRITE8_MEMBER( isa8_ec1840_0002_device::mode_control_w )
+void isa8_ec1840_0002_device::mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mode_control = data;
 

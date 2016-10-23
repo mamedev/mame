@@ -34,17 +34,17 @@ public:
 	uint8_t m_yscroll[2];
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	DECLARE_WRITE8_MEMBER(e0xx_w);
-	DECLARE_READ8_MEMBER(debug_output_area_r);
-	DECLARE_READ8_MEMBER(some_changing_input);
-	DECLARE_WRITE8_MEMBER(background_videoram_w);
-	DECLARE_WRITE8_MEMBER(background_colorram_w);
-	DECLARE_WRITE8_MEMBER(txtram_w);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
-	DECLARE_WRITE8_MEMBER(yscroll_w);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_READ8_MEMBER(soundtimer_r);
+	void soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void e0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t debug_output_area_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t some_changing_input(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void background_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void txtram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t soundtimer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_txt_tile_info);

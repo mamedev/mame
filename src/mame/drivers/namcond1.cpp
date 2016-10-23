@@ -124,17 +124,17 @@ static INPUT_PORTS_START( namcond1 )
 INPUT_PORTS_END
 
 
-READ16_MEMBER(namcond1_state::mcu_p7_read)
+uint16_t namcond1_state::mcu_p7_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff;
 }
 
-READ16_MEMBER(namcond1_state::mcu_pa_read)
+uint16_t namcond1_state::mcu_pa_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(namcond1_state::mcu_pa_write)
+void namcond1_state::mcu_pa_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_p8 = data;
 }

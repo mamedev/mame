@@ -19,13 +19,13 @@ public:
 	// construction/destruction
 	sma_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	//DECLARE_WRITE16_MEMBER( kof99_bankswitch_w );
-	//DECLARE_WRITE16_MEMBER( garou_bankswitch_w );
-	//DECLARE_WRITE16_MEMBER( garouh_bankswitch_w );
-	//DECLARE_WRITE16_MEMBER( mslug3_bankswitch_w );
-	//DECLARE_WRITE16_MEMBER( kof2000_bankswitch_w );
-	DECLARE_READ16_MEMBER( prot_9a37_r );
-	DECLARE_READ16_MEMBER( random_r );
+	//void kof99_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//void garou_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//void garouh_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//void mslug3_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//void kof2000_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t prot_9a37_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t random_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint32_t kof99_bank_base(uint16_t sel);
 	uint32_t garou_bank_base(uint16_t sel);
 	uint32_t garouh_bank_base(uint16_t sel);

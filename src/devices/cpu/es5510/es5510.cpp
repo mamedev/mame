@@ -355,7 +355,7 @@ static inline char * DESCRIBE_INSTR(char *s, uint64_t instr, uint32_t gpr, const
 }
 
 
-READ8_MEMBER(es5510_device::host_r)
+uint8_t es5510_device::host_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,dsp_ram[offset]);
 
@@ -402,7 +402,7 @@ READ8_MEMBER(es5510_device::host_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(es5510_device::host_w)
+void es5510_device::host_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if VERBOSE
 	static char buf[1024];

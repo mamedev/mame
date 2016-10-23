@@ -56,41 +56,41 @@ public:
 	int m_key_count; //debug only
 
 	// common
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(textbank1_w);
-	DECLARE_WRITE8_MEMBER(fg_videoram_w);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void textbank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// tsamurai and m660 specific
-	DECLARE_WRITE8_MEMBER(bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(fg_colorram_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(scrollx_w);
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_READ8_MEMBER(unknown_d806_r);
-	DECLARE_READ8_MEMBER(unknown_d900_r);
-	DECLARE_READ8_MEMBER(unknown_d938_r);
-	DECLARE_WRITE8_MEMBER(sound_command1_w);
-	DECLARE_WRITE8_MEMBER(sound_command2_w);
-	DECLARE_READ8_MEMBER(sound_command1_r);
-	DECLARE_READ8_MEMBER(sound_command2_r);
+	void bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unknown_d806_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unknown_d900_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unknown_d938_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_command1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_command1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_command2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// tsamurai specific
-	DECLARE_READ8_MEMBER(tsamurai_unknown_d803_r);
+	uint8_t tsamurai_unknown_d803_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// m660 specific
-	DECLARE_WRITE8_MEMBER(m660_textbank2_w);
-	DECLARE_READ8_MEMBER(m660_unknown_d803_r);
-	DECLARE_WRITE8_MEMBER(m660_sound_command3_w);
-	DECLARE_READ8_MEMBER(m660_sound_command3_r);
+	void m660_textbank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m660_unknown_d803_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m660_sound_command3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m660_sound_command3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// vsgongf specific
-	DECLARE_WRITE8_MEMBER(vsgongf_color_w);
-	DECLARE_WRITE8_MEMBER(vsgongf_sound_nmi_enable_w);
-	DECLARE_READ8_MEMBER(vsgongf_a006_r);
-	DECLARE_READ8_MEMBER(vsgongf_a100_r);
-	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
+	void vsgongf_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vsgongf_sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vsgongf_a006_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vsgongf_a100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vsgongf_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

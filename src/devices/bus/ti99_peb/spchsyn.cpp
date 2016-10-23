@@ -60,7 +60,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+void ti_speech_synthesizer_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 

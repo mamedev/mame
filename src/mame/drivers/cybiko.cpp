@@ -113,12 +113,12 @@ static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0xe00000, 0xefffff ) AM_READ( cybikoxt_key_r )
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(cybiko_state::serflash_w)
+void cybiko_state::serflash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_flash1->cs_w ((data & 0x10) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::clock_r)
+uint16_t cybiko_state::clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_rtc->sda_r())
 	{
@@ -128,13 +128,13 @@ READ16_MEMBER(cybiko_state::clock_r)
 	return 0x04;
 }
 
-WRITE16_MEMBER(cybiko_state::clock_w)
+void cybiko_state::clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rtc->scl_w((data & 0x02) ? 1 : 0);
 	m_rtc->sda_w((data & 0x01) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::xtclock_r)
+uint16_t cybiko_state::xtclock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_rtc->sda_r())
 	{
@@ -144,30 +144,30 @@ READ16_MEMBER(cybiko_state::xtclock_r)
 	return 0;
 }
 
-WRITE16_MEMBER(cybiko_state::xtclock_w)
+void cybiko_state::xtclock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rtc->scl_w((data & 0x02) ? 1 : 0);
 	m_rtc->sda_w((data & 0x40) ? 0 : 1);
 }
 
-READ16_MEMBER(cybiko_state::xtpower_r)
+uint16_t cybiko_state::xtpower_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 7 = on/off button
 	// bit 6 = battery charged if "1"
 	return 0xc0;
 }
 
-READ16_MEMBER(cybiko_state::adc1_r)
+uint16_t cybiko_state::adc1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x01;
 }
 
-READ16_MEMBER(cybiko_state::adc2_r)
+uint16_t cybiko_state::adc2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x00;
 }
 
-READ16_MEMBER(cybiko_state::port0_r)
+uint16_t cybiko_state::port0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 3 = on/off button
 	return 0x08;

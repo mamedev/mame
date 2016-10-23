@@ -303,10 +303,10 @@ public:
 		m_cart(*this, "cartslot")
 		{ }
 
-	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
-	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
+	void tourvision_8085_d000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tourvision_i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tourvision_i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tourvision_i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
+void tourvision_state::tourvision_8085_d000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -469,18 +469,18 @@ static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_a_w)
+void tourvision_state::tourvision_i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_b_w)
+void tourvision_state::tourvision_i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Selects game slot in bits 0 - 1
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
+void tourvision_state::tourvision_i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }

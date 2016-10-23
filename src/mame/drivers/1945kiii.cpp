@@ -76,11 +76,11 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
-	DECLARE_WRITE16_MEMBER(k3_bgram_w);
-	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
-	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
-	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
-	DECLARE_WRITE16_MEMBER(flagrall_soundbanks_w);
+	void k3_bgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void k3_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void k3_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void k3_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flagrall_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -92,7 +92,7 @@ public:
 };
 
 
-WRITE16_MEMBER(k3_state::k3_bgram_w)
+void k3_state::k3_bgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -142,23 +142,23 @@ uint32_t k3_state::screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-WRITE16_MEMBER(k3_state::k3_scrollx_w)
+void k3_state::k3_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE16_MEMBER(k3_state::k3_scrolly_w)
+void k3_state::k3_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE16_MEMBER(k3_state::k3_soundbanks_w)
+void k3_state::k3_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki2->set_rom_bank((data & 4) >> 2);
 	m_oki1->set_rom_bank((data & 2) >> 1);
 }
 
-WRITE16_MEMBER(k3_state::flagrall_soundbanks_w)
+void k3_state::flagrall_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 

@@ -84,13 +84,13 @@ class namco_device : public namco_audio_device
 public:
 	namco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( pacman_sound_enable_w );
-	DECLARE_WRITE8_MEMBER( pacman_sound_w );
+	void pacman_sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pacman_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void polepos_sound_enable(int enable);
 
-	DECLARE_READ8_MEMBER( polepos_sound_r );
-	DECLARE_WRITE8_MEMBER( polepos_sound_w );
+	uint8_t polepos_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void polepos_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -103,9 +103,9 @@ class namco_15xx_device : public namco_audio_device
 public:
 	namco_15xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( namco_15xx_w );
-	DECLARE_READ8_MEMBER( sharedram_r );
-	DECLARE_WRITE8_MEMBER( sharedram_w );
+	void namco_15xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void mappy_sound_enable(int enable);
 
@@ -120,11 +120,11 @@ class namco_cus30_device : public namco_audio_device
 public:
 	namco_cus30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( namcos1_cus30_w );   /* wavedata + sound registers + RAM */
-	DECLARE_READ8_MEMBER( namcos1_cus30_r );
-	DECLARE_WRITE8_MEMBER( namcos1_sound_w );
+	void namcos1_cus30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);   /* wavedata + sound registers + RAM */
+	uint8_t namcos1_cus30_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos1_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( pacman_sound_w );
+	void pacman_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

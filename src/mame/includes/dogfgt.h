@@ -40,19 +40,19 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	DECLARE_READ8_MEMBER(sharedram_r);
-	DECLARE_WRITE8_MEMBER(sharedram_w);
-	DECLARE_WRITE8_MEMBER(subirqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irqack_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_soundcontrol_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_plane_select_w);
-	DECLARE_READ8_MEMBER(dogfgt_bitmapram_r);
-	DECLARE_WRITE8_MEMBER(internal_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_bitmapram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_scroll_w);
-	DECLARE_WRITE8_MEMBER(dogfgt_1800_w);
+	uint8_t sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void subirqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sub_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_soundcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_plane_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dogfgt_bitmapram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void internal_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dogfgt_1800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

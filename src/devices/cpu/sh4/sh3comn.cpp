@@ -12,7 +12,7 @@
 
 /* High internal area (ffffxxxx) */
 
-WRITE32_MEMBER( sh3_base_device::sh3_internal_high_w )
+void sh3_base_device::sh3_internal_high_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sh3internal_upper[offset]);
 
@@ -73,7 +73,7 @@ WRITE32_MEMBER( sh3_base_device::sh3_internal_high_w )
 
 }
 
-READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
+uint32_t sh3_base_device::sh3_internal_high_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -136,7 +136,7 @@ READ32_MEMBER( sh3_base_device::sh3_internal_high_r )
 }
 
 
-READ32_MEMBER( sh3_base_device::sh3_internal_r )
+uint32_t sh3_base_device::sh3_internal_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset<0x1000)
 	{
@@ -374,7 +374,7 @@ READ32_MEMBER( sh3_base_device::sh3_internal_r )
 
 /* Lower internal area */
 
-WRITE32_MEMBER( sh3_base_device::sh3_internal_w )
+void sh3_base_device::sh3_internal_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset<0x1000)
 	{

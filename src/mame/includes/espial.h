@@ -51,14 +51,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
-	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(espial_videoram_w);
-	DECLARE_WRITE8_MEMBER(espial_colorram_w);
-	DECLARE_WRITE8_MEMBER(espial_attributeram_w);
-	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
-	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
+	void espial_master_interrupt_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_master_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_attributeram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void espial_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

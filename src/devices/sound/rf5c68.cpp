@@ -140,7 +140,7 @@ void rf5c68_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //    RF5C68 write register
 //-------------------------------------------------
 
-READ8_MEMBER( rf5c68_device::rf5c68_r )
+uint8_t rf5c68_device::rf5c68_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t shift;
 
@@ -152,7 +152,7 @@ READ8_MEMBER( rf5c68_device::rf5c68_r )
 	return (m_chan[(offset & 0x0e) >> 1].addr) >> (shift);
 }
 
-WRITE8_MEMBER( rf5c68_device::rf5c68_w )
+void rf5c68_device::rf5c68_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rf5c68_pcm_channel *chan = &m_chan[m_cbank];
 	int i;
@@ -217,7 +217,7 @@ WRITE8_MEMBER( rf5c68_device::rf5c68_w )
 //    RF5C68 read memory
 //-------------------------------------------------
 
-READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
+uint8_t rf5c68_device::rf5c68_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data[m_wbank * 0x1000 + offset];
 }
@@ -227,7 +227,7 @@ READ8_MEMBER( rf5c68_device::rf5c68_mem_r )
 //    RF5C68 write memory
 //-------------------------------------------------
 
-WRITE8_MEMBER( rf5c68_device::rf5c68_mem_w )
+void rf5c68_device::rf5c68_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data[m_wbank * 0x1000 + offset] = data;
 }

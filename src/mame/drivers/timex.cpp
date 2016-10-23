@@ -166,23 +166,23 @@ http://www.z88forever.org.uk/zxplus3e/
 /* TS2048 specific functions */
 
 
-READ8_MEMBER( spectrum_state::ts2068_port_f4_r )
+uint8_t spectrum_state::ts2068_port_f4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_f4_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_f4_w )
+void spectrum_state::ts2068_port_f4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_f4_data = data;
 	ts2068_update_memory();
 }
 
-READ8_MEMBER( spectrum_state::ts2068_port_ff_r )
+uint8_t spectrum_state::ts2068_port_ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_ff_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
+void spectrum_state::ts2068_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		/* Bits 0-2 Video Mode Select
 		   Bits 3-5 64 column mode ink/paper selection
@@ -567,7 +567,7 @@ void spectrum_state::machine_reset_ts2068()
 /* TC2048 specific functions */
 
 
-WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
+void spectrum_state::tc2048_port_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);

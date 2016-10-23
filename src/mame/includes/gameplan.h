@@ -71,14 +71,14 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 
 
-	DECLARE_WRITE8_MEMBER(io_select_w);
-	DECLARE_READ8_MEMBER(io_port_r);
+	void io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);
 	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
-	DECLARE_WRITE8_MEMBER(audio_cmd_w);
+	void audio_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
 	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
-	DECLARE_WRITE8_MEMBER(r6532_soundlatch_w);
+	void r6532_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_gameplan();
 	void machine_reset_gameplan();
 	void machine_start_trvquest();
@@ -94,15 +94,15 @@ public:
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);
 	TIMER_CALLBACK_MEMBER(via_0_ca1_timer_callback);
-	DECLARE_WRITE8_MEMBER(video_data_w);
-	DECLARE_WRITE8_MEMBER(gameplan_video_command_w);
-	DECLARE_WRITE8_MEMBER(leprechn_video_command_w);
-	DECLARE_READ8_MEMBER(leprechn_videoram_r);
+	void video_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gameplan_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leprechn_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t leprechn_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
 	DECLARE_WRITE_LINE_MEMBER(via_irq);
-	DECLARE_READ8_MEMBER(trvquest_question_r);
+	uint8_t trvquest_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
 	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
 

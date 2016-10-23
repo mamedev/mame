@@ -614,7 +614,7 @@ void mappy_state::common_latch_w(uint32_t offset)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::superpac_latch_w)
+void mappy_state::superpac_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -644,7 +644,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::phozon_latch_w)
+void mappy_state::phozon_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -671,7 +671,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 	}
 }
 
-WRITE8_MEMBER(mappy_state::mappy_latch_w)
+void mappy_state::mappy_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 1;
 
@@ -1604,26 +1604,26 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-READ8_MEMBER(mappy_state::dipA_l){ return ioport("DSW1")->read(); }     // dips A
-READ8_MEMBER(mappy_state::dipA_h){ return ioport("DSW1")->read() >> 4; }    // dips A
+uint8_t mappy_state::dipA_l(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read(); }     // dips A
+uint8_t mappy_state::dipA_h(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("DSW1")->read() >> 4; }    // dips A
 
-READ8_MEMBER(mappy_state::dipB_mux)// dips B
+uint8_t mappy_state::dipB_mux(address_space &space, offs_t offset, uint8_t mem_mask)// dips B
 {
 	return ioport("DSW2")->read() >> (4 * m_mux);
 }
 
-READ8_MEMBER(mappy_state::dipB_muxi)// dips B
+uint8_t mappy_state::dipB_muxi(address_space &space, offs_t offset, uint8_t mem_mask)// dips B
 {
 	// bits are interleaved in Phozon
 	return BITSWAP8(ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * m_mux);
 }
 
-WRITE8_MEMBER(mappy_state::out_mux)
+void mappy_state::out_mux(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux = data & 1;
 }
 
-WRITE8_MEMBER(mappy_state::out_lamps)
+void mappy_state::out_lamps(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 1);
 	output().set_led_value(1, data & 2);

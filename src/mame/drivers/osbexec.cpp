@@ -106,18 +106,18 @@ public:
 		else
 			m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
-	DECLARE_WRITE8_MEMBER(osbexec_0000_w);
-	DECLARE_READ8_MEMBER(osbexec_c000_r);
-	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
-	DECLARE_READ8_MEMBER(osbexec_kbd_r);
-	DECLARE_READ8_MEMBER(osbexec_rtc_r);
+	void osbexec_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t osbexec_c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void osbexec_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t osbexec_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t osbexec_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_osbexec();
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
-	DECLARE_READ8_MEMBER(osbexec_pia0_a_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_a_w);
-	DECLARE_READ8_MEMBER(osbexec_pia0_b_r);
-	DECLARE_WRITE8_MEMBER(osbexec_pia0_b_w);
+	uint8_t osbexec_pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void osbexec_pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t osbexec_pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void osbexec_pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_irq);
@@ -125,7 +125,7 @@ public:
 };
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
+void osbexec_state::osbexec_0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Font RAM writing is enabled when ROM bank is enabled */
 	if ( m_pia0_porta & 0x80 )
@@ -140,7 +140,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_c000_r)
+uint8_t osbexec_state::osbexec_c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t   data = m_ram_c000[offset];
 
@@ -153,7 +153,7 @@ READ8_MEMBER(osbexec_state::osbexec_c000_r)
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
+void osbexec_state::osbexec_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_c000[offset] = data;
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_kbd_r)
+uint8_t osbexec_state::osbexec_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -196,7 +196,7 @@ READ8_MEMBER(osbexec_state::osbexec_kbd_r)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_rtc_r)
+uint8_t osbexec_state::osbexec_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc;
 }
@@ -349,13 +349,13 @@ uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
   CB2 - 60/50 (?)
 */
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_a_r)
+uint8_t osbexec_state::osbexec_pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia0_porta;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
+void osbexec_state::osbexec_pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("osbexec_pia0_a_w: %02x\n", data );
 
@@ -365,13 +365,13 @@ WRITE8_MEMBER(osbexec_state::osbexec_pia0_a_w)
 }
 
 
-READ8_MEMBER(osbexec_state::osbexec_pia0_b_r)
+uint8_t osbexec_state::osbexec_pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia0_portb;
 }
 
 
-WRITE8_MEMBER(osbexec_state::osbexec_pia0_b_w)
+void osbexec_state::osbexec_pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia0_portb = data;
 

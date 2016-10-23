@@ -357,7 +357,7 @@ void msx_cart_disk_type1::device_reset()
 }
 
 
-READ8_MEMBER(msx_cart_disk_type1::read_cart)
+uint8_t msx_cart_disk_type1::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -398,7 +398,7 @@ READ8_MEMBER(msx_cart_disk_type1::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_disk_type1::write_cart)
+void msx_cart_disk_type1::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -500,7 +500,7 @@ void msx_cart_disk_type2::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_cart_disk_type2::read_cart)
+uint8_t msx_cart_disk_type2::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -533,7 +533,7 @@ READ8_MEMBER(msx_cart_disk_type2::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_disk_type2::write_cart)
+void msx_cart_disk_type2::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -581,7 +581,7 @@ void msx_cart_fsfd1a::device_reset()
 }
 
 
-READ8_MEMBER(msx_cart_fsfd1a::read_cart)
+uint8_t msx_cart_fsfd1a::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -602,7 +602,7 @@ READ8_MEMBER(msx_cart_fsfd1a::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_fsfd1a::write_cart)
+void msx_cart_fsfd1a::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

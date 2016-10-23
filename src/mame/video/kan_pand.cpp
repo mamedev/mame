@@ -228,7 +228,7 @@ void kaneko_pandora_device::eof( )
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER ( kaneko_pandora_device::spriteram_w )
+void kaneko_pandora_device::spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// it's either hooked up oddly on this, or on the 16-bit games
 	// either way, we swap the address lines so that the spriteram is in the same format
@@ -249,7 +249,7 @@ WRITE8_MEMBER ( kaneko_pandora_device::spriteram_w )
 	m_spriteram[offset] = data;
 }
 
-READ8_MEMBER( kaneko_pandora_device::spriteram_r )
+uint8_t kaneko_pandora_device::spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// it's either hooked up oddly on this, or on the 16-bit games
 	// either way, we swap the address lines so that the spriteram is in the same format
@@ -270,7 +270,7 @@ READ8_MEMBER( kaneko_pandora_device::spriteram_r )
 }
 
 /* I don't know if this MSB/LSB mirroring is correct, or if there is twice as much ram, with half of it unused */
-WRITE16_MEMBER( kaneko_pandora_device::spriteram_LSB_w )
+void kaneko_pandora_device::spriteram_LSB_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_spriteram)
 	{
@@ -289,7 +289,7 @@ WRITE16_MEMBER( kaneko_pandora_device::spriteram_LSB_w )
 	}
 }
 
-READ16_MEMBER( kaneko_pandora_device::spriteram_LSB_r )
+uint16_t kaneko_pandora_device::spriteram_LSB_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_spriteram)
 	{

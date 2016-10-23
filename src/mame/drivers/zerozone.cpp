@@ -36,7 +36,7 @@
 #include "sound/okim6295.h"
 
 
-WRITE16_MEMBER( zerozone_state::sound_w )
+void zerozone_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

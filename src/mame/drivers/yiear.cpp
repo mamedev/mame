@@ -106,7 +106,7 @@ Sound: VLM5030 at 7B
 
 
 
-READ8_MEMBER(yiear_state::yiear_speech_r)
+uint8_t yiear_state::yiear_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -114,7 +114,7 @@ READ8_MEMBER(yiear_state::yiear_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
+void yiear_state::yiear_VLM5030_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);

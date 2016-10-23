@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(ojankohs_state,ojankoy)
 	}
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
+void ojankohs_state::ojankohs_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -66,7 +66,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_palette_w)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
+void ojankohs_state::ccasino_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -84,7 +84,7 @@ WRITE8_MEMBER(ojankohs_state::ccasino_palette_w)
 	m_palette->set_pen_color(offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
+void ojankohs_state::ojankoc_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, color;
 
@@ -110,19 +110,19 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_palette_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_videoram_w)
+void ojankohs_state::ojankohs_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_colorram_w)
+void ojankohs_state::ojankohs_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
+void ojankohs_state::ojankohs_gfxreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfxreg != data)
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
 	}
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
+void ojankohs_state::ojankohs_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen != BIT(data, 0))
 	{
@@ -212,7 +212,7 @@ void ojankohs_state::ojankoc_flipscreen( address_space &space, int data )
 	m_flipscreen_old = m_flipscreen;
 }
 
-WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
+void ojankohs_state::ojankoc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	uint8_t x, y, xx, px, py ;

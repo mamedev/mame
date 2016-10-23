@@ -45,8 +45,8 @@ public:
 	void install_read_handler( int n_channel, psx_dma_read_delegate p_fn_dma_read );
 	void install_write_handler( int n_channel, psx_dma_read_delegate p_fn_dma_write );
 
-	DECLARE_WRITE32_MEMBER( write );
-	DECLARE_READ32_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t *m_ram;
 	size_t m_ramsize;

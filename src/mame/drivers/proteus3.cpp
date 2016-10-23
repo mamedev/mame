@@ -68,8 +68,8 @@ public:
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
@@ -121,7 +121,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(proteus3)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( proteus3_state::kbd_put )
+void proteus3_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
 /******************************************************************************
  Video
 ******************************************************************************/
-WRITE8_MEMBER( proteus3_state::video_w )
+void proteus3_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_data = data;
 }

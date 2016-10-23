@@ -643,26 +643,26 @@ public:
 		dev.m_txcb = txb;
 	}
 
-	DECLARE_READ8_MEMBER( cd_ba_r );
-	DECLARE_WRITE8_MEMBER( cd_ba_w );
-	DECLARE_READ8_MEMBER( ba_cd_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_w );
-	DECLARE_READ8_MEMBER( ba_cd_inv_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
+	uint8_t cd_ba_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cd_ba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ba_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ba_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ba_cd_inv_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ba_cd_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* Definitions moved to z80scc.c for enhencements */
-	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }
-	DECLARE_WRITE8_MEMBER( da_w ); // { m_chanA->data_write(data); }
-	DECLARE_READ8_MEMBER( db_r );  // { return m_chanB->data_read(); }
-	DECLARE_WRITE8_MEMBER( db_w ); // { m_chanB->data_write(data); }
+	uint8_t da_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);  // { return m_chanA->data_read(); }
+	void da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // { m_chanA->data_write(data); }
+	uint8_t db_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);  // { return m_chanB->data_read(); }
+	void db_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // { m_chanB->data_write(data); }
 
-	DECLARE_READ8_MEMBER( ca_r ) { return m_chanA->control_read(); }
-	DECLARE_WRITE8_MEMBER( ca_w ) { m_chanA->control_write(data); }
-	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
-	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
+	uint8_t ca_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanA->control_read(); }
+	void ca_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanA->control_write(data); }
+	uint8_t cb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_chanB->control_read(); }
+	void cb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_chanB->control_write(data); }
 
-	DECLARE_READ8_MEMBER( zbus_r );
-	DECLARE_WRITE8_MEMBER( zbus_w );
+	uint8_t zbus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zbus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// interrupt acknowledge
 	int m1_r();

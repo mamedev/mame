@@ -42,12 +42,12 @@ public:
 	DECLARE_PALETTE_INIT(svmu);
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(prog_r);
-	DECLARE_WRITE8_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(p7_r);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
@@ -55,12 +55,12 @@ private:
 };
 
 
-WRITE8_MEMBER(svmu_state::page_w)
+void svmu_state::page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_page = data & 0x03;
 }
 
-READ8_MEMBER(svmu_state::prog_r)
+uint8_t svmu_state::prog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_page == 1)
 		return m_flash->read(offset);
@@ -70,7 +70,7 @@ READ8_MEMBER(svmu_state::prog_r)
 		return m_bios[offset];
 }
 
-WRITE8_MEMBER(svmu_state::prog_w)
+void svmu_state::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_page == 1)
 		m_flash->write(offset, data);
@@ -92,12 +92,12 @@ WRITE8_MEMBER(svmu_state::prog_w)
 
 */
 
-READ8_MEMBER(svmu_state::p1_r)
+uint8_t svmu_state::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(svmu_state::p1_w)
+void svmu_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
@@ -112,7 +112,7 @@ WRITE8_MEMBER(svmu_state::p1_w)
     ---- ---x   5V detection
 */
 
-READ8_MEMBER(svmu_state::p7_r)
+uint8_t svmu_state::p7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("BATTERY")->read()<<1);
 }

@@ -42,10 +42,10 @@ public:
 
 	virtual void update_k_line();
 	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
-	virtual DECLARE_READ8_MEMBER(input_r);
-	virtual DECLARE_WRITE8_MEMBER(input_w);
-	virtual DECLARE_WRITE16_MEMBER(lcd_segment_w);
-	virtual DECLARE_WRITE8_MEMBER(sm511_melody_w);
+	virtual uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void lcd_segment_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void sm511_melody_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void machine_start() override;
@@ -82,7 +82,7 @@ void hh_sm510_state::machine_reset()
 
 // lcd panel - on lcd handhelds, usually not a generic x/y screen device
 
-WRITE16_MEMBER(hh_sm510_state::lcd_segment_w)
+void hh_sm510_state::lcd_segment_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	for (int seg = 0; seg < 0x10; seg++)
 	{
@@ -130,13 +130,13 @@ INPUT_CHANGED_MEMBER(hh_sm510_state::input_changed)
 	update_k_line();
 }
 
-WRITE8_MEMBER(hh_sm510_state::input_w)
+void hh_sm510_state::input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_inp_mux = data;
 	update_k_line();
 }
 
-READ8_MEMBER(hh_sm510_state::input_r)
+uint8_t hh_sm510_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_inputs(m_inp_lines);
 }
@@ -144,7 +144,7 @@ READ8_MEMBER(hh_sm510_state::input_r)
 
 // other generic output handlers
 
-WRITE8_MEMBER(hh_sm510_state::sm511_melody_w)
+void hh_sm510_state::sm511_melody_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// SM511 R pin is melody output
 	m_speaker->level_w(data & 1);
@@ -177,12 +177,12 @@ public:
 		m_inp_lines = 3;
 	}
 
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(ktopgun_state::speaker_w)
+void ktopgun_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(data >> 0 & 1);
 }
@@ -426,12 +426,12 @@ public:
 		m_inp_lines = 2;
 	}
 
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(gnwmndon_state::speaker_w)
+void gnwmndon_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(data >> 1 & 1);
 }

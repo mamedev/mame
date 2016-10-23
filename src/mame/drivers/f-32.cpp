@@ -47,7 +47,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<uint32_t> m_videoram;
 
-	DECLARE_READ32_MEMBER(f32_input_port_1_r);
+	uint32_t f32_input_port_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
+uint32_t mosaicf2_state::f32_input_port_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 

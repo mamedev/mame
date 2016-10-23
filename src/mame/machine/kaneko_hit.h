@@ -46,8 +46,8 @@ public:
 
 	int m_hittype;
 
-	DECLARE_READ16_MEMBER(kaneko_hit_r);
-	DECLARE_WRITE16_MEMBER(kaneko_hit_w);
+	uint16_t kaneko_hit_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko_hit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;
@@ -59,16 +59,16 @@ private:
 	calc1_hit_t m_hit;
 	calc3_hit_t m_hit3;
 
-	DECLARE_READ16_MEMBER(kaneko_hit_type0_r);
-	DECLARE_WRITE16_MEMBER(kaneko_hit_type0_w);
+	uint16_t kaneko_hit_type0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko_hit_type0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(kaneko_hit_type1_r);
-	DECLARE_WRITE16_MEMBER(kaneko_hit_type1_w);
+	uint16_t kaneko_hit_type1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko_hit_type1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	int16_t calc_compute_x(calc1_hit_t &hit);
 	int16_t calc_compute_y(calc1_hit_t &hit);
 
-	DECLARE_WRITE16_MEMBER(kaneko_hit_type2_w);
-	DECLARE_READ16_MEMBER(kaneko_hit_type2_r);
+	void kaneko_hit_type2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t kaneko_hit_type2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	int type2_calc_compute(int x1, int w1, int x2, int w2);
 	void type2_calc_org(int mode, int x0, int s0,  int* x1, int* s1);
 	void type2_recalc_collisions(calc3_hit_t &hit3);

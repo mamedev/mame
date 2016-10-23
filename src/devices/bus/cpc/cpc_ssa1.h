@@ -64,8 +64,8 @@ public:
 	void set_sby(uint8_t state) { m_sby = state; }
 	uint8_t get_sby() { return m_sby; }
 
-	DECLARE_READ8_MEMBER(ssa1_r);
-	DECLARE_WRITE8_MEMBER(ssa1_w);
+	uint8_t ssa1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ssa1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
 	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 
@@ -100,8 +100,8 @@ public:
 	void set_sby(uint8_t state) { m_sby = state; }
 	uint8_t get_sby() { return m_sby; }
 
-	DECLARE_READ8_MEMBER(dkspeech_r);
-	DECLARE_WRITE8_MEMBER(dkspeech_w);
+	uint8_t dkspeech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dkspeech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
 	DECLARE_WRITE_LINE_MEMBER(sby_cb);
 

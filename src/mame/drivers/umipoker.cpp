@@ -48,21 +48,21 @@ public:
 	tilemap_t *m_tilemap_3;
 	required_shared_ptr<uint8_t> m_z80_wram;
 	int m_umipoker_scrolly[4];
-	DECLARE_READ8_MEMBER(z80_rom_readback_r);
-	DECLARE_READ8_MEMBER(z80_shared_ram_r);
-	DECLARE_WRITE8_MEMBER(z80_shared_ram_w);
-	DECLARE_WRITE16_MEMBER(umipoker_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(umipoker_scrolly_0_w);
-	DECLARE_WRITE16_MEMBER(umipoker_scrolly_1_w);
-	DECLARE_WRITE16_MEMBER(umipoker_scrolly_2_w);
-	DECLARE_WRITE16_MEMBER(umipoker_scrolly_3_w);
-	DECLARE_WRITE16_MEMBER(umipoker_vram_0_w);
-	DECLARE_WRITE16_MEMBER(umipoker_vram_1_w);
-	DECLARE_WRITE16_MEMBER(umipoker_vram_2_w);
-	DECLARE_WRITE16_MEMBER(umipoker_vram_3_w);
-	DECLARE_WRITE16_MEMBER(lamps_w);
-	DECLARE_WRITE16_MEMBER(umi_counters_w);
-	DECLARE_WRITE16_MEMBER(saiyu_counters_w);
+	uint8_t z80_rom_readback_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void umipoker_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_scrolly_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_scrolly_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_scrolly_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_scrolly_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umipoker_vram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void umi_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void saiyu_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_umipoker();
 	void init_saiyukip();
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
@@ -153,28 +153,28 @@ uint32_t umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER(umipoker_state::z80_rom_readback_r)
+uint8_t umipoker_state::z80_rom_readback_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("audiocpu")->base();
 
 	return ROM[offset];
 }
 
-READ8_MEMBER(umipoker_state::z80_shared_ram_r)
+uint8_t umipoker_state::z80_shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // force resync
 
 	return m_z80_wram[offset];
 }
 
-WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
+void umipoker_state::z80_shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // force resync
 
 	m_z80_wram[offset] = data;
 }
 
-WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
+void umipoker_state::umipoker_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 
@@ -183,37 +183,37 @@ WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
 		popmessage("%04x IRQ ACK, contact MAMEdev",data);
 }
 
-WRITE16_MEMBER(umipoker_state::umipoker_scrolly_0_w){ COMBINE_DATA(&m_umipoker_scrolly[0]); }
-WRITE16_MEMBER(umipoker_state::umipoker_scrolly_1_w){ COMBINE_DATA(&m_umipoker_scrolly[1]); }
-WRITE16_MEMBER(umipoker_state::umipoker_scrolly_2_w){ COMBINE_DATA(&m_umipoker_scrolly[2]); }
-WRITE16_MEMBER(umipoker_state::umipoker_scrolly_3_w){ COMBINE_DATA(&m_umipoker_scrolly[3]); }
+void umipoker_state::umipoker_scrolly_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_umipoker_scrolly[0]); }
+void umipoker_state::umipoker_scrolly_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_umipoker_scrolly[1]); }
+void umipoker_state::umipoker_scrolly_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_umipoker_scrolly[2]); }
+void umipoker_state::umipoker_scrolly_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_umipoker_scrolly[3]); }
 
-WRITE16_MEMBER(umipoker_state::umipoker_vram_0_w)
+void umipoker_state::umipoker_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
+void umipoker_state::umipoker_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset >> 1);
 }
 
 
-WRITE16_MEMBER(umipoker_state::umipoker_vram_2_w)
+void umipoker_state::umipoker_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_2[offset]);
 	m_tilemap_2->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(umipoker_state::umipoker_vram_3_w)
+void umipoker_state::umipoker_vram_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_3[offset]);
 	m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(umipoker_state::lamps_w)
+void umipoker_state::lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   Umipoker buttons layout:
@@ -262,7 +262,7 @@ WRITE16_MEMBER(umipoker_state::lamps_w)
 	output().set_lamp_value(5, (data >> 13) & 1);     /* Lamp 5 - START */
 }
 
-WRITE16_MEMBER(umipoker_state::umi_counters_w)
+void umipoker_state::umi_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {/*
   0x0000 - Normal State (lamps off).
   0x0001 - Payout pulse.
@@ -283,7 +283,7 @@ WRITE16_MEMBER(umipoker_state::umi_counters_w)
 	machine().bookkeeping().coin_counter_w(2, data & 0x01);  /* PAYOUT */
 }
 
-WRITE16_MEMBER(umipoker_state::saiyu_counters_w)
+void umipoker_state::saiyu_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   0x0000 - Normal State (lamps off).

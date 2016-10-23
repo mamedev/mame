@@ -93,14 +93,14 @@ Stephh's Notes:
  *
  *************************************/
 
-READ8_MEMBER(jack_state::timer_r)
+uint8_t jack_state::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
 	return m_audiocpu->total_cycles() / m_timer_rate;
 }
 
-WRITE8_MEMBER(jack_state::jack_sh_command_w)
+void jack_state::jack_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -109,7 +109,7 @@ WRITE8_MEMBER(jack_state::jack_sh_command_w)
 
 /***************************************************************/
 
-READ8_MEMBER(jack_state::striv_question_r)
+uint8_t jack_state::striv_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Set-up the remap table for every 16 bytes
 	if ((offset & 0xc00) == 0x800)
@@ -143,7 +143,7 @@ READ8_MEMBER(jack_state::striv_question_r)
 }
 
 
-WRITE8_MEMBER(jack_state::joinem_control_w)
+void jack_state::joinem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: related to test mode?
 	// d1: unused?

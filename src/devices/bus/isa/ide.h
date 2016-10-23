@@ -30,8 +30,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_ADDRESS_MAP(map, 16);
 	DECLARE_ADDRESS_MAP(alt_map, 8);
-	READ8_MEMBER(ide16_alt_r);
-	WRITE8_MEMBER(ide16_alt_w);
+	uint8_t ide16_alt_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void ide16_alt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

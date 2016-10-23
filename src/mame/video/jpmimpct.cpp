@@ -29,7 +29,7 @@
  *  1 1 0    Command register
  */
 
-WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
+void jpmimpct_state::jpmimpct_bt477_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t val = data & 0xff;
 
@@ -75,7 +75,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmimpct_bt477_w)
 	}
 }
 
-READ16_MEMBER(jpmimpct_state::jpmimpct_bt477_r)
+uint16_t jpmimpct_state::jpmimpct_bt477_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	popmessage("Bt477: Unhandled read access (offset:%x)", offset);
 	return 0;

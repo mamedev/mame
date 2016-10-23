@@ -340,12 +340,12 @@ void toaplan1_state::video_start_toaplan1()
 
 ***************************************************************************/
 
-READ16_MEMBER(toaplan1_state::toaplan1_frame_done_r)
+uint16_t toaplan1_state::toaplan1_frame_done_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_screen->vblank();
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
+void toaplan1_state::toaplan1_tile_offsets_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( offset == 0 )
 	{
@@ -360,7 +360,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 	toaplan1_set_scrolls();
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
+void toaplan1_state::toaplan1_bcu_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7 && (data != m_bcu_flipscreen))
 	{
@@ -372,7 +372,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_fcu_flipscreen_w)
+void toaplan1_state::toaplan1_fcu_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -381,25 +381,25 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_fcu_flipscreen_w)
 	}
 }
 
-READ16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_r)/// this aint really needed ?
+uint16_t toaplan1_state::toaplan1_spriteram_offs_r(address_space &space, offs_t offset, uint16_t mem_mask)/// this aint really needed ?
 {
 	return m_spriteram_offs;
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram_offs_w)
+void toaplan1_state::toaplan1_spriteram_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram_offs);
 }
 
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_bgpalette_w)
+void toaplan1_state::toaplan1_bgpalette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgpaletteram[offset]);
 	data = m_bgpaletteram[offset];
 	m_palette->set_pen_color(offset, pal5bit(data>>0), pal5bit(data>>5), pal5bit(data>>10));
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_fgpalette_w)
+void toaplan1_state::toaplan1_fgpalette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgpaletteram[offset]);
 	data = m_fgpaletteram[offset];
@@ -407,12 +407,12 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_fgpalette_w)
 }
 
 
-READ16_MEMBER(toaplan1_state::toaplan1_spriteram16_r)
+uint16_t toaplan1_state::toaplan1_spriteram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)];
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram16_w)
+void toaplan1_state::toaplan1_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[m_spriteram_offs & ((TOAPLAN1_SPRITERAM_SIZE/2)-1)]);
 
@@ -427,12 +427,12 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_spriteram16_w)
 	m_spriteram_offs++;
 }
 
-READ16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_r)
+uint16_t toaplan1_state::toaplan1_spritesizeram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)];
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_w)
+void toaplan1_state::toaplan1_spritesizeram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritesizeram16[m_spriteram_offs & ((TOAPLAN1_SPRITESIZERAM_SIZE/2)-1)]);
 
@@ -449,17 +449,17 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_spritesizeram16_w)
 
 
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_control_w)
+void toaplan1_state::toaplan1_bcu_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("BCU tile controller register:%02x now = %04x\n",offset,data);
 }
 
-READ16_MEMBER(toaplan1_state::toaplan1_tileram_offs_r)
+uint16_t toaplan1_state::toaplan1_tileram_offs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pf_voffs;
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_tileram_offs_w)
+void toaplan1_state::toaplan1_tileram_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data >= 0x4000)
 		logerror("Hmmm, unknown video layer being selected (%08x)\n",data);
@@ -467,7 +467,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tileram_offs_w)
 }
 
 
-READ16_MEMBER(toaplan1_state::toaplan1_tileram16_r)
+uint16_t toaplan1_state::toaplan1_tileram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offs_t vram_offset;
 	uint16_t video_data = 0;
@@ -498,7 +498,7 @@ READ16_MEMBER(toaplan1_state::toaplan1_tileram16_r)
 	return video_data;
 }
 
-READ16_MEMBER(toaplan1_rallybik_state::rallybik_tileram16_r)
+uint16_t toaplan1_rallybik_state::rallybik_tileram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = toaplan1_tileram16_r(space, offset, mem_mask);
 
@@ -510,7 +510,7 @@ READ16_MEMBER(toaplan1_rallybik_state::rallybik_tileram16_r)
 	return data;
 }
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_tileram16_w)
+void toaplan1_state::toaplan1_tileram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offs_t vram_offset;
 
@@ -544,7 +544,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tileram16_w)
 
 
 
-READ16_MEMBER(toaplan1_state::toaplan1_scroll_regs_r)
+uint16_t toaplan1_state::toaplan1_scroll_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t scroll = 0;
 
@@ -565,7 +565,7 @@ READ16_MEMBER(toaplan1_state::toaplan1_scroll_regs_r)
 }
 
 
-WRITE16_MEMBER(toaplan1_state::toaplan1_scroll_regs_w)
+void toaplan1_state::toaplan1_scroll_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{

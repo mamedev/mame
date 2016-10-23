@@ -42,9 +42,9 @@ public:
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_scroll_panel_bitmap;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(scroll_panel_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_panel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m58);

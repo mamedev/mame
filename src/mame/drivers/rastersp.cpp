@@ -106,22 +106,22 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<nvram_device>   m_nvram;
 
-	DECLARE_WRITE32_MEMBER(cyrix_cache_w);
-	DECLARE_READ8_MEMBER(nvram_r);
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_WRITE32_MEMBER(port1_w);
-	DECLARE_WRITE32_MEMBER(port2_w);
-	DECLARE_WRITE32_MEMBER(port3_w);
-	DECLARE_WRITE32_MEMBER(dpylist_w);
-	DECLARE_READ32_MEMBER(tms32031_control_r);
-	DECLARE_WRITE32_MEMBER(tms32031_control_w);
-	DECLARE_WRITE32_MEMBER(dsp_unk_w);
-	DECLARE_WRITE32_MEMBER(dsp_ctrl_w);
-	DECLARE_WRITE32_MEMBER(dsp_486_int_w);
-	DECLARE_READ32_MEMBER(dsp_speedup_r);
-	DECLARE_WRITE32_MEMBER(dsp_speedup_w);
-	DECLARE_READ32_MEMBER(ncr53c700_read);
-	DECLARE_WRITE32_MEMBER(ncr53c700_write);
+	void cyrix_cache_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void port2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void port3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dpylist_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t tms32031_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void tms32031_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dsp_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dsp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dsp_486_int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ncr53c700_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ncr53c700_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer1);
@@ -203,7 +203,7 @@ void rastersp_state::video_start()
 }
 
 
-WRITE32_MEMBER( rastersp_state::dpylist_w )
+void rastersp_state::dpylist_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dpyaddr = data;
 
@@ -422,7 +422,7 @@ INTERRUPT_GEN_MEMBER( rastersp_state::vblank_irq )
  *
  *************************************/
 
-WRITE32_MEMBER( rastersp_state::port1_w )
+void rastersp_state::port1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// x... .... - LED?
 	// ..x. .... - DSP IRQ2 line
@@ -436,14 +436,14 @@ WRITE32_MEMBER( rastersp_state::port1_w )
 }
 
 
-WRITE32_MEMBER( rastersp_state::port2_w )
+void rastersp_state::port2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// .x.. .... - X9313WP /INC
 	// ..x. .... - X9313WP U/#D
 }
 
 
-WRITE32_MEMBER( rastersp_state:: port3_w )
+void rastersp_state:: port3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// xxxx xxxx - 8 LED cluster?
 }
@@ -456,7 +456,7 @@ WRITE32_MEMBER( rastersp_state:: port3_w )
  *
  *************************************/
 
-WRITE8_MEMBER( rastersp_state::nvram_w )
+void rastersp_state::nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset *= 4;
 
@@ -473,7 +473,7 @@ WRITE8_MEMBER( rastersp_state::nvram_w )
 }
 
 
-READ8_MEMBER( rastersp_state::nvram_r )
+uint8_t rastersp_state::nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset *= 4;
 
@@ -490,7 +490,7 @@ READ8_MEMBER( rastersp_state::nvram_r )
 }
 
 
-WRITE32_MEMBER( rastersp_state::cyrix_cache_w )
+void rastersp_state::cyrix_cache_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO?
 }
@@ -534,7 +534,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_timer1 )
 }
 
 
-READ32_MEMBER( rastersp_state::tms32031_control_r )
+uint32_t rastersp_state::tms32031_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t val = m_tms_io_regs[offset];
 
@@ -557,7 +557,7 @@ READ32_MEMBER( rastersp_state::tms32031_control_r )
 }
 
 
-WRITE32_MEMBER( rastersp_state::tms32031_control_w )
+void rastersp_state::tms32031_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_tms_io_regs[offset];
 
@@ -618,19 +618,19 @@ WRITE32_MEMBER( rastersp_state::tms32031_control_w )
 }
 
 
-WRITE32_MEMBER( rastersp_state::dsp_unk_w )
+void rastersp_state::dsp_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// TODO: Looks like a debug port?
 }
 
 
-WRITE32_MEMBER( rastersp_state::dsp_486_int_w )
+void rastersp_state::dsp_486_int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	update_irq(IRQ_DSP, ASSERT_LINE);
 }
 
 
-WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
+void rastersp_state::dsp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// x... .... LED?
 	// .xx. .... 486 reset control?
@@ -639,7 +639,7 @@ WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
 }
 
 
-WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
+void rastersp_state::dsp_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// 809e90  48fd, 48d5
 	if (space.device().safe_pc() == 0x809c23)
@@ -653,7 +653,7 @@ WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 }
 
 
-READ32_MEMBER( rastersp_state::dsp_speedup_r )
+uint32_t rastersp_state::dsp_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_speedup_count;
 }
@@ -816,12 +816,12 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ32_MEMBER(rastersp_state::ncr53c700_read)
+uint32_t rastersp_state::ncr53c700_read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_dword(offset, mem_mask);
 }
 
-WRITE32_MEMBER(rastersp_state::ncr53c700_write)
+void rastersp_state::ncr53c700_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }

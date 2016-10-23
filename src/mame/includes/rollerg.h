@@ -36,18 +36,18 @@ public:
 	required_device<k05324x_device> m_k053244;
 	required_device<k051316_device> m_k051316;
 	required_device<k053252_device> m_k053252;
-	DECLARE_WRITE8_MEMBER(rollerg_0010_w);
-	DECLARE_READ8_MEMBER(rollerg_k051316_r);
-	DECLARE_WRITE8_MEMBER(soundirq_w);
-	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
-	DECLARE_READ8_MEMBER(pip_r);
+	void rollerg_0010_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rollerg_k051316_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void soundirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pip_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(rollerg_irq_ack_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_rollerg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K05324X_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

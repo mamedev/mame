@@ -29,14 +29,14 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(display_7seg_data_w);
-	DECLARE_WRITE8_MEMBER(multiplex_7seg_w);
-	DECLARE_WRITE8_MEMBER(ay1_port_a_w);
-	DECLARE_WRITE8_MEMBER(ay1_port_b_w);
-	DECLARE_WRITE8_MEMBER(ay2_port_a_w);
-	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(port_r);
+	void display_7seg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multiplex_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay2_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_selected_7seg_module;
 };
@@ -99,28 +99,28 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( marywu_state::ay1_port_a_w )
+void marywu_state::ay1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (uint8_t i=0; i<8; i++){
 		output().set_led_value(i, (data & (1 << i)) ? 1 : 0);
 	}
 }
 
-WRITE8_MEMBER( marywu_state::ay1_port_b_w )
+void marywu_state::ay1_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (uint8_t i=0; i<8; i++){
 		output().set_led_value(i+8, (data & (1 << i)) ? 1 : 0);
 	}
 }
 
-WRITE8_MEMBER( marywu_state::ay2_port_a_w )
+void marywu_state::ay2_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (uint8_t i=0; i<8; i++){
 		output().set_led_value(i+16, (data & (1 << i)) ? 1 : 0);
 	}
 }
 
-WRITE8_MEMBER( marywu_state::ay2_port_b_w )
+void marywu_state::ay2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (uint8_t i=0; i<6; i++){
 		/* we only have 30 LEDs. The last 2 bits in this port are unused.  */
@@ -128,12 +128,12 @@ WRITE8_MEMBER( marywu_state::ay2_port_b_w )
 	}
 }
 
-WRITE8_MEMBER( marywu_state::multiplex_7seg_w )
+void marywu_state::multiplex_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_selected_7seg_module = data;
 }
 
-READ8_MEMBER( marywu_state::port_r )
+uint8_t marywu_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //TODO: figure out what each bit is mapped to in the 80c31 ports P1 and P3
 	switch(offset){
@@ -144,7 +144,7 @@ READ8_MEMBER( marywu_state::port_r )
 	}
 }
 
-READ8_MEMBER( marywu_state::keyboard_r )
+uint8_t marywu_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_selected_7seg_module % 8){
 	case 0: return ioport("KEYS1")->read();
@@ -156,7 +156,7 @@ READ8_MEMBER( marywu_state::keyboard_r )
 	}
 }
 
-WRITE8_MEMBER( marywu_state::display_7seg_data_w )
+void marywu_state::display_7seg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 

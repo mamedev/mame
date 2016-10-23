@@ -58,11 +58,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
-	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
-	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
-	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
-	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
+	void dbzcontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dbz_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dbz_sound_cause_nmi(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dbz_bg2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dbz_bg1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(dbz_irq2_ack_w);
 	void init_dbza();
 	void init_dbz();

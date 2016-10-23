@@ -28,19 +28,19 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker") { }
 
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_READ8_MEMBER(port_r);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(dev0_r);
-	DECLARE_WRITE8_MEMBER(dev1_w);
-	DECLARE_WRITE8_MEMBER(dev2_w);
-	DECLARE_READ8_MEMBER(dev4_r);
+	uint8_t dev0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dev1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dev4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	char port0, port1, port2, port3;
 };
 
-WRITE8_MEMBER(daruma_state::port_w)
+void daruma_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("port_w: write %02X to PORT (offset=%02X)\n", data, offset);
 	switch(offset)
@@ -52,7 +52,7 @@ WRITE8_MEMBER(daruma_state::port_w)
 	}
 }
 
-READ8_MEMBER(daruma_state::port_r)
+uint8_t daruma_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -64,17 +64,17 @@ READ8_MEMBER(daruma_state::port_r)
 	return 0;
 }
 
-READ8_MEMBER(daruma_state::dev0_r)
+uint8_t daruma_state::dev0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xFF;
 }
 
-READ8_MEMBER(daruma_state::dev4_r)
+uint8_t daruma_state::dev4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("switches")->read();
 }
 
-WRITE8_MEMBER(daruma_state::dev1_w)
+void daruma_state::dev1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//while attempting to identify which bit is used for
 	//controlling the buzzer, here's what I heard from each of
@@ -90,7 +90,7 @@ WRITE8_MEMBER(daruma_state::dev1_w)
 	m_speaker->level_w(data & 0x02);
 }
 
-WRITE8_MEMBER(daruma_state::dev2_w)
+void daruma_state::dev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//while attempting to identify which bit is used for
 	//controlling the buzzer, here's what I heard from each of

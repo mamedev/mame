@@ -203,7 +203,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 //  mem_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::mem_r )
+uint8_t comx35_state::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int extrom = 1;
 
@@ -230,7 +230,7 @@ READ8_MEMBER( comx35_state::mem_r )
 //  mem_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::mem_w )
+void comx35_state::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->mwr_w(space, offset, data);
 
@@ -253,7 +253,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 //  io_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( comx35_state::io_r )
+uint8_t comx35_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_exp->io_r(space, offset);
 
@@ -270,7 +270,7 @@ READ8_MEMBER( comx35_state::io_r )
 //  io_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( comx35_state::io_w )
+void comx35_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->io_w(space, offset, data);
 
@@ -476,7 +476,7 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_exp->q_w(state);
 }
 
-WRITE8_MEMBER( comx35_state::sc_w )
+void comx35_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{

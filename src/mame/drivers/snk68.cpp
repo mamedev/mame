@@ -55,35 +55,35 @@ void snk68_state::machine_start()
 	save_item(NAME(m_invert_controls));
 }
 
-READ16_MEMBER(snk68_state::control_1_r)
+uint16_t snk68_state::control_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("P1")->read() + (ioport("P2")->read() << 8));
 }
 
-READ16_MEMBER(snk68_state::rotary_1_r)
+uint16_t snk68_state::rotary_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (( ~(1 << ioport("ROT1")->read()) )<<8)&0xff00;
 }
 
-READ16_MEMBER(snk68_state::rotary_2_r)
+uint16_t snk68_state::rotary_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (( ~(1 << ioport("ROT2")->read()) )<<8)&0xff00;
 }
 
-READ16_MEMBER(snk68_state::rotary_lsb_r)
+uint16_t snk68_state::rotary_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((( ~(1 << ioport("ROT2")->read())  ) <<4)&0xf000)
 			+ ((( ~(1 << ioport("ROT1")->read())  )    )&0x0f00);
 }
 
-READ16_MEMBER(snk68_state::protcontrols_r)
+uint16_t snk68_state::protcontrols_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 
 	return ioport(portnames[offset])->read() ^ m_invert_controls;
 }
 
-WRITE16_MEMBER(snk68_state::protection_w)
+void snk68_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* top byte is used, meaning unknown */
 	/* bottom byte is protection in ikari 3 and streetsm */
@@ -93,7 +93,7 @@ WRITE16_MEMBER(snk68_state::protection_w)
 	}
 }
 
-WRITE16_MEMBER(snk68_state::sound_w)
+void snk68_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -151,14 +151,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(snk68_state::D7759_write_port_0_w)
+void snk68_state::D7759_write_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(snk68_state::D7759_upd_reset_w)
+void snk68_state::D7759_upd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 0x80);
 }

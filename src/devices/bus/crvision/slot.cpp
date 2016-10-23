@@ -266,7 +266,7 @@ std::string crvision_cart_slot_device::get_default_card_software()
  read_rom
  -------------------------------------------------*/
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom40)
+uint8_t crvision_cart_slot_device::read_rom40(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom40(space, offset);
@@ -274,7 +274,7 @@ READ8_MEMBER(crvision_cart_slot_device::read_rom40)
 		return 0xff;
 }
 
-READ8_MEMBER(crvision_cart_slot_device::read_rom80)
+uint8_t crvision_cart_slot_device::read_rom80(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom80(space, offset);

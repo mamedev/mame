@@ -39,13 +39,13 @@ public:
 	exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~exidy440_sound_device() {}
 
-	DECLARE_READ8_MEMBER( sound_command_r );
-	DECLARE_READ8_MEMBER( sound_volume_r );
-	DECLARE_WRITE8_MEMBER( sound_volume_w );
-	DECLARE_WRITE8_MEMBER( sound_interrupt_clear_w );
-	DECLARE_READ8_MEMBER( m6844_r );
-	DECLARE_WRITE8_MEMBER( m6844_w );
-	DECLARE_WRITE8_MEMBER( sound_banks_w );
+	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sound_volume_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_interrupt_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m6844_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_banks_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void exidy440_sound_command(uint8_t param);
 	uint8_t exidy440_sound_command_ack();

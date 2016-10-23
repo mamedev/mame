@@ -70,10 +70,10 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_ace;
 	required_device<beep_device> m_beep;
-	DECLARE_READ8_MEMBER(h19_80_r);
-	DECLARE_READ8_MEMBER(h19_a0_r);
-	DECLARE_WRITE8_MEMBER(h19_c0_w);
-	DECLARE_WRITE8_MEMBER(h19_kbd_put);
+	uint8_t h19_80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t h19_a0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void h19_c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void h19_kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<palette_device> m_palette;
@@ -99,7 +99,7 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-READ8_MEMBER( h19_state::h19_80_r )
+uint8_t h19_state::h19_80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // keyboard data
 	uint8_t ret = m_term_data;
@@ -107,14 +107,14 @@ READ8_MEMBER( h19_state::h19_80_r )
 	return ret;
 }
 
-READ8_MEMBER( h19_state::h19_a0_r )
+uint8_t h19_state::h19_a0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // keyboard status
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x7f; // says that a key is ready and no modifier keys are pressed
 }
 
-WRITE8_MEMBER( h19_state::h19_c0_w )
+void h19_state::h19_c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Beeper control - a 96L02 contains 2 oneshots, one for bell and one for keyclick.
 - lengths need verifying
@@ -375,7 +375,7 @@ static GFXDECODE_START( h19 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( h19_state::h19_kbd_put )
+void h19_state::h19_kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_maincpu->set_input_line(0, HOLD_LINE);

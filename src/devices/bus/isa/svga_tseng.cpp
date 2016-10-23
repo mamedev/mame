@@ -68,7 +68,7 @@ isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER(isa8_svga_et4k_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+uint8_t isa8_svga_et4k_device::input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
 
 void isa8_svga_et4k_device::device_start()
 {

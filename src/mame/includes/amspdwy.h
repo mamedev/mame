@@ -48,13 +48,13 @@ public:
 	uint8_t m_wheel_old[2];
 	uint8_t m_wheel_return[2];
 
-	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
-	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
-	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);
-	DECLARE_WRITE8_MEMBER(amspdwy_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
-	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
-	DECLARE_READ8_MEMBER(amspdwy_sound_r);
+	uint8_t amspdwy_wheel_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t amspdwy_wheel_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void amspdwy_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void amspdwy_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void amspdwy_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void amspdwy_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t amspdwy_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
 

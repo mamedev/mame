@@ -62,41 +62,41 @@ void mitchell_state::video_start_pang()
   OBJ / CHAR RAM HANDLERS (BANK 0 = CHAR, BANK 1=OBJ)
 ***************************************************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_video_bank_w)
+void mitchell_state::pang_video_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bank handler (sets base pointers for video write) (doesn't apply to mgakuen) */
 	m_video_bank = data;
 }
 
-WRITE8_MEMBER(mitchell_state::mstworld_video_bank_w)
+void mitchell_state::mstworld_video_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Monsters World seems to freak out if more bits are used.. */
 	m_video_bank = data & 1;
 }
 
 
-WRITE8_MEMBER(mitchell_state::mgakuen_videoram_w)
+void mitchell_state::mgakuen_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_MEMBER(mitchell_state::mgakuen_videoram_r)
+uint8_t mitchell_state::mgakuen_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(mitchell_state::mgakuen_objram_w)
+void mitchell_state::mgakuen_objram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_objram[offset] = data;
 }
 
-READ8_MEMBER(mitchell_state::mgakuen_objram_r)
+uint8_t mitchell_state::mgakuen_objram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_objram[offset];
 }
 
-WRITE8_MEMBER(mitchell_state::pang_videoram_w)
+void mitchell_state::pang_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_video_bank)
 		mgakuen_objram_w(space, offset, data);
@@ -104,7 +104,7 @@ WRITE8_MEMBER(mitchell_state::pang_videoram_w)
 		mgakuen_videoram_w(space, offset, data);
 }
 
-READ8_MEMBER(mitchell_state::pang_videoram_r)
+uint8_t mitchell_state::pang_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_video_bank)
 		return mgakuen_objram_r(space, offset);
@@ -116,13 +116,13 @@ READ8_MEMBER(mitchell_state::pang_videoram_r)
   COLOUR RAM
 ****************************************************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_colorram_w)
+void mitchell_state::pang_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(mitchell_state::pang_colorram_r)
+uint8_t mitchell_state::pang_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_colorram[offset];
 }
@@ -131,7 +131,7 @@ READ8_MEMBER(mitchell_state::pang_colorram_r)
   PALETTE HANDLERS (COLOURS: BANK 0 = 0x00-0x3f BANK 1=0x40-0xff)
 ****************************************************************************/
 
-WRITE8_MEMBER(mitchell_state::pang_gfxctrl_w)
+void mitchell_state::pang_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
@@ -169,7 +169,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* up marukin - you can see partially built up screens during attract mode. */
 }
 
-WRITE8_MEMBER(mitchell_state::pangbl_gfxctrl_w)
+void mitchell_state::pangbl_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
@@ -205,7 +205,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* up marukin - you can see partially built up screens during attract mode. */
 }
 
-WRITE8_MEMBER(mitchell_state::mstworld_gfxctrl_w)
+void mitchell_state::mstworld_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
@@ -239,12 +239,12 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 	/* up marukin - you can see partially built up screens during attract mode. */
 }
 
-WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
+void mitchell_state::pang_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette->write(space, offset + (m_paletteram_bank ? 0x800 : 0x000), data);
 }
 
-READ8_MEMBER(mitchell_state::pang_paletteram_r)
+uint8_t mitchell_state::pang_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_paletteram[offset + (m_paletteram_bank ? 0x800 : 0x000)];
 }

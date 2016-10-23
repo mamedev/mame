@@ -750,7 +750,7 @@ uint16_t pit8253_device::masked_value(pit8253_timer *timer)
      latched_count
      rmsb
   so they don't affect any timer operations except other reads. */
-READ8_MEMBER( pit8253_device::read )
+uint8_t pit8253_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	pit8253_timer *timer = get_timer(offset);
 	uint8_t data;
@@ -929,7 +929,7 @@ void pit8253_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	update(get_timer(id));
 }
 
-WRITE8_MEMBER( pit8253_device::write )
+void pit8253_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pit8253_timer *timer = get_timer(offset);
 

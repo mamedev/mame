@@ -119,13 +119,13 @@ public:
 	uint8_t m_rom_bank;
 	uint8_t m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
-	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
-	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
-	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
-	DECLARE_WRITE8_MEMBER(supertnk_videoram_w);
-	DECLARE_READ8_MEMBER(supertnk_videoram_r);
-	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
-	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
+	void supertnk_bankswitch_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supertnk_bankswitch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supertnk_interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supertnk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t supertnk_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void supertnk_bitplane_select_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supertnk_bitplane_select_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_supertnk();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -148,14 +148,14 @@ void supertnk_state::machine_start()
  *
  *************************************/
 
-WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
+void supertnk_state::supertnk_bankswitch_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = (m_rom_bank & 0x02) | ((data << 0) & 0x01);
 	membank("bank1")->set_entry(m_rom_bank);
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
+void supertnk_state::supertnk_bankswitch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = (m_rom_bank & 0x01) | ((data << 1) & 0x02);
 	membank("bank1")->set_entry(m_rom_bank);
@@ -175,7 +175,7 @@ INTERRUPT_GEN_MEMBER(supertnk_state::supertnk_interrupt)
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
+void supertnk_state::supertnk_interrupt_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL4, CLEAR_LINE);
 }
@@ -206,7 +206,7 @@ void supertnk_state::video_start()
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
+void supertnk_state::supertnk_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bitplane_select > 2)
 	{
@@ -221,7 +221,7 @@ WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
 }
 
 
-READ8_MEMBER(supertnk_state::supertnk_videoram_r)
+uint8_t supertnk_state::supertnk_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -232,13 +232,13 @@ READ8_MEMBER(supertnk_state::supertnk_videoram_r)
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_0_w)
+void supertnk_state::supertnk_bitplane_select_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitplane_select = (m_bitplane_select & 0x02) | ((data << 0) & 0x01);
 }
 
 
-WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_1_w)
+void supertnk_state::supertnk_bitplane_select_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitplane_select = (m_bitplane_select & 0x01) | ((data << 1) & 0x02);
 }

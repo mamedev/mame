@@ -73,7 +73,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 	svision_irq();
 }
 
-READ8_MEMBER(svision_state::svision_r)
+uint8_t svision_state::svision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_reg[offset];
 	switch (offset)
@@ -128,7 +128,7 @@ READ8_MEMBER(svision_state::svision_r)
 	return data;
 }
 
-WRITE8_MEMBER(svision_state::svision_w)
+void svision_state::svision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int value, delay, bank;
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 	}
 }
 
-READ8_MEMBER(svision_state::tvlink_r)
+uint8_t svision_state::tvlink_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -204,7 +204,7 @@ READ8_MEMBER(svision_state::tvlink_r)
 	}
 }
 
-WRITE8_MEMBER(svision_state::tvlink_w)
+void svision_state::tvlink_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

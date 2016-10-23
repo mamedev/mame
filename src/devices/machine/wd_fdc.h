@@ -149,28 +149,28 @@ public:
 
 	void cmd_w(uint8_t val);
 	uint8_t status_r();
-	DECLARE_READ8_MEMBER( status_r ) { return status_r(); }
-	DECLARE_WRITE8_MEMBER( cmd_w ) { cmd_w(data); }
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return status_r(); }
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { cmd_w(data); }
 
 	void track_w(uint8_t val);
 	uint8_t track_r();
-	DECLARE_READ8_MEMBER( track_r ) { return track_r(); }
-	DECLARE_WRITE8_MEMBER( track_w ) { track_w(data); }
+	uint8_t track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return track_r(); }
+	void track_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { track_w(data); }
 
 	void sector_w(uint8_t val);
 	uint8_t sector_r();
-	DECLARE_READ8_MEMBER( sector_r ) { return sector_r(); }
-	DECLARE_WRITE8_MEMBER( sector_w ) { sector_w(data); }
+	uint8_t sector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return sector_r(); }
+	void sector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { sector_w(data); }
 
 	void data_w(uint8_t val);
 	uint8_t data_r();
-	DECLARE_READ8_MEMBER( data_r ) { return data_r(); }
-	DECLARE_WRITE8_MEMBER( data_w ) { data_w(data); }
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return data_r(); }
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { data_w(data); }
 
 	void gen_w(int reg, uint8_t val);
 	uint8_t gen_r(int reg);
-	DECLARE_READ8_MEMBER( read ) { return gen_r(offset);}
-	DECLARE_WRITE8_MEMBER( write ) { gen_w(offset,data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return gen_r(offset);}
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { gen_w(offset,data); }
 
 	bool intrq_r();
 	bool drq_r();

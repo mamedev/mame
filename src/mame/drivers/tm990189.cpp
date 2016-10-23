@@ -92,10 +92,10 @@ public:
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
 
-	DECLARE_READ8_MEMBER(video_vdp_r);
-	DECLARE_WRITE8_MEMBER(video_vdp_w);
-	DECLARE_READ8_MEMBER(video_joy_r);
-	DECLARE_WRITE8_MEMBER(video_joy_w);
+	uint8_t video_vdp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_vdp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_joy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_joy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	int m_load_state;
 
 	int m_digitsel;
@@ -113,7 +113,7 @@ public:
 	emu_timer *m_rs232_input_timer;
 	uint8_t m_bogus_read_save;
 
-	DECLARE_WRITE8_MEMBER( external_operation );
+	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
@@ -121,10 +121,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
 	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
-	DECLARE_WRITE8_MEMBER(usr9901_interrupt_callback);
+	void usr9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(sys9901_interrupt_callback);
-	DECLARE_READ8_MEMBER(sys9901_r);
+	void sys9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sys9901_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel2_w);
@@ -144,7 +144,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sys9901_spkrdrive_w);
 	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
 
-	DECLARE_WRITE8_MEMBER( xmit_callback );
+	void xmit_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_tm990_189();
 	void machine_reset_tm990_189();
 	void machine_start_tm990_189_v();
@@ -262,7 +262,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
     tms9901 code
 */
 
-WRITE8_MEMBER( tm990189_state::usr9901_interrupt_callback )
+void tm990189_state::usr9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Triggered by internal timer (set by ROM to 1.6 ms cycle) on level 3
 	// or by keyboard interrupt (level 6)
@@ -300,14 +300,14 @@ WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
 	led_set(3, state);
 }
 
-WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
+void tm990189_state::sys9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// machine().device<tms9901_device>("tms9901_0")->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
 	// TODO: Check this
 	m_tms9901_usr->set_single_int(5, (data!=0)? ASSERT_LINE:CLEAR_LINE);
 }
 
-READ8_MEMBER( tm990189_state::sys9901_r )
+uint8_t tm990189_state::sys9901_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	if (offset == TMS9901_CB_INT7)
@@ -511,7 +511,7 @@ void tm990_189_rs232_image_device::call_unload()
     tms9902->set_cts(RTS);
 } */
 
-WRITE8_MEMBER( tm990189_state::xmit_callback )
+void tm990189_state::xmit_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t buf = data;
 	if (m_rs232_fp) m_rs232_fp->fwrite(&buf, 1);
@@ -520,7 +520,7 @@ WRITE8_MEMBER( tm990189_state::xmit_callback )
 /*
     External instruction decoding
 */
-WRITE8_MEMBER( tm990189_state::external_operation )
+void tm990189_state::external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -553,7 +553,7 @@ WRITE8_MEMBER( tm990189_state::external_operation )
     Video Board handling
 */
 
-READ8_MEMBER( tm990189_state::video_vdp_r )
+uint8_t tm990189_state::video_vdp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply = 0;
 
@@ -584,7 +584,7 @@ READ8_MEMBER( tm990189_state::video_vdp_r )
 	return reply;
 }
 
-WRITE8_MEMBER( tm990189_state::video_vdp_w )
+void tm990189_state::video_vdp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -595,7 +595,7 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 	}
 }
 
-READ8_MEMBER( tm990189_state::video_joy_r )
+uint8_t tm990189_state::video_joy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("BUTTONS")->read();
 
@@ -614,7 +614,7 @@ READ8_MEMBER( tm990189_state::video_joy_r )
 	return data;
 }
 
-WRITE8_MEMBER( tm990189_state::video_joy_w )
+void tm990189_state::video_joy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy1x_timer->reset(attotime::from_usec(ioport("JOY1_X")->read()*28+28));
 	m_joy1y_timer->reset(attotime::from_usec(ioport("JOY1_Y")->read()*28+28));

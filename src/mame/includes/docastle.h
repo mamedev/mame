@@ -53,17 +53,17 @@ public:
 	uint8_t    m_buffer0[9];
 	uint8_t    m_buffer1[9];
 
-	DECLARE_READ8_MEMBER(docastle_shared0_r);
-	DECLARE_READ8_MEMBER(docastle_shared1_r);
-	DECLARE_WRITE8_MEMBER(docastle_shared0_w);
-	DECLARE_WRITE8_MEMBER(docastle_shared1_w);
-	DECLARE_WRITE8_MEMBER(docastle_nmitrigger_w);
-	DECLARE_WRITE8_MEMBER(docastle_videoram_w);
-	DECLARE_WRITE8_MEMBER(docastle_colorram_w);
-	DECLARE_READ8_MEMBER(flipscreen_r);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
-	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
+	uint8_t docastle_shared0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t docastle_shared1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void docastle_shared0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void docastle_shared1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void docastle_nmitrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void docastle_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void docastle_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t idsoccer_adpcm_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void idsoccer_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

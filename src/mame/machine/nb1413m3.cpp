@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
 }
 
 
-WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
+void nb1413m3_device::nmi_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_clock = data;
 
@@ -194,7 +194,7 @@ WRITE8_MEMBER( nb1413m3_device::nmi_clock_w )
 
 }
 
-READ8_MEMBER( nb1413m3_device::sndrom_r )
+uint8_t nb1413m3_device::sndrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int rombank;
 
@@ -297,7 +297,7 @@ READ8_MEMBER( nb1413m3_device::sndrom_r )
 	}
 }
 
-WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
+void nb1413m3_device::sndrombank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// if (data & 0x02) coin counter ?
 	outcoin_w(space, 0, data);             // (data & 0x04) >> 2;
@@ -305,44 +305,44 @@ WRITE8_MEMBER( nb1413m3_device::sndrombank1_w )
 	m_sndrombank1 = (((data & 0xc0) >> 5) | ((data & 0x10) >> 4));
 }
 
-WRITE8_MEMBER( nb1413m3_device::sndrombank2_w )
+void nb1413m3_device::sndrombank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndrombank2 = (data & 0x03);
 }
 
-READ8_MEMBER( nb1413m3_device::gfxrom_r )
+uint8_t nb1413m3_device::gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *GFXROM = space.machine().root_device().memregion("gfx1")->base();
 
 	return GFXROM[(0x20000 * (m_gfxrombank | ((m_sndrombank1 & 0x02) << 3))) + ((0x0200 * m_gfxradr_h) + (0x0002 * m_gfxradr_l)) + (offset & 0x01)];
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxrombank_w )
+void nb1413m3_device::gfxrombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxrombank = (((data & 0xc0) >> 4) + (data & 0x03));
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxradr_l_w )
+void nb1413m3_device::gfxradr_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxradr_l = data;
 }
 
-WRITE8_MEMBER( nb1413m3_device::gfxradr_h_w )
+void nb1413m3_device::gfxradr_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxradr_h = data;
 }
 
-WRITE8_MEMBER( nb1413m3_device::inputportsel_w )
+void nb1413m3_device::inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_inputport = data;
 }
 
-READ8_MEMBER( nb1413m3_device::inputport0_r )
+uint8_t nb1413m3_device::inputport0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((space.machine().root_device().ioport("SYSTEM")->read() & 0xfd) | ((m_outcoin_flag & 0x01) << 1));
 }
 
-READ8_MEMBER( nb1413m3_device::inputport1_r )
+uint8_t nb1413m3_device::inputport1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_t &root = space.machine().root_device();
 	switch (m_nb1413m3_type)
@@ -391,7 +391,7 @@ READ8_MEMBER( nb1413m3_device::inputport1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::inputport2_r )
+uint8_t nb1413m3_device::inputport2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_t &root = space.machine().root_device();
 	switch (m_nb1413m3_type)
@@ -440,7 +440,7 @@ READ8_MEMBER( nb1413m3_device::inputport2_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::inputport3_r )
+uint8_t nb1413m3_device::inputport3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_nb1413m3_type)
 	{
@@ -463,7 +463,7 @@ READ8_MEMBER( nb1413m3_device::inputport3_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw1_r )
+uint8_t nb1413m3_device::dipsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_t &root = space.machine().root_device();
 	switch (m_nb1413m3_type)
@@ -507,7 +507,7 @@ READ8_MEMBER( nb1413m3_device::dipsw1_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw2_r )
+uint8_t nb1413m3_device::dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_t &root = space.machine().root_device();
 	switch (m_nb1413m3_type)
@@ -551,17 +551,17 @@ READ8_MEMBER( nb1413m3_device::dipsw2_r )
 	}
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw3_l_r )
+uint8_t nb1413m3_device::dipsw3_l_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((space.machine().root_device().ioport("DSWC")->read() & 0xf0) >> 4);
 }
 
-READ8_MEMBER( nb1413m3_device::dipsw3_h_r )
+uint8_t nb1413m3_device::dipsw3_h_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((space.machine().root_device().ioport("DSWC")->read() & 0x0f) >> 0);
 }
 
-WRITE8_MEMBER( nb1413m3_device::outcoin_w )
+void nb1413m3_device::outcoin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outcoin_enable = (data & 0x04) >> 2;
 
@@ -600,7 +600,7 @@ WRITE8_MEMBER( nb1413m3_device::outcoin_w )
 	space.machine().output().set_led_value(2, m_outcoin_flag);      // out coin
 }
 
-WRITE8_MEMBER( nb1413m3_device::vcrctrl_w )
+void nb1413m3_device::vcrctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x08)
 	{

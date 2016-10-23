@@ -26,28 +26,28 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(vector4_02_r);
-	DECLARE_READ8_MEMBER(vector4_03_r);
-	DECLARE_WRITE8_MEMBER(vector4_02_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t vector4_02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vector4_03_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vector4_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 
 
-WRITE8_MEMBER( vector4_state::vector4_02_w )
+void vector4_state::vector4_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data < 0xff)
 		m_terminal->write(space, 0, data);
 }
 
-READ8_MEMBER( vector4_state::vector4_03_r )
+uint8_t vector4_state::vector4_03_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( vector4_state::vector4_02_r )
+uint8_t vector4_state::vector4_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -81,7 +81,7 @@ void vector4_state::machine_reset()
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-WRITE8_MEMBER( vector4_state::kbd_put )
+void vector4_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

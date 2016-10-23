@@ -34,10 +34,10 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_WRITE8_MEMBER(port01_w);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_READ8_MEMBER(port02_r);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_out_data;
 	required_device<i4004_cpu_device> m_maincpu;
@@ -113,7 +113,7 @@ static INPUT_PORTS_START( flicker )
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("D Target") PORT_CODE(KEYCODE_COMMA)
 INPUT_PORTS_END
 
-READ8_MEMBER( flicker_state::port02_r )
+uint8_t flicker_state::port02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
 
@@ -123,14 +123,14 @@ READ8_MEMBER( flicker_state::port02_r )
 	return 0;
 }
 
-WRITE8_MEMBER( flicker_state::port00_w )
+void flicker_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	offset = m_maincpu->state_int(I4004_RAM); // we need the full address
 	output().set_digit_value(offset, patterns[data]);
 }
 
-WRITE8_MEMBER( flicker_state::port01_w )
+void flicker_state::port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // The output lines operate the various lamps (44 of them)
 	offset = m_maincpu->state_int(I4004_RAM) & 0x0f; // we need the full address
@@ -144,7 +144,7 @@ WRITE8_MEMBER( flicker_state::port01_w )
 	m_maincpu->set_test(BIT(test_port, offset));
 }
 
-WRITE8_MEMBER( flicker_state::port10_w )
+void flicker_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Outputs depend on data:
     1 = tens chime

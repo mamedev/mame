@@ -33,22 +33,22 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER(txstat_r);
-	DECLARE_WRITE8_MEMBER(txstat_w);
-	DECLARE_READ8_MEMBER(txmask_r);
-	DECLARE_WRITE8_MEMBER(txmask_w);
-	DECLARE_READ8_MEMBER(rxstat_r);
-	DECLARE_WRITE8_MEMBER(rxstat_w);
-	DECLARE_READ8_MEMBER(rxmask_r);
-	DECLARE_WRITE8_MEMBER(rxmask_w);
-	DECLARE_READ8_MEMBER(txmode_r);
-	DECLARE_WRITE8_MEMBER(txmode_w);
-	DECLARE_READ8_MEMBER(rxmode_r);
-	DECLARE_WRITE8_MEMBER(rxmode_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
-	DECLARE_READ8_MEMBER(tdc_lsb_r);
-	DECLARE_READ8_MEMBER(mac_r);
-	DECLARE_WRITE8_MEMBER(mac_w);
+	uint8_t txstat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void txstat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t txmask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void txmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rxstat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rxstat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rxmask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rxmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t txmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void txmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rxmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rxmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tdc_lsb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void tx_dma_w(uint8_t data, bool eof);
 	void rx_dma_r(uint8_t &data, bool &eof);

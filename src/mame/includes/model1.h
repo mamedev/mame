@@ -44,52 +44,52 @@ public:
 	void machine_reset_model1();
 	void machine_reset_model1_vr();
 
-	DECLARE_READ16_MEMBER(network_ctl_r);
-	DECLARE_WRITE16_MEMBER(network_ctl_w);
+	uint16_t network_ctl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void network_ctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(bank_w);
+	void bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	// Sound
-	DECLARE_READ16_MEMBER(snd_68k_ready_r);
-	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
+	uint16_t snd_68k_ready_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void snd_latch_to_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// TGP
-	DECLARE_READ16_MEMBER(fifoin_status_r);
-	DECLARE_WRITE16_MEMBER(md1_w);
-	DECLARE_WRITE16_MEMBER(md0_w);
-	DECLARE_WRITE16_MEMBER(p_w);
-	DECLARE_WRITE16_MEMBER(mr_w);
-	DECLARE_WRITE16_MEMBER(mr2_w);
+	uint16_t fifoin_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void md1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void md0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void p_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mr2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(model1_tgp_copro_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_w);
-	DECLARE_READ16_MEMBER(model1_tgp_copro_adr_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_adr_w);
-	DECLARE_READ16_MEMBER(model1_tgp_copro_ram_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_copro_ram_w);
-	DECLARE_READ16_MEMBER(model1_tgp_vr_adr_r);
-	DECLARE_WRITE16_MEMBER(model1_tgp_vr_adr_w);
-	DECLARE_READ16_MEMBER(model1_vr_tgp_ram_r);
-	DECLARE_WRITE16_MEMBER(model1_vr_tgp_ram_w);
-	DECLARE_READ16_MEMBER(model1_vr_tgp_r);
-	DECLARE_WRITE16_MEMBER(model1_vr_tgp_w);
+	uint16_t model1_tgp_copro_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_tgp_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t model1_tgp_copro_adr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_tgp_copro_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t model1_tgp_copro_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_tgp_copro_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t model1_tgp_vr_adr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_tgp_vr_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t model1_vr_tgp_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_vr_tgp_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t model1_vr_tgp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_vr_tgp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER(copro_ram_r);
-	DECLARE_WRITE32_MEMBER(copro_ram_w);
+	uint32_t copro_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void copro_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_READ_LINE_MEMBER(copro_fifoin_pop_ok);
-	DECLARE_READ32_MEMBER(copro_fifoin_pop);
-	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
+	uint32_t copro_fifoin_pop(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void copro_fifoout_push(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// Rendering
 	void video_start_model1();
-	DECLARE_READ16_MEMBER(model1_listctl_r);
-	DECLARE_WRITE16_MEMBER(model1_listctl_w);
+	uint16_t model1_listctl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void model1_listctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_model1(screen_device &screen, bool state);

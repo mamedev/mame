@@ -22,13 +22,13 @@ TODO:
 #include "includes/asterix.h"
 
 #if 0
-READ16_MEMBER(asterix_state::control2_r)
+uint16_t asterix_state::control2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cur_control2;
 }
 #endif
 
-WRITE16_MEMBER(asterix_state::control2_w)
+void asterix_state::control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -72,13 +72,13 @@ void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
+void asterix_state::sound_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(attotime::from_usec(5), TIMER_NMI);
 }
 
-WRITE16_MEMBER(asterix_state::sound_irq_w)
+void asterix_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
@@ -87,7 +87,7 @@ WRITE16_MEMBER(asterix_state::sound_irq_w)
 // You're not supposed to laugh.
 // This emulation is grossly overkill but hey, I'm having fun.
 #if 0
-WRITE16_MEMBER(asterix_state::protection_w)
+void asterix_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
 
@@ -125,7 +125,7 @@ WRITE16_MEMBER(asterix_state::protection_w)
 }
 #endif
 
-WRITE16_MEMBER(asterix_state::protection_w)
+void asterix_state::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_prot + offset);
 

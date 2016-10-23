@@ -16,7 +16,7 @@ except for the Promat licensed Korean version which is unprotected.
 #include "sound/okim6295.h"
 #include "includes/glass.h"
 
-WRITE16_MEMBER(glass_state::clr_int_w)
+void glass_state::clr_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cause_interrupt = 1;
 }
@@ -53,13 +53,13 @@ static GFXDECODE_START( glass )
 GFXDECODE_END
 
 
-WRITE16_MEMBER(glass_state::OKIM6295_bankswitch_w)
+void glass_state::OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		membank("okibank")->set_entry(data & 0x0f);
 }
 
-WRITE16_MEMBER(glass_state::coin_w)
+void glass_state::coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset >> 3)
 	{
@@ -344,7 +344,7 @@ void glass_state::ROM16_split_gfx( const char *src_reg, const char *dst_reg, int
 
  */
 
-READ16_MEMBER( glass_state::mainram_r )
+uint16_t glass_state::mainram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_mainram[offset];
 	int pc = space.device().safe_pc();
@@ -378,7 +378,7 @@ READ16_MEMBER( glass_state::mainram_r )
 	return ret;
 }
 
-WRITE16_MEMBER( glass_state::mainram_w )
+void glass_state::mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 

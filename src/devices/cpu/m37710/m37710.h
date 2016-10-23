@@ -96,8 +96,8 @@ public:
 	// construction/destruction
 	m37710_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_delegate map_delegate);
 
-	DECLARE_READ16_MEMBER( m37710_internal_word_r );
-	DECLARE_WRITE16_MEMBER( m37710_internal_word_w );
+	uint16_t m37710_internal_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m37710_internal_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

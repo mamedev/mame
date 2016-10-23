@@ -24,9 +24,9 @@ public:
 
 	int m_trigger;
 
-	DECLARE_WRITE8_MEMBER(porta_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
 

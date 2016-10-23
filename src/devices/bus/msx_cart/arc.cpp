@@ -39,7 +39,7 @@ void msx_cart_arc::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_arc::read_cart)
+uint8_t msx_cart_arc::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
@@ -49,7 +49,7 @@ READ8_MEMBER(msx_cart_arc::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_arc::io_7f_w)
+void msx_cart_arc::io_7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x35)
 	{
@@ -58,7 +58,7 @@ WRITE8_MEMBER(msx_cart_arc::io_7f_w)
 }
 
 
-READ8_MEMBER(msx_cart_arc::io_7f_r)
+uint8_t msx_cart_arc::io_7f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_7f & 0x03) == 0x03) ? 0xda : 0xff;
 }

@@ -38,7 +38,7 @@ INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
 }
 
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
+void fromanc2_state::fromanc2_sndcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
@@ -47,12 +47,12 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 	m_sndcpu_nmi_flag = 0;
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_portselect_w)
+void fromanc2_state::fromanc2_portselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_portselect = data;
 }
 
-READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
+uint16_t fromanc2_state::fromanc2_keymatrix_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 
@@ -85,7 +85,7 @@ CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
 	return m_subcpu_nmi_flag & 0x01;
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
+void fromanc2_state::fromancr_gfxbank_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	fromancr_gfxbank_w(data & 0xfff8);
 	if (ACCESSING_BITS_0_7)
@@ -96,7 +96,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxbank_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
+void fromanc2_state::fromanc2_subcpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_datalatch1 = data;
 
@@ -104,7 +104,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_subcpu_w)
 	m_subcpu_int_flag = 0;
 }
 
-READ16_MEMBER(fromanc2_state::fromanc2_subcpu_r)
+uint16_t fromanc2_state::fromanc2_subcpu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_subcpu_nmi_flag = 0;
@@ -112,41 +112,41 @@ READ16_MEMBER(fromanc2_state::fromanc2_subcpu_r)
 	return (m_datalatch_2h << 8) | m_datalatch_2l;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_maincpu_r_l)
+uint8_t fromanc2_state::fromanc2_maincpu_r_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_datalatch1 & 0x00ff;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_maincpu_r_h)
+uint8_t fromanc2_state::fromanc2_maincpu_r_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_subcpu_int_flag = 1;
 
 	return (m_datalatch1 & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_maincpu_w_l)
+void fromanc2_state::fromanc2_maincpu_w_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_datalatch_2l = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_maincpu_w_h)
+void fromanc2_state::fromanc2_maincpu_w_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_datalatch_2h = data;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_nmi_clr)
+void fromanc2_state::fromanc2_subcpu_nmi_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu_nmi_flag = 1;
 }
 
-READ8_MEMBER(fromanc2_state::fromanc2_sndcpu_nmi_clr)
+uint8_t fromanc2_state::fromanc2_sndcpu_nmi_clr(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sndcpu_nmi_flag = 1;
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(fromanc2_state::fromanc2_subcpu_rombank_w)
+void fromanc2_state::fromanc2_subcpu_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Change ROM BANK
 	membank("bank1")->set_entry(data & 0x03);

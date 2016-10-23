@@ -92,8 +92,8 @@ public:
 
 	void init_megaphx();
 
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_c_w);
+	uint8_t port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_pic_is_reset;
 	int m_pic_shift_pos;
@@ -240,7 +240,7 @@ INPUT_PORTS_END
 // the PIC is accessed serially through clock / data lines, each time 16-bits are accessed..
 // not 100% sure if the command takes effect after all 16-bits are written, or after 8..
 
-READ8_MEMBER(megaphx_state::port_c_r)
+uint8_t megaphx_state::port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("read port c - write value was %02x\n", port_c_value);
 
@@ -256,7 +256,7 @@ READ8_MEMBER(megaphx_state::port_c_r)
 }
 
 
-WRITE8_MEMBER(megaphx_state::port_c_w)
+void megaphx_state::port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  int pc = machine().device("maincpu")->safe_pc();
 	port_c_value = (data & 0x0f);

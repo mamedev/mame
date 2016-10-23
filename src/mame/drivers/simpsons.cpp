@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
+void simpsons_state::z80_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 7);
 }
@@ -179,7 +179,7 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
+void simpsons_state::z80_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */

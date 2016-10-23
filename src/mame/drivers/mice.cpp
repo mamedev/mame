@@ -34,22 +34,22 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(port50_r);
-	DECLARE_READ8_MEMBER(port51_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port50_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port51_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 
-READ8_MEMBER( mice_state::port50_r )
+uint8_t mice_state::port50_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( mice_state::port51_r )
+uint8_t mice_state::port51_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 5 : 1;
 }
@@ -76,7 +76,7 @@ void mice_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( mice_state::kbd_put )
+void mice_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

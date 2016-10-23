@@ -163,7 +163,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 #include "sound/msm5205.h"
 #include "includes/rastan.h"
 
-WRITE8_MEMBER(rastan_state::rastan_bankswitch_w)
+void rastan_state::rastan_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
@@ -184,17 +184,17 @@ WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
 	}
 }
 
-WRITE8_MEMBER(rastan_state::rastan_msm5205_address_w)
+void rastan_state::rastan_msm5205_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(rastan_state::rastan_msm5205_start_w)
+void rastan_state::rastan_msm5205_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
+void rastan_state::rastan_msm5205_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(1);
 	m_adpcm_pos &= 0xff00;

@@ -67,11 +67,11 @@ public:
 	int m_inputval;
 	int m_inputlen;
 	int m_ioram[8];
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(unknown_w);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -158,13 +158,13 @@ uint32_t koikoi_state::screen_update_koikoi(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-WRITE8_MEMBER(koikoi_state::vram_w)
+void koikoi_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(koikoi_state::input_r)
+uint8_t koikoi_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_inputcnt < 0)
 		return 0;
@@ -200,12 +200,12 @@ READ8_MEMBER(koikoi_state::input_r)
 	return 0xff; //return 0^0xff
 }
 
-WRITE8_MEMBER(koikoi_state::unknown_w)
+void koikoi_state::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
-READ8_MEMBER(koikoi_state::io_r)
+uint8_t koikoi_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!offset)
 		return ioport("IN0")->read() ^ m_ioram[4]; //coin
@@ -213,7 +213,7 @@ READ8_MEMBER(koikoi_state::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(koikoi_state::io_w)
+void koikoi_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 7 && data == 0)
 		m_inputcnt = 0; //reset read cycle counter

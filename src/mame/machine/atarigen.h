@@ -119,16 +119,16 @@ public:
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
-	DECLARE_WRITE8_MEMBER(main_command_w);
-	DECLARE_READ8_MEMBER(main_response_r);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void main_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t main_response_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// sound cpu accessors
 	void sound_cpu_reset() { synchronize(TID_SOUND_RESET, 1); }
-	DECLARE_WRITE8_MEMBER(sound_response_w);
-	DECLARE_READ8_MEMBER(sound_command_r);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(sound_irq_ack_r);
+	void sound_response_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(sound_irq_gen);
 
 	// additional helpers
@@ -193,15 +193,15 @@ public:
 	atari_motion_objects_device &mob() const { return *m_mob; }
 
 	// read/write handlers
-	DECLARE_READ16_MEMBER(control_read);
-	DECLARE_WRITE16_MEMBER(control_write);
+	uint16_t control_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void control_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// playfield/alpha tilemap helpers
-	DECLARE_WRITE16_MEMBER(alpha_w);
-	DECLARE_WRITE16_MEMBER(playfield_upper_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_lsb_w);
-	DECLARE_WRITE16_MEMBER(playfield_latched_msb_w);
-	DECLARE_WRITE16_MEMBER(playfield2_latched_msb_w);
+	void alpha_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void playfield_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void playfield_latched_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void playfield_latched_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void playfield2_latched_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -266,16 +266,16 @@ protected:
 
 public:
 	// unlock controls
-	DECLARE_READ8_MEMBER(unlock_read);
-	DECLARE_WRITE8_MEMBER(unlock_write);
-	DECLARE_READ16_MEMBER(unlock_read);
-	DECLARE_WRITE16_MEMBER(unlock_write);
-	DECLARE_READ32_MEMBER(unlock_read);
-	DECLARE_WRITE32_MEMBER(unlock_write);
+	uint8_t unlock_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unlock_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t unlock_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void unlock_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t unlock_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void unlock_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// EEPROM read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -345,20 +345,20 @@ public:
 	void scanline_int_set(screen_device &screen, int scanline);
 	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
-	DECLARE_WRITE16_MEMBER(scanline_int_ack_w);
+	void scanline_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
 	INTERRUPT_GEN_MEMBER(sound_int_gen);
-	DECLARE_WRITE16_MEMBER(sound_int_ack_w);
+	void sound_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	INTERRUPT_GEN_MEMBER(video_int_gen);
-	DECLARE_WRITE16_MEMBER(video_int_ack_w);
+	void video_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// slapstic helpers
 	void slapstic_configure(cpu_device &device, offs_t base, offs_t mirror, uint8_t *mem);
 	void slapstic_update_bank(int bank);
-	DECLARE_WRITE16_MEMBER(slapstic_w);
-	DECLARE_READ16_MEMBER(slapstic_r);
+	void slapstic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// scanline timing
 	void scanline_timer_reset(screen_device &screen, int frequency);

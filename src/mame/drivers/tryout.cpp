@@ -24,12 +24,12 @@ $208 strikes count
 #include "sound/2203intf.h"
 #include "includes/tryout.h"
 
-WRITE8_MEMBER(tryout_state::nmi_ack_w)
+void tryout_state::nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
-WRITE8_MEMBER(tryout_state::sound_w)
+void tryout_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -37,7 +37,7 @@ WRITE8_MEMBER(tryout_state::sound_w)
 
 /*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
   stays on this state.*/
-WRITE8_MEMBER(tryout_state::sound_irq_ack_w)
+void tryout_state::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
@@ -47,7 +47,7 @@ void tryout_state::machine_start()
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 }
 
-WRITE8_MEMBER(tryout_state::bankswitch_w)
+void tryout_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x01);
 }

@@ -344,7 +344,7 @@ enum
 //  mreq_r - memory request read
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::mreq_r )
+uint8_t adam_state::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
@@ -467,7 +467,7 @@ READ8_MEMBER( adam_state::mreq_r )
 // mreq_w - memory request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::mreq_w )
+void adam_state::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bmreq = 0, biorq = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
@@ -523,7 +523,7 @@ WRITE8_MEMBER( adam_state::mreq_w )
 //  iorq_r - I/O request read
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::iorq_r )
+uint8_t adam_state::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
@@ -574,7 +574,7 @@ READ8_MEMBER( adam_state::iorq_r )
 //  iorq_w - I/O request write
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::iorq_w )
+void adam_state::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
@@ -628,7 +628,7 @@ WRITE8_MEMBER( adam_state::iorq_w )
 //  mioc_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::mioc_r )
+uint8_t adam_state::mioc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mioc & 0x0f;
 }
@@ -638,7 +638,7 @@ READ8_MEMBER( adam_state::mioc_r )
 //  mioc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::mioc_w )
+void adam_state::mioc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -668,7 +668,7 @@ WRITE8_MEMBER( adam_state::mioc_w )
 //  adamnet_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::adamnet_r )
+uint8_t adam_state::adamnet_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_an & 0x0f;
 }
@@ -678,7 +678,7 @@ READ8_MEMBER( adam_state::adamnet_r )
 //  adamnet_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::adamnet_w )
+void adam_state::adamnet_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -710,7 +710,7 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 //  m6801_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p1_w )
+void adam_state::m6801_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -735,7 +735,7 @@ WRITE8_MEMBER( adam_state::m6801_p1_w )
 //  m6801_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p2_r )
+uint8_t adam_state::m6801_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -762,7 +762,7 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 //  m6801_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p2_w )
+void adam_state::m6801_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -791,7 +791,7 @@ WRITE8_MEMBER( adam_state::m6801_p2_w )
 //  m6801_p3_r -
 //-------------------------------------------------
 
-READ8_MEMBER( adam_state::m6801_p3_r )
+uint8_t adam_state::m6801_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -816,7 +816,7 @@ READ8_MEMBER( adam_state::m6801_p3_r )
 //  m6801_p3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p3_w )
+void adam_state::m6801_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -841,7 +841,7 @@ WRITE8_MEMBER( adam_state::m6801_p3_w )
 //  m6801_p4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( adam_state::m6801_p4_w )
+void adam_state::m6801_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

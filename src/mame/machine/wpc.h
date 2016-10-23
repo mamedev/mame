@@ -104,8 +104,8 @@ class wpc_device : public device_t
 public:
 	wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint16_t get_memprotect_mask() { return m_memprotect_mask; }
 	bool memprotect_active() { if(m_memprotect == 0xb4) return false; else return true; }

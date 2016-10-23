@@ -254,7 +254,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::delayed_joystick_int)
 }
 
 
-READ16_MEMBER(atarisy1_state::joystick_r)
+uint16_t atarisy1_state::joystick_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int newval = 0xff;
 	static const char *const portnames[] = { "IN0", "IN1" };
@@ -283,7 +283,7 @@ READ16_MEMBER(atarisy1_state::joystick_r)
 }
 
 
-WRITE16_MEMBER(atarisy1_state::joystick_w)
+void atarisy1_state::joystick_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* the A4 bit enables/disables joystick IRQs */
 	m_joystick_int_enable = ((offset >> 3) & 1) ^ 1;
@@ -297,7 +297,7 @@ WRITE16_MEMBER(atarisy1_state::joystick_w)
  *
  *************************************/
 
-READ16_MEMBER(atarisy1_state::trakball_r)
+uint16_t atarisy1_state::trakball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0xff;
 
@@ -345,7 +345,7 @@ READ16_MEMBER(atarisy1_state::trakball_r)
  *
  *************************************/
 
-READ8_MEMBER(atarisy1_state::switch_6502_r)
+uint8_t atarisy1_state::switch_6502_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int temp = ioport("1820")->read();
 	if (!(ioport("F60000")->read() & 0x0040)) temp ^= 0x80;
@@ -375,19 +375,19 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
  *          D5 =    LED (out)
  */
 
-WRITE8_MEMBER(atarisy1_state::via_pa_w)
+void atarisy1_state::via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tms->data_w(space, 0, data);
 }
 
 
-READ8_MEMBER(atarisy1_state::via_pa_r)
+uint8_t atarisy1_state::via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tms->status_r(space, 0);
 }
 
 
-WRITE8_MEMBER(atarisy1_state::via_pb_w)
+void atarisy1_state::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write strobe */
 	m_tms->wsq_w(data & 1);
@@ -401,7 +401,7 @@ WRITE8_MEMBER(atarisy1_state::via_pb_w)
 }
 
 
-READ8_MEMBER(atarisy1_state::via_pb_r)
+uint8_t atarisy1_state::via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_tms->readyq_r() << 2) | (m_tms->intq_r() << 3);
 }
@@ -414,7 +414,7 @@ READ8_MEMBER(atarisy1_state::via_pb_r)
  *
  *************************************/
 
-WRITE8_MEMBER(atarisy1_state::led_w)
+void atarisy1_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 1);
 }

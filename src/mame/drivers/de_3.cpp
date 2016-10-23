@@ -44,38 +44,38 @@ public:
 	optional_device<decodmd_type1_device> m_dmdtype1;
 	optional_device<decodmd_type2_device> m_dmdtype2;
 
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_READ8_MEMBER(pia2c_pb_r);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
+	void pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia2c_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_READ8_MEMBER(pia28_w7_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
+	uint8_t pia28_w7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	//DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	//DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(dac_w) { };
+	void sol2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 8-15
+	void sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_READ8_MEMBER(dmd_status_r);
+	uint8_t dmd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-//  DECLARE_READ8_MEMBER(sound_latch_r);
-//  DECLARE_WRITE8_MEMBER(sample_bank_w);
+//  uint8_t sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  void sample_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	required_device<decobsmt_device> m_decobsmt;
 	bool m_nmi_enable;
 
 	// devcb callbacks
-	DECLARE_READ8_MEMBER(display_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	uint8_t display_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 
@@ -169,11 +169,11 @@ static INPUT_PORTS_START( de_3 )
 INPUT_PORTS_END
 
 // 6821 PIA at 0x2000
-WRITE8_MEMBER( de_3_state::sol3_w )
+void de_3_state::sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( de_3_state::sound_w )
+void de_3_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_data = data;
 	if(m_sound_data != 0xfe)
@@ -187,13 +187,13 @@ WRITE_LINE_MEMBER( de_3_state::pia21_ca2_w )
 }
 
 // 6821 PIA at 0x2400
-WRITE8_MEMBER( de_3_state::lamp0_w )
+void de_3_state::lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 
 // 6821 PIA at 0x2800
-WRITE8_MEMBER( de_3_state::dig0_w )
+void de_3_state::dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 //  data &= 0x7f;
@@ -204,7 +204,7 @@ WRITE8_MEMBER( de_3_state::dig0_w )
 //  m_segment2 = 0;
 }
 
-WRITE8_MEMBER( de_3_state::dig1_w )
+void de_3_state::dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_segment2 |= data;
 //  m_segment2 |= 0x30000;
@@ -218,7 +218,7 @@ WRITE8_MEMBER( de_3_state::dig1_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia28_w7_r )
+uint8_t de_3_state::pia28_w7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x80;
 
@@ -229,7 +229,7 @@ READ8_MEMBER( de_3_state::pia28_w7_r )
 }
 
 // 6821 PIA at 0x2c00
-WRITE8_MEMBER( de_3_state::pia2c_pa_w )
+void de_3_state::pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DMD data */
 	if(m_dmdtype2)
@@ -251,7 +251,7 @@ WRITE8_MEMBER( de_3_state::pia2c_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::pia2c_pb_r )
+uint8_t de_3_state::pia2c_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_dmdtype1)
 		return m_dmdtype1->busy_r(space,offset);
@@ -260,7 +260,7 @@ READ8_MEMBER( de_3_state::pia2c_pb_r )
 	return 0;
 }
 
-WRITE8_MEMBER( de_3_state::pia2c_pb_w )
+void de_3_state::pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* DMD ctrl */
 	if(m_dmdtype2)
@@ -285,14 +285,14 @@ WRITE8_MEMBER( de_3_state::pia2c_pb_w )
 
 
 // 6821 PIA at 0x3000
-READ8_MEMBER( de_3_state::switch_r )
+uint8_t de_3_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"INP%X",m_kbdrow);
 	return ~ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( de_3_state::switch_w )
+void de_3_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x;
 
@@ -305,7 +305,7 @@ WRITE8_MEMBER( de_3_state::switch_w )
 }
 
 // 6821 PIA at 0x3400
-WRITE8_MEMBER( de_3_state::pia34_pa_w )
+void de_3_state::pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Not connected?
 //  m_segment2 |= (data<<8);
@@ -317,7 +317,7 @@ WRITE8_MEMBER( de_3_state::pia34_pa_w )
 //  }
 }
 
-READ8_MEMBER( de_3_state::dmd_status_r )
+uint8_t de_3_state::dmd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_dmdtype1)
 	{
@@ -330,7 +330,7 @@ READ8_MEMBER( de_3_state::dmd_status_r )
 	return 0;
 }
 
-READ8_MEMBER(de_3_state::display_r)
+uint8_t de_3_state::display_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -347,7 +347,7 @@ READ8_MEMBER(de_3_state::display_r)
 	return ret;
 }
 
-WRITE8_MEMBER(de_3_state::display_w)
+void de_3_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -369,7 +369,7 @@ WRITE8_MEMBER(de_3_state::display_w)
 	}
 }
 
-WRITE8_MEMBER(de_3_state::lamps_w)
+void de_3_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

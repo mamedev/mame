@@ -138,9 +138,9 @@ public:
 	template<class _Object> static devcb_base &set_lightpen_y_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_lightpen_y_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_c64_mem_r_callback(device_t &device, _Object object) { return downcast<vic3_device &>(device).m_c64_mem_r_cb.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(port_r);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void raster_interrupt_gen();
 	uint32_t video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);

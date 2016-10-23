@@ -26,11 +26,11 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
 
-		DECLARE_READ8_MEMBER(saa1099_16_r);
-		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
-		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
-		DECLARE_READ8_MEMBER(detect_r);
-		DECLARE_WRITE8_MEMBER(detect_w);
+		uint8_t saa1099_16_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void saa1099_1_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		void saa1099_2_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t detect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void detect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 		// device-level overrides
 		virtual void device_start() override;

@@ -36,11 +36,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<serflash_device> m_serflash;
 
-	DECLARE_READ32_MEMBER(nexus3d_unk_r);
-//  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
-//  DECLARE_READ32_MEMBER(nexus3d_unk3_r);
-//  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
-//  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
+	uint32_t nexus3d_unk_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+//  uint32_t nexus3d_unk2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+//  uint32_t nexus3d_unk3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+//  void nexus3d_unk2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+//  void nexus3d_unk3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void init_nexus3d();
 	virtual void machine_reset() override;
@@ -53,27 +53,27 @@ public:
 
 
 
-READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
+uint32_t nexus3d_state::nexus3d_unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand() ^ (machine().rand() << 16);
 }
 
-//READ32_MEMBER(nexus3d_state::nexus3d_unk2_r)
+//uint32_t nexus3d_state::nexus3d_unk2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 //{
 //  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//READ32_MEMBER(nexus3d_state::nexus3d_unk3_r)
+//uint32_t nexus3d_state::nexus3d_unk3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 //{
 //  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//WRITE32_MEMBER(nexus3d_state::nexus3d_unk2_w)
+//void nexus3d_state::nexus3d_unk2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 //{
 //
 //}
 //
-//WRITE32_MEMBER(nexus3d_state::nexus3d_unk3_w)
+//void nexus3d_state::nexus3d_unk3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 //{
 //
 //}

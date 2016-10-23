@@ -109,16 +109,16 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( uart_status_r );
-	DECLARE_WRITE8_MEMBER( uart_ctrl_w );
-	DECLARE_WRITE8_MEMBER( modem_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( lcd_r );
-	DECLARE_WRITE8_MEMBER( lcd_w );
-	DECLARE_WRITE8_MEMBER( i8155_pa_w );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_READ8_MEMBER( i8155_pc_r );
+	uint8_t uart_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void modem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
@@ -161,14 +161,14 @@ public:
 	virtual void machine_start() override;
 	required_device<generic_slot_device> m_cas_cart;
 
-	DECLARE_READ8_MEMBER( bank_r );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_WRITE8_MEMBER( scp_w );
-	DECLARE_READ8_MEMBER( uart_status_r );
-	DECLARE_WRITE8_MEMBER( romah_w );
-	DECLARE_WRITE8_MEMBER( romal_w );
-	DECLARE_WRITE8_MEMBER( romam_w );
-	DECLARE_READ8_MEMBER( romrd_r );
+	uint8_t bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t uart_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void romah_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void romal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void romam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t romrd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void bankswitch(uint8_t data);
 
@@ -217,13 +217,13 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( bank_r );
-	DECLARE_WRITE8_MEMBER( bank_w );
-	DECLARE_READ8_MEMBER( stbk_r );
-	DECLARE_WRITE8_MEMBER( stbk_w );
-	DECLARE_WRITE8_MEMBER( i8155_pa_w );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_READ8_MEMBER( i8155_pc_r );
+	uint8_t bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stbk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stbk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);

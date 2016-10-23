@@ -11,19 +11,19 @@
 #include "emu.h"
 #include "includes/zodiack.h"
 
-WRITE8_MEMBER( zodiack_state::videoram_w )
+void zodiack_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( zodiack_state::videoram2_w )
+void zodiack_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( zodiack_state::attributes_w )
+void zodiack_state::attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) && m_attributeram[offset] != data)
 	{
@@ -39,7 +39,7 @@ WRITE8_MEMBER( zodiack_state::attributes_w )
 	m_attributeram[offset] = data;
 }
 
-WRITE8_MEMBER( zodiack_state::flipscreen_w )
+void zodiack_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }

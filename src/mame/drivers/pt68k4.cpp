@@ -90,15 +90,15 @@ public:
 		, m_wdfdc(*this, WDFDC_TAG)
 	{ }
 
-	DECLARE_READ8_MEMBER(hiram_r);
-	DECLARE_WRITE8_MEMBER(hiram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
+	uint8_t hiram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hiram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(pia_stub_r);
-	DECLARE_WRITE8_MEMBER(duart1_out);
+	uint8_t pia_stub_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void duart1_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(fdc_select_w);
+	void fdc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(duart1_irq);
 	DECLARE_WRITE_LINE_MEMBER(duart2_irq);
@@ -179,17 +179,17 @@ WRITE_LINE_MEMBER(pt68k4_state::keyboard_data_w)
 	m_kdata = (state == ASSERT_LINE) ? 0x80 : 0x00;
 }
 
-WRITE8_MEMBER(pt68k4_state::duart1_out)
+void pt68k4_state::duart1_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-READ8_MEMBER(pt68k4_state::pia_stub_r)
+uint8_t pt68k4_state::pia_stub_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pt68k4_state::fdc_select_w)
+void pt68k4_state::fdc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_connector *con = machine().device<floppy_connector>(WDFDC_TAG":0");
 	floppy_connector *con2 = machine().device<floppy_connector>(WDFDC_TAG":1");
@@ -266,7 +266,7 @@ static INPUT_PORTS_START( pt68k4 )
 INPUT_PORTS_END
 
 /* built in keyboard: offset 0 reads 0x80 if key ready, 0 if not.  If key ready, offset 1 reads scancode.  Read or write to offs 0 clears key ready */
-READ8_MEMBER(pt68k4_state::keyboard_r)
+uint8_t pt68k4_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -281,18 +281,18 @@ READ8_MEMBER(pt68k4_state::keyboard_r)
 	return m_scancode;
 }
 
-WRITE8_MEMBER(pt68k4_state::keyboard_w)
+void pt68k4_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdflag = 0;
 	m_duart1->ip2_w(ASSERT_LINE);
 }
 
-READ8_MEMBER(pt68k4_state::hiram_r)
+uint8_t pt68k4_state::hiram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hiram[offset];
 }
 
-WRITE8_MEMBER(pt68k4_state::hiram_w)
+void pt68k4_state::hiram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hiram[offset] = data;
 }

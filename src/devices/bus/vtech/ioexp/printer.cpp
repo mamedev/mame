@@ -81,12 +81,12 @@ WRITE_LINE_MEMBER( printer_interface_device::busy_w )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( printer_interface_device::busy_r )
+uint8_t printer_interface_device::busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfe | m_centronics_busy;
 }
 
-WRITE8_MEMBER( printer_interface_device::strobe_w )
+void printer_interface_device::strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(1);
 	m_centronics->write_strobe(0);

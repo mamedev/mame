@@ -23,7 +23,7 @@
 
 
 
-WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
+void bfm_sc5_state::sc5_duart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// clearly a duart of some kind, write patterns are the same as SC4 games
 //  printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
@@ -39,7 +39,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 }
 
-READ8_MEMBER( bfm_sc5_state::sc5_mux1_r )
+uint8_t bfm_sc5_state::sc5_mux1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -53,7 +53,7 @@ READ8_MEMBER( bfm_sc5_state::sc5_mux1_r )
 }
 
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_mux1_w )
+void bfm_sc5_state::sc5_mux1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset&0xf)==0)
 	{
@@ -67,7 +67,7 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_mux1_w )
 
 
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_mux2_w )
+void bfm_sc5_state::sc5_mux2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset&0xf)==0)
 	{
@@ -156,7 +156,7 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( bfm_sc5 )
 INPUT_PORTS_END
 
-READ8_MEMBER( bfm_sc5_state::sc5_10202F0_r )
+uint8_t bfm_sc5_state::sc5_10202F0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -171,7 +171,7 @@ READ8_MEMBER( bfm_sc5_state::sc5_10202F0_r )
 	return 0;
 }
 
-WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
+void bfm_sc5_state::sc5_10202F0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -198,13 +198,13 @@ WRITE_LINE_MEMBER(bfm_sc5_state::bfm_sc5_duart_txa)
 	logerror("bfm_sc5_duart_tx\n");
 }
 
-READ8_MEMBER(bfm_sc5_state::bfm_sc5_duart_input_r)
+uint8_t bfm_sc5_state::bfm_sc5_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("bfm_sc5_duart_input_r\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
+void bfm_sc5_state::bfm_sc5_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("bfm_sc5_duart_output_w\n");
 }

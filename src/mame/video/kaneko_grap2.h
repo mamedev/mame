@@ -30,8 +30,8 @@ public:
 	static void set_chipnum(device_t &device, int chipnum);
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	DECLARE_READ16_MEMBER(galpani3_regs1_r);
-	DECLARE_WRITE16_MEMBER(galpani3_regs1_go_w);
+	uint16_t galpani3_regs1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galpani3_regs1_go_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 	void gp3_do_rle(uint32_t address, uint16_t*framebuffer, uint8_t* rledata);
@@ -48,31 +48,31 @@ public:
 
 	uint16_t m_regs1_address_regs[0x2];
 
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_enable_w) { m_framebuffer_enable = data; }
+	void galpani3_framebuffer1_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_framebuffer_enable = data; }
 
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_scrolly_w) { m_framebuffer_scrolly = data; }
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_scrollx_w) { m_framebuffer_scrollx = data; }
-
-
-	DECLARE_READ16_MEMBER(galpani3_framebuffer1_fbbright1_r) { return m_framebuffer_bright1; }
-	DECLARE_READ16_MEMBER(galpani3_framebuffer1_fbbright2_r) { return m_framebuffer_bright2; }
+	void galpani3_framebuffer1_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_framebuffer_scrolly = data; }
+	void galpani3_framebuffer1_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_framebuffer_scrollx = data; }
 
 
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_fbbright1_w) { COMBINE_DATA(&m_framebuffer_bright1); }
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_fbbright2_w) { COMBINE_DATA(&m_framebuffer_bright2); }
+	uint16_t galpani3_framebuffer1_fbbright1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer_bright1; }
+	uint16_t galpani3_framebuffer1_fbbright2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer_bright2; }
 
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_bgcol_w);
 
-	DECLARE_WRITE16_MEMBER(galpani3_regs1_address_w) { COMBINE_DATA(&m_regs1_address_regs[offset]); }
+	void galpani3_framebuffer1_fbbright1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_framebuffer_bright1); }
+	void galpani3_framebuffer1_fbbright2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_framebuffer_bright2); }
 
-	DECLARE_READ16_MEMBER(  framebuffer_r ) { return m_framebuffer[offset]; }
-	DECLARE_WRITE16_MEMBER( framebuffer_w ) { COMBINE_DATA(&m_framebuffer[offset]); }
-	DECLARE_READ16_MEMBER(  pal_r ) { return m_framebuffer_palette[offset]; }
-	DECLARE_WRITE16_MEMBER(galpani3_framebuffer1_palette_w);
-	DECLARE_READ16_MEMBER(  unk1_r ) { return m_framebuffer_unk1[offset]; }
-	DECLARE_WRITE16_MEMBER( unk1_w ) { COMBINE_DATA(&m_framebuffer_unk1[offset]); }
-	DECLARE_READ16_MEMBER(  unk2_r ) { return m_framebuffer_unk2[offset]; }
-	DECLARE_WRITE16_MEMBER( unk2_w ) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
+	void galpani3_framebuffer1_bgcol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+
+	void galpani3_regs1_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_regs1_address_regs[offset]); }
+
+	uint16_t framebuffer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer[offset]; }
+	void framebuffer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_framebuffer[offset]); }
+	uint16_t pal_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer_palette[offset]; }
+	void galpani3_framebuffer1_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t unk1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer_unk1[offset]; }
+	void unk1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_framebuffer_unk1[offset]); }
+	uint16_t unk2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_framebuffer_unk2[offset]; }
+	void unk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { COMBINE_DATA(&m_framebuffer_unk2[offset]); }
 
 	std::unique_ptr<uint16_t[]> m_framebuffer;
 	std::unique_ptr<uint16_t[]> m_framebuffer_palette;

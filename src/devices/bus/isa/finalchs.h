@@ -22,13 +22,13 @@ public:
 		// construction/destruction
 		isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-		DECLARE_READ8_MEMBER(finalchs_r);
-		DECLARE_WRITE8_MEMBER(finalchs_w);
+		uint8_t finalchs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void finalchs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-		DECLARE_WRITE8_MEMBER( io7ff8_write );
-		DECLARE_READ8_MEMBER( io7ff8_read );
-		DECLARE_READ8_MEMBER( io6000_read );
-		DECLARE_WRITE8_MEMBER( io6000_write );
+		void io7ff8_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t io7ff8_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		uint8_t io6000_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void io6000_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;

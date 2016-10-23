@@ -43,9 +43,9 @@ public:
 
 	required_device<gime_base_device> m_gime;
 
-	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
-	virtual DECLARE_READ8_MEMBER( ff40_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff40_write ) override;
+	virtual void ff20_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t ff40_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void ff40_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
 	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }

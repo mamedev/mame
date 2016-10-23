@@ -105,15 +105,15 @@ public:
 	uint32_t m_phillips_code;
 
 	emu_timer *m_irq_timer;
-	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
-	DECLARE_WRITE8_MEMBER(cliff_port_bank_w);
-	DECLARE_READ8_MEMBER(cliff_port_r);
-	DECLARE_READ8_MEMBER(cliff_phillips_code_r);
-	DECLARE_WRITE8_MEMBER(cliff_phillips_clear_w);
-	DECLARE_WRITE8_MEMBER(cliff_coin_counter_w);
-	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
-	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
-	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
+	void cliff_test_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cliff_port_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cliff_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cliff_phillips_code_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cliff_phillips_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cliff_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cliff_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cliff_ldwire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cliff_sound_overlay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_cliff();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -126,12 +126,12 @@ public:
 
 /********************************************************/
 
-WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
+void cliffhgr_state::cliff_test_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset ^ 1);
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
+void cliffhgr_state::cliff_port_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* writing 0x0f clears the LS174 flip flop */
 	if (data == 0x0f)
@@ -140,7 +140,7 @@ WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
 		m_port_bank = data & 0x0f; /* only D3-D0 are connected */
 }
 
-READ8_MEMBER(cliffhgr_state::cliff_port_r)
+uint8_t cliffhgr_state::cliff_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
@@ -153,22 +153,22 @@ READ8_MEMBER(cliffhgr_state::cliff_port_r)
 	return 0xff;
 }
 
-READ8_MEMBER(cliffhgr_state::cliff_phillips_code_r)
+uint8_t cliffhgr_state::cliff_phillips_code_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_phillips_code >> (8 * offset)) & 0xff;
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_phillips_clear_w)
+void cliffhgr_state::cliff_phillips_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset serial to parallel converters */
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_coin_counter_w)
+void cliffhgr_state::cliff_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data & 0x40) ? 1 : 0 );
 }
 
-READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
+uint8_t cliffhgr_state::cliff_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* deassert IRQ on the CPU */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -176,7 +176,7 @@ READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
+void cliffhgr_state::cliff_sound_overlay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* audio */
 	m_discrete->write(space, CLIFF_ENABLE_SND_1, data & 1);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(cliffhgr_state::cliff_sound_overlay_w)
 	// bit 4 (data & 0x10) is overlay related?
 }
 
-WRITE8_MEMBER(cliffhgr_state::cliff_ldwire_w)
+void cliffhgr_state::cliff_ldwire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc->control_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -18,14 +18,14 @@ public:
 	virtual void map_extdevice(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 									uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 
-	DECLARE_READ8_MEMBER(  index_r);
-	DECLARE_WRITE8_MEMBER( index_w);
-	DECLARE_READ8_MEMBER(  target_r);
-	DECLARE_WRITE8_MEMBER( target_w);
-	DECLARE_READ8_MEMBER(  extindex_r);
-	DECLARE_WRITE8_MEMBER( extindex_w);
-	DECLARE_READ8_MEMBER(  exttarget_r);
-	DECLARE_WRITE8_MEMBER( exttarget_w);
+	uint8_t index_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t target_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void target_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t extindex_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void extindex_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exttarget_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exttarget_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	void device_start() override;

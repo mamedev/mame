@@ -38,9 +38,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(term_status_r);
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t term_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 
@@ -52,12 +52,12 @@ public:
 // should be 8251 UART
 
 
-READ8_MEMBER( pimps_state::term_status_r )
+uint8_t pimps_state::term_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( pimps_state::term_r )
+uint8_t pimps_state::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -86,7 +86,7 @@ void pimps_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( pimps_state::kbd_put )
+void pimps_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

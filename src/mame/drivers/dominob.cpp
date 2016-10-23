@@ -86,8 +86,8 @@ public:
 	/* input-related */
 	//uint8_t m_paddle_select;
 	//uint8_t m_paddle_value;
-	DECLARE_WRITE8_MEMBER(dominob_d008_w);
-	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
+	void dominob_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dominob_unk_port02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	uint32_t screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -169,7 +169,7 @@ uint32_t dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind1
 }
 
 
-WRITE8_MEMBER(dominob_state::dominob_d008_w)
+void dominob_state::dominob_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 ADDRESS_MAP_END
 
 /* I don't know if this has a purpose - also read in 'arkatayt' but not handled */
-READ8_MEMBER(dominob_state::dominob_unk_port02_r)
+uint8_t dominob_state::dominob_unk_port02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

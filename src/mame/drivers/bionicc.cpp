@@ -70,19 +70,19 @@
  *
  *************************************/
 
-WRITE16_MEMBER(bionicc_state::hacked_controls_w)
+void bionicc_state::hacked_controls_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x: hacked_controls_w %04x %02x\n", space.device().safe_pc(), offset, data);
 	COMBINE_DATA(&m_inp[offset]);
 }
 
-READ16_MEMBER(bionicc_state::hacked_controls_r)
+uint16_t bionicc_state::hacked_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%06x: hacked_controls_r %04x %04x\n", space.device().safe_pc(), offset, m_inp[offset]);
 	return m_inp[offset];
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
+void bionicc_state::bionicc_mpu_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = ioport("SYSTEM")->read() >> 12;
 	m_inp[0] = data ^ 0x0f;
@@ -95,13 +95,13 @@ WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
 }
 
 
-WRITE16_MEMBER(bionicc_state::hacked_soundcommand_w)
+void bionicc_state::hacked_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundcommand);
 	m_soundlatch->write(space, 0, m_soundcommand & 0xff);
 }
 
-READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
+uint16_t bionicc_state::hacked_soundcommand_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundcommand;
 }

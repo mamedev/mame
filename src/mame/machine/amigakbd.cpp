@@ -419,7 +419,7 @@ void amigakbd_device::update_irqs()
 		m_mpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER( amigakbd_device::port_a_r )
+uint8_t amigakbd_device::port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xfc;
 
@@ -449,7 +449,7 @@ READ8_MEMBER( amigakbd_device::port_a_r )
 	return data;
 }
 
-WRITE8_MEMBER( amigakbd_device::port_a_w )
+void amigakbd_device::port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// look for pa0 edge
 	if (!m_kdat && BIT(data, 0))
@@ -479,18 +479,18 @@ WRITE8_MEMBER( amigakbd_device::port_a_w )
 	}
 }
 
-WRITE8_MEMBER( amigakbd_device::port_b_w )
+void amigakbd_device::port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// caps lock led
 	machine().output().set_value("led0", BIT(data, 7));
 }
 
-WRITE8_MEMBER( amigakbd_device::port_c_w )
+void amigakbd_device::port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c = data;
 }
 
-WRITE8_MEMBER( amigakbd_device::port_d_w )
+void amigakbd_device::port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// reset watchdog on 0 -> 1 transition
 	if (!BIT(m_port_d, 7) && BIT(data, 7))
@@ -499,7 +499,7 @@ WRITE8_MEMBER( amigakbd_device::port_d_w )
 	m_port_d = data;
 }
 
-WRITE8_MEMBER( amigakbd_device::latch_w )
+void amigakbd_device::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -513,7 +513,7 @@ WRITE8_MEMBER( amigakbd_device::latch_w )
 	}
 }
 
-READ8_MEMBER( amigakbd_device::counter_r )
+uint8_t amigakbd_device::counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -527,7 +527,7 @@ READ8_MEMBER( amigakbd_device::counter_r )
 		return m_counter >> 0;
 }
 
-WRITE8_MEMBER( amigakbd_device::transfer_latch_w )
+void amigakbd_device::transfer_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control &= ~COUNTER_OVERFLOW;
 	update_irqs();
@@ -538,24 +538,24 @@ WRITE8_MEMBER( amigakbd_device::transfer_latch_w )
 	m_counter = m_latch;
 }
 
-WRITE8_MEMBER( amigakbd_device::clear_pa0_detect )
+void amigakbd_device::clear_pa0_detect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control &= ~PA0_POSITIVE_EDGE;
 	update_irqs();
 }
 
-WRITE8_MEMBER( amigakbd_device::clear_pa1_detect )
+void amigakbd_device::clear_pa1_detect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control &= ~PA1_NEGATIVE_EDGE;
 	update_irqs();
 }
 
-READ8_MEMBER( amigakbd_device::control_r )
+uint8_t amigakbd_device::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_control;
 }
 
-WRITE8_MEMBER( amigakbd_device::control_w )
+void amigakbd_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control = data;
 	update_irqs();

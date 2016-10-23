@@ -207,7 +207,7 @@ void namcona1_state::write_version_info()
  * The secondary purpose of the custom key chip is to act as a random number
  * generator in some games.
  */
-READ16_MEMBER(namcona1_state::custom_key_r)
+uint16_t namcona1_state::custom_key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int old_count;
 
@@ -289,7 +289,7 @@ READ16_MEMBER(namcona1_state::custom_key_r)
 	return machine().rand()&0xffff;
 } /* custom_key_r */
 
-WRITE16_MEMBER(namcona1_state::custom_key_w)
+void namcona1_state::custom_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 } /* custom_key_w */
 
@@ -489,7 +489,7 @@ void namcona1_state::blit()
 	}
 } /* blit */
 
-WRITE16_MEMBER(namcona1_state::vreg_w)
+void namcona1_state::vreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_vreg[offset] );
 
@@ -511,12 +511,12 @@ WRITE16_MEMBER(namcona1_state::vreg_w)
 
 // MCU "mailslot" handler - has 8 16-bit slots mirrored
 
-READ16_MEMBER(namcona1_state::mcu_mailbox_r)
+uint16_t namcona1_state::mcu_mailbox_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mcu_mailbox[offset%8];
 }
 
-WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_68k)
+void namcona1_state::mcu_mailbox_w_68k(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
@@ -534,7 +534,7 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_68k)
 	}
 }
 
-WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
+void namcona1_state::mcu_mailbox_w_mcu(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 }
@@ -568,7 +568,7 @@ ADDRESS_MAP_END
 
 /* ----- NA-1 MCU handling ----------------------------------- */
 
-READ16_MEMBER(namcona1_state::na1mcu_shared_r)
+uint16_t namcona1_state::na1mcu_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = flipendian_int16(m_workram[offset]);
 
@@ -581,7 +581,7 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 	return data;
 }
 
-WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
+void namcona1_state::na1mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mem_mask = flipendian_int16(mem_mask);
 	data = flipendian_int16(data);
@@ -589,13 +589,13 @@ WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 	COMBINE_DATA(&m_workram[offset]);
 }
 
-READ16_MEMBER(namcona1_state::snd_r)
+uint16_t namcona1_state::snd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	return m_c140->c140_r(space,offset*2+1) | m_c140->c140_r(space,offset*2)<<8;
 }
 
-WRITE16_MEMBER(namcona1_state::snd_w)
+void namcona1_state::snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
@@ -619,12 +619,12 @@ ADDRESS_MAP_END
 
 
 // port 4: bit 3 (0x08) enables the 68000 (see the 68k launch code at c604 in swcourt's BIOS)
-READ8_MEMBER(namcona1_state::port4_r)
+uint8_t namcona1_state::port4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_port4;
 }
 
-WRITE8_MEMBER(namcona1_state::port4_w)
+void namcona1_state::port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x08) && !(m_mcu_port4 & 0x08))
 	{
@@ -638,12 +638,12 @@ WRITE8_MEMBER(namcona1_state::port4_w)
 }
 
 // port 5: not sure yet, but MCU code requires this interaction at least
-READ8_MEMBER(namcona1_state::port5_r)
+uint8_t namcona1_state::port5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_port5;
 }
 
-WRITE8_MEMBER(namcona1_state::port5_w)
+void namcona1_state::port5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port5 = data;
 
@@ -652,17 +652,17 @@ WRITE8_MEMBER(namcona1_state::port5_w)
 	m_mcu_port5 |= ((m_mcu_port5 & 0x2)>>1);
 }
 
-READ8_MEMBER(namcona1_state::port6_r)
+uint8_t namcona1_state::port6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(namcona1_state::port6_w)
+void namcona1_state::port6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port6 = data;
 }
 
-READ8_MEMBER(namcona1_state::port7_r)
+uint8_t namcona1_state::port7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_mcu_port6 & 0x80) == 0)
 		return m_muxed_inputs[m_mcu_port6 >> 5]->read();
@@ -670,17 +670,17 @@ READ8_MEMBER(namcona1_state::port7_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(namcona1_state::port7_w)
+void namcona1_state::port7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // port 8: bit 5 (0x20) toggles, watchdog?
-READ8_MEMBER(namcona1_state::port8_r)
+uint8_t namcona1_state::port8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_port8;
 }
 
-WRITE8_MEMBER(namcona1_state::port8_w)
+void namcona1_state::port8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port8 = data;
 }
@@ -719,7 +719,7 @@ void namcona1_state::machine_reset()
 // bit 2 => port 5
 // bit 3 => port 6
 // bit 7 => port 7
-READ8_MEMBER(namcona1_state::portana_r)
+uint8_t namcona1_state::portana_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
 	uint8_t port = m_io_p3->read();

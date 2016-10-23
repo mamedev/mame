@@ -28,9 +28,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// i8255 callbacks
-	DECLARE_READ8_MEMBER( ppi_porta_r );
-	DECLARE_WRITE8_MEMBER( ppi_portb_w );
-	DECLARE_WRITE8_MEMBER( ppi_portc_w );
+	uint8_t ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

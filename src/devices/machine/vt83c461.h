@@ -34,8 +34,8 @@ class vt83c461_device : public ide_controller_32_device
 public:
 	vt83c461_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read_config);
-	DECLARE_WRITE32_MEMBER(write_config);
+	uint32_t read_config(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write_config(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_start() override;

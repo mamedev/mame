@@ -47,12 +47,12 @@ PALETTE_INIT_MEMBER(mouser_state, mouser)
 	}
 }
 
-WRITE8_MEMBER(mouser_state::mouser_flip_screen_x_w)
+void mouser_state::mouser_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(~data & 1);
 }
 
-WRITE8_MEMBER(mouser_state::mouser_flip_screen_y_w)
+void mouser_state::mouser_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(~data & 1);
 }

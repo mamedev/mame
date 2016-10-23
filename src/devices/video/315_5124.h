@@ -71,12 +71,12 @@ public:
 	template<class _Object> static devcb_base &set_csync_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_csync_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pause_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_pause_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( vram_read );
-	DECLARE_WRITE8_MEMBER( vram_write );
-	DECLARE_READ8_MEMBER( register_read );
-	DECLARE_WRITE8_MEMBER( register_write );
-	DECLARE_READ8_MEMBER( vcount_read );
-	DECLARE_READ8_MEMBER( hcount_read );
+	uint8_t vram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t register_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void register_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vcount_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hcount_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT( sega315_5124 );
 

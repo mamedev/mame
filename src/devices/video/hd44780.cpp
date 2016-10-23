@@ -343,7 +343,7 @@ uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(hd44780_device::read)
+uint8_t hd44780_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0x01)
 	{
@@ -354,7 +354,7 @@ READ8_MEMBER(hd44780_device::read)
 	return 0;
 }
 
-WRITE8_MEMBER(hd44780_device::write)
+void hd44780_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x01)
 	{
@@ -363,7 +363,7 @@ WRITE8_MEMBER(hd44780_device::write)
 	}
 }
 
-WRITE8_MEMBER(hd44780_device::control_write)
+void hd44780_device::control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_data_len == 4)
 	{
@@ -483,7 +483,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	m_first_cmd = false;
 }
 
-READ8_MEMBER(hd44780_device::control_read)
+uint8_t hd44780_device::control_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_data_len == 4)
 	{
@@ -501,7 +501,7 @@ READ8_MEMBER(hd44780_device::control_read)
 	}
 }
 
-WRITE8_MEMBER(hd44780_device::data_write)
+void hd44780_device::data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_busy_flag)
 	{
@@ -541,7 +541,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 	set_busy_flag(41);
 }
 
-READ8_MEMBER(hd44780_device::data_read)
+uint8_t hd44780_device::data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 

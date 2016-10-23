@@ -46,27 +46,27 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_READ8_MEMBER(super80v_low_r);
-	DECLARE_READ8_MEMBER(super80v_high_r);
-	DECLARE_WRITE8_MEMBER(super80v_low_w);
-	DECLARE_WRITE8_MEMBER(super80v_high_w);
-	DECLARE_WRITE8_MEMBER(super80v_10_w);
-	DECLARE_WRITE8_MEMBER(super80v_11_w);
-	DECLARE_READ8_MEMBER(port3e_r);
-	DECLARE_WRITE8_MEMBER(port3f_w);
-	DECLARE_WRITE8_MEMBER(super80_f1_w);
-	DECLARE_READ8_MEMBER(super80_f2_r);
-	DECLARE_WRITE8_MEMBER(super80_dc_w);
-	DECLARE_WRITE8_MEMBER(super80_f0_w);
-	DECLARE_WRITE8_MEMBER(super80r_f0_w);
-	DECLARE_READ8_MEMBER(super80_read_ff);
+	uint8_t super80v_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t super80v_high_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void super80v_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80v_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80v_10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80v_11_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port3e_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port3f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80_f1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t super80_f2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void super80_dc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void super80r_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t super80_read_ff(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
-	DECLARE_WRITE8_MEMBER(pio_port_a_w);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_super80();
 	void machine_reset_super80();
 	void machine_reset_super80r();

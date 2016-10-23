@@ -40,13 +40,13 @@ void blockout_state::setcolor( int color, int rgb )
 	m_palette->set_pen_color(color, rgb_t(r,g,b));
 }
 
-WRITE16_MEMBER(blockout_state::blockout_paletteram_w)
+void blockout_state::blockout_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	setcolor(offset, m_paletteram[offset]);
 }
 
-WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
+void blockout_state::blockout_frontcolor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_color);
 	setcolor(512, m_color);
@@ -95,7 +95,7 @@ void blockout_state::update_pixels( int x, int y )
 
 
 
-WRITE16_MEMBER(blockout_state::blockout_videoram_w)
+void blockout_state::blockout_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	update_pixels((offset % 256) * 2, (offset / 256) % 256);

@@ -68,7 +68,7 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-WRITE8_MEMBER( geebee_sound_device::sound_w )
+void geebee_sound_device::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 	m_sound_latch = data;

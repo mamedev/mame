@@ -254,31 +254,31 @@ public:
 		, m_palette(*this, "palette")
 		, m_timer(nullptr)
 	{}
-	DECLARE_READ8_MEMBER(psga_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	uint8_t psga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_READ8_MEMBER(mc6845_videoram_r);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(palet_w);
-	DECLARE_WRITE8_MEMBER(priority_w);
-	DECLARE_WRITE8_MEMBER(pcg_w);
-	DECLARE_WRITE8_MEMBER(pcgg_w);
-	DECLARE_WRITE8_MEMBER(pcgb_w);
-	DECLARE_WRITE8_MEMBER(pcgr_w);
-	DECLARE_READ8_MEMBER(pcg_r);
-	DECLARE_READ8_MEMBER(pcgg_r);
-	DECLARE_READ8_MEMBER(pcgb_r);
-	DECLARE_READ8_MEMBER(pcgr_r);
-	DECLARE_WRITE8_MEMBER(crtc_w);
-	DECLARE_READ8_MEMBER(crtc_r);
-	DECLARE_WRITE8_MEMBER(romsel);
-	DECLARE_WRITE8_MEMBER(ramsel);
-	DECLARE_WRITE8_MEMBER(portb_w);
-	DECLARE_WRITE8_MEMBER(psgb_w);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(double_w);
-	DECLARE_READ8_MEMBER(io_r);
+	uint8_t mc6845_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palet_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcgg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcgb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcgr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pcgg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pcgb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pcgr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t crtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void romsel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ramsel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void psgb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void double_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(spc);
 	void video_start_spc();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -322,7 +322,7 @@ private:
 	void get_pcg_addr();
 };
 
-READ8_MEMBER( spc1500_state::keyboard_r )
+uint8_t spc1500_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0xf;
 
@@ -332,7 +332,7 @@ READ8_MEMBER( spc1500_state::keyboard_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( spc1500_state::romsel)
+void spc1500_state::romsel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romsel = 1;
 	if (m_ipl)
@@ -341,18 +341,18 @@ WRITE8_MEMBER( spc1500_state::romsel)
 		membank("bank1")->set_entry(1);
 }
 
-WRITE8_MEMBER( spc1500_state::ramsel)
+void spc1500_state::ramsel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_romsel = 0;
 	membank("bank1")->set_entry(2);
 }
 
-WRITE8_MEMBER( spc1500_state::portb_w)
+void spc1500_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_ipl = data & (1 << 1);
 }
 
-WRITE8_MEMBER( spc1500_state::psgb_w)
+void spc1500_state::psgb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int elapsed_time = m_timer->elapsed().as_attoseconds()/ATTOSECONDS_PER_MICROSECOND;
 	if (m_ipl != ((data>>1)&1))
@@ -369,7 +369,7 @@ WRITE8_MEMBER( spc1500_state::psgb_w)
 	m_motor = BIT(data, 7);
 }
 
-WRITE8_MEMBER( spc1500_state::portc_w)
+void spc1500_state::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
 	m_centronics->write_strobe(BIT(data, 7));
@@ -378,7 +378,7 @@ WRITE8_MEMBER( spc1500_state::portc_w)
 	m_vdg->set_clock(VDP_CLOCK/(BIT(data, 2) ? 48 : 24));
 }
 
-READ8_MEMBER( spc1500_state::portb_r)
+uint8_t spc1500_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	data |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED || ((m_cass->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_DISABLED));
@@ -389,7 +389,7 @@ READ8_MEMBER( spc1500_state::portb_r)
 	return data;
 }
 
-WRITE8_MEMBER( spc1500_state::crtc_w)
+void spc1500_state::crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static int m_crtc_index;
 	if((offset & 1) == 0)
@@ -404,7 +404,7 @@ WRITE8_MEMBER( spc1500_state::crtc_w)
 	}
 }
 
-READ8_MEMBER( spc1500_state::crtc_r)
+uint8_t spc1500_state::crtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -447,7 +447,7 @@ void spc1500_state::get_pcg_addr()
 	}
 }
 
-WRITE8_MEMBER( spc1500_state::pcg_w)
+void spc1500_state::pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int reg = (offset>>8)-0x15;
 	get_pcg_addr();
@@ -459,7 +459,7 @@ WRITE8_MEMBER( spc1500_state::pcg_w)
 		m_pcg_offset[reg]++;
 }
 
-READ8_MEMBER( spc1500_state::pcg_r)
+uint8_t spc1500_state::pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reg = (offset>>8)-0x15;
 	uint8_t data = 0;
@@ -478,12 +478,12 @@ READ8_MEMBER( spc1500_state::pcg_r)
 	return data;
 }
 
-WRITE8_MEMBER( spc1500_state::priority_w)
+void spc1500_state::priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_priority = data;
 }
 
-WRITE8_MEMBER( spc1500_state::palet_w)
+void spc1500_state::palet_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palet[(offset>>8)&0x0f] = data;
 	for(int i=1, j=0; i < 0x100; i<<=1, j++)
@@ -615,7 +615,7 @@ MC6845_UPDATE_ROW(spc1500_state::crtc_update_row)
 	}
 }
 
-WRITE8_MEMBER( spc1500_state::double_w)
+void spc1500_state::double_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_double_mode)
 	{
@@ -651,7 +651,7 @@ WRITE8_MEMBER( spc1500_state::double_w)
 	}
 }
 
-READ8_MEMBER( spc1500_state::io_r)
+uint8_t spc1500_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_double_mode = false;
 	if (offset < 0x1000) {} else
@@ -872,12 +872,12 @@ void spc1500_state::machine_reset()
 	m_char_count = 0;
 }
 
-READ8_MEMBER(spc1500_state::mc6845_videoram_r)
+uint8_t spc1500_state::mc6845_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_videoram[offset];
 }
 
-READ8_MEMBER( spc1500_state::psga_r )
+uint8_t spc1500_state::psga_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	data |= (BIT(m_dipsw->read(),1)<<4) | (BIT(m_dipsw->read(),2)<<7);
@@ -885,7 +885,7 @@ READ8_MEMBER( spc1500_state::psga_r )
 	return data;
 }
 
-READ8_MEMBER( spc1500_state::porta_r )
+uint8_t spc1500_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;

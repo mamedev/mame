@@ -51,17 +51,17 @@ so levels 0,1,2,5 are unmasked, vectors get set during the sound CPU init code.
 // if you actually map RAM here on the MIPS side then xrally will upload the actual sound program here and blank out the area where
 // the program would usually be uploaded (and where all other games upload it) this seems to suggest that the area is unmapped on
 // real hardware.
-WRITE32_MEMBER(hng64_state::hng64_soundram2_w)
+void hng64_state::hng64_soundram2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(hng64_state::hng64_soundram2_r)
+uint32_t hng64_state::hng64_soundram2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x0000;
 }
 
 
-WRITE32_MEMBER(hng64_state::hng64_soundram_w)
+void hng64_state::hng64_soundram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//logerror("hng64_soundram_w %08x: %08x %08x\n", offset, data, mem_mask);
 
@@ -100,7 +100,7 @@ WRITE32_MEMBER(hng64_state::hng64_soundram_w)
 }
 
 
-READ32_MEMBER(hng64_state::hng64_soundram_r)
+uint32_t hng64_state::hng64_soundram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t datalo = m_soundram[offset * 2 + 0];
 	uint16_t datahi = m_soundram[offset * 2 + 1];
@@ -108,7 +108,7 @@ READ32_MEMBER(hng64_state::hng64_soundram_r)
 	return flipendian_int16(datahi) | (flipendian_int16(datalo) << 16);
 }
 
-WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
+void hng64_state::hng64_soundcpu_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16, hng64_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAMBANK("bankf")
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
+void hng64_state::hng64_sound_port_0008_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  logerror("hng64_sound_port_0008_w %04x %04x\n", data, mem_mask);
 	// seems to one or more of the DMARQ on the V53, writes here when it expects DMA channel 3 to transfer ~0x20 bytes just after startup
@@ -204,7 +204,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 }
 
 
-READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
+uint16_t hng64_state::hng64_sound_port_0008_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// read in irq5
 	//printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
@@ -214,7 +214,7 @@ READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 
 
 // but why not just use the V33/V53 XA mode??
-WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
+void hng64_state::hng64_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x hng64_sound_bank_w? %02x %04x\n", space.device().safe_pc(), offset, data);
 	// buriki writes 0x3f to 0x200 before jumping to the low addresses..
@@ -246,24 +246,24 @@ WRITE16_MEMBER(hng64_state::hng64_sound_bank_w)
 }
 
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_000a_w)
+void hng64_state::hng64_sound_port_000a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x: hng64_port hng64_sound_port_000a_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
 }
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_000c_w)
+void hng64_state::hng64_sound_port_000c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x: hng64_port hng64_sound_port_000c_w %04x mask (%04x)\n",  space.device().safe_pc(), data, mem_mask);
 }
 
 
-WRITE16_MEMBER(hng64_state::hng64_sound_port_0080_w)
+void hng64_state::hng64_sound_port_0080_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("hng64_port 0x0080 %04x\n", data);
 }
 
 
-WRITE16_MEMBER(hng64_state::sound_comms_w)
+void hng64_state::sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -284,7 +284,7 @@ WRITE16_MEMBER(hng64_state::sound_comms_w)
 	//printf("SOUND W %02x %04x\n",offset*2,data);
 }
 
-READ16_MEMBER(hng64_state::sound_comms_r)
+uint16_t hng64_state::sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -318,12 +318,12 @@ WRITE_LINE_MEMBER(hng64_state::dma_hreq_cb)
 	m_audiocpu->hack_w(1);
 }
 
-READ8_MEMBER(hng64_state::dma_memr_cb)
+uint8_t hng64_state::dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_audiocpu->space(AS_PROGRAM).read_byte(offset);;
 }
 
-WRITE8_MEMBER(hng64_state::dma_iow3_cb)
+void hng64_state::dma_iow3_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// currently it reads a block of 0x20 '0x00' values from a very specific block of RAM where there is a 0x20 space in the data and transfers them repeatedly, I assume
 	// this is some kind of buffer for the audio or DSP and eventually will be populated with other values...

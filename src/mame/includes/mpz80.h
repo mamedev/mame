@@ -53,21 +53,21 @@ public:
 	inline void check_traps();
 	inline void check_interrupt();
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_READ8_MEMBER( mmu_io_r );
-	DECLARE_WRITE8_MEMBER( mmu_io_w );
-	DECLARE_READ8_MEMBER( trap_addr_r );
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_READ8_MEMBER( switch_r );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( disp_seg_w );
-	DECLARE_WRITE8_MEMBER( disp_col_w );
-	DECLARE_WRITE8_MEMBER( task_w );
-	DECLARE_WRITE8_MEMBER( mask_w );
+	uint8_t mmu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmu_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t trap_addr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void disp_seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void task_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
-	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);
+	offs_t mpz80_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	// memory state
 	uint32_t m_addr;

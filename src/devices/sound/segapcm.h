@@ -45,8 +45,8 @@ public:
 	// static configuration
 	static void set_bank(device_t &device, int bank) { downcast<segapcm_device &>(device).m_bank = bank; }
 
-	DECLARE_WRITE8_MEMBER( sega_pcm_w );
-	DECLARE_READ8_MEMBER( sega_pcm_r );
+	void sega_pcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sega_pcm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

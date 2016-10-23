@@ -61,20 +61,20 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( sts_r );
-	DECLARE_WRITE8_MEMBER( com_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t sts_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void com_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( fd5_data_r );
-	DECLARE_WRITE8_MEMBER( fd5_data_w );
-	DECLARE_READ8_MEMBER( fd5_com_r );
-	DECLARE_WRITE8_MEMBER( fd5_com_w );
-	DECLARE_WRITE8_MEMBER( fd5_ctrl_w );
-	DECLARE_WRITE8_MEMBER( fd5_tc_w );
+	uint8_t fd5_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fd5_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fd5_com_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fd5_com_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fd5_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fd5_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -89,10 +89,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
 
 	// memory
-	DECLARE_READ8_MEMBER( mem64KBI_r );
-	DECLARE_WRITE8_MEMBER( mem64KBI_w );
-	DECLARE_WRITE8_MEMBER( mem64KBF_w );
-	DECLARE_WRITE8_MEMBER( mem64KRX_w );
+	uint8_t mem64KBI_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mem64KBI_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mem64KBF_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mem64KRX_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_ram_mode;
 	uint8_t m_ram_type;
 	memory_region *m_cart_rom;
@@ -128,15 +128,15 @@ public:
 
 
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_READ8_MEMBER( ramsel_r );
-	DECLARE_WRITE8_MEMBER(ramsel_w );
-	DECLARE_READ8_MEMBER( romsel_r );
-	DECLARE_WRITE8_MEMBER(romsel_w );
+	uint8_t mmu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ramsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t romsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( fd_r );
-	DECLARE_WRITE8_MEMBER( fd_w );
+	uint8_t fd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 

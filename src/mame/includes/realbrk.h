@@ -46,22 +46,22 @@ public:
 	tilemap_t *m_tilemap_2;
 
 	// common
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_WRITE16_MEMBER(vram_2_w);
-	DECLARE_WRITE16_MEMBER(vregs_w);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// realbrk and/or dai2kaku
-	DECLARE_READ16_MEMBER(realbrk_dsw_r);
-	DECLARE_WRITE16_MEMBER(realbrk_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(dai2kaku_flipscreen_w);
+	uint16_t realbrk_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void realbrk_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dai2kaku_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// pkgnsh and/or pkgnshdx
-	DECLARE_READ16_MEMBER(pkgnsh_input_r);
-	DECLARE_READ16_MEMBER(pkgnshdx_input_r);
-	DECLARE_READ16_MEMBER(backup_ram_r);
-	DECLARE_READ16_MEMBER(backup_ram_dx_r);
-	DECLARE_WRITE16_MEMBER(backup_ram_w);
+	uint16_t pkgnsh_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t pkgnshdx_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t backup_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t backup_ram_dx_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void backup_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);

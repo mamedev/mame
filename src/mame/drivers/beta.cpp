@@ -71,10 +71,10 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( riot_pa_r );
-	DECLARE_WRITE8_MEMBER( riot_pa_w );
-	DECLARE_READ8_MEMBER( riot_pb_r );
-	DECLARE_WRITE8_MEMBER( riot_pb_w );
+	uint8_t riot_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t riot_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void riot_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
@@ -159,7 +159,7 @@ TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 	}
 }
 
-READ8_MEMBER( beta_state::riot_pa_r )
+uint8_t beta_state::riot_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -195,7 +195,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( beta_state::riot_pa_w )
+void beta_state::riot_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -222,12 +222,12 @@ WRITE8_MEMBER( beta_state::riot_pa_w )
 	m_eprom_data = data;
 }
 
-READ8_MEMBER( beta_state::riot_pb_r )
+uint8_t beta_state::riot_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( beta_state::riot_pb_w )
+void beta_state::riot_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

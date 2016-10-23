@@ -59,18 +59,18 @@ public:
 	DECLARE_PALETTE_INIT(spartanxtec);
 
 	tilemap_t*             m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	void kungfum_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(spartanxtec_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(a801_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_ack);
-	DECLARE_WRITE8_MEMBER(irq_ack);
+	void spartanxtec_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a801_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
 
 
-WRITE8_MEMBER(spartanxtec_state::kungfum_tileram_w)
+void spartanxtec_state::kungfum_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m62_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -159,18 +159,18 @@ uint32_t spartanxtec_state::screen_update_spartanxtec(screen_device &screen, bit
 
 
 
-WRITE8_MEMBER(spartanxtec_state::spartanxtec_soundlatch_w)
+void spartanxtec_state::spartanxtec_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(spartanxtec_state::a801_w)
+void spartanxtec_state::a801_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0xf0) printf("a801_w %02x\n", data);
 }
 
-WRITE8_MEMBER(spartanxtec_state::irq_ack)
+void spartanxtec_state::irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(spartanxtec_state::sound_irq_ack)
+void spartanxtec_state::sound_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

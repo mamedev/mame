@@ -53,10 +53,10 @@ public:
 
 	void init_mquake();
 
-	DECLARE_READ8_MEMBER( es5503_sample_r );
-	DECLARE_WRITE16_MEMBER( output_w );
-	DECLARE_READ16_MEMBER( coin_chip_r );
-	DECLARE_WRITE16_MEMBER( coin_chip_w );
+	uint8_t es5503_sample_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t coin_chip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void coin_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 private:
 	required_device<es5503_device> m_es5503;
@@ -72,7 +72,7 @@ private:
  *
  *************************************/
 
-READ8_MEMBER( mquake_state::es5503_sample_r )
+uint8_t mquake_state::es5503_sample_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_es5503_rom[offset + (m_es5503->get_channel_strobe() * 0x10000)];
 }
@@ -81,14 +81,14 @@ static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, mquake_state )
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
-WRITE16_MEMBER( mquake_state::output_w )
+void mquake_state::output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
 }
 
 
-READ16_MEMBER( mquake_state::coin_chip_r )
+uint16_t mquake_state::coin_chip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
@@ -96,7 +96,7 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( mquake_state::coin_chip_w )
+void mquake_state::coin_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
 }

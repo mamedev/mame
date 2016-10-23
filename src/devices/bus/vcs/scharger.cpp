@@ -114,7 +114,7 @@ inline uint8_t a26_rom_ss_device::read_byte(uint32_t offset)
 		return 0xff;
 }
 
-READ8_MEMBER(a26_rom_ss_device::read_rom)
+uint8_t a26_rom_ss_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return read_byte(offset);

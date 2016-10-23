@@ -282,12 +282,12 @@ register. So what is controlling priority.
 #include "sound/msm5205.h"
 #include "includes/opwolf.h"
 
-READ16_MEMBER(opwolf_state::cchip_r)
+uint16_t opwolf_state::cchip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cchip_ram[offset];
 }
 
-WRITE16_MEMBER(opwolf_state::cchip_w)
+void opwolf_state::cchip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cchip_ram[offset] = data &0xff;
 }
@@ -299,30 +299,30 @@ WRITE16_MEMBER(opwolf_state::cchip_w)
 #define P1X_PORT_TAG     "P1X"
 #define P1Y_PORT_TAG     "P1Y"
 
-READ16_MEMBER(opwolf_state::opwolf_in_r)
+uint16_t opwolf_state::opwolf_in_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
 	return ioport(inname[offset])->read();
 }
 
-READ16_MEMBER(opwolf_state::opwolf_dsw_r)
+uint16_t opwolf_state::opwolf_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
 	return ioport(dswname[offset])->read();
 }
 
-READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
+uint16_t opwolf_state::opwolf_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const dswname[2] = { "IN2", "IN3" };
 	return ioport(dswname[offset])->read();
 }
 
-READ8_MEMBER(opwolf_state::z80_input1_r)
+uint8_t opwolf_state::z80_input1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();   /* irrelevant mirror ? */
 }
 
-READ8_MEMBER(opwolf_state::z80_input2_r)
+uint8_t opwolf_state::z80_input2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();   /* needed for coins */
 }
@@ -332,7 +332,7 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
                 SOUND
 ******************************************************/
 
-WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
+void opwolf_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 0x03);
 }
@@ -487,7 +487,7 @@ WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
 	opwolf_msm5205_vck(m_msm2, 1);
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
+void opwolf_state::opwolf_adpcm_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int start;
 	int end;
@@ -510,7 +510,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 }
 
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
+void opwolf_state::opwolf_adpcm_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int start;
 	int end;
@@ -534,12 +534,12 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 }
 
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
+void opwolf_state::opwolf_adpcm_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }
 
-WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
+void opwolf_state::opwolf_adpcm_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
 }

@@ -50,11 +50,11 @@ public:
 	std::unique_ptr<gb_tempsprite[]> m_spritelist;
 	uint32_t m_mem[2];
 
-	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
-	DECLARE_WRITE32_MEMBER(motor_control_w);
-	DECLARE_READ32_MEMBER(gunbustr_gun_r);
-	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
-	DECLARE_READ32_MEMBER(main_cycle_r);
+	void gunbustr_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gunbustr_gun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gunbustr_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	void init_gunbustrj();
 	void init_gunbustr();

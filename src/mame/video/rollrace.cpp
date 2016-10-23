@@ -28,13 +28,13 @@ void rollrace_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
-WRITE8_MEMBER(rollrace_state::vram_w)
+void rollrace_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rollrace_state::cram_w)
+void rollrace_state::cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	if(offset & 1)
@@ -92,24 +92,24 @@ PALETTE_INIT_MEMBER(rollrace_state, rollrace)
 	}
 }
 
-WRITE8_MEMBER(rollrace_state::charbank_w)
+void rollrace_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charbank[offset&1] = data;
 	m_chrbank = m_charbank[0] | (m_charbank[1] << 1) ;
 	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(rollrace_state::bkgpen_w)
+void rollrace_state::bkgpen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bkgpen = data;
 }
 
-WRITE8_MEMBER(rollrace_state::spritebank_w)
+void rollrace_state::spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = data;
 }
 
-WRITE8_MEMBER(rollrace_state::backgroundpage_w)
+void rollrace_state::backgroundpage_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bkgpage = data & 0x1f;
 	m_bkgflip = ( data & 0x80 ) >> 7;
@@ -117,18 +117,18 @@ WRITE8_MEMBER(rollrace_state::backgroundpage_w)
 	/* 0x80 flip vertical */
 }
 
-WRITE8_MEMBER(rollrace_state::backgroundcolor_w)
+void rollrace_state::backgroundcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bkgcol = data;
 }
 
-WRITE8_MEMBER(rollrace_state::flipy_w)
+void rollrace_state::flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipy = data & 0x01;
 	// bit 2: cleared at night stage in attract, unknown purpose
 }
 
-WRITE8_MEMBER(rollrace_state::flipx_w)
+void rollrace_state::flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipx = data & 0x01;
 	m_fg_tilemap->set_flip(m_flipx ? TILEMAP_FLIPX|TILEMAP_FLIPY : 0);

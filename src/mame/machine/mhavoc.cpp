@@ -40,7 +40,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_state::mhavoc_cpu_irq_clock)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_irq_ack_w)
+void mhavoc_state::mhavoc_alpha_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* clear the line and reset the clock */
 	m_alpha->set_input_line(0, CLEAR_LINE);
@@ -49,7 +49,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_irq_ack_w)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_irq_ack_w)
+void mhavoc_state::mhavoc_gamma_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* clear the line and reset the clock */
 	m_gamma->set_input_line(0, CLEAR_LINE);
@@ -136,14 +136,14 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_w)
+void mhavoc_state::mhavoc_gamma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mhavoc_state::delayed_gamma_w),this), data);
 }
 
 
-READ8_MEMBER(mhavoc_state::mhavoc_alpha_r)
+uint8_t mhavoc_state::mhavoc_alpha_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("\t\t\t\t\treading from alpha processor: %02x (%d %d)\n", m_alpha_data, m_gamma_rcvd, m_alpha_xmtd);
 	m_gamma_rcvd = 1;
@@ -159,7 +159,7 @@ READ8_MEMBER(mhavoc_state::mhavoc_alpha_r)
  *
  *************************************/
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_w)
+void mhavoc_state::mhavoc_alpha_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("\t\t\t\t\twriting to alpha processor: %02x %d %d\n", data, m_alpha_rcvd, m_gamma_xmtd);
 	m_alpha_rcvd = 0;
@@ -168,7 +168,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_w)
 }
 
 
-READ8_MEMBER(mhavoc_state::mhavoc_gamma_r)
+uint8_t mhavoc_state::mhavoc_gamma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("  reading from gamma processor: %02x (%d %d)\n", m_gamma_data, m_alpha_rcvd, m_gamma_xmtd);
 	m_alpha_rcvd = 1;
@@ -184,13 +184,13 @@ READ8_MEMBER(mhavoc_state::mhavoc_gamma_r)
  *
  *************************************/
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_ram_banksel_w)
+void mhavoc_state::mhavoc_ram_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 1);
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
+void mhavoc_state::mhavoc_rom_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 3);
 }
@@ -246,7 +246,7 @@ CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_xmtd_r)
  *
  *************************************/
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
+void mhavoc_state::mhavoc_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 7 = Invert Y -- unemulated */
 	/* Bit 6 = Invert X -- unemulated */
@@ -273,7 +273,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 }
 
 
-WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
+void mhavoc_state::alphaone_out_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 5 = P2 lamp */
 	output().set_led_value(0, ~data & 0x20);
@@ -291,7 +291,7 @@ logerror("alphaone_out_0_w(%02X)\n", data);
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavoc_out_1_w)
+void mhavoc_state::mhavoc_out_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 1 = left coin counter */
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
@@ -306,13 +306,13 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_1_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
+void mhavoc_state::mhavocrv_speech_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speech_write_buffer = data;
 }
 
 
-WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
+void mhavoc_state::mhavocrv_speech_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	tms5220->data_w(space, 0, m_speech_write_buffer);

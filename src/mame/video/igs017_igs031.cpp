@@ -45,7 +45,7 @@ DEVICE_ADDRESS_MAP_START( map, 8, igs017_igs031_device )
 
 ADDRESS_MAP_END
 
-READ8_MEMBER(igs017_igs031_device::i8255_r)
+uint8_t igs017_igs031_device::i8255_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_i8255)
 		return m_i8255->read(space, offset);
@@ -157,12 +157,12 @@ void igs017_igs031_device::device_reset()
 	m_irq_enable = 0;
 }
 
-READ8_MEMBER(igs017_igs031_device::read)
+uint8_t igs017_igs031_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space_r(offset);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::write)
+void igs017_igs031_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space_w(offset, data);
 }
@@ -179,7 +179,7 @@ uint8_t igs017_igs031_device::space_r(int offset)
 }
 
 
-WRITE8_MEMBER(igs017_igs031_device::video_disable_w)
+void igs017_igs031_device::video_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_disable = data & 1;
 	if (data & (~1))
@@ -187,7 +187,7 @@ WRITE8_MEMBER(igs017_igs031_device::video_disable_w)
 //  popmessage("VIDEO %02X",data);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::palram_w)
+void igs017_igs031_device::palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palram[offset] = data;
 
@@ -218,13 +218,13 @@ TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
-WRITE8_MEMBER(igs017_igs031_device::fg_w)
+void igs017_igs031_device::fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset/4);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::bg_w)
+void igs017_igs031_device::bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/4);
@@ -414,7 +414,7 @@ uint32_t igs017_igs031_device::screen_update_igs017(screen_device &screen, bitma
 }
 
 #if 0
-WRITE16_MEMBER(igs017_igs031_device::irq_enable_w)
+void igs017_igs031_device::irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_irq_enable = data & 1;
@@ -423,7 +423,7 @@ WRITE16_MEMBER(igs017_igs031_device::irq_enable_w)
 		logerror("%s: irq_enable = %04x\n", machine().describe_context(), data);
 }
 
-WRITE16_MEMBER(igs017_igs031_device::nmi_enable_w)
+void igs017_igs031_device::nmi_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_nmi_enable = data & 1;
@@ -433,14 +433,14 @@ WRITE16_MEMBER(igs017_igs031_device::nmi_enable_w)
 }
 #endif
 
-WRITE8_MEMBER(igs017_igs031_device::nmi_enable_w)
+void igs017_igs031_device::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 1;
 	if (data & (~1))
 		logerror("%s: nmi_enable = %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(igs017_igs031_device::irq_enable_w)
+void igs017_igs031_device::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 1;
 	if (data & (~1))

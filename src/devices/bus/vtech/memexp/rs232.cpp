@@ -93,12 +93,12 @@ WRITE_LINE_MEMBER( rs232_interface_device::rs232_rx_w )
 	m_rx = state;
 }
 
-READ8_MEMBER( rs232_interface_device::receive_data_r )
+uint8_t rs232_interface_device::receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7f | (m_rx << 7);
 }
 
-WRITE8_MEMBER( rs232_interface_device::transmit_data_w )
+void rs232_interface_device::transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_txd(!BIT(data, 7));
 }

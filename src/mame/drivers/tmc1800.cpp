@@ -118,17 +118,17 @@ Notes:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( tmc1800_state::keylatch_w )
+void tmc1800_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( osc1000b_state::keylatch_w )
+void osc1000b_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( tmc2000_state::keylatch_w )
+void tmc2000_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -148,7 +148,7 @@ WRITE8_MEMBER( tmc2000_state::keylatch_w )
 	m_keylatch = data & 0x3f;
 }
 
-WRITE8_MEMBER( nano_state::keylatch_w )
+void nano_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -211,7 +211,7 @@ void tmc2000_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( tmc2000_state::bankswitch_w )
+void tmc2000_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_roc = 0;
 	m_rac = BIT(data, 0);
@@ -220,7 +220,7 @@ WRITE8_MEMBER( tmc2000_state::bankswitch_w )
 	m_cti->tone_latch_w(space, 0, data);
 }
 
-WRITE8_MEMBER( nano_state::bankswitch_w )
+void nano_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* enable RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
@@ -231,7 +231,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 	m_cti->tone_latch_w(space, 0, data);
 }
 
-READ8_MEMBER( tmc1800_state::dispon_r )
+uint8_t tmc1800_state::dispon_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -239,7 +239,7 @@ READ8_MEMBER( tmc1800_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tmc1800_state::dispoff_w )
+void tmc1800_state::dispoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdc->disp_off_w(1);
 	m_vdc->disp_off_w(0);
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER( tmc2000_state::q_w )
 	m_cassette->output(state ? 1.0 : -1.0);
 }
 
-WRITE8_MEMBER( tmc2000_state::dma_w )
+void tmc2000_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color = ~(m_colorram[offset & 0x1ff]) & 0x07;
 

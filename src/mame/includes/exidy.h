@@ -78,8 +78,8 @@ public:
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
 
-	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
-	DECLARE_READ8_MEMBER(exidy_interrupt_r);
+	void fax_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exidy_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
 
@@ -117,9 +117,9 @@ public:
 	uint8_t m_tone_freq;
 	uint8_t m_tone_active;
 	uint8_t m_tone_pointer;
-	DECLARE_WRITE8_MEMBER(targ_audio_1_w);
-	DECLARE_WRITE8_MEMBER(targ_audio_2_w);
-	DECLARE_WRITE8_MEMBER(spectar_audio_2_w);
+	void targ_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void targ_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spectar_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adjust_sample(uint8_t freq);
 	void common_audio_start(int freq);
 	SAMPLES_START_CB_MEMBER(spectar_audio_start);

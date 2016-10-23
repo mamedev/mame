@@ -1255,7 +1255,7 @@ void vic3_device::vic2_drawlines( int first, int last, int start_x, int end_x )
     I/O HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( vic3_device::palette_w )
+void vic3_device::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x100)
 		m_palette_red[offset] = data;
@@ -1268,7 +1268,7 @@ WRITE8_MEMBER( vic3_device::palette_w )
 }
 
 
-WRITE8_MEMBER( vic3_device::port_w )
+void vic3_device::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x7f;
@@ -1526,7 +1526,7 @@ WRITE8_MEMBER( vic3_device::port_w )
 	}
 }
 
-READ8_MEMBER( vic3_device::port_r )
+uint8_t vic3_device::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	offset &= 0x7f;

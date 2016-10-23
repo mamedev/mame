@@ -72,37 +72,37 @@ public:
 	int m_snd_interrupt_enable2;
 
 	// common
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// splash specific
 	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
-	DECLARE_WRITE16_MEMBER(splash_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(splash_adpcm_data_w);
+	void splash_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void splash_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// roldfrog specific
-	DECLARE_WRITE16_MEMBER(roldf_sh_irqtrigger_w);
-	DECLARE_READ16_MEMBER(roldfrog_bombs_r);
-	DECLARE_WRITE8_MEMBER(roldfrog_vblank_ack_w);
-	DECLARE_READ8_MEMBER(roldfrog_unk_r);
+	void roldf_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t roldfrog_bombs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void roldfrog_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t roldfrog_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 	// funystrp specific
-	DECLARE_READ16_MEMBER(spr_read);
-	DECLARE_WRITE16_MEMBER(spr_write);
-	DECLARE_READ8_MEMBER(int_source_r);
-	DECLARE_WRITE8_MEMBER(msm1_data_w);
-	DECLARE_WRITE8_MEMBER(msm1_interrupt_w);
-	DECLARE_WRITE8_MEMBER(msm2_interrupt_w);
-	DECLARE_WRITE8_MEMBER(msm2_data_w);
+	uint16_t spr_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spr_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t int_source_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msm1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm1_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm2_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
-	DECLARE_WRITE16_MEMBER(funystrp_protection_w);
-	DECLARE_READ16_MEMBER(funystrp_protection_r);
-	DECLARE_WRITE16_MEMBER(funystrp_sh_irqtrigger_w);
+	void funystrp_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t funystrp_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void funystrp_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	//roldfrog and funystrp specific
-	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	void sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_splash10();
 	void init_roldfrog();

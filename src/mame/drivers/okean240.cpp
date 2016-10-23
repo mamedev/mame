@@ -76,15 +76,15 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
-	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
-	DECLARE_READ8_MEMBER(term_status_r);
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_READ8_MEMBER(okean240_keyboard_r);
-	DECLARE_WRITE8_MEMBER(okean240_keyboard_w);
-	DECLARE_READ8_MEMBER(okean240a_keyboard_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	uint8_t okean240_kbd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t okean240a_kbd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t term_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t okean240_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void okean240_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t okean240a_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint8_t m_j;
 	uint8_t m_scroll;
@@ -104,7 +104,7 @@ protected:
 };
 
 // okean240 requires bit 4 to change
-READ8_MEMBER( okean240_state::okean240_kbd_status_r )
+uint8_t okean240_state::okean240_kbd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_term_data)
 		return (machine().rand() & 0x10) | 2;
@@ -113,7 +113,7 @@ READ8_MEMBER( okean240_state::okean240_kbd_status_r )
 }
 
 // see if a key is pressed and indicate status
-READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
+uint8_t okean240_state::okean240a_kbd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,j;
 
@@ -128,12 +128,12 @@ READ8_MEMBER( okean240_state::okean240a_kbd_status_r )
 }
 
 // for test rom
-READ8_MEMBER( okean240_state::term_status_r )
+uint8_t okean240_state::term_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( okean240_state::okean240_keyboard_r )
+uint8_t okean240_state::okean240_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0) // port 40 (get ascii key value)
 		return term_r(space, offset);
@@ -146,7 +146,7 @@ READ8_MEMBER( okean240_state::okean240_keyboard_r )
 		return 0;
 }
 
-READ8_MEMBER( okean240_state::okean240a_keyboard_r )
+uint8_t okean240_state::okean240a_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,j;
 
@@ -183,21 +183,21 @@ READ8_MEMBER( okean240_state::okean240a_keyboard_r )
 
 // This is a keyboard acknowledge pulse, it goes high then
 // straightaway low, if reading port 40 indicates a key is pressed.
-WRITE8_MEMBER( okean240_state::okean240_keyboard_w )
+void okean240_state::okean240_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // okean240: port 42 bit 7
 // okean240a: port 42 bit 4
 }
 
 // for test rom
-READ8_MEMBER( okean240_state::term_r )
+uint8_t okean240_state::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( okean240_state::scroll_w )
+void okean240_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = data;
 }
@@ -406,7 +406,7 @@ void okean240_state::machine_reset()
 	m_scroll = 0;
 }
 
-WRITE8_MEMBER( okean240_state::kbd_put )
+void okean240_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

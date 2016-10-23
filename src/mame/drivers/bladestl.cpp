@@ -54,7 +54,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
  *
  *************************************/
 
-READ8_MEMBER(bladestl_state::trackball_r)
+uint8_t bladestl_state::trackball_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int curr = m_trackball[offset]->read();
 	int delta = (curr - m_last_track[offset]) & 0xff;
@@ -63,7 +63,7 @@ READ8_MEMBER(bladestl_state::trackball_r)
 	return (delta & 0x80) | (curr >> 1);
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
+void bladestl_state::bladestl_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -83,14 +83,14 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
+void bladestl_state::bladestl_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
+void bladestl_state::bladestl_port_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 3-5 = ROM bank select
 	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
@@ -105,12 +105,12 @@ WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
-READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
+uint8_t bladestl_state::bladestl_speech_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
+void bladestl_state::bladestl_speech_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 1);
 	m_upd7759->start_w(data & 2);

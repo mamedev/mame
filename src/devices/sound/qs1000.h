@@ -89,21 +89,21 @@ protected:
 	virtual void rom_bank_updated() override;
 
 public:
-	DECLARE_WRITE8_MEMBER( wave_w );
+	void wave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( p0_r );
-	DECLARE_WRITE8_MEMBER( p0_w );
+	uint8_t p0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_WRITE8_MEMBER( p1_w );
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( p2_r );
-	DECLARE_WRITE8_MEMBER( p2_w );
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( data_to_i8052 );
+	uint8_t data_to_i8052(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	enum
 	{

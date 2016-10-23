@@ -57,17 +57,17 @@ void mb14241_device::device_reset()
     IMPLEMENTATION
 *****************************************************************************/
 
-WRITE8_MEMBER( mb14241_device::shift_count_w )
+void mb14241_device::shift_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shift_count = ~data & 0x07;
 }
 
-WRITE8_MEMBER( mb14241_device::shift_data_w )
+void mb14241_device::shift_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shift_data = (m_shift_data >> 8) | ((uint16_t)data << 7);
 }
 
-READ8_MEMBER( mb14241_device::shift_result_r )
+uint8_t mb14241_device::shift_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shift_data >> m_shift_count;
 }

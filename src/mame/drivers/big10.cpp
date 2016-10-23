@@ -79,8 +79,8 @@ public:
 
 	required_device<v9938_device> m_v9938;
 	uint8_t m_mux_data;
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	uint8_t mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_ioport_array<6> m_in;
@@ -96,14 +96,14 @@ public:
 ****************************************/
 
 
-WRITE8_MEMBER(big10_state::mux_w)
+void big10_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = ~data;
 	m_hopper->write(space, 0, (data & 0x40) << 1);
 	machine().output().set_lamp_value(1, BIT(~data, 7)); // maybe a coin counter?
 }
 
-READ8_MEMBER(big10_state::mux_r)
+uint8_t big10_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 	for (int b = 0; b < 6; b++)

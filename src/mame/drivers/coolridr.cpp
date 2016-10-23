@@ -396,28 +396,28 @@ public:
 	uint32_t get_20bit_data(uint32_t romoffset, int _20bitwordnum);
 	uint16_t get_10bit_data(uint32_t romoffset, int _10bitwordnum);
 
-	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
-	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
-	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
-	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_blit_data_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
-	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
+	uint32_t sysh1_sound_dma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sysh1_sound_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sysh1_unk_blit_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sysh1_unk_blit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sysh1_blit_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sysh1_blit_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sysh1_fb_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sysh1_fb_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
-	DECLARE_READ32_MEMBER(coolridr_hack2_r);
-	DECLARE_READ32_MEMBER(aquastge_hack_r);
-	DECLARE_READ16_MEMBER(h1_soundram_r);
-	DECLARE_READ16_MEMBER(h1_soundram2_r);
-	DECLARE_WRITE16_MEMBER(h1_soundram_w);
-	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
-	DECLARE_READ8_MEMBER(analog_mux_r);
-	DECLARE_WRITE8_MEMBER(analog_mux_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void sysh1_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t coolridr_hack2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t aquastge_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t h1_soundram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t h1_soundram2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void h1_soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void h1_soundram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t analog_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void analog_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
-	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
+	void sound_to_sh1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_coolridr();
 	void init_aquastge();
 	virtual void machine_start() override;
@@ -440,7 +440,7 @@ public:
 	void blit_current_sprite(address_space &space);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
-	DECLARE_WRITE8_MEMBER(scsp_irq);
+	void scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void sysh1_dma_transfer( address_space &space, uint16_t dma_index );
 
@@ -2351,7 +2351,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
+void coolridr_state::sysh1_blit_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
@@ -2437,7 +2437,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
+void coolridr_state::sysh1_blit_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_blitterMode == 0xf4)
 	{
@@ -2500,7 +2500,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
+void coolridr_state::sysh1_fb_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	This does the fb display/clear phases of blitter data processed in the previous frame.
@@ -2532,7 +2532,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
 
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
+void coolridr_state::sysh1_fb_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(m_blitterClearCount == 0)
 	{
@@ -2674,7 +2674,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	m_blitterClearCount++;
 }
 
-READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
+uint32_t coolridr_state::sysh1_unk_blit_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if(offset == 0x0c/4) // TODO
 
@@ -2682,7 +2682,7 @@ READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
 }
 
 
-WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
+void coolridr_state::sysh1_unk_blit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
@@ -2827,7 +2827,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, uint16_t dma_inde
 	}while(!end_dma_mark );
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
+void coolridr_state::sysh1_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
@@ -2868,27 +2868,27 @@ static ADDRESS_MAP_START(aquastge_h1_map, AS_PROGRAM, 32, coolridr_state)
 	AM_IMPORT_FROM(system_h1_map)
 ADDRESS_MAP_END
 
-READ16_MEMBER( coolridr_state::h1_soundram_r)
+uint16_t coolridr_state::h1_soundram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundram[offset];
 }
 
-READ16_MEMBER( coolridr_state::h1_soundram2_r)
+uint16_t coolridr_state::h1_soundram2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundram2[offset];
 }
 
-WRITE16_MEMBER( coolridr_state::h1_soundram_w)
+void coolridr_state::h1_soundram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundram[offset]);
 }
 
-WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
+void coolridr_state::h1_soundram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_soundram2[offset]);
 }
 
-READ8_MEMBER( coolridr_state::analog_mux_r )
+uint8_t coolridr_state::analog_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t adc_data = 0;
 	switch(an_mux_data)
@@ -2907,12 +2907,12 @@ READ8_MEMBER( coolridr_state::analog_mux_r )
 	return adc_data;
 }
 
-WRITE8_MEMBER( coolridr_state::analog_mux_w )
+void coolridr_state::analog_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	an_mux_data = data;
 }
 
-WRITE8_MEMBER( coolridr_state::lamps_w )
+void coolridr_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- P2 Music select Lamp
@@ -2926,7 +2926,7 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 }
 
 
-READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
+uint32_t coolridr_state::sysh1_sound_dma_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(offset == 8)
 	{
@@ -2947,7 +2947,7 @@ READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
 	return m_sound_dma[offset];
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
+void coolridr_state::sysh1_sound_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
@@ -3042,7 +3042,7 @@ static ADDRESS_MAP_START( aquastge_submap, AS_PROGRAM, 32, coolridr_state )
 ADDRESS_MAP_END
 
 /* TODO: what is this for, volume mixing? MIDI? */
-WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
+void coolridr_state::sound_to_sh1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sound_fifo = data;
 }
@@ -3685,7 +3685,7 @@ void coolridr_state::machine_reset()
 	m_usethreads = m_io_config->read()&1;
 }
 
-WRITE8_MEMBER(coolridr_state::scsp_irq)
+void coolridr_state::scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(offset, data);
 }
@@ -3877,7 +3877,7 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
     06002DFA: 0009   NOP
 
 */
-READ32_MEMBER(coolridr_state::coolridr_hack2_r)
+uint32_t coolridr_state::coolridr_hack2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 
@@ -3892,7 +3892,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 }
 
 
-READ32_MEMBER(coolridr_state::aquastge_hack_r)
+uint32_t coolridr_state::aquastge_hack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 

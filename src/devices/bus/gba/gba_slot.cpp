@@ -454,7 +454,7 @@ std::string gba_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(gba_cart_slot_device::read_rom)
+uint32_t gba_cart_slot_device::read_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset, mem_mask);
@@ -462,7 +462,7 @@ READ32_MEMBER(gba_cart_slot_device::read_rom)
 		return 0xffffffff;
 }
 
-READ32_MEMBER(gba_cart_slot_device::read_ram)
+uint32_t gba_cart_slot_device::read_ram(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ram(space, offset, mem_mask);
@@ -470,7 +470,7 @@ READ32_MEMBER(gba_cart_slot_device::read_ram)
 		return 0xffffffff;
 }
 
-READ32_MEMBER(gba_cart_slot_device::read_gpio)
+uint32_t gba_cart_slot_device::read_gpio(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_gpio(space, offset, mem_mask);
@@ -483,13 +483,13 @@ READ32_MEMBER(gba_cart_slot_device::read_gpio)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(gba_cart_slot_device::write_ram)
+void gba_cart_slot_device::write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
+void gba_cart_slot_device::write_gpio(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_gpio(space, offset, data, mem_mask);

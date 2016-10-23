@@ -150,20 +150,20 @@ void ym3812_device::device_reset()
 }
 
 
-READ8_MEMBER( ym3812_device::read )
+uint8_t ym3812_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ym3812_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym3812_device::write )
+void ym3812_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ym3812_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym3812_device::status_port_r ) { return read(space, 0); }
-READ8_MEMBER( ym3812_device::read_port_r ) { return read(space, 1); }
-WRITE8_MEMBER( ym3812_device::control_port_w ) { write(space, 0, data); }
-WRITE8_MEMBER( ym3812_device::write_port_w ) { write(   space, 1, data); }
+uint8_t ym3812_device::status_port_r(address_space &space, offs_t offset, uint8_t mem_mask) { return read(space, 0); }
+uint8_t ym3812_device::read_port_r(address_space &space, offs_t offset, uint8_t mem_mask) { return read(space, 1); }
+void ym3812_device::control_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { write(space, 0, data); }
+void ym3812_device::write_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { write(   space, 1, data); }
 
 
 const device_type YM3812 = &device_creator<ym3812_device>;

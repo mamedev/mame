@@ -5,24 +5,24 @@
 
 /******************************************************************************/
 
-WRITE32_MEMBER(deco32_state::pri_w)
+void deco32_state::pri_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pri=data;
 }
 
-WRITE32_MEMBER(dragngun_state::sprite_control_w)
+void dragngun_state::sprite_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sprite_ctrl=data;
 }
 
-WRITE32_MEMBER(dragngun_state::spriteram_dma_w)
+void dragngun_state::spriteram_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* DMA spriteram to private sprite chip area, and clear cpu ram */
 	m_spriteram->copy();
 	memset(m_spriteram->live(),0,0x2000);
 }
 
-WRITE32_MEMBER(deco32_state::ace_ram_w)
+void deco32_state::ace_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* Some notes pieced together from Tattoo Assassins info:
 
@@ -98,7 +98,7 @@ void deco32_state::updateAceRam()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE32_MEMBER(deco32_state::nonbuffered_palette_w)
+void deco32_state::nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 
@@ -111,13 +111,13 @@ WRITE32_MEMBER(deco32_state::nonbuffered_palette_w)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-WRITE32_MEMBER(deco32_state::buffered_palette_w)
+void deco32_state::buffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_dirty_palette[offset]=1;
 }
 
-WRITE32_MEMBER(deco32_state::palette_dma_w)
+void deco32_state::palette_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int m=m_palette->entries();
 	int r,g,b,i;

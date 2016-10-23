@@ -136,23 +136,23 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(rom_r);
-	DECLARE_WRITE8_MEMBER(rom_w);
-	DECLARE_READ8_MEMBER(pio_portA_r);
-	DECLARE_READ8_MEMBER(pio_portB_r);
-	DECLARE_WRITE8_MEMBER(pio_portA_w);
-	DECLARE_WRITE8_MEMBER(pio_portB_w);
-	DECLARE_WRITE8_MEMBER(display_command_w);
-	DECLARE_READ8_MEMBER(display_data_r);
-	DECLARE_WRITE8_MEMBER(display_data_w);
-	DECLARE_READ8_MEMBER(dma_mask_r);
-	DECLARE_WRITE8_MEMBER(dma_mask_w);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
-	DECLARE_READ8_MEMBER(memmap_r);
-	DECLARE_WRITE8_MEMBER(memmap_w);
-	DECLARE_READ8_MEMBER(dma_mem_r);
-	DECLARE_WRITE8_MEMBER(dma_mem_w);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t display_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_mask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t memmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(eop_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
@@ -340,7 +340,7 @@ void attache_state::vblank_int(screen_device &screen, bool state)
 	m_ctc->trg2(state);
 }
 
-READ8_MEMBER(attache_state::rom_r)
+uint8_t attache_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_rom_active)
 		return m_rom->base()[offset];
@@ -348,7 +348,7 @@ READ8_MEMBER(attache_state::rom_r)
 		return m_ram->pointer()[m_membank1->entry()*0x2000 + offset];
 }
 
-WRITE8_MEMBER(attache_state::rom_w)
+void attache_state::rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[m_membank1->entry()*0x2000 + offset] = data;
 }
@@ -422,7 +422,7 @@ void attache_state::keyboard_clock_w(bool state)
 }
 
 // TODO: Figure out exactly how the HLD, RD, WR and CS lines on the RTC are hooked up
-READ8_MEMBER(attache_state::pio_portA_r)
+uint8_t attache_state::pio_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 	uint8_t porta = m_pio_porta;
@@ -471,7 +471,7 @@ READ8_MEMBER(attache_state::pio_portA_r)
 	return ret;
 }
 
-READ8_MEMBER(attache_state::pio_portB_r)
+uint8_t attache_state::pio_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_pio_portb & 0xbf;
 	ret |= keyboard_data_r();
@@ -529,7 +529,7 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER(attache_state::pio_portA_w)
+void attache_state::pio_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  AO-7 = LATCH DATA OUT:
 	//  LO = MOTOR ON
@@ -544,7 +544,7 @@ WRITE8_MEMBER(attache_state::pio_portA_w)
 	m_pio_porta = data;
 }
 
-WRITE8_MEMBER(attache_state::pio_portB_w)
+void attache_state::pio_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  BO-1 = 5101 A4-5
 	//  B2-4 = OPERATION SELECT
@@ -570,7 +570,7 @@ WRITE8_MEMBER(attache_state::pio_portB_w)
 }
 
 // Display uses A8-A15 placed on the bus by the OUT instruction as an extra parameter
-READ8_MEMBER(attache_state::display_data_r)
+uint8_t attache_state::display_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 	uint8_t param = (offset & 0xff00) >> 8;
@@ -608,7 +608,7 @@ READ8_MEMBER(attache_state::display_data_r)
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::display_data_w)
+void attache_state::display_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t param = (offset & 0xff00) >> 8;
 	switch(m_current_cmd)
@@ -642,7 +642,7 @@ WRITE8_MEMBER(attache_state::display_data_w)
 	}
 }
 
-WRITE8_MEMBER(attache_state::display_command_w)
+void attache_state::display_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t cmd = (data & 0xe0) >> 5;
 
@@ -672,12 +672,12 @@ WRITE8_MEMBER(attache_state::display_command_w)
 	}
 }
 
-READ8_MEMBER(attache_state::memmap_r)
+uint8_t attache_state::memmap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memmap;
 }
 
-WRITE8_MEMBER(attache_state::memmap_w)
+void attache_state::memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: figure this out properly
 	// Tech manual says that RAM is split into 8kB chunks.
@@ -692,33 +692,33 @@ WRITE8_MEMBER(attache_state::memmap_w)
 	logerror("MEM: write %02x - bank %i, location %i\n",data, bank, loc);
 }
 
-READ8_MEMBER(attache_state::dma_mask_r)
+uint8_t attache_state::dma_mask_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dma->read(space,0x0f);
 }
 
-WRITE8_MEMBER(attache_state::dma_mask_w)
+void attache_state::dma_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma->write(space,0x0f,data);
 }
 
-READ8_MEMBER(attache_state::fdc_dma_r)
+uint8_t attache_state::fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_fdc->dma_r();
 	return ret;
 }
 
-WRITE8_MEMBER(attache_state::fdc_dma_w)
+void attache_state::fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->dma_w(data);
 }
 
-READ8_MEMBER(attache_state::dma_mem_r)
+uint8_t attache_state::dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(attache_state::dma_mem_w)
+void attache_state::dma_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }

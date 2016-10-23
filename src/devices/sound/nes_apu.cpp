@@ -769,8 +769,8 @@ inline void nesapu_device::apu_write(int address, uint8 value)
 /* EXTERNAL INTERFACE FUNCTIONS */
 
 /* REGISTER READ/WRITE FUNCTIONS */
-READ8_MEMBER( nesapu_device::read ) {return apu_read(offset);}
-WRITE8_MEMBER( nesapu_device::write ) {apu_write(offset,data);}
+uint8_t nesapu_device::read(address_space &space, offs_t offset, uint8_t mem_mask) {return apu_read(offset);}
+void nesapu_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {apu_write(offset,data);}
 
 
 //-------------------------------------------------

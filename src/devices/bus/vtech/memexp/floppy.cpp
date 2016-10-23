@@ -136,7 +136,7 @@ void floppy_controller_device::device_reset()
 //  bit  6:   !write request
 //  bits 4,7: floppy select
 
-WRITE8_MEMBER(floppy_controller_device::latch_w)
+void floppy_controller_device::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = m_latch ^ data;
 	m_latch = data;
@@ -212,7 +212,7 @@ WRITE8_MEMBER(floppy_controller_device::latch_w)
 // - the inverted inverter output is shifted through the lsb of the shift register
 // - the inverter is cleared
 
-READ8_MEMBER(floppy_controller_device::shifter_r)
+uint8_t floppy_controller_device::shifter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_latching_inverter();
 	m_shifter = (m_shifter << 1) | !m_latching_inverter;
@@ -222,7 +222,7 @@ READ8_MEMBER(floppy_controller_device::shifter_r)
 
 
 // Linked to the latching inverter on bit 7, rest is floating
-READ8_MEMBER(floppy_controller_device::rd_r)
+uint8_t floppy_controller_device::rd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_latching_inverter();
 	return m_latching_inverter ? 0x80 : 0x00;
@@ -230,7 +230,7 @@ READ8_MEMBER(floppy_controller_device::rd_r)
 
 
 // Linked to wp signal on bit 7, rest is floating
-READ8_MEMBER(floppy_controller_device::wpt_r)
+uint8_t floppy_controller_device::wpt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_floppy && m_floppy->wpt_r() ? 0x80 : 0x00;
 }

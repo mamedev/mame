@@ -43,7 +43,7 @@
 #include "includes/lkage.h"
 
 
-WRITE8_MEMBER(lkage_state::lkage_videoram_w)
+void lkage_state::lkage_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 

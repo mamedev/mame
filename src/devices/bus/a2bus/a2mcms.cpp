@@ -315,7 +315,7 @@ void mcms_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	}
 }
 
-WRITE8_MEMBER(mcms_device::voiceregs_w)
+void mcms_device::voiceregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	if (offset >= 0x20)
@@ -354,7 +354,7 @@ WRITE8_MEMBER(mcms_device::voiceregs_w)
 	}
 }
 
-WRITE8_MEMBER(mcms_device::control_w)
+void mcms_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 

@@ -76,7 +76,7 @@ TO DO :
 #include "includes/stlforce.h"
 
 
-WRITE16_MEMBER(stlforce_state::eeprom_w)
+void stlforce_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -86,7 +86,7 @@ WRITE16_MEMBER(stlforce_state::eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(stlforce_state::oki_bank_w)
+void stlforce_state::oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank((data>>8) & 3);
 }

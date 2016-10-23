@@ -52,8 +52,8 @@ public:
 	void bootleg_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram16, int spriteram16_bytes);
 
 
-	DECLARE_READ16_MEMBER(kaneko16_sprites_regs_r);
-	DECLARE_WRITE16_MEMBER(kaneko16_sprites_regs_w);
+	uint16_t kaneko16_sprites_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko16_sprites_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

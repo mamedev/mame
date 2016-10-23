@@ -76,8 +76,8 @@ public:
 	template<class _Object> static devcb_base &set_write_port6_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port6.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_port7_callback(device_t &device, _Object object) { return downcast<tms1024_device &>(device).m_write_port7.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(write_h);
-	DECLARE_WRITE8_MEMBER(write_s);
+	void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_s(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_std);
 
 protected:

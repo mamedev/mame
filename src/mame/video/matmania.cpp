@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(matmania_state, matmania)
 
 
 
-WRITE8_MEMBER(matmania_state::matmania_paletteram_w)
+void matmania_state::matmania_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit0, bit1, bit2, bit3, val;
 	int r, g, b;

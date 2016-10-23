@@ -457,7 +457,7 @@ WRITE_LINE_MEMBER( pc_kbd_keytronic_pc3270_device::data_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_read )
+uint8_t pc_kbd_keytronic_pc3270_device::internal_data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::internal_data_read(): read from %04x\n", offset);
@@ -472,7 +472,7 @@ READ8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_write )
+void pc_kbd_keytronic_pc3270_device::internal_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::internal_data_write(): write to offset %04x\n", offset);
@@ -574,13 +574,13 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::internal_data_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1 & m_p1_data;
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_write )
+void pc_kbd_keytronic_pc3270_device::p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p1_write(): write %02x\n", data);
@@ -589,13 +589,13 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p1_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p2_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
+void pc_kbd_keytronic_pc3270_device::p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p2_write(): write %02x\n", data);
@@ -604,7 +604,7 @@ WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p2_write )
 }
 
 
-READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
+uint8_t pc_kbd_keytronic_pc3270_device::p3_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p3;
 
@@ -620,7 +620,7 @@ READ8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_keytronic_pc3270_device::p3_write )
+void pc_kbd_keytronic_pc3270_device::p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)
 		logerror("keytronic_pc3270::p3_write(): write %02x\n", data);

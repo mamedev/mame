@@ -119,7 +119,7 @@ public:
 	line_state ready();
 	void treset();
 
-	DECLARE_READ8_MEMBER( read );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	DECLARE_READ_LINE_MEMBER( sprd_out );
@@ -207,7 +207,7 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
@@ -216,7 +216,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pmemen_in );
 	DECLARE_WRITE_LINE_MEMBER( skdrcs_in );
 
-	DECLARE_READ8_MEMBER( rom1cs_out );
+	uint8_t rom1cs_out(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( gromclk_out );
 
 	DECLARE_READ_LINE_MEMBER( alccs_out );
@@ -290,9 +290,9 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( set_address );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void set_address(address_space &space, offs_t offset);
 
 	DECLARE_WRITE_LINE_MEMBER( srdy_in );
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
@@ -377,8 +377,8 @@ class oso_device : public device_t
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void device_start() override;
 
 private:
@@ -394,13 +394,13 @@ public:
 	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Memory space
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_SETOFFSET_MEMBER( setoffset );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void setoffset(address_space &space, offs_t offset);
 
 	// I/O space
 	DECLARE_READ8Z_MEMBER( crureadz );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// Control lines
 	DECLARE_WRITE_LINE_MEMBER( clock_in );

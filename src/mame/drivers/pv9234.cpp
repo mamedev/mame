@@ -32,9 +32,9 @@ public:
 		m_p_ram(*this, "p_ram"),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE32_MEMBER(debug_w);
-	DECLARE_WRITE32_MEMBER(debug1_w);
-	DECLARE_WRITE32_MEMBER(debug2_w);
+	void debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void debug1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void debug2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	required_shared_ptr<uint32_t> m_p_ram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -65,7 +65,7 @@ All printing enabled. Press space bar to toggle on/off.
 Time stamping enabled. Press 't' to turn on/off.
 Press 'o' to toggle printing of MPEG Xport error messages.
 */
-WRITE32_MEMBER( pv9234_state::debug_w )
+void pv9234_state::debug_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data)
 	{
@@ -74,7 +74,7 @@ WRITE32_MEMBER( pv9234_state::debug_w )
 	}
 }
 
-WRITE32_MEMBER( pv9234_state::debug1_w )
+void pv9234_state::debug1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t i,j;
 	if (data)
@@ -90,7 +90,7 @@ WRITE32_MEMBER( pv9234_state::debug1_w )
 	}
 }
 
-WRITE32_MEMBER( pv9234_state::debug2_w )
+void pv9234_state::debug2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data)
 		logerror("debug2=%02x\n",data); // ignore the huge amount of zeroes here

@@ -26,13 +26,13 @@ public:
 
 	TILEMAP_MAPPER_MEMBER(twc94_scan);
 
-	DECLARE_WRITE16_MEMBER(regs_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(line_w);
+	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(regs_r);
-	DECLARE_READ16_MEMBER(vram_r);
-	DECLARE_READ16_MEMBER(line_r);
+	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t line_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);

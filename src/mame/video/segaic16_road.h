@@ -53,8 +53,8 @@ public:
 
 	void segaic16_road_draw(int which, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 
-	DECLARE_READ16_MEMBER( segaic16_road_control_0_r );
-	DECLARE_WRITE16_MEMBER( segaic16_road_control_0_w );
+	uint16_t segaic16_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void segaic16_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 protected:

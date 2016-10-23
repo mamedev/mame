@@ -19,11 +19,11 @@ public:
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
 	int                  m_scrollx[2];
-	DECLARE_WRITE8_MEMBER(travrusa_videoram_w);
-	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_low_w);
-	DECLARE_WRITE8_MEMBER(travrusa_scroll_x_high_w);
-	DECLARE_WRITE8_MEMBER(travrusa_flipscreen_w);
-	DECLARE_READ8_MEMBER(shtridrb_port11_r);
+	void travrusa_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void travrusa_scroll_x_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void travrusa_scroll_x_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void travrusa_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t shtridrb_port11_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_shtridra();
 	void init_motorace();
 	void init_shtridrb();

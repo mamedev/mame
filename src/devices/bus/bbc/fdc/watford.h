@@ -43,8 +43,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(wd177xl_read);
-	DECLARE_WRITE8_MEMBER(wd177xl_write);
+	uint8_t wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd177xl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -68,8 +68,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(wd177xl_read);
-	DECLARE_WRITE8_MEMBER(wd177xl_write);
+	uint8_t wd177xl_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd177xl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

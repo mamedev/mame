@@ -44,22 +44,22 @@ public:
 	bool    m_video_enable;
 
 	/* common */
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_READ8_MEMBER(scanline_r);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* all but psurge */
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(video_enable_w);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* psurge */
-	DECLARE_READ8_MEMBER(psurge_protection_r);
+	uint8_t psurge_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* chkun */
 	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
-	DECLARE_WRITE8_MEMBER(chkun_sound_w);
+	void chkun_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_chkun_tile_info);

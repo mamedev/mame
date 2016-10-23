@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/4enraya.h"
 
-WRITE8_MEMBER(_4enraya_state::fenraya_videoram_w)
+void _4enraya_state::fenraya_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[(offset & 0x3ff) * 2] = data;
 	m_videoram[(offset & 0x3ff) * 2 + 1] = (offset & 0xc00) >> 10;

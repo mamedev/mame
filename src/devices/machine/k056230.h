@@ -41,11 +41,11 @@ public:
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<k056230_device &>(device).m_cpu.set_tag(tag); }
 	static void set_thunderh_hack(device_t &device, int thunderh) { downcast<k056230_device &>(device).m_is_thunderh = thunderh; }
 
-	DECLARE_READ32_MEMBER(lanc_ram_r);
-	DECLARE_WRITE32_MEMBER(lanc_ram_w);
+	uint32_t lanc_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lanc_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_CALLBACK_MEMBER(network_irq_clear);
 

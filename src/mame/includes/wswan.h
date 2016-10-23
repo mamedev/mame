@@ -49,9 +49,9 @@ public:
 	required_device<wswan_video_device> m_vdp;
 	required_device<wswan_sound_device> m_sound;
 	required_device<ws_cart_slot_device> m_cart;
-	DECLARE_READ8_MEMBER(bios_r);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
+	uint8_t bios_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_ws_portram[256];
 	uint8_t m_internal_eeprom[INTERNAL_EEPROM_SIZE];

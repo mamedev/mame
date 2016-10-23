@@ -174,12 +174,12 @@ uint32_t nubus_radiustpd_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_radiustpd_device::radiustpd_w )
+void nubus_radiustpd_device::radiustpd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("TPD: write %08x to %x, mask %08x\n", data, offset, mem_mask);
 }
 
-READ32_MEMBER( nubus_radiustpd_device::radiustpd_r )
+uint32_t nubus_radiustpd_device::radiustpd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("TPD: read @ %x, mask %08x\n", offset, mem_mask);
 
@@ -202,13 +202,13 @@ READ32_MEMBER( nubus_radiustpd_device::radiustpd_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_radiustpd_device::vram_w )
+void nubus_radiustpd_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_radiustpd_device::vram_r )
+uint32_t nubus_radiustpd_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

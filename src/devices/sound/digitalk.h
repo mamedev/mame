@@ -40,7 +40,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER(digitalker_data_w);
+	void digitalker_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	void digitalker_write(uint8_t *adr, uint8_t vol, int8_t dac);

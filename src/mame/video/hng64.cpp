@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
 }
 
 
-WRITE32_MEMBER(hng64_state::hng64_videoram_w)
+void hng64_state::hng64_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	const int realoff = (offset * 4);
 	COMBINE_DATA(&m_videoram[offset]);

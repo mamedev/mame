@@ -38,7 +38,7 @@ TODO:
 
 static const int clear_hack = 1;
 
-WRITE16_MEMBER(taitoo_state::io_w)
+void taitoo_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -48,7 +48,7 @@ WRITE16_MEMBER(taitoo_state::io_w)
 	}
 }
 
-READ16_MEMBER(taitoo_state::io_r)
+uint16_t taitoo_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int retval = 0;
 

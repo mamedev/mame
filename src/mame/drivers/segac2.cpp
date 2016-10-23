@@ -169,20 +169,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
 	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
 
-	DECLARE_READ8_MEMBER(io_portc_r);
-	DECLARE_WRITE8_MEMBER(io_portd_w);
-	DECLARE_WRITE8_MEMBER(io_porth_w);
+	uint8_t io_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_porth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
-	DECLARE_READ16_MEMBER( palette_r );
-	DECLARE_WRITE16_MEMBER( palette_w );
-	DECLARE_WRITE8_MEMBER( control_w );
-	DECLARE_READ8_MEMBER( prot_r );
-	DECLARE_WRITE8_MEMBER( prot_w );
-	DECLARE_WRITE8_MEMBER( counter_timer_w );
-	DECLARE_READ16_MEMBER( printer_r );
-	DECLARE_WRITE16_MEMBER( print_club_camera_w );
-	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
+	void segac2_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counter_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t printer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void print_club_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ichirjbl_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
@@ -281,7 +281,7 @@ void segac2_state::machine_reset_segac2()
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
+void segac2_state::segac2_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* make sure we have a UPD chip */
 	if (m_upd7759 == nullptr)
@@ -315,7 +315,7 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w)
 ******************************************************************************/
 
 /* handle reads from the paletteram */
-READ16_MEMBER(segac2_state::palette_r)
+uint16_t segac2_state::palette_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x1ff;
 	if (m_segac2_alt_palette_mode)
@@ -325,7 +325,7 @@ READ16_MEMBER(segac2_state::palette_r)
 }
 
 /* handle writes to the paletteram */
-WRITE16_MEMBER(segac2_state::palette_w)
+void segac2_state::palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
@@ -418,7 +418,7 @@ void segac2_state::recompute_palette_tables()
     Sega 315-5296 I/O chip
 ******************************************************************************/
 
-READ8_MEMBER(segac2_state::io_portc_r)
+uint8_t segac2_state::io_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// D7 : From MB3773P pin 1. (/RESET output)
 	// D6 : From uPD7759 pin 18. (/BUSY output)
@@ -426,7 +426,7 @@ READ8_MEMBER(segac2_state::io_portc_r)
 	return 0xbf | busy;
 }
 
-WRITE8_MEMBER(segac2_state::io_portd_w)
+void segac2_state::io_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 D7 : To pin 3 of JP15. (Watchdog clock control)
@@ -444,7 +444,7 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
-WRITE8_MEMBER(segac2_state::io_porth_w)
+void segac2_state::io_porth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 D7 : To pin A19 of CN4
@@ -481,7 +481,7 @@ WRITE8_MEMBER(segac2_state::io_porth_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::control_w)
+void segac2_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 
@@ -513,7 +513,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 ******************************************************************************/
 
 /* protection chip reads */
-READ8_MEMBER(segac2_state::prot_r)
+uint8_t segac2_state::prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
@@ -521,7 +521,7 @@ READ8_MEMBER(segac2_state::prot_r)
 
 
 /* protection chip writes */
-WRITE8_MEMBER(segac2_state::prot_w)
+void segac2_state::prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
@@ -560,7 +560,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 ******************************************************************************/
 
-WRITE8_MEMBER(segac2_state::counter_timer_w)
+void segac2_state::counter_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*int value = data & 1;*/
 	switch (data & 0x1e)
@@ -604,12 +604,12 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 
 ******************************************************************************/
 
-READ16_MEMBER(segac2_state::printer_r)
+uint16_t segac2_state::printer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cam_data;
 }
 
-WRITE16_MEMBER(segac2_state::print_club_camera_w)
+void segac2_state::print_club_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cam_data = data;
 }
@@ -2387,7 +2387,7 @@ void segac2_state::init_ichirj()
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_ichirj),this));
 }
 
-READ16_MEMBER(segac2_state::ichirjbl_prot_r )
+uint16_t segac2_state::ichirjbl_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x00f5;
 }

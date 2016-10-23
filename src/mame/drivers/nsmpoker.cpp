@@ -79,9 +79,9 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
-	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
-	DECLARE_READ8_MEMBER(debug_r);
+	void nsmpoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nsmpoker_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t debug_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nsmpoker);
@@ -98,14 +98,14 @@ public:
 *************************/
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_videoram_w)
+void nsmpoker_state::nsmpoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
+void nsmpoker_state::nsmpoker_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -158,12 +158,12 @@ INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
 	m_maincpu->set_input_line(INT_9995_INT1, CLEAR_LINE);
 }
 
-//WRITE8_MEMBER(nsmpoker_state::debug_w)
+//void nsmpoker_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-READ8_MEMBER(nsmpoker_state::debug_r)
+uint8_t nsmpoker_state::debug_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand() & 0xff;
 }

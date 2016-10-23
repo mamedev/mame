@@ -53,9 +53,9 @@ public:
 		, m_dac(*this, "dac")
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_WRITE8_MEMBER(port_a_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 private:
@@ -84,7 +84,7 @@ F00-FFF  256 bytes RAM (Standard) / VDU RAM  Decoded by 1111
 */
 
 
-READ8_MEMBER( mk14_state::keyboard_r )
+uint8_t mk14_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 8)
 		return m_keyboard[offset]->read();
@@ -92,7 +92,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( mk14_state::display_w )
+void mk14_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 8 )
 		output().set_digit_value(offset, data);
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( mk14 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")    PORT_CODE(KEYCODE_7)      PORT_CHAR('7')
 INPUT_PORTS_END
 
-WRITE8_MEMBER( mk14_state::port_a_w )
+void mk14_state::port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

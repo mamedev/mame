@@ -105,7 +105,7 @@ pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, cons
     INLINE FUNCTIONS
 ***************************************************************************/
 
-READ32_MEMBER( pci_bus_legacy_device::read )
+uint32_t pci_bus_legacy_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0xffffffff;
 	int function, reg;
@@ -160,7 +160,7 @@ pci_bus_legacy_device *pci_bus_legacy_device::pci_search_bustree(int busnum, int
 
 
 
-WRITE32_MEMBER( pci_bus_legacy_device::write )
+void pci_bus_legacy_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset %= 2;
 
@@ -209,7 +209,7 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 
 
 
-READ64_MEMBER(pci_bus_legacy_device::read_64be)
+uint64_t pci_bus_legacy_device::read_64be(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t result = 0;
 	mem_mask = flipendian_int64(mem_mask);
@@ -220,7 +220,7 @@ READ64_MEMBER(pci_bus_legacy_device::read_64be)
 	return flipendian_int64(result);
 }
 
-WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
+void pci_bus_legacy_device::write_64be(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	data = flipendian_int64(data);
 	mem_mask = flipendian_int64(mem_mask);

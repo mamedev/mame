@@ -139,7 +139,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "includes/gaiden.h"
 
-WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
+void gaiden_state::gaiden_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);   /* Ninja Gaiden */
@@ -148,7 +148,7 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
+void gaiden_state::drgnbowl_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -163,7 +163,7 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
-WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
+void gaiden_state::wildfang_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -212,7 +212,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::wildfang_protection_r)
+uint16_t gaiden_state::wildfang_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
 	return m_prot;
@@ -325,7 +325,7 @@ void gaiden_state::machine_start_raiga()
 	save_item(NAME(m_spr_offset_y));
 }
 
-WRITE16_MEMBER(gaiden_state::raiga_protection_w)
+void gaiden_state::raiga_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -375,7 +375,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	}
 }
 
-READ16_MEMBER(gaiden_state::raiga_protection_r)
+uint16_t gaiden_state::raiga_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
 	return m_prot;

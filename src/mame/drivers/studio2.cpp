@@ -227,12 +227,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_400 );
-	DECLARE_READ8_MEMBER( cart_a00 );
-	DECLARE_READ8_MEMBER( cart_e00 );
-	DECLARE_READ8_MEMBER( dispon_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_WRITE8_MEMBER( dispon_w );
+	uint8_t cart_400(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cart_a00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cart_e00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dispon_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dispon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( clear_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
@@ -258,7 +258,7 @@ public:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 class mpt02_state : public studio2_state
@@ -275,8 +275,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_c00 );
-	DECLARE_WRITE8_MEMBER( dma_w );
+	uint8_t cart_c00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -299,12 +299,12 @@ public:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( studio2_state::keylatch_w )
+void studio2_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( studio2_state::dispon_r )
+uint8_t studio2_state::dispon_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -312,7 +312,7 @@ READ8_MEMBER( studio2_state::dispon_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( studio2_state::dispon_w )
+void studio2_state::dispon_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdc->disp_on_w(1);
 	m_vdc->disp_on_w(0);
@@ -453,7 +453,7 @@ WRITE_LINE_MEMBER( studio2_state::q_w )
 	m_beeper->set_state(state);
 }
 
-WRITE8_MEMBER( visicom_state::dma_w )
+void visicom_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx = m_screen->hpos() + 4;
 	int y = m_screen->vpos();
@@ -471,7 +471,7 @@ WRITE8_MEMBER( visicom_state::dma_w )
 	}
 }
 
-WRITE8_MEMBER( mpt02_state::dma_w )
+void mpt02_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t addr = ((offset & 0xe0) >> 2) | (offset & 0x07);
 
@@ -484,10 +484,10 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 /* Machine Initialization */
 
 // trampolines to cartridge
-READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(space, offset); }
-READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(space, offset + 0x600); }
-READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(space, offset + 0xa00); }
-READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(space, offset + 0x800); }
+uint8_t studio2_state::cart_400(address_space &space, offs_t offset, uint8_t mem_mask) { return m_cart->read_rom(space, offset); }
+uint8_t studio2_state::cart_a00(address_space &space, offs_t offset, uint8_t mem_mask) { return m_cart->read_rom(space, offset + 0x600); }
+uint8_t studio2_state::cart_e00(address_space &space, offs_t offset, uint8_t mem_mask) { return m_cart->read_rom(space, offset + 0xa00); }
+uint8_t mpt02_state::cart_c00(address_space &space, offs_t offset, uint8_t mem_mask) { return m_cart->read_rom(space, offset + 0x800); }
 
 void studio2_state::machine_start()
 {

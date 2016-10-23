@@ -74,7 +74,7 @@ INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
 }
 
 
-WRITE8_MEMBER(tutankhm_state::irq_enable_w)
+void tutankhm_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)
@@ -88,7 +88,7 @@ WRITE8_MEMBER(tutankhm_state::irq_enable_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
+void tutankhm_state::tutankhm_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
@@ -100,13 +100,13 @@ WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tutankhm_state::sound_mute_w)
+void tutankhm_state::sound_mute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_mute(data & 1);
 }
 
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
+void tutankhm_state::tutankhm_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset ^ 1, data);
 }

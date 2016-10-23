@@ -23,7 +23,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "sound/volt_reg.h"
 
 
-READ8_MEMBER(megazone_state::megazone_port_a_r)
+uint8_t megazone_state::megazone_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int clock, timer;
 
@@ -42,7 +42,7 @@ READ8_MEMBER(megazone_state::megazone_port_a_r)
 	return (timer << 4) | m_i8039_status;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_port_b_w)
+void megazone_state::megazone_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const fltname[] = { "filter.0.0", "filter.0.1", "filter.0.2" };
 	int i;
@@ -60,24 +60,24 @@ WRITE8_MEMBER(megazone_state::megazone_port_b_w)
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
+void megazone_state::megazone_i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_daccpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
+void megazone_state::i8039_irqen_and_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x80) == 0)
 		m_daccpu->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
-WRITE8_MEMBER(megazone_state::megazone_coin_counter_w)
+void megazone_state::megazone_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1 - offset, data);        /* 1-offset, because coin counters are in reversed order */
 }
 
-WRITE8_MEMBER(megazone_state::irq_mask_w)
+void megazone_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

@@ -38,21 +38,21 @@ WRITE_LINE_MEMBER(mc80_state::ctc_z2_w)
 	downcast<z80ctc_device *>(machine().device("z80ctc"))->trg1(state);
 }
 
-READ8_MEMBER( mc80_state::mc80_port_b_r )
+uint8_t mc80_state::mc80_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER( mc80_state::mc80_port_a_r )
+uint8_t mc80_state::mc80_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( mc80_state::mc80_port_a_w )
+void mc80_state::mc80_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mc80_state::mc80_port_b_w )
+void mc80_state::mc80_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -60,11 +60,11 @@ WRITE8_MEMBER( mc80_state::mc80_port_b_w )
 /*                            Implementation for MC80.3x                     */
 /*****************************************************************************/
 
-WRITE8_MEMBER( mc80_state::mc8030_zve_write_protect_w )
+void mc80_state::mc8030_zve_write_protect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mc80_state::mc8030_vis_w )
+void mc80_state::mc8030_vis_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// reg C
 	// 7 6 5 4 -- module
@@ -84,7 +84,7 @@ WRITE8_MEMBER( mc80_state::mc8030_vis_w )
 	m_p_videoram[addr] = m_p_videoram[addr] | (val[data & 7]*c);
 }
 
-WRITE8_MEMBER( mc80_state::mc8030_eprom_prog_w )
+void mc80_state::mc8030_eprom_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -97,38 +97,38 @@ void mc80_state::machine_reset_mc8030()
 {
 }
 
-READ8_MEMBER( mc80_state::zve_port_a_r )
+uint8_t mc80_state::zve_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( mc80_state::zve_port_b_r )
+uint8_t mc80_state::zve_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( mc80_state::zve_port_a_w )
+void mc80_state::zve_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mc80_state::zve_port_b_w )
+void mc80_state::zve_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( mc80_state::asp_port_a_r )
-{
-	return 0xff;
-}
-
-READ8_MEMBER( mc80_state::asp_port_b_r )
+uint8_t mc80_state::asp_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( mc80_state::asp_port_a_w )
+uint8_t mc80_state::asp_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
+{
+	return 0xff;
+}
+
+void mc80_state::asp_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( mc80_state::asp_port_b_w )
+void mc80_state::asp_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }

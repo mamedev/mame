@@ -136,7 +136,7 @@ void mcr68_state::video_start_zwackery()
  *
  *************************************/
 
-WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
+void mcr68_state::mcr68_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
@@ -144,7 +144,7 @@ WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
 }
 
 
-WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
+void mcr68_state::zwackery_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
@@ -153,7 +153,7 @@ WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
 }
 
 
-WRITE16_MEMBER(mcr68_state::zwackery_spriteram_w)
+void mcr68_state::zwackery_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */

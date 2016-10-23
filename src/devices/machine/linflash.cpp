@@ -19,14 +19,14 @@ const address_space_config *linear_flash_pccard_device::memory_space_config( add
 	return ( spacenum == AS_0 ) ? &m_space_config : nullptr;
 }
 
-READ16_MEMBER( linear_flash_pccard_device::read_memory )
+uint16_t linear_flash_pccard_device::read_memory(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_space->read_word(offset * 2, mem_mask);
 	//printf( "<%08x %04x %04x\n", offset, data, mem_mask );
 	return data;
 }
 
-WRITE16_MEMBER( linear_flash_pccard_device::write_memory )
+void linear_flash_pccard_device::write_memory(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf( ">%08x %04x %04x\n", offset, data, mem_mask );
 	m_space->write_word(offset * 2, data, mem_mask);

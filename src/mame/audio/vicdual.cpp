@@ -137,7 +137,7 @@ void vicdual_state::machine_start_frogs_audio()
 }
 
 
-WRITE8_MEMBER( vicdual_state::frogs_audio_w )
+void vicdual_state::frogs_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static int last_croak = 0;
 	static int last_buzzz = 0;
@@ -452,7 +452,7 @@ MACHINE_CONFIG_FRAGMENT( headon_audio )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-WRITE8_MEMBER( vicdual_state::headon_audio_w )
+void vicdual_state::headon_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_discrete == nullptr)
 		return;
@@ -466,7 +466,7 @@ WRITE8_MEMBER( vicdual_state::headon_audio_w )
 
 }
 
-WRITE8_MEMBER( vicdual_state::invho2_audio_w )
+void vicdual_state::invho2_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_discrete == nullptr)
 		return;

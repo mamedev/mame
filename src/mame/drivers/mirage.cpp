@@ -73,10 +73,10 @@ public:
 	required_shared_ptr<uint16_t> m_pf2_rowscroll;
 	optional_device<decospr_device> m_sprgen;
 
-	DECLARE_WRITE16_MEMBER(mirage_mux_w);
-	DECLARE_READ16_MEMBER(mirage_input_r);
-	DECLARE_WRITE16_MEMBER(okim1_rombank_w);
-	DECLARE_WRITE16_MEMBER(okim0_rombank_w);
+	void mirage_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mirage_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void okim1_rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void okim0_rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_mirage();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -112,12 +112,12 @@ uint32_t miragemi_state::screen_update_mirage(screen_device &screen, bitmap_rgb3
 }
 
 
-WRITE16_MEMBER(miragemi_state::mirage_mux_w)
+void miragemi_state::mirage_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mux_data = data & 0x1f;
 }
 
-READ16_MEMBER(miragemi_state::mirage_input_r)
+uint16_t miragemi_state::mirage_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_mux_data & 0x1f)
 	{
@@ -131,12 +131,12 @@ READ16_MEMBER(miragemi_state::mirage_input_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(miragemi_state::okim1_rombank_w)
+void miragemi_state::okim1_rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki_sfx->set_rom_bank(data & 0x3);
 }
 
-WRITE16_MEMBER(miragemi_state::okim0_rombank_w)
+void miragemi_state::okim0_rombank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*bits 4-6 used on POST? */
 	m_oki_bgm->set_rom_bank(data & 0x7);

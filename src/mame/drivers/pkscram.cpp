@@ -39,10 +39,10 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
-	DECLARE_WRITE16_MEMBER(pkscramble_output_w);
+	void pkscramble_fgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_mdtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_bgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pkscramble_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_md_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -61,19 +61,19 @@ public:
 enum { interrupt_scanline=192 };
 
 
-WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
+void pkscram_state::pkscramble_fgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
+void pkscram_state::pkscramble_mdtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
+void pkscram_state::pkscramble_bgtilemap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
@@ -81,7 +81,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
 // it should stay high for some time (currently we cheat keeping the input always active)
-WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
+void pkscram_state::pkscramble_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// OUTPUT
 	// BIT

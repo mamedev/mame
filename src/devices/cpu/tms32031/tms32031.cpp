@@ -291,7 +291,7 @@ tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag,
 }
 
 
-DIRECT_UPDATE_MEMBER( tms3203x_device::direct_handler )
+offs_t tms3203x_device::direct_handler(direct_read_data &direct, offs_t address)
 {
 	// internal boot loader ROM
 	if (m_mcbl_mode && address < (0x1000 << 2))

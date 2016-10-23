@@ -151,22 +151,22 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
  **********************************************************/
 
 /// HACK: the memory system cannot cope with mixing the  8 bit device map from the fdc with a 32 bit handler
-READ8_MEMBER(southbridge_device::ide_read_cs1_r)
+uint8_t southbridge_device::ide_read_cs1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ide->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(southbridge_device::ide_write_cs1_w)
+void southbridge_device::ide_write_cs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ide->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
 }
 
-READ8_MEMBER(southbridge_device::ide2_read_cs1_r)
+uint8_t southbridge_device::ide2_read_cs1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ide2->read_cs1(space, 1, (uint32_t) 0xff0000) >> 16;
 }
 
-WRITE8_MEMBER(southbridge_device::ide2_write_cs1_w)
+void southbridge_device::ide2_write_cs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ide2->write_cs1(space, 1, (uint32_t) data << 16, (uint32_t) 0xff0000);
 }
@@ -218,7 +218,7 @@ void southbridge_device::device_reset()
  * pic8259 configuration
  *
  *************************************************************/
-READ8_MEMBER( southbridge_device::get_slave_ack )
+uint8_t southbridge_device::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==2) // IRQ = 2
 		return m_pic8259_slave->acknowledge();
@@ -270,7 +270,7 @@ WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out2_changed )
  *
  *************************************************************************/
 
-READ8_MEMBER( southbridge_device::at_page8_r )
+uint8_t southbridge_device::at_page8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_at_pages[offset % 0x10];
 
@@ -293,7 +293,7 @@ READ8_MEMBER( southbridge_device::at_page8_r )
 }
 
 
-WRITE8_MEMBER( southbridge_device::at_page8_w )
+void southbridge_device::at_page8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_at_pages[offset % 0x10] = data;
 
@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 	m_dma8237_2->hack_w( state );
 }
 
-READ8_MEMBER(southbridge_device::pc_dma_read_byte)
+uint8_t southbridge_device::pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -336,7 +336,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
+void southbridge_device::pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -347,7 +347,7 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_byte)
 }
 
 
-READ8_MEMBER(southbridge_device::pc_dma_read_word)
+uint8_t southbridge_device::pc_dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -362,7 +362,7 @@ READ8_MEMBER(southbridge_device::pc_dma_read_word)
 }
 
 
-WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
+void southbridge_device::pc_dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_dma_channel == -1)
@@ -373,22 +373,22 @@ WRITE8_MEMBER(southbridge_device::pc_dma_write_word)
 }
 
 
-READ8_MEMBER( southbridge_device::pc_dma8237_0_dack_r ) { return m_isabus->dack_r(0); }
-READ8_MEMBER( southbridge_device::pc_dma8237_1_dack_r ) { return m_isabus->dack_r(1); }
-READ8_MEMBER( southbridge_device::pc_dma8237_2_dack_r ) { return m_isabus->dack_r(2); }
-READ8_MEMBER( southbridge_device::pc_dma8237_3_dack_r ) { return m_isabus->dack_r(3); }
-READ8_MEMBER( southbridge_device::pc_dma8237_5_dack_r ) { return m_isabus->dack_r(5); }
-READ8_MEMBER( southbridge_device::pc_dma8237_6_dack_r ) { return m_isabus->dack_r(6); }
-READ8_MEMBER( southbridge_device::pc_dma8237_7_dack_r ) { return m_isabus->dack_r(7); }
+uint8_t southbridge_device::pc_dma8237_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(0); }
+uint8_t southbridge_device::pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(1); }
+uint8_t southbridge_device::pc_dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(2); }
+uint8_t southbridge_device::pc_dma8237_3_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(3); }
+uint8_t southbridge_device::pc_dma8237_5_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(5); }
+uint8_t southbridge_device::pc_dma8237_6_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(6); }
+uint8_t southbridge_device::pc_dma8237_7_dack_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_isabus->dack_r(7); }
 
 
-WRITE8_MEMBER( southbridge_device::pc_dma8237_0_dack_w ){ m_isabus->dack_w(0, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_2_dack_w ){ m_isabus->dack_w(2, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_3_dack_w ){ m_isabus->dack_w(3, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_5_dack_w ){ m_isabus->dack_w(5, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_6_dack_w ){ m_isabus->dack_w(6, data); }
-WRITE8_MEMBER( southbridge_device::pc_dma8237_7_dack_w ){ m_isabus->dack_w(7, data); }
+void southbridge_device::pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(0, data); }
+void southbridge_device::pc_dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(1, data); }
+void southbridge_device::pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(2, data); }
+void southbridge_device::pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(3, data); }
+void southbridge_device::pc_dma8237_5_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(5, data); }
+void southbridge_device::pc_dma8237_6_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(6, data); }
+void southbridge_device::pc_dma8237_7_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(7, data); }
 
 WRITE_LINE_MEMBER( southbridge_device::at_dma8237_out_eop )
 {
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dack5_w ) { pc_select_dma_channel(5, s
 WRITE_LINE_MEMBER( southbridge_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
 
-READ8_MEMBER( southbridge_device::at_portb_r )
+uint8_t southbridge_device::at_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_at_speaker;
 	data &= ~0xd0; /* AT BIOS don't likes this being set */
@@ -437,7 +437,7 @@ READ8_MEMBER( southbridge_device::at_portb_r )
 	return data;
 }
 
-WRITE8_MEMBER( southbridge_device::at_portb_w )
+void southbridge_device::at_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_at_speaker = data;
 	m_pit8254->write_gate2(BIT(data, 0));
@@ -446,17 +446,17 @@ WRITE8_MEMBER( southbridge_device::at_portb_w )
 	m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
 }
 
-READ8_MEMBER( southbridge_device::at_dma8237_2_r )
+uint8_t southbridge_device::at_dma8237_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dma8237_2->read( space, offset / 2);
 }
 
-WRITE8_MEMBER( southbridge_device::at_dma8237_2_w )
+void southbridge_device::at_dma8237_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma8237_2->write( space, offset / 2, data);
 }
 
-READ8_MEMBER( southbridge_device::at_keybc_r )
+uint8_t southbridge_device::at_keybc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -467,7 +467,7 @@ READ8_MEMBER( southbridge_device::at_keybc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( southbridge_device::at_keybc_w )
+void southbridge_device::at_keybc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -477,7 +477,7 @@ WRITE8_MEMBER( southbridge_device::at_keybc_w )
 }
 
 
-WRITE8_MEMBER( southbridge_device::write_rtc )
+void southbridge_device::write_rtc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);

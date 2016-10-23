@@ -74,7 +74,7 @@ TIMER_CALLBACK_MEMBER(mc1502_state::keyb_signal_callback)
 	}
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
+void mc1502_state::mc1502_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
@@ -88,7 +88,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portb_w)
 // bit 0: parallel port data transfer direction (default = 0 = out)
 // bits 1-2: CGA_FONT (default = 01)
 // bit 3: i8251 SYNDET pin triggers NMI (default = 1 = no)
-WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
+void mc1502_state::mc1502_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  DBG_LOG(2,"mc1502_ppi_portc_w",("( %02X )\n", data));
 	m_ppi_portc = data & 15;
@@ -98,7 +98,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_ppi_portc_w)
 // 0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
 // 0x20 -- T2OUT
 // 0x10 -- SNDOUT
-READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
+uint8_t mc1502_state::mc1502_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 	double tap_val = m_cassette->input();
@@ -112,7 +112,7 @@ READ8_MEMBER(mc1502_state::mc1502_ppi_portc_r)
 	return data;
 }
 
-READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
+uint8_t mc1502_state::mc1502_kppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t key = 0;
 
@@ -133,7 +133,7 @@ READ8_MEMBER(mc1502_state::mc1502_kppi_porta_r)
 	return key;
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
+void mc1502_state::mc1502_kppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd.mask &= ~255;
 	m_kbd.mask |= data ^ 255;
@@ -144,7 +144,7 @@ WRITE8_MEMBER(mc1502_state::mc1502_kppi_portb_w)
 //  DBG_LOG(2,"mc1502_kppi_portb_w",("( %02X -> %04X )\n", data, m_kbd.mask));
 }
 
-WRITE8_MEMBER(mc1502_state::mc1502_kppi_portc_w)
+void mc1502_state::mc1502_kppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd.mask &= ~(7 << 8);
 	m_kbd.mask |= ((data ^ 7) & 7) << 8;

@@ -46,7 +46,7 @@
 #include "formats/kaypro_dsk.h"
 #include "softlist.h"
 
-READ8_MEMBER( kaypro_state::kaypro2x_87_r ) { return 0x7f; }    /* to bypass unemulated HD controller */
+uint8_t kaypro_state::kaypro2x_87_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x7f; }    /* to bypass unemulated HD controller */
 
 /***********************************************************
 

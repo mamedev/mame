@@ -14,7 +14,7 @@
 #include "cpu/cosmac/cosmac.h"
 #include "includes/pecom.h"
 
-WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
+void pecom_state::pecom_cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t ma = m_cdp1802->get_memory_address();
 

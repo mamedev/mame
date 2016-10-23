@@ -136,12 +136,12 @@ static ADDRESS_MAP_START( sms_supergame_map, AS_PROGRAM, 8, smsbootleg_state )
 //  AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(smsbootleg_state::port08_w)
+void smsbootleg_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("port08_w %02x\n", data);
 }
 
-WRITE8_MEMBER(smsbootleg_state::port18_w)
+void smsbootleg_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("port18_w %02x\n", data);
 }

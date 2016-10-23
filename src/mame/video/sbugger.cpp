@@ -15,13 +15,13 @@ TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,color,0);
 }
 
-WRITE8_MEMBER(sbugger_state::videoram_w)
+void sbugger_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sbugger_state::videoram_attr_w)
+void sbugger_state::videoram_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram_attr[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);

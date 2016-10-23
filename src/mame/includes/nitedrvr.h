@@ -53,13 +53,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
-	DECLARE_READ8_MEMBER(nitedrvr_in0_r);
-	DECLARE_READ8_MEMBER(nitedrvr_in1_r);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
-	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
+	uint8_t nitedrvr_steering_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nitedrvr_steering_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nitedrvr_in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nitedrvr_in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nitedrvr_out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nitedrvr_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nitedrvr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

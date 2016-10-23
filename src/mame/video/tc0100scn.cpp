@@ -381,7 +381,7 @@ void tc0100scn_device::set_bg_tilemask( int mask )
 	m_bg_tilemask = mask;
 }
 
-WRITE16_MEMBER( tc0100scn_device::gfxbank_w )   /* Mjnquest banks its 2 sets of scr tiles */
+void tc0100scn_device::gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)   /* Mjnquest banks its 2 sets of scr tiles */
 {
 	m_gfxbank = (data & 0x1);
 }
@@ -456,12 +456,12 @@ void tc0100scn_device::postload()
 	m_tilemap[2][1]->mark_all_dirty();
 }
 
-READ16_MEMBER( tc0100scn_device::word_r )
+uint16_t tc0100scn_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0100scn_device::word_w )
+void tc0100scn_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 	if (!m_dblwidth)
@@ -488,12 +488,12 @@ WRITE16_MEMBER( tc0100scn_device::word_w )
 	}
 }
 
-READ16_MEMBER( tc0100scn_device::ctrl_word_r )
+uint16_t tc0100scn_device::ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
+void tc0100scn_device::ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 
@@ -564,12 +564,12 @@ WRITE16_MEMBER( tc0100scn_device::ctrl_word_w )
 }
 
 
-READ32_MEMBER( tc0100scn_device::ctrl_long_r )
+uint32_t tc0100scn_device::ctrl_long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (ctrl_word_r(space, offset * 2, 0xffff) << 16) | ctrl_word_r(space, offset * 2 + 1, 0xffff);
 }
 
-WRITE32_MEMBER( tc0100scn_device::ctrl_long_w )
+void tc0100scn_device::ctrl_long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		ctrl_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
@@ -577,12 +577,12 @@ WRITE32_MEMBER( tc0100scn_device::ctrl_long_w )
 		ctrl_word_w(space, (offset * 2) + 1, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_MEMBER( tc0100scn_device::long_r )
+uint32_t tc0100scn_device::long_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (word_r(space, offset * 2, 0xffff) << 16) | word_r(space, offset * 2 + 1, 0xffff);
 }
 
-WRITE32_MEMBER( tc0100scn_device::long_w )
+void tc0100scn_device::long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{

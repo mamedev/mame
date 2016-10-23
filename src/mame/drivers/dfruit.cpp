@@ -44,25 +44,25 @@ public:
 	uint8_t m_irq_vector[3];
 	uint8_t m_irq_enable;
 
-	DECLARE_READ8_MEMBER(dfruit_rom_r);
+	uint8_t dfruit_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(dfruit_ram_0_r);
-	DECLARE_READ8_MEMBER(dfruit_ram_1_r);
-	DECLARE_READ8_MEMBER(dfruit_ram_2_r);
-	DECLARE_READ8_MEMBER(dfruit_ram_3_r);
-	DECLARE_WRITE8_MEMBER(dfruit_ram_0_w);
-	DECLARE_WRITE8_MEMBER(dfruit_ram_1_w);
-	DECLARE_WRITE8_MEMBER(dfruit_ram_2_w);
-	DECLARE_WRITE8_MEMBER(dfruit_ram_3_w);
+	uint8_t dfruit_ram_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_ram_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_ram_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_ram_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dfruit_ram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dfruit_ram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dfruit_ram_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dfruit_ram_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(dfruit_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(dfruit_rom_bank_w);
-	DECLARE_READ8_MEMBER(dfruit_ram_bank_r);
-	DECLARE_WRITE8_MEMBER(dfruit_ram_bank_w);
-	DECLARE_READ8_MEMBER(dfruit_irq_vector_r);
-	DECLARE_WRITE8_MEMBER(dfruit_irq_vector_w);
-	DECLARE_READ8_MEMBER(dfruit_irq_enable_r);
-	DECLARE_WRITE8_MEMBER(dfruit_irq_enable_w);
+	uint8_t dfruit_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dfruit_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_ram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dfruit_ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_irq_vector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dfruit_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dfruit_irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dfruit_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
@@ -90,49 +90,49 @@ void dfruit_state::screen_eof(screen_device &screen, bool state)
 	}
 }
 
-READ8_MEMBER(dfruit_state::dfruit_rom_r)
+uint8_t dfruit_state::dfruit_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	return ROM[offset + m_rom_bank * 0x2000];
 }
 
-READ8_MEMBER(dfruit_state::dfruit_rom_bank_r)
+uint8_t dfruit_state::dfruit_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(dfruit_state::dfruit_rom_bank_w)
+void dfruit_state::dfruit_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = data;
 }
 
-READ8_MEMBER(dfruit_state::dfruit_irq_vector_r)
+uint8_t dfruit_state::dfruit_irq_vector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_vector[offset];
 }
 
-WRITE8_MEMBER(dfruit_state::dfruit_irq_vector_w)
+void dfruit_state::dfruit_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_vector[offset] = data;
 }
 
-READ8_MEMBER(dfruit_state::dfruit_irq_enable_r)
+uint8_t dfruit_state::dfruit_irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_enable;
 }
 
-WRITE8_MEMBER(dfruit_state::dfruit_irq_enable_w)
+void dfruit_state::dfruit_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data;
 }
 
-READ8_MEMBER(dfruit_state::dfruit_ram_bank_r)
+uint8_t dfruit_state::dfruit_ram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_bank[offset];
 }
 
-WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
+void dfruit_state::dfruit_ram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank[offset] = data;
 }
@@ -149,14 +149,14 @@ void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;
 }
 
-READ8_MEMBER(dfruit_state::dfruit_ram_0_r) { return ram_bank_r(offset, 0); }
-READ8_MEMBER(dfruit_state::dfruit_ram_1_r) { return ram_bank_r(offset, 1); }
-READ8_MEMBER(dfruit_state::dfruit_ram_2_r) { return ram_bank_r(offset, 2); }
-READ8_MEMBER(dfruit_state::dfruit_ram_3_r) { return ram_bank_r(offset, 3); }
-WRITE8_MEMBER(dfruit_state::dfruit_ram_0_w) { ram_bank_w(offset, data, 0); }
-WRITE8_MEMBER(dfruit_state::dfruit_ram_1_w) { ram_bank_w(offset, data, 1); }
-WRITE8_MEMBER(dfruit_state::dfruit_ram_2_w) { ram_bank_w(offset, data, 2); }
-WRITE8_MEMBER(dfruit_state::dfruit_ram_3_w) { ram_bank_w(offset, data, 3); }
+uint8_t dfruit_state::dfruit_ram_0_r(address_space &space, offs_t offset, uint8_t mem_mask) { return ram_bank_r(offset, 0); }
+uint8_t dfruit_state::dfruit_ram_1_r(address_space &space, offs_t offset, uint8_t mem_mask) { return ram_bank_r(offset, 1); }
+uint8_t dfruit_state::dfruit_ram_2_r(address_space &space, offs_t offset, uint8_t mem_mask) { return ram_bank_r(offset, 2); }
+uint8_t dfruit_state::dfruit_ram_3_r(address_space &space, offs_t offset, uint8_t mem_mask) { return ram_bank_r(offset, 3); }
+void dfruit_state::dfruit_ram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { ram_bank_w(offset, data, 0); }
+void dfruit_state::dfruit_ram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { ram_bank_w(offset, data, 1); }
+void dfruit_state::dfruit_ram_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { ram_bank_w(offset, data, 2); }
+void dfruit_state::dfruit_ram_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { ram_bank_w(offset, data, 3); }
 
 static ADDRESS_MAP_START( tc0091lvc_map, AS_PROGRAM, 8, dfruit_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM

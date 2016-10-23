@@ -282,7 +282,7 @@ TODO:
 /*********************************************************************/
 // Interrupt handlers common to all SNK triple Z80 games
 
-READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
+uint8_t snk_state::snk_cpuA_nmi_trigger_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -291,12 +291,12 @@ READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
+void snk_state::snk_cpuA_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
+uint8_t snk_state::snk_cpuB_nmi_trigger_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -305,7 +305,7 @@ READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(snk_state::snk_cpuB_nmi_ack_w)
+void snk_state::snk_cpuB_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -325,14 +325,14 @@ enum
 
 /*********************************************************************/
 
-WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
+void snk_state::marvins_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_marvins_sound_busy_flag = 1;
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(snk_state::marvins_soundlatch_r)
+uint8_t snk_state::marvins_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_marvins_sound_busy_flag = 0;
 	return m_soundlatch->read(space, 0);
@@ -343,7 +343,7 @@ CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 	return m_marvins_sound_busy_flag;
 }
 
-READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
+uint8_t snk_state::marvins_sound_nmi_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
@@ -372,25 +372,25 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 }
 
 
-WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
+void snk_state::sgladiat_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
+uint8_t snk_state::sgladiat_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
 	return m_soundlatch->read(space,0);
 }
 
-READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
+uint8_t snk_state::sgladiat_sound_nmi_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
+uint8_t snk_state::sgladiat_sound_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
@@ -472,7 +472,7 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 
 
 
-WRITE8_MEMBER(snk_state::snk_soundlatch_w)
+void snk_state::snk_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
@@ -485,12 +485,12 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
 
 
 
-READ8_MEMBER(snk_state::snk_sound_status_r)
+uint8_t snk_state::snk_sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_status;
 }
 
-WRITE8_MEMBER(snk_state::snk_sound_status_w)
+void snk_state::snk_sound_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~data & 0x10)   // ack YM1 irq
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
@@ -507,19 +507,19 @@ WRITE8_MEMBER(snk_state::snk_sound_status_w)
 
 
 
-READ8_MEMBER(snk_state::tnk3_cmdirq_ack_r)
+uint8_t snk_state::tnk3_cmdirq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
+uint8_t snk_state::tnk3_ymirq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
-READ8_MEMBER(snk_state::tnk3_busy_clear_r)
+uint8_t snk_state::tnk3_busy_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	m_soundlatch->clear_w(space, 0, 0);
@@ -547,17 +547,17 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::hardflags_scrollx_w)
+void snk_state::hardflags_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hf_posx = (m_hf_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::hardflags_scrolly_w)
+void snk_state::hardflags_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hf_posy = (m_hf_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
+void snk_state::hardflags_scroll_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hf_posx = (m_hf_posx & 0xff) | ((data & 0x80) << 1);
 	m_hf_posy = (m_hf_posy & 0xff) | ((data & 0x40) << 2);
@@ -593,13 +593,13 @@ int snk_state::hardflags_check8(int num)
 		(hardflags_check(num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::hardflags1_r){ return hardflags_check8(0*8); }
-READ8_MEMBER(snk_state::hardflags2_r){ return hardflags_check8(1*8); }
-READ8_MEMBER(snk_state::hardflags3_r){ return hardflags_check8(2*8); }
-READ8_MEMBER(snk_state::hardflags4_r){ return hardflags_check8(3*8); }
-READ8_MEMBER(snk_state::hardflags5_r){ return hardflags_check8(4*8); }
-READ8_MEMBER(snk_state::hardflags6_r){ return hardflags_check8(5*8); }
-READ8_MEMBER(snk_state::hardflags7_r)
+uint8_t snk_state::hardflags1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(0*8); }
+uint8_t snk_state::hardflags2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(1*8); }
+uint8_t snk_state::hardflags3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(2*8); }
+uint8_t snk_state::hardflags4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(3*8); }
+uint8_t snk_state::hardflags5_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(4*8); }
+uint8_t snk_state::hardflags6_r(address_space &space, offs_t offset, uint8_t mem_mask){ return hardflags_check8(5*8); }
+uint8_t snk_state::hardflags7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
 	return
@@ -627,27 +627,27 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::turbocheck16_1_w)
+void snk_state::turbocheck16_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tc16_posy = (m_tc16_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck16_2_w)
+void snk_state::turbocheck16_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tc16_posx = (m_tc16_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck32_1_w)
+void snk_state::turbocheck32_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tc32_posy = (m_tc32_posy & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck32_2_w)
+void snk_state::turbocheck32_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tc32_posx = (m_tc32_posx & ~0xff) | data;
 }
 
-WRITE8_MEMBER(snk_state::turbocheck_msb_w)
+void snk_state::turbocheck_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tc16_posx = (m_tc16_posx & 0xff) | ((data & 0x80) << 1);
 	m_tc16_posy = (m_tc16_posy & 0xff) | ((data & 0x40) << 2);
@@ -685,18 +685,18 @@ int snk_state::turbofront_check8(int small, int num)
 		(turbofront_check(small, num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::turbocheck16_1_r){ return turbofront_check8(1, 0*8); }
-READ8_MEMBER(snk_state::turbocheck16_2_r){ return turbofront_check8(1, 1*8); }
-READ8_MEMBER(snk_state::turbocheck16_3_r){ return turbofront_check8(1, 2*8); }
-READ8_MEMBER(snk_state::turbocheck16_4_r){ return turbofront_check8(1, 3*8); }
-READ8_MEMBER(snk_state::turbocheck16_5_r){ return turbofront_check8(1, 4*8); }
-READ8_MEMBER(snk_state::turbocheck16_6_r){ return turbofront_check8(1, 5*8); }
-READ8_MEMBER(snk_state::turbocheck16_7_r){ return turbofront_check8(1, 6*8); }
-READ8_MEMBER(snk_state::turbocheck16_8_r){ return turbofront_check8(1, 7*8); }
-READ8_MEMBER(snk_state::turbocheck32_1_r){ return turbofront_check8(0, 0*8); }
-READ8_MEMBER(snk_state::turbocheck32_2_r){ return turbofront_check8(0, 1*8); }
-READ8_MEMBER(snk_state::turbocheck32_3_r){ return turbofront_check8(0, 2*8); }
-READ8_MEMBER(snk_state::turbocheck32_4_r){ return turbofront_check8(0, 3*8); }
+uint8_t snk_state::turbocheck16_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 0*8); }
+uint8_t snk_state::turbocheck16_2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 1*8); }
+uint8_t snk_state::turbocheck16_3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 2*8); }
+uint8_t snk_state::turbocheck16_4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 3*8); }
+uint8_t snk_state::turbocheck16_5_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 4*8); }
+uint8_t snk_state::turbocheck16_6_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 5*8); }
+uint8_t snk_state::turbocheck16_7_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 6*8); }
+uint8_t snk_state::turbocheck16_8_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(1, 7*8); }
+uint8_t snk_state::turbocheck32_1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(0, 0*8); }
+uint8_t snk_state::turbocheck32_2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(0, 1*8); }
+uint8_t snk_state::turbocheck32_3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(0, 2*8); }
+uint8_t snk_state::turbocheck32_4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return turbofront_check8(0, 3*8); }
 
 
 
@@ -748,13 +748,13 @@ CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 /************************************************************************/
 
 
-WRITE8_MEMBER(snk_state::athena_coin_counter_w)
+void snk_state::athena_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, ~data & 2);
 	machine().bookkeeping().coin_counter_w(1, ~data & 1);
 }
 
-WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
+void snk_state::ikari_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~data & 0x80)
 	{
@@ -769,13 +769,13 @@ WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
 	}
 }
 
-WRITE8_MEMBER(snk_state::tdfever_coin_counter_w)
+void snk_state::tdfever_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE8_MEMBER(snk_state::countryc_trackball_w)
+void snk_state::countryc_trackball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_countryc_trackball = data & 1;
 }

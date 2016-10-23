@@ -79,20 +79,20 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(main_bank_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(main_to_sub_w);
-	DECLARE_READ8_MEMBER(sub_to_main_r);
-	DECLARE_WRITE8_MEMBER(slot_bank_w);
-	DECLARE_READ8_MEMBER(slot_id_r);
-	DECLARE_READ8_MEMBER(main_to_sub_r);
-	DECLARE_WRITE8_MEMBER(sub_to_main_w);
-	DECLARE_WRITE8_MEMBER(colour_control_w);
-	DECLARE_WRITE8_MEMBER(kbd_row_w);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
+	void main_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_to_sub_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sub_to_main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slot_id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t main_to_sub_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sub_to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colour_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	INTERRUPT_GEN_MEMBER(fp1100_vblank_irq);
@@ -178,13 +178,13 @@ d0 - Package select
 d1 - Bank select (at boot time)
 other bits not used
 */
-WRITE8_MEMBER( fp1100_state::main_bank_w )
+void fp1100_state::main_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry( BIT(data,1)); //(1) RAM (0) ROM
 	m_slot_num = (m_slot_num & 3) | ((data & 1) << 2); //??
 }
 
-WRITE8_MEMBER( fp1100_state::irq_mask_w )
+void fp1100_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // force resync
 	m_irq_mask = data;
@@ -192,7 +192,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 	if (LOG) printf("%s: IRQmask=%X\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER( fp1100_state::main_to_sub_w )
+void fp1100_state::main_to_sub_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
@@ -200,7 +200,7 @@ WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 	if (LOG) printf("%s: From main:%X\n",machine().describe_context(),data);
 }
 
-READ8_MEMBER( fp1100_state::sub_to_main_r )
+uint8_t fp1100_state::sub_to_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -208,12 +208,12 @@ READ8_MEMBER( fp1100_state::sub_to_main_r )
 	return m_main_latch;
 }
 
-WRITE8_MEMBER( fp1100_state::slot_bank_w )
+void fp1100_state::slot_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slot_num = (data & 3) | (m_slot_num & 4);
 }
 
-READ8_MEMBER( fp1100_state::slot_id_r )
+uint8_t fp1100_state::slot_id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//return 0xff;
 	return m_slot[m_slot_num & 7].id;
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START(fp1100_io, AS_IO, 8, fp1100_state )
 	AM_RANGE(0xffc0, 0xffff) AM_WRITE(main_to_sub_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER( fp1100_state::main_to_sub_r )
+uint8_t fp1100_state::main_to_sub_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
@@ -243,7 +243,7 @@ READ8_MEMBER( fp1100_state::main_to_sub_r )
 	return m_sub_latch;
 }
 
-WRITE8_MEMBER( fp1100_state::sub_to_main_w )
+void fp1100_state::sub_to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 //  m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
@@ -257,7 +257,7 @@ d3     - not used
 d4,5,6 - colour of cursor; or display area (B,R,G) (see d7)
 d7     - 1=display area; 0=cursor
 */
-WRITE8_MEMBER( fp1100_state::colour_control_w )
+void fp1100_state::colour_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data = BITSWAP8(data, 7, 4, 6, 5, 3, 0, 2, 1);  // change BRG to RGB
 
@@ -278,7 +278,7 @@ d4       - Beeper
 d5       - "3state buffer of key data line (1=open, 0=closed)"
 d6,7     - not used
 */
-WRITE8_MEMBER( fp1100_state::kbd_row_w )
+void fp1100_state::kbd_row_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbd_row = data & 15;
 	m_beep->set_state(BIT(data, 4));
@@ -306,7 +306,7 @@ d6     - CMT baud rate (1=300; 0=1200)
 d7     - CMT load clock
 The SO pin is Serial Output to CMT (1=2400Hz; 0=1200Hz)
 */
-WRITE8_MEMBER( fp1100_state::porta_w )
+void fp1100_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7801.porta = data;
 
@@ -314,7 +314,7 @@ WRITE8_MEMBER( fp1100_state::porta_w )
 		memset(m_p_videoram, 0, 0xc000);
 }
 
-READ8_MEMBER( fp1100_state::portb_r )
+uint8_t fp1100_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_keyboard[m_kbd_row]->read() ^ 0xff;
 	//m_subcpu->set_input_line(UPD7810_INTF0, BIT(data, 7) ? HOLD_LINE : CLEAR_LINE);
@@ -327,7 +327,7 @@ d1 - Centronics error
 d2 - CMT load input clock
 d7 - CMT load serial data
 */
-READ8_MEMBER( fp1100_state::portc_r )
+uint8_t fp1100_state::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_upd7801.portc & 0x78) | m_centronics_busy;
 }
@@ -338,7 +338,7 @@ d4 - Centronics port is used for input or output
 d5 - CMT relay
 d6 - Centronics strobe
 */
-WRITE8_MEMBER( fp1100_state::portc_w )
+void fp1100_state::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_irq_mask, 4))
 		m_maincpu->set_input_line_and_vector(0, BIT(data, 3) ? CLEAR_LINE : HOLD_LINE, 0xf0);

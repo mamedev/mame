@@ -20,27 +20,27 @@
 
 const device_type SEIBU_COP_BOOTLEG = &device_creator<seibu_cop_bootleg_device>;
 
-READ16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_r)
+uint16_t seibu_cop_bootleg_device::reg_lo_addr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_reg[offset] & 0xffff;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_r)
+uint16_t seibu_cop_bootleg_device::reg_hi_addr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_reg[offset] >> 16;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::reg_lo_addr_w)
+void seibu_cop_bootleg_device::reg_lo_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_reg[offset] = (m_reg[offset] & 0xffff0000) | (data & 0xffff);
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::reg_hi_addr_w)
+void seibu_cop_bootleg_device::reg_hi_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_reg[offset] = (m_reg[offset] & 0xffff) | (data << 16);
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
+void seibu_cop_bootleg_device::cmd_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("%04x %08x %08x\n",data,m_reg[0],m_reg[1]);
 	uint8_t offs;
@@ -204,27 +204,27 @@ WRITE16_MEMBER(seibu_cop_bootleg_device::cmd_trigger_w)
 
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::status_r)
+uint16_t seibu_cop_bootleg_device::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_status;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::dist_r)
+uint16_t seibu_cop_bootleg_device::dist_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dist;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::angle_r)
+uint16_t seibu_cop_bootleg_device::angle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_angle;
 }
 
-READ16_MEMBER(seibu_cop_bootleg_device::d104_move_r)
+uint16_t seibu_cop_bootleg_device::d104_move_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_d104_move_offset >> offset*16;
 }
 
-WRITE16_MEMBER(seibu_cop_bootleg_device::d104_move_w)
+void seibu_cop_bootleg_device::d104_move_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 1)
 		m_d104_move_offset = (m_d104_move_offset & 0xffff0000) | (data & 0xffff);
@@ -303,12 +303,12 @@ inline void seibu_cop_bootleg_device::write_word(offs_t address, uint16_t data)
 	space().write_word(address << 1, data);
 }
 
-READ16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_r )
+uint16_t seibu_cop_bootleg_device::copdxbl_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( seibu_cop_bootleg_device::copdxbl_0_w )
+void seibu_cop_bootleg_device::copdxbl_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	write_word(offset,data);
 }

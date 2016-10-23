@@ -20,7 +20,7 @@
 #include "includes/srumbler.h"
 
 
-WRITE8_MEMBER(srumbler_state::bankswitch_w)
+void srumbler_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  banking is controlled by two PROMs. 0000-4fff is mapped to the same

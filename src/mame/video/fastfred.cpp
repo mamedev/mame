@@ -112,14 +112,14 @@ void fastfred_state::video_start_fastfred()
  *
  *************************************/
 
-WRITE8_MEMBER(fastfred_state::fastfred_videoram_w )
+void fastfred_state::fastfred_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
+void fastfred_state::fastfred_attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_attributesram[offset] != data)
 	{
@@ -142,7 +142,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
+void fastfred_state::fastfred_charbank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t new_data = (m_charbank & 0x0200) | ((data & 0x01) << 8);
 
@@ -154,7 +154,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
 	}
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
+void fastfred_state::fastfred_charbank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t new_data = (m_charbank & 0x0100) | ((data & 0x01) << 9);
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
 }
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
+void fastfred_state::fastfred_colorbank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t new_data = (m_colorbank & 0x10) | ((data & 0x01) << 3);
 
@@ -179,7 +179,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
 	}
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
+void fastfred_state::fastfred_colorbank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t new_data = (m_colorbank & 0x08) | ((data & 0x01) << 4);
 
@@ -193,7 +193,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
 
 
 
-WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_x_w )
+void fastfred_state::fastfred_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen_x() != (data & 0x01))
 	{
@@ -203,7 +203,7 @@ WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_x_w )
 	}
 }
 
-WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_y_w )
+void fastfred_state::fastfred_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen_y() != (data & 0x01))
 	{
@@ -316,13 +316,13 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 	SET_TILE_INFO_MEMBER(3, tile_index & 0x1ff, 0, 0);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )
+void fastfred_state::imago_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_imago_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_charbank_w )
+void fastfred_state::imago_charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_charbank != data )
 	{

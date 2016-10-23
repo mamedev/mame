@@ -49,8 +49,8 @@ public:
 	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<upd71071_device &>(device).m_out_dack_3_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(set_hreq);
 	DECLARE_WRITE_LINE_MEMBER(set_eop);
 

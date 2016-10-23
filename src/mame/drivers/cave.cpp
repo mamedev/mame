@@ -167,7 +167,7 @@ WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
 
 /* Reads the cause of the interrupt and clears the state */
 
-READ16_MEMBER(cave_state::cave_irq_cause_r)
+uint16_t cave_state::cave_irq_cause_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0x0003;
 
@@ -209,7 +209,7 @@ READ16_MEMBER(cave_state::cave_irq_cause_r)
 /*  We need a FIFO buffer for sailormn, where the inter-CPUs
     communication is *really* tight */
 
-READ8_MEMBER(cave_state::soundflags_r)
+uint8_t cave_state::soundflags_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
@@ -218,7 +218,7 @@ READ8_MEMBER(cave_state::soundflags_r)
 return 0;
 }
 
-READ16_MEMBER(cave_state::soundflags_ack_r)
+uint16_t cave_state::soundflags_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 0 is low: can write command
 	// bit 1 is low: can read answer
@@ -229,7 +229,7 @@ READ16_MEMBER(cave_state::soundflags_ack_r)
 }
 
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
-WRITE16_MEMBER(cave_state::sound_cmd_w)
+void cave_state::sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  m_sound_flag1 = 1;
 //  m_sound_flag2 = 1;
@@ -239,21 +239,21 @@ WRITE16_MEMBER(cave_state::sound_cmd_w)
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
-READ8_MEMBER(cave_state::soundlatch_lo_r)
+uint8_t cave_state::soundlatch_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  m_sound_flag1 = 0;
 	return m_soundlatch->read(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
-READ8_MEMBER(cave_state::soundlatch_hi_r)
+uint8_t cave_state::soundlatch_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  m_sound_flag2 = 0;
 	return m_soundlatch->read(space, offset, 0xff00) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
-READ16_MEMBER(cave_state::soundlatch_ack_r)
+uint16_t cave_state::soundlatch_ack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_soundbuf_len > 0)
 	{
@@ -271,7 +271,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 
 
 /* Sound CPU: write latch for the main CPU (acknowledge) */
-WRITE8_MEMBER(cave_state::soundlatch_ack_w)
+void cave_state::soundlatch_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbuf_data[m_soundbuf_len] = data;
 	if (m_soundbuf_len < 32)
@@ -290,7 +290,7 @@ WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
+void cave_state::cave_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0xfe00)
 		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
@@ -313,13 +313,13 @@ WRITE16_MEMBER(cave_state::cave_eeprom_msb_w)
 	}
 }
 
-WRITE16_MEMBER(cave_state::sailormn_eeprom_msb_w)
+void cave_state::sailormn_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	sailormn_tilebank_w(data & 0x0100);
 	cave_eeprom_msb_w(space, offset, data & ~0x0100, mem_mask);
 }
 
-WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
+void cave_state::hotdogst_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)  // even address
 	{
@@ -334,7 +334,7 @@ WRITE16_MEMBER(cave_state::hotdogst_eeprom_msb_w)
 	}
 }
 
-WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
+void cave_state::ppsatan_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x000f)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -355,7 +355,7 @@ WRITE16_MEMBER(cave_state::ppsatan_eeprom_msb_w)
 }
 
 
-WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
+void cave_state::cave_eeprom_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x00ef)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -379,7 +379,7 @@ WRITE16_MEMBER(cave_state::cave_eeprom_lsb_w)
 }
 
 /*  - No eeprom or lockouts */
-WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
+void cave_state::gaia_coin_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
@@ -390,7 +390,7 @@ WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
 
 /*  - No coin lockouts
     - Writing 0xcf00 shouldn't send a 1 bit to the eeprom   */
-WRITE16_MEMBER(cave_state::metmqstr_eeprom_msb_w)
+void cave_state::metmqstr_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0xff00)
 		logerror("%s: Unknown EEPROM bit written %04X\n", machine().describe_context(), data);
@@ -480,7 +480,7 @@ ADDRESS_MAP_END
                                     Donpachi
 ***************************************************************************/
 
-READ16_MEMBER(cave_state::donpachi_videoregs_r)
+uint16_t cave_state::donpachi_videoregs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -635,7 +635,7 @@ void cave_state::show_leds()
 #endif
 }
 
-WRITE16_MEMBER(cave_state::korokoro_leds_w)
+void cave_state::korokoro_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_leds[0]);
 
@@ -659,7 +659,7 @@ WRITE16_MEMBER(cave_state::korokoro_leds_w)
 }
 
 
-WRITE16_MEMBER(cave_state::korokoro_eeprom_msb_w)
+void cave_state::korokoro_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x7000)
 	{
@@ -785,7 +785,7 @@ ADDRESS_MAP_END
                                Poka Poka Satan
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::ppsatan_io_mux_w)
+void cave_state::ppsatan_io_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ppsatan_io_mux);
 }
@@ -829,16 +829,16 @@ uint16_t cave_state::ppsatan_touch_r(int player)
 	return ret_x | (ret_y << 8);
 }
 
-READ16_MEMBER(cave_state::ppsatan_touch1_r)
+uint16_t cave_state::ppsatan_touch1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ppsatan_touch_r(0);
 }
-READ16_MEMBER(cave_state::ppsatan_touch2_r)
+uint16_t cave_state::ppsatan_touch2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ppsatan_touch_r(1);
 }
 
-WRITE16_MEMBER(cave_state::ppsatan_out_w)
+void cave_state::ppsatan_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -908,7 +908,7 @@ ADDRESS_MAP_END
                                 Power Instinct 2
 ***************************************************************************/
 
-READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
+uint16_t cave_state::pwrinst2_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ~8 + ((m_eeprom->do_read() & 1) ? 8 : 0);
 }
@@ -929,10 +929,10 @@ inline void cave_state::vctrl_w(address_space &space, offs_t offset, uint16_t da
 	}
 	COMBINE_DATA(&VCTRL[offset]);
 }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_0_w){ vctrl_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_1_w){ vctrl_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_2_w){ vctrl_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(cave_state::pwrinst2_vctrl_3_w){ vctrl_w(space, offset, data, mem_mask, 3); }
+void cave_state::pwrinst2_vctrl_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vctrl_w(space, offset, data, mem_mask, 0); }
+void cave_state::pwrinst2_vctrl_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vctrl_w(space, offset, data, mem_mask, 1); }
+void cave_state::pwrinst2_vctrl_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vctrl_w(space, offset, data, mem_mask, 2); }
+void cave_state::pwrinst2_vctrl_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vctrl_w(space, offset, data, mem_mask, 3); }
 
 static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                                                     // ROM
@@ -964,7 +964,7 @@ ADDRESS_MAP_END
                                 Sailor Moon
 ***************************************************************************/
 
-READ16_MEMBER(cave_state::sailormn_input0_r)
+uint16_t cave_state::sailormn_input0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  watchdog_reset16_r(0, 0);    // written too rarely for mame.
 	return ioport("IN0")->read();
@@ -1004,7 +1004,7 @@ ADDRESS_MAP_END
                             Tobikose! Jumpman
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
+void cave_state::tjumpman_eeprom_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x0038)
 		logerror("%s: Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -1022,7 +1022,7 @@ WRITE16_MEMBER(cave_state::tjumpman_eeprom_lsb_w)
 	}
 }
 
-WRITE16_MEMBER(cave_state::tjumpman_leds_w)
+void cave_state::tjumpman_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1068,7 +1068,7 @@ ADDRESS_MAP_END
                                    Pac-Slot
 ***************************************************************************/
 
-WRITE16_MEMBER(cave_state::pacslot_leds_w)
+void cave_state::pacslot_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1149,7 +1149,7 @@ ADDRESS_MAP_END
                                 Hotdog Storm
 ***************************************************************************/
 
-WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
+void cave_state::hotdogst_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
@@ -1157,7 +1157,7 @@ WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 	membank("z80bank")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(cave_state::hotdogst_okibank_w)
+void cave_state::hotdogst_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
@@ -1186,7 +1186,7 @@ ADDRESS_MAP_END
                                 Mazinger Z
 ***************************************************************************/
 
-WRITE8_MEMBER(cave_state::mazinger_rombank_w)
+void cave_state::mazinger_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
@@ -1217,7 +1217,7 @@ ADDRESS_MAP_END
                                 Metamoqester
 ***************************************************************************/
 
-WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
+void cave_state::metmqstr_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x0f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
@@ -1225,7 +1225,7 @@ WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 	membank("z80bank")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(cave_state::metmqstr_okibank_w)
+void cave_state::metmqstr_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
@@ -1233,7 +1233,7 @@ WRITE8_MEMBER(cave_state::metmqstr_okibank_w)
 	membank("okibank2")->set_entry(bank2);
 }
 
-WRITE8_MEMBER(cave_state::metmqstr_oki2bank_w)
+void cave_state::metmqstr_oki2bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
@@ -1265,7 +1265,7 @@ ADDRESS_MAP_END
                                 Power Instinct 2
 ***************************************************************************/
 
-WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
+void cave_state::pwrinst2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x07)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
@@ -1297,7 +1297,7 @@ ADDRESS_MAP_END
                                 Sailor Moon
 ***************************************************************************/
 
-WRITE8_MEMBER(cave_state::sailormn_rombank_w)
+void cave_state::sailormn_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & ~0x1f)
 		logerror("CPU #1 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
@@ -1305,7 +1305,7 @@ WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 	membank("z80bank")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(cave_state::sailormn_okibank_w)
+void cave_state::sailormn_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
@@ -1313,7 +1313,7 @@ WRITE8_MEMBER(cave_state::sailormn_okibank_w)
 	membank("okibank2")->set_entry(bank2);
 }
 
-WRITE8_MEMBER(cave_state::sailormn_oki2bank_w)
+void cave_state::sailormn_oki2bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;

@@ -313,7 +313,7 @@ WRITE_LINE_MEMBER( pc_kbd_microsoft_natural_device::data_write )
 }
 
 
-READ8_MEMBER( pc_kbd_microsoft_natural_device::p0_read )
+uint8_t pc_kbd_microsoft_natural_device::p0_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -404,25 +404,25 @@ READ8_MEMBER( pc_kbd_microsoft_natural_device::p0_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_microsoft_natural_device::p0_write )
+void pc_kbd_microsoft_natural_device::p0_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p0 = data;
 }
 
 
-WRITE8_MEMBER( pc_kbd_microsoft_natural_device::p1_write )
+void pc_kbd_microsoft_natural_device::p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 }
 
 
-WRITE8_MEMBER( pc_kbd_microsoft_natural_device::p2_write )
+void pc_kbd_microsoft_natural_device::p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
 
 
-READ8_MEMBER( pc_kbd_microsoft_natural_device::p3_read )
+uint8_t pc_kbd_microsoft_natural_device::p3_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p3 & ~0x21;
 
@@ -436,7 +436,7 @@ READ8_MEMBER( pc_kbd_microsoft_natural_device::p3_read )
 }
 
 
-WRITE8_MEMBER( pc_kbd_microsoft_natural_device::p3_write )
+void pc_kbd_microsoft_natural_device::p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_pc_kbdc )
 	{

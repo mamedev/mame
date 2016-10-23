@@ -253,12 +253,12 @@ WRITE_LINE_MEMBER(bbc_acorn8271_device::fdc_intrq_w)
 }
 
 
-READ8_MEMBER(bbc_acorn1770_device::wd1770l_read)
+uint8_t bbc_acorn1770_device::wd1770l_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_acorn1770_device::wd1770l_write)
+void bbc_acorn1770_device::wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

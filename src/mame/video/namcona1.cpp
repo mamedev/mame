@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 
 /*************************************************************************/
 
-WRITE16_MEMBER(namcona1_state::videoram_w)
+void namcona1_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_videoram[offset] );
 	if( offset<0x8000/2 )
@@ -110,7 +110,7 @@ void namcona1_state::UpdatePalette( int offset )
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE16_MEMBER(namcona1_state::paletteram_w)
+void namcona1_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_paletteram[offset] );
 	if( m_vreg[0x8e/2] )
@@ -124,7 +124,7 @@ WRITE16_MEMBER(namcona1_state::paletteram_w)
 }
 
 
-READ16_MEMBER(namcona1_state::gfxram_r)
+uint16_t namcona1_state::gfxram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t type = m_vreg[0x0c/2];
 	if( type == 0x03 )
@@ -142,7 +142,7 @@ READ16_MEMBER(namcona1_state::gfxram_r)
 	return 0x0000;
 } /* gfxram_r */
 
-WRITE16_MEMBER(namcona1_state::gfxram_w)
+void namcona1_state::gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t type = m_vreg[0x0c/2];
 	uint16_t old_word;

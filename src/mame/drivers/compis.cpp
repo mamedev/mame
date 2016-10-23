@@ -119,27 +119,27 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER( pcs6_0_1_r );
-	DECLARE_WRITE16_MEMBER( pcs6_0_1_w );
-	DECLARE_READ16_MEMBER( pcs6_2_3_r );
-	DECLARE_WRITE16_MEMBER( pcs6_2_3_w );
-	DECLARE_READ16_MEMBER( pcs6_4_5_r );
-	DECLARE_WRITE16_MEMBER( pcs6_4_5_w );
-	DECLARE_READ16_MEMBER( pcs6_6_7_r );
-	DECLARE_WRITE16_MEMBER( pcs6_6_7_w );
-	DECLARE_READ16_MEMBER( pcs6_8_9_r );
-	DECLARE_WRITE16_MEMBER( pcs6_8_9_w );
-	DECLARE_READ16_MEMBER( pcs6_10_11_r );
-	DECLARE_WRITE16_MEMBER( pcs6_10_11_w );
-	DECLARE_READ16_MEMBER( pcs6_12_13_r );
-	DECLARE_WRITE16_MEMBER( pcs6_12_13_w );
-	DECLARE_READ16_MEMBER( pcs6_14_15_r );
-	DECLARE_WRITE16_MEMBER( pcs6_14_15_w );
+	uint16_t pcs6_0_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_0_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_2_3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_2_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_4_5_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_4_5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_6_7_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_6_7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_8_9_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_8_9_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_10_11_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_10_11_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_12_13_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_12_13_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pcs6_14_15_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcs6_14_15_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER( compis_irq_callback );
+	uint8_t compis_irq_callback(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
 	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
@@ -163,7 +163,7 @@ public:
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( compis_state::pcs6_0_1_r )
+uint16_t compis_state::pcs6_0_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -175,7 +175,7 @@ READ16_MEMBER( compis_state::pcs6_0_1_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_0_1_w )
+void compis_state::pcs6_0_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -189,7 +189,7 @@ WRITE16_MEMBER( compis_state::pcs6_0_1_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_2_3_r )
+uint16_t compis_state::pcs6_2_3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -208,7 +208,7 @@ READ16_MEMBER( compis_state::pcs6_2_3_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_2_3_w )
+void compis_state::pcs6_2_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -226,7 +226,7 @@ WRITE16_MEMBER( compis_state::pcs6_2_3_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_4_5_r )
+uint16_t compis_state::pcs6_4_5_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -241,7 +241,7 @@ READ16_MEMBER( compis_state::pcs6_4_5_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_4_5_w )
+void compis_state::pcs6_4_5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -254,7 +254,7 @@ WRITE16_MEMBER( compis_state::pcs6_4_5_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_6_7_r )
+uint16_t compis_state::pcs6_6_7_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -269,7 +269,7 @@ READ16_MEMBER( compis_state::pcs6_6_7_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_6_7_w )
+void compis_state::pcs6_6_7_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -282,7 +282,7 @@ WRITE16_MEMBER( compis_state::pcs6_6_7_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_8_9_r )
+uint16_t compis_state::pcs6_8_9_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -294,7 +294,7 @@ READ16_MEMBER( compis_state::pcs6_8_9_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_8_9_w )
+void compis_state::pcs6_8_9_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -306,7 +306,7 @@ WRITE16_MEMBER( compis_state::pcs6_8_9_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_10_11_r )
+uint16_t compis_state::pcs6_10_11_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -318,7 +318,7 @@ READ16_MEMBER( compis_state::pcs6_10_11_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_10_11_w )
+void compis_state::pcs6_10_11_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -330,7 +330,7 @@ WRITE16_MEMBER( compis_state::pcs6_10_11_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_12_13_r )
+uint16_t compis_state::pcs6_12_13_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -342,7 +342,7 @@ READ16_MEMBER( compis_state::pcs6_12_13_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_12_13_w )
+void compis_state::pcs6_12_13_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -354,7 +354,7 @@ WRITE16_MEMBER( compis_state::pcs6_12_13_w )
 	}
 }
 
-READ16_MEMBER( compis_state::pcs6_14_15_r )
+uint16_t compis_state::pcs6_14_15_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -366,7 +366,7 @@ READ16_MEMBER( compis_state::pcs6_14_15_r )
 	}
 }
 
-WRITE16_MEMBER( compis_state::pcs6_14_15_w )
+void compis_state::pcs6_14_15_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -560,7 +560,7 @@ INPUT_PORTS_END
 //  I80186_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( compis_state::compis_irq_callback )
+uint8_t compis_state::compis_irq_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_osp->inta_r();
 }
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER(compis_state::write_centronics_select)
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( compis_state::ppi_pb_r )
+uint8_t compis_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -649,7 +649,7 @@ READ8_MEMBER( compis_state::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( compis_state::ppi_pc_w )
+void compis_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

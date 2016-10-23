@@ -584,7 +584,7 @@ void abc99_device::txd_w(int state)
 //  z2_bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z2_led_w )
+void abc99_device::z2_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_led_en) return;
 
@@ -603,7 +603,7 @@ WRITE8_MEMBER( abc99_device::z2_led_w )
 //  z2_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z2_p1_w )
+void abc99_device::z2_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -647,7 +647,7 @@ WRITE8_MEMBER( abc99_device::z2_p1_w )
 //  z2_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_p2_r )
+uint8_t abc99_device::z2_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -674,7 +674,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 //  z2_t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_t0_r )
+uint8_t abc99_device::z2_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1; // 0=mouse connected, 1=no mouse
 }
@@ -684,7 +684,7 @@ READ8_MEMBER( abc99_device::z2_t0_r )
 //  z2_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z2_t1_r )
+uint8_t abc99_device::z2_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t1_z2;
 }
@@ -694,7 +694,7 @@ READ8_MEMBER( abc99_device::z2_t1_r )
 //  z5_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z5_p1_r )
+uint8_t abc99_device::z5_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -727,7 +727,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 //  z5_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc99_device::z5_p2_w )
+void abc99_device::z5_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -776,7 +776,7 @@ WRITE8_MEMBER( abc99_device::z5_p2_w )
 //  z5_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc99_device::z5_t1_r )
+uint8_t abc99_device::z5_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t1_z5;
 }

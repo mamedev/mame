@@ -103,7 +103,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-WRITE8_MEMBER(yunsun16_state::sound_bank_w)
+void yunsun16_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("okibank")->set_entry(data & 3);
 }
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(yunsun16_state::magicbub_sound_command_w)
+void yunsun16_state::magicbub_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

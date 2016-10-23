@@ -120,14 +120,14 @@ SetTilemapVideoram( int offset, uint16_t newword )
 	}
 } /* SetTilemapVideoram */
 
-WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_w )
+void namcos2_shared_state::c123_tilemap_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = mTilemapInfo.videoram[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapVideoram( offset, newword );
 }
 
-READ16_MEMBER( namcos2_shared_state::c123_tilemap_videoram_r )
+uint16_t namcos2_shared_state::c123_tilemap_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mTilemapInfo.videoram[offset];
 }
@@ -183,14 +183,14 @@ SetTilemapControl( int offset, uint16_t newword )
 	}
 } /* SetTilemapControl */
 
-WRITE16_MEMBER( namcos2_shared_state::c123_tilemap_control_w )
+void namcos2_shared_state::c123_tilemap_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = mTilemapInfo.control[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapControl( offset, newword );
 }
 
-READ16_MEMBER( namcos2_shared_state::c123_tilemap_control_r )
+uint16_t namcos2_shared_state::c123_tilemap_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mTilemapInfo.control[offset];
 }
@@ -555,11 +555,11 @@ void namcos2_state::draw_sprites_metalhawk(screen_device &screen, bitmap_ind16 &
 
 /**************************************************************************************/
 
-WRITE16_MEMBER( namcos2_shared_state::c355_obj_position_w )
+void namcos2_shared_state::c355_obj_position_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c355_obj_position[offset]);
 }
-READ16_MEMBER( namcos2_shared_state::c355_obj_position_r )
+uint16_t namcos2_shared_state::c355_obj_position_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c355_obj_position[offset];
 }
@@ -865,12 +865,12 @@ void namcos2_shared_state::c355_obj_draw(screen_device &screen, bitmap_rgb32 &bi
 		c355_obj_draw_list(screen, bitmap, cliprect, pri, &m_c355_obj_ram[0x14000/2], &m_c355_obj_ram[0x10000/2]);
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c355_obj_ram_w )
+void namcos2_shared_state::c355_obj_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c355_obj_ram[offset]);
 }
 
-READ16_MEMBER( namcos2_shared_state::c355_obj_ram_r )
+uint16_t namcos2_shared_state::c355_obj_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c355_obj_ram[offset];
 }
@@ -1154,22 +1154,22 @@ void namcos2_shared_state::c169_roz_draw(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_control_r )
+uint16_t namcos2_shared_state::c169_roz_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_control[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_control_w )
+void namcos2_shared_state::c169_roz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c169_roz_control[offset]);
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_bank_r )
+uint16_t namcos2_shared_state::c169_roz_bank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_bank[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
+void namcos2_shared_state::c169_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_c169_roz_bank[offset];
 	COMBINE_DATA(&m_c169_roz_bank[offset]);
@@ -1178,12 +1178,12 @@ WRITE16_MEMBER( namcos2_shared_state::c169_roz_bank_w )
 			elem->mark_all_dirty();
 }
 
-READ16_MEMBER( namcos2_shared_state::c169_roz_videoram_r )
+uint16_t namcos2_shared_state::c169_roz_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_c169_roz_videoram[offset];
 }
 
-WRITE16_MEMBER( namcos2_shared_state::c169_roz_videoram_w )
+void namcos2_shared_state::c169_roz_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_c169_roz_videoram[offset]);
 	for (auto & elem : m_c169_roz_tilemap)

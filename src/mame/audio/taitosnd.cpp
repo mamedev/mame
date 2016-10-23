@@ -105,7 +105,7 @@ void tc0140syt_device::update_nmi()
 //  MASTER SIDE
 //-------------------------------------------------
 
-WRITE8_MEMBER( tc0140syt_device::master_port_w )
+void tc0140syt_device::master_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 	m_mainmode = data;
@@ -116,7 +116,7 @@ WRITE8_MEMBER( tc0140syt_device::master_port_w )
 	}
 }
 
-WRITE8_MEMBER( tc0140syt_device::master_comm_w )
+void tc0140syt_device::master_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
 	data &= 0x0f; /* this is important, otherwise ballbros won't work */
@@ -153,7 +153,7 @@ WRITE8_MEMBER( tc0140syt_device::master_comm_w )
 	}
 }
 
-READ8_MEMBER( tc0140syt_device::master_comm_r )
+uint8_t tc0140syt_device::master_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(); // let slavecpu catch up (after we return and the main cpu finishes what it's doing)
 	uint8_t res = 0;
@@ -194,7 +194,7 @@ READ8_MEMBER( tc0140syt_device::master_comm_r )
 //  SLAVE SIDE
 //-------------------------------------------------
 
-WRITE8_MEMBER( tc0140syt_device::slave_port_w )
+void tc0140syt_device::slave_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 	m_submode = data;
@@ -205,7 +205,7 @@ WRITE8_MEMBER( tc0140syt_device::slave_port_w )
 	}
 }
 
-WRITE8_MEMBER( tc0140syt_device::slave_comm_w )
+void tc0140syt_device::slave_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 0x0f;
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER( tc0140syt_device::slave_comm_w )
 	}
 }
 
-READ8_MEMBER( tc0140syt_device::slave_comm_r )
+uint8_t tc0140syt_device::slave_comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0;
 

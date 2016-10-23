@@ -11,7 +11,7 @@
 #include "includes/opwolf.h"
 
 
-WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
+void opwolf_state::opwolf_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{

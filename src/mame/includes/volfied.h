@@ -43,17 +43,17 @@ public:
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE16_MEMBER(volfied_cchip_ctrl_w);
-	DECLARE_WRITE16_MEMBER(volfied_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(volfied_cchip_ram_w);
-	DECLARE_READ16_MEMBER(volfied_cchip_ctrl_r);
-	DECLARE_READ16_MEMBER(volfied_cchip_ram_r);
-	DECLARE_READ16_MEMBER(volfied_video_ram_r);
-	DECLARE_WRITE16_MEMBER(volfied_video_ram_w);
-	DECLARE_WRITE16_MEMBER(volfied_video_ctrl_w);
-	DECLARE_READ16_MEMBER(volfied_video_ctrl_r);
-	DECLARE_WRITE16_MEMBER(volfied_video_mask_w);
-	DECLARE_WRITE16_MEMBER(volfied_sprite_ctrl_w);
+	void volfied_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void volfied_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void volfied_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t volfied_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t volfied_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t volfied_video_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void volfied_video_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void volfied_video_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t volfied_video_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void volfied_video_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void volfied_sprite_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

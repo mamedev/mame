@@ -15,15 +15,15 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(ampoker2_port30_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port31_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port32_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port33_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port34_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port35_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_port36_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_watchdog_reset_w);
-	DECLARE_WRITE8_MEMBER(ampoker2_videoram_w);
+	void ampoker2_port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port32_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port33_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port35_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_port36_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ampoker2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_rabbitpk();
 	void init_piccolop();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

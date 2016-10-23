@@ -34,11 +34,11 @@ public:
 	uint8_t      m_objon;
 	uint8_t      m_bgon;
 	uint8_t      m_sprite3bank;
-	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
-	DECLARE_WRITE8_MEMBER(gunsmoke_videoram_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_colorram_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_c804_w);
-	DECLARE_WRITE8_MEMBER(gunsmoke_d806_w);
+	uint8_t gunsmoke_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gunsmoke_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunsmoke_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunsmoke_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gunsmoke_d806_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

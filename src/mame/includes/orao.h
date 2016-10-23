@@ -25,8 +25,8 @@ public:
 		m_beep(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(orao_io_r);
-	DECLARE_WRITE8_MEMBER(orao_io_w);
+	uint8_t orao_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void orao_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_orao();
 	void init_orao103();
 	virtual void machine_reset() override;

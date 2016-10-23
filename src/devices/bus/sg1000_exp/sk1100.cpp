@@ -213,7 +213,7 @@ void sega_sk1100_device::device_start()
 //  peripheral_r - keyboard read
 //-------------------------------------------------
 
-READ8_MEMBER(sega_sk1100_device::peripheral_r)
+uint8_t sega_sk1100_device::peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, offset & 0x03);
 }
@@ -223,7 +223,7 @@ READ8_MEMBER(sega_sk1100_device::peripheral_r)
 //  peripheral_w - keyboard write
 //-------------------------------------------------
 
-WRITE8_MEMBER(sega_sk1100_device::peripheral_w)
+void sega_sk1100_device::peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, offset & 0x03, data);
 }
@@ -239,7 +239,7 @@ bool sega_sk1100_device::is_readable(uint8_t offset)
     I8255 INTERFACE
 -------------------------------------------------*/
 
-READ8_MEMBER( sega_sk1100_device::ppi_pa_r )
+uint8_t sega_sk1100_device::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -257,7 +257,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pa_r )
 	return m_pa[m_keylatch]->read();
 }
 
-READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
+uint8_t sega_sk1100_device::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description
@@ -287,7 +287,7 @@ READ8_MEMBER( sega_sk1100_device::ppi_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sega_sk1100_device::ppi_pc_w )
+void sega_sk1100_device::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    Signal  Description

@@ -216,7 +216,7 @@ void hp98035_io_card::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-READ16_MEMBER(hp98035_io_card::reg_r)
+uint16_t hp98035_io_card::reg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res;
 
@@ -249,7 +249,7 @@ READ16_MEMBER(hp98035_io_card::reg_r)
 	return res;
 }
 
-WRITE16_MEMBER(hp98035_io_card::reg_w)
+void hp98035_io_card::reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	bool new_inten;
 

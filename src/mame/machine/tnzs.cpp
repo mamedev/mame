@@ -20,7 +20,7 @@
 
 
 
-READ8_MEMBER(tnzs_state::mcu_tnzs_r)
+uint8_t tnzs_state::mcu_tnzs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -32,7 +32,7 @@ READ8_MEMBER(tnzs_state::mcu_tnzs_r)
 	return data;
 }
 
-WRITE8_MEMBER(tnzs_state::mcu_tnzs_w)
+void tnzs_state::mcu_tnzs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("PC %04x: write %02x to mcu $c00%01x\n", space.device().safe_pcbase(), data, offset);
 
@@ -40,7 +40,7 @@ WRITE8_MEMBER(tnzs_state::mcu_tnzs_w)
 }
 
 
-READ8_MEMBER(tnzs_state::tnzs_port1_r)
+uint8_t tnzs_state::tnzs_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 
@@ -57,7 +57,7 @@ READ8_MEMBER(tnzs_state::tnzs_port1_r)
 	return data;
 }
 
-READ8_MEMBER(tnzs_state::tnzs_port2_r)
+uint8_t tnzs_state::tnzs_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_in2->read();
 
@@ -66,7 +66,7 @@ READ8_MEMBER(tnzs_state::tnzs_port2_r)
 	return data;
 }
 
-WRITE8_MEMBER(tnzs_state::tnzs_port2_w)
+void tnzs_state::tnzs_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("I8742:%04x  Write %02x to port 2\n", space.device().safe_pcbase(), data);
 
@@ -80,7 +80,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_port2_w)
 
 
 
-READ8_MEMBER(tnzs_state::arknoid2_sh_f000_r)
+uint8_t tnzs_state::arknoid2_sh_f000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("PC %04x: read input %04x\n", space.device().safe_pc(), 0xf000 + offset);
 
@@ -180,7 +180,7 @@ void tnzs_state::mcu_handle_coins( int coin )
 }
 
 
-READ8_MEMBER(tnzs_state::mcu_arknoid2_r)
+uint8_t tnzs_state::mcu_arknoid2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char mcu_startup[] = "\x55\xaa\x5a";
 
@@ -241,7 +241,7 @@ READ8_MEMBER(tnzs_state::mcu_arknoid2_r)
 	}
 }
 
-WRITE8_MEMBER(tnzs_state::mcu_arknoid2_w)
+void tnzs_state::mcu_arknoid2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -286,7 +286,7 @@ WRITE8_MEMBER(tnzs_state::mcu_arknoid2_w)
 }
 
 
-READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
+uint8_t tnzs_state::mcu_extrmatn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char mcu_startup[] = "\x5a\xa5\x55";
 
@@ -370,7 +370,7 @@ READ8_MEMBER(tnzs_state::mcu_extrmatn_r)
 	}
 }
 
-WRITE8_MEMBER(tnzs_state::mcu_extrmatn_w)
+void tnzs_state::mcu_extrmatn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -472,7 +472,7 @@ TIMER_CALLBACK_MEMBER(tnzs_state::kludge_callback)
     tnzs_sharedram[0x0f10] = param;
 }
 
-WRITE8_MEMBER(tnzs_state::tnzs_sync_kludge_w)
+void tnzs_state::tnzs_sync_kludge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     machine().scheduler().synchronize(timer_expired_delegate(FUNC(tnzs_state::kludge_callback),this), data);
 }
@@ -547,7 +547,7 @@ void tnzs_state::init_kageki()
 }
 
 
-READ8_MEMBER(tnzs_state::tnzs_mcu_r)
+uint8_t tnzs_state::tnzs_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_mcu_type)
 	{
@@ -565,7 +565,7 @@ READ8_MEMBER(tnzs_state::tnzs_mcu_r)
 	}
 }
 
-WRITE8_MEMBER(tnzs_state::tnzs_mcu_w)
+void tnzs_state::tnzs_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_mcu_type)
 	{
@@ -670,7 +670,7 @@ void tnzs_state::machine_start_tnzs()
 }
 
 
-WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bankswitch_w)
+void tnzs_state::tnzs_ramrom_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("PC %04x: writing %02x to bankswitch\n", space.device().safe_pc(),data);
 
@@ -684,7 +684,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bankswitch_w)
 	m_mainbank->set_bank(data & 0x07);
 }
 
-WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
+void tnzs_state::tnzs_bankswitch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("PC %04x: writing %02x to bankswitch 1\n", space.device().safe_pc(),data);
 

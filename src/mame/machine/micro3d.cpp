@@ -43,12 +43,12 @@ WRITE_LINE_MEMBER(micro3d_state::duart_txb)
 	m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(micro3d_state::data_to_i8031)
+uint8_t micro3d_state::data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_m68681_tx0;
 }
 
-WRITE8_MEMBER(micro3d_state::data_from_i8031)
+void micro3d_state::data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duart68681->rx_b_w(data);
 }
@@ -61,7 +61,7 @@ WRITE8_MEMBER(micro3d_state::data_from_i8031)
  * 4: -
  * 5: -
  */
-READ8_MEMBER(micro3d_state::duart_input_r)
+uint8_t micro3d_state::duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x2;
 }
@@ -70,7 +70,7 @@ READ8_MEMBER(micro3d_state::duart_input_r)
  * 5: /I8051 reset
  * 7: Status LED
 */
-WRITE8_MEMBER(micro3d_state::duart_output_w)
+void micro3d_state::duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -88,7 +88,7 @@ enum
 };
 
 
-WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
+void micro3d_state::micro3d_ti_uart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -144,7 +144,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_ti_uart_w)
 	}
 }
 
-READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
+uint16_t micro3d_state::micro3d_ti_uart_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -190,7 +190,7 @@ READ16_MEMBER(micro3d_state::micro3d_ti_uart_r)
  *
  *************************************/
 
-WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
+void micro3d_state::micro3d_scc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #if DRMATH_MONITOR_DISPLAY
 	if (offset == 1)
@@ -198,7 +198,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_scc_w)
 #endif
 }
 
-READ32_MEMBER(micro3d_state::micro3d_scc_r)
+uint32_t micro3d_state::micro3d_scc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 1)
 		return 0xd;
@@ -251,18 +251,18 @@ TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 	m_mac_stat = 0;
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_mac1_w)
+void micro3d_state::micro3d_mac1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_vtx_addr = (data & 0x3ffff);
 	m_sram_w_addr = (data >> 18) & 0xfff;
 }
 
-READ32_MEMBER(micro3d_state::micro3d_mac2_r)
+uint32_t micro3d_state::micro3d_mac2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_mac_inst << 1) | m_mac_stat;
 }
 
-WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
+void micro3d_state::micro3d_mac2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t cnt = data & 0xff;
 	uint32_t inst = (data >> 8) & 0x1f;
@@ -465,7 +465,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_mac2_w)
  *
  *************************************/
 
-READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
+uint16_t micro3d_state::micro3d_encoder_h_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t x_encoder = m_joystick_x.read_safe(0);
 	uint16_t y_encoder = m_joystick_y.read_safe(0);
@@ -473,7 +473,7 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_h_r)
 	return (y_encoder & 0xf00) | ((x_encoder & 0xf00) >> 8);
 }
 
-READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
+uint16_t micro3d_state::micro3d_encoder_l_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t x_encoder = m_joystick_x.read_safe(0);
 	uint16_t y_encoder = m_joystick_y.read_safe(0);
@@ -496,12 +496,12 @@ TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
 //  mc68901_int_gen(machine(), GPIP3);
 }
 
-READ16_MEMBER(micro3d_state::micro3d_adc_r)
+uint16_t micro3d_state::micro3d_adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_adc_val;
 }
 
-WRITE16_MEMBER(micro3d_state::micro3d_adc_w)
+void micro3d_state::micro3d_adc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Only handle single-ended mode */
 	if (data < 4 || data > 7)
@@ -518,13 +518,13 @@ CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
 	return m_botss_latch;
 }
 
-READ16_MEMBER(micro3d_state::botss_140000_r)
+uint16_t micro3d_state::botss_140000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_botss_latch = 0;
 	return 0xffff;
 }
 
-READ16_MEMBER(micro3d_state::botss_180000_r)
+uint16_t micro3d_state::botss_180000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_botss_latch = 1;
 	return 0xffff;
@@ -536,7 +536,7 @@ READ16_MEMBER(micro3d_state::botss_180000_r)
  *
  *************************************/
 
-WRITE16_MEMBER(micro3d_state::micro3d_reset_w)
+void micro3d_state::micro3d_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data >>= 8;
 	m_drmath->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
@@ -544,7 +544,7 @@ WRITE16_MEMBER(micro3d_state::micro3d_reset_w)
 	/* TODO: Joystick reset? */
 }
 
-WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
+void micro3d_state::host_drmath_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_drmath->set_input_line(AM29000_INTR2, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -557,23 +557,23 @@ WRITE16_MEMBER(micro3d_state::host_drmath_int_w)
  *
  *************************************/
 
-WRITE32_MEMBER(micro3d_state::micro3d_shared_w)
+void micro3d_state::micro3d_shared_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_shared_ram[offset * 2 + 1] = data & 0xffff;
 	m_shared_ram[offset * 2 + 0] = data >> 16;
 }
 
-READ32_MEMBER(micro3d_state::micro3d_shared_r)
+uint32_t micro3d_state::micro3d_shared_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_shared_ram[offset * 2] << 16) | m_shared_ram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(micro3d_state::drmath_int_w)
+void micro3d_state::drmath_int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
+void micro3d_state::drmath_intr2_ack(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_drmath->set_input_line(AM29000_INTR2, CLEAR_LINE);
 }

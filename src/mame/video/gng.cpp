@@ -62,33 +62,33 @@ void gng_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gng_state::gng_fgvideoram_w)
+void gng_state::gng_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(gng_state::gng_bgvideoram_w)
+void gng_state::gng_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(gng_state::gng_bgscrollx_w)
+void gng_state::gng_bgscrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scrollx[0] + 256 * m_scrollx[1]);
 }
 
-WRITE8_MEMBER(gng_state::gng_bgscrolly_w)
+void gng_state::gng_bgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly[offset] = data;
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0] + 256 * m_scrolly[1]);
 }
 
 
-WRITE8_MEMBER(gng_state::gng_flipscreen_w)
+void gng_state::gng_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }

@@ -40,7 +40,7 @@
 #define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
 
 
-WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
+void starwars_state::quad_pokeyn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
@@ -85,7 +85,7 @@ void starwars_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(starwars_state::irq_ack_w)
+void starwars_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
@@ -111,7 +111,7 @@ void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
 }
 
 
-READ8_MEMBER(starwars_state::esb_slapstic_r)
+uint8_t starwars_state::esb_slapstic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = m_slapstic_base[offset];
 	esb_slapstic_tweak(space, offset);
@@ -119,7 +119,7 @@ READ8_MEMBER(starwars_state::esb_slapstic_r)
 }
 
 
-WRITE8_MEMBER(starwars_state::esb_slapstic_w)
+void starwars_state::esb_slapstic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	esb_slapstic_tweak(space, offset);
 }

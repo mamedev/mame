@@ -120,7 +120,7 @@ public:
 	bus8z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ8Z_MEMBER(readz) =0;
-	virtual DECLARE_WRITE8_MEMBER(write) =0;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) =0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
 
@@ -130,7 +130,7 @@ public:
 	bus16z_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source) { }
 	virtual DECLARE_READ16Z_MEMBER(read16z) =0;
-	virtual DECLARE_WRITE16_MEMBER(write16) =0;
+	virtual void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) =0;
 	virtual DECLARE_SETADDRESS_DBIN_MEMBER( setaddress_dbin ) { };
 };
 

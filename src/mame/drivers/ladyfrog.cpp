@@ -54,19 +54,19 @@ Notes:
 #include "includes/ladyfrog.h"
 
 
-READ8_MEMBER(ladyfrog_state::from_snd_r)
+uint8_t ladyfrog_state::from_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_snd_flag = 0;
 	return m_snd_data;
 }
 
-WRITE8_MEMBER(ladyfrog_state::to_main_w)
+void ladyfrog_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_data = data;
 	m_snd_flag = 2;
 }
 
-WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
+void ladyfrog_state::sound_cpu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -79,18 +79,18 @@ TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(ladyfrog_state::sound_command_w)
+void ladyfrog_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(ladyfrog_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(ladyfrog_state::nmi_disable_w)
+void ladyfrog_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
+void ladyfrog_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -100,11 +100,11 @@ WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(ladyfrog_state::unk_w)
+void ladyfrog_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(ladyfrog_state::snd_flag_r)
+uint8_t ladyfrog_state::snd_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_flag | 0xfd;
 }

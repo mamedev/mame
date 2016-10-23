@@ -50,19 +50,19 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
 	SET_TILE_INFO_MEMBER(4,tile&0xfff,tile>>12,0);
 }
 
-WRITE16_MEMBER(bbusters_state::video_w)
+void bbusters_state::video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bbusters_state::pf1_w)
+void bbusters_state::pf1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(bbusters_state::pf2_w)
+void bbusters_state::pf2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);

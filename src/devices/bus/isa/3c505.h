@@ -127,8 +127,8 @@ public:
 	threecom3c505_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device register I/O
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static void set_verbose(int on_off);
 

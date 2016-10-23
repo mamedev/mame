@@ -11,12 +11,12 @@
 #include "machine/idectrl.h"
 #include "imagedev/harddriv.h"
 
-READ8_MEMBER(isa16_ide_device::ide16_alt_r )
+uint8_t isa16_ide_device::ide16_alt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ide->read_cs1(space, 6/2, 0xff);
 }
 
-WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
+void isa16_ide_device::ide16_alt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ide->write_cs1(space, 6/2, data, 0xff);
 }

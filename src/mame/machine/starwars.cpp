@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
  *
  *************************************/
 
-WRITE8_MEMBER(starwars_state::starwars_nstore_w)
+void starwars_state::starwars_nstore_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<x2212_device>("x2212")->store(0);
 	machine().device<x2212_device>("x2212")->store(1);
@@ -62,7 +62,7 @@ WRITE8_MEMBER(starwars_state::starwars_nstore_w)
  *
  *************************************/
 
-WRITE8_MEMBER(starwars_state::starwars_out_w)
+void starwars_state::starwars_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -122,7 +122,7 @@ CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_adc_r)
+uint8_t starwars_state::starwars_adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* pitch */
 	if (m_control_num == kPitch)
@@ -138,7 +138,7 @@ READ8_MEMBER(starwars_state::starwars_adc_r)
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
+void starwars_state::starwars_adc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control_num = offset;
 }
@@ -363,7 +363,7 @@ void starwars_state::run_mproc()
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_prng_r)
+uint8_t starwars_state::starwars_prng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	 * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
@@ -389,19 +389,19 @@ READ8_MEMBER(starwars_state::starwars_prng_r)
  *
  *************************************/
 
-READ8_MEMBER(starwars_state::starwars_div_reh_r)
+uint8_t starwars_state::starwars_div_reh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_quotient_shift & 0xff00) >> 8;
 }
 
 
-READ8_MEMBER(starwars_state::starwars_div_rel_r)
+uint8_t starwars_state::starwars_div_rel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_quotient_shift & 0x00ff;
 }
 
 
-WRITE8_MEMBER(starwars_state::starwars_math_w)
+void starwars_state::starwars_math_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 

@@ -158,16 +158,16 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
-	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
-	DECLARE_WRITE8_MEMBER(mmd1_port2_w);
-	DECLARE_READ8_MEMBER(mmd1_keyboard_r);
-	DECLARE_READ8_MEMBER(mmd2_01_r);
-	DECLARE_READ8_MEMBER(mmd2_bank_r);
-	DECLARE_READ8_MEMBER(mmd2_kbd_r);
-	DECLARE_WRITE8_MEMBER(mmd2_scanlines_w);
-	DECLARE_WRITE8_MEMBER(mmd2_digit_w);
-	DECLARE_WRITE8_MEMBER(mmd2_status_callback);
+	void mmd1_port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmd1_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmd1_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmd1_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mmd2_01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mmd2_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mmd2_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmd2_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmd2_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
 	uint8_t m_return_code;
 	uint8_t m_digit;
@@ -178,7 +178,7 @@ public:
 };
 
 
-WRITE8_MEMBER( mmd1_state::mmd1_port0_w )
+void mmd1_state::mmd1_port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("p0_7", BIT(data,7) ? 0 : 1);
 	output().set_value("p0_6", BIT(data,6) ? 0 : 1);
@@ -190,7 +190,7 @@ WRITE8_MEMBER( mmd1_state::mmd1_port0_w )
 	output().set_value("p0_0", BIT(data,0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( mmd1_state::mmd1_port1_w )
+void mmd1_state::mmd1_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("p1_7", BIT(data,7) ? 0 : 1);
 	output().set_value("p1_6", BIT(data,6) ? 0 : 1);
@@ -202,7 +202,7 @@ WRITE8_MEMBER( mmd1_state::mmd1_port1_w )
 	output().set_value("p1_0", BIT(data,0) ? 0 : 1);
 }
 
-WRITE8_MEMBER( mmd1_state::mmd1_port2_w )
+void mmd1_state::mmd1_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("p2_7", BIT(data,7) ? 0 : 1);
 	output().set_value("p2_6", BIT(data,6) ? 0 : 1);
@@ -215,7 +215,7 @@ WRITE8_MEMBER( mmd1_state::mmd1_port2_w )
 }
 
 // keyboard has a keydown and a keyup code. Keyup = last keydown + bit 7 set
-READ8_MEMBER( mmd1_state::mmd1_keyboard_r )
+uint8_t mmd1_state::mmd1_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t line1 = ioport("LINE1")->read();
 	uint8_t line2 = ioport("LINE2")->read();
@@ -365,7 +365,7 @@ C  D  E  F      MEM  REGS  AUX  CANCEL
 
 */
 
-READ8_MEMBER( mmd1_state::mmd2_bank_r )
+uint8_t mmd1_state::mmd2_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(offset);
 	membank("bank2")->set_entry(offset);
@@ -378,7 +378,7 @@ READ8_MEMBER( mmd1_state::mmd2_bank_r )
 	return 0xff;
 }
 
-READ8_MEMBER( mmd1_state::mmd2_01_r )
+uint8_t mmd1_state::mmd2_01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// need to add cassin, ttyin bits
 	uint8_t data = 0x87;
@@ -386,18 +386,18 @@ READ8_MEMBER( mmd1_state::mmd2_01_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmd1_state::mmd2_scanlines_w )
+void mmd1_state::mmd2_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( mmd1_state::mmd2_digit_w )
+void mmd1_state::mmd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_digit < 9)
 		output().set_digit_value(m_digit, data);
 }
 
-READ8_MEMBER( mmd1_state::mmd2_kbd_r )
+uint8_t mmd1_state::mmd2_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -410,7 +410,7 @@ READ8_MEMBER( mmd1_state::mmd2_kbd_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmd1_state::mmd2_status_callback )
+void mmd1_state::mmd2_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// operate the HALT LED
 	output().set_value("led_halt", ~data & I8085_STATUS_HLTA);

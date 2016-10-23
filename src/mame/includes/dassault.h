@@ -61,15 +61,15 @@ public:
 	required_shared_ptr<uint16_t> m_shared_ram;
 	required_shared_ptr<uint16_t> m_ram2;
 
-	DECLARE_READ16_MEMBER(dassault_control_r);
-	DECLARE_WRITE16_MEMBER(dassault_control_w);
-	DECLARE_READ16_MEMBER(dassault_sub_control_r);
-	DECLARE_WRITE16_MEMBER(dassault_sound_w);
-	DECLARE_READ16_MEMBER(dassault_irq_r);
-	DECLARE_WRITE16_MEMBER(dassault_irq_w);
-	DECLARE_WRITE16_MEMBER(shared_ram_w);
-	DECLARE_READ16_MEMBER(shared_ram_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint16_t dassault_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dassault_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dassault_sub_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dassault_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dassault_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dassault_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_thndzone();
 	void init_dassault();
 	virtual void video_start() override;

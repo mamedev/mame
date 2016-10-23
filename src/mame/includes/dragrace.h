@@ -56,11 +56,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE8_MEMBER(dragrace_misc_w);
-	DECLARE_WRITE8_MEMBER(dragrace_misc_clear_w);
-	DECLARE_READ8_MEMBER(dragrace_input_r);
-	DECLARE_READ8_MEMBER(dragrace_steering_r);
-	DECLARE_READ8_MEMBER(dragrace_scanline_r);
+	void dragrace_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dragrace_misc_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dragrace_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dragrace_steering_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dragrace_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -469,7 +469,7 @@ void centiped_state::machine_reset_magworm()
 }
 
 
-WRITE8_MEMBER(centiped_state::irq_ack_w)
+void centiped_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -527,24 +527,24 @@ inline int centiped_state::read_trackball(int idx, int switch_port)
 }
 
 
-READ8_MEMBER(centiped_state::centiped_IN0_r)
+uint8_t centiped_state::centiped_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_trackball(0, 0);
 }
 
 
-READ8_MEMBER(centiped_state::centiped_IN2_r)
+uint8_t centiped_state::centiped_IN2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_trackball(1, 2);
 }
 
 
-READ8_MEMBER(centiped_state::milliped_IN1_r)
+uint8_t centiped_state::milliped_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_trackball(1, 1);
 }
 
-READ8_MEMBER(centiped_state::milliped_IN2_r)
+uint8_t centiped_state::milliped_IN2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("IN2")->read();
 
@@ -566,19 +566,19 @@ READ8_MEMBER(centiped_state::milliped_IN2_r)
 	return data;
 }
 
-WRITE8_MEMBER(centiped_state::input_select_w)
+void centiped_state::input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_select = (~data >> 7) & 1;
 }
 
 /* used P2 controls if 1, P1 controls if 0 */
-WRITE8_MEMBER(centiped_state::control_select_w)
+void centiped_state::control_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control_select = (data >> 7) & 1;
 }
 
 
-READ8_MEMBER(centiped_state::mazeinv_input_r)
+uint8_t centiped_state::mazeinv_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const sticknames[] = { "STICK0", "STICK1", "STICK2", "STICK3" };
 
@@ -586,12 +586,12 @@ READ8_MEMBER(centiped_state::mazeinv_input_r)
 }
 
 
-WRITE8_MEMBER(centiped_state::mazeinv_input_select_w)
+void centiped_state::mazeinv_input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control_select = offset & 3;
 }
 
-READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
+uint8_t centiped_state::bullsdrt_data_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -614,25 +614,25 @@ READ8_MEMBER(centiped_state::bullsdrt_data_port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::led_w)
+void centiped_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 0x80);
 }
 
 
-READ8_MEMBER(centiped_state::caterplr_unknown_r)
+uint8_t centiped_state::caterplr_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand() % 0xff;
 }
 
 
-WRITE8_MEMBER(centiped_state::coin_count_w)
+void centiped_state::coin_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
 
-WRITE8_MEMBER(centiped_state::bullsdrt_coin_count_w)
+void centiped_state::bullsdrt_coin_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }
@@ -717,13 +717,13 @@ static ADDRESS_MAP_START( caterplr_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(caterplr_AY8910_r, caterplr_AY8910_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
+void centiped_state::caterplr_AY8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_aysnd->address_w(space, 0, offset);
 	m_aysnd->data_w(space, 0, data);
 }
 
-READ8_MEMBER(centiped_state::caterplr_AY8910_r)
+uint8_t centiped_state::caterplr_AY8910_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_aysnd->address_w(space, 0, offset);
 	return m_aysnd->data_r(space, 0);
@@ -815,12 +815,12 @@ static ADDRESS_MAP_START( multiped_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0xdc00, 0xdc00) AM_MIRROR(0x03ff) AM_WRITE(multiped_gfxbank_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(centiped_state::multiped_eeprom_r)
+uint8_t centiped_state::multiped_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->do_read() ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
+void centiped_state::multiped_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a0: always high
 	// a3-a7: always low
@@ -840,7 +840,7 @@ WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
 		m_eeprom->cs_write((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(centiped_state::multiped_prgbank_w)
+void centiped_state::multiped_prgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d6: N/C?
 	// d7: prg (and gfx) rom bank

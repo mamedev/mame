@@ -167,7 +167,7 @@ uint32_t nubus_lview_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-READ32_MEMBER( nubus_lview_device::lview_r )
+uint32_t nubus_lview_device::lview_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t rv = 0;
 
@@ -187,7 +187,7 @@ READ32_MEMBER( nubus_lview_device::lview_r )
 	return rv;
 }
 
-WRITE32_MEMBER( nubus_lview_device::lview_w )
+void nubus_lview_device::lview_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //    if (offset != 0x7a && offset != 0x3ffb) printf("prot_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 
@@ -205,12 +205,12 @@ WRITE32_MEMBER( nubus_lview_device::lview_w )
 	}
 }
 
-WRITE32_MEMBER( nubus_lview_device::vram_w )
+void nubus_lview_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_lview_device::vram_r )
+uint32_t nubus_lview_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

@@ -71,20 +71,20 @@ public:
 
 	uint32_t m_cx5510_regs[256/4];
 
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
-	DECLARE_READ32_MEMBER(port400_r);
-	DECLARE_WRITE32_MEMBER(port400_w);
-	DECLARE_READ32_MEMBER(port800_r);
-	DECLARE_WRITE32_MEMBER(port800_w);
+	uint32_t disp_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void disp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t memory_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void memory_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t parallel_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void parallel_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t io20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t port400_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void port400_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t port800_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void port800_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_pinball2k();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -298,7 +298,7 @@ uint32_t pinball2k_state::screen_update_mediagx(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ32_MEMBER(pinball2k_state::disp_ctrl_r)
+uint32_t pinball2k_state::disp_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -315,19 +315,19 @@ READ32_MEMBER(pinball2k_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::disp_ctrl_w)
+void pinball2k_state::disp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(pinball2k_state::memory_ctrl_r)
+uint32_t pinball2k_state::memory_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
+void pinball2k_state::memory_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -363,7 +363,7 @@ WRITE32_MEMBER(pinball2k_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(pinball2k_state::biu_ctrl_r)
+uint32_t pinball2k_state::biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -372,7 +372,7 @@ READ32_MEMBER(pinball2k_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
+void pinball2k_state::biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -384,12 +384,12 @@ WRITE32_MEMBER(pinball2k_state::biu_ctrl_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(pinball2k_state::bios_ram_w)
+void pinball2k_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 #endif
 
-READ8_MEMBER(pinball2k_state::io20_r)
+uint8_t pinball2k_state::io20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0;
 
@@ -404,7 +404,7 @@ READ8_MEMBER(pinball2k_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(pinball2k_state::io20_w)
+void pinball2k_state::io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -417,32 +417,32 @@ WRITE8_MEMBER(pinball2k_state::io20_w)
 	}
 }
 
-READ32_MEMBER(pinball2k_state::port400_r)
+uint32_t pinball2k_state::port400_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x8000;
 }
 
-WRITE32_MEMBER(pinball2k_state::port400_w)
+void pinball2k_state::port400_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(pinball2k_state::port800_r)
+uint32_t pinball2k_state::port800_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x80;
 }
 
-WRITE32_MEMBER(pinball2k_state::port800_w)
+void pinball2k_state::port800_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(pinball2k_state::parallel_port_r)
+uint32_t pinball2k_state::parallel_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
 	return r;
 }
 
-WRITE32_MEMBER(pinball2k_state::parallel_port_w)
+void pinball2k_state::parallel_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 

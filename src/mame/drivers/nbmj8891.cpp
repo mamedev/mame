@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( hanaoji_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
+uint8_t nbmj8891_state::taiwanmb_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;                                                    // MCU or 1413M3 STATUS?
 }

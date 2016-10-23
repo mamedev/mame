@@ -73,7 +73,7 @@ void vixen_state::update_interrupt()
 }
 
 
-READ8_MEMBER( vixen_state::opram_r )
+uint8_t vixen_state::opram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 		membank("bank3")->set_entry(0); // read videoram
@@ -84,7 +84,7 @@ READ8_MEMBER( vixen_state::opram_r )
 	return data;
 }
 
-READ8_MEMBER( vixen_state::oprom_r )
+uint8_t vixen_state::oprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 		membank("bank3")->set_entry(1); // read rom
@@ -95,7 +95,7 @@ READ8_MEMBER( vixen_state::oprom_r )
 //  status_r - status read
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::status_r )
+uint8_t vixen_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -131,7 +131,7 @@ READ8_MEMBER( vixen_state::status_r )
 //  cmd_w - command write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vixen_state::cmd_w )
+void vixen_state::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER( vixen_state::cmd_w )
 //  ieee488_r - IEEE488 bus read
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::ieee488_r )
+uint8_t vixen_state::ieee488_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -221,7 +221,7 @@ READ8_MEMBER( vixen_state::ieee488_r )
 //  port3_r - serial status read
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::port3_r )
+uint8_t vixen_state::port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -499,7 +499,7 @@ DISCRETE_SOUND_END
 //  I8155 interface
 //-------------------------------------------------
 
-READ8_MEMBER( vixen_state::i8155_pa_r )
+uint8_t vixen_state::i8155_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -509,12 +509,12 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pb_w )
+void vixen_state::i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_col = data;
 }
 
-WRITE8_MEMBER( vixen_state::i8155_pc_w )
+void vixen_state::i8155_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -556,7 +556,7 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 //  I8155 IO interface
 //-------------------------------------------------
 
-WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
+void vixen_state::io_i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -598,7 +598,7 @@ WRITE8_MEMBER( vixen_state::io_i8155_pb_w )
 	m_ieee488->ren_w(BIT(data, 7));
 }
 
-WRITE8_MEMBER( vixen_state::io_i8155_pc_w )
+void vixen_state::io_i8155_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

@@ -239,7 +239,7 @@ void c64_final_chesscard_device::c64_cd_w(address_space &space, offs_t offset, u
 //  nvram_r - NVRAM read
 //-------------------------------------------------
 
-READ8_MEMBER( c64_final_chesscard_device::nvram_r )
+uint8_t c64_final_chesscard_device::nvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[offset & m_nvram.mask()];
 }
@@ -249,7 +249,7 @@ READ8_MEMBER( c64_final_chesscard_device::nvram_r )
 //  nvram_w - NVRAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( c64_final_chesscard_device::nvram_w )
+void c64_final_chesscard_device::nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset & m_nvram.mask()] = data;
 }

@@ -33,10 +33,10 @@ public:
 	void hd44102ch_init( int which );
 	void lcd_update();
 
-	DECLARE_WRITE8_MEMBER( port_a_w );
-	DECLARE_READ8_MEMBER( port_b_r );
-	DECLARE_WRITE8_MEMBER( port_b_w );
-	DECLARE_READ8_MEMBER( port_c_r );
+	void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;

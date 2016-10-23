@@ -50,12 +50,12 @@ public:
 
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( digits_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_a_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_b_w );
-	DECLARE_WRITE8_MEMBER( pio1_port_b_dm_w );
-	DECLARE_READ8_MEMBER( pio2_port_a_r );
-	DECLARE_WRITE8_MEMBER( pio2_port_b_w );
+	void digits_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio1_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio1_port_b_dm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio2_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
@@ -253,7 +253,7 @@ void chessmst_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( chessmst_state::digits_w )
+void chessmst_state::digits_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = (m_digit << 4) | (data & 0x0f);
 	m_digit_matrix = (data >> 4) & 0x0f;
@@ -261,7 +261,7 @@ WRITE8_MEMBER( chessmst_state::digits_w )
 	update_display();
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
+void chessmst_state::pio1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int row=1; row<=8; row++)
 	{
@@ -290,7 +290,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_a_w )
 	m_led_sel = 0;
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
+void chessmst_state::pio1_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix = (m_matrix & 0xff) | ((data & 0x01)<<8);
 	m_led_sel = (m_led_sel & 0xff) | ((data & 0x03)<<8);
@@ -298,7 +298,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_w )
 	m_speaker->level_w(BIT(data, 6));
 }
 
-WRITE8_MEMBER( chessmst_state::pio1_port_b_dm_w )
+void chessmst_state::pio1_port_b_dm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix = (m_matrix & 0xff) | ((data & 0x04)<<6);
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER( chessmst_state::pio1_port_b_dm_w )
 	output().set_value("playmode_led", !BIT(data, 6));
 }
 
-READ8_MEMBER( chessmst_state::pio2_port_a_r )
+uint8_t chessmst_state::pio2_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 
@@ -331,7 +331,7 @@ READ8_MEMBER( chessmst_state::pio2_port_a_r )
 	return data;
 }
 
-WRITE8_MEMBER( chessmst_state::pio2_port_b_w )
+void chessmst_state::pio2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrix = (data & 0xff) | (m_matrix & 0x100);
 	m_led_sel = (data & 0xff) | (m_led_sel & 0x300);

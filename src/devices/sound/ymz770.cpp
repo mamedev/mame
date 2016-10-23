@@ -230,7 +230,7 @@ retry:
 //  write - write to the chip's registers
 //-------------------------------------------------
 
-WRITE8_MEMBER( ymz770_device::write )
+void ymz770_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{

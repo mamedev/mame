@@ -251,7 +251,7 @@ READ8Z_MEMBER(peribox_device::readz)
 	}
 }
 
-WRITE8_MEMBER(peribox_device::write)
+void peribox_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -278,7 +278,7 @@ READ8Z_MEMBER(peribox_device::crureadz)
 	}
 }
 
-WRITE8_MEMBER(peribox_device::cruwrite)
+void peribox_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -656,7 +656,7 @@ READ8Z_MEMBER(peribox_slot_device::readz)
 	m_card->readz(space, offset, value, mem_mask);
 }
 
-WRITE8_MEMBER(peribox_slot_device::write)
+void peribox_slot_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_card->write(space, offset, data, mem_mask);
 }
@@ -671,7 +671,7 @@ READ8Z_MEMBER(peribox_slot_device::crureadz)
 	m_card->crureadz(space, offset, value);
 }
 
-WRITE8_MEMBER(peribox_slot_device::cruwrite)
+void peribox_slot_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_card->cruwrite(space, offset, data);
 }

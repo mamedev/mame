@@ -205,15 +205,15 @@ public:
 	memory_region *m_cart_rom;
 
 	int m_bank1_switching;
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_READ8_MEMBER(tutor_mapper_r);
-	DECLARE_WRITE8_MEMBER(tutor_mapper_w);
-	DECLARE_READ8_MEMBER(tutor_cassette_r);
-	DECLARE_WRITE8_MEMBER(tutor_cassette_w);
-	DECLARE_READ8_MEMBER(tutor_printer_r);
-	DECLARE_WRITE8_MEMBER(tutor_printer_w);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tutor_mapper_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tutor_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tutor_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tutor_cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tutor_printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tutor_printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(tutor_highmem_r);
+	uint8_t tutor_highmem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	int m_tape_interrupt_enable;
 	emu_timer *m_tape_interrupt_timer;
 	virtual void machine_start() override;
@@ -278,7 +278,7 @@ void tutor_state::machine_reset()
     mapped to both a keyboard key and a joystick switch.
 */
 
-READ8_MEMBER( tutor_state::key_r )
+uint8_t tutor_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char port[12];
 	uint8_t value;
@@ -311,7 +311,7 @@ READ8_MEMBER( tutor_state::key_r )
     Cartridge may also define a boot ROM at base >0000 (see below).
 */
 
-READ8_MEMBER( tutor_state::tutor_mapper_r )
+uint8_t tutor_state::tutor_mapper_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply;
 
@@ -331,7 +331,7 @@ READ8_MEMBER( tutor_state::tutor_mapper_r )
 	return reply;
 }
 
-WRITE8_MEMBER( tutor_state::tutor_mapper_w )
+void tutor_state::tutor_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -366,7 +366,7 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
     This is only called from the debugger; the on-chip memory is handled
     within the CPU itself.
 */
-READ8_MEMBER( tutor_state::tutor_highmem_r )
+uint8_t tutor_state::tutor_highmem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_maincpu->is_onchip(offset | 0xf000)) return m_maincpu->debug_read_onchip_memory(offset&0xff);
 	return 0;
@@ -398,13 +398,13 @@ TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 }
 
 /* CRU handler */
-READ8_MEMBER( tutor_state::tutor_cassette_r )
+uint8_t tutor_state::tutor_cassette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
-WRITE8_MEMBER( tutor_state::tutor_cassette_w )
+void tutor_state::tutor_cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & /*0x1f*/0x1e)
 		logerror("unknown port in %s %d\n", __FILE__, __LINE__);
@@ -452,7 +452,7 @@ WRITE_LINE_MEMBER( tutor_state::write_centronics_busy )
 }
 
 /* memory handlers */
-READ8_MEMBER( tutor_state::tutor_printer_r )
+uint8_t tutor_state::tutor_printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply;
 
@@ -473,7 +473,7 @@ READ8_MEMBER( tutor_state::tutor_printer_r )
 	return reply;
 }
 
-WRITE8_MEMBER( tutor_state::tutor_printer_w )
+void tutor_state::tutor_printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -528,7 +528,7 @@ WRITE8_MEMBER( tutor_state::tutor_printer_w )
 */
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER( tutor_state::test_w )
+void tutor_state::test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

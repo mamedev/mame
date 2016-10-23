@@ -110,7 +110,7 @@ void wangpcbus_device::add_card(device_wangpcbus_card_interface *card, int sid)
 //  mrdc_r - memory read
 //-------------------------------------------------
 
-READ16_MEMBER( wangpcbus_device::mrdc_r )
+uint16_t wangpcbus_device::mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -130,7 +130,7 @@ READ16_MEMBER( wangpcbus_device::mrdc_r )
 //  amwc_w - memory write
 //-------------------------------------------------
 
-WRITE16_MEMBER( wangpcbus_device::amwc_w )
+void wangpcbus_device::amwc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 
@@ -146,7 +146,7 @@ WRITE16_MEMBER( wangpcbus_device::amwc_w )
 //  sad_r - I/O read
 //-------------------------------------------------
 
-READ16_MEMBER( wangpcbus_device::sad_r )
+uint16_t wangpcbus_device::sad_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -166,7 +166,7 @@ READ16_MEMBER( wangpcbus_device::sad_r )
 //  sad_w - I/O write
 //-------------------------------------------------
 
-WRITE16_MEMBER( wangpcbus_device::sad_w )
+void wangpcbus_device::sad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	device_wangpcbus_card_interface *entry = m_device_list.first();
 

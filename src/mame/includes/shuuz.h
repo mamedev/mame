@@ -22,9 +22,9 @@ public:
 
 	virtual void update_interrupts() override;
 
-	DECLARE_WRITE16_MEMBER(latch_w);
-	DECLARE_READ16_MEMBER(leta_r);
-	DECLARE_READ16_MEMBER(special_port0_r);
+	void latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t leta_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t special_port0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 

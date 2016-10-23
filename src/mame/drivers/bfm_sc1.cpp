@@ -160,35 +160,35 @@ public:
 	uint8_t m_codec_data[256];
 
 	int m_defaultbank;
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(reel56_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_READ8_MEMBER(dipcoin_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_READ8_MEMBER(mux1latch_r);
-	DECLARE_READ8_MEMBER(mux1datlo_r);
-	DECLARE_READ8_MEMBER(mux1dathi_r);
-	DECLARE_WRITE8_MEMBER(mux1latch_w);
-	DECLARE_WRITE8_MEMBER(mux1datlo_w);
-	DECLARE_WRITE8_MEMBER(mux1dathi_w);
-	DECLARE_READ8_MEMBER(mux2latch_r);
-	DECLARE_READ8_MEMBER(mux2datlo_r);
-	DECLARE_READ8_MEMBER(mux2dathi_r);
-	DECLARE_WRITE8_MEMBER(mux2latch_w);
-	DECLARE_WRITE8_MEMBER(mux2datlo_w);
-	DECLARE_WRITE8_MEMBER(mux2dathi_w);
-	DECLARE_WRITE8_MEMBER(aciactrl_w);
-	DECLARE_WRITE8_MEMBER(aciadata_w);
-	DECLARE_READ8_MEMBER(aciastat_r);
-	DECLARE_READ8_MEMBER(aciadata_r);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
-	DECLARE_READ8_MEMBER(nec_r);
-	DECLARE_WRITE8_MEMBER(nec_latch_w);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel56_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipcoin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux1latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux1datlo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux1dathi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux1latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux1datlo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux1dathi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux2latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux2datlo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux2dathi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux2latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux2datlo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux2dathi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aciactrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aciadata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t aciastat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t aciadata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t triac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nec_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nec_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void save_state();
 
@@ -268,7 +268,7 @@ int bfm_sc1_state::Scorpion1_GetSwitchState(int strobe, int data)
 #endif
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
+void bfm_sc1_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
@@ -289,7 +289,7 @@ INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::irqlatch_r)
+uint8_t bfm_sc1_state::irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = m_irq_status | 0x02;
 
@@ -300,7 +300,7 @@ READ8_MEMBER(bfm_sc1_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel12_w)
+void bfm_sc1_state::reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_locked & 0x01 )
 	{   // hardware is still locked,
@@ -317,7 +317,7 @@ WRITE8_MEMBER(bfm_sc1_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel34_w)
+void bfm_sc1_state::reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_locked & 0x02 )
 	{   // hardware is still locked,
@@ -334,7 +334,7 @@ WRITE8_MEMBER(bfm_sc1_state::reel34_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::reel56_w)
+void bfm_sc1_state::reel56_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4->update((data>>4)&0x0f);
 	m_reel5->update( data    &0x0f);
@@ -347,7 +347,7 @@ WRITE8_MEMBER(bfm_sc1_state::reel56_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
+void bfm_sc1_state::mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	if ( m_locked & 0x04 )
@@ -373,28 +373,28 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mmtr_r)
+uint8_t bfm_sc1_state::mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mmtr_latch;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::dipcoin_r)
+uint8_t bfm_sc1_state::dipcoin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("STROBE0")->read() & 0x1F;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::nec_r)
+uint8_t bfm_sc1_state::nec_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::vfd_w)
+void bfm_sc1_state::vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vfd0->por(data & VFD_RESET);
 	m_vfd0->data(data & VFD_DATA);
@@ -432,28 +432,28 @@ static const uint8_t BFM_strcnv[] =
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1latch_r)
+uint8_t bfm_sc1_state::mux1latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux1_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1datlo_r)
+uint8_t bfm_sc1_state::mux1datlo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux1dathi_r)
+uint8_t bfm_sc1_state::mux1dathi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
+void bfm_sc1_state::mux1latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed = m_mux1_outputlatch ^ data;
 	static const char *const portnames[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
@@ -492,42 +492,42 @@ WRITE8_MEMBER(bfm_sc1_state::mux1latch_w)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1datlo_w)
+void bfm_sc1_state::mux1datlo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux1_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux1dathi_w)
+void bfm_sc1_state::mux1dathi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux1_datahi = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2latch_r)
+uint8_t bfm_sc1_state::mux2latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux2_input;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2datlo_r)
+uint8_t bfm_sc1_state::mux2datlo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::mux2dathi_r)
+uint8_t bfm_sc1_state::mux2dathi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
+void bfm_sc1_state::mux2latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed = m_mux2_outputlatch ^ data;
 
@@ -562,14 +562,14 @@ WRITE8_MEMBER(bfm_sc1_state::mux2latch_w)
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2datlo_w)
+void bfm_sc1_state::mux2datlo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux2_datalo = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::mux2dathi_w)
+void bfm_sc1_state::mux2dathi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux2_datahi = data;
 }
@@ -578,26 +578,26 @@ WRITE8_MEMBER(bfm_sc1_state::mux2dathi_w)
 // serial port //////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::aciactrl_w)
+void bfm_sc1_state::aciactrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::aciadata_w)
+void bfm_sc1_state::aciadata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::aciastat_r)
+uint8_t bfm_sc1_state::aciastat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_acia_status;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::aciadata_r)
+uint8_t bfm_sc1_state::aciadata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -606,28 +606,28 @@ READ8_MEMBER(bfm_sc1_state::aciadata_r)
 // payslide triacs //////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_sc1_state::triac_w)
+void bfm_sc1_state::triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_triac_latch = data;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_sc1_state::triac_r)
+uint8_t bfm_sc1_state::triac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_triac_latch;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(bfm_sc1_state::nec_reset_w)
+void bfm_sc1_state::nec_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->start_w(0);
 	m_upd7759->reset_w(data);
 }
 #endif
 /////////////////////////////////////////////////////////////////////////////////////
-WRITE8_MEMBER(bfm_sc1_state::nec_latch_w)
+void bfm_sc1_state::nec_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w (space, 0, data&0x3F);   // setup sample
 	m_upd7759->start_w(0);

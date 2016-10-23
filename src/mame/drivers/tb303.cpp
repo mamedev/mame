@@ -31,13 +31,13 @@ public:
 	bool m_ram_ce;
 	bool m_ram_we;
 
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(strobe_w);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void refresh_ram();
 
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void update_leds();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
@@ -86,7 +86,7 @@ void tb303_state::refresh_ram()
 	}
 }
 
-WRITE8_MEMBER(tb303_state::ram_w)
+void tb303_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// MCU C: RAM data
 	// MCU D,F,E: RAM address
@@ -97,7 +97,7 @@ WRITE8_MEMBER(tb303_state::ram_w)
 	//..
 }
 
-READ8_MEMBER(tb303_state::ram_r)
+uint8_t tb303_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// MCU C: RAM data
 	if (m_ram_ce && !m_ram_we)
@@ -106,7 +106,7 @@ READ8_MEMBER(tb303_state::ram_r)
 		return 0;
 }
 
-WRITE8_MEMBER(tb303_state::strobe_w)
+void tb303_state::strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// MCU I0: RAM _WE
 	m_ram_we = (data & 1) ? false : true;
@@ -136,7 +136,7 @@ void tb303_state::update_leds()
 	// todo: 4 more leds(see top-left part)
 }
 
-WRITE8_MEMBER(tb303_state::switch_w)
+void tb303_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// MCU G: leds state
 	// MCU H: input/led mux
@@ -147,7 +147,7 @@ WRITE8_MEMBER(tb303_state::switch_w)
 	update_leds();
 }
 
-READ8_MEMBER(tb303_state::input_r)
+uint8_t tb303_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// MCU A,B: multiplexed inputs
 	// if input mux(port H) is 0, port A status buffer & gate is selected (via Q5 NAND)

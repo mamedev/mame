@@ -74,7 +74,7 @@ public:
 	static void static_set_transparent_pen(device_t &device, unsigned pen);
 	static void static_set_primella_code_bits(device_t &device, unsigned bits);
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	dooyong_rom_tilemap_device(
@@ -130,8 +130,8 @@ class dooyong_ram_tilemap_device : public dooyong_tilemap_device_base
 public:
 	dooyong_ram_tilemap_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ16_MEMBER(tileram_r) { return m_tileram[offset & ((64U * 32U) - 1)]; }
-	DECLARE_WRITE16_MEMBER(tileram_w);
+	uint16_t tileram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_tileram[offset & ((64U * 32U) - 1)]; }
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void set_scrolly(int value) { m_tilemap->set_scrolly(value); }
 
 protected:
@@ -188,16 +188,16 @@ public:
 		SPRITE_YSHIFT_FLYTIGER = 0x08
 	};
 
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(lastday_tx_r);
-	DECLARE_WRITE8_MEMBER(lastday_tx_w);
-	DECLARE_READ8_MEMBER(bluehawk_tx_r);
-	DECLARE_WRITE8_MEMBER(bluehawk_tx_w);
-	DECLARE_WRITE8_MEMBER(primella_ctrl_w);
-	DECLARE_READ8_MEMBER(paletteram_flytiger_r);
-	DECLARE_WRITE8_MEMBER(paletteram_flytiger_w);
-	DECLARE_WRITE8_MEMBER(flytiger_ctrl_w);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lastday_tx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lastday_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bluehawk_tx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bluehawk_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void primella_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t paletteram_flytiger_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paletteram_flytiger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flytiger_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -226,11 +226,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(lastday_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pollux_ctrl_w);
+	void lastday_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pollux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
-	DECLARE_READ8_MEMBER(unk_r);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void machine_reset_sound_ym2203();
 	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gulfstrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -252,7 +252,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 protected:

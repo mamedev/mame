@@ -105,8 +105,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cs_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);
 
-	DECLARE_WRITE8_MEMBER(add_w);
-	DECLARE_READ8_MEMBER(data_r); // 4bit
+	void add_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // 4bit
 	DECLARE_READ_LINE_MEMBER(data_line_r);
 
 protected:

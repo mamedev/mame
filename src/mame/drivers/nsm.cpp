@@ -32,9 +32,9 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_WRITE8_MEMBER(cru_w);
-	DECLARE_WRITE8_MEMBER(oe_w);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void oe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 
 	// devices
@@ -73,14 +73,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( nsm )
 INPUT_PORTS_END
 
-READ8_MEMBER( nsm_state::ff_r ) { return 1; }
+uint8_t nsm_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 1; }
 
-WRITE8_MEMBER( nsm_state::oe_w )
+void nsm_state::oe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cru_count = 9;
 }
 
-WRITE8_MEMBER( nsm_state::cru_w )
+void nsm_state::cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 7;
 	if (!offset)

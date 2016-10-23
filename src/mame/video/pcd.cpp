@@ -268,7 +268,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcd_video_device::mouse_timer)
 	}
 }
 
-WRITE8_MEMBER(pcd_video_device::vram_w)
+void pcd_video_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_vram_sw)
 		m_vram[offset] = data;
@@ -280,22 +280,22 @@ WRITE8_MEMBER(pcd_video_device::vram_w)
 	}
 }
 
-READ8_MEMBER(pcd_video_device::vram_r)
+uint8_t pcd_video_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(pcd_video_device::vram_sw_w)
+void pcd_video_device::vram_sw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_sw = data & 1;
 }
 
-READ8_MEMBER(pcd_video_device::t1_r)
+uint8_t pcd_video_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t1;
 }
 
-READ8_MEMBER(pcd_video_device::p1_r)
+uint8_t pcd_video_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
 	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 1);
@@ -306,13 +306,13 @@ READ8_MEMBER(pcd_video_device::p1_r)
 	return data;
 }
 
-WRITE8_MEMBER(pcd_video_device::p2_w)
+void pcd_video_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 	m_pic2->ir7_w((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ8_MEMBER(pcx_video_device::term_r)
+uint8_t pcx_video_device::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -327,7 +327,7 @@ READ8_MEMBER(pcx_video_device::term_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pcx_video_device::term_w)
+void pcx_video_device::term_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!offset)
 	{
@@ -337,7 +337,7 @@ WRITE8_MEMBER(pcx_video_device::term_w)
 	}
 }
 
-READ8_MEMBER(pcx_video_device::term_mcu_r)
+uint8_t pcx_video_device::term_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -352,7 +352,7 @@ READ8_MEMBER(pcx_video_device::term_mcu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(pcx_video_device::term_mcu_w)
+void pcx_video_device::term_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!offset)
 	{
@@ -362,14 +362,14 @@ WRITE8_MEMBER(pcx_video_device::term_mcu_w)
 	}
 }
 
-WRITE8_MEMBER(pcx_video_device::vram_w)
+void pcx_video_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset <<= 1;
 	m_vram[offset] = m_vram_latch_w[0];
 	m_vram[offset+1] = m_vram_latch_w[1];
 }
 
-READ8_MEMBER(pcx_video_device::vram_r)
+uint8_t pcx_video_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset <<= 1;
 	m_vram_latch_r[0] = m_vram[offset];
@@ -377,31 +377,31 @@ READ8_MEMBER(pcx_video_device::vram_r)
 	return m_vram[offset];
 }
 
-WRITE8_MEMBER(pcx_video_device::vram_latch_w)
+void pcx_video_device::vram_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_latch_w[offset] = data;
 }
 
-READ8_MEMBER(pcx_video_device::vram_latch_r)
+uint8_t pcx_video_device::vram_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram_latch_r[offset];
 }
 
-READ8_MEMBER(pcdx_video_device::detect_r)
+uint8_t pcdx_video_device::detect_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pcdx_video_device::detect_w)
+void pcdx_video_device::detect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(pcx_video_device::unk_r)
+uint8_t pcx_video_device::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;
 }
 
-WRITE8_MEMBER(pcx_video_device::p1_w)
+void pcx_video_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 }
@@ -456,12 +456,12 @@ DEVICE_ADDRESS_MAP_START(map, 16, pcx_video_device)
 	AM_RANGE(0x0, 0xf) AM_READWRITE8(term_r, term_w, 0xffff)
 ADDRESS_MAP_END
 
-READ8_MEMBER(pcx_video_device::rx_callback)
+uint8_t pcx_video_device::rx_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_received_char();
 }
 
-WRITE8_MEMBER(pcx_video_device::tx_callback)
+void pcx_video_device::tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	transmit_register_setup(data);
 }

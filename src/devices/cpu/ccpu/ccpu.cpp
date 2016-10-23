@@ -73,7 +73,7 @@ ccpu_cpu_device::ccpu_cpu_device(const machine_config &mconfig, const char *tag,
 }
 
 
-READ8_MEMBER( ccpu_cpu_device::read_jmi )
+uint8_t ccpu_cpu_device::read_jmi(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* this routine is called when there is no external input */
 	/* and the JMI jumper is present */

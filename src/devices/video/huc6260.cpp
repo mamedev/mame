@@ -184,19 +184,19 @@ void huc6260_device::video_update( bitmap_ind16 &bitmap, const rectangle &clipre
 
 
 // the battlera arcade board reads/writes the palette directly
-READ8_MEMBER(huc6260_device::palette_direct_read)
+uint8_t huc6260_device::palette_direct_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!(offset&1)) return m_palette[offset>>1];
 	else return m_palette[offset >> 1] >> 8;
 }
 
-WRITE8_MEMBER(huc6260_device::palette_direct_write)
+void huc6260_device::palette_direct_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(offset&1)) m_palette[offset>>1] = (m_palette[offset>>1] & 0xff00) | data;
 	else m_palette[offset>>1] = (m_palette[offset>>1] & 0x00ff) | (data<<8);
 }
 
-READ8_MEMBER( huc6260_device::read )
+uint8_t huc6260_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -218,7 +218,7 @@ READ8_MEMBER( huc6260_device::read )
 }
 
 
-WRITE8_MEMBER( huc6260_device::write )
+void huc6260_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset & 7 )
 	{

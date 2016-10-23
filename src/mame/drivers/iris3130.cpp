@@ -62,33 +62,33 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_m_quad_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_m_quad_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_swtch_r);
-	DECLARE_READ8_MEMBER(sgi_ip2_clock_ctl_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_ctl_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_clock_data_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_clock_data_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_os_base_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_os_base_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_status_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_status_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_parctl_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_parctl_w);
-	DECLARE_READ8_MEMBER(sgi_ip2_mbp_r);
-	DECLARE_WRITE8_MEMBER(sgi_ip2_mbp_w);
-	DECLARE_READ32_MEMBER(sgi_ip2_ptmap_r);
-	DECLARE_WRITE32_MEMBER(sgi_ip2_ptmap_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_tdbase_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_tdbase_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_tdlmt_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_tdlmt_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_stkbase_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_stkbase_w);
-	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
-	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
+	uint8_t sgi_ip2_m_but_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_m_but_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t sgi_ip2_m_quad_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_m_quad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sgi_ip2_swtch_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t sgi_ip2_clock_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_clock_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sgi_ip2_clock_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_clock_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sgi_ip2_os_base_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_os_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t sgi_ip2_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t sgi_ip2_parctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_parctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sgi_ip2_mbp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sgi_ip2_mbp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t sgi_ip2_ptmap_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sgi_ip2_ptmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t sgi_ip2_tdbase_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_tdbase_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sgi_ip2_tdlmt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_tdlmt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sgi_ip2_stkbase_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_stkbase_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sgi_ip2_stklmt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sgi_ip2_stklmt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_sgi_ip2();
 	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
@@ -145,13 +145,13 @@ inline void ATTR_PRINTF(3,4) sgi_ip2_state::verboselog( int n_level, const char 
 #define BOARD_REV2      0x50    /* Board revision - #2 */
 
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_r)
+uint8_t sgi_ip2_state::sgi_ip2_m_but_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_m_but_r: %02x\n", m_mbut | BOARD_REV1);
 	return m_mbut | BOARD_REV1;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_w)
+void sgi_ip2_state::sgi_ip2_m_but_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_m_but_w: %02x\n", data);
 	m_mbut = data;
@@ -163,52 +163,52 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_m_but_w)
 #define MOUSE_YCHANGE   0x08    /* MOUSE_YCHANGE ? y-- : y++ */
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_r)
+uint16_t sgi_ip2_state::sgi_ip2_m_quad_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_m_quad_r: %04x\n", m_mquad);
 	return m_mquad;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_m_quad_w)
+void sgi_ip2_state::sgi_ip2_m_quad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_m_quad_w = %04x & %04x\n", data, mem_mask);
 	COMBINE_DATA(&m_mquad);
 }
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
+uint16_t sgi_ip2_state::sgi_ip2_swtch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_swtch_r: %04x\n", ioport("SWTCH")->read());
 	return ioport("SWTCH")->read();
 }
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
+uint8_t sgi_ip2_state::sgi_ip2_clock_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_rtc->read(space, 1);
 	verboselog(1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
+void sgi_ip2_state::sgi_ip2_clock_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(1, "sgi_ip2_clock_ctl_w: %02x\n", data);
 	m_rtc->write(space, 1, data);
 }
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
+uint8_t sgi_ip2_state::sgi_ip2_clock_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_rtc->read(space, 0);
 	verboselog(1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
+void sgi_ip2_state::sgi_ip2_clock_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(1, "sgi_ip2_clock_data_w: %02x\n", data);
 	m_rtc->write(space, 0, data);
 }
 
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_r)
+uint8_t sgi_ip2_state::sgi_ip2_os_base_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -219,7 +219,7 @@ READ8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_r)
 	return 0;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_w)
+void sgi_ip2_state::sgi_ip2_os_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -229,7 +229,7 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_os_base_w)
 	}
 }
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_status_r)
+uint16_t sgi_ip2_state::sgi_ip2_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -240,7 +240,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_status_r)
 	return 0;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_status_w)
+void sgi_ip2_state::sgi_ip2_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -260,13 +260,13 @@ WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_status_w)
 #define PAR_MBW     0x80    /* Check parity on multibus writes */
 
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_r)
+uint8_t sgi_ip2_state::sgi_ip2_parctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_parctl_r: %02x\n", m_parctl);
 	return m_parctl;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_w)
+void sgi_ip2_state::sgi_ip2_parctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_parctl_w: %02x\n", data);
 	m_parctl = data;
@@ -282,78 +282,78 @@ WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_parctl_w)
 #define MBP_HMACC   0x80    /* Allow upper memory access (0x8nnnnn - 0xfnnnnn) */
 
 
-READ8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_r)
+uint8_t sgi_ip2_state::sgi_ip2_mbp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_mbp_r: %02x\n", m_mbp);
 	return m_mbp;
 }
 
-WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_mbp_w)
+void sgi_ip2_state::sgi_ip2_mbp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_mbp_w: %02x\n", data);
 	m_mbp = data;
 }
 
 
-READ32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_r)
+uint32_t sgi_ip2_state::sgi_ip2_ptmap_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_ptmap_r: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), m_ptmap[offset], mem_mask);
 	return m_ptmap[offset];
 }
 
-WRITE32_MEMBER(sgi_ip2_state::sgi_ip2_ptmap_w)
+void sgi_ip2_state::sgi_ip2_ptmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_ptmap_w: %08x = %08x & %08x\n", 0x3b000000 + (offset << 2), data, mem_mask);
 	COMBINE_DATA(&m_ptmap[offset]);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_r)
+uint16_t sgi_ip2_state::sgi_ip2_tdbase_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_tdbase_r: %04x\n", m_tdbase);
 	return m_tdbase;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdbase_w)
+void sgi_ip2_state::sgi_ip2_tdbase_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_tdbase_w: %04x & %04x\n", data, mem_mask);
 	COMBINE_DATA(&m_tdbase);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_r)
+uint16_t sgi_ip2_state::sgi_ip2_tdlmt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_tdlmt_r: %04x\n", m_tdlmt);
 	return m_tdlmt;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_tdlmt_w)
+void sgi_ip2_state::sgi_ip2_tdlmt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_tdlmt_w: %04x & %04x\n", data, mem_mask);
 	COMBINE_DATA(&m_tdlmt);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_r)
+uint16_t sgi_ip2_state::sgi_ip2_stkbase_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_stkbase_r: %04x\n", m_stkbase);
 	return m_stkbase;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stkbase_w)
+void sgi_ip2_state::sgi_ip2_stkbase_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_stkbase_w: %04x & %04x\n", data, mem_mask);
 	COMBINE_DATA(&m_stkbase);
 }
 
 
-READ16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_r)
+uint16_t sgi_ip2_state::sgi_ip2_stklmt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_stklmt_r: %04x\n", m_stklmt);
 	return m_stklmt;
 }
 
-WRITE16_MEMBER(sgi_ip2_state::sgi_ip2_stklmt_w)
+void sgi_ip2_state::sgi_ip2_stklmt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	verboselog(0, "sgi_ip2_stklmt_w: %04x & %04x\n", data, mem_mask);
 	COMBINE_DATA(&m_stklmt);

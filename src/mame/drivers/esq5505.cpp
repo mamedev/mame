@@ -190,16 +190,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ16_MEMBER(lower_r);
-	DECLARE_WRITE16_MEMBER(lower_w);
+	uint16_t lower_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(analog_r);
-	DECLARE_WRITE16_MEMBER(analog_w);
+	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_system_type;
 	uint8_t m_duart_io;
@@ -227,10 +227,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
-	DECLARE_READ8_MEMBER(fdc_read_byte);
-	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	void dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -325,7 +325,7 @@ void esq5505_state::update_irq_to_maincpu() {
 	}
 }
 
-READ16_MEMBER(esq5505_state::lower_r)
+uint16_t esq5505_state::lower_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x7fff;
 
@@ -346,7 +346,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 	}
 }
 
-WRITE16_MEMBER(esq5505_state::lower_w)
+void esq5505_state::lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7fff;
 
@@ -414,13 +414,13 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 	update_irq_to_maincpu();
 }
 
-WRITE16_MEMBER(esq5505_state::analog_w)
+void esq5505_state::analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7;
 	m_analog_values[offset] = data;
 }
 
-READ16_MEMBER(esq5505_state::analog_r)
+uint16_t esq5505_state::analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_analog_values[m_duart_io & 7];
 }
@@ -440,7 +440,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(esq5505_state::duart_output)
+void esq5505_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : nullptr;
@@ -502,7 +502,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-WRITE8_MEMBER(esq5505_state::dma_end)
+void esq5505_state::dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0)
 	{
@@ -519,7 +519,7 @@ WRITE8_MEMBER(esq5505_state::dma_end)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(esq5505_state::dma_error)
+void esq5505_state::dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != 0)
 	{
@@ -535,12 +535,12 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 	update_irq_to_maincpu();
 }
 
-READ8_MEMBER(esq5505_state::fdc_read_byte)
+uint8_t esq5505_state::fdc_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->data_r();
 }
 
-WRITE8_MEMBER(esq5505_state::fdc_write_byte)
+void esq5505_state::fdc_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->data_w(data & 0xff);
 }

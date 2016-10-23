@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
 	}
 }
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_videoram_w)
+void ampoker2_state::ampoker2_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

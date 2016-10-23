@@ -36,7 +36,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcc_w)
+void cedar_magnet_plane_device::plane_portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_framebuffer[((m_curline&0xff)*0x100)+(m_lineoffset&0xff)] = data;
 
@@ -51,18 +51,18 @@ WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcc_w)
 	}
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcd_w)
+void cedar_magnet_plane_device::plane_portcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lineoffset = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::plane_portce_w)
+void cedar_magnet_plane_device::plane_portce_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_curline = data;
 
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::plane_portcf_w)
+void cedar_magnet_plane_device::plane_portcf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// does it have a meaning or is it just some kind of watchdog?
 	m_cf_data = data;
@@ -90,7 +90,7 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_plane )
 MACHINE_CONFIG_END
 
 
-READ8_MEMBER(cedar_magnet_plane_device::pio0_pa_r)
+uint8_t cedar_magnet_plane_device::pio0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // this is read
 //  logerror("%s: pio0_pa_r\n", machine().describe_context());
@@ -98,7 +98,7 @@ READ8_MEMBER(cedar_magnet_plane_device::pio0_pa_r)
 }
 
 
-WRITE8_MEMBER(cedar_magnet_plane_device::pio0_pa_w)
+void cedar_magnet_plane_device::pio0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio0_pa_data = data;
 
@@ -111,17 +111,17 @@ WRITE8_MEMBER(cedar_magnet_plane_device::pio0_pa_w)
 	// 321 = always set after startup?
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::pio0_pb_w)
+void cedar_magnet_plane_device::pio0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio0_pb_data = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pa_w)
+void cedar_magnet_plane_device::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_plane_device::pio1_pb_w)
+void cedar_magnet_plane_device::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }

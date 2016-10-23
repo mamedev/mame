@@ -19,17 +19,17 @@
 #include "includes/hcastle.h"
 
 
-WRITE8_MEMBER(hcastle_state::hcastle_bankswitch_w)
+void hcastle_state::hcastle_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_soundirq_w)
+void hcastle_state::hcastle_soundirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
+void hcastle_state::hcastle_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);
 	machine().bookkeeping().coin_counter_w(1, data & 0x80);
@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(hcastle_state::sound_bank_w)
+void hcastle_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
@@ -156,7 +156,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-WRITE8_MEMBER(hcastle_state::volume_callback)
+void hcastle_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

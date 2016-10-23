@@ -90,9 +90,9 @@ public:
 	int       m_oki_bank;
 	uint16_t  m_gfx_control;
 
-	DECLARE_WRITE16_MEMBER(gfx_ctrl_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
-	DECLARE_WRITE16_MEMBER(tilemap1_scrolly_w);
+	void gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap1_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap1_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void video_start() override;
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 			0);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
+void _3x3puzzle_state::gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// does this have registers to control when the actual tile/palette
 	// data is copied to a private buffer?
@@ -159,12 +159,12 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrollx_w)
+void _3x3puzzle_state::tilemap1_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilemap1->set_scrollx(data);
 }
 
-WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
+void _3x3puzzle_state::tilemap1_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilemap1->set_scrolly(data);
 }

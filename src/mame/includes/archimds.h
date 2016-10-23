@@ -71,16 +71,16 @@ public:
 	void archimedes_clear_irq_b(int mask);
 	void archimedes_clear_fiq(int mask);
 
-	DECLARE_READ32_MEMBER(aristmk5_drame_memc_logical_r);
-	DECLARE_READ32_MEMBER(archimedes_memc_logical_r);
-	DECLARE_WRITE32_MEMBER(archimedes_memc_logical_w);
-	DECLARE_READ32_MEMBER(archimedes_memc_r);
-	DECLARE_WRITE32_MEMBER(archimedes_memc_w);
-	DECLARE_WRITE32_MEMBER(archimedes_memc_page_w);
-	DECLARE_READ32_MEMBER(archimedes_ioc_r);
-	DECLARE_WRITE32_MEMBER(archimedes_ioc_w);
-	DECLARE_READ32_MEMBER(archimedes_vidc_r);
-	DECLARE_WRITE32_MEMBER(archimedes_vidc_w);
+	uint32_t aristmk5_drame_memc_logical_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t archimedes_memc_logical_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void archimedes_memc_logical_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t archimedes_memc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void archimedes_memc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void archimedes_memc_page_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t archimedes_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void archimedes_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t archimedes_vidc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void archimedes_vidc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
 	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
 
@@ -122,8 +122,8 @@ private:
 	void vidc_dynamic_res_change();
 	void latch_timer_cnt(int tmr);
 	void a310_set_timer(int tmr);
-	DECLARE_READ32_MEMBER(ioc_ctrl_r);
-	DECLARE_WRITE32_MEMBER(ioc_ctrl_w);
+	uint32_t ioc_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ioc_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t *m_archimedes_memc_physmem;
 	uint32_t m_memc_pagesize;

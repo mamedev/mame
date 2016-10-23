@@ -33,12 +33,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( k005289_control_A_w );
-	DECLARE_WRITE8_MEMBER( k005289_control_B_w );
-	DECLARE_WRITE8_MEMBER( ld1_w );
-	DECLARE_WRITE8_MEMBER( ld2_w );
-	DECLARE_WRITE8_MEMBER( tg1_w );
-	DECLARE_WRITE8_MEMBER( tg2_w );
+	void k005289_control_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k005289_control_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ld1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ld2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	void make_mixer_table(int voices);

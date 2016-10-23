@@ -46,7 +46,7 @@ TODO:
 #include "includes/hnayayoi.h"
 
 
-READ8_MEMBER(hnayayoi_state::keyboard_0_r)
+uint8_t hnayayoi_state::keyboard_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0x3f;
 	int i;
@@ -61,34 +61,34 @@ READ8_MEMBER(hnayayoi_state::keyboard_0_r)
 	return res;
 }
 
-READ8_MEMBER(hnayayoi_state::keyboard_1_r)
+uint8_t hnayayoi_state::keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Player 2 not supported */
 	return 0x3f;
 }
 
-WRITE8_MEMBER(hnayayoi_state::keyboard_w)
+void hnayayoi_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb = data;
 }
 
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
+void hnayayoi_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_vclk_w)
+void hnayayoi_state::adpcm_vclk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->vclk_w(data & 1);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_reset_w)
+void hnayayoi_state::adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_reset_inv_w)
+void hnayayoi_state::adpcm_reset_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(~data & 1);
 }

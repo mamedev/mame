@@ -895,7 +895,7 @@ void model3_state::pci_device_set_reg(uint32_t value)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_addr_r)
+uint64_t model3_state::mpc105_addr_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -904,7 +904,7 @@ READ64_MEMBER(model3_state::mpc105_addr_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::mpc105_addr_w)
+void model3_state::mpc105_addr_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -918,7 +918,7 @@ WRITE64_MEMBER(model3_state::mpc105_addr_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_data_r)
+uint64_t model3_state::mpc105_data_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		return ((uint64_t)(flipendian_int32(m_mpc105_regs[(m_pci_reg/2)+1])) << 32) |
@@ -927,7 +927,7 @@ READ64_MEMBER(model3_state::mpc105_data_r)
 	return flipendian_int32(pci_device_get_reg());
 }
 
-WRITE64_MEMBER(model3_state::mpc105_data_w)
+void model3_state::mpc105_data_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		m_mpc105_regs[(m_pci_reg/2)+1] = flipendian_int32((uint32_t)(data >> 32));
@@ -940,13 +940,13 @@ WRITE64_MEMBER(model3_state::mpc105_data_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc105_reg_r)
+uint64_t model3_state::mpc105_reg_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return ((uint64_t)(m_mpc105_regs[(offset*2)+0]) << 32) |
 			(uint64_t)(m_mpc105_regs[(offset*2)+1]);
 }
 
-WRITE64_MEMBER(model3_state::mpc105_reg_w)
+void model3_state::mpc105_reg_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_mpc105_regs[(offset*2)+0] = (uint32_t)(data >> 32);
 	m_mpc105_regs[(offset*2)+1] = (uint32_t)data;
@@ -972,7 +972,7 @@ static void mpc105_init(running_machine &machine)
 /* Motorola MPC106 PCI Bridge/Memory Controller */
 
 
-READ64_MEMBER(model3_state::mpc106_addr_r)
+uint64_t model3_state::mpc106_addr_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -981,7 +981,7 @@ READ64_MEMBER(model3_state::mpc106_addr_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::mpc106_addr_w)
+void model3_state::mpc106_addr_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -1003,7 +1003,7 @@ WRITE64_MEMBER(model3_state::mpc106_addr_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc106_data_r)
+uint64_t model3_state::mpc106_data_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		return ((uint64_t)(flipendian_int32(m_mpc106_regs[(m_pci_reg/2)+1])) << 32) |
@@ -1019,7 +1019,7 @@ READ64_MEMBER(model3_state::mpc106_data_r)
 	}
 }
 
-WRITE64_MEMBER(model3_state::mpc106_data_w)
+void model3_state::mpc106_data_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(m_pci_device == 0) {
 		m_mpc106_regs[(m_pci_reg/2)+1] = flipendian_int32((uint32_t)(data >> 32));
@@ -1032,13 +1032,13 @@ WRITE64_MEMBER(model3_state::mpc106_data_w)
 	}
 }
 
-READ64_MEMBER(model3_state::mpc106_reg_r)
+uint64_t model3_state::mpc106_reg_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return ((uint64_t)(m_mpc106_regs[(offset*2)+0]) << 32) |
 			(uint64_t)(m_mpc106_regs[(offset*2)+1]);
 }
 
-WRITE64_MEMBER(model3_state::mpc106_reg_w)
+void model3_state::mpc106_reg_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_mpc106_regs[(offset*2)+0] = (uint32_t)(data >> 32);
 	m_mpc106_regs[(offset*2)+1] = (uint32_t)data;
@@ -1067,7 +1067,7 @@ static void mpc106_init(running_machine &machine)
 
 /*****************************************************************************/
 
-READ64_MEMBER(model3_state::scsi_r)
+uint64_t model3_state::scsi_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	int reg = offset*8;
 	uint64_t r = 0;
@@ -1099,7 +1099,7 @@ READ64_MEMBER(model3_state::scsi_r)
 	return r;
 }
 
-WRITE64_MEMBER(model3_state::scsi_w)
+void model3_state::scsi_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
@@ -1145,7 +1145,7 @@ LSI53C810_IRQ_CB(model3_state::scsi_irq_callback)
 /* Real3D DMA */
 
 
-READ64_MEMBER(model3_state::real3d_dma_r)
+uint64_t model3_state::real3d_dma_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1161,7 +1161,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::real3d_dma_w)
+void model3_state::real3d_dma_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1368,7 +1368,7 @@ void model3_state::machine_reset_model3_20(){ model3_init(0x20); }
 void model3_state::machine_reset_model3_21(){ model3_init(0x21); }
 
 
-READ64_MEMBER(model3_state::model3_ctrl_r)
+uint64_t model3_state::model3_ctrl_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	switch( offset )
 	{
@@ -1443,7 +1443,7 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_ctrl_w)
+void model3_state::model3_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1539,7 +1539,7 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 	logerror("ctrl_w: %02X, %08X%08X, %08X%08X", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 }
 
-READ64_MEMBER(model3_state::model3_sys_r)
+uint64_t model3_state::model3_sys_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 //  printf("model3_sys_r: mask %llx @ %x (PC %x)\n", mem_mask, offset, space.device().safe_pc());
 
@@ -1574,7 +1574,7 @@ READ64_MEMBER(model3_state::model3_sys_r)
 	return 0;
 }
 
-WRITE64_MEMBER(model3_state::model3_sys_w)
+void model3_state::model3_sys_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 //  printf("model3_sys_w: %llx to %x mask %llx\n", data, offset, mem_mask);
 
@@ -1644,7 +1644,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 	}
 }
 
-READ64_MEMBER(model3_state::model3_rtc_r)
+uint64_t model3_state::model3_rtc_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	if(ACCESSING_BITS_56_63) {
@@ -1656,7 +1656,7 @@ READ64_MEMBER(model3_state::model3_rtc_r)
 	return r;
 }
 
-WRITE64_MEMBER(model3_state::model3_rtc_w)
+void model3_state::model3_rtc_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if(ACCESSING_BITS_56_63) {
 		rtc72421_w(space, (offset*2)+0, (uint32_t)(data >> 32), (uint32_t)(mem_mask >> 32));
@@ -1666,7 +1666,7 @@ WRITE64_MEMBER(model3_state::model3_rtc_w)
 	}
 }
 
-READ64_MEMBER(model3_state::real3d_status_r)
+uint64_t model3_state::real3d_status_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	m_real3d_status ^= U64(0xffffffffffffffff);
 	if (offset == 0)
@@ -1681,7 +1681,7 @@ READ64_MEMBER(model3_state::real3d_status_r)
 }
 
 /* SCSP interface */
-READ8_MEMBER(model3_state::model3_sound_r)
+uint8_t model3_state::model3_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1696,7 +1696,7 @@ READ8_MEMBER(model3_state::model3_sound_r)
 	return 0;
 }
 
-WRITE8_MEMBER(model3_state::model3_sound_w)
+void model3_state::model3_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1734,7 +1734,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 
 
-READ64_MEMBER(model3_state::model3_5881prot_r)
+uint64_t model3_state::model3_5881prot_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t retvalue = U64(0xffffffffffffffff);
 
@@ -1771,7 +1771,7 @@ READ64_MEMBER(model3_state::model3_5881prot_r)
 
 }
 
-WRITE64_MEMBER(model3_state::model3_5881prot_w)
+void model3_state::model3_5881prot_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (offset == 0x10 / 8)
 	{
@@ -1797,7 +1797,7 @@ WRITE64_MEMBER(model3_state::model3_5881prot_w)
 	}
 }
 
-WRITE64_MEMBER(model3_state::daytona2_rombank_w)
+void model3_state::daytona2_rombank_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_56_63)
 	{
@@ -5470,7 +5470,7 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-WRITE16_MEMBER(model3_state::model3snd_ctrl)
+void model3_state::model3snd_ctrl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// handle sample banking
 	if (memregion("scsp2")->bytes() > 0x800000)
@@ -5502,7 +5502,7 @@ static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(model3_state::scsp_irq)
+void model3_state::scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(offset, data);
 }

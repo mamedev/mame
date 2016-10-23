@@ -35,10 +35,10 @@ protected:
 		virtual void device_reset() override;
 		virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-		DECLARE_READ16_MEMBER(sedisplay_r);
-		DECLARE_WRITE16_MEMBER(sedisplay_w);
-		DECLARE_READ16_MEMBER(ramdac_r);
-		DECLARE_WRITE16_MEMBER(ramdac_w);
+		uint16_t sedisplay_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void sedisplay_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		uint16_t ramdac_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void ramdac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 public:
 		std::unique_ptr<uint8_t[]> m_vram;

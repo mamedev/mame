@@ -49,7 +49,7 @@ void saturn_rom_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ32_MEMBER(saturn_rom_device::read_rom)
+uint32_t saturn_rom_device::read_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_rom[offset & (m_rom_size/4 - 1)];
 }

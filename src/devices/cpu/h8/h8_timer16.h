@@ -78,22 +78,22 @@ public:
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
 
-	DECLARE_READ8_MEMBER(tcr_r);
-	DECLARE_WRITE8_MEMBER(tcr_w);
-	DECLARE_READ8_MEMBER(tmdr_r);
-	DECLARE_WRITE8_MEMBER(tmdr_w);
-	DECLARE_READ8_MEMBER(tior_r);
-	DECLARE_WRITE8_MEMBER(tior_w);
-	DECLARE_READ8_MEMBER(tier_r);
-	DECLARE_WRITE8_MEMBER(tier_w);
-	DECLARE_READ8_MEMBER(tsr_r);
-	DECLARE_WRITE8_MEMBER(tsr_w);
-	DECLARE_READ16_MEMBER(tcnt_r);
-	DECLARE_WRITE16_MEMBER(tcnt_w);
-	DECLARE_READ16_MEMBER(tgr_r);
-	DECLARE_WRITE16_MEMBER(tgr_w);
-	DECLARE_READ16_MEMBER(tbr_r);
-	DECLARE_WRITE16_MEMBER(tbr_w);
+	uint8_t tcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tmdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tior_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tior_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tier_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tier_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t tcnt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tcnt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tgr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tgr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tbr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tbr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint64_t internal_update(uint64_t current_time);
 	void set_ier(uint8_t value);
@@ -168,23 +168,23 @@ public:
 
 	void set_info(int timer_count, uint8_t default_tstr);
 
-	DECLARE_READ8_MEMBER(tstr_r);
-	DECLARE_WRITE8_MEMBER(tstr_w);
-	DECLARE_READ8_MEMBER(tsyr_r);
-	DECLARE_WRITE8_MEMBER(tsyr_w);
-	DECLARE_READ8_MEMBER(tmdr_r);
-	DECLARE_WRITE8_MEMBER(tmdr_w);
-	DECLARE_READ8_MEMBER(tfcr_r);
-	DECLARE_WRITE8_MEMBER(tfcr_w);
-	DECLARE_READ8_MEMBER(toer_r);
-	DECLARE_WRITE8_MEMBER(toer_w);
-	DECLARE_READ8_MEMBER(tocr_r);
-	DECLARE_WRITE8_MEMBER(tocr_w);
-	DECLARE_READ8_MEMBER(tisr_r);
-	DECLARE_WRITE8_MEMBER(tisr_w);
-	DECLARE_READ8_MEMBER(tisrc_r);
-	DECLARE_WRITE8_MEMBER(tisrc_w);
-	DECLARE_WRITE8_MEMBER(tolr_w);
+	uint8_t tstr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tstr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tsyr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tsyr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tmdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tfcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tfcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t toer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void toer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tocr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tocr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tisr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tisr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tisrc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tisrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tolr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<h8_device> cpu;

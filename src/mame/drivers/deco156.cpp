@@ -50,16 +50,16 @@ public:
 	uint16_t   m_pf1_rowscroll[0x800/2];
 	uint16_t   m_pf2_rowscroll[0x800/2];
 	std::unique_ptr<uint16_t[]> m_spriteram;
-	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_nonbuffered_palette_w);
-	DECLARE_WRITE32_MEMBER(deco156_nonbuffered_palette_w);
-	DECLARE_READ32_MEMBER(wcvol95_pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(wcvol95_pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(wcvol95_spriteram_r);
-	DECLARE_WRITE32_MEMBER(wcvol95_pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
-	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
+	void hvysmsh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void wcvol95_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void deco156_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t wcvol95_pf1_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t wcvol95_pf2_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t wcvol95_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void wcvol95_pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void wcvol95_pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void wcvol95_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void hvysmsh_oki_0_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_hvysmsh();
 	void init_wcvol95();
 	virtual void video_start() override;
@@ -100,7 +100,7 @@ uint32_t deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb3
 
 /***************************************************************************/
 
-WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
+void deco156_state::hvysmsh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -109,19 +109,19 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 	}
 }
 
-WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
+void deco156_state::hvysmsh_oki_0_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)
+void deco156_state::wcvol95_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
 /* This is the same as deco32_nonbuffered_palette_w in video/deco32.c */
-WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
+void deco156_state::deco156_nonbuffered_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 
@@ -134,12 +134,12 @@ WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
 	m_palette->set_pen_color(offset,rgb_t(r,g,b));
 }
 
-READ32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::wcvol95_spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::wcvol95_spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
+uint32_t deco156_state::wcvol95_pf1_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::wcvol95_pf2_rowscroll_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+uint32_t deco156_state::wcvol95_spriteram_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_spriteram[offset] ^ 0xffff0000; }
+void deco156_state::wcvol95_pf1_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+void deco156_state::wcvol95_pf2_rowscroll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+void deco156_state::wcvol95_spriteram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )

@@ -147,7 +147,7 @@ machine_config_constructor a78_xm_device::device_mconfig_additions() const
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_xboard_device::read_40xx)
+uint8_t a78_xboard_device::read_40xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 3) && offset < 0x4000)
 		return m_ram[offset + (m_ram_bank * 0x4000)];
@@ -155,7 +155,7 @@ READ8_MEMBER(a78_xboard_device::read_40xx)
 		return m_xbslot->read_40xx(space, offset);
 }
 
-WRITE8_MEMBER(a78_xboard_device::write_40xx)
+void a78_xboard_device::write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 3) && offset < 0x4000)
 		m_ram[offset + (m_ram_bank * 0x4000)] = data;
@@ -163,7 +163,7 @@ WRITE8_MEMBER(a78_xboard_device::write_40xx)
 		m_xbslot->write_40xx(space, offset, data);
 }
 
-READ8_MEMBER(a78_xboard_device::read_04xx)
+uint8_t a78_xboard_device::read_04xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		return m_pokey->read(space, offset & 0x0f);
@@ -173,7 +173,7 @@ READ8_MEMBER(a78_xboard_device::read_04xx)
 		return 0xff;
 }
 
-WRITE8_MEMBER(a78_xboard_device::write_04xx)
+void a78_xboard_device::write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		m_pokey->write(space, offset & 0x0f, data);
@@ -193,22 +193,22 @@ WRITE8_MEMBER(a78_xboard_device::write_04xx)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(a78_xm_device::read_10xx)
+uint8_t a78_xm_device::read_10xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(a78_xm_device::write_10xx)
+void a78_xm_device::write_10xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset] = data;
 }
 
-READ8_MEMBER(a78_xm_device::read_30xx)
+uint8_t a78_xm_device::read_30xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset];
 }
 
-READ8_MEMBER(a78_xm_device::read_04xx)
+uint8_t a78_xm_device::read_04xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		return m_pokey->read(space, offset & 0x0f);
@@ -220,7 +220,7 @@ READ8_MEMBER(a78_xm_device::read_04xx)
 		return 0xff;
 }
 
-WRITE8_MEMBER(a78_xm_device::write_04xx)
+void a78_xm_device::write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
 		m_pokey->write(space, offset & 0x0f, data);

@@ -58,7 +58,7 @@ nes_bandai_pt554_device::nes_bandai_pt554_device(const machine_config &mconfig, 
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bandai_pt554_device::write_m)
+void nes_bandai_pt554_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
 

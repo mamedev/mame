@@ -90,33 +90,33 @@ TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
 			0);
 }
 
-READ16_MEMBER( tc0280grd_device::tc0280grd_word_r )
+uint16_t tc0280grd_device::tc0280grd_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0280grd_word_w )
+void tc0280grd_device::tc0280grd_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0280grd_ctrl_word_w )
+void tc0280grd_device::tc0280grd_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ctrl[offset]);
 }
 
-READ16_MEMBER( tc0280grd_device::tc0430grw_word_r )
+uint16_t tc0280grd_device::tc0430grw_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return tc0280grd_word_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0430grw_word_w )
+void tc0280grd_device::tc0430grw_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tc0280grd_word_w(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER( tc0280grd_device::tc0430grw_ctrl_word_w )
+void tc0280grd_device::tc0430grw_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tc0280grd_ctrl_word_w(space, offset, data, mem_mask);
 }

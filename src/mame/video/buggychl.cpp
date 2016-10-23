@@ -24,7 +24,7 @@ void buggychl_state::video_start()
 
 
 
-WRITE8_MEMBER(buggychl_state::buggychl_chargen_w)
+void buggychl_state::buggychl_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charram[offset] != data)
 	{
@@ -33,17 +33,17 @@ WRITE8_MEMBER(buggychl_state::buggychl_chargen_w)
 	}
 }
 
-WRITE8_MEMBER(buggychl_state::buggychl_sprite_lookup_bank_w)
+void buggychl_state::buggychl_sprite_lookup_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sl_bank = (data & 0x10) << 8;
 }
 
-WRITE8_MEMBER(buggychl_state::buggychl_sprite_lookup_w)
+void buggychl_state::buggychl_sprite_lookup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_lookup[offset + m_sl_bank] = data;
 }
 
-WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
+void buggychl_state::buggychl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     bit7 = lamp
@@ -67,7 +67,7 @@ WRITE8_MEMBER(buggychl_state::buggychl_ctrl_w)
 	output().set_led_value(0, ~data & 0x80);
 }
 
-WRITE8_MEMBER(buggychl_state::buggychl_bg_scrollx_w)
+void buggychl_state::buggychl_bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scrollx = -(data - 0x12);
 }

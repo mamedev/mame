@@ -470,7 +470,7 @@ void taitoair_state::fb_fill_op()
     @todo still don't know how this works. It calls three values (0x1fff-0x5fff-0xdfff), for two or three offsets.
     In theory this should fit into framebuffer draw, display, clear and swap in some way.
 */
-WRITE16_MEMBER(taitoair_state::dsp_flags_w)
+void taitoair_state::dsp_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	rectangle cliprect;
 

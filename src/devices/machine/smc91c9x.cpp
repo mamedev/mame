@@ -375,7 +375,7 @@ void smc91c9x_device::process_command(uint16_t data)
     smc91c9x_r - handle a read from the device
 -------------------------------------------------*/
 
-READ16_MEMBER( smc91c9x_device::read )
+uint16_t smc91c9x_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t result;
 
@@ -419,7 +419,7 @@ READ16_MEMBER( smc91c9x_device::read )
     smc91c9x_w - handle a write to the device
 -------------------------------------------------*/
 
-WRITE16_MEMBER( smc91c9x_device::write )
+void smc91c9x_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//  uint16_t olddata;
 

@@ -134,38 +134,38 @@ public:
 	uint8_t m_profpac_writemode;
 	uint16_t m_profpac_writemask;
 	uint8_t m_profpac_vw;
-	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
-	DECLARE_READ8_MEMBER(protected_ram_r);
-	DECLARE_WRITE8_MEMBER(protected_ram_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_lamps_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
-	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
-	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
-	DECLARE_WRITE8_MEMBER(ebases_coin_w);
-	DECLARE_READ8_MEMBER(spacezap_io_r);
-	DECLARE_READ8_MEMBER(wow_io_r);
-	DECLARE_READ8_MEMBER(gorf_io_1_r);
-	DECLARE_READ8_MEMBER(gorf_io_2_r);
-	DECLARE_READ8_MEMBER(robby_io_r);
-	DECLARE_READ8_MEMBER(profpac_io_1_r);
-	DECLARE_READ8_MEMBER(profpac_io_2_r);
-	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
-	DECLARE_WRITE8_MEMBER(demndrgn_banksw_w);
-	DECLARE_READ8_MEMBER(demndrgn_io_r);
-	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_sound_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
-	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
-	DECLARE_READ8_MEMBER(astrocade_data_chip_register_r);
-	DECLARE_WRITE8_MEMBER(astrocade_data_chip_register_w);
-	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
-	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
-	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
-	DECLARE_READ8_MEMBER(profpac_intercept_r);
-	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
-	DECLARE_READ8_MEMBER(profpac_videoram_r);
-	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
+	void protected_ram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t protected_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protected_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seawolf2_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seawolf2_sound_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seawolf2_sound_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ebases_trackball_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ebases_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spacezap_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t wow_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gorf_io_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gorf_io_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t robby_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t profpac_io_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t profpac_io_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void profpac_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void demndrgn_banksw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t demndrgn_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void demndrgn_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tenpindx_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tenpindx_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tenpindx_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tenpindx_lights_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t astrocade_data_chip_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void astrocade_data_chip_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astrocade_funcgen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void astrocade_pattern_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void profpac_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t profpac_intercept_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void profpac_screenram_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t profpac_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void profpac_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
 	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
@@ -196,11 +196,11 @@ public:
 	virtual void machine_start() override;
 
 	/*----------- defined in audio/wow.c -----------*/
-	DECLARE_READ8_MEMBER( wow_speech_r );
+	uint8_t wow_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	CUSTOM_INPUT_MEMBER( wow_speech_status_r );
 
 	/*----------- defined in audio/gorf.c -----------*/
-	DECLARE_READ8_MEMBER( gorf_speech_r );
+	uint8_t gorf_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
 
 protected:

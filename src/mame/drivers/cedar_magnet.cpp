@@ -180,7 +180,7 @@ ADDRESS_MAP_END
 
 ***********************/
 
-WRITE8_MEMBER(cedar_magnet_state::rambank_palbank_w)
+void cedar_magnet_state::rambank_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ---- --xx
 	// xx = program bank
@@ -192,17 +192,17 @@ WRITE8_MEMBER(cedar_magnet_state::rambank_palbank_w)
 	m_sub_pal_bankdev->set_bank(palbank);
 }
 
-WRITE8_MEMBER(cedar_magnet_state::palupload_w)
+void cedar_magnet_state::palupload_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sub_pal_bankdev->write8(space, m_paladdr, data);
 }
 
-WRITE8_MEMBER(cedar_magnet_state::paladdr_w)
+void cedar_magnet_state::paladdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paladdr = data;
 }
 
-READ8_MEMBER(cedar_magnet_state::watchdog_r)
+uint8_t cedar_magnet_state::watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// watchdog
 	return 0x00;
@@ -215,7 +215,7 @@ READ8_MEMBER(cedar_magnet_state::watchdog_r)
 
 ***********************/
 
-READ8_MEMBER(cedar_magnet_state::port7c_r)
+uint8_t cedar_magnet_state::port7c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("%s: port7c_r\n", device().machine().describe_context());
 	return 0x01;
@@ -229,18 +229,18 @@ READ8_MEMBER(cedar_magnet_state::port7c_r)
 
 ***********************/
 
-READ8_MEMBER(cedar_magnet_state::port18_r)
+uint8_t cedar_magnet_state::port18_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("%s: port18_r\n", device().machine().describe_context());
 	return 0x00;
 }
 
-WRITE8_MEMBER(cedar_magnet_state::port18_w)
+void cedar_magnet_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: port18_w %02x\n", device().machine().describe_context(), data);
 }
 
-READ8_MEMBER(cedar_magnet_state::port19_r)
+uint8_t cedar_magnet_state::port19_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 //  printf("%s: port19_r\n", device().machine().describe_context());
@@ -253,19 +253,19 @@ READ8_MEMBER(cedar_magnet_state::port19_r)
 	return ret;
 }
 
-READ8_MEMBER(cedar_magnet_state::port1a_r)
+uint8_t cedar_magnet_state::port1a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("%s: port1a_r\n", device().machine().describe_context());
 	return 0x00;
 }
 
 
-WRITE8_MEMBER(cedar_magnet_state::port19_w)
+void cedar_magnet_state::port19_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: port19_w %02x\n", device().machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(cedar_magnet_state::port1b_w)
+void cedar_magnet_state::port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: port1b_w %02x\n", device().machine().describe_context(), data);
 }
@@ -281,19 +281,19 @@ void cedar_magnet_state::set_palette(int offset)
 	m_palette->set_pen_color(offset^0xff, pal4bit(m_pal_r[offset]), pal4bit(m_pal_g[offset]), pal4bit(m_pal_b[offset]));
 }
 
-WRITE8_MEMBER(cedar_magnet_state::palette_r_w)
+void cedar_magnet_state::palette_r_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pal_r[offset] = data;
 	set_palette(offset);
 }
 
-WRITE8_MEMBER(cedar_magnet_state::palette_g_w)
+void cedar_magnet_state::palette_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pal_g[offset] = data;
 	set_palette(offset);
 }
 
-WRITE8_MEMBER(cedar_magnet_state::palette_b_w)
+void cedar_magnet_state::palette_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pal_b[offset] = data;
 	set_palette(offset);
@@ -323,14 +323,14 @@ void cedar_magnet_state::video_start()
 
 ***********************/
 
-WRITE8_MEMBER(cedar_magnet_state::soundlatch_w)
+void cedar_magnet_state::soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s: writing soundlatch_w! %02x\n", device().machine().describe_context(), data);
 	portff_data = data;
 	m_cedsound->write_command(data);
 }
 
-READ8_MEMBER(cedar_magnet_state::other_cpu_r)
+uint8_t cedar_magnet_state::other_cpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	int plane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
@@ -379,7 +379,7 @@ READ8_MEMBER(cedar_magnet_state::other_cpu_r)
 	return ret;
 }
 
-WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
+void cedar_magnet_state::other_cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	int plane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
@@ -449,7 +449,7 @@ void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_device* d
 
 ***********************/
 
-READ8_MEMBER( cedar_magnet_state::ic48_pio_pa_r ) // 0x20
+uint8_t cedar_magnet_state::ic48_pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask) // 0x20
 {
 	uint8_t ret = m_ic48_pio_pa_val & ~0x08;
 
@@ -463,7 +463,7 @@ READ8_MEMBER( cedar_magnet_state::ic48_pio_pa_r ) // 0x20
 	return ret;
 }
 
-WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
+void cedar_magnet_state::ic48_pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // 0x20
 {
 	int oldplane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
 
@@ -491,7 +491,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 }
 
 
-READ8_MEMBER( cedar_magnet_state::ic48_pio_pb_r ) // 0x22
+uint8_t cedar_magnet_state::ic48_pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask) // 0x22
 {
 	uint8_t ret = m_ic48_pio_pb_val & ~0x80;
 
@@ -504,7 +504,7 @@ READ8_MEMBER( cedar_magnet_state::ic48_pio_pb_r ) // 0x22
 	return ret;
 }
 
-WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
+void cedar_magnet_state::ic48_pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // 0x22
 {
 	int oldplane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int oldspriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
@@ -537,7 +537,7 @@ WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 
 ***********************/
 
-READ8_MEMBER( cedar_magnet_state::ic49_pio_pb_r ) // 0x42
+uint8_t cedar_magnet_state::ic49_pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask) // 0x42
 {
 	uint8_t ret = m_ic49_pio_pb_val;
 
@@ -547,7 +547,7 @@ READ8_MEMBER( cedar_magnet_state::ic49_pio_pb_r ) // 0x42
 	return ret;
 }
 
-WRITE8_MEMBER( cedar_magnet_state::ic49_pio_pb_w ) // 0x42
+void cedar_magnet_state::ic49_pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) // 0x42
 {
 	int oldsoundselect = (m_ic49_pio_pb_val & 0x70) >> 4;
 

@@ -76,14 +76,14 @@ public:
 	required_shared_ptr<uint16_t> m_gms_vidram;
 	uint16_t m_tilebank;
 	uint8_t m_mux_data;
-	DECLARE_READ16_MEMBER(gms_read);
-	DECLARE_WRITE16_MEMBER(gms_write1);
-	DECLARE_WRITE16_MEMBER(gms_write2);
-	DECLARE_WRITE16_MEMBER(gms_write3);
-	DECLARE_READ8_MEMBER(rbmk_mcu_io_r);
-	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
-	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
+	uint16_t gms_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gms_write1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gms_write2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gms_write3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rbmk_mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rbmk_mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_io_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void video_start() override;
 	uint32_t screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
@@ -95,26 +95,26 @@ public:
 };
 
 
-READ16_MEMBER(rbmk_state::gms_read)
+uint16_t rbmk_state::gms_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
 
-WRITE16_MEMBER(rbmk_state::gms_write1)
+void rbmk_state::gms_write1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER(rbmk_state::gms_write2)
+void rbmk_state::gms_write2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilebank=data;
 }
 
-WRITE16_MEMBER(rbmk_state::gms_write3)
+void rbmk_state::gms_write3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-WRITE16_MEMBER(rbmk_state::eeprom_w)
+void rbmk_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8, rbmk_state )
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
+uint8_t rbmk_state::rbmk_mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_mux_data & 8)
 	{
@@ -167,7 +167,7 @@ READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(rbmk_state::rbmk_mcu_io_w)
+void rbmk_state::rbmk_mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_mux_data & 8) { machine().device<ym2151_device>("ymsnd")->write(space, offset & 1, data); }
 	else if(m_mux_data & 4)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(rbmk_state::rbmk_mcu_io_w)
 		printf("Warning: mux data W = %02x",m_mux_data);
 }
 
-WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
+void rbmk_state::mcu_io_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = ~data;
 }

@@ -65,12 +65,12 @@ void cpc_pds_device::device_reset()
 }
 
 
-READ8_MEMBER(cpc_pds_device::pio_r)
+uint8_t cpc_pds_device::pio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio->read(space,offset);
 }
 
-WRITE8_MEMBER(cpc_pds_device::pio_w)
+void cpc_pds_device::pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio->write(space,offset,data);
 }

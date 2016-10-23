@@ -27,20 +27,20 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(p1_lamps_w);
-	DECLARE_WRITE8_MEMBER(p2_lamps_w);
-	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
-	DECLARE_WRITE8_MEMBER(cm_coincount_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fg_atrram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(goldstar_fa00_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ncb3_port81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cm_coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_fg_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_fg_atrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void goldstar_fa00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_goldstar();
 	void init_cmast91();
 	void init_wcherry();
@@ -102,9 +102,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(outport0_w);
-	DECLARE_WRITE8_MEMBER(girl_scroll_w);
-	DECLARE_WRITE8_MEMBER(background_col_w);
+	void outport0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void girl_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_cm();
 	void init_cmv4();
@@ -129,25 +129,25 @@ public:
 
 protected:
 	// installed by various driver init handlers to get stuff to work
-	READ8_MEMBER(fixedval09_r) { return 0x09; }
-	READ8_MEMBER(fixedval38_r) { return 0x38; }
-	READ8_MEMBER(fixedval48_r) { return 0x48; }
-	READ8_MEMBER(fixedval58_r) { return 0x58; }
-	READ8_MEMBER(fixedval68_r) { return 0x68; }
-	READ8_MEMBER(fixedval74_r) { return 0x74; }
-	READ8_MEMBER(fixedval80_r) { return 0x80; }
-	READ8_MEMBER(fixedval82_r) { return 0x82; }
-	READ8_MEMBER(fixedval84_r) { return 0x84; }
-	READ8_MEMBER(fixedval90_r) { return 0x90; }
-	READ8_MEMBER(fixedval96_r) { return 0x96; }
-	READ8_MEMBER(fixedvala8_r) { return 0xa8; }
-	READ8_MEMBER(fixedvalaa_r) { return 0xaa; }
-	READ8_MEMBER(fixedvalb2_r) { return 0xb2; }
-	READ8_MEMBER(fixedvalb4_r) { return 0xb4; }
-	READ8_MEMBER(fixedvalbe_r) { return 0xbe; }
-	READ8_MEMBER(fixedvalc7_r) { return 0xc7; }
-	READ8_MEMBER(fixedvalea_r) { return 0xea; }
-	READ8_MEMBER(fixedvale4_r) { return 0xe4; }
+	uint8_t fixedval09_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x09; }
+	uint8_t fixedval38_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x38; }
+	uint8_t fixedval48_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x48; }
+	uint8_t fixedval58_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x58; }
+	uint8_t fixedval68_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x68; }
+	uint8_t fixedval74_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x74; }
+	uint8_t fixedval80_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x80; }
+	uint8_t fixedval82_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x82; }
+	uint8_t fixedval84_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x84; }
+	uint8_t fixedval90_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x90; }
+	uint8_t fixedval96_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0x96; }
+	uint8_t fixedvala8_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xa8; }
+	uint8_t fixedvalaa_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xaa; }
+	uint8_t fixedvalb2_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xb2; }
+	uint8_t fixedvalb4_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xb4; }
+	uint8_t fixedvalbe_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xbe; }
+	uint8_t fixedvalc7_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xc7; }
+	uint8_t fixedvalea_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xea; }
+	uint8_t fixedvale4_r(address_space &space, offs_t offset, uint8_t mem_mask) { return 0xe4; }
 };
 
 
@@ -160,12 +160,12 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
-	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
-	DECLARE_WRITE8_MEMBER(fl7w4_outc802_w);
-	DECLARE_WRITE8_MEMBER(system_outputa_w);
-	DECLARE_WRITE8_MEMBER(system_outputb_w);
-	DECLARE_WRITE8_MEMBER(system_outputc_w);
+	void magodds_outb850_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magodds_outb860_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fl7w4_outc802_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void system_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void system_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void system_outputc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_lucky8a();
 	void init_magoddsc();
@@ -227,16 +227,16 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(enable_w);
-	DECLARE_WRITE8_MEMBER(coincount_w);
+	void enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(fg_vidram_w);
-	DECLARE_WRITE8_MEMBER(fg_atrram_w);
-	DECLARE_WRITE8_MEMBER(bg_vidram_w);
-	DECLARE_WRITE8_MEMBER(bg_atrram_w);
-	DECLARE_WRITE8_MEMBER(reel1_attrram_w);
-	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
-	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
+	void fg_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_atrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_atrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel1_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel2_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel3_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void video_start_sangho();
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -269,13 +269,13 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
-	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
+	void coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unkcm_0x02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unkcm_0x03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(reel1_attrram_w);
-	DECLARE_WRITE8_MEMBER(reel2_attrram_w);
-	DECLARE_WRITE8_MEMBER(reel3_attrram_w);
+	void reel1_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel2_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel3_attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_unkch1();
 	void init_unkch3();

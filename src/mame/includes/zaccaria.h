@@ -19,17 +19,17 @@ public:
 		, m_dsw_port(*this, "DSW.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_READ8_MEMBER(prot1_r);
-	DECLARE_READ8_MEMBER(prot2_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(attributes_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(ressound_w);
-	DECLARE_WRITE8_MEMBER(dsw_sel_w);
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t prot1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t prot2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ressound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -66,7 +66,7 @@ Address map:
 #include "sound/tms5220.h"
 
 /* Devices */
-WRITE8_MEMBER(pes_state::pes_kbd_input)
+void pes_state::pes_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef DEBUG_FIFO
 	fprintf(stderr,"keyboard input: %c, ", data);
@@ -92,7 +92,7 @@ WRITE8_MEMBER(pes_state::pes_kbd_input)
 }
 
 /* Helper Functions */
-READ8_MEMBER( pes_state::data_to_i8031)
+uint8_t pes_state::data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	data = m_infifo[m_infifo_tail_ptr];
@@ -105,7 +105,7 @@ READ8_MEMBER( pes_state::data_to_i8031)
 	return data;
 }
 
-WRITE8_MEMBER(pes_state::data_from_i8031)
+void pes_state::data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_terminal->write(space,0,data);
 #ifdef DEBUG_SERIAL_CB
@@ -114,7 +114,7 @@ WRITE8_MEMBER(pes_state::data_from_i8031)
 }
 
 /* Port Handlers */
-WRITE8_MEMBER( pes_state::rsws_w )
+void pes_state::rsws_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_wsstate = data&0x1; // /ws is bit 0
 	m_rsstate = (data&0x2)>>1; // /rs is bit 1
@@ -125,7 +125,7 @@ WRITE8_MEMBER( pes_state::rsws_w )
 	m_speech->wsq_w(m_wsstate);
 }
 
-WRITE8_MEMBER( pes_state::port1_w )
+void pes_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
@@ -134,7 +134,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 
 }
 
-READ8_MEMBER( pes_state::port1_r )
+uint8_t pes_state::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 	data = m_speech->status_r(space, 0);
@@ -153,7 +153,7 @@ READ8_MEMBER( pes_state::port1_r )
 #define P3_WR (((state->m_port3_data)&(1<<6))>>6)
 #define P3_RD (((state->m_port3_data)&(1<<7))>>7)
 */
-WRITE8_MEMBER( pes_state::port3_w )
+void pes_state::port3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port3_state = data;
 #ifdef DEBUG_PORTS
@@ -170,7 +170,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 	// todo: poke serial handler here somehow?
 }
 
-READ8_MEMBER( pes_state::port3_r )
+uint8_t pes_state::port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared

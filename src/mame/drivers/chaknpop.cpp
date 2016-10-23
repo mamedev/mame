@@ -120,17 +120,17 @@ Notes:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(chaknpop_state::unknown_port_1_w)
+void chaknpop_state::unknown_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%s: write to unknow port 1: 0x%02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::unknown_port_2_w)
+void chaknpop_state::unknown_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%s: write to unknow port 2: 0x%02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(chaknpop_state::coinlock_w)
+void chaknpop_state::coinlock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04x: coin lock %sable\n", space.device().safe_pc(), data ? "dis" : "en");
 }

@@ -275,20 +275,20 @@ public:
 	int m_scrolly;
 	uint8_t m_reg_a002;
 	uint8_t m_motor_active;
-	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
-	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
-	DECLARE_READ8_MEMBER(gfx1_vram_r);
-	DECLARE_READ8_MEMBER(gfx1_cram_r);
-	DECLARE_READ8_MEMBER(read_a000);
-	DECLARE_WRITE8_MEMBER(write_a002);
-	DECLARE_WRITE8_MEMBER(write_a006);
-	DECLARE_WRITE8_MEMBER(write_a008);
-	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_READ8_MEMBER(read_8010);
-	DECLARE_WRITE8_MEMBER(xscroll_w);
-	DECLARE_WRITE8_MEMBER(yscroll_w);
+	void gfx0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfx0_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfx1_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfx1_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gfx1_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gfx1_cram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_a000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_a002(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_a006(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_a008(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prot_read_700x(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_8010(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_witch();
 	TILE_GET_INFO_MEMBER(get_gfx0b_tile_info);
 	TILE_GET_INFO_MEMBER(get_gfx0a_tile_info);
@@ -350,14 +350,14 @@ TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
 			0);
 }
 
-WRITE8_MEMBER(witch_state::gfx0_vram_w)
+void witch_state::gfx0_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx0_vram[offset] = data;
 	m_gfx0a_tilemap->mark_tile_dirty(offset);
 	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(witch_state::gfx0_cram_w)
+void witch_state::gfx0_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx0_cram[offset] = data;
 	m_gfx0a_tilemap->mark_tile_dirty(offset);
@@ -367,32 +367,32 @@ WRITE8_MEMBER(witch_state::gfx0_cram_w)
 #define FIX_OFFSET() do { \
 	offset=(((offset + ((m_scrolly & 0xf8) << 2) ) & 0x3e0)+((offset + (m_scrollx >> 3) ) & 0x1f)+32)&0x3ff; } while(0)
 
-WRITE8_MEMBER(witch_state::gfx1_vram_w)
+void witch_state::gfx1_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	FIX_OFFSET();
 	m_gfx1_vram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(witch_state::gfx1_cram_w)
+void witch_state::gfx1_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	FIX_OFFSET();
 	m_gfx1_cram[offset] = data;
 	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
-READ8_MEMBER(witch_state::gfx1_vram_r)
+uint8_t witch_state::gfx1_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	FIX_OFFSET();
 	return m_gfx1_vram[offset];
 }
 
-READ8_MEMBER(witch_state::gfx1_cram_r)
+uint8_t witch_state::gfx1_cram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	FIX_OFFSET();
 	return m_gfx1_cram[offset];
 }
 
-READ8_MEMBER(witch_state::read_a000)
+uint8_t witch_state::read_a000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_reg_a002 & 0x3f)
 	{
@@ -408,7 +408,7 @@ READ8_MEMBER(witch_state::read_a000)
 	}
 }
 
-WRITE8_MEMBER(witch_state::write_a002)
+void witch_state::write_a002(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//A002 bit 7&6 = m_bank ????
 	m_reg_a002 = data;
@@ -416,7 +416,7 @@ WRITE8_MEMBER(witch_state::write_a002)
 	membank("bank1")->set_entry((data >> 6) & 3);
 }
 
-WRITE8_MEMBER(witch_state::write_a006)
+void witch_state::write_a006(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// don't write when zeroed on reset
 	if (data == 0)
@@ -430,12 +430,12 @@ WRITE8_MEMBER(witch_state::write_a006)
 	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6)); // coin in counter
 }
 
-WRITE8_MEMBER(witch_state::write_a008)
+void witch_state::write_a008(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.device().execute().set_input_line(0, CLEAR_LINE);
 }
 
-READ8_MEMBER(witch_state::prot_read_700x)
+uint8_t witch_state::prot_read_700x(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     Code @$21a looks like simple protection check.
@@ -464,13 +464,13 @@ READ8_MEMBER(witch_state::prot_read_700x)
  * Status from ES8712?
  * BIT1 is zero when no sample is playing?
  */
-READ8_MEMBER(witch_state::read_8010){   return 0x00; }
+uint8_t witch_state::read_8010(address_space &space, offs_t offset, uint8_t mem_mask){   return 0x00; }
 
-WRITE8_MEMBER(witch_state::xscroll_w)
+void witch_state::xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx=data;
 }
-WRITE8_MEMBER(witch_state::yscroll_w)
+void witch_state::yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly=data;
 }

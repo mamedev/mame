@@ -139,13 +139,13 @@ void mc6845_device::call_on_update_address(int strobe)
 }
 
 
-WRITE8_MEMBER( mc6845_device::address_w )
+void mc6845_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-READ8_MEMBER( mc6845_device::status_r )
+uint8_t mc6845_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -165,7 +165,7 @@ READ8_MEMBER( mc6845_device::status_r )
 }
 
 
-READ8_MEMBER( mc6845_device::register_r )
+uint8_t mc6845_device::register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -206,7 +206,7 @@ READ8_MEMBER( mc6845_device::register_r )
 }
 
 
-WRITE8_MEMBER( mc6845_device::register_w )
+void mc6845_device::register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)  logerror("%s:M6845 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 
@@ -278,13 +278,13 @@ WRITE8_MEMBER( mc6845_device::register_w )
 }
 
 
-WRITE8_MEMBER( mos8563_device::address_w )
+void mos8563_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_register_address_latch = data & 0x3f;
 }
 
 
-READ8_MEMBER( mos8563_device::status_r )
+uint8_t mos8563_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_revision;
 
@@ -304,7 +304,7 @@ READ8_MEMBER( mos8563_device::status_r )
 }
 
 
-READ8_MEMBER( mos8563_device::register_r )
+uint8_t mos8563_device::register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -354,7 +354,7 @@ READ8_MEMBER( mos8563_device::register_r )
 }
 
 
-WRITE8_MEMBER( mos8563_device::register_w )
+void mos8563_device::register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)  logerror("%s:MOS8563 reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 

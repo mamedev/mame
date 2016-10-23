@@ -23,18 +23,18 @@ public:
 	/* input-related */
 	uint8_t m_coin_latch;  /* Active Low */
 	uint8_t m_just_been_reset;
-	DECLARE_READ8_MEMBER(blockade_input_port_0_r);
-	DECLARE_WRITE8_MEMBER(blockade_coin_latch_w);
-	DECLARE_WRITE8_MEMBER(blockade_videoram_w);
-	DECLARE_WRITE8_MEMBER(blockade_env_on_w);
-	DECLARE_WRITE8_MEMBER(blockade_env_off_w);
+	uint8_t blockade_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blockade_coin_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blockade_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blockade_env_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blockade_env_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_blockade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(blockade_interrupt);
-	DECLARE_WRITE8_MEMBER(blockade_sound_freq_w);
+	void blockade_sound_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 	required_device<samples_device> m_samples;
 	required_device<gfxdecode_device> m_gfxdecode;

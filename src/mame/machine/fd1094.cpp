@@ -919,7 +919,7 @@ void fd1094_device::default_state_change(uint8_t state)
 //  (state change)
 //-------------------------------------------------
 
-WRITE32_MEMBER(fd1094_device::cmp_callback)
+void fd1094_device::cmp_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0 && (data & 0x0000ffff) == 0x0000ffff)
 		change_state(data >> 16);

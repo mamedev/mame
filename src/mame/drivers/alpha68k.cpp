@@ -201,19 +201,19 @@ DIP locations verified from manuals for:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::tnextspc_coin_counters_w)
+void alpha68k_state::tnextspc_coin_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
 
-WRITE16_MEMBER(alpha68k_state::tnextspc_unknown_w)
+void alpha68k_state::tnextspc_unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", space.device().safe_pc(), offset, data);
 	if (offset == 0)
 		alpha68k_flipscreen_w(data & 0x100);
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha_microcontroller_w)
+void alpha68k_state::alpha_microcontroller_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", space.device().safe_pc(), offset, data);
 	/* 0x44 = coin clear signal to microcontroller? */
@@ -223,12 +223,12 @@ WRITE16_MEMBER(alpha68k_state::alpha_microcontroller_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(alpha68k_state::kyros_dip_r)
+uint16_t alpha68k_state::kyros_dip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN1")->read() << 8;
 }
 
-READ16_MEMBER(alpha68k_state::control_1_r)
+uint16_t alpha68k_state::control_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_invert_controls)
 		return ~(ioport("IN0")->read() + (ioport("IN1")->read() << 8));
@@ -236,7 +236,7 @@ READ16_MEMBER(alpha68k_state::control_1_r)
 	return ioport("IN0")->read() + (ioport("IN1")->read() << 8);
 }
 
-READ16_MEMBER(alpha68k_state::control_2_r)
+uint16_t alpha68k_state::control_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_invert_controls)
 		return ~(ioport("IN3")->read() + ((~(1 << ioport("IN5")->read())) << 8));
@@ -245,12 +245,12 @@ READ16_MEMBER(alpha68k_state::control_2_r)
 		((~(1 << ioport("IN5")->read())) << 8);
 }
 
-READ16_MEMBER(alpha68k_state::control_2_V_r)
+uint16_t alpha68k_state::control_2_V_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ioport("IN3")->read();
 }
 
-READ16_MEMBER(alpha68k_state::control_3_r)
+uint16_t alpha68k_state::control_3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_invert_controls)
 		return ~(((~(1 << ioport("IN6")->read())) << 8) & 0xff00);
@@ -259,7 +259,7 @@ READ16_MEMBER(alpha68k_state::control_3_r)
 }
 
 /* High 4 bits of CN1 & CN2 */
-READ16_MEMBER(alpha68k_state::control_4_r)
+uint16_t alpha68k_state::control_4_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_invert_controls)
 		return ~((((~(1 << ioport("IN6")->read())) << 4) & 0xf000)
@@ -269,7 +269,7 @@ READ16_MEMBER(alpha68k_state::control_4_r)
 			+ (((~(1 << ioport("IN5")->read()))) & 0x0f00);
 }
 
-READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
+uint16_t alpha68k_state::jongbou_inputs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t inp1 = ioport("IN3")->read();
 	uint8_t inp2 = ioport("IN4")->read();
@@ -281,19 +281,19 @@ READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::kyros_sound_w)
+void alpha68k_state::kyros_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_sound_w)
+void alpha68k_state::alpha68k_II_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
+void alpha68k_state::alpha68k_V_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Sound & fix bank select are in the same word */
 	if(ACCESSING_BITS_0_7)
@@ -302,7 +302,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
 		alpha68k_V_video_bank_w((data >> 8) & 0xff);
 }
 //AT
-WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
+void alpha68k_state::paddlema_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -311,7 +311,7 @@ WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 	}
 }
 
-WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
+void alpha68k_state::tnextspc_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -322,7 +322,7 @@ WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 //ZT
 /******************************************************************************/
 
-READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
+uint16_t alpha68k_state::kyros_alpha_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* possible jump codes:
 	     - Kyros          : 0x22
@@ -402,7 +402,7 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 }
 
 /* Time Soldiers, Sky Soldiers, Gold Medalist */
-READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
+uint16_t alpha68k_state::alpha_II_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* possible jump codes:
 	     - Time Soldiers : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
@@ -496,7 +496,7 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 }
 
 /* Sky Adventure, Gang Wars, Super Champion Baseball */
-READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
+uint16_t alpha68k_state::alpha_V_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* possible jump codes:
 	     - Sky Adventure           : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
@@ -700,7 +700,7 @@ static ADDRESS_MAP_START( alpha68k_V_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
-READ16_MEMBER(alpha68k_state::sound_cpu_r){ return 1; }
+uint16_t alpha68k_state::sound_cpu_r(address_space &space, offs_t offset, uint16_t mem_mask){ return 1; }
 
 static ADDRESS_MAP_START( tnextspc_map, AS_PROGRAM, 16, alpha68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -722,7 +722,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-WRITE8_MEMBER(alpha68k_state::sound_bank_w)
+void alpha68k_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank7")->set_entry(data);
 }
@@ -1806,7 +1806,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-WRITE8_MEMBER(alpha68k_state::porta_w)
+void alpha68k_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0xff)
 		return; // skip

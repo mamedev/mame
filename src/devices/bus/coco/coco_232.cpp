@@ -70,7 +70,7 @@ machine_config_constructor coco_232_device::device_mconfig_additions() const
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(coco_232_device::read)
+uint8_t coco_232_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0x00;
 
@@ -85,7 +85,7 @@ READ8_MEMBER(coco_232_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(coco_232_device::write)
+void coco_232_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset >= 0x28) && (offset <= 0x2F))
 		m_uart->write(space, offset - 0x28, data);

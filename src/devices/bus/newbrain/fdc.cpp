@@ -251,7 +251,7 @@ WRITE_LINE_MEMBER( newbrain_fdc_t::fdc_int_w )
 //  fdc_auxiliary_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_fdc_t::fdc_auxiliary_w )
+void newbrain_fdc_t::fdc_auxiliary_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -285,7 +285,7 @@ WRITE8_MEMBER( newbrain_fdc_t::fdc_auxiliary_w )
 //  fdc_control_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_fdc_t::fdc_control_r )
+uint8_t newbrain_fdc_t::fdc_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -310,7 +310,7 @@ READ8_MEMBER( newbrain_fdc_t::fdc_control_r )
 //  io_dec_w - 0x20f
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_fdc_t::io_dec_w )
+void newbrain_fdc_t::io_dec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

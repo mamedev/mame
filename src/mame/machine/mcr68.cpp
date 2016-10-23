@@ -19,7 +19,7 @@
  *
  *************************************/
 
-READ8_MEMBER(mcr68_state::zwackery_port_1_r)
+uint8_t mcr68_state::zwackery_port_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("IN1")->read();
 
@@ -29,7 +29,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 }
 
 
-READ8_MEMBER(mcr68_state::zwackery_port_3_r)
+uint8_t mcr68_state::zwackery_port_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("IN3")->read();
 
@@ -186,7 +186,7 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
+void mcr68_state::zwackery_pia0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 is the watchdog */
 	if (!(data & 0x80)) m_watchdog->watchdog_reset();
@@ -197,7 +197,7 @@ WRITE8_MEMBER(mcr68_state::zwackery_pia0_w)
 }
 
 
-WRITE8_MEMBER(mcr68_state::zwackery_pia1_w)
+void mcr68_state::zwackery_pia1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zwackery_sound_data = (data >> 4) & 0x0f;
 }
@@ -407,7 +407,7 @@ uint16_t mcr68_state::compute_counter(int counter)
  *
  *************************************/
 
-WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
+void mcr68_state::mcr68_6840_w_common(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -478,7 +478,7 @@ WRITE8_MEMBER(mcr68_state::mcr68_6840_w_common)
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_r_common)
+uint16_t mcr68_state::mcr68_6840_r_common(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* offset 0 is a no-op */
 	if (offset == 0)
@@ -515,27 +515,27 @@ READ16_MEMBER(mcr68_state::mcr68_6840_r_common)
 }
 
 
-WRITE16_MEMBER(mcr68_state::mcr68_6840_upper_w)
+void mcr68_state::mcr68_6840_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		mcr68_6840_w_common(space, offset, (data >> 8) & 0xff);
 }
 
 
-WRITE16_MEMBER(mcr68_state::mcr68_6840_lower_w)
+void mcr68_state::mcr68_6840_lower_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		mcr68_6840_w_common(space, offset, data & 0xff);
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_upper_r)
+uint16_t mcr68_state::mcr68_6840_upper_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (mcr68_6840_r_common(space,offset,0) << 8) | 0x00ff;
 }
 
 
-READ16_MEMBER(mcr68_state::mcr68_6840_lower_r)
+uint16_t mcr68_state::mcr68_6840_lower_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }

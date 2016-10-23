@@ -176,7 +176,7 @@ void ep64_exdos_device::device_reset()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( ep64_exdos_device::read )
+uint8_t ep64_exdos_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -208,7 +208,7 @@ READ8_MEMBER( ep64_exdos_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ep64_exdos_device::write )
+void ep64_exdos_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

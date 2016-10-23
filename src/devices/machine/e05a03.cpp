@@ -90,7 +90,7 @@ void e05a03_device::device_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-WRITE8_MEMBER( e05a03_device::write )
+void e05a03_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: e05a03_w(%02x): %02x\n", space.machine().describe_context(), offset, data);
 
@@ -127,7 +127,7 @@ WRITE8_MEMBER( e05a03_device::write )
 	}
 }
 
-READ8_MEMBER( e05a03_device::read )
+uint8_t e05a03_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 

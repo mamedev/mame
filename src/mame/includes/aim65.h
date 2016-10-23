@@ -52,12 +52,12 @@ public:
 		m_ds5(*this, "ds5")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_pia_b_w);
-	DECLARE_READ8_MEMBER(aim65_riot_b_r);
-	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
-	DECLARE_WRITE8_MEMBER(aim65_pb_w);
-	DECLARE_READ8_MEMBER(aim65_pb_r);
+	void aim65_pia_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aim65_pia_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t aim65_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void aim65_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aim65_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t aim65_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_pia_a;
 	uint8_t m_pia_b;
 	uint8_t m_riot_port_a;
@@ -78,11 +78,11 @@ public:
 	virtual void machine_start() override;
 	void aim65_pia();
 
-	DECLARE_WRITE16_MEMBER(aim65_update_ds1);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds2);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds3);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds4);
-	DECLARE_WRITE16_MEMBER(aim65_update_ds5);
+	void aim65_update_ds1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aim65_update_ds2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aim65_update_ds3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aim65_update_ds4(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aim65_update_ds5(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void dl1416_update(dl1416_device *device, int index);
 

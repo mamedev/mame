@@ -823,17 +823,17 @@ bool lc89510_temp_device::CDD_Import(running_machine& machine)
 
 
 
-WRITE16_MEMBER( lc89510_temp_device::segacd_cdc_mode_address_w )
+void lc89510_temp_device::segacd_cdc_mode_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&CDC_REG0);
 }
 
-READ16_MEMBER( lc89510_temp_device::segacd_cdc_mode_address_r )
+uint16_t lc89510_temp_device::segacd_cdc_mode_address_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return CDC_REG0;
 }
 
-WRITE16_MEMBER( lc89510_temp_device::segacd_cdc_data_w )
+void lc89510_temp_device::segacd_cdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&CDC_REG1);
 
@@ -841,7 +841,7 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_cdc_data_w )
 		CDC_Reg_w(data);
 }
 
-READ16_MEMBER( lc89510_temp_device::segacd_cdc_data_r )
+uint16_t lc89510_temp_device::segacd_cdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retdat = 0x0000;
 
@@ -852,12 +852,12 @@ READ16_MEMBER( lc89510_temp_device::segacd_cdc_data_r )
 }
 
 
-READ16_MEMBER( lc89510_temp_device::cdc_data_sub_r )
+uint16_t lc89510_temp_device::cdc_data_sub_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return CDC_Host_r(space.machine(), READ_SUB);
 }
 
-READ16_MEMBER( lc89510_temp_device::cdc_data_main_r )
+uint16_t lc89510_temp_device::cdc_data_main_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return CDC_Host_r(space.machine(), READ_MAIN);
 }
@@ -865,12 +865,12 @@ READ16_MEMBER( lc89510_temp_device::cdc_data_main_r )
 
 
 
-READ16_MEMBER( lc89510_temp_device::segacd_irq_mask_r )
+uint16_t lc89510_temp_device::segacd_irq_mask_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return segacd_irq_mask;
 }
 
-WRITE16_MEMBER( lc89510_temp_device::segacd_irq_mask_w )
+void lc89510_temp_device::segacd_irq_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -900,13 +900,13 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_irq_mask_w )
 	}
 }
 
-READ16_MEMBER( lc89510_temp_device::segacd_cdd_ctrl_r )
+uint16_t lc89510_temp_device::segacd_cdd_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return CDD_CONTROL;
 }
 
 
-WRITE16_MEMBER( lc89510_temp_device::segacd_cdd_ctrl_w )
+void lc89510_temp_device::segacd_cdd_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -954,7 +954,7 @@ uint8_t lc89510_temp_device::neocd_cdd_rx_r()
 }
 
 // mapped like 'ram'
-READ8_MEMBER( lc89510_temp_device::segacd_cdd_rx_r )
+uint8_t lc89510_temp_device::segacd_cdd_rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return CDD_RX[offset];
 }
@@ -969,7 +969,7 @@ void lc89510_temp_device::neocd_cdd_tx_w(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( lc89510_temp_device::segacd_cdd_tx_w )
+void lc89510_temp_device::segacd_cdd_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	CDD_TX[offset] = data;
 
@@ -984,12 +984,12 @@ WRITE8_MEMBER( lc89510_temp_device::segacd_cdd_tx_w )
 
 
 
-READ16_MEMBER( lc89510_temp_device::segacd_cdfader_r )
+uint16_t lc89510_temp_device::segacd_cdfader_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER( lc89510_temp_device::segacd_cdfader_w )
+void lc89510_temp_device::segacd_cdfader_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static double cdfader_vol;
 	if(data & 0x800f)

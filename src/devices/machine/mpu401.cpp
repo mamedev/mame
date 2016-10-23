@@ -159,7 +159,7 @@ void mpu401_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 	m_ourcpu->m6801_clock_serial();
 }
 
-READ8_MEMBER(mpu401_device::regs_mode2_r)
+uint8_t mpu401_device::regs_mode2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -178,7 +178,7 @@ READ8_MEMBER(mpu401_device::regs_mode2_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mpu401_device::regs_mode2_w)
+void mpu401_device::regs_mode2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -195,28 +195,28 @@ WRITE8_MEMBER(mpu401_device::regs_mode2_w)
 	}
 }
 
-READ8_MEMBER(mpu401_device::port1_r)
+uint8_t mpu401_device::port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(mpu401_device::port1_w)
+void mpu401_device::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("port1_w: %02x met %x syncout %x DSRD %d DRRD %d\n", data, data & 3, (data>>3) & 3, (data>>6) & 1, (data>>7) & 1);
 }
 
-READ8_MEMBER(mpu401_device::port2_r)
+uint8_t mpu401_device::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("Read P2 (PC=%x)\n", space.device().safe_pc());
 	return m_port2;
 }
 
-WRITE8_MEMBER(mpu401_device::port2_w)
+void mpu401_device::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("port2_w: %02x SYCOUT %d SYCIN %d SRCK %d MIDI OUT %d\n", data, (data & 1), (data>>1) & 1, (data>>2) & 1, (data>>4) & 1);
 }
 
-READ8_MEMBER(mpu401_device::mpu_r)
+uint8_t mpu401_device::mpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("mpu_r @ %d\n", offset);
 
@@ -232,7 +232,7 @@ READ8_MEMBER(mpu401_device::mpu_r)
 	}
 }
 
-WRITE8_MEMBER(mpu401_device::mpu_w)
+void mpu401_device::mpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to MPU-401 @ %d\n", data, offset);
 	m_command = data;
@@ -248,7 +248,7 @@ WRITE8_MEMBER(mpu401_device::mpu_w)
 	}
 }
 
-READ8_MEMBER(mpu401_device::asic_r)
+uint8_t mpu401_device::asic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -263,7 +263,7 @@ READ8_MEMBER(mpu401_device::asic_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(mpu401_device::asic_w)
+void mpu401_device::asic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("MPU401: %02x to gate array @ %d\n", data, offset);
 

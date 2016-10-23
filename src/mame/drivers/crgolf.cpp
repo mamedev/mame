@@ -102,7 +102,7 @@ protected or a snippet should do the aforementioned string copy.
  *
  *************************************/
 
-WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
+void crgolf_state::rom_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 15);
 }
@@ -144,7 +144,7 @@ void crgolf_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(crgolf_state::switch_input_r)
+uint8_t crgolf_state::switch_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
@@ -152,13 +152,13 @@ READ8_MEMBER(crgolf_state::switch_input_r)
 }
 
 
-READ8_MEMBER(crgolf_state::analog_input_r)
+uint8_t crgolf_state::analog_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((ioport("STICK0")->read() >> 4) | (ioport("STICK1")->read() & 0xf0)) ^ 0x88;
 }
 
 
-WRITE8_MEMBER(crgolf_state::switch_input_select_w)
+void crgolf_state::switch_input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x40)) m_port_select = 6;
 	if (!(data & 0x20)) m_port_select = 5;
@@ -170,7 +170,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 }
 
 
-WRITE8_MEMBER(crgolf_state::unknown_w)
+void crgolf_state::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
 }
@@ -190,13 +190,13 @@ TIMER_CALLBACK_MEMBER(crgolf_state::main_to_sound_callback)
 }
 
 
-WRITE8_MEMBER(crgolf_state::main_to_sound_w)
+void crgolf_state::main_to_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::main_to_sound_callback),this), data);
 }
 
 
-READ8_MEMBER(crgolf_state::main_to_sound_r)
+uint8_t crgolf_state::main_to_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_main_to_sound_data;
@@ -217,13 +217,13 @@ TIMER_CALLBACK_MEMBER(crgolf_state::sound_to_main_callback)
 }
 
 
-WRITE8_MEMBER(crgolf_state::sound_to_main_w)
+void crgolf_state::sound_to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(crgolf_state::sound_to_main_callback),this), data);
 }
 
 
-READ8_MEMBER(crgolf_state::sound_to_main_r)
+uint8_t crgolf_state::sound_to_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_sound_to_main_data;
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 }
 
 
-WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
+void crgolf_state::crgolfhi_sample_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -287,7 +287,7 @@ WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 	}
 }
 
-WRITE8_MEMBER(crgolf_state::screen_select_w)
+void crgolf_state::screen_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (data & 0xfe) printf("vram_page_select_w %02x\n", data);
 	m_vrambank->set_bank(data & 0x1);
@@ -374,22 +374,22 @@ static ADDRESS_MAP_START( mastrglf_submap, AS_PROGRAM, 8, crgolf_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(crgolf_state::unk_sub_02_r)
+uint8_t crgolf_state::unk_sub_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(crgolf_state::unk_sub_05_r)
+uint8_t crgolf_state::unk_sub_05_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(crgolf_state::unk_sub_07_r)
+uint8_t crgolf_state::unk_sub_07_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(crgolf_state::unk_sub_0c_w)
+void crgolf_state::unk_sub_0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

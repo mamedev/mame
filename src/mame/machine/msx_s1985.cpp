@@ -22,7 +22,7 @@ uint8_t msx_s1985_device::get_id()
 }
 
 
-READ8_MEMBER(msx_s1985_device::io_read)
+uint8_t msx_s1985_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -45,7 +45,7 @@ READ8_MEMBER(msx_s1985_device::io_read)
 }
 
 
-WRITE8_MEMBER(msx_s1985_device::io_write)
+void msx_s1985_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

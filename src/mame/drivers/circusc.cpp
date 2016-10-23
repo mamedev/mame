@@ -72,7 +72,7 @@ void circusc_state::machine_reset()
 	m_sn_latch = 0;
 }
 
-READ8_MEMBER(circusc_state::circusc_sh_timer_r)
+uint8_t circusc_state::circusc_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* This port reads the output of a counter clocked from the CPU clock.
 	 * The CPU XTAL is 14.31818MHz divided by 4.  It then goes through 10
@@ -92,17 +92,17 @@ READ8_MEMBER(circusc_state::circusc_sh_timer_r)
 	return clock & 0x1e;
 }
 
-WRITE8_MEMBER(circusc_state::circusc_sh_irqtrigger_w)
+void circusc_state::circusc_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_coin_counter_w)
+void circusc_state::circusc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(circusc_state::circusc_sound_w)
+void circusc_state::circusc_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 7)
 	{
@@ -135,7 +135,7 @@ WRITE8_MEMBER(circusc_state::circusc_sound_w)
 	}
 }
 
-WRITE8_MEMBER(circusc_state::irq_mask_w)
+void circusc_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

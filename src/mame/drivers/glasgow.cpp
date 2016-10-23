@@ -57,27 +57,27 @@ public:
 		, m_keyboard(*this, "LINE.%u", 0)
 		{ }
 
-	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
-	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
-	DECLARE_READ16_MEMBER(glasgow_keys_r);
-	DECLARE_WRITE16_MEMBER(glasgow_keys_w);
-	DECLARE_READ16_MEMBER(glasgow_board_r);
-	DECLARE_WRITE16_MEMBER(glasgow_board_w);
-	DECLARE_WRITE16_MEMBER(glasgow_beeper_w);
-	DECLARE_READ16_MEMBER(read_board);
-	DECLARE_WRITE16_MEMBER(write_board);
-	DECLARE_WRITE16_MEMBER(write_beeper);
-	DECLARE_WRITE16_MEMBER(write_lcd);
-	DECLARE_WRITE16_MEMBER(write_lcd_flag);
-	DECLARE_WRITE16_MEMBER(write_irq_flag);
-	DECLARE_READ16_MEMBER(read_newkeys16);
-	DECLARE_WRITE32_MEMBER(write_beeper32);
-	DECLARE_READ32_MEMBER(read_board32);
-	DECLARE_WRITE32_MEMBER(write_board32);
-	DECLARE_WRITE32_MEMBER(write_keys32);
-	DECLARE_WRITE32_MEMBER(write_lcd32);
-	DECLARE_WRITE32_MEMBER(write_lcd_flag32);
-	DECLARE_READ32_MEMBER(read_newkeys32);
+	void glasgow_lcd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void glasgow_lcd_flag_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t glasgow_keys_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void glasgow_keys_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t glasgow_board_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void glasgow_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void glasgow_beeper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_board(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_board(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_beeper(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_lcd(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_lcd_flag(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_irq_flag(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_newkeys16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_beeper32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read_board32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write_board32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_keys32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_lcd32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_lcd_flag32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read_newkeys32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
 	void machine_start_dallas32();
@@ -170,7 +170,7 @@ void glasgow_state::glasgow_pieces_w( )
 			output().set_indexed_value("P", 63 - l_board[i_18][i_AH].field, l_board[i_18][i_AH].piece);
 }
 
-WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
+void glasgow_state::glasgow_lcd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t lcd_data = data >> 8;
 
@@ -181,7 +181,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_w )
 	m_lcd_shift_counter &= 3;
 }
 
-WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
+void glasgow_state::glasgow_lcd_flag_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t lcd_flag = data & 0x8100;
 
@@ -196,7 +196,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 	}
 }
 
-READ16_MEMBER( glasgow_state::glasgow_keys_r )
+uint16_t glasgow_state::glasgow_keys_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_board_row++;
 	m_board_row &= 7;
@@ -260,13 +260,13 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 	return data << 8;
 }
 
-WRITE16_MEMBER( glasgow_state::glasgow_keys_w )
+void glasgow_state::glasgow_keys_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_key_select = data >> 8;
 	glasgow_pieces_w();
 }
 
-READ16_MEMBER( glasgow_state::glasgow_board_r )
+uint16_t glasgow_state::glasgow_board_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t i_AH, data = 0;
 
@@ -285,7 +285,7 @@ READ16_MEMBER( glasgow_state::glasgow_board_r )
 	return data << 8;
 }
 
-WRITE16_MEMBER( glasgow_state::glasgow_board_w )
+void glasgow_state::glasgow_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_Line18_REED = pos_to_num(data >> 8) ^ 7;
 
@@ -303,7 +303,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_board_w )
 	m_lcd_invert = 1;
 }
 
-WRITE16_MEMBER( glasgow_state::glasgow_beeper_w )
+void glasgow_state::glasgow_beeper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t i_AH, i_18;
 	uint8_t LED;
@@ -345,12 +345,12 @@ WRITE16_MEMBER( glasgow_state::glasgow_beeper_w )
 	}
 }
 
-WRITE16_MEMBER( glasgow_state::write_beeper )
+void glasgow_state::write_beeper(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_lcd_invert = 1;
 }
 
-WRITE16_MEMBER( glasgow_state::write_lcd )
+void glasgow_state::write_lcd(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t lcd_data = data >> 8;
 
@@ -360,7 +360,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd )
 	logerror("LCD Offset = %d Data low = %x \n", offset, lcd_data);
 }
 
-WRITE16_MEMBER( glasgow_state::write_lcd_flag )
+void glasgow_state::write_lcd_flag(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_lcd_invert = 0;
 	uint8_t lcd_flag = data >> 8;
@@ -375,12 +375,12 @@ WRITE16_MEMBER( glasgow_state::write_lcd_flag )
 	logerror("LCD Flag 16 = %x \n", data);
 }
 
-READ16_MEMBER( glasgow_state::read_board )
+uint16_t glasgow_state::read_board(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff00; // Mephisto need it for working
 }
 
-WRITE16_MEMBER( glasgow_state::write_board )
+void glasgow_state::write_board(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t board = data >> 8;
 
@@ -393,13 +393,13 @@ WRITE16_MEMBER( glasgow_state::write_board )
 }
 
 
-WRITE16_MEMBER( glasgow_state::write_irq_flag )
+void glasgow_state::write_irq_flag(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_beep->set_state(BIT(data, 8));
 	logerror("Write 0x800004 = %x \n", data);
 }
 
-READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
+uint16_t glasgow_state::read_newkeys16(address_space &space, offs_t offset, uint16_t mem_mask)  //Amsterdam, Roma
 {
 	uint16_t data;
 
@@ -415,7 +415,7 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(read_test)
+uint16_t read_test(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("read test Offset = %x Data = %x\n  ",offset,data);
 	return 0xffff;    // Mephisto need it for working
@@ -428,7 +428,7 @@ READ16_MEMBER(read_test)
 
 */
 
-WRITE32_MEMBER( glasgow_state::write_lcd32 )
+void glasgow_state::write_lcd32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t lcd_data = data >> 8;
 
@@ -438,7 +438,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd32 )
 	// logerror("LCD Offset = %d Data   = %x \n  ", offset, lcd_data);
 }
 
-WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
+void glasgow_state::write_lcd_flag32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t lcd_flag = data >> 24;
 
@@ -454,14 +454,14 @@ WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
 }
 
 
-WRITE32_MEMBER( glasgow_state::write_keys32 )
+void glasgow_state::write_keys32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_lcd_invert = 1;
 	m_key_select = data;
 	logerror("Write Key = %x \n", m_key_select);
 }
 
-READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
+uint32_t glasgow_state::read_newkeys32(address_space &space, offs_t offset, uint32_t mem_mask) // Dallas 32, Roma 32
 {
 	uint32_t data;
 
@@ -475,21 +475,21 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 	return data ;
 }
 
-READ32_MEMBER( glasgow_state::read_board32 )
+uint32_t glasgow_state::read_board32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("read board 32 Offset = %x \n", offset);
 	return 0;
 }
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(read_board_amsterd)
+uint16_t read_board_amsterd(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("read board amsterdam Offset = %x \n  ", offset);
 	return 0xffff;
 }
 #endif
 
-WRITE32_MEMBER( glasgow_state::write_board32 )
+void glasgow_state::write_board32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t board = data >> 24;
 	if (board == 0xff)
@@ -499,7 +499,7 @@ WRITE32_MEMBER( glasgow_state::write_board32 )
 }
 
 
-WRITE32_MEMBER( glasgow_state::write_beeper32 )
+void glasgow_state::write_beeper32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_beep->set_state(data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);

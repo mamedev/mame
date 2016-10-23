@@ -33,49 +33,49 @@ DEVICE_ADDRESS_MAP_START(amap64, 64, address_map_bank_device)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read64, write64)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(address_map_bank_device::write8)
+void address_map_bank_device::write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	m_program->write_byte(m_offset + offset, data);
 }
 
-WRITE16_MEMBER(address_map_bank_device::write16)
+void address_map_bank_device::write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	m_program->write_word(m_offset + (offset * 2), data, mem_mask);
 }
 
-WRITE32_MEMBER(address_map_bank_device::write32)
+void address_map_bank_device::write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	m_program->write_dword(m_offset + (offset * 4), data, mem_mask);
 }
 
-WRITE64_MEMBER(address_map_bank_device::write64)
+void address_map_bank_device::write64(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	m_program->write_qword(m_offset + (offset * 8), data, mem_mask);
 }
 
-READ8_MEMBER(address_map_bank_device::read8)
+uint8_t address_map_bank_device::read8(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	return m_program->read_byte(m_offset + offset);
 }
 
-READ16_MEMBER(address_map_bank_device::read16)
+uint16_t address_map_bank_device::read16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	return m_program->read_word(m_offset + (offset * 2), mem_mask);
 }
 
-READ32_MEMBER(address_map_bank_device::read32)
+uint32_t address_map_bank_device::read32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	return m_program->read_dword(m_offset + (offset * 4), mem_mask);
 }
 
-READ64_MEMBER(address_map_bank_device::read64)
+uint64_t address_map_bank_device::read64(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	m_program->set_debugger_access(space.debugger_access());
 	return m_program->read_qword(m_offset + (offset * 8), mem_mask);

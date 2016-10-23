@@ -91,7 +91,7 @@ const tiny_rom_entry *p1_hdc_device::device_rom_region() const
 //**************************************************************************
 
 
-READ8_MEMBER(p1_hdc_device::p1_HDC_r)
+uint8_t p1_hdc_device::p1_HDC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 
@@ -103,7 +103,7 @@ READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 	return data;
 }
 
-WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
+void p1_hdc_device::p1_HDC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"hdc",("W $%04x <- $%02x\n", offset, data));
 	switch (offset >> 8) {

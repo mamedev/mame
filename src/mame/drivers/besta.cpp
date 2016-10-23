@@ -40,9 +40,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( mpcc_reg_r );
-	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t mpcc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mpcc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint8_t m_mpcc_regs[32];
 
@@ -55,7 +55,7 @@ public:
 	required_shared_ptr<uint32_t> m_p_ram;
 };
 
-READ8_MEMBER( besta_state::mpcc_reg_r )
+uint8_t besta_state::mpcc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -76,7 +76,7 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 	}
 }
 
-WRITE8_MEMBER( besta_state::mpcc_reg_w )
+void besta_state::mpcc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *devconf = machine().device(TERMINAL_TAG);
 
@@ -94,7 +94,7 @@ WRITE8_MEMBER( besta_state::mpcc_reg_w )
 	}
 }
 
-WRITE8_MEMBER( besta_state::kbd_put )
+void besta_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mpcc_reg_w(space, (offs_t)2, data, mem_mask);
 }

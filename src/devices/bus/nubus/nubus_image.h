@@ -44,20 +44,20 @@ protected:
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
-		DECLARE_READ32_MEMBER(image_status_r);
-		DECLARE_WRITE32_MEMBER(image_status_w);
-		DECLARE_READ32_MEMBER(image_r);
-		DECLARE_WRITE32_MEMBER(image_w);
-		DECLARE_READ32_MEMBER(image_super_r);
-		DECLARE_WRITE32_MEMBER(image_super_w);
-		DECLARE_READ32_MEMBER(file_cmd_r);
-		DECLARE_WRITE32_MEMBER(file_cmd_w);
-		DECLARE_READ32_MEMBER(file_data_r);
-		DECLARE_WRITE32_MEMBER(file_data_w);
-		DECLARE_READ32_MEMBER(file_len_r);
-		DECLARE_WRITE32_MEMBER(file_len_w);
-		DECLARE_READ32_MEMBER(file_name_r);
-		DECLARE_WRITE32_MEMBER(file_name_w);
+		uint32_t image_status_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void image_status_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t image_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void image_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t image_super_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void image_super_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t file_cmd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void file_cmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t file_data_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void file_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t file_len_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void file_len_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t file_name_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void file_name_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 public:
 	messimg_disk_image_device *m_image;

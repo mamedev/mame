@@ -111,35 +111,35 @@ void f1gp_state::video_start_f1gp2()
 
 ***************************************************************************/
 
-READ16_MEMBER(f1gp_state::f1gp_zoomdata_r)
+uint16_t f1gp_state::f1gp_zoomdata_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_zoomdata[offset];
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_zoomdata_w)
+void f1gp_state::f1gp_zoomdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_zoomdata[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset / 64);
 }
 
-READ16_MEMBER(f1gp_state::f1gp_rozvideoram_r)
+uint16_t f1gp_state::f1gp_rozvideoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rozvideoram[offset];
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_rozvideoram_w)
+void f1gp_state::f1gp_rozvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozvideoram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgvideoram_w)
+void f1gp_state::f1gp_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
+void f1gp_state::f1gp_fgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll[offset]);
 
@@ -147,7 +147,7 @@ WRITE16_MEMBER(f1gp_state::f1gp_fgscroll_w)
 	m_fg_tilemap->set_scrolly(0, m_scroll[1]);
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
+void f1gp_state::f1gp_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(f1gp_state::f1gp_gfxctrl_w)
 	}
 }
 
-WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
+void f1gp_state::f1gp2_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

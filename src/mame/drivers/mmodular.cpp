@@ -134,54 +134,54 @@ public:
 	uint8_t lcd_char;
 	//uint8_t led7;
 	uint8_t latch_data;
-	DECLARE_WRITE8_MEMBER(write_polgar_IO);
-	DECLARE_WRITE8_MEMBER(write_LCD_polgar);
-	DECLARE_READ8_MEMBER(read_1ff1_sfortea);
-	DECLARE_READ8_MEMBER(read_1ff0_sfortea);
-	DECLARE_WRITE8_MEMBER(write_latch_sfortea);
-	DECLARE_WRITE8_MEMBER(write_lcd_IO_sfortea);
-	DECLARE_WRITE8_MEMBER(write_LCD_academy);
-//  DECLARE_WRITE16_MEMBER(diablo68_aciawrite);
-//  DECLARE_READ16_MEMBER(diablo68_aciaread);
-	DECLARE_WRITE16_MEMBER(diablo68_reg_select);
-	DECLARE_WRITE16_MEMBER(diablo68_write_LCD);
-	DECLARE_WRITE8_MEMBER(milano_write_LED);
-	DECLARE_WRITE8_MEMBER(megaiv_write_LED);
-	DECLARE_WRITE8_MEMBER(academy_write_LED);
-	DECLARE_WRITE8_MEMBER(academy_inhibitNMI);
-	DECLARE_WRITE32_MEMBER(write_LED_BPL32);
-	DECLARE_WRITE8_MEMBER(polgar_write_LED);
-	DECLARE_WRITE8_MEMBER(monteciv_write_LCD);
-	DECLARE_WRITE8_MEMBER(monteciv_3007);
-	DECLARE_WRITE8_MEMBER(monteciv_3005);
-	DECLARE_WRITE8_MEMBER(monteciv_3006);
-	DECLARE_WRITE8_MEMBER(academy_write_board);
-	DECLARE_WRITE8_MEMBER(milano_write_board);
-	DECLARE_READ8_MEMBER(milano_read_board);
-	DECLARE_READ8_MEMBER(read_keys);
-	DECLARE_READ8_MEMBER(read_keys_megaiv);
-	DECLARE_READ32_MEMBER(read_keys_BPL32);
-	DECLARE_WRITE8_MEMBER(beep_academy);
-	DECLARE_WRITE8_MEMBER(megaiv_IO);
-	DECLARE_WRITE8_MEMBER(monteciv_select_line);
-	DECLARE_READ8_MEMBER(read_keys_board_monteciv);
-	DECLARE_READ8_MEMBER(read_keys_board_academy);
-	DECLARE_WRITE32_MEMBER(write_board_BPL32);
-	DECLARE_READ32_MEMBER(read_buttons_gen32);
-	DECLARE_READ32_MEMBER(read_buttons_van32);
-	DECLARE_READ16_MEMBER(read_buttons_van16);
-	DECLARE_WRITE32_MEMBER(write_LCD_data_32);
-	DECLARE_WRITE16_MEMBER(write_LCD_data);
-	DECLARE_WRITE32_MEMBER(write_IOenables_32);
-	DECLARE_WRITE16_MEMBER(write_IOenables);
-	DECLARE_READ32_MEMBER(read_unknown1_32);
-	DECLARE_READ16_MEMBER(read_unknown1);
-	DECLARE_WRITE32_MEMBER(write_unknown2_32);
-	DECLARE_WRITE16_MEMBER(write_unknown2);
-	DECLARE_READ32_MEMBER(read_unknown3_32);
-	DECLARE_READ16_MEMBER(read_unknown3);
-	DECLARE_READ32_MEMBER(read_1800000);
-	DECLARE_WRITE32_MEMBER(write_1000000);
+	void write_polgar_IO(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_LCD_polgar(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_1ff1_sfortea(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_1ff0_sfortea(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_latch_sfortea(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_lcd_IO_sfortea(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_LCD_academy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  void diablo68_aciawrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+//  uint16_t diablo68_aciaread(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void diablo68_reg_select(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void diablo68_write_LCD(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void milano_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void megaiv_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void academy_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void academy_inhibitNMI(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_LED_BPL32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void polgar_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void monteciv_write_LCD(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void monteciv_3007(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void monteciv_3005(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void monteciv_3006(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void academy_write_board(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void milano_write_board(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t milano_read_board(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_keys(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_keys_megaiv(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t read_keys_BPL32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void beep_academy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void megaiv_IO(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void monteciv_select_line(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_keys_board_monteciv(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_keys_board_academy(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_board_BPL32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t read_buttons_gen32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t read_buttons_van32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t read_buttons_van16(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_LCD_data_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_LCD_data(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_IOenables_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_IOenables(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t read_unknown1_32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t read_unknown1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_unknown2_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_unknown2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t read_unknown3_32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t read_unknown3(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t read_1800000(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write_1000000(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_polgar();
 	void machine_start_polgar();
 	void machine_reset_polgar();
@@ -231,7 +231,7 @@ uint8_t polgar_state::convert_imputmask(uint8_t input)
 		}
 }
 
-WRITE8_MEMBER(polgar_state::write_polgar_IO)
+void polgar_state::write_polgar_IO(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -265,7 +265,7 @@ WRITE8_MEMBER(polgar_state::write_polgar_IO)
 }
 
 
-WRITE8_MEMBER(polgar_state::write_LCD_polgar)
+void polgar_state::write_LCD_polgar(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	lcd_char = data;
 
@@ -273,7 +273,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 
 }
 
-READ8_MEMBER(polgar_state::read_1ff1_sfortea)
+uint8_t polgar_state::read_1ff1_sfortea(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	data = ioport("BUTTONS_SFOR1")->read();
@@ -282,7 +282,7 @@ READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 //  return data;
 }
 
-READ8_MEMBER(polgar_state::read_1ff0_sfortea)
+uint8_t polgar_state::read_1ff0_sfortea(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	data = ioport("BUTTONS_SFOR2")->read();
@@ -300,7 +300,7 @@ READ8_MEMBER(polgar_state::read_1ff0_sfortea)
 
 
 
-WRITE8_MEMBER(polgar_state::write_latch_sfortea)
+void polgar_state::write_latch_sfortea(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	sfortea_latch = data;
 	logerror("latch data %02x\n",data);
@@ -308,7 +308,7 @@ WRITE8_MEMBER(polgar_state::write_latch_sfortea)
 
 }
 
-WRITE8_MEMBER(polgar_state::write_lcd_IO_sfortea)
+void polgar_state::write_lcd_IO_sfortea(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* bits
 7
@@ -337,7 +337,7 @@ WRITE8_MEMBER(polgar_state::write_lcd_IO_sfortea)
 	}
 }
 
-WRITE8_MEMBER(polgar_state::write_LCD_academy)
+void polgar_state::write_LCD_academy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcdc->write(space, offset & 1, data);
 }
@@ -345,7 +345,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_academy)
 //  AM_RANGE( 0x3a0000,0x3a0000 ) AM_READ(diablo68_write_LCD)
 //  AM_RANGE( 0x3c0000,0x3c0000 ) AM_READ(diablo68_reg_select)
 
-/*WRITE16_MEMBER(polgar_state::diablo68_aciawrite)
+/*void polgar_state::diablo68_aciawrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  device_t *acia = machine().device("acia65c51");
 //  acia_6551_w(acia, offset & 0x03, data >> 8);
@@ -353,7 +353,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_academy)
     logerror("ACIA write data %04x offset %02x\n",data,offset);
 }
 
-READ16_MEMBER(polgar_state::diablo68_aciaread)
+uint16_t polgar_state::diablo68_aciaread(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  device_t *acia = machine().device("acia65c51");
     uint16_t result;
@@ -367,7 +367,7 @@ READ16_MEMBER(polgar_state::diablo68_aciaread)
 }
 */
 
-WRITE16_MEMBER(polgar_state::diablo68_reg_select)
+void polgar_state::diablo68_reg_select(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	diablo68_3c0000 = data >> 8;
 	//printf("3c0000 = %04x\n",data>>8);
@@ -376,7 +376,7 @@ WRITE16_MEMBER(polgar_state::diablo68_reg_select)
 }
 
 
-WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
+void polgar_state::diablo68_write_LCD(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data >>= 8;
 	if (!(diablo68_3c0000 & 0x02)) {
@@ -396,7 +396,7 @@ WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 
 }
 
-WRITE8_MEMBER(polgar_state::milano_write_LED)
+void polgar_state::milano_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t LED_offset = 100;
 	if (data == 0xff)   output().set_led_value(LED_offset+offset,1);
@@ -405,7 +405,7 @@ WRITE8_MEMBER(polgar_state::milano_write_LED)
 	//logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-WRITE8_MEMBER(polgar_state::megaiv_write_LED)
+void polgar_state::megaiv_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data,7))
 		m_beeper->set_state(1);
@@ -421,7 +421,7 @@ WRITE8_MEMBER(polgar_state::megaiv_write_LED)
 }
 
 
-WRITE8_MEMBER(polgar_state::academy_write_LED)
+void polgar_state::academy_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 int found = 0;
 
@@ -486,14 +486,14 @@ else
 }
 
 
-WRITE8_MEMBER(polgar_state::academy_inhibitNMI)
+void polgar_state::academy_inhibitNMI(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	academyallowNMI = data;
 
 }
 
 
-WRITE32_MEMBER(polgar_state::write_LED_BPL32)
+void polgar_state::write_LED_BPL32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 
@@ -508,7 +508,7 @@ WRITE32_MEMBER(polgar_state::write_LED_BPL32)
 }
 
 
-WRITE8_MEMBER(polgar_state::polgar_write_LED)
+void polgar_state::polgar_write_LED(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #define LED_offset 100
 
@@ -538,7 +538,7 @@ uint8_t polgar_state::convertMCIV2LED(uint8_t codedchar)
 	return data;
 }
 
-WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
+void polgar_state::monteciv_write_LCD(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 // first write == 00 (start) then 8 writes (to 74595) x 4 chars, then ff to finish
 {
 	static uint8_t charstodisplay[4] = { 0,0,0,0 };
@@ -605,7 +605,7 @@ WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
 //    printf("$3004 %02x %02x \n",data,tempchar);
 }
 
-WRITE8_MEMBER(polgar_state::monteciv_3007)
+void polgar_state::monteciv_3007(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    logerror("$3007 SELECTTOP %02x\n",data);
 //    printf("$3007 SELECTTOP %02x\n",data);
@@ -613,7 +613,7 @@ WRITE8_MEMBER(polgar_state::monteciv_3007)
 	montecivtopnew = 1;
 }
 
-WRITE8_MEMBER(polgar_state::monteciv_3005)
+void polgar_state::monteciv_3005(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    logerror("$3005 SELECTBOT %02x\n",data);
 //    printf("$3005 SELECTBOT %02x\n",data);
@@ -621,26 +621,26 @@ WRITE8_MEMBER(polgar_state::monteciv_3005)
 	montecivbotnew = 1;
 }
 
-WRITE8_MEMBER(polgar_state::monteciv_3006)
+void polgar_state::monteciv_3006(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("$3006 CLK %02x\n",data);
 //    printf("$3006 CLK %02x\n",data);
 }
 
 
-WRITE8_MEMBER(polgar_state::academy_write_board)
+void polgar_state::academy_write_board(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//latch_data = data;
 //    logerror("acad_write_latch %02x\n",data);
 	//if (data != 0xff) mboard_write_board_8(space,0, data);
 }
 
-WRITE8_MEMBER(polgar_state::milano_write_board)
+void polgar_state::milano_write_board(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	latch_data = data;
 }
 
-READ8_MEMBER(polgar_state::milano_read_board)
+uint8_t polgar_state::milano_read_board(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int line;
 	static const char *const board_lines[8] =
@@ -663,7 +663,7 @@ READ8_MEMBER(polgar_state::milano_read_board)
 
 }
 
-READ8_MEMBER(polgar_state::read_keys)
+uint8_t polgar_state::read_keys(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	static const char *const keynames[1][8] =
@@ -676,7 +676,7 @@ READ8_MEMBER(polgar_state::read_keys)
 	return data | 0x7f;
 }
 
-READ8_MEMBER(polgar_state::read_keys_megaiv)
+uint8_t polgar_state::read_keys_megaiv(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 	static const char *const keynames[1][8] =
@@ -690,7 +690,7 @@ READ8_MEMBER(polgar_state::read_keys_megaiv)
 }
 
 
-READ32_MEMBER(polgar_state::read_keys_BPL32)
+uint32_t polgar_state::read_keys_BPL32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	uint8_t tmp = 0xff, line = 0;
@@ -717,7 +717,7 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 	return data;
 }
 
-WRITE8_MEMBER(polgar_state::beep_academy)
+void polgar_state::beep_academy(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(data,7))
 			m_beeper->set_state(1);
@@ -725,7 +725,7 @@ WRITE8_MEMBER(polgar_state::beep_academy)
 			m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER(polgar_state::megaiv_IO)
+void polgar_state::megaiv_IO(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (BIT(data,0)) beep_set_state(machine->device("beeper"),1); else beep_set_state(machine->device("beeper"),0);
 	logerror("$2400 = %02x\n",data);
@@ -733,13 +733,13 @@ WRITE8_MEMBER(polgar_state::megaiv_IO)
 }
 
 
-WRITE8_MEMBER(polgar_state::monteciv_select_line)
+void polgar_state::monteciv_select_line(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	monteciv_select[offset] = data;
 }
 
 // FIXME : unlike polgar, academy shares port IO for keys and board, and i just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
-READ8_MEMBER(polgar_state::read_keys_board_monteciv)
+uint8_t polgar_state::read_keys_board_monteciv(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -770,7 +770,7 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 
 
 // FIXME : unlike polgar, academy shares port IO for keys and board, and I just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
-READ8_MEMBER(polgar_state::read_keys_board_academy)
+uint8_t polgar_state::read_keys_board_academy(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  static int startup = 0;
 	uint8_t data = 0;
@@ -812,14 +812,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_M6502_irq)
 }
 
 
-WRITE32_MEMBER(polgar_state::write_board_BPL32)
+void polgar_state::write_board_BPL32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	BPL32latch_data = data >> 24;
 	logerror("Write BPL32 board Data Latch %08x Offset: %08x\n",BPL32latch_data,offset);
 
 }
 
-READ32_MEMBER(polgar_state::read_buttons_gen32)
+uint32_t polgar_state::read_buttons_gen32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 	static const char *const keynames[4] = { "BUTTON_1", "BUTTON_2", "", "BUTTON_3" };
@@ -831,7 +831,7 @@ READ32_MEMBER(polgar_state::read_buttons_gen32)
 	return data;
 }
 
-READ32_MEMBER(polgar_state::read_buttons_van32)
+uint32_t polgar_state::read_buttons_van32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 	static const char *const keynames[4] = { "BUTTON_1", "", "BUTTON_2", "BUTTON_3" };
@@ -844,7 +844,7 @@ READ32_MEMBER(polgar_state::read_buttons_van32)
 	return data;
 }
 
-READ16_MEMBER(polgar_state::read_buttons_van16)
+uint16_t polgar_state::read_buttons_van16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 	static const char *const keynames[3] = { "BUTTON_1", "BUTTON_2", "BUTTON_3" };
@@ -856,7 +856,7 @@ READ16_MEMBER(polgar_state::read_buttons_van16)
 	return data;
 }
 
-WRITE32_MEMBER(polgar_state::write_LCD_data_32)
+void polgar_state::write_LCD_data_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	logerror("Write LCD Data Latch %08x o: %08x\n",data,offset);
@@ -865,7 +865,7 @@ WRITE32_MEMBER(polgar_state::write_LCD_data_32)
 
 }
 
-WRITE16_MEMBER(polgar_state::write_LCD_data)
+void polgar_state::write_LCD_data(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	lcd32_char = data>>8;
 
@@ -906,42 +906,42 @@ void polgar_state::write_IOenable(unsigned char data,address_space &space)
 
 }
 
-WRITE32_MEMBER(polgar_state::write_IOenables_32){
+void polgar_state::write_IOenables_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	write_IOenable(data>>24,space);
 }
 
-WRITE16_MEMBER(polgar_state::write_IOenables)
+void polgar_state::write_IOenables(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	write_IOenable(data>>8,space);
 }
 
 /* Unknown read/write */
 
-READ32_MEMBER(polgar_state::read_unknown1_32)
+uint32_t polgar_state::read_unknown1_32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("Read from unknown1 offset: %x\n",offset);
 	return 0xff00ff00;
 }
 
-READ16_MEMBER(polgar_state::read_unknown1)
+uint16_t polgar_state::read_unknown1(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("Read from %06x offset: %x\n",0xe80002,offset);
 	return 0xff00;
 }
 
-WRITE32_MEMBER(polgar_state::write_unknown2_32)
+void polgar_state::write_unknown2_32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//unknown2_data = data;
 	logerror("Write to   unknown2 data: %04x\n",data);
 }
 
-WRITE16_MEMBER(polgar_state::write_unknown2)
+void polgar_state::write_unknown2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//unknown2_data = data;
 	logerror("Write from %06x data: %04x\n",0xe80004,data);
 }
 
-READ32_MEMBER(polgar_state::read_unknown3_32)
+uint32_t polgar_state::read_unknown3_32(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) m_maincpu->state_int(M68K_PC));
 	return 0xffffffff;
@@ -949,7 +949,7 @@ READ32_MEMBER(polgar_state::read_unknown3_32)
 
 }
 
-READ16_MEMBER(polgar_state::read_unknown3)
+uint16_t polgar_state::read_unknown3(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("Read from %06x offset: %x\n",0xe80006,offset);
 	return 0xffff;
@@ -957,13 +957,13 @@ READ16_MEMBER(polgar_state::read_unknown3)
 
 }
 
-READ32_MEMBER(polgar_state::read_1800000)
+uint32_t polgar_state::read_1800000(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("Read from RISC2500 1800000\n");
 	return 0;
 }
 
-WRITE32_MEMBER(polgar_state::write_1000000)
+void polgar_state::write_1000000(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Write to  RISC2500 1000000\n");
 }

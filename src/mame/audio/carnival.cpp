@@ -61,7 +61,7 @@ enum
 };
 
 
-WRITE8_MEMBER( vicdual_state::carnival_audio_1_w )
+void vicdual_state::carnival_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bitsChanged;
 	int bitsGoneHigh;
@@ -127,7 +127,7 @@ WRITE8_MEMBER( vicdual_state::carnival_audio_1_w )
 }
 
 
-WRITE8_MEMBER( vicdual_state::carnival_audio_2_w )
+void vicdual_state::carnival_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bitsChanged;
 	//int bitsGoneHigh;
@@ -168,14 +168,14 @@ void vicdual_state::carnival_psg_latch(address_space &space)
 	}
 }
 
-WRITE8_MEMBER( vicdual_state::carnival_music_port_1_w )
+void vicdual_state::carnival_music_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// P1: ay8912 d0-d7
 	m_psgData = data;
 	carnival_psg_latch(space);
 }
 
-WRITE8_MEMBER( vicdual_state::carnival_music_port_2_w )
+void vicdual_state::carnival_music_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// P2 d6: AY8912 BDIR(R/W)
 	// P2 d7: AY8912 BC1
@@ -184,7 +184,7 @@ WRITE8_MEMBER( vicdual_state::carnival_music_port_2_w )
 }
 
 
-READ8_MEMBER( vicdual_state::carnival_music_port_t1_r )
+uint8_t vicdual_state::carnival_music_port_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T1: comms from audio port 2 d3
 	return ~m_port2State >> 3 & 1;

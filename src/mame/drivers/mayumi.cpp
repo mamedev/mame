@@ -39,11 +39,11 @@ public:
 	int m_int_enable;
 	int m_input_sel;
 	uint8_t key_matrix_r(uint8_t offset);
-	DECLARE_WRITE8_MEMBER(mayumi_videoram_w);
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_WRITE8_MEMBER(input_sel_w);
-	DECLARE_READ8_MEMBER(key_matrix_1p_r);
-	DECLARE_READ8_MEMBER(key_matrix_2p_r);
+	void mayumi_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t key_matrix_1p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_matrix_2p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -74,7 +74,7 @@ void mayumi_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mayumi_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
+void mayumi_state::mayumi_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x7ff);
@@ -104,7 +104,7 @@ INTERRUPT_GEN_MEMBER(mayumi_state::mayumi_interrupt)
  *
  *************************************/
 
-WRITE8_MEMBER(mayumi_state::bank_sel_w)
+void mayumi_state::bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = BIT(data, 7) | (BIT(data, 6) << 1);
 
@@ -285,7 +285,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // memory reset
 INPUT_PORTS_END
 
-WRITE8_MEMBER(mayumi_state::input_sel_w)
+void mayumi_state::input_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel = data;
 }
@@ -312,12 +312,12 @@ uint8_t mayumi_state::key_matrix_r(uint8_t offset)
 	return ret;
 }
 
-READ8_MEMBER(mayumi_state::key_matrix_1p_r)
+uint8_t mayumi_state::key_matrix_1p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return key_matrix_r(0);
 }
 
-READ8_MEMBER(mayumi_state::key_matrix_2p_r)
+uint8_t mayumi_state::key_matrix_2p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return key_matrix_r(1);
 }

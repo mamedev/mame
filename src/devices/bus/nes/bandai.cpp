@@ -209,7 +209,7 @@ void nes_fjump2_device::pcb_reset()
  -------------------------------------------------*/
 
 
-WRITE8_MEMBER(nes_oekakids_device::nt_w)
+void nes_oekakids_device::nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER(nes_oekakids_device::nt_w)
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
-READ8_MEMBER(nes_oekakids_device::nt_r)
+uint8_t nes_oekakids_device::nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 
@@ -257,7 +257,7 @@ void nes_oekakids_device::ppu_latch(offs_t offset)
 #endif
 }
 
-WRITE8_MEMBER(nes_oekakids_device::write_h)
+void nes_oekakids_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("oeka kids write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -312,7 +312,7 @@ void nes_fcg_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(nes_fcg_device::fcg_write)
+void nes_fcg_device::fcg_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("lz93d50_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -350,7 +350,7 @@ WRITE8_MEMBER(nes_fcg_device::fcg_write)
 	}
 }
 
-WRITE8_MEMBER(nes_fcg_device::write_m)
+void nes_fcg_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(nes_fcg_device::write_m)
 // FCG board does not access regs in 0x8000-0xffff space!
 // only later design lz93d50 (and its variants do)!
 
-WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
+void nes_lz93d50_24c01_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("lz93d50_24c01 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER(nes_lz93d50_24c01_device::write_h)
 	}
 }
 
-READ8_MEMBER(nes_lz93d50_24c01_device::read_m)
+uint8_t nes_lz93d50_24c01_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("lz93d50 EEPROM read, offset: %04x\n", offset));
 	if (m_i2c_dir)
@@ -443,19 +443,19 @@ void nes_fjump2_device::set_prg()
 	prg16_cdef(prg_base | 0x0f);
 }
 
-READ8_MEMBER(nes_fjump2_device::read_m)
+uint8_t nes_fjump2_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
 	return m_battery[offset & (m_battery.size() - 1)];
 }
 
-WRITE8_MEMBER(nes_fjump2_device::write_m)
+void nes_fjump2_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
 	m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_fjump2_device::write_h)
+void nes_fjump2_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("fjump2 write_h, offset: %04x, data: %02x\n", offset, data));
 

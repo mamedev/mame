@@ -74,10 +74,10 @@ public:
 	uint32_t hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t hp98544_16_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(buserror16_r);
-	DECLARE_WRITE16_MEMBER(buserror16_w);
-	DECLARE_READ32_MEMBER(buserror_r);
-	DECLARE_WRITE32_MEMBER(buserror_w);
+	uint16_t buserror16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void buserror16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint32_t buserror_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void buserror_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 private:
 	bool m_in_buserr;
@@ -216,7 +216,7 @@ void hp9k3xx_state::machine_reset()
 	m_last_buserr_pc = 0;
 }
 
-READ16_MEMBER(hp9k3xx_state::buserror16_r)
+uint16_t hp9k3xx_state::buserror16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_last_buserr_pc == space.device().safe_pc())
 	{
@@ -234,7 +234,7 @@ READ16_MEMBER(hp9k3xx_state::buserror16_r)
 	return 0;
 }
 
-WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
+void hp9k3xx_state::buserror16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_last_buserr_pc == space.device().safe_pc())
 	{
@@ -251,7 +251,7 @@ WRITE16_MEMBER(hp9k3xx_state::buserror16_w)
 	}
 }
 
-READ32_MEMBER(hp9k3xx_state::buserror_r)
+uint32_t hp9k3xx_state::buserror_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_last_buserr_pc == space.device().safe_pc())
 	{
@@ -269,7 +269,7 @@ READ32_MEMBER(hp9k3xx_state::buserror_r)
 	return 0;
 }
 
-WRITE32_MEMBER(hp9k3xx_state::buserror_w)
+void hp9k3xx_state::buserror_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_last_buserr_pc == space.device().safe_pc())
 	{

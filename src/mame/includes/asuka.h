@@ -57,14 +57,14 @@ public:
 	required_device<tc0100scn_device> m_tc0100scn;
 	required_device<tc0110pcr_device> m_tc0110pcr;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
-	DECLARE_READ16_MEMBER(cadash_share_r);
-	DECLARE_WRITE16_MEMBER(cadash_share_w);
-	DECLARE_WRITE16_MEMBER(asuka_spritectrl_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_2151_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_start_w);
-	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asuka_msm5205_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t cadash_share_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cadash_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void asuka_spritectrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_2151_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asuka_msm5205_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asuka_msm5205_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -76,11 +76,11 @@ public:
 	void WriteLevelData();
 	void WriteRestartPos(int level );
 
-	DECLARE_READ16_MEMBER( bonzeadv_cchip_ctrl_r );
-	DECLARE_READ16_MEMBER( bonzeadv_cchip_ram_r );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ctrl_w );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_bank_w );
-	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
+	uint16_t bonzeadv_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bonzeadv_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bonzeadv_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bonzeadv_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bonzeadv_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
 
 protected:

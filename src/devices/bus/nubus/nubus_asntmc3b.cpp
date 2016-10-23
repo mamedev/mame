@@ -134,19 +134,19 @@ void nubus_mac8390_device::device_reset()
 	memcpy(m_prom, m_dp83902->get_mac(), 6);
 }
 
-WRITE8_MEMBER( nubus_mac8390_device::asntm3b_ram_w )
+void nubus_mac8390_device::asntm3b_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("MC3NB: CPU wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;
 }
 
-READ8_MEMBER( nubus_mac8390_device::asntm3b_ram_r )
+uint8_t nubus_mac8390_device::asntm3b_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("MC3NB: CPU read %02x @ RAM %x\n", m_ram[offset], offset);
 	return m_ram[offset];
 }
 
-WRITE32_MEMBER( nubus_mac8390_device::en_w )
+void nubus_mac8390_device::en_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -165,7 +165,7 @@ WRITE32_MEMBER( nubus_mac8390_device::en_w )
 	}
 }
 
-READ32_MEMBER( nubus_mac8390_device::en_r )
+uint32_t nubus_mac8390_device::en_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (mem_mask == 0xff000000)
 	{
@@ -197,13 +197,13 @@ WRITE_LINE_MEMBER( nubus_mac8390_device::dp_irq_w )
 	}
 }
 
-READ8_MEMBER( nubus_mac8390_device::dp_mem_read )
+uint8_t nubus_mac8390_device::dp_mem_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("MC3NB: 8390 read RAM @ %x = %02x\n", offset, m_ram[offset]);
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( nubus_mac8390_device::dp_mem_write )
+void nubus_mac8390_device::dp_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("MC3NB: 8390 wrote %02x to RAM @ %x\n", data, offset);
 	m_ram[offset] = data;

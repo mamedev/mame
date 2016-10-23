@@ -58,9 +58,9 @@ public:
 	template<class _Object> static devcb_base &set_ft_handler(device_t &device, _Object object) { return downcast<com8116_device &>(device).m_ft_handler.set_callback(object); }
 
 	void str_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER( str_w );
+	void str_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void stt_w(uint8_t data);
-	DECLARE_WRITE8_MEMBER( stt_w );
+	void stt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	static const int divisors_16X_5_0688MHz[];
 	static const int divisors_16X_6_01835MHz[];

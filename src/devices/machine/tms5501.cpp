@@ -217,7 +217,7 @@ void tms5501_device::rcv_complete()
 //  rb_r - read receiver buffer
 //-------------------------------------------------
 
-READ8_MEMBER( tms5501_device::rb_r )
+uint8_t tms5501_device::rb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sta &= ~STA_RBL;
 	m_irq &= ~IRQ_RB;
@@ -232,7 +232,7 @@ READ8_MEMBER( tms5501_device::rb_r )
 //  xi_r - read external inputs
 //-------------------------------------------------
 
-READ8_MEMBER( tms5501_device::xi_r )
+uint8_t tms5501_device::xi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_read_xi(0);
 
@@ -249,7 +249,7 @@ READ8_MEMBER( tms5501_device::xi_r )
 //  rst_r - read interrupt address
 //-------------------------------------------------
 
-READ8_MEMBER( tms5501_device::rst_r )
+uint8_t tms5501_device::rst_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return get_vector();
 }
@@ -259,7 +259,7 @@ READ8_MEMBER( tms5501_device::rst_r )
 //  sta_r - read TMS5510 status
 //-------------------------------------------------
 
-READ8_MEMBER( tms5501_device::sta_r )
+uint8_t tms5501_device::sta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_sta;
 
@@ -273,7 +273,7 @@ READ8_MEMBER( tms5501_device::sta_r )
 //  cmd_w - issue discrete commands
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::cmd_w )
+void tms5501_device::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Command %02x\n", tag(), data);
 
@@ -312,7 +312,7 @@ WRITE8_MEMBER( tms5501_device::cmd_w )
 //  rr_w - load rate register
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::rr_w )
+void tms5501_device::rr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Rate Register %02x\n", tag(), data);
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER( tms5501_device::rr_w )
 //  tb_w - load transmitter buffer
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::tb_w )
+void tms5501_device::tb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Transmitter Buffer %02x\n", tag(), data);
 
@@ -371,7 +371,7 @@ WRITE8_MEMBER( tms5501_device::tb_w )
 //  xo_w - load output port
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::xo_w )
+void tms5501_device::xo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Output %02x\n", tag(), data);
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER( tms5501_device::xo_w )
 //  mr_w - load mask register
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::mr_w )
+void tms5501_device::mr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Mask Register %02x\n", tag(), data);
 
@@ -397,7 +397,7 @@ WRITE8_MEMBER( tms5501_device::mr_w )
 //  tmr_w - load interval timer
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms5501_device::tmr_w )
+void tms5501_device::tmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS5501 '%s' Timer %u %02x\n", tag(), offset, data);
 

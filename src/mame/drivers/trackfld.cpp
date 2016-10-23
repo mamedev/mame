@@ -199,12 +199,12 @@ MAIN BOARD:
 #define VLM_CLOCK             XTAL_3_579545MHz
 
 
-WRITE8_MEMBER(trackfld_state::coin_w)
+void trackfld_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
 
-WRITE8_MEMBER(trackfld_state::questions_bank_w)
+void trackfld_state::questions_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER(trackfld_state::questions_bank_w)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::irq_mask_w)
+void trackfld_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }
@@ -251,12 +251,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
+void trackfld_state::yieartf_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yieartf_nmi_mask = data & 1;
 }
 
-READ8_MEMBER(trackfld_state::trackfld_speech_r)
+uint8_t trackfld_state::trackfld_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_vlm->bsy())
 		return 1;
@@ -264,7 +264,7 @@ READ8_MEMBER(trackfld_state::trackfld_speech_r)
 		return 0;
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_VLM5030_control_w)
+void trackfld_state::trackfld_VLM5030_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is latch direction */
 	m_vlm->st((data >> 1) & 1);
@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(trackfld_state::trackfld_SN76496_r)
+uint8_t trackfld_state::trackfld_SN76496_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	konami_SN76496_w(space, 0, 0);
 	return 0xff; // ?

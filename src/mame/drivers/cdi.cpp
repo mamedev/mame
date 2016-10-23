@@ -415,7 +415,7 @@ void cdi_state::machine_reset_quizard4r42()
 *     68HC05 Handlers     *
 **************************/
 
-READ8_MEMBER( cdi_state::servo_io_r )
+uint8_t cdi_state::servo_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -528,7 +528,7 @@ READ8_MEMBER( cdi_state::servo_io_r )
 }
 
 
-WRITE8_MEMBER( cdi_state::servo_io_w )
+void cdi_state::servo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -615,7 +615,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 	m_servo_io_regs[offset] = data;
 }
 
-READ8_MEMBER( cdi_state::slave_io_r )
+uint8_t cdi_state::slave_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 	{
@@ -725,7 +725,7 @@ READ8_MEMBER( cdi_state::slave_io_r )
 	return ret;
 }
 
-WRITE8_MEMBER( cdi_state::slave_io_w )
+void cdi_state::slave_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

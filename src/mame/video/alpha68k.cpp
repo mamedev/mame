@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
+void alpha68k_state::alpha68k_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* 8 bit RAM, upper & lower byte writes end up in the same place due to m68k byte smearing */
 	m_videoram[offset] = data & 0xff;
@@ -140,7 +140,7 @@ uint32_t alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap
 
 */
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
+void alpha68k_state::alpha68k_II_video_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -179,7 +179,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_II_video_bank_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(alpha68k_state::alpha68k_V_video_control_w)
+void alpha68k_state::alpha68k_V_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

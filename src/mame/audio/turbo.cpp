@@ -71,7 +71,7 @@ if (!((data >> 4) & 1)) osd_printf_debug("/TRIG4\n");
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
+void turbo_state::turbo_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if (!DISCRETE_TEST)
 #endif
@@ -122,7 +122,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
+void turbo_state::turbo_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -143,7 +143,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
+void turbo_state::turbo_sound_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* OSEL1-2 */
 	m_turbo_osel = (m_turbo_osel & 1) | ((data & 3) << 1);
@@ -285,7 +285,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(turbo_state::subroc3d_sound_a_w)
+void turbo_state::subroc3d_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_state[0] = data;
 
@@ -314,7 +314,7 @@ inline void turbo_state::subroc3d_update_volume(int leftchan, uint8_t dis, uint8
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
+void turbo_state::subroc3d_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
@@ -368,7 +368,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::subroc3d_sound_c_w)
+void turbo_state::subroc3d_sound_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
@@ -484,7 +484,7 @@ void turbo_state::buckrog_update_samples()
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
+void turbo_state::buckrog_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
@@ -508,7 +508,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 }
 
 
-WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
+void turbo_state::buckrog_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;

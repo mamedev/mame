@@ -139,13 +139,13 @@ PALETTE_INIT_MEMBER(redclash_state,sraider)
 }
 
 
-WRITE8_MEMBER( redclash_state::redclash_videoram_w )
+void redclash_state::redclash_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER( redclash_state::redclash_gfxbank_w )
+void redclash_state::redclash_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfxbank != (data & 0x01))
 	{
@@ -154,7 +154,7 @@ WRITE8_MEMBER( redclash_state::redclash_gfxbank_w )
 	}
 }
 
-WRITE8_MEMBER( redclash_state::redclash_flipscreen_w )
+void redclash_state::redclash_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
@@ -170,25 +170,25 @@ star_speed:
 6 = backwards medium
 7 = backwards fast
 */
-WRITE8_MEMBER( redclash_state::redclash_star0_w )
+void redclash_state::redclash_star0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_star_speed = (m_star_speed & ~1) | ((data & 1) << 0);
 	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_MEMBER( redclash_state::redclash_star1_w )
+void redclash_state::redclash_star1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_star_speed = (m_star_speed & ~2) | ((data & 1) << 1);
 	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_MEMBER( redclash_state::redclash_star2_w )
+void redclash_state::redclash_star2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_star_speed = (m_star_speed & ~4) | ((data & 1) << 2);
 	redclash_set_stars_speed( m_star_speed);
 }
 
-WRITE8_MEMBER( redclash_state::redclash_star_reset_w )
+void redclash_state::redclash_star_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	redclash_set_stars_enable(1);
 }
@@ -452,7 +452,7 @@ uint32_t redclash_state::screen_update_redclash(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(redclash_state::sraider_io_w)
+void redclash_state::sraider_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit7 = flip
 	// bit6 = grid red

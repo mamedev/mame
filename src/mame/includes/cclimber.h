@@ -56,15 +56,15 @@ public:
 	tilemap_t *m_toproller_bg_tilemap;
 	std::unique_ptr<uint8_t[]> m_opcodes;
 
-	DECLARE_WRITE8_MEMBER(swimmer_sh_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(yamato_p0_w);
-	DECLARE_WRITE8_MEMBER(yamato_p1_w);
-	DECLARE_READ8_MEMBER(yamato_p0_r);
-	DECLARE_READ8_MEMBER(yamato_p1_r);
-	DECLARE_WRITE8_MEMBER(toprollr_rombank_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(cclimber_colorram_w);
-	DECLARE_WRITE8_MEMBER(cannonb_flip_screen_w);
+	void swimmer_sh_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yamato_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yamato_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t yamato_p0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t yamato_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void toprollr_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cclimber_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cannonb_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	void init_cclimber();

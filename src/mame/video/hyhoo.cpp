@@ -12,7 +12,7 @@
 #include "includes/hyhoo.h"
 
 
-WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
+void hyhoo_state::hyhoo_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -37,7 +37,7 @@ WRITE8_MEMBER(hyhoo_state::hyhoo_blitter_w)
 }
 
 
-WRITE8_MEMBER(hyhoo_state::hyhoo_romsel_w)
+void hyhoo_state::hyhoo_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));

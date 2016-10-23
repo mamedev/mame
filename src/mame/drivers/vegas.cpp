@@ -520,40 +520,40 @@ public:
 	void update_sio_irqs();
 	inline void _add_dynamic_address(offs_t start, offs_t end, read32_delegate read, write32_delegate write);
 
-	DECLARE_WRITE32_MEMBER( cmos_unlock_w );
-	DECLARE_WRITE32_MEMBER(timekeeper_w);
-	DECLARE_READ32_MEMBER(timekeeper_r);
-	DECLARE_READ32_MEMBER( pci_bridge_r );
-	DECLARE_WRITE32_MEMBER( pci_bridge_w );
-	DECLARE_READ32_MEMBER( pci_ide_r );
-	DECLARE_WRITE32_MEMBER( pci_ide_w );
-	DECLARE_READ32_MEMBER( pci_3dfx_r );
-	DECLARE_WRITE32_MEMBER( pci_3dfx_w );
-	DECLARE_READ32_MEMBER( nile_r );
-	DECLARE_WRITE32_MEMBER( nile_w );
-	DECLARE_READ32_MEMBER( sio_irq_clear_r );
-	DECLARE_WRITE32_MEMBER( sio_irq_clear_w );
-	DECLARE_READ32_MEMBER( sio_irq_enable_r );
-	DECLARE_WRITE32_MEMBER( sio_irq_enable_w );
-	DECLARE_READ32_MEMBER( sio_irq_cause_r );
-	DECLARE_READ32_MEMBER( sio_irq_status_r );
-	DECLARE_WRITE32_MEMBER( sio_led_w );
-	DECLARE_READ32_MEMBER( sio_led_r );
-	DECLARE_WRITE32_MEMBER( sio_w );
-	DECLARE_READ32_MEMBER( sio_r );
-	DECLARE_READ32_MEMBER( analog_port_r );
-	DECLARE_WRITE32_MEMBER( analog_port_w );
-	DECLARE_WRITE32_MEMBER( vegas_watchdog_w );
-	DECLARE_WRITE32_MEMBER( asic_fifo_w );
-	DECLARE_READ32_MEMBER( ide_main_r );
-	DECLARE_WRITE32_MEMBER( ide_main_w );
-	DECLARE_READ32_MEMBER( ide_alt_r );
-	DECLARE_WRITE32_MEMBER( ide_alt_w );
-	DECLARE_READ32_MEMBER( ide_bus_master32_r );
-	DECLARE_WRITE32_MEMBER( ide_bus_master32_w );
-	DECLARE_READ32_MEMBER( ethernet_r );
-	DECLARE_WRITE32_MEMBER( ethernet_w );
-	DECLARE_WRITE32_MEMBER( dcs3_fifo_full_w );
+	void cmos_unlock_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void timekeeper_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t timekeeper_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t pci_bridge_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pci_bridge_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pci_ide_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pci_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pci_3dfx_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pci_3dfx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t nile_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void nile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_irq_clear_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sio_irq_clear_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_irq_enable_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sio_irq_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_irq_cause_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_irq_status_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sio_led_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_led_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t analog_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void analog_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void vegas_watchdog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ide_main_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide_main_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ide_alt_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide_alt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ide_bus_master32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide_bus_master32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ethernet_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ethernet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void dcs3_fifo_full_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 };
@@ -656,13 +656,13 @@ void vegas_state::machine_reset()
  *
  *************************************/
 
-WRITE32_MEMBER( vegas_state::cmos_unlock_w )
+void vegas_state::cmos_unlock_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cmos_unlocked = 1;
 }
 
 
-WRITE32_MEMBER( vegas_state::timekeeper_w )
+void vegas_state::timekeeper_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cmos_unlocked)
 	{
@@ -683,7 +683,7 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 }
 
 
-READ32_MEMBER( vegas_state::timekeeper_r )
+uint32_t vegas_state::timekeeper_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0xffffffff;
 	if (ACCESSING_BITS_0_7)
@@ -707,7 +707,7 @@ READ32_MEMBER( vegas_state::timekeeper_r )
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::pci_bridge_r )
+uint32_t vegas_state::pci_bridge_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_pci_bridge_regs[offset];
 
@@ -728,7 +728,7 @@ READ32_MEMBER( vegas_state::pci_bridge_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::pci_bridge_w )
+void vegas_state::pci_bridge_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pci_bridge_regs[offset] = data;
 	if (LOG_PCI)
@@ -743,7 +743,7 @@ WRITE32_MEMBER( vegas_state::pci_bridge_w )
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::pci_ide_r )
+uint32_t vegas_state::pci_ide_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_pci_ide_regs[offset];
 
@@ -766,7 +766,7 @@ READ32_MEMBER( vegas_state::pci_ide_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::pci_ide_w )
+void vegas_state::pci_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_pci_ide_regs[offset] = data;
 
@@ -804,7 +804,7 @@ WRITE32_MEMBER( vegas_state::pci_ide_w )
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::pci_3dfx_r )
+uint32_t vegas_state::pci_3dfx_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int voodoo_type = m_voodoo->voodoo_get_type();
 	uint32_t result = m_pci_3dfx_regs[offset];
@@ -837,7 +837,7 @@ READ32_MEMBER( vegas_state::pci_3dfx_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::pci_3dfx_w )
+void vegas_state::pci_3dfx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int voodoo_type = m_voodoo->voodoo_get_type();
 
@@ -995,7 +995,7 @@ TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::nile_r )
+uint32_t vegas_state::nile_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_nile_regs[offset];
 	bool logit = true;
@@ -1114,7 +1114,7 @@ READ32_MEMBER( vegas_state::nile_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::nile_w )
+void vegas_state::nile_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t olddata = m_nile_regs[offset];
 	bool logit = true;
@@ -1362,13 +1362,13 @@ WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 }
 
 
-READ32_MEMBER( vegas_state::sio_irq_clear_r )
+uint32_t vegas_state::sio_irq_clear_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sio_irq_clear;
 }
 
 
-WRITE32_MEMBER( vegas_state::sio_irq_clear_w )
+void vegas_state::sio_irq_clear_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1391,13 +1391,13 @@ WRITE32_MEMBER( vegas_state::sio_irq_clear_w )
 }
 
 
-READ32_MEMBER( vegas_state::sio_irq_enable_r )
+uint32_t vegas_state::sio_irq_enable_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sio_irq_enable;
 }
 
 
-WRITE32_MEMBER( vegas_state::sio_irq_enable_w )
+void vegas_state::sio_irq_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1407,26 +1407,26 @@ WRITE32_MEMBER( vegas_state::sio_irq_enable_w )
 }
 
 
-READ32_MEMBER( vegas_state::sio_irq_cause_r )
+uint32_t vegas_state::sio_irq_cause_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sio_irq_state & m_sio_irq_enable;
 }
 
 
-READ32_MEMBER( vegas_state::sio_irq_status_r )
+uint32_t vegas_state::sio_irq_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sio_irq_state;
 }
 
 
-WRITE32_MEMBER( vegas_state::sio_led_w )
+void vegas_state::sio_led_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_sio_led_state = data;
 }
 
 
-READ32_MEMBER( vegas_state::sio_led_r )
+uint32_t vegas_state::sio_led_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sio_led_state;
 }
@@ -1439,7 +1439,7 @@ READ32_MEMBER( vegas_state::sio_led_r )
  *
  *************************************/
 
-WRITE32_MEMBER( vegas_state::sio_w )
+void vegas_state::sio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) offset += 0;
 	if (ACCESSING_BITS_8_15) offset += 1;
@@ -1454,7 +1454,7 @@ WRITE32_MEMBER( vegas_state::sio_w )
 }
 
 
-READ32_MEMBER( vegas_state::sio_r )
+uint32_t vegas_state::sio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7) offset += 0;
@@ -1476,13 +1476,13 @@ READ32_MEMBER( vegas_state::sio_r )
  *
  *************************************/
 
-READ32_MEMBER( vegas_state::analog_port_r )
+uint32_t vegas_state::analog_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_pending_analog_read;
 }
 
 
-WRITE32_MEMBER( vegas_state::analog_port_w )
+void vegas_state::analog_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", safe_pc(), data);
@@ -1497,55 +1497,55 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
  *
  *************************************/
 
-WRITE32_MEMBER( vegas_state::vegas_watchdog_w )
+void vegas_state::vegas_watchdog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	space.device().execute().eat_cycles(100);
 }
 
 
-WRITE32_MEMBER( vegas_state::asic_fifo_w )
+void vegas_state::asic_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ioasic->fifo_w(data);
 }
 
 
-READ32_MEMBER( vegas_state::ide_main_r )
+uint32_t vegas_state::ide_main_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ide->read_cs0(space, offset, mem_mask);
 }
 
 
-WRITE32_MEMBER( vegas_state::ide_main_w )
+void vegas_state::ide_main_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ide->write_cs0(space, offset, data, mem_mask);
 }
 
 
-READ32_MEMBER( vegas_state::ide_alt_r )
+uint32_t vegas_state::ide_alt_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ide->read_cs1(space, offset + 1, mem_mask);
 }
 
 
-WRITE32_MEMBER( vegas_state::ide_alt_w )
+void vegas_state::ide_alt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ide->write_cs1(space, offset + 1, data, mem_mask);
 }
 
 
-READ32_MEMBER( vegas_state::ide_bus_master32_r )
+uint32_t vegas_state::ide_bus_master32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ide->bmdma_r(space, offset, mem_mask);
 }
 
 
-WRITE32_MEMBER( vegas_state::ide_bus_master32_w )
+void vegas_state::ide_bus_master32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ide->bmdma_w(space, offset, data, mem_mask);
 }
 
 
-READ32_MEMBER( vegas_state::ethernet_r )
+uint32_t vegas_state::ethernet_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
@@ -1556,7 +1556,7 @@ READ32_MEMBER( vegas_state::ethernet_r )
 }
 
 
-WRITE32_MEMBER( vegas_state::ethernet_w )
+void vegas_state::ethernet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_ethernet->write(space, offset * 2 + 0, data, mem_mask);
@@ -1565,7 +1565,7 @@ WRITE32_MEMBER( vegas_state::ethernet_w )
 }
 
 
-WRITE32_MEMBER( vegas_state::dcs3_fifo_full_w )
+void vegas_state::dcs3_fifo_full_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ioasic->fifo_full_w(data);
 }

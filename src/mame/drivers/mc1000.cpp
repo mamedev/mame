@@ -80,16 +80,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_WRITE8_MEMBER( mc6845_ctrl_w );
-	DECLARE_WRITE8_MEMBER( mc6847_attr_w );
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc6845_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc6847_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( fs_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( keylatch_w );
-	DECLARE_READ8_MEMBER( keydata_r );
-	DIRECT_UPDATE_MEMBER(mc1000_direct_update_handler);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keydata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	offs_t mc1000_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	void bankswitch();
 
@@ -172,24 +172,24 @@ WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( mc1000_state::printer_r )
+uint8_t mc1000_state::printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_centronics_busy;
 }
 
-WRITE8_MEMBER( mc1000_state::printer_w )
+void mc1000_state::printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics->write_strobe(BIT(data, 0));
 }
 
-WRITE8_MEMBER( mc1000_state::mc6845_ctrl_w )
+void mc1000_state::mc6845_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mc6845_bank = BIT(data, 0);
 
 	bankswitch();
 }
 
-WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
+void mc1000_state::mc6847_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER( mc1000_state::hs_w )
 	m_hsync = state;
 }
 
-READ8_MEMBER( mc1000_state::videoram_r )
+uint8_t mc1000_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 
@@ -373,14 +373,14 @@ READ8_MEMBER( mc1000_state::videoram_r )
 
 /* AY-3-8910 Interface */
 
-WRITE8_MEMBER( mc1000_state::keylatch_w )
+void mc1000_state::keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( mc1000_state::keydata_r )
+uint8_t mc1000_state::keydata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -570,7 +570,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
+offs_t mc1000_state::mc1000_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_rom0000)
 	{

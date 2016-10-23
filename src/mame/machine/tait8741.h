@@ -68,14 +68,14 @@ public:
 	static void static_set_mode(device_t &device, int num, uint8_t mode) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].mode = mode; }
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<taito8741_4pack_device &>(device).m_taito8741[num].connect = conn; }
 
-	DECLARE_READ8_MEMBER( read_0 ) { if(offset&1) return status_r(0); else return data_r(0); }
-	DECLARE_WRITE8_MEMBER( write_0 ) { if(offset&1) command_w(0,data); else data_w(0,data); }
-	DECLARE_READ8_MEMBER( read_1 ) { if(offset&1) return status_r(1); else return data_r(1); }
-	DECLARE_WRITE8_MEMBER( write_1 ) { if(offset&1) command_w(1,data); else data_w(1,data); }
-	DECLARE_READ8_MEMBER( read_2 ) { if(offset&1) return status_r(2); else return data_r(2); }
-	DECLARE_WRITE8_MEMBER( write_2 ) { if(offset&1) command_w(2,data); else data_w(2,data); }
-	DECLARE_READ8_MEMBER( read_3 ) { if(offset&1) return status_r(3); else return data_r(3); }
-	DECLARE_WRITE8_MEMBER( write_3 ) { if(offset&1) command_w(3,data); else data_w(3,data); }
+	uint8_t read_0(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if(offset&1) return status_r(0); else return data_r(0); }
+	void write_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(offset&1) command_w(0,data); else data_w(0,data); }
+	uint8_t read_1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if(offset&1) return status_r(1); else return data_r(1); }
+	void write_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(offset&1) command_w(1,data); else data_w(1,data); }
+	uint8_t read_2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if(offset&1) return status_r(2); else return data_r(2); }
+	void write_2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(offset&1) command_w(2,data); else data_w(2,data); }
+	uint8_t read_3(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if(offset&1) return status_r(3); else return data_r(3); }
+	void write_3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(offset&1) command_w(3,data); else data_w(3,data); }
 
 	TIMER_CALLBACK_MEMBER( serial_tx );
 	void update(int num);
@@ -153,12 +153,12 @@ public:
 
 	static void static_set_connect(device_t &device, int num, int conn) { downcast<josvolly8741_4pack_device &>(device).m_i8741[num].connect = conn; }
 
-	DECLARE_READ8_MEMBER( read_0 ) { return read(0,offset); }
-	DECLARE_WRITE8_MEMBER( write_0 ) { write(0,offset,data); }
-	DECLARE_READ8_MEMBER( read_1 ) { return read(1,offset); }
-	DECLARE_WRITE8_MEMBER( write_1 ) { write(1,offset,data); }
+	uint8_t read_0(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(0,offset); }
+	void write_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(0,offset,data); }
+	uint8_t read_1(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(1,offset); }
+	void write_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(1,offset,data); }
 
-	DECLARE_WRITE8_MEMBER( nmi_enable_w ) { m_nmi_enable = 1; }
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_nmi_enable = 1; }
 
 	TIMER_CALLBACK_MEMBER( tx );
 protected:

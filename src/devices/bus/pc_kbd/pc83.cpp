@@ -283,7 +283,7 @@ void ibm_pc_83_keyboard_device::device_reset()
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_83_keyboard_device::bus_w )
+void ibm_pc_83_keyboard_device::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -308,7 +308,7 @@ WRITE8_MEMBER( ibm_pc_83_keyboard_device::bus_w )
 //  p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_83_keyboard_device::p1_r )
+uint8_t ibm_pc_83_keyboard_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -338,7 +338,7 @@ READ8_MEMBER( ibm_pc_83_keyboard_device::p1_r )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ibm_pc_83_keyboard_device::p2_w )
+void ibm_pc_83_keyboard_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER( ibm_pc_83_keyboard_device::p2_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ibm_pc_83_keyboard_device::t1_r )
+uint8_t ibm_pc_83_keyboard_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

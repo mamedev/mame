@@ -712,7 +712,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
  *
  *************************************/
 
-WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
+void cps_state::cps2_eeprom_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -805,7 +805,7 @@ TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
 	machine().device<qsound_device>("qsound")->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
 }
 
-READ16_MEMBER(cps_state::cps2_qsound_volume_r)
+uint16_t cps_state::cps2_qsound_volume_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const uint16_t cps2_vol_states[40] =
 	{
@@ -839,12 +839,12 @@ READ16_MEMBER(cps_state::cps2_qsound_volume_r)
  *
  *************************************/
 
-READ16_MEMBER(cps_state::kludge_r)
+uint16_t cps_state::kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(cps_state::joy_or_paddle_r)
+uint16_t cps_state::joy_or_paddle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_readpaddle != 0)
 	{
@@ -856,7 +856,7 @@ READ16_MEMBER(cps_state::joy_or_paddle_r)
 	}
 }
 
-READ16_MEMBER(cps_state::joy_or_paddle_ecofghtr_r)
+uint16_t cps_state::joy_or_paddle_ecofghtr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_readpaddle == 0 || (m_io_in1->read() & 0x10) == 0x10) // ignore bit if spinner not enabled
 	{
@@ -9756,12 +9756,12 @@ void cps_state::init_singbrd()
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-READ16_MEMBER( cps_state::gigaman2_dummyqsound_r )
+uint16_t cps_state::gigaman2_dummyqsound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_gigaman2_dummyqsound_ram[offset];
 }
 
-WRITE16_MEMBER( cps_state::gigaman2_dummyqsound_w )
+void cps_state::gigaman2_dummyqsound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gigaman2_dummyqsound_ram[offset] = data;
 }

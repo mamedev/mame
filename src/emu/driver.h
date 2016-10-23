@@ -158,8 +158,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
 
 	// general fatal error handlers
-	DECLARE_READ8_MEMBER( fatal_generic_read );
-	DECLARE_WRITE8_MEMBER( fatal_generic_write );
+	uint8_t fatal_generic_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fatal_generic_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// helpers called at startup

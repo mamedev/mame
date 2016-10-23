@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( dave_device::int2_w )
 //  program_r - program space read
 //-------------------------------------------------
 
-READ8_MEMBER( dave_device::program_r )
+uint8_t dave_device::program_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
@@ -322,7 +322,7 @@ READ8_MEMBER( dave_device::program_r )
 //  program_w - program space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( dave_device::program_w )
+void dave_device::program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
@@ -335,7 +335,7 @@ WRITE8_MEMBER( dave_device::program_w )
 //  io_r - I/O space read
 //-------------------------------------------------
 
-READ8_MEMBER( dave_device::io_r )
+uint8_t dave_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -388,7 +388,7 @@ READ8_MEMBER( dave_device::io_r )
 //  io_w - I/O space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( dave_device::io_w )
+void dave_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xff)
 	{

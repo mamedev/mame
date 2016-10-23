@@ -46,15 +46,15 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(portf5_r);
-	DECLARE_READ8_MEMBER(portf6_r);
-	DECLARE_WRITE8_MEMBER(portf6_w);
-	DECLARE_READ8_MEMBER(portf7_r);
-	DECLARE_WRITE8_MEMBER(portf7_w);
-	DECLARE_WRITE8_MEMBER(portf8_w);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portf5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portf6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portf6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portf7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portf7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portf8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_microdec();
 private:
 	uint8_t m_term_data;
@@ -70,12 +70,12 @@ private:
 };
 
 
-READ8_MEMBER( microdec_state::status_r )
+uint8_t microdec_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-READ8_MEMBER( microdec_state::keyin_r )
+uint8_t microdec_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -87,7 +87,7 @@ d0-2 : motor on signals from f8
 d3   : ack (cent)
 d4   : ready (fdd)
 d5   : diag jumper (md3 only) */
-READ8_MEMBER( microdec_state::portf5_r )
+uint8_t microdec_state::portf5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_fdc->set_ready_line_connected(m_fdc_rdy);
 
@@ -96,27 +96,27 @@ READ8_MEMBER( microdec_state::portf5_r )
 }
 
 // disable eprom
-READ8_MEMBER( microdec_state::portf6_r )
+uint8_t microdec_state::portf6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(0); // point at ram
 	return 0xff;
 }
 
 // TC pin on fdc
-READ8_MEMBER( microdec_state::portf7_r )
+uint8_t microdec_state::portf7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_fdc->tc_w(1);
 	return 0xff;
 }
 
 // enable eprom
-WRITE8_MEMBER( microdec_state::portf6_w )
+void microdec_state::portf6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1); // point at rom
 }
 
 // sets up VFO stuff
-WRITE8_MEMBER( microdec_state::portf7_w )
+void microdec_state::portf7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_rdy = BIT(data,2);
 }
@@ -124,7 +124,7 @@ WRITE8_MEMBER( microdec_state::portf7_w )
 /*
 d0-2 : motor on for drive sockets
 d3   : precomp */
-WRITE8_MEMBER( microdec_state::portf8_w )
+void microdec_state::portf8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portf8 = data & 7;
 	/* code for motor on per drive goes here */
@@ -183,7 +183,7 @@ void microdec_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( microdec_state::kbd_put )
+void microdec_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

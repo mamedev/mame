@@ -50,8 +50,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }

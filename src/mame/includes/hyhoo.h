@@ -35,8 +35,8 @@ public:
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
 
-	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
-	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
+	void hyhoo_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hyhoo_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 

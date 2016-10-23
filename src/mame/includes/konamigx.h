@@ -76,28 +76,28 @@ public:
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
-	DECLARE_WRITE32_MEMBER(esc_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(control_w);
-	DECLARE_READ32_MEMBER(le2_gun_H_r);
-	DECLARE_READ32_MEMBER(le2_gun_V_r);
-	DECLARE_READ32_MEMBER(type1_roz_r1);
-	DECLARE_READ32_MEMBER(type1_roz_r2);
-	DECLARE_READ32_MEMBER(type3_sync_r);
-	DECLARE_WRITE32_MEMBER(type4_prot_w);
-	DECLARE_WRITE32_MEMBER(type1_cablamps_w);
-	DECLARE_READ16_MEMBER(tms57002_data_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
-	DECLARE_READ16_MEMBER(tms57002_status_word_r);
-	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
-	DECLARE_READ16_MEMBER(K055550_word_r);
-	DECLARE_WRITE16_MEMBER(K055550_word_w);
-	DECLARE_WRITE16_MEMBER(K053990_martchmp_word_w);
-	DECLARE_WRITE32_MEMBER(fantjour_dma_w);
-	DECLARE_WRITE32_MEMBER(konamigx_type3_psac2_bank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_tilebank_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t1_psacmap_w);
-	DECLARE_WRITE32_MEMBER(konamigx_t4_psacmap_w);
+	void esc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t le2_gun_H_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t le2_gun_V_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t type1_roz_r1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t type1_roz_r2(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t type3_sync_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void type4_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void type1_cablamps_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t tms57002_data_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms57002_data_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tms57002_status_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms57002_control_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t K055550_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void K055550_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void K053990_martchmp_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fantjour_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void konamigx_type3_psac2_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void konamigx_tilebank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void konamigx_t1_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void konamigx_t4_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq_ack_w);
 	DECLARE_WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
@@ -137,7 +137,7 @@ public:
 	K055673_CB_MEMBER(le2_sprite_callback);
 
 	void common_init();
-	DECLARE_READ32_MEMBER( k_6bpp_rom_long_r );
+	uint32_t k_6bpp_rom_long_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void konamigx_mixer     (screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,tilemap_t *sub1, int sub1flags,tilemap_t *sub2, int sub2flags,int mixerflags, bitmap_ind16 *extra_bitmap, int rushingheroes_hack);
 	void konamigx_mixer_draw(screen_device &Screen, bitmap_rgb32 &bitmap, const rectangle &cliprect,
 						tilemap_t *sub1, int sub1flags,

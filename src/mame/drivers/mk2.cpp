@@ -69,10 +69,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<mos6530_device> m_miot;
-	DECLARE_READ8_MEMBER(mk2_read_a);
-	DECLARE_WRITE8_MEMBER(mk2_write_a);
-	DECLARE_READ8_MEMBER(mk2_read_b);
-	DECLARE_WRITE8_MEMBER(mk2_write_b);
+	uint8_t mk2_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mk2_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mk2_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mk2_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_led[5];
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
@@ -133,7 +133,7 @@ void mk2_state::machine_start()
 {
 }
 
-READ8_MEMBER( mk2_state::mk2_read_a )
+uint8_t mk2_state::mk2_read_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0xff;
 	int help=ioport("BLACK")->read() | ioport("WHITE")->read(); // looks like white and black keys are the same!
@@ -158,7 +158,7 @@ READ8_MEMBER( mk2_state::mk2_read_a )
 	return data;
 }
 
-WRITE8_MEMBER( mk2_state::mk2_write_a )
+void mk2_state::mk2_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t temp = m_miot->portb_out_get();
 
@@ -166,13 +166,13 @@ WRITE8_MEMBER( mk2_state::mk2_write_a )
 }
 
 
-READ8_MEMBER( mk2_state::mk2_read_b )
+uint8_t mk2_state::mk2_read_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff&~0x40; // chip select mapped to pb6
 }
 
 
-WRITE8_MEMBER( mk2_state::mk2_write_b )
+void mk2_state::mk2_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x06) == 0x06)
 			m_speaker->level_w(BIT(data, 0));

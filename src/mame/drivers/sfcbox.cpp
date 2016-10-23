@@ -140,17 +140,17 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( port_81_r );
-	DECLARE_READ8_MEMBER( port_83_r );
-	DECLARE_WRITE8_MEMBER( port_80_w );
-	DECLARE_WRITE8_MEMBER( port_81_w );
-	DECLARE_WRITE8_MEMBER( port_83_w );
-	DECLARE_WRITE8_MEMBER( snes_map_0_w );
-	DECLARE_WRITE8_MEMBER( snes_map_1_w );
+	uint8_t port_81_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_83_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_83_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snes_map_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snes_map_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	uint8_t spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -165,12 +165,12 @@ static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
-READ8_MEMBER(sfcbox_state::spc_ram_100_r)
+uint8_t sfcbox_state::spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spc700->spc_ram_r(space, offset + 0x100);
 }
 
-WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
+void sfcbox_state::spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( sfcbox_map, AS_PROGRAM, 8, sfcbox_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER( sfcbox_state::port_80_w )
+void sfcbox_state::port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     x--- ----   (often same as bit5)
@@ -207,7 +207,7 @@ WRITE8_MEMBER( sfcbox_state::port_80_w )
 }
 
 
-READ8_MEMBER( sfcbox_state::port_81_r )
+uint8_t sfcbox_state::port_81_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     x--- ----   Vblank, Vsync, or Whatever flag (must toggle on/off at whatever speed)
@@ -233,7 +233,7 @@ READ8_MEMBER( sfcbox_state::port_81_r )
 	return res;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_81_w )
+void sfcbox_state::port_81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
@@ -241,16 +241,16 @@ WRITE8_MEMBER( sfcbox_state::port_81_w )
 	ioport("OSD_CS")->write(data, 0xff);
 }
 
-READ8_MEMBER( sfcbox_state::port_83_r )
+uint8_t sfcbox_state::port_83_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( sfcbox_state::port_83_w )
+void sfcbox_state::port_83_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
+void sfcbox_state::snes_map_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const char *const rom_socket[4] = { "ROM5", "ROM1/7/12", "ROM3/9", "IC23" };
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
 	printf("%s ROM / DSP / SRAM maps\n",(data & 0x80) ? "HiROM" : "LoROM");
 }
 
-WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
+void sfcbox_state::snes_map_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Reserved for ROM DSP SRAM probably means bank ATROM */
 	const char *const rom_dsp_sram[4] = {   "Reserved?", "GSU", "LoROM", "HiROM" };

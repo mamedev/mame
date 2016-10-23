@@ -254,21 +254,21 @@ public:
 	void check_interrupts();
 	void update_speaker();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE8_MEMBER( via_pa_w );
-	DECLARE_READ8_MEMBER( via_pb_r );
-	DECLARE_WRITE8_MEMBER( via_pb_w );
+	void via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
-	DECLARE_READ8_MEMBER( pia1_pa_r );
-	DECLARE_READ8_MEMBER( pia1_pb_r );
-	DECLARE_WRITE8_MEMBER( pia1_pa_w );
+	uint8_t pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
 
 	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
@@ -333,7 +333,7 @@ public:
 		pet_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( pia1_pb_r );
+	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -401,8 +401,8 @@ public:
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
 	void read_pla2_eprom(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_cr;
 };
@@ -461,7 +461,7 @@ void pet_state::update_speaker()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( pet_state::read )
+uint8_t pet_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int sel = offset >> 12;
 	int norom = m_exp->norom_r(space, offset, sel);
@@ -556,7 +556,7 @@ READ8_MEMBER( pet_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pet_state::write )
+void pet_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sel = offset >> 12;
 
@@ -684,7 +684,7 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( cbm8296_state::read )
+uint8_t cbm8296_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
@@ -765,7 +765,7 @@ READ8_MEMBER( cbm8296_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( cbm8296_state::write )
+void cbm8296_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
@@ -1115,7 +1115,7 @@ WRITE_LINE_MEMBER( pet_state::via_irq_w )
 	check_interrupts();
 }
 
-WRITE8_MEMBER( pet_state::via_pa_w )
+void pet_state::via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_user->write_c((data>>0)&1);
 	m_user->write_d((data>>1)&1);
@@ -1129,7 +1129,7 @@ WRITE8_MEMBER( pet_state::via_pa_w )
 	m_via_pa = data;
 }
 
-READ8_MEMBER( pet_state::via_pb_r )
+uint8_t pet_state::via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1159,7 +1159,7 @@ READ8_MEMBER( pet_state::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::via_pb_w )
+void pet_state::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1214,7 +1214,7 @@ WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
 	check_interrupts();
 }
 
-READ8_MEMBER( pet_state::pia1_pa_r )
+uint8_t pet_state::pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1249,7 +1249,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet_state::pia1_pa_w )
+void pet_state::pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1274,7 +1274,7 @@ WRITE8_MEMBER( pet_state::pia1_pa_w )
 	update_speaker();
 }
 
-READ8_MEMBER( pet_state::pia1_pb_r )
+uint8_t pet_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1295,7 +1295,7 @@ READ8_MEMBER( pet_state::pia1_pb_r )
 	return data;
 }
 
-READ8_MEMBER( pet2001b_state::pia1_pb_r )
+uint8_t pet2001b_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

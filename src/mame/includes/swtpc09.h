@@ -62,8 +62,8 @@ public:
 	optional_device<device_t> m_harddisk;
 	optional_device<ide_controller_device> m_ide;
 
-	DECLARE_READ8_MEMBER(pia0_a_r);
-	DECLARE_READ8_MEMBER(pia0_ca1_r);
+	uint8_t pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia0_ca1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_o1_callback );
@@ -76,29 +76,29 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 
-	DECLARE_READ8_MEMBER( dmf3_via_read_porta );
-	DECLARE_READ8_MEMBER( dmf3_via_read_portb );
-	DECLARE_WRITE8_MEMBER( dmf3_via_write_porta );
+	uint8_t dmf3_via_read_porta(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dmf3_via_read_portb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_via_write_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dmf3_via_irq );
 
-	DECLARE_READ8_MEMBER(piaide_a_r);
-	DECLARE_READ8_MEMBER(piaide_b_r);
-	DECLARE_WRITE8_MEMBER(piaide_a_w);
-	DECLARE_WRITE8_MEMBER(piaide_b_w);
+	uint8_t piaide_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t piaide_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void piaide_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void piaide_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER ( dmf2_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf2_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmf2_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf2_control_reg_w );
+	uint8_t dmf2_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf2_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmf2_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf2_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER ( dmf3_dma_address_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf3_dma_address_reg_w );
-	DECLARE_READ8_MEMBER ( dmf3_control_reg_r );
-	DECLARE_WRITE8_MEMBER ( dmf3_control_reg_w );
+	uint8_t dmf3_dma_address_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_dma_address_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmf3_control_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmf3_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER ( dc4_control_reg_w );
+	void dc4_control_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(dat_w);
+	void dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_swtpc09();
 	void init_swtpc09i();
@@ -139,8 +139,8 @@ public:
 	uint8_t m_m6844_priority;
 	uint8_t m_m6844_interrupt;
 	uint8_t m_m6844_chain;
-	DECLARE_READ8_MEMBER ( m6844_r );
-	DECLARE_WRITE8_MEMBER ( m6844_w );
+	uint8_t m6844_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 };
 

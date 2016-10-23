@@ -45,12 +45,12 @@ public:
 
 	tilemap_t    *m_extra_tilemap;
 
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	void bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(extraram_w);
+	void extraram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_extra_tile_info);
 
 
@@ -60,16 +60,16 @@ public:
 	bitmap_ind16 m_sprite_bitmap;
 
 
-	DECLARE_WRITE16_MEMBER(soundcommand_w);
+	void soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( spbatnp_90002_w );
-	DECLARE_WRITE16_MEMBER( spbatnp_90006_w );
-	DECLARE_WRITE16_MEMBER( spbatnp_9000a_w );
-	DECLARE_WRITE16_MEMBER( spbatnp_9000c_w );
-	DECLARE_WRITE16_MEMBER( spbatnp_9000e_w );
+	void spbatnp_90002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spbatnp_90006_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spbatnp_9000a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spbatnp_9000c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spbatnp_9000e_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( spbatnp_90124_w );
-	DECLARE_WRITE16_MEMBER( spbatnp_9012c_w );
+	void spbatnp_90124_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spbatnp_9012c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void video_start_spbactn();
 	void video_start_spbactnp();
@@ -81,7 +81,7 @@ public:
 	int draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites);
 
 	// temp hack
-	DECLARE_READ16_MEMBER(temp_read_handler_r)
+	uint16_t temp_read_handler_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)
 	{
 		return 0xffff;
 	}

@@ -39,9 +39,9 @@ public:
 		, m_special(*this, "SPECIAL")
 	{ }
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_WRITE8_MEMBER( colorram_w );
+	uint8_t pia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
@@ -49,9 +49,9 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
-	DECLARE_WRITE8_MEMBER( dma_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
 	required_shared_ptr<uint8_t> m_p_videoram;
 

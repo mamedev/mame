@@ -114,10 +114,10 @@ public:
 	template<class _Object> static devcb_base &set_flag_wr_callback(device_t &device, _Object object) { return downcast<cbm2_user_port_device &>(device).m_write_flag.set_callback(object); }
 
 	// computer interface
-	DECLARE_READ8_MEMBER( d1_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }
-	DECLARE_WRITE8_MEMBER( d1_w ) { if (m_card != nullptr) m_card->cbm2_d1_w(space, offset, data); }
-	DECLARE_READ8_MEMBER( d2_r ) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d2_r(space, offset); return data; }
-	DECLARE_WRITE8_MEMBER( d2_w ) { if (m_card != nullptr) m_card->cbm2_d2_w(space, offset, data); }
+	uint8_t d1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d1_r(space, offset); return data; }
+	void d1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card != nullptr) m_card->cbm2_d1_w(space, offset, data); }
+	uint8_t d2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { uint8_t data = 0xff; if (m_card != nullptr) data = m_card->cbm2_d2_r(space, offset); return data; }
+	void d2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card != nullptr) m_card->cbm2_d2_w(space, offset, data); }
 	DECLARE_READ_LINE_MEMBER( pb2_r ) { return m_card ? m_card->cbm2_pb2_r() : 1; }
 	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { if (m_card != nullptr) m_card->cbm2_pb2_w(state); }
 	DECLARE_READ_LINE_MEMBER( pb3_r ) { return m_card ? m_card->cbm2_pb3_r() : 1; }

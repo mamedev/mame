@@ -338,7 +338,7 @@ int abc1600_mac_device::get_fc()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::read )
+uint8_t abc1600_mac_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int fc = get_fc();
 
@@ -366,7 +366,7 @@ READ8_MEMBER( abc1600_mac_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::write )
+void abc1600_mac_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int fc = get_fc();
 
@@ -385,7 +385,7 @@ WRITE8_MEMBER( abc1600_mac_device::write )
 //  cause_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::cause_r )
+uint8_t abc1600_mac_device::cause_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -417,7 +417,7 @@ READ8_MEMBER( abc1600_mac_device::cause_r )
 //  task_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::task_w )
+void abc1600_mac_device::task_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -444,7 +444,7 @@ WRITE8_MEMBER( abc1600_mac_device::task_w )
 //  segment_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::segment_r )
+uint8_t abc1600_mac_device::segment_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -472,7 +472,7 @@ READ8_MEMBER( abc1600_mac_device::segment_r )
 //  segment_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::segment_w )
+void abc1600_mac_device::segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -501,7 +501,7 @@ WRITE8_MEMBER( abc1600_mac_device::segment_w )
 //  page_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abc1600_mac_device::page_r )
+uint8_t abc1600_mac_device::page_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -556,7 +556,7 @@ READ8_MEMBER( abc1600_mac_device::page_r )
 //  page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::page_w )
+void abc1600_mac_device::page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -678,7 +678,7 @@ void abc1600_mac_device::dma_iorq_w(int index, uint16_t offset, uint8_t data)
 //  dmamap_w - DMA map write
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc1600_mac_device::dmamap_w )
+void abc1600_mac_device::dmamap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

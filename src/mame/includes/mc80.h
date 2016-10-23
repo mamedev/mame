@@ -23,23 +23,23 @@ public:
 		m_p_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE8_MEMBER(mc8030_zve_write_protect_w);
-	DECLARE_WRITE8_MEMBER(mc8030_vis_w);
-	DECLARE_WRITE8_MEMBER(mc8030_eprom_prog_w);
+	void mc8030_zve_write_protect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc8030_vis_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc8030_eprom_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_READ8_MEMBER(mc80_port_b_r);
-	DECLARE_READ8_MEMBER(mc80_port_a_r);
-	DECLARE_WRITE8_MEMBER(mc80_port_a_w);
-	DECLARE_WRITE8_MEMBER(mc80_port_b_w);
-	DECLARE_READ8_MEMBER(zve_port_a_r);
-	DECLARE_READ8_MEMBER(zve_port_b_r);
-	DECLARE_WRITE8_MEMBER(zve_port_a_w);
-	DECLARE_WRITE8_MEMBER(zve_port_b_w);
-	DECLARE_READ8_MEMBER(asp_port_a_r);
-	DECLARE_READ8_MEMBER(asp_port_b_r);
-	DECLARE_WRITE8_MEMBER(asp_port_a_w);
-	DECLARE_WRITE8_MEMBER(asp_port_b_w);
+	uint8_t mc80_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mc80_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc80_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mc80_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t zve_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zve_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zve_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zve_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t asp_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t asp_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void asp_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void asp_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	void machine_reset_mc8020();
 	void video_start_mc8020();

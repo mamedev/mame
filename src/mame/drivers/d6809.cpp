@@ -100,21 +100,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_READ8_MEMBER( term_r );
-	DECLARE_WRITE8_MEMBER( term_w );
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void term_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( d6809_state::term_r )
+uint8_t d6809_state::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( d6809_state::term_w )
+void d6809_state::term_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data > 0) && (data < 0x80))
 		m_terminal->write(space, 0, data);
@@ -134,7 +134,7 @@ static INPUT_PORTS_START( d6809 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER( d6809_state::kbd_put )
+void d6809_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

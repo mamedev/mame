@@ -218,7 +218,7 @@ might be for Footchmp. That seems to be the only game
 altering spritebanks of sprites while they're on screen.
 ********************************************************/
 
-WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
+void taitof2_state::taitof2_sprite_extension_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* areas above 0x1000 cleared in some games, but not used */
 
@@ -229,7 +229,7 @@ WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
 }
 
 
-WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
+void taitof2_state::taitof2_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i = 0;
 	int j = 0;
@@ -258,7 +258,7 @@ WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
 
 }
 
-WRITE16_MEMBER(taitof2_state::koshien_spritebank_w)
+void taitof2_state::koshien_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spritebank_buffered[0] = 0x0000;   /* never changes */
 	m_spritebank_buffered[1] = 0x0400;

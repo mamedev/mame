@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 *************************************/
 
-READ8_MEMBER( snes_state::snes_open_bus_r )
+uint8_t snes_state::snes_open_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint8_t recurse = 0;
 	uint16_t result;
@@ -276,7 +276,7 @@ READ8_MEMBER( snes_state::snes_open_bus_r )
 }
 
 /* read & write to DMA addresses are defined separately, to be called by snessdd1 handlers */
-READ8_MEMBER( snes_state::snes_io_dma_r )
+uint8_t snes_state::snes_io_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -322,7 +322,7 @@ READ8_MEMBER( snes_state::snes_io_dma_r )
 	return snes_open_bus_r(space, 0);
 }
 
-WRITE8_MEMBER( snes_state::snes_io_dma_w )
+void snes_state::snes_io_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -386,7 +386,7 @@ WRITE8_MEMBER( snes_state::snes_io_dma_w )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-READ8_MEMBER( snes_state::snes_r_io )
+uint8_t snes_state::snes_r_io(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 
@@ -476,7 +476,7 @@ READ8_MEMBER( snes_state::snes_r_io )
  * mid  - This is the middle byte of a 24 bit value
  * high - This is the high byte of a 16 or 24 bit value
  */
-WRITE8_MEMBER( snes_state::snes_w_io )
+void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
@@ -721,7 +721,7 @@ inline uint8_t snes_state::snes_rom_access(uint32_t offset)
 }
 
 /* 0x000000 - 0x7dffff */
-READ8_MEMBER(snes_state::snes_r_bank1)
+uint8_t snes_state::snes_r_bank1(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0xff;
 	uint16_t address = offset & 0xffff;
@@ -785,7 +785,7 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 
 
 /* 0x800000 - 0xffffff */
-READ8_MEMBER(snes_state::snes_r_bank2)
+uint8_t snes_state::snes_r_bank2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	uint16_t address = offset & 0xffff;
@@ -833,7 +833,7 @@ READ8_MEMBER(snes_state::snes_r_bank2)
 
 
 /* 0x000000 - 0x7dffff */
-WRITE8_MEMBER(snes_state::snes_w_bank1)
+void snes_state::snes_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -890,7 +890,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 }
 
 /* 0x800000 - 0xffffff */
-WRITE8_MEMBER(snes_state::snes_w_bank2)
+void snes_state::snes_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xffff;
 
@@ -937,7 +937,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank2)
 
 *************************************/
 
-WRITE8_MEMBER(snes_state::io_read)
+void snes_state::io_read(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const portnames[2][2] =
 	{

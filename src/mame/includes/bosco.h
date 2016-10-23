@@ -21,7 +21,7 @@ public:
 	uint8_t *m_spriteram;
 	uint8_t *m_spriteram2;
 	uint32_t m_spriteram_size;
-	DECLARE_WRITE8_MEMBER(bosco_flip_screen_w);
+	void bosco_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
@@ -34,8 +34,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
-	DECLARE_WRITE8_MEMBER( bosco_videoram_w );
-	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );
-	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
-	DECLARE_WRITE8_MEMBER( bosco_starclr_w );
+	void bosco_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bosco_starclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

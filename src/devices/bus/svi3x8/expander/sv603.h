@@ -31,10 +31,10 @@ public:
 	sv603_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from host
-	virtual DECLARE_READ8_MEMBER( mreq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( mreq_w ) override;
-	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
+	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 

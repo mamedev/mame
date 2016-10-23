@@ -228,7 +228,7 @@ uint32_t nubus_spec8s3_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
+void nubus_spec8s3_device::spec8s3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -314,7 +314,7 @@ WRITE32_MEMBER( nubus_spec8s3_device::spec8s3_w )
 	}
 }
 
-READ32_MEMBER( nubus_spec8s3_device::spec8s3_r )
+uint32_t nubus_spec8s3_device::spec8s3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -343,13 +343,13 @@ READ32_MEMBER( nubus_spec8s3_device::spec8s3_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_spec8s3_device::vram_w )
+void nubus_spec8s3_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_spec8s3_device::vram_r )
+uint32_t nubus_spec8s3_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

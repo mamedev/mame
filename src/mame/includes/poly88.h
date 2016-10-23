@@ -48,9 +48,9 @@ public:
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
-	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
-	DECLARE_READ8_MEMBER(poly88_keyboard_r);
-	DECLARE_WRITE8_MEMBER(poly88_intr_w);
+	void poly88_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t poly88_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void poly88_intr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_poly88();
 	virtual void machine_reset() override;
 	virtual void video_start() override;

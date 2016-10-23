@@ -62,37 +62,37 @@ public:
 	m_palette(*this, "palette")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_READ8_MEMBER(attr_r);
-	DECLARE_READ8_MEMBER(pcg_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(attr_w);
-	DECLARE_WRITE8_MEMBER(pcg_w);
-	DECLARE_READ8_MEMBER(fbuf_r);
-	DECLARE_WRITE8_MEMBER(fbuf_w);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_WRITE8_MEMBER(border_col_w);
-	DECLARE_READ8_MEMBER(system_input_r);
-	DECLARE_WRITE8_MEMBER(system_output_w);
-	DECLARE_WRITE8_MEMBER(color_mode_w);
-	DECLARE_WRITE8_MEMBER(ramdac_w);
-	DECLARE_READ8_MEMBER(display_reg_r);
-	DECLARE_WRITE8_MEMBER(display_reg_w);
-	DECLARE_READ8_MEMBER(smc777_mem_r);
-	DECLARE_WRITE8_MEMBER(smc777_mem_w);
-	DECLARE_READ8_MEMBER(irq_mask_r);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	void mc6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t attr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pcg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fbuf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fbuf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void border_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t system_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void system_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void color_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ramdac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t display_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t smc777_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void smc777_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_mask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(smc777);
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ8_MEMBER(fdc_request_r);
-	DECLARE_WRITE8_MEMBER(floppy_select_w);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_request_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
@@ -288,7 +288,7 @@ uint32_t smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(smc777_state::mc6845_w)
+void smc777_state::mc6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -302,7 +302,7 @@ WRITE8_MEMBER(smc777_state::mc6845_w)
 	}
 }
 
-READ8_MEMBER(smc777_state::vram_r)
+uint8_t smc777_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -312,7 +312,7 @@ READ8_MEMBER(smc777_state::vram_r)
 	return m_vram[vram_index];
 }
 
-READ8_MEMBER(smc777_state::attr_r)
+uint8_t smc777_state::attr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -322,7 +322,7 @@ READ8_MEMBER(smc777_state::attr_r)
 	return m_attr[vram_index];
 }
 
-READ8_MEMBER(smc777_state::pcg_r)
+uint8_t smc777_state::pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -332,7 +332,7 @@ READ8_MEMBER(smc777_state::pcg_r)
 	return m_pcg[vram_index];
 }
 
-WRITE8_MEMBER(smc777_state::vram_w)
+void smc777_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -342,7 +342,7 @@ WRITE8_MEMBER(smc777_state::vram_w)
 	m_vram[vram_index] = data;
 }
 
-WRITE8_MEMBER(smc777_state::attr_w)
+void smc777_state::attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER(smc777_state::attr_w)
 	m_attr[vram_index] = data;
 }
 
-WRITE8_MEMBER(smc777_state::pcg_w)
+void smc777_state::pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER(smc777_state::pcg_w)
 	m_gfxdecode->gfx(0)->mark_dirty(vram_index >> 3);
 }
 
-READ8_MEMBER(smc777_state::fbuf_r)
+uint8_t smc777_state::fbuf_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -374,7 +374,7 @@ READ8_MEMBER(smc777_state::fbuf_r)
 	return m_gvram[vram_index];
 }
 
-WRITE8_MEMBER(smc777_state::fbuf_w)
+void smc777_state::fbuf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t vram_index;
 
@@ -384,17 +384,17 @@ WRITE8_MEMBER(smc777_state::fbuf_w)
 	m_gvram[vram_index] = data;
 }
 
-READ8_MEMBER( smc777_state::fdc_r )
+uint8_t smc777_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->read(space, offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( smc777_state::fdc_w )
+void smc777_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->write(space, offset, data ^ 0xff);
 }
 
-READ8_MEMBER( smc777_state::fdc_request_r )
+uint8_t smc777_state::fdc_request_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -404,7 +404,7 @@ READ8_MEMBER( smc777_state::fdc_request_r )
 	return data;
 }
 
-WRITE8_MEMBER( smc777_state::floppy_select_w )
+void smc777_state::floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -435,7 +435,7 @@ WRITE_LINE_MEMBER( smc777_state::fdc_drq_w )
 	m_fdc_drq_flag = state;
 }
 
-READ8_MEMBER(smc777_state::key_r)
+uint8_t smc777_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	-x-- ---- shift key
@@ -466,7 +466,7 @@ READ8_MEMBER(smc777_state::key_r)
 }
 
 /* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
-WRITE8_MEMBER(smc777_state::key_w)
+void smc777_state::key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 1) //keyboard command
 		m_keyb_cmd = data;
@@ -476,7 +476,7 @@ WRITE8_MEMBER(smc777_state::key_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::border_col_w)
+void smc777_state::border_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0xf0)
 		printf("Special border color enabled %02x\n",data);
@@ -485,7 +485,7 @@ WRITE8_MEMBER(smc777_state::border_col_w)
 }
 
 
-READ8_MEMBER(smc777_state::system_input_r)
+uint8_t smc777_state::system_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("System FF R %02x\n",m_system_data & 0x0f);
 
@@ -500,7 +500,7 @@ READ8_MEMBER(smc777_state::system_input_r)
 
 
 
-WRITE8_MEMBER(smc777_state::system_output_w)
+void smc777_state::system_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---x 0000 ram inibit signal
@@ -520,7 +520,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::color_mode_w)
+void smc777_state::color_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data & 0x0f)
 	{
@@ -529,7 +529,7 @@ WRITE8_MEMBER(smc777_state::color_mode_w)
 	}
 }
 
-WRITE8_MEMBER(smc777_state::ramdac_w)
+void smc777_state::ramdac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t pal_index;
 	pal_index = (offset & 0xf00) >> 8;
@@ -546,13 +546,13 @@ WRITE8_MEMBER(smc777_state::ramdac_w)
 	}
 }
 
-READ8_MEMBER(smc777_state::display_reg_r)
+uint8_t smc777_state::display_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_display_reg;
 }
 
 /* x */
-WRITE8_MEMBER(smc777_state::display_reg_w)
+void smc777_state::display_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- width 80 / 40 switch (0 = 640 x 200 1 = 320 x 200)
@@ -562,7 +562,7 @@ WRITE8_MEMBER(smc777_state::display_reg_w)
 	m_display_reg = data;
 }
 
-READ8_MEMBER(smc777_state::smc777_mem_r)
+uint8_t smc777_state::smc777_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t z80_r;
 
@@ -583,17 +583,17 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 	return m_work_ram[offset];
 }
 
-WRITE8_MEMBER(smc777_state::smc777_mem_w)
+void smc777_state::smc777_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_work_ram[offset] = data;
 }
 
-READ8_MEMBER(smc777_state::irq_mask_r)
+uint8_t smc777_state::irq_mask_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_mask;
 }
 
-WRITE8_MEMBER(smc777_state::irq_mask_w)
+void smc777_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0xfe)
 		printf("Irq mask = %02x\n",data & 0xfe);

@@ -51,38 +51,38 @@ public:
 	template<class _Object> static devcb_base &set_syn_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_syn_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_lbrdy_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_lbrdy_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( cs5_r ) { return m_via4->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs5_w ) { m_via4->write(space, offset, data); }
-	DECLARE_READ8_MEMBER( cs6_r ) { return m_via6->read(space, offset); }
-	DECLARE_WRITE8_MEMBER( cs6_w ) { m_via6->write(space, offset, data); }
-	DECLARE_READ8_MEMBER( cs7_r );
-	DECLARE_WRITE8_MEMBER( cs7_w );
+	uint8_t cs5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_via4->read(space, offset); }
+	void cs5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_via4->write(space, offset, data); }
+	uint8_t cs6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_via6->read(space, offset); }
+	void cs6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_via6->write(space, offset, data); }
+	uint8_t cs7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cs7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_READ8_MEMBER( floppy_p1_r );
-	DECLARE_WRITE8_MEMBER( floppy_p1_w );
-	DECLARE_READ8_MEMBER( floppy_p2_r );
-	DECLARE_WRITE8_MEMBER( floppy_p2_w );
-	DECLARE_READ8_MEMBER( tach0_r );
-	DECLARE_READ8_MEMBER( tach1_r );
-	DECLARE_WRITE8_MEMBER( da_w );
+	uint8_t floppy_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void floppy_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t floppy_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void floppy_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tach0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tach1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( via4_pa_r );
-	DECLARE_WRITE8_MEMBER( via4_pa_w );
-	DECLARE_READ8_MEMBER( via4_pb_r );
-	DECLARE_WRITE8_MEMBER( via4_pb_w );
+	uint8_t via4_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via4_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via4_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via4_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
 	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
 
-	DECLARE_READ8_MEMBER( via5_pa_r );
-	DECLARE_WRITE8_MEMBER( via5_pb_w );
+	uint8_t via5_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via5_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
 
-	DECLARE_READ8_MEMBER( via6_pa_r );
-	DECLARE_READ8_MEMBER( via6_pb_r );
-	DECLARE_WRITE8_MEMBER( via6_pa_w );
-	DECLARE_WRITE8_MEMBER( via6_pb_w );
+	uint8_t via6_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t via6_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via6_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via6_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( drw_w );
 	DECLARE_WRITE_LINE_MEMBER( erase_w );
 	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );

@@ -18,11 +18,11 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_ADDRESS_MAP(map, 8);
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);
-	DECLARE_WRITE8_MEMBER(side_sel_w);
-	DECLARE_WRITE8_MEMBER(fdc_reset_w);
-	DECLARE_WRITE8_MEMBER(ram_access_w);
-	DECLARE_WRITE8_MEMBER(rom_access_w);
-	DECLARE_WRITE8_MEMBER(select_w);
+	void side_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_access_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rom_access_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<wd1770_t> fdc;

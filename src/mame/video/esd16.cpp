@@ -89,21 +89,21 @@ TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_1_16x16)
 			0);
 }
 
-WRITE16_MEMBER(esd16_state::esd16_vram_0_w)
+void esd16_state::esd16_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset);
 	m_tilemap_0_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(esd16_state::esd16_vram_1_w)
+void esd16_state::esd16_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset);
 	m_tilemap_1_16x16->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
+void esd16_state::esd16_tilemap0_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tilemap0_color = data & 0x03;
 	m_tilemap_0->mark_all_dirty();
@@ -112,7 +112,7 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_w)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
+void esd16_state::esd16_tilemap0_color_jumppop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// todo
 	m_tilemap0_color = 2;

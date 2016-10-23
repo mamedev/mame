@@ -28,17 +28,17 @@ public:
 		, m_switch(*this, "SWITCH.%u", 0)
 	{ }
 
-	DECLARE_READ16_MEMBER(key_r);
-	DECLARE_READ16_MEMBER(rtrg_r);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(disp1_w);
-	DECLARE_WRITE16_MEMBER(disp2_w);
-	DECLARE_WRITE16_MEMBER(lamp1_w);
-	DECLARE_WRITE16_MEMBER(lamp2_w);
-	DECLARE_WRITE16_MEMBER(setout_w);
-	DECLARE_WRITE16_MEMBER(sol1_w);
-	DECLARE_WRITE16_MEMBER(sol2_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	uint16_t key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t rtrg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void disp1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void disp2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lamp1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lamp2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void setout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sol1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sol2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	INTERRUPT_GEN_MEMBER(techno_intgen);
 private:
 	bool m_digwait;
@@ -74,17 +74,17 @@ ADDRESS_MAP_END
 //  AM_RANGE(0xc000, 0xffff) AM_ROM // another 16k ROM
 //ADDRESS_MAP_END
 
-WRITE16_MEMBER( techno_state::disp1_w )
+void techno_state::disp1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(m_digit, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
-WRITE16_MEMBER( techno_state::disp2_w )
+void techno_state::disp2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(m_digit+30, BITSWAP16(data, 12, 10, 8, 14, 13, 9, 11, 15, 7, 6, 5, 4, 3, 2, 1, 0));
 }
 
-WRITE16_MEMBER( techno_state::sound_w )
+void techno_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
 d0..d7 : to sound board
@@ -106,7 +106,7 @@ d11-d15: AUX outputs
 }
 
 // lamps & keymatrix
-WRITE16_MEMBER( techno_state::lamp1_w )
+void techno_state::lamp1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 // Work out key row
 	for (int i = 8; i < 16; i++)
@@ -115,39 +115,39 @@ WRITE16_MEMBER( techno_state::lamp1_w )
 }
 
 // more lamps
-WRITE16_MEMBER( techno_state::lamp2_w )
+void techno_state::lamp2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 // solenoids
-WRITE16_MEMBER( techno_state::sol1_w )
+void techno_state::sol1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 // more solenoids
-WRITE16_MEMBER( techno_state::sol2_w )
+void techno_state::sol2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 // unknown
-WRITE16_MEMBER( techno_state::setout_w )
+void techno_state::setout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 // inputs
-READ16_MEMBER( techno_state::key_r )
+uint16_t techno_state::key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_switch[m_keyrow]->read();
 }
 
 // unknown
-READ16_MEMBER( techno_state::rtrg_r )
+uint16_t techno_state::rtrg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
 // feedback from sound board, and some AUX inputs
-READ16_MEMBER( techno_state::sound_r )
+uint16_t techno_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }

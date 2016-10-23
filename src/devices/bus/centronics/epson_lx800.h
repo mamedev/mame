@@ -38,11 +38,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portc_r);
-	DECLARE_WRITE8_MEMBER(portc_w);
-	DECLARE_READ8_MEMBER(centronics_data_r);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t centronics_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(centronics_pe_w);
 	DECLARE_WRITE_LINE_MEMBER(paperempty_led_w);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);

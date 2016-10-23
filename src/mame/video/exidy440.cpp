@@ -68,7 +68,7 @@ void exidy440_state::video_start_topsecex()
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_videoram_r)
+uint8_t exidy440_state::exidy440_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
@@ -77,7 +77,7 @@ READ8_MEMBER(exidy440_state::exidy440_videoram_r)
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_videoram_w)
+void exidy440_state::exidy440_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *base = &m_local_videoram[(*m_scanline * 256 + offset) * 2];
 
@@ -94,13 +94,13 @@ WRITE8_MEMBER(exidy440_state::exidy440_videoram_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_paletteram_r)
+uint8_t exidy440_state::exidy440_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_local_paletteram[m_palettebank_io * 512 + offset];
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_paletteram_w)
+void exidy440_state::exidy440_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* update palette ram in the I/O bank */
 	m_local_paletteram[m_palettebank_io * 512 + offset] = data;
@@ -127,7 +127,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_paletteram_w)
  *
  *************************************/
 
-READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
+uint8_t exidy440_state::exidy440_horizontal_pos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* clear the FIRQ on a read here */
 	m_firq_beam = 0;
@@ -139,7 +139,7 @@ READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
 }
 
 
-READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
+uint8_t exidy440_state::exidy440_vertical_pos_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result;
 
@@ -159,7 +159,7 @@ READ8_MEMBER(exidy440_state::exidy440_vertical_pos_r)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
+void exidy440_state::exidy440_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_spriteram[offset] = data;
@@ -173,7 +173,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_spriteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(exidy440_state::exidy440_control_w)
+void exidy440_state::exidy440_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int oldvis = m_palettebank_vis;
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_control_w)
 }
 
 
-WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
+void exidy440_state::exidy440_interrupt_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* clear the VBLANK FIRQ on a write here */
 	m_firq_vblank = 0;

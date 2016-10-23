@@ -60,7 +60,7 @@ kstudio_cart_interface::~kstudio_cart_interface()
 {
 }
 
-READ8_MEMBER(kstudio_cart_interface::read)
+uint8_t kstudio_cart_interface::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[(m_bank * 0x4000) + (offset & 0x3fff)];
 }
@@ -88,7 +88,7 @@ void nes_kstudio_slot_device::device_start()
 	m_cart = dynamic_cast<kstudio_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_kstudio_slot_device::read)
+uint8_t nes_kstudio_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
@@ -223,13 +223,13 @@ void nes_karaokestudio_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_karaokestudio_device::read_m)
+uint8_t nes_karaokestudio_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("karaoke studio read_m, offset: %04x\n", offset));
 	return m_mic_ipt->read();
 }
 
-READ8_MEMBER(nes_karaokestudio_device::read_h)
+uint8_t nes_karaokestudio_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("karaoke studio read_h, offset: %04x\n", offset));
 	// this shall be the proper code, but it's a bit slower, so we access directly the subcart below
@@ -245,7 +245,7 @@ READ8_MEMBER(nes_karaokestudio_device::read_h)
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_karaokestudio_device::write_h)
+void nes_karaokestudio_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data));
 	// bit3 1 = M ROM (main unit), 0=E ROM (expansion)

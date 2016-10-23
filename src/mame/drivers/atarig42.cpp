@@ -64,7 +64,7 @@ void atarig42_state::machine_reset_atarig42()
  *
  *************************************/
 
-READ16_MEMBER(atarig42_state::special_port2_r)
+uint16_t atarig42_state::special_port2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = ioport("IN2")->read();
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
@@ -72,7 +72,7 @@ READ16_MEMBER(atarig42_state::special_port2_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::a2d_select_w)
+void atarig42_state::a2d_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
 
@@ -80,13 +80,13 @@ WRITE16_MEMBER(atarig42_state::a2d_select_w)
 }
 
 
-READ16_MEMBER(atarig42_state::a2d_data_r)
+uint16_t atarig42_state::a2d_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_analog_data << 8;
 }
 
 
-WRITE16_MEMBER(atarig42_state::io_latch_w)
+void atarig42_state::io_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
@@ -113,7 +113,7 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 }
 
 
-WRITE16_MEMBER(atarig42_state::mo_command_w)
+void atarig42_state::mo_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write(space, offset, (data == 0) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -239,7 +239,7 @@ void atarig42_state::roadriot_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
+uint16_t atarig42_state::roadriot_sloop_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	roadriot_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -249,7 +249,7 @@ READ16_MEMBER(atarig42_state::roadriot_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::roadriot_sloop_data_w)
+void atarig42_state::roadriot_sloop_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	roadriot_sloop_tweak(offset);
 }
@@ -296,7 +296,7 @@ void atarig42_state::guardians_sloop_tweak(int offset)
 }
 
 
-READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
+uint16_t atarig42_state::guardians_sloop_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	guardians_sloop_tweak(offset);
 	if (offset < 0x78000/2)
@@ -306,7 +306,7 @@ READ16_MEMBER(atarig42_state::guardians_sloop_data_r)
 }
 
 
-WRITE16_MEMBER(atarig42_state::guardians_sloop_data_w)
+void atarig42_state::guardians_sloop_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	guardians_sloop_tweak(offset);
 }

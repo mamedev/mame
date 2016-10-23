@@ -30,21 +30,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(beezer_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(beezer_map_w);
-	DECLARE_READ8_MEMBER(beezer_line_r);
+	void beezer_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void beezer_map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t beezer_line_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_beezer();
 	virtual void machine_start() override;
 	uint32_t screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);
-	DECLARE_READ8_MEMBER(b_via_0_pa_r);
-	DECLARE_READ8_MEMBER(b_via_0_pb_r);
-	DECLARE_WRITE8_MEMBER(b_via_0_pa_w);
-	DECLARE_WRITE8_MEMBER(b_via_0_pb_w);
-	DECLARE_READ8_MEMBER(b_via_1_pa_r);
-	DECLARE_READ8_MEMBER(b_via_1_pb_r);
-	DECLARE_WRITE8_MEMBER(b_via_1_pa_w);
-	DECLARE_WRITE8_MEMBER(b_via_1_pb_w);
+	uint8_t b_via_0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t b_via_0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void b_via_0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void b_via_0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t b_via_1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t b_via_1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void b_via_1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void b_via_1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /*----------- defined in audio/beezer.c -----------*/
@@ -76,11 +76,11 @@ public:
 	beezer_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~beezer_sound_device() {}
 
-	DECLARE_READ8_MEMBER( sh6840_r );
-	DECLARE_WRITE8_MEMBER( sh6840_w );
-	DECLARE_WRITE8_MEMBER( sfxctrl_w );
-	DECLARE_WRITE8_MEMBER( timer1_w );
-	DECLARE_READ8_MEMBER( noise_r );
+	uint8_t sh6840_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sh6840_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t noise_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	//DECLARE_WRITE_LINE_MEMBER( update_irq_state );
 

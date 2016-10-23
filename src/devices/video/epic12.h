@@ -65,8 +65,8 @@ public:
 
 	static void *blit_request_callback(void *param, int threadid);
 
-	DECLARE_READ64_MEMBER( fpga_r );
-	DECLARE_WRITE64_MEMBER( fpga_w );
+	uint64_t fpga_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void fpga_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -90,8 +90,8 @@ public:
 	void install_handlers(int addr1, int addr2);
 
 	// thread safe mode, with no delays & shadow ram copy
-	DECLARE_READ32_MEMBER(blitter_r);
-	DECLARE_WRITE32_MEMBER(blitter_w);
+	uint32_t blitter_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t m_gfx_addr_shadowcopy;
 	uint32_t m_gfx_scroll_0_x_shadowcopy, m_gfx_scroll_0_y_shadowcopy;
 	uint32_t m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_y_shadowcopy;
@@ -103,14 +103,14 @@ public:
 	inline void gfx_upload(offs_t *addr);
 	inline void gfx_draw(offs_t *addr);
 	void gfx_exec(void);
-	DECLARE_READ32_MEMBER( gfx_ready_r );
-	DECLARE_WRITE32_MEMBER( gfx_exec_w );
+	uint32_t gfx_ready_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gfx_exec_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	DECLARE_READ32_MEMBER(blitter_r_unsafe);
-	DECLARE_WRITE32_MEMBER(blitter_w_unsafe);
-	READ32_MEMBER( gfx_ready_r_unsafe );
-	WRITE32_MEMBER( gfx_exec_w_unsafe );
+	uint32_t blitter_r_unsafe(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void blitter_w_unsafe(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gfx_ready_r_unsafe(address_space &space, offs_t offset, uint32_t mem_mask);
+	void gfx_exec_w_unsafe(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	void gfx_exec_unsafe(void);
 	static void *blit_request_callback_unsafe(void *param, int threadid);
 

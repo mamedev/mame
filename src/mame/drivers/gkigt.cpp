@@ -99,12 +99,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ32_MEMBER(igt_gk_28010008_r)
+	uint32_t igt_gk_28010008_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
 	{
 		return rand();
 	};
 
-	DECLARE_READ32_MEMBER(igt_gk_28030000_r)
+	uint32_t igt_gk_28030000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
 	{
 		return rand();
 	};

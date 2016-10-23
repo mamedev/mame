@@ -94,7 +94,7 @@ Notes:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::read )
+uint8_t abc80_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
@@ -124,7 +124,7 @@ READ8_MEMBER( abc80_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abc80_state::write )
+void abc80_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
@@ -243,7 +243,7 @@ INPUT_PORTS_END
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_state::pio_pa_r )
+uint8_t abc80_state::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -271,7 +271,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 	return data;
 }
 
-READ8_MEMBER( abc80_state::pio_pb_r )
+uint8_t abc80_state::pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -307,7 +307,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( abc80_state::pio_pb_w )
+void abc80_state::pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -381,7 +381,7 @@ WRITE_LINE_MEMBER( abc80_state::keydown_w )
 	m_pio->port_a_write(m_key_strobe << 7);
 }
 
-WRITE8_MEMBER( abc80_state::kbd_w )
+void abc80_state::kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_key_data = data;
 	m_key_strobe = 1;

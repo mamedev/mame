@@ -118,19 +118,19 @@ PALETTE_INIT_MEMBER(_1943_state,1943)
 	}
 }
 
-WRITE8_MEMBER(_1943_state::c1943_videoram_w)
+void _1943_state::c1943_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(_1943_state::c1943_colorram_w)
+void _1943_state::c1943_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(_1943_state::c1943_c804_w)
+void _1943_state::c1943_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -148,7 +148,7 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 	m_char_on = data & 0x80;
 }
 
-WRITE8_MEMBER(_1943_state::c1943_d806_w)
+void _1943_state::c1943_d806_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 enables bg 1 */
 	m_bg1_on = data & 0x10;

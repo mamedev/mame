@@ -49,9 +49,9 @@ public:
 	intvecs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~intvecs_control_port_device();
 
-	DECLARE_READ8_MEMBER( portA_r ) { return read_portA(); }
-	DECLARE_READ8_MEMBER( portB_r ) { return read_portB(); }
-	DECLARE_WRITE8_MEMBER( portA_w ) { return write_portA(data); }
+	uint8_t portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read_portA(); }
+	uint8_t portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read_portB(); }
+	void portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { return write_portA(data); }
 
 protected:
 	// device-level overrides

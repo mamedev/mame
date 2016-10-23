@@ -297,7 +297,7 @@ void k052109_device::vblank_callback(screen_device &screen, bool state)
 		m_irq_handler(ASSERT_LINE);
 }
 
-READ8_MEMBER( k052109_device::read )
+uint8_t k052109_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_rmrd_line == CLEAR_LINE)
 	{
@@ -346,7 +346,7 @@ READ8_MEMBER( k052109_device::read )
 	}
 }
 
-WRITE8_MEMBER( k052109_device::write )
+void k052109_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
 	{
@@ -474,12 +474,12 @@ WRITE8_MEMBER( k052109_device::write )
 	}
 }
 
-READ16_MEMBER( k052109_device::word_r )
+uint16_t k052109_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read(space, offset + 0x2000) | (read(space, offset) << 8);
 }
 
-WRITE16_MEMBER( k052109_device::word_w )
+void k052109_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		write(space, offset, (data >> 8) & 0xff);
@@ -487,12 +487,12 @@ WRITE16_MEMBER( k052109_device::word_w )
 		write(space, offset + 0x2000, data & 0xff);
 }
 
-READ16_MEMBER( k052109_device::lsb_r )
+uint16_t k052109_device::lsb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read(space, offset);
 }
 
-WRITE16_MEMBER( k052109_device::lsb_w )
+void k052109_device::lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		write(space, offset, data & 0xff);

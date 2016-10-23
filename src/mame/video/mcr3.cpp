@@ -135,7 +135,7 @@ void mcr3_state::video_start_spyhunt()
  *
  *************************************/
 
-WRITE8_MEMBER(mcr3_state::mcr3_videoram_w)
+void mcr3_state::mcr3_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -143,7 +143,7 @@ WRITE8_MEMBER(mcr3_state::mcr3_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_videoram_w)
+void mcr3_state::spyhunt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -151,14 +151,14 @@ WRITE8_MEMBER(mcr3_state::spyhunt_videoram_w)
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_alpharam_w)
+void mcr3_state::spyhunt_alpharam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spyhunt_alpharam[offset] = data;
 	m_alpha_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(mcr3_state::spyhunt_scroll_value_w)
+void mcr3_state::spyhunt_scroll_value_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

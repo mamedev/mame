@@ -93,12 +93,12 @@ FILE* tempfile;
 #endif
 
 
-READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot1_r)
+uint32_t sega_315_5838_comp_device::decathlt_prot1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return genericdecathlt_prot_r(mem_mask, 0);
 }
 
-READ32_MEMBER(sega_315_5838_comp_device::decathlt_prot2_r)
+uint32_t sega_315_5838_comp_device::decathlt_prot2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return genericdecathlt_prot_r(mem_mask, 1);
 }
@@ -301,12 +301,12 @@ void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask
 
 
 
-WRITE32_MEMBER( sega_315_5838_comp_device::decathlt_prot1_w_doa )  { write_prot_data(data, mem_mask, 0, 1); }
-WRITE32_MEMBER( sega_315_5838_comp_device::decathlt_prot1_w)  { write_prot_data(data, mem_mask, 0, 0); }
-WRITE32_MEMBER( sega_315_5838_comp_device::decathlt_prot2_w)  { write_prot_data(data, mem_mask, 1, 0); }
+void sega_315_5838_comp_device::decathlt_prot1_w_doa(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)  { write_prot_data(data, mem_mask, 0, 1); }
+void sega_315_5838_comp_device::decathlt_prot1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)  { write_prot_data(data, mem_mask, 0, 0); }
+void sega_315_5838_comp_device::decathlt_prot2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)  { write_prot_data(data, mem_mask, 1, 0); }
 
-WRITE32_MEMBER( sega_315_5838_comp_device::decathlt_prot1_srcaddr_w ) { set_prot_addr(data, mem_mask, 0); }
-WRITE32_MEMBER( sega_315_5838_comp_device::decathlt_prot2_srcaddr_w)  { set_prot_addr(data, mem_mask, 1); }
+void sega_315_5838_comp_device::decathlt_prot1_srcaddr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { set_prot_addr(data, mem_mask, 0); }
+void sega_315_5838_comp_device::decathlt_prot2_srcaddr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)  { set_prot_addr(data, mem_mask, 1); }
 
 
 void sega_315_5838_comp_device::install_decathlt_protection()
@@ -325,7 +325,7 @@ void sega_315_5838_comp_device::install_decathlt_protection()
 }
 
 
-READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
+uint32_t sega_315_5838_comp_device::doa_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retval = 0;
 
@@ -353,7 +353,7 @@ READ32_MEMBER(sega_315_5838_comp_device::doa_prot_r)
 }
 
 
-WRITE32_MEMBER(sega_315_5838_comp_device::doa_prot_w)
+void sega_315_5838_comp_device::doa_prot_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	printf("doa_prot_w %08x %08x %08x\n", offset*4, data, mem_mask);
 

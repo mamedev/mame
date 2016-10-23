@@ -40,15 +40,15 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ16_MEMBER(oneshot_in0_word_r);
-	DECLARE_READ16_MEMBER(oneshot_gun_x_p1_r);
-	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);
-	DECLARE_READ16_MEMBER(oneshot_gun_x_p2_r);
-	DECLARE_READ16_MEMBER(oneshot_gun_y_p2_r);
-	DECLARE_WRITE16_MEMBER(oneshot_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(oneshot_mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(oneshot_fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(soundbank_w);
+	uint16_t oneshot_in0_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t oneshot_gun_x_p1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t oneshot_gun_y_p1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t oneshot_gun_x_p2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t oneshot_gun_y_p2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void oneshot_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oneshot_mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oneshot_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void soundbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_oneshot_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_oneshot_mid_tile_info);
 	TILE_GET_INFO_MEMBER(get_oneshot_fg_tile_info);

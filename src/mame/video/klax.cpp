@@ -81,7 +81,7 @@ void klax_state::video_start_klax()
  *
  *************************************/
 
-WRITE16_MEMBER( klax_state::klax_latch_w )
+void klax_state::klax_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 

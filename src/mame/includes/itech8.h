@@ -95,27 +95,27 @@ public:
 
 	// common
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(blitter_bank_w);
-	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
-	DECLARE_WRITE8_MEMBER(pia_portb_out);
-	DECLARE_WRITE8_MEMBER(sound_data_w);
-	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
-	DECLARE_READ8_MEMBER(sound_data_r);
-	DECLARE_WRITE8_MEMBER(grom_bank_w);
-	DECLARE_WRITE16_MEMBER(grom_bank16_w);
-	DECLARE_WRITE16_MEMBER(display_page16_w);
-	DECLARE_WRITE16_MEMBER(palette16_w);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(tms34061_w);
-	DECLARE_READ8_MEMBER(tms34061_r);
-	DECLARE_WRITE8_MEMBER(grmatch_palette_w);
-	DECLARE_WRITE8_MEMBER(grmatch_xscroll_w);
-	DECLARE_WRITE8_MEMBER(pia_porta_out);
-	DECLARE_WRITE8_MEMBER(ym2203_portb_out);
+	void nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rimrockn_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gtg2_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void grom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grom_bank16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void display_page16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void palette16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tms34061_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms34061_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void grmatch_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void grmatch_xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2203_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
@@ -156,12 +156,12 @@ public:
 
 	/*----------- defined in machine/slikshot.c -----------*/
 
-	DECLARE_READ8_MEMBER( slikz80_port_r );
-	DECLARE_WRITE8_MEMBER( slikz80_port_w );
+	uint8_t slikz80_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slikz80_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( slikshot_z80_r );
-	DECLARE_READ8_MEMBER( slikshot_z80_control_r );
-	DECLARE_WRITE8_MEMBER( slikshot_z80_control_w );
+	uint8_t slikshot_z80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t slikshot_z80_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slikshot_z80_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void inters_to_vels(uint16_t inter1, uint16_t inter2, uint16_t inter3, uint8_t beams,
 							uint8_t *xres, uint8_t *vxres, uint8_t *vyres);

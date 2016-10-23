@@ -84,22 +84,22 @@ void bk_state::machine_reset()
 	m_scrool = 01330;
 }
 
-READ16_MEMBER(bk_state::bk_key_state_r)
+uint16_t bk_state::bk_key_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_kbd_state;
 }
-READ16_MEMBER(bk_state::bk_key_code_r)
+uint16_t bk_state::bk_key_code_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_kbd_state &= ~0x80; // mark reading done
 	m_key_pressed = 0;
 	return m_key_code;
 }
-READ16_MEMBER(bk_state::bk_vid_scrool_r)
+uint16_t bk_state::bk_vid_scrool_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scrool;
 }
 
-READ16_MEMBER(bk_state::bk_key_press_r)
+uint16_t bk_state::bk_key_press_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	double level = m_cassette->input();
 	uint16_t cas;
@@ -115,26 +115,26 @@ READ16_MEMBER(bk_state::bk_key_press_r)
 	return 0x8080 | m_key_pressed | cas;
 }
 
-WRITE16_MEMBER(bk_state::bk_key_state_w)
+void bk_state::bk_key_state_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_kbd_state = (m_kbd_state & ~0x40) | (data & 0x40);
 }
 
-WRITE16_MEMBER(bk_state::bk_vid_scrool_w)
+void bk_state::bk_vid_scrool_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scrool = data;
 }
 
-WRITE16_MEMBER(bk_state::bk_key_press_w)
+void bk_state::bk_key_press_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER(bk_state::bk_floppy_cmd_r)
+uint16_t bk_state::bk_floppy_cmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
+void bk_state::bk_floppy_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data & 1) == 1)
 	{
@@ -158,11 +158,11 @@ WRITE16_MEMBER(bk_state::bk_floppy_cmd_w)
 	}
 }
 
-READ16_MEMBER(bk_state::bk_floppy_data_r)
+uint16_t bk_state::bk_floppy_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(bk_state::bk_floppy_data_w)
+void bk_state::bk_floppy_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }

@@ -135,14 +135,14 @@ public:
 	uint8_t m_flipscreen_x;
 	uint8_t m_flipscreen_y;
 
-	DECLARE_WRITE8_MEMBER(audio_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE8_MEMBER(coin_counter0_w);
-	DECLARE_WRITE8_MEMBER(coin_counter1_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(ay1_sel);
-	DECLARE_WRITE8_MEMBER(ay2_sel);
+	void audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_counter0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_counter1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_sel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay2_sel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_mirax();
 	DECLARE_PALETTE_INIT(mirax);
@@ -257,51 +257,51 @@ void mirax_state::machine_start()
 	save_item(NAME(m_flipscreen_y));
 }
 
-WRITE8_MEMBER(mirax_state::audio_w)
+void mirax_state::audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nAyCtrl=offset;
 }
 
-WRITE8_MEMBER(mirax_state::ay1_sel)
+void mirax_state::ay1_sel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	ay8910->address_w(space,0,m_nAyCtrl);
 	ay8910->data_w(space,0,data);
 }
 
-WRITE8_MEMBER(mirax_state::ay2_sel)
+void mirax_state::ay2_sel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	ay8910->address_w(space,0,m_nAyCtrl);
 	ay8910->data_w(space,0,data);
 }
 
-WRITE8_MEMBER(mirax_state::nmi_mask_w)
+void mirax_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 	if(data & 0xfe)
 		printf("Warning: %02x written at $f501\n",data);
 }
 
-WRITE8_MEMBER(mirax_state::sound_cmd_w)
+void mirax_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-WRITE8_MEMBER(mirax_state::coin_counter0_w)
+void mirax_state::coin_counter0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE8_MEMBER(mirax_state::coin_counter1_w)
+void mirax_state::coin_counter1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 /* One address flips X, the other flips Y, but I can't tell which is which - Since the value is the same for the 2 addresses, it doesn't really matter */
-WRITE8_MEMBER(mirax_state::flip_screen_w)
+void mirax_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_flipscreen_x = data & 0x01;

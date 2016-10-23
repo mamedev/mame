@@ -21,7 +21,7 @@
 
 /* These overwrite the MAME ones in DRIVER_INIT */
 /* They're needed to give the users the choice between different controllers */
-READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
+uint8_t md_cons_state::mess_md_io_read_data_port(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int portnum = offset;
 
@@ -122,7 +122,7 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 }
 
 
-WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
+void md_cons_state::mess_md_io_write_data_port(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int portnum = offset;
 	int controller;
@@ -283,7 +283,7 @@ void md_cons_state::install_cartslot()
 //  m_maincpu->space(AS_PROGRAM).install_write_handler(0xa14000, 0xa14003, write16_delegate(FUNC(base_md_cart_slot_device::write_tmss_bank),(base_md_cart_slot_device*)m_cart));
 }
 
-READ16_MEMBER( md_cons_state::tmss_r )
+uint16_t md_cons_state::tmss_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x4000 / 2)
 		return m_tmss[offset];
@@ -291,7 +291,7 @@ READ16_MEMBER( md_cons_state::tmss_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( md_cons_state::tmss_swap_w )
+void md_cons_state::tmss_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 0x0001)
 	{

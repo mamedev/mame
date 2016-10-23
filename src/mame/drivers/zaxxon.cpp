@@ -307,7 +307,7 @@ INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
 }
 
 
-WRITE8_MEMBER(zaxxon_state::int_enable_w)
+void zaxxon_state::int_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_int_enabled = data & 1;
 	if (!m_int_enabled)
@@ -338,7 +338,7 @@ void zaxxon_state::machine_start()
  *
  *************************************/
 
-READ8_MEMBER(zaxxon_state::razmataz_counter_r)
+uint8_t zaxxon_state::razmataz_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
@@ -379,7 +379,7 @@ CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
  *
  *************************************/
 
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
+void zaxxon_state::zaxxon_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
 }
@@ -387,7 +387,7 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 
 // There is no external coin lockout circuitry; instead, the pcb simply latches
 // the coin input, which then needs to be explicitly cleared by the game.
-WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
+void zaxxon_state::zaxxon_coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_coin_enable[offset] = data & 1;
 	if (!m_coin_enable[offset])

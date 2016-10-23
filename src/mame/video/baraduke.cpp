@@ -137,23 +137,23 @@ void baraduke_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(baraduke_state::baraduke_videoram_r)
+uint8_t baraduke_state::baraduke_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_videoram_w)
+void baraduke_state::baraduke_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[offset/0x1000]->mark_tile_dirty((offset&0xfff)/2);
 }
 
-READ8_MEMBER(baraduke_state::baraduke_textram_r)
+uint8_t baraduke_state::baraduke_textram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_textram_w)
+void baraduke_state::baraduke_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -176,23 +176,23 @@ void baraduke_state::scroll_w(address_space &space, int layer, int offset, int d
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_scroll0_w)
+void baraduke_state::baraduke_scroll0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space, 0, offset, data);
 }
-WRITE8_MEMBER(baraduke_state::baraduke_scroll1_w)
+void baraduke_state::baraduke_scroll1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	scroll_w(space, 1, offset, data);
 }
 
 
 
-READ8_MEMBER(baraduke_state::baraduke_spriteram_r)
+uint8_t baraduke_state::baraduke_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_spriteram_w)
+void baraduke_state::baraduke_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram[offset] = data;
 

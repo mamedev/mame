@@ -686,20 +686,20 @@ void homedata_state::video_start_mirderby()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homedata_state::mrokumei_videoram_w)
+void homedata_state::mrokumei_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[(offset & 0x2000) >> 13][(offset & 0x1000) >> 12]->mark_tile_dirty((offset & 0xffe) >> 1);
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_videoram_w)
+void homedata_state::reikaids_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap[(offset & 0x2000) >> 13][offset & 3]->mark_tile_dirty((offset & 0xffc) >> 2);
 }
 
 
-WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
+void homedata_state::reikaids_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror( "%04x: [setbank %02x]\n",space.device().safe_pc(),data);
 
@@ -712,7 +712,7 @@ WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 	m_reikaids_which ^= 1;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
+void homedata_state::pteacher_gfx_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("%04x: gfxbank:=%02x\n", space.device().safe_pc(), data);
 	if (m_gfx_bank[0] != data)
@@ -722,7 +722,7 @@ WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 	}
 }
 
-WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
+void homedata_state::homedata_blitter_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("%04x: blitter_param_w %02x\n", space.device().safe_pc(), data);
 	m_blitter_param[m_blitter_param_count] = data;
@@ -730,7 +730,7 @@ WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 	m_blitter_param_count &= 3;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
+void homedata_state::mrokumei_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* --xxx--- layer 1 gfx bank
 	   -----x-- blitter ROM bank
@@ -743,7 +743,7 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
+void homedata_state::reikaids_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* xxx----- priority control
 	   ----x--- target page? what's this for?
@@ -752,7 +752,7 @@ WRITE8_MEMBER(homedata_state::reikaids_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
+void homedata_state::pteacher_blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* xxx----- blitter ROM bank
 	   -----x-- pixel clock (normal/slow)
@@ -766,7 +766,7 @@ WRITE8_MEMBER(homedata_state::pteacher_blitter_bank_w)
 	m_blitter_bank = data;
 }
 
-WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
+void homedata_state::mrokumei_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 		mrokumei_handleblit(space, ((m_blitter_bank & 0x04) >> 2) * 0x10000);
@@ -775,12 +775,12 @@ WRITE8_MEMBER(homedata_state::mrokumei_blitter_start_w)
 	   optional service mode ROM (not available in current dump) */
 }
 
-WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
+void homedata_state::reikaids_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	reikaids_handleblit(space, (m_blitter_bank & 3) * 0x10000);
 }
 
-WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
+void homedata_state::pteacher_blitter_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pteacher_handleblit(space, (m_blitter_bank >> 5) * 0x10000 & (memregion("user1")->bytes() - 1));
 }

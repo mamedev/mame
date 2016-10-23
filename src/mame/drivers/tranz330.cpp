@@ -91,7 +91,7 @@ WRITE_LINE_MEMBER( tranz330_state::clock_w )
 	m_ctc->trg2(state);
 }
 
-READ8_MEMBER( tranz330_state::card_r )
+uint8_t tranz330_state::card_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// return 0xff for a magstripe 0, return 0x00 for a magstripe 1.
 	// an interrupt should be triggered on the Z80 when magstripe reading begins.
@@ -99,7 +99,7 @@ READ8_MEMBER( tranz330_state::card_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tranz330_state::pio_a_w )
+void tranz330_state::pio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keypad_col_mask = data & 0xf;
 	m_vfd->por ((data >> 4) & 1);
@@ -107,7 +107,7 @@ WRITE8_MEMBER( tranz330_state::pio_a_w )
 	m_vfd->sclk((data >> 6) & 1);
 }
 
-READ8_MEMBER( tranz330_state::pio_b_r )
+uint8_t tranz330_state::pio_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t input_mask = 0xf;
 	for (int i = 0; i < 4; i++)

@@ -252,7 +252,7 @@ void nes_ss88006_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf11_device::write_m)
+void nes_jf11_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf11 write_m, offset: %04x, data: %02x\n", offset, data));
 	chr8(data, CHRROM);
@@ -273,7 +273,7 @@ WRITE8_MEMBER(nes_jf11_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf13_device::write_m)
+void nes_jf13_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf13 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -300,7 +300,7 @@ WRITE8_MEMBER(nes_jf13_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf16_device::write_h)
+void nes_jf16_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf16 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -329,7 +329,7 @@ WRITE8_MEMBER(nes_jf16_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf17_device::write_h)
+void nes_jf17_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf17 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -344,7 +344,7 @@ WRITE8_MEMBER(nes_jf17_device::write_h)
 	m_latch = data;
 }
 
-WRITE8_MEMBER(nes_jf17_adpcm_device::write_h)
+void nes_jf17_adpcm_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf17 + ADPCM write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(nes_jf17_adpcm_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_jf19_device::write_h)
+void nes_jf19_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf19 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -391,7 +391,7 @@ WRITE8_MEMBER(nes_jf19_device::write_h)
 		chr8(data & 0x0f, CHRROM);
 }
 
-WRITE8_MEMBER(nes_jf19_adpcm_device::write_h)
+void nes_jf19_adpcm_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("jf19 + ADPCM write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -473,7 +473,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	}
 }
 
-WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
+void nes_ss88006_device::ss88006_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank;
 	LOG_MMC(("ss88006 write_h, offset: %04x, data: %02x\n", offset, data));

@@ -118,10 +118,10 @@ public:
 
 	uint8_t m_attrram[0x800];
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(sanremo_videoram_w);
+	void sanremo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_sanremo_tile_info);
-	DECLARE_WRITE8_MEMBER(banksel_w);
-	DECLARE_WRITE8_MEMBER(lamps_w);
+	void banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	int banksel;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sanremo);
@@ -136,7 +136,7 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER(sanremo_state::sanremo_videoram_w)
+void sanremo_state::sanremo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_attrram[offset] = banksel;
@@ -179,7 +179,7 @@ PALETTE_INIT_MEMBER(sanremo_state, sanremo)
 *                   R/W Handlers                  *
 **************************************************/
 
-WRITE8_MEMBER(sanremo_state::lamps_w)
+void sanremo_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  LAMPS:
 
@@ -202,7 +202,7 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
 	output().set_lamp_value(6, (data >> 6) & 1);  /* BET */
 }
 
-WRITE8_MEMBER(sanremo_state::banksel_w)
+void sanremo_state::banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  GFX banks selector.
 

@@ -46,8 +46,8 @@ public:
 	int m_test_y;
 	int m_start_offs;
 #if HACK_ENABLED
-	DECLARE_READ16_MEMBER(hack_r);
-	DECLARE_WRITE16_MEMBER(hack_w);
+	uint16_t hack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t m_hack[2];
 #endif
 
@@ -57,7 +57,7 @@ public:
 };
 
 #if HACK_ENABLED
-READ16_MEMBER(bowltry_state::hack_r)
+uint16_t bowltry_state::hack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset)
 		return m_hack[1] & ~0x20;
@@ -66,7 +66,7 @@ READ16_MEMBER(bowltry_state::hack_r)
 	return m_hack[0];
 }
 
-WRITE16_MEMBER(bowltry_state::hack_w)
+void bowltry_state::hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_hack[offset]);
 }

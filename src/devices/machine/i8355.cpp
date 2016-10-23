@@ -149,7 +149,7 @@ const address_space_config *i8355_device::memory_space_config(address_spacenum s
 //  io_r - register read
 //-------------------------------------------------
 
-READ8_MEMBER( i8355_device::io_r )
+uint8_t i8355_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int port = offset & 0x01;
 
@@ -176,7 +176,7 @@ READ8_MEMBER( i8355_device::io_r )
 //  io_w - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8355_device::io_w )
+void i8355_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int port = offset & 0x01;
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER( i8355_device::io_w )
 //  memory_r - internal ROM read
 //-------------------------------------------------
 
-READ8_MEMBER( i8355_device::memory_r )
+uint8_t i8355_device::memory_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return this->space().read_byte(offset);
 }

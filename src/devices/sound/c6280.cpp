@@ -140,12 +140,12 @@ void c6280_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 /* MAME specific code                                                       */
 /*--------------------------------------------------------------------------*/
 
-READ8_MEMBER( c6280_device::c6280_r )
+uint8_t c6280_device::c6280_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cpudevice->io_get_buffer();
 }
 
-WRITE8_MEMBER( c6280_device::c6280_w )
+void c6280_device::c6280_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpudevice->io_set_buffer(data);
 

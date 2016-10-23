@@ -100,8 +100,8 @@ public:
 	TIMER_CALLBACK_MEMBER(clear_load);
 	void ti990_hold_load();
 	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
-	READ8_MEMBER( ti990_panel_read );
-	WRITE8_MEMBER( ti990_panel_write );
+	uint8_t ti990_panel_read(address_space &space, offs_t offset, uint8_t mem_mask);
+	void ti990_panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	required_device<cpu_device> m_maincpu;
 	uint16_t m_intlines;
@@ -221,7 +221,7 @@ WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
     F: flag (according to 990 handbook)
 */
 
-READ8_MEMBER( ti990_10_state::ti990_panel_read )
+uint8_t ti990_10_state::ti990_panel_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 		return 0x48;
@@ -229,7 +229,7 @@ READ8_MEMBER( ti990_10_state::ti990_panel_read )
 	return 0;
 }
 
-WRITE8_MEMBER( ti990_10_state::ti990_panel_write )
+void ti990_10_state::ti990_panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

@@ -68,17 +68,17 @@ public:
 	uint8_t m_io_40;
 	uint8_t m_hsync;
 
-	DECLARE_WRITE8_MEMBER(io_40_w);
+	void io_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(io_60_r);
-	DECLARE_WRITE8_MEMBER(io_70_w);
-	DECLARE_WRITE8_MEMBER(io_90_w);
-	DECLARE_WRITE8_MEMBER(io_a0_w);
-	DECLARE_WRITE8_MEMBER(io_b0_w);
-	DECLARE_WRITE8_MEMBER(io_c0_w);
-	DECLARE_WRITE8_MEMBER(io_d0_w);
-	DECLARE_WRITE8_MEMBER(io_e0_w);
-	DECLARE_WRITE8_MEMBER(io_f0_w);
+	uint8_t io_60_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_a0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_e0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -102,10 +102,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
 	DECLARE_WRITE_LINE_MEMBER(vsync);
 	DECLARE_WRITE_LINE_MEMBER(hsync);
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(dark_1_clr);
-	DECLARE_WRITE8_MEMBER(dark_2_clr);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dark_1_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dark_2_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 
@@ -166,7 +166,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::count_ar)
 	}
 }
 
-WRITE8_MEMBER(fastinvaders_state::dark_1_clr)
+void fastinvaders_state::dark_1_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	if(data){
@@ -183,7 +183,7 @@ WRITE8_MEMBER(fastinvaders_state::dark_1_clr)
 	//return 0x00;
 }
 
-WRITE8_MEMBER(fastinvaders_state::dark_2_clr)
+void fastinvaders_state::dark_2_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	if(data){
@@ -238,20 +238,20 @@ uint32_t fastinvaders_state::screen_update(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_40_w)
+void fastinvaders_state::io_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_40=data;
 	logerror("av target= %02X\n",m_io_40);
 }
 
 
-WRITE8_MEMBER(fastinvaders_state::io_90_w)
+void fastinvaders_state::io_90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("Audio write &02X\n",data);
 }
 
 
-READ8_MEMBER(fastinvaders_state::io_60_r)
+uint8_t fastinvaders_state::io_60_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tmp=0;
 	//0x60 ds6 input bit 0 DX or SX
@@ -266,7 +266,7 @@ READ8_MEMBER(fastinvaders_state::io_60_r)
 }
 
 
-WRITE8_MEMBER(fastinvaders_state::io_70_w)
+void fastinvaders_state::io_70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //bit 0 rest55 clear
 //bit 1 rest65 clear
@@ -313,37 +313,37 @@ WRITE8_MEMBER(fastinvaders_state::io_70_w)
 }
 
 
-WRITE8_MEMBER(fastinvaders_state::io_a0_w)
+void fastinvaders_state::io_a0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq1=0;
 	m_pic8259->ir1_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_b0_w)
+void fastinvaders_state::io_b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq2=0;
 	m_pic8259->ir2_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_c0_w)
+void fastinvaders_state::io_c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq3=0;
 	m_pic8259->ir3_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_d0_w)
+void fastinvaders_state::io_d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq5=0;
 	m_pic8259->ir5_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_e0_w)
+void fastinvaders_state::io_e0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq4=0;
 	m_pic8259->ir4_w(CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastinvaders_state::io_f0_w)
+void fastinvaders_state::io_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq6=0;
 	m_pic8259->ir6_w(CLEAR_LINE);
@@ -472,7 +472,7 @@ DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::hsync)
 
 
 
-READ8_MEMBER(fastinvaders_state::memory_read_byte)
+uint8_t fastinvaders_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 logerror("dma read\n");
@@ -482,7 +482,7 @@ logerror("dma read\n");
 	//return 0x00;
 }
 
-WRITE8_MEMBER(fastinvaders_state::memory_write_byte)
+void fastinvaders_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 logerror("dma write\n");

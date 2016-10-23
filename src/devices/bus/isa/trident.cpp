@@ -784,7 +784,7 @@ void trident_vga_device::trident_gc_reg_write(uint8_t index, uint8_t data)
 	if(LOG) logerror("Trident GC%02X: write %02x\n",index,data);
 }
 
-READ8_MEMBER(trident_vga_device::port_03c0_r)
+uint8_t trident_vga_device::port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -820,7 +820,7 @@ READ8_MEMBER(trident_vga_device::port_03c0_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_03c0_w)
+void trident_vga_device::port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -855,7 +855,7 @@ WRITE8_MEMBER(trident_vga_device::port_03c0_w)
 }
 
 
-READ8_MEMBER(trident_vga_device::port_03d0_r)
+uint8_t trident_vga_device::port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -895,7 +895,7 @@ READ8_MEMBER(trident_vga_device::port_03d0_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_03d0_w)
+void trident_vga_device::port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -937,7 +937,7 @@ WRITE8_MEMBER(trident_vga_device::port_03d0_w)
 	}
 }
 
-READ8_MEMBER(trident_vga_device::port_43c6_r)
+uint8_t trident_vga_device::port_43c6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 	switch(offset)
@@ -958,7 +958,7 @@ READ8_MEMBER(trident_vga_device::port_43c6_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_43c6_w)
+void trident_vga_device::port_43c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -995,7 +995,7 @@ WRITE8_MEMBER(trident_vga_device::port_43c6_w)
 
 // Trident refers to these registers as a LUTDAC
 // Not much else is known.  XFree86 uses register 4 for something related to DPMS
-READ8_MEMBER(trident_vga_device::port_83c6_r)
+uint8_t trident_vga_device::port_83c6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 	switch(offset)
@@ -1012,7 +1012,7 @@ READ8_MEMBER(trident_vga_device::port_83c6_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::port_83c6_w)
+void trident_vga_device::port_83c6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1027,7 +1027,7 @@ WRITE8_MEMBER(trident_vga_device::port_83c6_w)
 	}
 }
 
-READ8_MEMBER(trident_vga_device::vram_r)
+uint8_t trident_vga_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (tri.linear_active)
 		return vga.memory[offset % vga.svga_intf.vram_size];
@@ -1035,7 +1035,7 @@ READ8_MEMBER(trident_vga_device::vram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(trident_vga_device::vram_w)
+void trident_vga_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (tri.linear_active)
 	{
@@ -1050,7 +1050,7 @@ WRITE8_MEMBER(trident_vga_device::vram_w)
 	}
 }
 
-READ8_MEMBER(trident_vga_device::mem_r )
+uint8_t trident_vga_device::mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
 	{
@@ -1076,7 +1076,7 @@ READ8_MEMBER(trident_vga_device::mem_r )
 	return vga_device::mem_r(space,offset,mem_mask);
 }
 
-WRITE8_MEMBER(trident_vga_device::mem_w)
+void trident_vga_device::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((tri.cr20 & 0x10) && (offset >= 0x1ff00)) // correct for old MMIO?
 	{
@@ -1192,7 +1192,7 @@ Graphics Engine for 9440/9660/9680
 #define GER_DSTCLIP_Y   0x214E      // Word
 */
 
-READ8_MEMBER(trident_vga_device::accel_r)
+uint8_t trident_vga_device::accel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0xff;
 
@@ -1227,7 +1227,7 @@ READ8_MEMBER(trident_vga_device::accel_r)
 	return res;
 }
 
-WRITE8_MEMBER(trident_vga_device::accel_w)
+void trident_vga_device::accel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset >= 0x60)
 	{

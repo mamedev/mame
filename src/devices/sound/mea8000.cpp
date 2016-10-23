@@ -495,7 +495,7 @@ TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
 /************************** CPU interface ****************************/
 
 
-READ8_MEMBER( mea8000_device::read )
+uint8_t mea8000_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -513,7 +513,7 @@ READ8_MEMBER( mea8000_device::read )
 	return 0;
 }
 
-WRITE8_MEMBER( mea8000_device::write )
+void mea8000_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

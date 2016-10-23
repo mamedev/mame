@@ -10,25 +10,25 @@
 
 const device_type ISA8_STEREO_FX = &device_creator<stereo_fx_device>;
 
-READ8_MEMBER( stereo_fx_device::dev_dsp_data_r )
+uint8_t stereo_fx_device::dev_dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_data_in = false;
 	return m_in_byte;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dev_dsp_data_w )
+void stereo_fx_device::dev_dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_out = true;
 	m_out_byte = data;
 }
 
 // port 1 is the left DAC but is written and read bitwise during capture
-READ8_MEMBER( stereo_fx_device::p1_r )
+uint8_t stereo_fx_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;
 }
 
-READ8_MEMBER( stereo_fx_device::p3_r )
+uint8_t stereo_fx_device::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -39,17 +39,17 @@ READ8_MEMBER( stereo_fx_device::p3_r )
 	return ret;
 }
 
-WRITE8_MEMBER( stereo_fx_device::p3_w )
+void stereo_fx_device::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_t1 = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dev_host_irq_w )
+void stereo_fx_device::dev_host_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isa->irq5_w(1);
 }
 
-WRITE8_MEMBER( stereo_fx_device::raise_drq_w )
+void stereo_fx_device::raise_drq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_isa->drq1_w(1);
 }
@@ -64,7 +64,7 @@ WRITE8_MEMBER( stereo_fx_device::raise_drq_w )
  * bit6 -
  * bit7 -
 */
-WRITE8_MEMBER( stereo_fx_device::port20_w )
+void stereo_fx_device::port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port20 = data;
 }
@@ -79,7 +79,7 @@ WRITE8_MEMBER( stereo_fx_device::port20_w )
  * bit6 -
  * bit7 -
 */
-WRITE8_MEMBER( stereo_fx_device::port00_w )
+void stereo_fx_device::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port00 = data;
 }
@@ -135,13 +135,13 @@ machine_config_constructor stereo_fx_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( stereo_fx );
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_data_r )
+uint8_t stereo_fx_device::dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_data_out = false;
 	return m_out_byte;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dsp_cmd_w )
+void stereo_fx_device::dsp_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_in = true;
 	m_in_byte = data;
@@ -161,29 +161,29 @@ void stereo_fx_device::dack_w(int line, uint8_t data)
 	m_in_byte = data;
 }
 
-WRITE8_MEMBER( stereo_fx_device::dsp_reset_w )
+void stereo_fx_device::dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_reset();
 	m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_wbuf_status_r )
+uint8_t stereo_fx_device::dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data_in << 7;
 }
 
-READ8_MEMBER( stereo_fx_device::dsp_rbuf_status_r )
+uint8_t stereo_fx_device::dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_isa->irq5_w(0);
 	return m_data_out << 7;
 }
 
-WRITE8_MEMBER( stereo_fx_device::invalid_w )
+void stereo_fx_device::invalid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("stereo fx: invalid port write\n");
 }
 
-READ8_MEMBER( stereo_fx_device::invalid_r )
+uint8_t stereo_fx_device::invalid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("stereo fx: invalid port read\n");
 	return 0xff;

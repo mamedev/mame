@@ -38,12 +38,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
+	void gamtor_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_gaminator();
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
+void gaminator_state::gamtor_unk_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 

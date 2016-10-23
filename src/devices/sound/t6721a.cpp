@@ -78,7 +78,7 @@ void t6721a_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( t6721a_device::read )
+uint8_t t6721a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -88,7 +88,7 @@ READ8_MEMBER( t6721a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( t6721a_device::write )
+void t6721a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

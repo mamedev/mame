@@ -384,79 +384,79 @@ public:
 	uint32_t m_extram_size;
 	uint8_t m_has_opna;
 
-	DECLARE_READ8_MEMBER(pc8801_alu_r);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
-	DECLARE_READ8_MEMBER(pc8801_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_wram_w);
-	DECLARE_READ8_MEMBER(pc8801_ext_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ext_wram_w);
-	DECLARE_READ8_MEMBER(pc8801_nbasic_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_n88basic_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_gvram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_gvram_w);
-	DECLARE_READ8_MEMBER(pc8801_high_wram_r);
-	DECLARE_WRITE8_MEMBER(pc8801_high_wram_w);
-	DECLARE_READ8_MEMBER(pc8801ma_dic_r);
-	DECLARE_READ8_MEMBER(pc8801_cdbios_rom_r);
-	DECLARE_READ8_MEMBER(pc8801_mem_r);
-	DECLARE_WRITE8_MEMBER(pc8801_mem_w);
-	DECLARE_READ8_MEMBER(pc8801_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_ext_rom_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_ext_rom_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_gfx_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_vram_select_r);
-	DECLARE_WRITE8_MEMBER(pc8801_vram_select_w);
-	DECLARE_WRITE8_MEMBER(pc8801_irq_level_w);
-	DECLARE_WRITE8_MEMBER(pc8801_irq_mask_w);
-	DECLARE_READ8_MEMBER(pc8801_window_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_window_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_window_bank_inc_w);
-	DECLARE_READ8_MEMBER(pc8801_misc_ctrl_r);
-	DECLARE_WRITE8_MEMBER(pc8801_misc_ctrl_w);
-	DECLARE_WRITE8_MEMBER(pc8801_bgpal_w);
-	DECLARE_WRITE8_MEMBER(pc8801_palram_w);
-	DECLARE_WRITE8_MEMBER(pc8801_layer_masking_w);
-	DECLARE_READ8_MEMBER(pc8801_crtc_param_r);
-	DECLARE_WRITE8_MEMBER(pc88_crtc_param_w);
-	DECLARE_READ8_MEMBER(pc8801_crtc_status_r);
-	DECLARE_WRITE8_MEMBER(pc88_crtc_cmd_w);
-	DECLARE_READ8_MEMBER(pc8801_dmac_r);
-	DECLARE_WRITE8_MEMBER(pc8801_dmac_w);
-	DECLARE_READ8_MEMBER(pc8801_dmac_status_r);
-	DECLARE_WRITE8_MEMBER(pc8801_dmac_mode_w);
-	DECLARE_READ8_MEMBER(pc8801_extram_mode_r);
-	DECLARE_WRITE8_MEMBER(pc8801_extram_mode_w);
-	DECLARE_READ8_MEMBER(pc8801_extram_bank_r);
-	DECLARE_WRITE8_MEMBER(pc8801_extram_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl1_w);
-	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl2_w);
-	DECLARE_WRITE8_MEMBER(pc8801_pcg8100_w);
-	DECLARE_WRITE8_MEMBER(pc8801_txt_cmt_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_kanji_r);
-	DECLARE_WRITE8_MEMBER(pc8801_kanji_w);
-	DECLARE_READ8_MEMBER(pc8801_kanji_lv2_r);
-	DECLARE_WRITE8_MEMBER(pc8801_kanji_lv2_w);
-	DECLARE_WRITE8_MEMBER(pc8801_dic_bank_w);
-	DECLARE_WRITE8_MEMBER(pc8801_dic_ctrl_w);
-	DECLARE_READ8_MEMBER(pc8801_cdrom_r);
-	DECLARE_WRITE8_MEMBER(pc8801_cdrom_w);
-	DECLARE_READ8_MEMBER(pc8801_cpuclock_r);
-	DECLARE_READ8_MEMBER(pc8801_baudrate_r);
-	DECLARE_WRITE8_MEMBER(pc8801_baudrate_w);
-	DECLARE_WRITE8_MEMBER(pc8801_rtc_w);
-	DECLARE_WRITE8_MEMBER(upd765_mc_w);
-	DECLARE_READ8_MEMBER(upd765_tc_r);
-	DECLARE_WRITE8_MEMBER(fdc_irq_vector_w);
-	DECLARE_WRITE8_MEMBER(fdc_drive_mode_w);
+	uint8_t pc8801_alu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_alu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_ext_wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_ext_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_nbasic_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_n88basic_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_gvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_gvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_high_wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_high_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801ma_dic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_cdbios_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_ext_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_ext_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_gfx_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_vram_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_irq_level_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_window_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_window_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_window_bank_inc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_misc_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_misc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_bgpal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_layer_masking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_crtc_param_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc88_crtc_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_crtc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc88_crtc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_dmac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_dmac_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_dmac_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_extram_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_extram_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_extram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_extram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_alu_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_alu_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_pcg8100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_txt_cmt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_kanji_lv2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_kanji_lv2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_dic_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_dic_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_cdrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_cdrom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_cpuclock_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_baudrate_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_baudrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc8801_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void upd765_mc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_drive_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_READ8_MEMBER(pc8801_sound_board_r);
-	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
-	DECLARE_READ8_MEMBER(pc8801_opna_r);
-	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
-	DECLARE_READ8_MEMBER(pc8801_unk_r);
-	DECLARE_WRITE8_MEMBER(pc8801_unk_w);
+	uint8_t pc8801_sound_board_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_sound_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_opna_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_opna_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc8801_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc8801_unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t pc8801_pixel_clock(void);
 	void pc8801_dynamic_res_change(void);
@@ -482,12 +482,12 @@ public:
 	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
 	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
-	DECLARE_READ8_MEMBER(cpu_8255_c_r);
-	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
-	DECLARE_READ8_MEMBER(fdc_8255_c_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER(opn_porta_r);
-	DECLARE_READ8_MEMBER(opn_portb_r);
+	uint8_t cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t opn_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };
@@ -886,7 +886,7 @@ uint32_t pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_alu_r)
+uint8_t pc8801_state::pc8801_alu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i;
 	uint8_t b,r,g;
@@ -905,7 +905,7 @@ READ8_MEMBER(pc8801_state::pc8801_alu_r)
 	return b & r & g;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
+void pc8801_state::pc8801_alu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -948,17 +948,17 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 }
 
 
-READ8_MEMBER(pc8801_state::pc8801_wram_r)
+uint8_t pc8801_state::pc8801_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_work_ram[offset];
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_wram_w)
+void pc8801_state::pc8801_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_work_ram[offset] = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
+uint8_t pc8801_state::pc8801_ext_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset < m_extram_size)
 		return m_ext_work_ram[offset];
@@ -966,57 +966,57 @@ READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_ext_wram_w)
+void pc8801_state::pc8801_ext_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset < m_extram_size)
 		m_ext_work_ram[offset] = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_nbasic_rom_r)
+uint8_t pc8801_state::pc8801_nbasic_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_n80rom[offset];
 }
 
-READ8_MEMBER(pc8801_state::pc8801_n88basic_rom_r)
+uint8_t pc8801_state::pc8801_n88basic_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_n88rom[offset];
 }
 
-READ8_MEMBER(pc8801_state::pc8801_gvram_r)
+uint8_t pc8801_state::pc8801_gvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gvram[offset];
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_gvram_w)
+void pc8801_state::pc8801_gvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gvram[offset] = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_high_wram_r)
+uint8_t pc8801_state::pc8801_high_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hi_work_ram[offset];
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_high_wram_w)
+void pc8801_state::pc8801_high_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hi_work_ram[offset] = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801ma_dic_r)
+uint8_t pc8801_state::pc8801ma_dic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *dic_rom = memregion("dictionary")->base();
 
 	return dic_rom[offset];
 }
 
-READ8_MEMBER(pc8801_state::pc8801_cdbios_rom_r)
+uint8_t pc8801_state::pc8801_cdbios_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *cdrom_bios = memregion("cdrom")->base();
 
 	return cdrom_bios[offset];
 }
 
-READ8_MEMBER(pc8801_state::pc8801_mem_r)
+uint8_t pc8801_state::pc8801_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset <= 0x7fff)
 	{
@@ -1086,7 +1086,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
+void pc8801_state::pc8801_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset <= 0x7fff)
 	{
@@ -1158,7 +1158,7 @@ static ADDRESS_MAP_START( pc8801_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pc8801_mem_r,pc8801_mem_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(pc8801_state::pc8801_ctrl_r)
+uint8_t pc8801_state::pc8801_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	11-- ----
@@ -1172,7 +1172,7 @@ READ8_MEMBER(pc8801_state::pc8801_ctrl_r)
 	return ioport("CTRL")->read();
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
+void pc8801_state::pc8801_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- SING (buzzer mask?)
@@ -1224,12 +1224,12 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 	m_device_ctrl_data = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_ext_rom_bank_r)
+uint8_t pc8801_state::pc8801_ext_rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ext_rom_bank;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_ext_rom_bank_w)
+void pc8801_state::pc8801_ext_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ext_rom_bank = data;
 }
@@ -1267,7 +1267,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 	machine().first_screen()->configure(xsize, ysize, visarea, refresh);
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
+void pc8801_state::pc8801_gfx_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	--x- ---- ???
@@ -1283,19 +1283,19 @@ WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
 	pc8801_dynamic_res_change();
 }
 
-READ8_MEMBER(pc8801_state::pc8801_vram_select_r)
+uint8_t pc8801_state::pc8801_vram_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xf8 | ((m_vram_sel == 3) ? 0 : (1 << m_vram_sel));
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_vram_select_w)
+void pc8801_state::pc8801_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_sel = offset & 3;
 }
 
 #ifdef USE_PROPER_I8214
 
-WRITE8_MEMBER(pc8801_state::i8214_irq_level_w)
+void pc8801_state::i8214_irq_level_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 8)
 		m_pic->b_w(7);
@@ -1303,7 +1303,7 @@ WRITE8_MEMBER(pc8801_state::i8214_irq_level_w)
 		m_pic->b_w(data & 0x07);
 }
 
-WRITE8_MEMBER(pc8801_state::i8214_irq_mask_w)
+void pc8801_state::i8214_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_irq_mask = data & 1;
 	m_vblank_irq_mask = data & 2;
@@ -1311,7 +1311,7 @@ WRITE8_MEMBER(pc8801_state::i8214_irq_mask_w)
 
 
 #else
-WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
+void pc8801_state::pc8801_irq_level_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 8)
 		m_i8214_irq_level = 7;
@@ -1322,7 +1322,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 }
 
 
-WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
+void pc8801_state::pc8801_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_irq_mask = data & 1;
 	m_vrtc_irq_mask = data & 2;
@@ -1343,28 +1343,28 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 }
 #endif
 
-READ8_MEMBER(pc8801_state::pc8801_window_bank_r)
+uint8_t pc8801_state::pc8801_window_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_window_offset_bank;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_window_bank_w)
+void pc8801_state::pc8801_window_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_window_offset_bank = data;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_window_bank_inc_w)
+void pc8801_state::pc8801_window_bank_inc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_window_offset_bank++;
 	m_window_offset_bank&=0xff;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_misc_ctrl_r)
+uint8_t pc8801_state::pc8801_misc_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_misc_ctrl;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
+void pc8801_state::pc8801_misc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- sound irq mask, active low
@@ -1394,13 +1394,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 	#endif
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_bgpal_w)
+void pc8801_state::pc8801_bgpal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data)
 		printf("BG Pal %02x\n",data);
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_palram_w)
+void pc8801_state::pc8801_palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_misc_ctrl & 0x20) //analog palette
 	{
@@ -1424,7 +1424,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_palram_w)
 	m_palette->set_pen_color(offset, pal3bit(m_palram[offset].r), pal3bit(m_palram[offset].g), pal3bit(m_palram[offset].b));
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_layer_masking_w)
+void pc8801_state::pc8801_layer_masking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---- x--- green gvram masked flag
@@ -1436,13 +1436,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_layer_masking_w)
 	m_layer_mask = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_crtc_param_r)
+uint8_t pc8801_state::pc8801_crtc_param_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("CRTC param reading\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc88_crtc_param_w)
+void pc8801_state::pc88_crtc_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_crtc.param_count < 5)
 	{
@@ -1454,7 +1454,7 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_param_w)
 	}
 }
 
-READ8_MEMBER(pc8801_state::pc8801_crtc_status_r)
+uint8_t pc8801_state::pc8801_crtc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	---x ---- video enable
@@ -1481,7 +1481,7 @@ static const char *const crtc_command[] =
 };
 #endif
 
-WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
+void pc8801_state::pc88_crtc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc.cmd = (data & 0xe0) >> 5;
 	m_crtc.param_count = 0;
@@ -1518,13 +1518,13 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
 	//  printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
-READ8_MEMBER(pc8801_state::pc8801_dmac_r)
+uint8_t pc8801_state::pc8801_dmac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("DMAC R %08x\n",offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_dmac_w)
+void pc8801_state::pc8801_dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 1)
 		m_dma_counter[offset >> 1] = (m_dmac_ff) ? (m_dma_counter[offset >> 1]&0xff)|(data<<8) : (m_dma_counter[offset >> 1]&0xff00)|(data&0xff);
@@ -1534,13 +1534,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_dmac_w)
 	m_dmac_ff ^= 1;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_dmac_status_r)
+uint8_t pc8801_state::pc8801_dmac_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("DMAC R STATUS\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_dmac_mode_w)
+void pc8801_state::pc8801_dmac_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmac_mode = data;
 	m_dmac_ff = 0;
@@ -1549,12 +1549,12 @@ WRITE8_MEMBER(pc8801_state::pc8801_dmac_mode_w)
 		printf("%02x DMAC mode\n",data);
 }
 
-READ8_MEMBER(pc8801_state::pc8801_extram_mode_r)
+uint8_t pc8801_state::pc8801_extram_mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_extram_mode ^ 0x11) | 0xee;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_extram_mode_w)
+void pc8801_state::pc8801_extram_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---x ---- Write EXT RAM access at 0x0000 - 0x7fff
@@ -1564,33 +1564,33 @@ WRITE8_MEMBER(pc8801_state::pc8801_extram_mode_w)
 	m_extram_mode = data & 0x11;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_extram_bank_r)
+uint8_t pc8801_state::pc8801_extram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_extram_bank;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_extram_bank_w)
+void pc8801_state::pc8801_extram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_extram_bank = data;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_alu_ctrl1_w)
+void pc8801_state::pc8801_alu_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alu_ctrl1 = data;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_alu_ctrl2_w)
+void pc8801_state::pc8801_alu_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alu_ctrl2 = data;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_pcg8100_w)
+void pc8801_state::pc8801_pcg8100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data)
 		printf("Write to PCG-8100 %02x %02x\n",offset,data);
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
+void pc8801_state::pc8801_txt_cmt_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 2 to 5 are cmt related */
 
@@ -1601,7 +1601,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
 }
 
 
-READ8_MEMBER(pc8801_state::pc8801_kanji_r)
+uint8_t pc8801_state::pc8801_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 2) == 0)
 		return m_kanji_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
@@ -1609,13 +1609,13 @@ READ8_MEMBER(pc8801_state::pc8801_kanji_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_kanji_w)
+void pc8801_state::pc8801_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset & 2) == 0)
 		m_knj_addr[0] = ((offset & 1) == 0) ? ((m_knj_addr[0]&0xff00)|(data&0xff)) : ((m_knj_addr[0]&0x00ff)|(data<<8));
 }
 
-READ8_MEMBER(pc8801_state::pc8801_kanji_lv2_r)
+uint8_t pc8801_state::pc8801_kanji_lv2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 2) == 0)
 		return m_kanji_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
@@ -1623,27 +1623,27 @@ READ8_MEMBER(pc8801_state::pc8801_kanji_lv2_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_kanji_lv2_w)
+void pc8801_state::pc8801_kanji_lv2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset & 2) == 0)
 		m_knj_addr[1] = ((offset & 1) == 0) ? ((m_knj_addr[1]&0xff00)|(data&0xff)) : ((m_knj_addr[1]&0x00ff)|(data<<8));
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_dic_bank_w)
+void pc8801_state::pc8801_dic_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("JISHO BANK = %02x\n",data);
 	if(m_has_dictionary)
 		m_dic_bank = data  & 0x1f;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_dic_ctrl_w)
+void pc8801_state::pc8801_dic_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("JISHO CTRL = %02x\n",data);
 	if(m_has_dictionary)
 		m_dic_ctrl = (data ^ 1) & 1;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_cdrom_r)
+uint8_t pc8801_state::pc8801_cdrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("CD-ROM read [%02x]\n",offset);
 
@@ -1653,7 +1653,7 @@ READ8_MEMBER(pc8801_state::pc8801_cdrom_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_cdrom_w)
+void pc8801_state::pc8801_cdrom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	[9] ---x ---- CD-ROM BIOS bank
@@ -1665,7 +1665,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_cdrom_w)
 		m_cdrom_reg[offset] = data;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_cpuclock_r)
+uint8_t pc8801_state::pc8801_cpuclock_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_has_clock_speed)
 		return 0x10 | m_clock_setting;
@@ -1673,7 +1673,7 @@ READ8_MEMBER(pc8801_state::pc8801_cpuclock_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pc8801_state::pc8801_baudrate_r)
+uint8_t pc8801_state::pc8801_baudrate_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_has_clock_speed)
 		return 0xf0 | m_baudrate_val;
@@ -1681,13 +1681,13 @@ READ8_MEMBER(pc8801_state::pc8801_baudrate_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_baudrate_w)
+void pc8801_state::pc8801_baudrate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_has_clock_speed)
 		m_baudrate_val = data & 0xf;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
+void pc8801_state::pc8801_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->c0_w((data & 1) >> 0);
 	m_rtc->c1_w((data & 2) >> 1);
@@ -1697,7 +1697,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 	/* TODO: remaining bits */
 }
 
-READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
+uint8_t pc8801_state::pc8801_sound_board_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_has_opna)
 		return m_opna->read(space, offset);
@@ -1705,7 +1705,7 @@ READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 	return (offset & 2) ? 0xff : m_opn->read(space, offset);
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
+void pc8801_state::pc8801_sound_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_has_opna)
 		m_opna->write(space, offset,data);
@@ -1713,7 +1713,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 		m_opn->write(space, offset, data);
 }
 
-READ8_MEMBER(pc8801_state::pc8801_opna_r)
+uint8_t pc8801_state::pc8801_opna_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_has_opna && (offset & 2) == 0)
 		return m_opna->read(space, (offset & 1) | ((offset & 4) >> 1));
@@ -1721,7 +1721,7 @@ READ8_MEMBER(pc8801_state::pc8801_opna_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
+void pc8801_state::pc8801_opna_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_has_opna && (offset & 2) == 0)
 		m_opna->write(space, (offset & 1) | ((offset & 4) >> 1),data);
@@ -1744,13 +1744,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 	}
 }
 
-READ8_MEMBER(pc8801_state::pc8801_unk_r)
+uint8_t pc8801_state::pc8801_unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("Read port 0x33\n");
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc8801_state::pc8801_unk_w)
+void pc8801_state::pc8801_unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("Write port 0x33\n");
 }
@@ -1829,14 +1829,14 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("d8255_master", i8255_device, read, write)
 ADDRESS_MAP_END
 
-READ8_MEMBER(pc8801_state::cpu_8255_c_r)
+uint8_t pc8801_state::cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 
 	return m_i8255_1_pc >> 4;
 }
 
-WRITE8_MEMBER(pc8801_state::cpu_8255_c_w)
+void pc8801_state::cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 
@@ -1844,14 +1844,14 @@ WRITE8_MEMBER(pc8801_state::cpu_8255_c_w)
 }
 
 
-READ8_MEMBER(pc8801_state::fdc_8255_c_r)
+uint8_t pc8801_state::fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(pc8801_state::fdc_8255_c_w)
+void pc8801_state::fdc_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  machine().scheduler().synchronize(); // force resync
 
@@ -1869,13 +1869,13 @@ TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 	machine().device<upd765a_device>("upd765")->tc_w(false);
 }
 
-WRITE8_MEMBER(pc8801_state::upd765_mc_w)
+void pc8801_state::upd765_mc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
 	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
-READ8_MEMBER(pc8801_state::upd765_tc_r)
+uint8_t pc8801_state::upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("%04x 1\n",m_fdccpu->pc());
 
@@ -1886,13 +1886,13 @@ READ8_MEMBER(pc8801_state::upd765_tc_r)
 	return 0xff; // value is meaningless
 }
 
-WRITE8_MEMBER(pc8801_state::fdc_irq_vector_w)
+void pc8801_state::fdc_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("Write to FDC IRQ vector I/O %02x, contact MESSdev\n",data);
 	m_fdc_irq_opcode = data;
 }
 
-WRITE8_MEMBER(pc8801_state::fdc_drive_mode_w)
+void pc8801_state::fdc_drive_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("FDC drive mode %02x\n", data);
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(data & 0x01 ? 360 : 300);
@@ -2535,7 +2535,7 @@ PALETTE_INIT_MEMBER(pc8801_state, pc8801)
 
 /* YM2203 Interface */
 
-READ8_MEMBER(pc8801_state::opn_porta_r)
+uint8_t pc8801_state::opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
@@ -2551,7 +2551,7 @@ READ8_MEMBER(pc8801_state::opn_porta_r)
 
 	return ioport("OPN_PA")->read();
 }
-READ8_MEMBER(pc8801_state::opn_portb_r){ return ioport("OPN_PB")->read(); }
+uint8_t pc8801_state::opn_portb_r(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("OPN_PB")->read(); }
 
 /* Cassette Configuration */
 WRITE_LINE_MEMBER( pc8801_state::txdata_callback )

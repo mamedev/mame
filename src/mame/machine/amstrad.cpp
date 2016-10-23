@@ -1399,7 +1399,7 @@ void amstrad_state::AmstradCPC_GA_SetRamConfiguration()
 
  */
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
+void amstrad_state::amstrad_plus_asic_4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1412,7 +1412,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_4000_w)
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
+void amstrad_state::amstrad_plus_asic_6000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
 	{
@@ -1515,7 +1515,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_plus_asic_6000_w)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
+uint8_t amstrad_state::amstrad_plus_asic_4000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x4000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1528,7 +1528,7 @@ READ8_MEMBER(amstrad_state::amstrad_plus_asic_4000_r)
 }
 
 
-READ8_MEMBER(amstrad_state::amstrad_plus_asic_6000_r)
+uint8_t amstrad_state::amstrad_plus_asic_6000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("RAM: read from &%04x\n",offset+0x6000);
 	if ( m_asic.enabled && ( m_asic.rmr2 & 0x18 ) == 0x18 )
@@ -1727,7 +1727,7 @@ In the 464+ and 6128+ this function is performed by the ASIC or a memory expansi
 }
 
 
-WRITE8_MEMBER(amstrad_state::aleste_msx_mapper)
+void amstrad_state::aleste_msx_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = (offset & 0x0300) >> 8;
 	int ramptr = (data & 0x3f) * 0x4000;
@@ -1853,7 +1853,7 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 */
 
-READ8_MEMBER(amstrad_state::amstrad_cpc_io_r)
+uint8_t amstrad_state::amstrad_cpc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2009,7 +2009,7 @@ void amstrad_state::amstrad_plus_seqcheck(int data)
 	m_prev_data = data;
 }
 
-WRITE8_MEMBER(amstrad_state::rom_select)
+void amstrad_state::rom_select(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gate_array.upper_bank = data;
 	// expansion devices know the selected ROM by monitoring I/O writes to DFxx
@@ -2037,7 +2037,7 @@ WRITE8_MEMBER(amstrad_state::rom_select)
 }
 
 /* Offset handler for write */
-WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
+void amstrad_state::amstrad_cpc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cpc_multiface2_device* mface2;
 
@@ -2561,14 +2561,14 @@ void amstrad_state::update_psg()
 
 
 /* Read/Write 8255 PPI port A (connected to AY-3-8912 databus) */
-READ8_MEMBER(amstrad_state::amstrad_ppi_porta_r)
+uint8_t amstrad_state::amstrad_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_psg();
 	return m_ppi_port_inputs[amstrad_ppi_PortA];
 }
 
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_porta_w)
+void amstrad_state::amstrad_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_port_outputs[amstrad_ppi_PortA] = data;
 	update_psg();
@@ -2605,7 +2605,7 @@ WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER(amstrad_state::amstrad_ppi_portb_r)
+uint8_t amstrad_state::amstrad_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0;
 /* Set b7 with cassette tape input */
@@ -2657,7 +2657,7 @@ Bit Description  Usage
 
 /* previous_ppi_portc_w value */
 
-WRITE8_MEMBER(amstrad_state::amstrad_ppi_portc_w)
+void amstrad_state::amstrad_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed_data;
 
@@ -2706,7 +2706,7 @@ When port B is defined as input (bit 7 of register 7 is set to "0"), a read of t
 */
 
 /* read PSG port A */
-READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
+uint8_t amstrad_state::amstrad_psg_porta_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Read CPC Keyboard
 	If keyboard matrix line 11-15 are selected, the byte is always &ff.

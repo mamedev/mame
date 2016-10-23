@@ -653,7 +653,7 @@ void atari_fdc_device::a800_serial_write()
 	}
 }
 
-READ8_MEMBER( atari_fdc_device::serin_r )
+uint8_t atari_fdc_device::serin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0x00;
 	int ser_delay = 0;
@@ -683,7 +683,7 @@ READ8_MEMBER( atari_fdc_device::serin_r )
 	return data;
 }
 
-WRITE8_MEMBER( atari_fdc_device::serout_w )
+void atari_fdc_device::serout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia6821_device *pia = machine().device<pia6821_device>( "pia" );
 

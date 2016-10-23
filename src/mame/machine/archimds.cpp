@@ -312,7 +312,7 @@ void archimedes_state::archimedes_init()
 	m_snd_timer->adjust(attotime::never);
 }
 
-READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
+uint32_t archimedes_state::archimedes_memc_logical_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t page, poffs;
 
@@ -350,7 +350,7 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 
 
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
+void archimedes_state::archimedes_memc_logical_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t page, poffs;
 
@@ -379,7 +379,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_logical_w)
 }
 
 /* Aristocrat Mark 5 - same as normal AA except with Dram emulator */
-READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
+uint32_t archimedes_state::aristmk5_drame_memc_logical_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t page, poffs;
 
@@ -500,7 +500,7 @@ bool archimedes_state::check_floppy_ready()
 }
 
 /* TODO: should be a 8-bit handler */
-READ32_MEMBER( archimedes_state::ioc_ctrl_r )
+uint32_t archimedes_state::ioc_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(IOC_LOG)
 	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
@@ -578,7 +578,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 }
 
 /* TODO: should be a 8-bit handler */
-WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
+void archimedes_state::ioc_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(IOC_LOG)
 	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], space.device() .safe_pc( ));
@@ -706,7 +706,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 	}
 }
 
-READ32_MEMBER(archimedes_state::archimedes_ioc_r)
+uint32_t archimedes_state::archimedes_ioc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -777,7 +777,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
+void archimedes_state::archimedes_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t ioc_addr;
 
@@ -881,7 +881,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", space.device().safe_pc(), data, (offset*4)+0x3000000, mem_mask);
 }
 
-READ32_MEMBER(archimedes_state::archimedes_vidc_r)
+uint32_t archimedes_state::archimedes_vidc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
@@ -925,7 +925,7 @@ void archimedes_state::vidc_dynamic_res_change()
 	}
 }
 
-WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
+void archimedes_state::archimedes_vidc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t reg = data>>24;
 	uint32_t val = data & 0xffffff;
@@ -1038,12 +1038,12 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 	}
 }
 
-READ32_MEMBER(archimedes_state::archimedes_memc_r)
+uint32_t archimedes_state::archimedes_memc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
+void archimedes_state::archimedes_memc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// is it a register?
 	if ((data & 0x0fe00000) == 0x03600000)
@@ -1153,7 +1153,7 @@ The physical page is encoded differently depending on the page size :
             1 being bit 6
 */
 
-WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
+void archimedes_state::archimedes_memc_page_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t log, phys, memc;
 

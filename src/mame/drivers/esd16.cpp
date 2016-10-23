@@ -83,7 +83,7 @@ ToDo:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
+void esd16_state::esd16_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -93,7 +93,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(esd16_state::hedpanic_platform_w)
+void esd16_state::hedpanic_platform_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int offsets = m_headpanic_platform_x[0] + 0x40 * m_headpanic_platform_y[0];
 
@@ -102,7 +102,7 @@ WRITE16_MEMBER(esd16_state::hedpanic_platform_w)
 }
 
 
-READ16_MEMBER(esd16_state::esd_eeprom_r)
+uint16_t esd16_state::esd_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -113,7 +113,7 @@ READ16_MEMBER(esd16_state::esd_eeprom_r)
 	return 0;
 }
 
-WRITE16_MEMBER(esd16_state::esd_eeprom_w)
+void esd16_state::esd_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		ioport("EEPROMOUT")->write(data, 0xffff);
@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(esd16_state::esd16_sound_rombank_w)
+void esd16_state::esd16_sound_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0xf;
 	membank("bank1")->set_entry(bank);
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8, esd16_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM                         // RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(esd16_state::esd16_sound_command_r)
+uint8_t esd16_state::esd16_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Clear IRQ only after reading the command, or some get lost */
 	m_audiocpu->set_input_line(0, CLEAR_LINE);

@@ -43,14 +43,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
-	DECLARE_READ8_MEMBER(cop01_sound_command_r);
-	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
-	DECLARE_READ8_MEMBER(cop01_sound_irq_ack_w);
-	DECLARE_READ8_MEMBER(kludge);
-	DECLARE_WRITE8_MEMBER(cop01_background_w);
-	DECLARE_WRITE8_MEMBER(cop01_foreground_w);
-	DECLARE_WRITE8_MEMBER(cop01_vreg_w);
+	void cop01_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop01_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cop01_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop01_sound_irq_ack_w(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kludge(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cop01_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cop01_foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cop01_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
 	void init_mightguy();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

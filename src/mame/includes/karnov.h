@@ -56,10 +56,10 @@ public:
 	int         m_coin_mask;
 	int         m_latch;
 
-	DECLARE_WRITE16_MEMBER(karnov_control_w);
-	DECLARE_READ16_MEMBER(karnov_control_r);
-	DECLARE_WRITE16_MEMBER(karnov_videoram_w);
-	DECLARE_WRITE16_MEMBER(karnov_playfield_swap_w);
+	void karnov_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t karnov_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void karnov_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void karnov_playfield_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_wndrplnt();
 	void init_karnov();
 	void init_karnovj();

@@ -114,7 +114,7 @@ void adc12138_device::device_reset()
     di_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::di_w )
+void adc12138_device::di_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_in = data & 1;
 }
@@ -212,7 +212,7 @@ void adc12138_device::convert(int channel, int bits16, int lsbfirst)
     cs_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::cs_w )
+void adc12138_device::cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -293,7 +293,7 @@ WRITE8_MEMBER( adc12138_device::cs_w )
     sclk_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::sclk_w )
+void adc12138_device::sclk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -313,7 +313,7 @@ WRITE8_MEMBER( adc12138_device::sclk_w )
     conv_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( adc12138_device::conv_w )
+void adc12138_device::conv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_end_conv = 1;
 }
@@ -322,7 +322,7 @@ WRITE8_MEMBER( adc12138_device::conv_w )
     do_r
 -------------------------------------------------*/
 
-READ8_MEMBER( adc12138_device::do_r )
+uint8_t adc12138_device::do_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("ADC: DO\n");
 	return m_data_out;
@@ -332,7 +332,7 @@ READ8_MEMBER( adc12138_device::do_r )
     eoc_r
 -------------------------------------------------*/
 
-READ8_MEMBER( adc12138_device::eoc_r )
+uint8_t adc12138_device::eoc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_end_conv;
 }

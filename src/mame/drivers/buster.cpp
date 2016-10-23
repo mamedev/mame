@@ -60,7 +60,7 @@ uint32_t buster_state::screen_update_buster(screen_device &screen, bitmap_ind16 
 }
 
 #if 0
-READ8_MEMBER(buster_state::test_r)
+uint8_t buster_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

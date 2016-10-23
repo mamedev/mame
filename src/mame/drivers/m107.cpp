@@ -104,7 +104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 
 /*****************************************************************************/
 
-WRITE16_MEMBER(m107_state::coincounter_w)
+void m107_state::coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -113,7 +113,7 @@ WRITE16_MEMBER(m107_state::coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m107_state::bankswitch_w)
+void m107_state::bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -123,36 +123,36 @@ WRITE16_MEMBER(m107_state::bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(m107_state::soundlatch_w)
+void m107_state::soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 	m_soundlatch->write(space, 0, data & 0xff);
 //      logerror("m_soundlatch->write %02x\n",data);
 }
 
-READ16_MEMBER(m107_state::sound_status_r)
+uint16_t m107_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sound_status;
 }
 
-READ16_MEMBER(m107_state::soundlatch_r)
+uint16_t m107_state::soundlatch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return m_soundlatch->read(space, offset) | 0xff00;
 }
 
-WRITE16_MEMBER(m107_state::sound_irq_ack_w)
+void m107_state::sound_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(m107_state::sound_status_w)
+void m107_state::sound_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sound_status);
 	M107_TRIGGER_IRQ3
 }
 
-WRITE16_MEMBER(m107_state::sound_reset_w)
+void m107_state::sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
-WRITE16_MEMBER(m107_state::wpksoc_output_w)
+void m107_state::wpksoc_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	x--- ---- ?

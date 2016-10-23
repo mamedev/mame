@@ -482,7 +482,7 @@ void suna8_state::init_sparkman()
                                 Hard Head
 ***************************************************************************/
 
-READ8_MEMBER(suna8_state::hardhead_protection_r)
+uint8_t suna8_state::hardhead_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t protection_val = m_protection_val;
 
@@ -495,7 +495,7 @@ READ8_MEMBER(suna8_state::hardhead_protection_r)
 				(((offset ^ protection_val) & 0x01) ?   0x84 : 0);
 }
 
-WRITE8_MEMBER(suna8_state::hardhead_protection_w)
+void suna8_state::hardhead_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)    m_protection_val = data;
 	else                m_protection_val = offset & 1;
@@ -514,7 +514,7 @@ WRITE8_MEMBER(suna8_state::hardhead_protection_w)
                                 Hard Head
 ***************************************************************************/
 
-READ8_MEMBER(suna8_state::hardhead_ip_r)
+uint8_t suna8_state::hardhead_ip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (*m_hardhead_ip)
 	{
@@ -533,7 +533,7 @@ READ8_MEMBER(suna8_state::hardhead_ip_r)
     ---4 ----
     ---- 3210   ROM Bank
 */
-WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
+void suna8_state::hardhead_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x0f;
 
@@ -548,7 +548,7 @@ WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
     ---- -2--   Flip Screen
     ---- --10
 */
-WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
+void suna8_state::hardhead_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x04);
 	machine().bookkeeping().coin_lockout_w(0, data & 0x08);
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
     ---- 3---
     ---- -210   ROM Bank
 */
-WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
+void suna8_state::rranger_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))  bank += 4;
@@ -609,13 +609,13 @@ WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
     ---- --1-   1 -> Interlude screens
     ---- ---0
 */
-READ8_MEMBER(suna8_state::rranger_soundstatus_r)
+uint8_t suna8_state::rranger_soundstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch2->read(space, offset);
 	return 0x02;
 }
 
-WRITE8_MEMBER(suna8_state::sranger_prot_w)
+void suna8_state::sranger_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
 	   estabilish if what I'm doing can be considered or not a kludge... -AS */
@@ -656,7 +656,7 @@ ADDRESS_MAP_END
          ---- --1-
          ---- ---0   Use Cheat 1 and 2 (driver config)
 */
-READ8_MEMBER(suna8_state::brickzn_cheats_r)
+uint8_t suna8_state::brickzn_cheats_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint8_t bit2 = 0;
 	bit2 = 1 - bit2;    // see code at 2b48
@@ -671,7 +671,7 @@ READ8_MEMBER(suna8_state::brickzn_cheats_r)
          ---- --1-   Sprite RAM Bank
          ---- ---0   Flip Screen
 */
-WRITE8_MEMBER(suna8_state::brickzn_sprbank_w)
+void suna8_state::brickzn_sprbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_protection_val = data;
 
@@ -687,7 +687,7 @@ WRITE8_MEMBER(suna8_state::brickzn_sprbank_w)
   C060:  7654 ----
          ---- 3210   ROM Bank
 */
-WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
+void suna8_state::brickzn_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x0f;
 
@@ -707,7 +707,7 @@ WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
          ---- --1-   Start 2 Led
          ---- ---0   Start 1 Led
 */
-WRITE8_MEMBER(suna8_state::brickzn_leds_w)
+void suna8_state::brickzn_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x01);
 	output().set_led_value(1, data & 0x02);
@@ -721,7 +721,7 @@ WRITE8_MEMBER(suna8_state::brickzn_leds_w)
   C0A0:  7654 321-
          ---- ---0   Palette RAM Bank
 */
-WRITE8_MEMBER(suna8_state::brickzn_palbank_w)
+void suna8_state::brickzn_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palettebank = data & 0x01;
 
@@ -763,7 +763,7 @@ ADDRESS_MAP_END
 
   C0A0:  Leds
 */
-WRITE8_MEMBER(suna8_state::brickzn_multi_w)
+void suna8_state::brickzn_multi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int protselect = m_protection_val & 0xfc;
 
@@ -826,7 +826,7 @@ WRITE8_MEMBER(suna8_state::brickzn_multi_w)
   (newer sets only)
   C0C0: two protection values written in rapid succession
 */
-WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
+void suna8_state::brickzn_prot2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Disable work RAM write, see code at 96a:
 	if ((m_prot2 ^ data) == 0x24)
@@ -848,11 +848,11 @@ WRITE8_MEMBER(suna8_state::brickzn_prot2_w)
 }
 
 // (newer sets only) Disable palette RAM writes, see code at 4990:
-WRITE8_MEMBER(suna8_state::brickzn_enab_palram_w)
+void suna8_state::brickzn_enab_palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram_enab = 1;
 }
-WRITE8_MEMBER(suna8_state::brickzn_disab_palram_w)
+void suna8_state::brickzn_disab_palram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram_enab = 0;
 }
@@ -901,7 +901,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* Probably wrong: */
-WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
+void suna8_state::hardhea2_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 0x01;
 //  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",space.device().safe_pc(),data);
@@ -911,13 +911,13 @@ WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
     7654 321-
     ---- ---0   Flip Screen
 */
-WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
+void suna8_state::hardhea2_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 	if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",space.device().safe_pc(),data);
 }
 
-WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
+void suna8_state::hardhea2_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x01);
 	output().set_led_value(1, data & 0x02);
@@ -930,7 +930,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
     ---- --1-   Sprite RAM Bank
     ---- ---0   Sprite RAM Bank?
 */
-WRITE8_MEMBER(suna8_state::hardhea2_spritebank_w)
+void suna8_state::hardhea2_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = (data >> 1) & 1;
 	if (data & ~0x02)   logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",space.device().safe_pc(),data);
@@ -940,7 +940,7 @@ WRITE8_MEMBER(suna8_state::hardhea2_spritebank_w)
     7654 ----
     ---- 3210   ROM Bank
 */
-WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
+void suna8_state::hardhea2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x0f;
 
@@ -951,21 +951,21 @@ WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 	m_rombank = data;
 }
 
-WRITE8_MEMBER(suna8_state::hardhea2_spritebank_0_w)
+void suna8_state::hardhea2_spritebank_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = 0;
 }
-WRITE8_MEMBER(suna8_state::hardhea2_spritebank_1_w)
+void suna8_state::hardhea2_spritebank_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = 1;
 }
 
-WRITE8_MEMBER(suna8_state::hardhea2_rambank_0_w)
+void suna8_state::hardhea2_rambank_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(0);
 }
 
-WRITE8_MEMBER(suna8_state::hardhea2_rambank_1_w)
+void suna8_state::hardhea2_rambank_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(1);
 }
@@ -1022,7 +1022,7 @@ ADDRESS_MAP_END
               ---4 ----
               ---- 3210   ROM Bank (Latched)
 */
-WRITE8_MEMBER(suna8_state::starfigh_rombank_latch_w)
+void suna8_state::starfigh_rombank_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU #0 - PC %04X: rom bank latch %04X = %02X\n",space.device().safe_pc(), 0xc280 + offset, data);
 	m_rombank_latch = data;
@@ -1031,7 +1031,7 @@ WRITE8_MEMBER(suna8_state::starfigh_rombank_latch_w)
 /*
   C500:  Sound Latch
 */
-WRITE8_MEMBER(suna8_state::starfigh_sound_latch_w)
+void suna8_state::starfigh_sound_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( !(m_rombank_latch & 0x20) )
 		m_soundlatch->write(space, 0, data);
@@ -1040,7 +1040,7 @@ WRITE8_MEMBER(suna8_state::starfigh_sound_latch_w)
 /*
   C080:
 */
-READ8_MEMBER(suna8_state::starfigh_cheats_r)
+uint8_t suna8_state::starfigh_cheats_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("CHEATS")->read();
 }
@@ -1048,7 +1048,7 @@ READ8_MEMBER(suna8_state::starfigh_cheats_r)
 /*
   C380-C3FF:
 */
-WRITE8_MEMBER(suna8_state::starfigh_spritebank_latch_w)
+void suna8_state::starfigh_spritebank_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 1 = disable RAM writes. See code at 2696, 4e8f
 	m_spritebank_latch  =   (data >> 2) & 1;
@@ -1059,7 +1059,7 @@ WRITE8_MEMBER(suna8_state::starfigh_spritebank_latch_w)
 /*
   C200:
 */
-WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
+void suna8_state::starfigh_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = m_spritebank_latch;
 }
@@ -1073,7 +1073,7 @@ WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
 
   Writes to C400 also set ROM bank from latch
 */
-WRITE8_MEMBER(suna8_state::starfigh_leds_w)
+void suna8_state::starfigh_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,     data & 0x01);
 	output().set_led_value(1,     data & 0x02);
@@ -1125,7 +1125,7 @@ ADDRESS_MAP_END
           ------1-   Sprite RAM Bank (Inverted by Sprite Bank Latch)
           -------0   Sprite "chip"   ""
 */
-WRITE8_MEMBER(suna8_state::sparkman_spritebank_w)
+void suna8_state::sparkman_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = ((data >> 1) & 0x01) | ((data << 1) & 0x02);
 	if ((m_spritebank_latch >> 1) & 0x01)
@@ -1140,7 +1140,7 @@ WRITE8_MEMBER(suna8_state::sparkman_spritebank_w)
            ---4 ----
            ---- 3210   ROM Bank (Latched)
 */
-WRITE8_MEMBER(suna8_state::sparkman_rombank_latch_w)
+void suna8_state::sparkman_rombank_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank_latch = data;
 	logerror("CPU #0 - PC %04X: rom bank latch %04X = %02X\n",space.device().safe_pc(), 0xc280 + offset, data);
@@ -1153,7 +1153,7 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_latch_w)
           ---- 321-
           ---- ---0   Flip Screen
 */
-WRITE8_MEMBER(suna8_state::sparkman_spritebank_latch_w)
+void suna8_state::sparkman_spritebank_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 	m_spritebank_latch  =   (data >> 4) & 0x03;
@@ -1166,7 +1166,7 @@ WRITE8_MEMBER(suna8_state::sparkman_spritebank_latch_w)
           ---4321-
           -------0   Work RAM Writes Disable
 */
-WRITE8_MEMBER(suna8_state::sparkman_write_disable_w)
+void suna8_state::sparkman_write_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_write_disable     =   (data >> 0) & 1;    // bit 0 = disable RAM writes. See code at b48, d4d
 	m_nmi_enable        =   (data >> 5) & 1;    // see code at 66
@@ -1174,7 +1174,7 @@ WRITE8_MEMBER(suna8_state::sparkman_write_disable_w)
 }
 
 // RAM writes can be disabled
-WRITE8_MEMBER(suna8_state::suna8_wram_w)
+void suna8_state::suna8_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_write_disable)
 		m_wram[offset] = data;
@@ -1187,7 +1187,7 @@ WRITE8_MEMBER(suna8_state::suna8_wram_w)
 
   Writes to C400 also set ROM bank from latch
 */
-WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
+void suna8_state::sparkman_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,     data & 0x01);
 	output().set_led_value(1,     data & 0x02);
@@ -1208,13 +1208,13 @@ WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
     C480: 7654321-
           -------0   Coin Counter
 */
-WRITE8_MEMBER(suna8_state::sparkman_coin_counter_w)
+void suna8_state::sparkman_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 // To do: implement this, affects the duration of copyright screen
-READ8_MEMBER(suna8_state::sparkman_c0a3_r)
+uint8_t suna8_state::sparkman_c0a3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_screen->frame_number() & 1) ? 0x80 : 0;
 }

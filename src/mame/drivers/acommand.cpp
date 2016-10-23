@@ -88,13 +88,13 @@ public:
 	uint16_t m_led1;
 	uint16_t m_ufo_sw1;
 	uint16_t m_ufo_sw2;
-	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
-	DECLARE_WRITE16_MEMBER(ac_txvram_w);
-	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
-	DECLARE_WRITE16_MEMBER(ac_txscroll_w);
-	DECLARE_READ16_MEMBER(ac_devices_r);
-	DECLARE_WRITE16_MEMBER(ac_devices_w);
-	DECLARE_WRITE16_MEMBER(ac_unk2_w);
+	void ac_bgvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ac_txvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ac_bgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ac_txscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ac_devices_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ac_devices_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ac_unk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
@@ -280,19 +280,19 @@ uint32_t acommand_state::screen_update_acommand(screen_device &screen, bitmap_in
 }
 
 
-WRITE16_MEMBER(acommand_state::ac_bgvram_w)
+void acommand_state::ac_bgvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ac_bgvram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(acommand_state::ac_txvram_w)
+void acommand_state::ac_txvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ac_txvram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(acommand_state::ac_bgscroll_w)
+void acommand_state::ac_bgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -302,7 +302,7 @@ WRITE16_MEMBER(acommand_state::ac_bgscroll_w)
 	}
 }
 
-WRITE16_MEMBER(acommand_state::ac_txscroll_w)
+void acommand_state::ac_txscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -315,7 +315,7 @@ WRITE16_MEMBER(acommand_state::ac_txscroll_w)
 /******************************************************************************************/
 
 
-READ16_MEMBER(acommand_state::ac_devices_r)
+uint16_t acommand_state::ac_devices_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("(PC=%06x) read at %04x\n",space.device().safe_pc(),offset*2);
 
@@ -410,7 +410,7 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 	return m_ac_devram[offset];
 }
 
-WRITE16_MEMBER(acommand_state::ac_devices_w)
+void acommand_state::ac_devices_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ac_devram[offset]);
 	switch(offset)
@@ -457,7 +457,7 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 }
 
 /*This is always zero ATM*/
-WRITE16_MEMBER(acommand_state::ac_unk2_w)
+void acommand_state::ac_unk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(data)
 		popmessage("UNK-2 enabled %04x",data);

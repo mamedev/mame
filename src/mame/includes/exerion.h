@@ -57,14 +57,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(exerion_protection_r);
-	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
-	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
-	DECLARE_READ8_MEMBER(exerion_video_timing_r);
+	uint8_t exerion_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exerion_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exerion_video_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exerion_video_timing_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ8_MEMBER(exerion_porta_r);
-	DECLARE_WRITE8_MEMBER(exerion_portb_w);
+	uint8_t exerion_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exerion_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_exerion();
 	void init_exerionb();
 	virtual void machine_start() override;

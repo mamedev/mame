@@ -57,7 +57,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 	return m_coin_word[num];
 }
 
-READ32_MEMBER(taito_f3_state::f3_control_r)
+uint32_t taito_f3_state::f3_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset<6)
 		return m_input[offset]->read();
@@ -66,7 +66,7 @@ READ32_MEMBER(taito_f3_state::f3_control_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_control_w)
+void taito_f3_state::f3_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -106,17 +106,17 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",space.device().safe_pc(),offset,data);
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)
+void taito_f3_state::f3_sound_reset_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
+void taito_f3_state::f3_sound_reset_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
+void taito_f3_state::f3_sound_bankswitch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_f3_game==KIRAMEKI) {
 		uint16_t *rom = (uint16_t *)memregion("taito_en:audiocpu")->base();
@@ -138,7 +138,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 	}
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_unk_w)
+void taito_f3_state::f3_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	Several games writes a value here at POST, dunno what kind of config this is ...
@@ -3982,11 +3982,11 @@ void taito_f3_state::init_bubsymph()
 }
 
 
-READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
+uint32_t taito_f3_state::bubsympb_oki_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_oki->read(space,0);
 }
-WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
+void taito_f3_state::bubsympb_oki_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
 	if (ACCESSING_BITS_0_7) m_oki->write(space, 0,data&0xff);

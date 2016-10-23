@@ -196,7 +196,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 	return 0;
 }
 
-WRITE16_MEMBER(ssv_state::irq_ack_w)
+void ssv_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int level = ((offset * 2) & 0x70) >> 4;
 
@@ -223,7 +223,7 @@ WRITE16_MEMBER(ssv_state::irq_ack_w)
     ultrax:     40,00 at the start then 42,4a
     twineag2:   40,00 at the start then 42,4a
 */
-WRITE16_MEMBER(ssv_state::irq_enable_w)
+void ssv_state::irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_irq_enable);
 }
@@ -286,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
     survarts:   83
     sxyreact:   80
 */
-WRITE16_MEMBER(ssv_state::lockout_w)
+void ssv_state::lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -301,7 +301,7 @@ WRITE16_MEMBER(ssv_state::lockout_w)
 }
 
 /* Same as above but with inverted lockout lines */
-WRITE16_MEMBER(ssv_state::lockout_inv_w)
+void ssv_state::lockout_inv_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
@@ -337,17 +337,17 @@ static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, ssv_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
-READ16_MEMBER(ssv_state::dsp_dr_r)
+uint16_t ssv_state::dsp_dr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp->snesdsp_read(true);
 }
 
-WRITE16_MEMBER(ssv_state::dsp_dr_w)
+void ssv_state::dsp_dr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp->snesdsp_write(true, data);
 }
 
-READ16_MEMBER(ssv_state::dsp_r)
+uint16_t ssv_state::dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 	uint16_t res;
@@ -364,7 +364,7 @@ READ16_MEMBER(ssv_state::dsp_r)
 	return res;
 }
 
-WRITE16_MEMBER(ssv_state::dsp_w)
+void ssv_state::dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t temp = m_dsp->dataram_r(offset/2);
 
@@ -391,7 +391,7 @@ WRITE16_MEMBER(ssv_state::dsp_w)
 ***************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
+uint16_t ssv_state::fake_r(address_space &space, offs_t offset, uint16_t mem_mask){   return ssv_scroll[offset];  }
 #endif
 
 #define SSV_MAP( _ROM  )                                                                                            \
@@ -419,7 +419,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
                                 Drift Out '94
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::drifto94_unknown_r)
+uint16_t ssv_state::drifto94_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand() & 0xffff;
 }
@@ -442,12 +442,12 @@ ADDRESS_MAP_END
                      Mobil Suit Gundam Final Shooting
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::gdfs_eeprom_r)
+uint16_t ssv_state::gdfs_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ m_io_gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->do_read() << 8);
 }
 
-WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
+void ssv_state::gdfs_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x7b00)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
@@ -500,7 +500,7 @@ ADDRESS_MAP_END
     rom-board, AFAIK)
 */
 
-READ16_MEMBER(ssv_state::hypreact_input_r)
+uint16_t ssv_state::hypreact_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -589,12 +589,12 @@ ADDRESS_MAP_END
 
 /* Monster Slider needs the RAM mirrored for the gameplay logic to work correctly */
 
-READ16_MEMBER(ssv_state::mainram_r)
+uint16_t ssv_state::mainram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mainram[offset];
 }
 
-WRITE16_MEMBER(ssv_state::mainram_w)
+void ssv_state::mainram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mainram[offset]);
 }
@@ -623,7 +623,7 @@ ADDRESS_MAP_END
                             Super Real Mahjong PIV
 ***************************************************************************/
 
-READ16_MEMBER(ssv_state::srmp4_input_r)
+uint16_t ssv_state::srmp4_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -653,12 +653,12 @@ ADDRESS_MAP_END
     Interrupts aren't supported by the chip emulator yet
     (lev 5 in this case, I guess)
 */
-READ16_MEMBER(ssv_state::srmp7_irqv_r)
+uint16_t ssv_state::srmp7_irqv_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0080;
 }
 
-WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
+void ssv_state::srmp7_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -670,7 +670,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 //  popmessage("%04X",data);
 }
 
-READ16_MEMBER(ssv_state::srmp7_input_r)
+uint16_t ssv_state::srmp7_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t input_sel = *m_input_sel;
 
@@ -718,18 +718,18 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
+uint16_t ssv_state::sxyreact_ballswitch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_io_service.read_safe(0);
 }
 
-READ16_MEMBER(ssv_state::sxyreact_dial_r)
+uint16_t ssv_state::sxyreact_dial_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_sxyreact_serial >> 1) & 0x80);
 }
 
 
-WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
+void ssv_state::sxyreact_dial_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -743,7 +743,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 	}
 }
 
-WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
+void ssv_state::sxyreact_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
@@ -795,14 +795,14 @@ ADDRESS_MAP_END
 
 /* from st0016.c */
 
-READ32_MEMBER(ssv_state::latch32_r)
+uint32_t ssv_state::latch32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]&=~2;
 	return m_latches[offset];
 }
 
-WRITE32_MEMBER(ssv_state::latch32_w)
+void ssv_state::latch32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]|=1;
@@ -810,14 +810,14 @@ WRITE32_MEMBER(ssv_state::latch32_w)
 	machine().scheduler().synchronize();
 }
 
-READ16_MEMBER(ssv_state::latch16_r)
+uint16_t ssv_state::latch16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]&=~1;
 	return m_latches[offset];
 }
 
-WRITE16_MEMBER(ssv_state::latch16_w)
+void ssv_state::latch16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!offset)
 		m_latches[2]|=2;
@@ -847,7 +847,7 @@ ADDRESS_MAP_END
   Eagle Shot Golf
 ***************************************************************************/
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
+void ssv_state::eaglshot_gfxrom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -855,7 +855,7 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
 	}
 }
 
-READ16_MEMBER(ssv_state::eaglshot_trackball_r)
+uint16_t ssv_state::eaglshot_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_trackball_select)
 	{
@@ -868,7 +868,7 @@ READ16_MEMBER(ssv_state::eaglshot_trackball_r)
 	return 0;
 }
 
-WRITE16_MEMBER(ssv_state::eaglshot_trackball_w)
+void ssv_state::eaglshot_trackball_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -878,12 +878,12 @@ WRITE16_MEMBER(ssv_state::eaglshot_trackball_w)
 
 
 
-READ16_MEMBER(ssv_state::eaglshot_gfxram_r)
+uint16_t ssv_state::eaglshot_gfxram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_eaglshot_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
 }
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
+void ssv_state::eaglshot_gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset += (m_scroll[0x76/2] & 0xf) * 0x40000/2;
 	COMBINE_DATA(&m_eaglshot_gfxram[offset]);

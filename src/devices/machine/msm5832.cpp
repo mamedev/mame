@@ -161,7 +161,7 @@ void msm5832_device::rtc_clock_updated(int year, int month, int day, int day_of_
 //  data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( msm5832_device::data_r )
+uint8_t msm5832_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -192,7 +192,7 @@ READ8_MEMBER( msm5832_device::data_r )
 //  data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm5832_device::data_w )
+void msm5832_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("MSM5832 Register Write %01x: %01x\n", m_address, data & 0x0f);
 

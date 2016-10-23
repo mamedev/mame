@@ -17,14 +17,14 @@ public:
 
 	DECLARE_ADDRESS_MAP(registers, 8);
 
-	DECLARE_READ8_MEMBER(adrh_r);
-	DECLARE_WRITE8_MEMBER(adrh_w);
-	DECLARE_READ8_MEMBER(adrl_r);
-	DECLARE_WRITE8_MEMBER(adrl_w);
-	DECLARE_READ8_MEMBER(val1_r);
-	DECLARE_WRITE8_MEMBER(val1_w);
-	DECLARE_READ8_MEMBER(val2_r);
-	DECLARE_WRITE8_MEMBER(val2_w);
+	uint8_t adrh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adrh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t val1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void val1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t val2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void val2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	uint16_t adr;

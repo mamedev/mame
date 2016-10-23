@@ -47,7 +47,7 @@ void meadows_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_videoram_w)
+void meadows_state::meadows_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -62,7 +62,7 @@ WRITE8_MEMBER(meadows_state::meadows_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
+void meadows_state::meadows_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());

@@ -89,12 +89,12 @@ Preliminary COP MCU memory map
 
 /*****************************************************************************/
 
-READ16_MEMBER(legionna_state::sound_comms_r)
+uint16_t legionna_state::sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
-READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
+uint16_t legionna_state::denjinmk_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Routine at 5FDC spins indefinitely until the lowest bit becomes 1
 	if (offset == 10) // ($100714)
@@ -103,7 +103,7 @@ READ16_MEMBER(legionna_state::denjinmk_sound_comms_r)
 	return m_seibu_sound->main_word_r(space,(offset >> 1) & 7,0xffff);
 }
 
-WRITE16_MEMBER(legionna_state::sound_comms_w)
+void legionna_state::sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space,(offset >> 1) & 7,data,0x00ff);
 }

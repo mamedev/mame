@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER( fd2000_device::via_pa_r )
+uint8_t fd2000_device::via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -133,7 +133,7 @@ READ8_MEMBER( fd2000_device::via_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( fd2000_device::via_pa_w )
+void fd2000_device::via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -151,7 +151,7 @@ WRITE8_MEMBER( fd2000_device::via_pa_w )
 	*/
 }
 
-READ8_MEMBER( fd2000_device::via_pb_r )
+uint8_t fd2000_device::via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -176,7 +176,7 @@ READ8_MEMBER( fd2000_device::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( fd2000_device::via_pb_w )
+void fd2000_device::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

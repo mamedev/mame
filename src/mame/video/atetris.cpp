@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(atetris_state::get_tile_info)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::videoram_w)
+void atetris_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 

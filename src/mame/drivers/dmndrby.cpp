@@ -82,9 +82,9 @@ public:
 	tilemap_t *m_racetrack_tilemap;
 	uint8_t m_io_port[8];
 	int m_bg;
-	DECLARE_WRITE8_MEMBER(dderby_sound_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	void dderby_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_dmndrby_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(dmndrby);
@@ -99,14 +99,14 @@ public:
 };
 
 
-WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
+void dmndrby_state::dderby_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
-READ8_MEMBER(dmndrby_state::input_r)
+uint8_t dmndrby_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 7)
 	{
@@ -123,7 +123,7 @@ READ8_MEMBER(dmndrby_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dmndrby_state::output_w)
+void dmndrby_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	---- x--- refill meter [4]

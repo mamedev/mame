@@ -45,10 +45,10 @@ public:
 	{
 	}
 
-	DECLARE_READ32_MEMBER(hpc_r);
-	DECLARE_WRITE32_MEMBER(hpc_w);
-	DECLARE_READ32_MEMBER(int_r);
-	DECLARE_WRITE32_MEMBER(int_w);
+	uint32_t hpc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void hpc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t int_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 
 	virtual void machine_start() override;
@@ -126,7 +126,7 @@ uint32_t indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 #define RTC_SECOND      m_rtc.nRAM[0x06]
 #define RTC_HUNDREDTH   m_rtc.nRAM[0x05]
 
-READ32_MEMBER(indigo_state::hpc_r)
+uint32_t indigo_state::hpc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
@@ -238,7 +238,7 @@ READ32_MEMBER(indigo_state::hpc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(indigo_state::hpc_w)
+void indigo_state::hpc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
@@ -447,13 +447,13 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 }
 
 // INT/INT2/INT3 interrupt controllers
-READ32_MEMBER(indigo_state::int_r)
+uint32_t indigo_state::int_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	osd_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 	return 0;
 }
 
-WRITE32_MEMBER(indigo_state::int_w)
+void indigo_state::int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 }

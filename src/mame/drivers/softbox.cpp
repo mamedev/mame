@@ -106,7 +106,7 @@
 //  dbrg_w - baud rate selection
 //-------------------------------------------------
 
-WRITE8_MEMBER( softbox_state::dbrg_w )
+void softbox_state::dbrg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
@@ -177,12 +177,12 @@ INPUT_PORTS_END
 //  I8255A 0 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi0_pa_r )
+uint8_t softbox_state::ppi0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ieee->dio_r() ^ 0xff;
 }
 
-WRITE8_MEMBER( softbox_state::ppi0_pb_w )
+void softbox_state::ppi0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ieee->dio_w(data ^ 0xff);
 }
@@ -191,7 +191,7 @@ WRITE8_MEMBER( softbox_state::ppi0_pb_w )
 //  I8255A 1 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( softbox_state::ppi1_pa_r )
+uint8_t softbox_state::ppi1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -222,7 +222,7 @@ READ8_MEMBER( softbox_state::ppi1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pb_w )
+void softbox_state::ppi1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -249,7 +249,7 @@ WRITE8_MEMBER( softbox_state::ppi1_pb_w )
 	m_ieee->ifc_w(!BIT(data, 7));
 }
 
-READ8_MEMBER( softbox_state::ppi1_pc_r )
+uint8_t softbox_state::ppi1_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -275,7 +275,7 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 	return data;
 }
 
-WRITE8_MEMBER( softbox_state::ppi1_pc_w )
+void softbox_state::ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

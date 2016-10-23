@@ -79,29 +79,29 @@ machine_config_constructor pc_lpt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( pc_lpt  );
 }
 
-READ8_MEMBER( pc_lpt_device::data_r )
+uint8_t pc_lpt_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// pull up mechanism for input lines, zeros are provided by peripheral
 	return m_data & m_cent_data_in->read();
 }
 
-WRITE8_MEMBER( pc_lpt_device::data_w )
+void pc_lpt_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data = data;
 	m_cent_data_out->write(m_data);
 }
 
-READ8_MEMBER( pc_lpt_device::status_r )
+uint8_t pc_lpt_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cent_status_in->read() ^ STATUS_BUSY;
 }
 
-READ8_MEMBER( pc_lpt_device::control_r )
+uint8_t pc_lpt_device::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ~((m_control & m_cent_ctrl_in->read() & 0x3f) ^ CONTROL_INIT);
 }
 
-WRITE8_MEMBER( pc_lpt_device::control_w )
+void pc_lpt_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  logerror("pc_lpt_control_w: 0x%02x\n", data);
 
@@ -109,7 +109,7 @@ WRITE8_MEMBER( pc_lpt_device::control_w )
 	m_cent_ctrl_out->write(m_control);
 }
 
-READ8_MEMBER( pc_lpt_device::read )
+uint8_t pc_lpt_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -124,7 +124,7 @@ READ8_MEMBER( pc_lpt_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc_lpt_device::write )
+void pc_lpt_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

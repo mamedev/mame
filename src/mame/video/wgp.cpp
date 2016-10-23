@@ -119,12 +119,12 @@ custom chip capable of four rather than three tilemaps.)
 
 *******************************************************************/
 
-READ16_MEMBER(wgp_state::wgp_pivram_word_r)
+uint16_t wgp_state::wgp_pivram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pivram[offset];
 }
 
-WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
+void wgp_state::wgp_pivram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pivram[offset]);
 
@@ -142,12 +142,12 @@ WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
 	}
 }
 
-READ16_MEMBER(wgp_state::wgp_piv_ctrl_word_r)
+uint16_t wgp_state::wgp_piv_ctrl_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_piv_ctrlram[offset];
 }
 
-WRITE16_MEMBER(wgp_state::wgp_piv_ctrl_word_w)
+void wgp_state::wgp_piv_ctrl_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t a, b;
 

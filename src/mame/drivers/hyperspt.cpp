@@ -24,12 +24,12 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
+void hyperspt_state::hyperspt_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(hyperspt_state::irq_mask_w)
+void hyperspt_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

@@ -59,41 +59,41 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(invalid_r);
-	DECLARE_WRITE16_MEMBER(invalid_w);
-	DECLARE_READ16_MEMBER(memmap_r);
-	DECLARE_WRITE16_MEMBER(memmap_w);
-	DECLARE_WRITE16_MEMBER(parallel_led_w);
-	DECLARE_WRITE8_MEMBER(via_a_w);
-	DECLARE_WRITE8_MEMBER(via_b_w);
-	DECLARE_READ8_MEMBER(video_r);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(video_dma_r);
-	DECLARE_WRITE8_MEMBER(video_dma_w);
-	DECLARE_READ8_MEMBER(video_uart0_r);
-	DECLARE_WRITE8_MEMBER(video_uart0_w);
-	DECLARE_READ8_MEMBER(video_uart1_r);
-	DECLARE_WRITE8_MEMBER(video_uart1_w);
-	DECLARE_READ8_MEMBER(videosram_r);
-	DECLARE_WRITE8_MEMBER(videosram_w);
-	DECLARE_WRITE8_MEMBER(videosram_store_w);
-	DECLARE_WRITE8_MEMBER(videosram_recall_w);
-	DECLARE_READ8_MEMBER(video_timer_r);
-	DECLARE_WRITE8_MEMBER(video_timer_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(video_ctrl_r);
-	DECLARE_WRITE8_MEMBER(video_ctrl_w);
-	DECLARE_READ8_MEMBER(video_status_r);
+	uint16_t invalid_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void invalid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t memmap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void memmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void parallel_led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_uart0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_uart0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_uart1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_uart1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videosram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videosram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videosram_store_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videosram_recall_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
 	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
-	DECLARE_READ8_MEMBER(hdc_r);
-	DECLARE_WRITE8_MEMBER(hdc_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_READ16_MEMBER(via_r);
-	DECLARE_WRITE16_MEMBER(via_w);
+	uint8_t hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t via_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
@@ -370,7 +370,7 @@ void wicat_state::send_key(uint8_t val)
 	m_kb_serial_timer->adjust(attotime::zero,0,attotime::from_hz(1200));
 }
 
-WRITE16_MEMBER( wicat_state::parallel_led_w )
+void wicat_state::parallel_led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 0 - parallel port A direction (0 = input)
 	// bit 1 - parallel port B direction (0 = input)
@@ -382,19 +382,19 @@ WRITE16_MEMBER( wicat_state::parallel_led_w )
 	output().set_value("led6",data & 0x8000);
 }
 
-WRITE8_MEMBER( wicat_state::via_a_w )
+void wicat_state::via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA = data;
 	logerror("VIA: write %02x to port A\n",data);
 }
 
-WRITE8_MEMBER( wicat_state::via_b_w )
+void wicat_state::via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portB = data;
 	logerror("VIA: write %02x to port B\n",data);
 }
 
-READ16_MEMBER( wicat_state::invalid_r )
+uint16_t wicat_state::invalid_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -405,7 +405,7 @@ READ16_MEMBER( wicat_state::invalid_r )
 	return 0xff;
 }
 
-WRITE16_MEMBER( wicat_state::invalid_w )
+void wicat_state::invalid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -416,20 +416,20 @@ WRITE16_MEMBER( wicat_state::invalid_w )
 }
 
 // TODO
-READ16_MEMBER(wicat_state::memmap_r)
+uint16_t wicat_state::memmap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	popmessage("Memory mapping register EFFC01 read!");
 	return 0xff;
 }
 
-WRITE16_MEMBER(wicat_state::memmap_w)
+void wicat_state::memmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	popmessage("Memory mapping register EFFC01 written!");
 }
 
 // WD1000 Winchester Disk controller (10MB 5 1/4" HD)
 // for now, we'll just try to tell the system there is no HD
-READ8_MEMBER(wicat_state::hdc_r)
+uint8_t wicat_state::hdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -441,7 +441,7 @@ READ8_MEMBER(wicat_state::hdc_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(wicat_state::hdc_w)
+void wicat_state::hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -487,7 +487,7 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 	}
 }
 
-READ8_MEMBER(wicat_state::fdc_r)
+uint8_t wicat_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -513,7 +513,7 @@ READ8_MEMBER(wicat_state::fdc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(wicat_state::fdc_w)
+void wicat_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("FDC: write offset %02x data %02x",offset,data);
 	switch(offset)
@@ -536,14 +536,14 @@ WRITE8_MEMBER(wicat_state::fdc_w)
 	}
 }
 
-READ16_MEMBER(wicat_state::via_r)
+uint16_t wicat_state::via_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		return m_via->read(space,offset);
 	return 0x00;
 }
 
-WRITE16_MEMBER(wicat_state::via_w)
+void wicat_state::via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		m_via->write(space,offset,data);
@@ -551,7 +551,7 @@ WRITE16_MEMBER(wicat_state::via_w)
 		m_via->write(space,offset,data>>8);
 }
 
-READ8_MEMBER(wicat_state::video_r)
+uint8_t wicat_state::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -564,7 +564,7 @@ READ8_MEMBER(wicat_state::video_r)
 	}
 }
 
-WRITE8_MEMBER(wicat_state::video_w)
+void wicat_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -577,53 +577,53 @@ WRITE8_MEMBER(wicat_state::video_w)
 	}
 }
 
-READ8_MEMBER( wicat_state::vram_r )
+uint8_t wicat_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videocpu->space(AS_IO).read_byte(offset*2);
 }
 
-WRITE8_MEMBER( wicat_state::vram_w )
+void wicat_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videocpu->space(AS_IO).write_byte(offset*2,data);
 }
 
-READ8_MEMBER(wicat_state::video_dma_r)
+uint8_t wicat_state::video_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videodma->read(space,offset/2);
 }
 
-WRITE8_MEMBER(wicat_state::video_dma_w)
+void wicat_state::video_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(offset & 0x01))
 		m_videodma->write(space,offset/2,data);
 }
 
-READ8_MEMBER(wicat_state::video_uart0_r)
+uint8_t wicat_state::video_uart0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t noff = offset >> 1;
 	return m_videouart0->read(space,noff);
 }
 
-WRITE8_MEMBER(wicat_state::video_uart0_w)
+void wicat_state::video_uart0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t noff = offset >> 1;
 	m_videouart0->write(space,noff,data);
 }
 
-READ8_MEMBER(wicat_state::video_uart1_r)
+uint8_t wicat_state::video_uart1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t noff = offset >> 1;
 	return m_videouart1->read(space,noff);
 }
 
-WRITE8_MEMBER(wicat_state::video_uart1_w)
+void wicat_state::video_uart1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t noff = offset >> 1;
 	m_videouart1->write(space,noff,data);
 }
 
 // XD2210 64 x 4bit NOVRAM
-READ8_MEMBER(wicat_state::videosram_r)
+uint8_t wicat_state::videosram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset & 0x01)
 		return 0xff;
@@ -631,13 +631,13 @@ READ8_MEMBER(wicat_state::videosram_r)
 		return m_videosram->read(space,offset/2);
 }
 
-WRITE8_MEMBER(wicat_state::videosram_w)
+void wicat_state::videosram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(offset & 0x01))
 		m_videosram->write(space,offset/2,data);
 }
 
-WRITE8_MEMBER(wicat_state::videosram_store_w)
+void wicat_state::videosram_store_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
 	{
@@ -647,7 +647,7 @@ WRITE8_MEMBER(wicat_state::videosram_store_w)
 	}
 }
 
-WRITE8_MEMBER(wicat_state::videosram_recall_w)
+void wicat_state::videosram_recall_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0x01)  // unsure of the actual bit checked, the terminal code just writes 0xff
 	{
@@ -657,7 +657,7 @@ WRITE8_MEMBER(wicat_state::videosram_recall_w)
 	}
 }
 
-READ8_MEMBER(wicat_state::video_timer_r)
+uint8_t wicat_state::video_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -681,25 +681,25 @@ READ8_MEMBER(wicat_state::video_timer_r)
 	return ret;
 }
 
-WRITE8_MEMBER(wicat_state::video_timer_w)
+void wicat_state::video_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("I/O port 0x%04x write %02x\n",offset,data);
 	if(offset == 0x02)
 		m_videouart->write(space,0,data);
 }
 
-READ8_MEMBER(wicat_state::video_ctrl_r)
+uint8_t wicat_state::video_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;  // TODO
 }
 
-WRITE8_MEMBER(wicat_state::video_ctrl_w)
+void wicat_state::video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0x07)
 		m_nmi_enable = data;
 }
 
-READ8_MEMBER(wicat_state::video_status_r)
+uint8_t wicat_state::video_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this port is read in the NVI IRQ routine, which if bit 2 is set, will unmask DMA channel 0.  But no idea what triggers it...
 	if(m_crtc_irq == ASSERT_LINE)

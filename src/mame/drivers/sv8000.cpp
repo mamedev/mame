@@ -51,19 +51,19 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
 
-	DECLARE_READ8_MEMBER( ay_port_a_r );
-	DECLARE_READ8_MEMBER( ay_port_b_r );
-	DECLARE_WRITE8_MEMBER( ay_port_a_w );
-	DECLARE_WRITE8_MEMBER( ay_port_b_w );
+	uint8_t ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( i8255_porta_r );
-	DECLARE_WRITE8_MEMBER( i8255_porta_w );
-	DECLARE_READ8_MEMBER( i8255_portb_r );
-	DECLARE_WRITE8_MEMBER( i8255_portb_w );
-	DECLARE_READ8_MEMBER( i8255_portc_r );
-	DECLARE_WRITE8_MEMBER( i8255_portc_w );
+	uint8_t i8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	virtual void machine_start() override;
@@ -211,20 +211,20 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_porta_r )
+uint8_t sv8000_state::i8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("i8255_porta_r\n");
 	return m_io_joy->read();
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_porta_w )
+void sv8000_state::i8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8255_porta_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portb_r )
+uint8_t sv8000_state::i8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -246,27 +246,27 @@ READ8_MEMBER( sv8000_state::i8255_portb_r )
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portb_w )
+void sv8000_state::i8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8255_portb_w: %02X\n", data);
 }
 
 
-READ8_MEMBER( sv8000_state::i8255_portc_r )
+uint8_t sv8000_state::i8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("i8255_portc_r\n");
 	return 0xff;
 }
 
 
-WRITE8_MEMBER( sv8000_state::i8255_portc_w )
+void sv8000_state::i8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8255_portc_w: %02X\n", data);
 	m_column = data;
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_a_r )
+uint8_t sv8000_state::ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -275,7 +275,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 }
 
 
-READ8_MEMBER( sv8000_state::ay_port_b_r )
+uint8_t sv8000_state::ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -312,7 +312,7 @@ READ8_MEMBER( sv8000_state::ay_port_b_r )
 // beamgala:
 // 0x5A 01011010 graphics 3KB in 6KB mode?
 //
-WRITE8_MEMBER( sv8000_state::ay_port_a_w )
+void sv8000_state::ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("ay_port_a_w: %02X\n", data);
 
@@ -333,12 +333,12 @@ WRITE8_MEMBER( sv8000_state::ay_port_a_w )
 }
 
 
-WRITE8_MEMBER( sv8000_state::ay_port_b_w )
+void sv8000_state::ay_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("ay_port_b_w: %02X\n", data);
 }
 
-READ8_MEMBER( sv8000_state::mc6847_videoram_r )
+uint8_t sv8000_state::mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 

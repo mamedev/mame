@@ -62,23 +62,23 @@ void smbus_device::device_reset()
 	notify_dhigh = 0x00;
 }
 
-READ8_MEMBER  (smbus_device::hst_sts_r)
+uint8_t smbus_device::hst_sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hst_sts;
 }
 
-WRITE8_MEMBER (smbus_device::hst_sts_w)
+void smbus_device::hst_sts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hst_sts &= ~data;
 	logerror("%s: hst_sts = %02x\n", tag(), hst_sts);
 }
 
-READ8_MEMBER  (smbus_device::hst_cnt_r)
+uint8_t smbus_device::hst_cnt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hst_cnt;
 }
 
-WRITE8_MEMBER (smbus_device::hst_cnt_w)
+void smbus_device::hst_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hst_cnt = data;
 	logerror("%s: hst_cnt = %02x\n", tag(), hst_cnt);
@@ -110,171 +110,171 @@ WRITE8_MEMBER (smbus_device::hst_cnt_w)
 	}
 }
 
-READ8_MEMBER  (smbus_device::hst_cmd_r)
+uint8_t smbus_device::hst_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hst_cmd;
 }
 
-WRITE8_MEMBER (smbus_device::hst_cmd_w)
+void smbus_device::hst_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hst_cmd = data;
 	logerror("%s: hst_cmd = %02x\n", tag(), hst_cmd);
 }
 
-READ8_MEMBER  (smbus_device::xmit_slva_r)
+uint8_t smbus_device::xmit_slva_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return xmit_slva;
 }
 
-WRITE8_MEMBER (smbus_device::xmit_slva_w)
+void smbus_device::xmit_slva_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	xmit_slva = data;
 	logerror("%s: xmit_slva = %02x\n", tag(), xmit_slva);
 }
 
-READ8_MEMBER  (smbus_device::hst_d0_r)
+uint8_t smbus_device::hst_d0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hst_d0;
 }
 
-WRITE8_MEMBER (smbus_device::hst_d0_w)
+void smbus_device::hst_d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hst_d0 = data;
 	logerror("%s: hst_d0 = %02x\n", tag(), hst_d0);
 }
 
-READ8_MEMBER  (smbus_device::hst_d1_r)
+uint8_t smbus_device::hst_d1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hst_d1;
 }
 
-WRITE8_MEMBER (smbus_device::hst_d1_w)
+void smbus_device::hst_d1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hst_d1 = data;
 	logerror("%s: hst_d1 = %02x\n", tag(), hst_d1);
 }
 
-READ8_MEMBER  (smbus_device::host_block_db_r)
+uint8_t smbus_device::host_block_db_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return host_block_db;
 }
 
-WRITE8_MEMBER (smbus_device::host_block_db_w)
+void smbus_device::host_block_db_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	host_block_db = data;
 	logerror("%s: host_block_db = %02x\n", tag(), host_block_db);
 }
 
-READ8_MEMBER  (smbus_device::pec_r)
+uint8_t smbus_device::pec_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pec;
 }
 
-WRITE8_MEMBER (smbus_device::pec_w)
+void smbus_device::pec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pec = data;
 	logerror("%s: pec = %02x\n", tag(), pec);
 }
 
-READ8_MEMBER  (smbus_device::rcv_slva_r)
+uint8_t smbus_device::rcv_slva_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return rcv_slva;
 }
 
-WRITE8_MEMBER (smbus_device::rcv_slva_w)
+void smbus_device::rcv_slva_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rcv_slva = data;
 	logerror("%s: rcv_slva = %02x\n", tag(), rcv_slva);
 }
 
-READ16_MEMBER (smbus_device::slv_data_r)
+uint16_t smbus_device::slv_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return slv_data;
 }
 
-WRITE16_MEMBER(smbus_device::slv_data_w)
+void smbus_device::slv_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	slv_data = data;
 	logerror("%s: slv_data = %02x\n", tag(), slv_data);
 }
 
-READ8_MEMBER  (smbus_device::aux_sts_r)
+uint8_t smbus_device::aux_sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return aux_sts;
 }
 
-WRITE8_MEMBER (smbus_device::aux_sts_w)
+void smbus_device::aux_sts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	aux_sts = data;
 	logerror("%s: aux_sts = %02x\n", tag(), aux_sts);
 }
 
-READ8_MEMBER  (smbus_device::aux_ctl_r)
+uint8_t smbus_device::aux_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return aux_ctl;
 }
 
-WRITE8_MEMBER (smbus_device::aux_ctl_w)
+void smbus_device::aux_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	aux_ctl = data;
 	logerror("%s: aux_ctl = %02x\n", tag(), aux_ctl);
 }
 
-READ8_MEMBER  (smbus_device::smlink_pin_ctl_r)
+uint8_t smbus_device::smlink_pin_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return smlink_pin_ctl;
 }
 
-WRITE8_MEMBER (smbus_device::smlink_pin_ctl_w)
+void smbus_device::smlink_pin_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	smlink_pin_ctl = data;
 	logerror("%s: smlink_pin_ctl = %02x\n", tag(), smlink_pin_ctl);
 }
 
-READ8_MEMBER  (smbus_device::smbus_pin_ctl_r)
+uint8_t smbus_device::smbus_pin_ctl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return smbus_pin_ctl;
 }
 
-WRITE8_MEMBER (smbus_device::smbus_pin_ctl_w)
+void smbus_device::smbus_pin_ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	smbus_pin_ctl = data;
 	logerror("%s: smbus_pin_ctl = %02x\n", tag(), smbus_pin_ctl);
 }
 
-READ8_MEMBER  (smbus_device::slv_sts_r)
+uint8_t smbus_device::slv_sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return slv_sts;
 }
 
-WRITE8_MEMBER (smbus_device::slv_sts_w)
+void smbus_device::slv_sts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	slv_sts = data;
 	logerror("%s: slv_sts = %02x\n", tag(), slv_sts);
 }
 
-READ8_MEMBER  (smbus_device::slv_cmd_r)
+uint8_t smbus_device::slv_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return slv_cmd;
 }
 
-WRITE8_MEMBER (smbus_device::slv_cmd_w)
+void smbus_device::slv_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	slv_cmd = data;
 	logerror("%s: slv_cmd = %02x\n", tag(), slv_cmd);
 }
 
-READ8_MEMBER  (smbus_device::notify_daddr_r)
+uint8_t smbus_device::notify_daddr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return notify_daddr;
 }
 
-READ8_MEMBER  (smbus_device::notify_dlow_r)
+uint8_t smbus_device::notify_dlow_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return notify_dlow;
 }
 
-READ8_MEMBER  (smbus_device::notify_dhigh_r)
+uint8_t smbus_device::notify_dhigh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return notify_dhigh;
 }

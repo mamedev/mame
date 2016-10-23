@@ -41,9 +41,9 @@ public:
 		, m_dart(*this, "dart")
 	{ }
 
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(port43_w);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port43_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	const uint8_t *m_p_chargen;
@@ -60,18 +60,18 @@ private:
 
 
 
-WRITE8_MEMBER( univac_state::port43_w )
+void univac_state::port43_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen_num = BIT(data, 0);
 }
 
-READ8_MEMBER( univac_state::vram_r )
+uint8_t univac_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offs_t offs = (offset & 0x1fff) ^ (BIT(offset, 13) ? 0x2000 : 0) ^ (m_screen_num ? 0x2000 : 0);
 	return m_p_videoram[offs];
 }
 
-WRITE8_MEMBER( univac_state::vram_w )
+void univac_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offs_t offs = (offset & 0x1fff) ^ (BIT(offset, 13) ? 0x2000 : 0) ^ (m_screen_num ? 0x2000 : 0);
 	m_p_videoram[offs] = data;

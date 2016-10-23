@@ -78,23 +78,23 @@ void taito_zoom_device::device_reset()
 
 ***************************************************************************/
 
-READ8_MEMBER(taito_zoom_device::shared_ram_r)
+uint8_t taito_zoom_device::shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_shared_ram[offset];
 }
 
-WRITE8_MEMBER(taito_zoom_device::shared_ram_w)
+void taito_zoom_device::shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_shared_ram[offset] = data;
 }
 
 
-READ8_MEMBER(taito_zoom_device::tms_ctrl_r)
+uint8_t taito_zoom_device::tms_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tms_ctrl;
 }
 
-WRITE8_MEMBER(taito_zoom_device::tms_ctrl_w)
+void taito_zoom_device::tms_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if 0
 	tms57002_reset_w(data & 4);
@@ -121,19 +121,19 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE16_MEMBER(taito_zoom_device::sound_irq_w)
+void taito_zoom_device::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, ASSERT_LINE);
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-READ16_MEMBER(taito_zoom_device::sound_irq_r)
+uint16_t taito_zoom_device::sound_irq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// reads this before writing irq, bit 0 = busy?
 	return 0;
 }
 
-WRITE16_MEMBER(taito_zoom_device::reg_data_w)
+void taito_zoom_device::reg_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (m_reg_address)
 	{
@@ -156,7 +156,7 @@ WRITE16_MEMBER(taito_zoom_device::reg_data_w)
 	}
 }
 
-WRITE16_MEMBER(taito_zoom_device::reg_address_w)
+void taito_zoom_device::reg_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_reg_address = data & 0xff;
 }

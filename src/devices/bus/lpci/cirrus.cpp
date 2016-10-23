@@ -157,7 +157,7 @@ void cirrus_device::pci_write(pci_bus_device *pcibus, int function, int offset, 
  *
  *************************************/
 
-WRITE8_MEMBER( cirrus_device::cirrus_42E8_w )
+void cirrus_device::cirrus_42E8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x80)
 		machine().device("vga")->reset();

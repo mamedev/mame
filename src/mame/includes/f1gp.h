@@ -77,19 +77,19 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch; // not f1gpb
 
-	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_READ16_MEMBER(command_pending_r);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
-	DECLARE_READ16_MEMBER(f1gp_zoomdata_r);
-	DECLARE_WRITE16_MEMBER(f1gp_zoomdata_w);
-	DECLARE_READ16_MEMBER(f1gp_rozvideoram_r);
-	DECLARE_WRITE16_MEMBER(f1gp_rozvideoram_w);
-	DECLARE_WRITE16_MEMBER(f1gp_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(f1gp_fgscroll_w);
-	DECLARE_WRITE16_MEMBER(f1gp_gfxctrl_w);
-	DECLARE_WRITE16_MEMBER(f1gp2_gfxctrl_w);
+	void f1gp_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t command_pending_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void f1gpb_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t f1gp_zoomdata_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void f1gp_zoomdata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t f1gp_rozvideoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void f1gp_rozvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void f1gp_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void f1gp_fgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void f1gp_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void f1gp2_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(f1gp_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(f1gp2_get_roz_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

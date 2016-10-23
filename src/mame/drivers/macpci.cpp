@@ -43,14 +43,14 @@
 #include "sound/cdda.h"
 #include "softlist.h"
 
-READ64_MEMBER( macpci_state::unk1_r )
+uint64_t macpci_state::unk1_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	m_unk1_test ^= 0x0400; //PC=ff808760
 
 	return m_unk1_test << 16;
 }
 
-READ64_MEMBER( macpci_state::unk2_r )
+uint64_t macpci_state::unk2_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_32_47)
 		return (uint64_t)0xe1 << 32; //PC=fff04810

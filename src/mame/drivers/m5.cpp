@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
 //  sts_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::sts_r )
+uint8_t m5_state::sts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -345,7 +345,7 @@ READ8_MEMBER( m5_state::sts_r )
 //  com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::com_w )
+void m5_state::com_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -382,7 +382,7 @@ WRITE8_MEMBER( m5_state::com_w )
 //  fd5_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::fd5_data_r )
+uint8_t m5_state::fd5_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ppi->pc6_w(0);
 
@@ -394,7 +394,7 @@ READ8_MEMBER( m5_state::fd5_data_r )
 //  fd5_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_data_w )
+void m5_state::fd5_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fd5_data = data;
 
@@ -406,7 +406,7 @@ WRITE8_MEMBER( m5_state::fd5_data_w )
 //  fd5_com_r -
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::fd5_com_r )
+uint8_t m5_state::fd5_com_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -431,7 +431,7 @@ READ8_MEMBER( m5_state::fd5_com_r )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_com_w )
+void m5_state::fd5_com_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -456,7 +456,7 @@ WRITE8_MEMBER( m5_state::fd5_com_w )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_ctrl_w )
+void m5_state::fd5_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -481,7 +481,7 @@ WRITE8_MEMBER( m5_state::fd5_ctrl_w )
 //  fd5_com_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( m5_state::fd5_tc_w )
+void m5_state::fd5_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->tc_w(true);
 	m_fdc->tc_w(false);
@@ -491,12 +491,12 @@ WRITE8_MEMBER( m5_state::fd5_tc_w )
 //  64KBI support for oldest memory module
 //**************************************************************************
 
-READ8_MEMBER( m5_state::mem64KBI_r ) //in 0x6c
+uint8_t m5_state::mem64KBI_r(address_space &space, offs_t offset, uint8_t mem_mask) //in 0x6c
 {
 	return BIT(m_ram_mode, 0);
 }
 
-WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
+void m5_state::mem64KBI_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) //out 0x6c
 {
 	if (m_ram_type != MEM64KBI) return;
 
@@ -537,7 +537,7 @@ WRITE8_MEMBER( m5_state::mem64KBI_w ) //out 0x6c
 //  64KBF paging
 //**************************************************************************
 
-WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
+void m5_state::mem64KBF_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) //out 0x30
 {
 	if (m_ram_type != MEM64KBF) return;
 
@@ -654,7 +654,7 @@ WRITE8_MEMBER( m5_state::mem64KBF_w ) //out 0x30
 //  64KRX paging
 //**************************************************************************
 
-WRITE8_MEMBER( m5_state::mem64KRX_w ) //out 0x7f
+void m5_state::mem64KRX_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) //out 0x7f
 {
 	if (m_ram_type != MEM64KRX) return;
 	if (m_ram_mode == data) return;
@@ -888,12 +888,12 @@ WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
 //  I8255 Interface
 //-------------------------------------------------
 
-READ8_MEMBER( m5_state::ppi_pa_r )
+uint8_t m5_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fd5_data;
 }
 
-READ8_MEMBER(m5_state::ppi_pc_r )
+uint8_t m5_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -920,12 +920,12 @@ READ8_MEMBER(m5_state::ppi_pc_r )
 	);
 }
 
-WRITE8_MEMBER( m5_state::ppi_pa_w )
+void m5_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fd5_data = data;
 }
 
-WRITE8_MEMBER( m5_state::ppi_pb_w )
+void m5_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -949,7 +949,7 @@ WRITE8_MEMBER( m5_state::ppi_pb_w )
 	}
 }
 
-WRITE8_MEMBER( m5_state::ppi_pc_w )
+void m5_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1059,13 +1059,13 @@ static ADDRESS_MAP_START( brno_io, AS_IO, 8, brno_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER( brno_state::mmu_r )
+uint8_t brno_state::mmu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 
-WRITE8_MEMBER( brno_state::mmu_w )
+void brno_state::mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ramcpu = m_maincpu->state_int(Z80_B);
 	m_rambank = ~data; //m_maincpu->state_int(Z80_A);
@@ -1097,13 +1097,13 @@ WRITE8_MEMBER( brno_state::mmu_w )
 
 }
 
-READ8_MEMBER( brno_state::ramsel_r )
+uint8_t brno_state::ramsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ramen;
 }
 
 
-WRITE8_MEMBER( brno_state::ramsel_w ) //out 6b
+void brno_state::ramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) //out 6b
 {
 	//address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -1115,12 +1115,12 @@ WRITE8_MEMBER( brno_state::ramsel_w ) //out 6b
 	logerror("CASEN change: out (&6b),%x\n",data);
 }
 
-READ8_MEMBER( brno_state::romsel_r )
+uint8_t brno_state::romsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_romen;
 }
 
-WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
+void brno_state::romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) //out 6c
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -1152,13 +1152,13 @@ WRITE8_MEMBER( brno_state::romsel_w ) //out 6c
 //  FD port 7c - Floppy select
 //-------------------------------------------------
 
-READ8_MEMBER( brno_state::fd_r )
+uint8_t brno_state::fd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 
-WRITE8_MEMBER( brno_state::fd_w )
+void brno_state::fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy;
 	m_floppy = nullptr;

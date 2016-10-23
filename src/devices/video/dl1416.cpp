@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER( dl1416_device::cu_w )
 }
 
 /* data */
-WRITE8_MEMBER( dl1416_device::data_w )
+void dl1416_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */

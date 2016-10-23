@@ -152,7 +152,7 @@ void pacman_state::acitya_decrypt_rom_B()
 }
 
 
-READ8_MEMBER(pacman_state::acitya_decrypt_rom )
+uint8_t pacman_state::acitya_decrypt_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 	{

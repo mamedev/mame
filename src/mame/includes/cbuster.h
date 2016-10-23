@@ -53,8 +53,8 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(twocrude_control_w);
-	DECLARE_READ16_MEMBER(twocrude_control_r);
+	void twocrude_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t twocrude_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_twocrude();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

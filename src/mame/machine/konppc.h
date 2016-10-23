@@ -32,31 +32,31 @@ public:
 
 
 	// read/write
-	DECLARE_READ32_MEMBER( cgboard_dsp_comm_r_ppc );
-	DECLARE_WRITE32_MEMBER( cgboard_dsp_comm_w_ppc );
-	DECLARE_READ32_MEMBER( cgboard_dsp_shared_r_ppc );
-	DECLARE_WRITE32_MEMBER( cgboard_dsp_shared_w_ppc );
+	uint32_t cgboard_dsp_comm_r_ppc(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_dsp_comm_w_ppc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cgboard_dsp_shared_r_ppc(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_dsp_shared_w_ppc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER( cgboard_0_comm_sharc_r );
-	DECLARE_WRITE32_MEMBER( cgboard_0_comm_sharc_w );
-	DECLARE_READ32_MEMBER( cgboard_0_shared_sharc_r );
-	DECLARE_WRITE32_MEMBER( cgboard_0_shared_sharc_w );
-	DECLARE_READ32_MEMBER( cgboard_1_comm_sharc_r );
-	DECLARE_WRITE32_MEMBER( cgboard_1_comm_sharc_w );
-	DECLARE_READ32_MEMBER( cgboard_1_shared_sharc_r );
-	DECLARE_WRITE32_MEMBER( cgboard_1_shared_sharc_w );
+	uint32_t cgboard_0_comm_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_0_comm_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cgboard_0_shared_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_0_shared_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cgboard_1_comm_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_1_comm_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cgboard_1_shared_sharc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cgboard_1_shared_sharc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(K033906_0_r);
-	DECLARE_WRITE32_MEMBER(K033906_0_w);
-	DECLARE_READ32_MEMBER(K033906_1_r);
-	DECLARE_WRITE32_MEMBER(K033906_1_w);
+	uint32_t K033906_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void K033906_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t K033906_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void K033906_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER(nwk_fifo_0_w);
-	DECLARE_WRITE32_MEMBER(nwk_fifo_1_w);
-	DECLARE_READ32_MEMBER(nwk_voodoo_0_r);
-	DECLARE_READ32_MEMBER(nwk_voodoo_1_r);
-	DECLARE_WRITE32_MEMBER(nwk_voodoo_0_w);
-	DECLARE_WRITE32_MEMBER(nwk_voodoo_1_w);
+	void nwk_fifo_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void nwk_fifo_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t nwk_voodoo_0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t nwk_voodoo_1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void nwk_voodoo_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void nwk_voodoo_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

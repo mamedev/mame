@@ -76,15 +76,15 @@ public:
 	uint8_t m_prot_read_index;
 	uint8_t m_prot_char[5];
 	uint8_t m_prot_index;
-	DECLARE_WRITE8_MEMBER(output_regs_w);
-	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_p2_r);
-	DECLARE_READ8_MEMBER(mux_p1_r);
-	DECLARE_READ8_MEMBER(ronjan_prot_r);
-	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
-	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
-	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
+	void output_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pinkiri8_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mux_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ronjan_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ronjan_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ronjan_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ronjan_patched_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_ronjan();
 	virtual void video_start() override;
 	uint32_t screen_update_pinkiri8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8, pinkiri8_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(pinkiri8_state::output_regs_w)
+void pinkiri8_state::output_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -388,7 +388,7 @@ WRITE8_MEMBER(pinkiri8_state::output_regs_w)
 
 #define LOG_VRAM 0
 
-WRITE8_MEMBER(pinkiri8_state::pinkiri8_vram_w)
+void pinkiri8_state::pinkiri8_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -423,12 +423,12 @@ WRITE8_MEMBER(pinkiri8_state::pinkiri8_vram_w)
 }
 
 
-WRITE8_MEMBER(pinkiri8_state::mux_w)
+void pinkiri8_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;
 }
 
-READ8_MEMBER(pinkiri8_state::mux_p2_r)
+uint8_t pinkiri8_state::mux_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -442,7 +442,7 @@ READ8_MEMBER(pinkiri8_state::mux_p2_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pinkiri8_state::mux_p1_r)
+uint8_t pinkiri8_state::mux_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -1182,7 +1182,7 @@ ROM_START( ronjan ) // the Z180 internal ROM wasn't extracted from this PCB. Usi
 	ROM_LOAD( "6.j1", 0x00000, 0x20000, CRC(d0b53513) SHA1(e94402f494adae741989c98a8c9587f464f144d2) )
 ROM_END
 
-READ8_MEMBER(pinkiri8_state::ronjan_prot_r)
+uint8_t pinkiri8_state::ronjan_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
 
@@ -1194,7 +1194,7 @@ READ8_MEMBER(pinkiri8_state::ronjan_prot_r)
 	return wing_str[(m_prot_read_index >> 1)-1];
 }
 
-WRITE8_MEMBER(pinkiri8_state::ronjan_prot_w)
+void pinkiri8_state::ronjan_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data == 0)
 	{
@@ -1212,12 +1212,12 @@ WRITE8_MEMBER(pinkiri8_state::ronjan_prot_w)
 	}
 }
 
-READ8_MEMBER(pinkiri8_state::ronjan_prot_status_r)
+uint8_t pinkiri8_state::ronjan_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; //bit 0 seems a protection status bit
 }
 
-READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
+uint8_t pinkiri8_state::ronjan_patched_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; //value is read then discarded
 }

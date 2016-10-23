@@ -36,13 +36,13 @@ public:
 	static void set_cpu_tags(device_t &device, const char *maintag, const char *subtag);
 	template<class _Object> static devcb_base &set_subres_cb(device_t &device, _Object object) { return downcast<namco_c117_device &>(device).m_subres_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(main_r);
-	DECLARE_READ8_MEMBER(sub_r);
-	DECLARE_WRITE8_MEMBER(main_w);
-	DECLARE_WRITE8_MEMBER(sub_w);
+	uint8_t main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sub_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sub_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// FIXME: this doesn't belong here
-	DECLARE_WRITE8_MEMBER(sound_watchdog_w);
+	void sound_watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	offs_t remap(int whichcpu, offs_t offset) { return m_offsets[whichcpu][offset>>13] | (offset & 0x1fff); }
 

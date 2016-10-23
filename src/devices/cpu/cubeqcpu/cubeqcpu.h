@@ -146,8 +146,8 @@ public:
 	template<class _Object> static devcb_base &set_dac_w(device_t &device, _Object object) { return downcast<cquestsnd_cpu_device &>(device).m_dac_w.set_callback(object); }
 	static void set_sound_region(device_t &device, const char *tag) { downcast<cquestsnd_cpu_device &>(device).m_sound_region_tag = tag; }
 
-	DECLARE_WRITE16_MEMBER(sndram_w);
-	DECLARE_READ16_MEMBER(sndram_r);
+	void sndram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sndram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -213,9 +213,9 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_linedata_w(device_t &device, _Object object) { return downcast<cquestrot_cpu_device &>(device).m_linedata_w.set_callback(object); }
 
-	DECLARE_READ16_MEMBER(linedata_r);
-	DECLARE_WRITE16_MEMBER(rotram_w);
-	DECLARE_READ16_MEMBER(rotram_r);
+	uint16_t linedata_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rotram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rotram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -295,7 +295,7 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_linedata_r(device_t &device, _Object object) { return downcast<cquestlin_cpu_device &>(device).m_linedata_r.set_callback(object); }
 
-	DECLARE_WRITE16_MEMBER( linedata_w );
+	void linedata_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cubeqcpu_swap_line_banks();
 	void cubeqcpu_clear_stack();
 	uint8_t cubeqcpu_get_ptr_ram_val(int i);

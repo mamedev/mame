@@ -94,8 +94,8 @@ public:
 	required_shared_ptr<uint32_t> m_mainram2;
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
-	DECLARE_READ32_MEMBER(in0_r);
-	DECLARE_WRITE32_MEMBER(output_w);
+	uint32_t in0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_feversoc();
 	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -146,14 +146,14 @@ uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_in
 
 
 
-READ32_MEMBER(feversoc_state::in0_r)
+uint32_t feversoc_state::in0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t io0 = (ioport("IN1")->read()&0xffff) << 16;
 	uint32_t io1 = (ioport("IN0")->read()&0xffff) << 0;
 	return io0 | io1;
 }
 
-WRITE32_MEMBER(feversoc_state::output_w)
+void feversoc_state::output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_16_31)
 	{

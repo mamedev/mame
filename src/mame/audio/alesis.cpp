@@ -120,7 +120,7 @@ void alesis_dm3ag_device::device_timer(emu_timer &timer, device_timer_id id, int
 	}
 }
 
-WRITE8_MEMBER(alesis_dm3ag_device::write)
+void alesis_dm3ag_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG)    logerror("DM3AG '%s' write: %02x\n", tag(), data);
 

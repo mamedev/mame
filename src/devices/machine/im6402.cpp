@@ -227,7 +227,7 @@ void im6402_device::rcv_complete()
 //  write - transmitter buffer register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( im6402_device::write )
+void im6402_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("IM6402 '%s' Transmit Buffer Register %02x\n", tag(), data);
 

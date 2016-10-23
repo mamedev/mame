@@ -43,12 +43,12 @@ public:
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
-	DECLARE_READ8_MEMBER(la120_KBD_r);
-	DECLARE_WRITE8_MEMBER(la120_LED_w);
-	DECLARE_READ8_MEMBER(la120_NVR_r);
-	DECLARE_WRITE8_MEMBER(la120_NVR_w);
-	DECLARE_READ8_MEMBER(la120_DC305_r);
-	DECLARE_WRITE8_MEMBER(la120_DC305_w);
+	uint8_t la120_KBD_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void la120_LED_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t la120_NVR_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void la120_NVR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t la120_DC305_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void la120_DC305_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	virtual void machine_start() override;
 	//virtual void machine_reset();
@@ -58,7 +58,7 @@ private:
 	uint8_t m_led_7seg[4];
 };
 
-READ8_MEMBER( decwriter_state::la120_KBD_r )
+uint8_t decwriter_state::la120_KBD_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* for reading the keyboard array, addr bits 5-11 are ignored.
 	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
@@ -80,7 +80,7 @@ READ8_MEMBER( decwriter_state::la120_KBD_r )
 	return code;
 }
 
-WRITE8_MEMBER( decwriter_state::la120_LED_w )
+void decwriter_state::la120_LED_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* for writing the keyboard array, addr bits 5-11 are ignored.
 	 * a15 a14 a13 a12 a11 a10  a9  a8  a7  a6  a5  a4  a3  a2  a1  a0
@@ -134,12 +134,12 @@ WRITE8_MEMBER( decwriter_state::la120_LED_w )
    1 1 0 Accept address
    1 1 1 Accept data
    */
-READ8_MEMBER( decwriter_state::la120_NVR_r )
+uint8_t decwriter_state::la120_NVR_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xFF;
 }
 
-WRITE8_MEMBER( decwriter_state::la120_NVR_w )
+void decwriter_state::la120_NVR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -158,7 +158,7 @@ WRITE8_MEMBER( decwriter_state::la120_NVR_w )
    |\------- ?
    \-------- ?
  */
-READ8_MEMBER( decwriter_state::la120_DC305_r )
+uint8_t decwriter_state::la120_DC305_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 	logerror("DC305 Read from offset %01x, returning %02X\n", offset, data);
@@ -174,7 +174,7 @@ READ8_MEMBER( decwriter_state::la120_DC305_r )
    at least 3 bits control the speaker/buzzer which can be on or off, at least two volume levels, and at least two frequencies, 400hz or 2400hz
    two quadrature lines from the head servomotor connect here to allow the dc305 to determine motor position; one pulses when the motor turns clockwise and one when it turns counterclockwise. the head stop is found when the pulses stop, which firmware uses to find the zero position.
  */
-WRITE8_MEMBER( decwriter_state::la120_DC305_w )
+void decwriter_state::la120_DC305_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("DC305 Write of %02X to offset %01X\n", data, offset);
 }

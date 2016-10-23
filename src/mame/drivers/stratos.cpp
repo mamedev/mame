@@ -34,14 +34,14 @@ public:
 	uint8_t latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
 
 	void init_stratos();
-	DECLARE_WRITE8_MEMBER(p2000_w);
-	DECLARE_READ8_MEMBER(p2200_r);
-	DECLARE_WRITE8_MEMBER(p2200_w);
-	DECLARE_WRITE8_MEMBER(p2400_w);
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(lcd_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	void p2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2200_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2200_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 
@@ -128,7 +128,7 @@ uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(stratos_state::p2000_w)
+void stratos_state::p2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	led_latch_control = data;
 
@@ -144,18 +144,18 @@ WRITE8_MEMBER(stratos_state::p2000_w)
 	show_leds();
 }
 
-READ8_MEMBER(stratos_state::p2200_r)
+uint8_t stratos_state::p2200_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("p2200_r (%s)\n", machine().describe_context());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(stratos_state::p2200_w)
+void stratos_state::p2200_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("p2200_w %02x -> %02x (%s)\n", data, data^0xff, machine().describe_context());
 }
 
-WRITE8_MEMBER(stratos_state::p2400_w)
+void stratos_state::p2400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(control & 0x20) {
 		individual_leds = individual_leds & 0x100ff;
@@ -170,7 +170,7 @@ WRITE8_MEMBER(stratos_state::p2400_w)
 	}
 }
 
-READ8_MEMBER(stratos_state::control_r)
+uint8_t stratos_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int xx = 0;
 	xx = !xx;
@@ -283,7 +283,7 @@ READ8_MEMBER(stratos_state::control_r)
 	return xx ? 0x20 : 0x00;
 }
 
-WRITE8_MEMBER(stratos_state::control_w)
+void stratos_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("control_w %02x bank %d (%s)\n", data, data & 3, machine().describe_context());
 
@@ -294,12 +294,12 @@ WRITE8_MEMBER(stratos_state::control_w)
 }
 
 
-READ8_MEMBER(stratos_state::lcd_r)
+uint8_t stratos_state::lcd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(stratos_state::lcd_w)
+void stratos_state::lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 08 0b - 00?
 	// 04 06 - 05

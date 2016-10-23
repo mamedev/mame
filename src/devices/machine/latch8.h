@@ -32,48 +32,48 @@ public:
 
 	/* write & read full byte */
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* reset the latch */
 
-	DECLARE_WRITE8_MEMBER( reset_w );
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* read bit x                 */
 	/* return (latch >> x) & 0x01 */
 
-	DECLARE_READ8_MEMBER( bit0_r );
-	DECLARE_READ8_MEMBER( bit1_r );
-	DECLARE_READ8_MEMBER( bit2_r );
-	DECLARE_READ8_MEMBER( bit3_r );
-	DECLARE_READ8_MEMBER( bit4_r );
-	DECLARE_READ8_MEMBER( bit5_r );
-	DECLARE_READ8_MEMBER( bit6_r );
-	DECLARE_READ8_MEMBER( bit7_r );
+	uint8_t bit0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* read inverted bit x        */
 	/* return (latch >> x) & 0x01 */
 
-	DECLARE_READ8_MEMBER( bit0_q_r );
-	DECLARE_READ8_MEMBER( bit1_q_r );
-	DECLARE_READ8_MEMBER( bit2_q_r );
-	DECLARE_READ8_MEMBER( bit3_q_r );
-	DECLARE_READ8_MEMBER( bit4_q_r );
-	DECLARE_READ8_MEMBER( bit5_q_r );
-	DECLARE_READ8_MEMBER( bit6_q_r );
-	DECLARE_READ8_MEMBER( bit7_q_r );
+	uint8_t bit0_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit1_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit2_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit3_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit4_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit5_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit6_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bit7_q_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* write bit x from data into bit determined by offset */
 	/* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */
 
-	DECLARE_WRITE8_MEMBER( bit0_w );
-	DECLARE_WRITE8_MEMBER( bit1_w );
-	DECLARE_WRITE8_MEMBER( bit2_w );
-	DECLARE_WRITE8_MEMBER( bit3_w );
-	DECLARE_WRITE8_MEMBER( bit4_w );
-	DECLARE_WRITE8_MEMBER( bit5_w );
-	DECLARE_WRITE8_MEMBER( bit6_w );
-	DECLARE_WRITE8_MEMBER( bit7_w );
+	void bit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	static void set_maskout(device_t &device, uint32_t maskout) { downcast<latch8_device &>(device).m_maskout = maskout; }
 	static void set_xorvalue(device_t &device, uint32_t xorvalue) { downcast<latch8_device &>(device).m_xorvalue = xorvalue; }

@@ -116,10 +116,10 @@ public:
 	void machine_reset_quizard4r40();
 	void machine_reset_quizard4r41();
 	void machine_reset_quizard4r42();
-	DECLARE_READ8_MEMBER(servo_io_r);
-	DECLARE_WRITE8_MEMBER(servo_io_w);
-	DECLARE_READ8_MEMBER(slave_io_r);
-	DECLARE_WRITE8_MEMBER(slave_io_w);
+	uint8_t servo_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void servo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

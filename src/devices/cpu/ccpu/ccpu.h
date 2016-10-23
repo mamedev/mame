@@ -55,7 +55,7 @@ public:
 	template<class _Object> static devcb_base &set_external_func(device_t &device, _Object object) { return downcast<ccpu_cpu_device &>(device).m_external_input.set_callback(object); }
 	static void set_vector_func(device_t &device, ccpu_vector_delegate callback) { downcast<ccpu_cpu_device &>(device).m_vector_callback = callback; }
 
-	DECLARE_READ8_MEMBER( read_jmi );
+	uint8_t read_jmi(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void wdt_timer_trigger();
 
 protected:

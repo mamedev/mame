@@ -61,14 +61,14 @@ public:
 	/* memory */
 	uint8_t m_videoram0[0x8000];
 	uint8_t m_videoram1[0x8000];
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_s_w);
-	DECLARE_WRITE8_MEMBER(dac_adr_e_w);
-	DECLARE_WRITE8_MEMBER(banksel1_w);
-	DECLARE_WRITE8_MEMBER(banksel2_w);
-	DECLARE_WRITE8_MEMBER(input_sel1_w);
-	DECLARE_WRITE8_MEMBER(input_sel2_w);
-	DECLARE_READ8_MEMBER(keys_r);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac_adr_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac_adr_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_sel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_sel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(dac_callback);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -131,7 +131,7 @@ void mjsister_state::plot1( int offset, uint8_t data )
 	m_tmpbitmap1->pix16(y, x * 2 + 1) = c2;
 }
 
-WRITE8_MEMBER(mjsister_state::videoram_w)
+void mjsister_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_vrambank)
 	{
@@ -206,12 +206,12 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 		m_dac_busy = 0;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_s_w)
+void mjsister_state::dac_adr_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac_adr_s = data;
 }
 
-WRITE8_MEMBER(mjsister_state::dac_adr_e_w)
+void mjsister_state::dac_adr_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac_adr_e = data;
 	m_dac_adr = m_dac_adr_s << 8;
@@ -222,7 +222,7 @@ WRITE8_MEMBER(mjsister_state::dac_adr_e_w)
 	m_dac_busy = 1;
 }
 
-WRITE8_MEMBER(mjsister_state::banksel1_w)
+void mjsister_state::banksel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tmp = m_colorbank;
 
@@ -257,7 +257,7 @@ WRITE8_MEMBER(mjsister_state::banksel1_w)
 	membank("bank1")->set_entry(m_rombank0 * 2 + m_rombank1);
 }
 
-WRITE8_MEMBER(mjsister_state::banksel2_w)
+void mjsister_state::banksel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -274,17 +274,17 @@ WRITE8_MEMBER(mjsister_state::banksel2_w)
 	membank("bank1")->set_entry(m_rombank0 * 2 + m_rombank1);
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel1_w)
+void mjsister_state::input_sel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel1 = data;
 }
 
-WRITE8_MEMBER(mjsister_state::input_sel2_w)
+void mjsister_state::input_sel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel2 = data;
 }
 
-READ8_MEMBER(mjsister_state::keys_r)
+uint8_t mjsister_state::keys_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };

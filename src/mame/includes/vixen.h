@@ -53,15 +53,15 @@ public:
 			m_txrdy(0)
 	{ }
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_READ8_MEMBER( ieee488_r );
-	DECLARE_READ8_MEMBER( port3_r );
-	DECLARE_READ8_MEMBER( i8155_pa_r );
-	DECLARE_WRITE8_MEMBER( i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( i8155_pc_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pb_w );
-	DECLARE_WRITE8_MEMBER( io_i8155_pc_w );
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ieee488_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8155_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_i8155_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( io_i8155_to_w );
 	DECLARE_WRITE_LINE_MEMBER( srq_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
@@ -71,8 +71,8 @@ public:
 	void init_vixen();
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 	IRQ_CALLBACK_MEMBER(vixen_int_ack);
-	DECLARE_READ8_MEMBER(opram_r);
-	DECLARE_READ8_MEMBER(oprom_r);
+	uint8_t opram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t oprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:

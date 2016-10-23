@@ -58,7 +58,7 @@ void speedatk_state::video_start()
 	save_item(NAME(m_flip_scr));
 }
 
-WRITE8_MEMBER(speedatk_state::m6845_w)
+void speedatk_state::m6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{

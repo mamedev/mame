@@ -74,14 +74,14 @@ const tiny_rom_entry *bml3bus_mp1805_device::device_rom_region() const
 	return ROM_NAME( mp1805 );
 }
 
-READ8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_r)
+uint8_t bml3bus_mp1805_device::bml3_mp1805_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO: read supported or not?
 	//  return mc6843_drq_r(m_mc6843) ? 0x00 : 0x80;
 	return -1;
 }
 
-WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
+void bml3bus_mp1805_device::bml3_mp1805_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// b7 b6 b5 b4 b3 b2 b1 b0
 	// MT ?  ?  ?  D3 D2 D1 D0

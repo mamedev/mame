@@ -33,8 +33,8 @@ public:
 	required_shared_ptr<uint8_t> m_tile_num_ram;
 	required_shared_ptr<uint8_t> m_tile_atr_ram;
 	tilemap_t *m_tilemap;
-	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
-	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
+	void ltcasino_tile_num_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ltcasino_tile_atr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_mv4in1();
 	TILE_GET_INFO_MEMBER(get_ltcasino_tile_info);
 	virtual void video_start() override;
@@ -64,13 +64,13 @@ void ltcasino_state::video_start()
 }
 
 
-WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
+void ltcasino_state::ltcasino_tile_num_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_num_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
+void ltcasino_state::ltcasino_tile_atr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_atr_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);

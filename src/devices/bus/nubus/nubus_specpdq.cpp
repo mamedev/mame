@@ -242,7 +242,7 @@ uint32_t nubus_specpdq_device::screen_update(screen_device &screen, bitmap_rgb32
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
+void nubus_specpdq_device::specpdq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset >= 0xc0000 && offset < 0x100000)
 	{
@@ -466,7 +466,7 @@ WRITE32_MEMBER( nubus_specpdq_device::specpdq_w )
 	}
 }
 
-READ32_MEMBER( nubus_specpdq_device::specpdq_r )
+uint32_t nubus_specpdq_device::specpdq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if (offset != 0xc005c && offset != 0xc005e) printf("specpdq_r: @ %x (mask %08x  PC=%x)\n", offset, mem_mask, space.device().safe_pc());
 
@@ -478,13 +478,13 @@ READ32_MEMBER( nubus_specpdq_device::specpdq_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_specpdq_device::vram_w )
+void nubus_specpdq_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_specpdq_device::vram_r )
+uint32_t nubus_specpdq_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

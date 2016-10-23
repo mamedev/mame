@@ -34,11 +34,11 @@ public:
 	void set_fbmem(const int fbmem) {m_fbmem = fbmem;}
 	void set_tmumem(const int tmumem0, const int tmumem1) {m_tmumem0 = tmumem0; m_tmumem1 = tmumem1;}
 
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
+	uint32_t pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(vga_r);
-	DECLARE_WRITE32_MEMBER(vga_w);
+	uint32_t vga_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void vga_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	virtual void device_start() override;

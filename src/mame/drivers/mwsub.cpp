@@ -28,14 +28,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_READ8_MEMBER(submar_sensor0_r);
-	DECLARE_READ8_MEMBER(submar_sensor1_r);
-	DECLARE_WRITE8_MEMBER(submar_motor_w);
-	DECLARE_WRITE8_MEMBER(submar_lamp_w);
-	DECLARE_WRITE8_MEMBER(submar_solenoid_w);
-	DECLARE_WRITE8_MEMBER(submar_sound_w);
-	DECLARE_WRITE8_MEMBER(submar_led_w);
-	DECLARE_WRITE8_MEMBER(submar_irq_clear_w);
+	uint8_t submar_sensor0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t submar_sensor1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void submar_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void submar_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void submar_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void submar_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void submar_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void submar_irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
@@ -45,19 +45,19 @@ public:
 
 ***************************************************************************/
 
-READ8_MEMBER(submar_state::submar_sensor0_r)
+uint8_t submar_state::submar_sensor0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ?
 	return 0;
 }
 
-READ8_MEMBER(submar_state::submar_sensor1_r)
+uint8_t submar_state::submar_sensor1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// ?
 	return (ioport("IN1")->read() & 0x70) | 0x8f;
 }
 
-WRITE8_MEMBER(submar_state::submar_motor_w)
+void submar_state::submar_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: torpedo follow
 	// d1: ship movement
@@ -71,7 +71,7 @@ WRITE8_MEMBER(submar_state::submar_motor_w)
 		output().set_indexed_value("motor", i, data >> i & 1);
 }
 
-WRITE8_MEMBER(submar_state::submar_lamp_w)
+void submar_state::submar_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: torpedo
 	// d1: target ship on water
@@ -85,7 +85,7 @@ WRITE8_MEMBER(submar_state::submar_lamp_w)
 		output().set_lamp_value(i, data >> i & 1);
 }
 
-WRITE8_MEMBER(submar_state::submar_solenoid_w)
+void submar_state::submar_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d4: ship1-5
 	// d5-d7: n/c
@@ -93,7 +93,7 @@ WRITE8_MEMBER(submar_state::submar_solenoid_w)
 		output().set_indexed_value("solenoid", i, data >> i & 1);
 }
 
-WRITE8_MEMBER(submar_state::submar_sound_w)
+void submar_state::submar_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: torpedo
 	// d1: "summer"
@@ -105,7 +105,7 @@ WRITE8_MEMBER(submar_state::submar_sound_w)
 	// d7: n/c
 }
 
-WRITE8_MEMBER(submar_state::submar_led_w)
+void submar_state::submar_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 7447 (BCD to LED segment)
 	const uint8_t _7447_map[16] =
@@ -116,7 +116,7 @@ WRITE8_MEMBER(submar_state::submar_led_w)
 	output().set_digit_value((offset << 1 & 2) | 1, _7447_map[data & 0x0f]);
 }
 
-WRITE8_MEMBER(submar_state::submar_irq_clear_w)
+void submar_state::submar_irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

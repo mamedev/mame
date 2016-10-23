@@ -57,22 +57,22 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER(pio_r);
-	DECLARE_WRITE8_MEMBER(pio_w);
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(input_select_w);
+	uint8_t pio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
 #define MAIN_CLOCK XTAL_4_433619MHz
 
 
-READ8_MEMBER(bbcbc_state::pio_r)
+uint8_t bbcbc_state::pio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio->read(space, offset >> 5, mem_mask);
 }
 
-WRITE8_MEMBER(bbcbc_state::pio_w)
+void bbcbc_state::pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio->write(space, offset >> 5, data, mem_mask);
 }
@@ -156,7 +156,7 @@ void bbcbc_state::machine_reset()
 	m_input_select = 0xff;
 }
 
-READ8_MEMBER(bbcbc_state::input_r)
+uint8_t bbcbc_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_select)
 	{
@@ -171,7 +171,7 @@ READ8_MEMBER(bbcbc_state::input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(bbcbc_state::input_select_w)
+void bbcbc_state::input_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_select = data;
 }

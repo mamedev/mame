@@ -65,11 +65,11 @@ public:
 	void init_czk80();
 	void machine_reset_czk80();
 	TIMER_CALLBACK_MEMBER(czk80_reset);
-	DECLARE_READ8_MEMBER(port80_r);
-	DECLARE_READ8_MEMBER(port81_r);
-	DECLARE_READ8_MEMBER(portc0_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port81_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portc0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
@@ -81,24 +81,24 @@ private:
 };
 
 
-WRITE8_MEMBER( czk80_state::port40_w )
+void czk80_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr1")->set_entry(BIT(data, 1));
 }
 
-READ8_MEMBER( czk80_state::port80_r )
+uint8_t czk80_state::port80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( czk80_state::portc0_r )
+uint8_t czk80_state::portc0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;
 }
 
-READ8_MEMBER( czk80_state::port81_r )
+uint8_t czk80_state::port81_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
@@ -183,7 +183,7 @@ static SLOT_INTERFACE_START( czk80_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE8_MEMBER( czk80_state::kbd_put )
+void czk80_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

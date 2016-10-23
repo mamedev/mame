@@ -36,8 +36,8 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
-	DIRECT_UPDATE_MEMBER(atm_direct);
+	void atm_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	offs_t atm_direct(direct_read_data &direct, offs_t address);
 	void machine_reset_atm();
 
 protected:
@@ -53,7 +53,7 @@ private:
 };
 
 
-DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
+offs_t atm_state::atm_direct(direct_read_data &direct, offs_t address)
 {
 	uint16_t pc = m_maincpu->state_int(STATE_GENPCBASE);
 
@@ -108,7 +108,7 @@ void atm_state::atm_update_memory()
 	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
-WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
+void atm_state::atm_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)

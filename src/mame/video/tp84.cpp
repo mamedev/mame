@@ -103,7 +103,7 @@ PALETTE_INIT_MEMBER(tp84_state, tp84)
 }
 
 
-WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
+void tp84_state::tp84_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the game multiplexes the sprites, so update now */
 //  m_screen->update_now();
@@ -112,7 +112,7 @@ WRITE8_MEMBER(tp84_state::tp84_spriteram_w)
 }
 
 
-READ8_MEMBER(tp84_state::tp84_scanline_r)
+uint8_t tp84_state::tp84_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

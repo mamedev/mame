@@ -39,8 +39,8 @@ class pc_joy_device :  public device_t,
 public:
 	pc_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(joy_port_r);
-	DECLARE_WRITE8_MEMBER(joy_port_w);
+	uint8_t joy_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void joy_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	virtual void device_start() override { m_stime = machine().time(); }
 	virtual void device_config_complete() override;

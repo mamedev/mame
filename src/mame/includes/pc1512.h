@@ -125,33 +125,33 @@ public:
 	MC6845_UPDATE_ROW(draw_graphics_1);
 	MC6845_UPDATE_ROW(draw_graphics_2);
 
-	DECLARE_READ8_MEMBER( video_ram_r );
-	DECLARE_WRITE8_MEMBER( video_ram_w );
-	DECLARE_READ8_MEMBER( system_r );
-	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_READ8_MEMBER( mouse_r );
-	DECLARE_WRITE8_MEMBER( mouse_w );
-	DECLARE_WRITE8_MEMBER( dma_page_w );
-	DECLARE_WRITE8_MEMBER( nmi_mask_w );
-	DECLARE_READ8_MEMBER( printer_r );
-	DECLARE_WRITE8_MEMBER( printer_w );
-	DECLARE_READ8_MEMBER( vdu_r );
-	DECLARE_WRITE8_MEMBER( vdu_w );
+	uint8_t video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mouse_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mouse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vdu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vdu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( kbdata_w );
 	DECLARE_WRITE_LINE_MEMBER( kbclk_w );
 	DECLARE_WRITE_LINE_MEMBER( pit1_w );
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
-	DECLARE_READ8_MEMBER( memr_r );
-	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_READ8_MEMBER( ior1_r );
-	DECLARE_READ8_MEMBER( ior2_r );
-	DECLARE_READ8_MEMBER( ior3_r );
-	DECLARE_WRITE8_MEMBER( iow0_w );
-	DECLARE_WRITE8_MEMBER( iow1_w );
-	DECLARE_WRITE8_MEMBER( iow2_w );
-	DECLARE_WRITE8_MEMBER( iow3_w );
+	uint8_t memr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ior1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ior2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ior3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iow0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void iow1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void iow3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
@@ -164,8 +164,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE8_MEMBER( mouse_x_w );
-	DECLARE_WRITE8_MEMBER( mouse_y_w );
+	void mouse_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mouse_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	// system status register
@@ -240,8 +240,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_READ8_MEMBER( printer_r );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	required_ioport m_sw;
 

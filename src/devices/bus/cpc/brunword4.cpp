@@ -82,7 +82,7 @@ void cpc_brunword4_device::device_reset()
 	m_rombank_active = false;
 }
 
-WRITE8_MEMBER(cpc_brunword4_device::rombank_w)
+void cpc_brunword4_device::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((data & 0xc0) == 0xc0 && (data & 0x04) == 0)
 	{

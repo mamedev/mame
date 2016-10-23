@@ -97,7 +97,7 @@ void st0016_cpu_device::device_reset()
 	}
 }
 
-READ8_MEMBER(st0016_cpu_device::soundram_read)
+uint8_t st0016_cpu_device::soundram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_charram[offset];
 }
@@ -138,7 +138,7 @@ static const gfx_layout charlayout =
 	8*8*4
 };
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_bank_w)
+void st0016_cpu_device::st0016_sprite_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     76543210
@@ -149,7 +149,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_bank_w)
 	st0016_spr2_bank=(data>>4)&ST0016_SPR_BANK_MASK;
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_palette_bank_w)
+void st0016_cpu_device::st0016_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     76543210
@@ -159,7 +159,7 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_bank_w)
 	st0016_pal_bank=data&ST0016_PAL_BANK_MASK;
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
+void st0016_cpu_device::st0016_character_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     fedcba9876543210
@@ -175,32 +175,32 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_character_bank_w)
 }
 
 
-READ8_MEMBER(st0016_cpu_device::st0016_sprite_ram_r)
+uint8_t st0016_cpu_device::st0016_sprite_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite_ram_w)
+void st0016_cpu_device::st0016_sprite_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_r)
+uint8_t st0016_cpu_device::st0016_sprite2_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_sprite2_ram_w)
+void st0016_cpu_device::st0016_sprite2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr2_bank+offset]=data;
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_palette_ram_r)
+uint8_t st0016_cpu_device::st0016_palette_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
+void st0016_cpu_device::st0016_palette_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int color=(ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset)/2;
 	int val;
@@ -211,18 +211,18 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_palette_ram_w)
 	palette().set_pen_color(color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_character_ram_r)
+uint8_t st0016_cpu_device::st0016_character_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset];
 }
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
+void st0016_cpu_device::st0016_character_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
 	gfx(st0016_ramgfx)->mark_dirty(st0016_char_bank);
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
+uint8_t st0016_cpu_device::st0016_vregs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
         $0, $1 = max scanline(including vblank)/timer? ($3e7)
@@ -252,7 +252,7 @@ READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
 	return st0016_vregs[offset];
 }
 
-READ8_MEMBER(st0016_cpu_device::st0016_dma_r)
+uint8_t st0016_cpu_device::st0016_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bits 0 and 1 = 0 -> DMA transfer complete */
 	if(ISMACS)
@@ -262,7 +262,7 @@ READ8_MEMBER(st0016_cpu_device::st0016_dma_r)
 }
 
 
-WRITE8_MEMBER(st0016_cpu_device::st0016_vregs_w)
+void st0016_cpu_device::st0016_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

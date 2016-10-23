@@ -161,42 +161,42 @@ TIMER_DEVICE_CALLBACK_MEMBER(wpc_dmd_device::scanline_timer)
 	scanline_cb(cur_scanline == (firq_scanline & 0x1f));
 }
 
-WRITE8_MEMBER(wpc_dmd_device::firq_scanline_w)
+void wpc_dmd_device::firq_scanline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	firq_scanline = data;
 }
 
-WRITE8_MEMBER(wpc_dmd_device::bank0_w)
+void wpc_dmd_device::bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmd0->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::bank2_w)
+void wpc_dmd_device::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmd2->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::bank4_w)
+void wpc_dmd_device::bank4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmd4->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::bank6_w)
+void wpc_dmd_device::bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmd6->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::bank8_w)
+void wpc_dmd_device::bank8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmd8->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::banka_w)
+void wpc_dmd_device::banka_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dmda->set_entry(data & 0xf);
 }
 
-WRITE8_MEMBER(wpc_dmd_device::visible_page_w)
+void wpc_dmd_device::visible_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	visible_page = data;
 }

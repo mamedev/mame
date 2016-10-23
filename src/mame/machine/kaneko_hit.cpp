@@ -113,7 +113,7 @@ void kaneko_hit_device::device_reset()
 }
 
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_r)
+uint16_t kaneko_hit_device::kaneko_hit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_hittype)
 	{
@@ -126,7 +126,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_r)
 	}
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
+void kaneko_hit_device::kaneko_hit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (m_hittype)
 	{
@@ -146,7 +146,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_w)
  bonkadv
 *********************************************************************/
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
+uint16_t kaneko_hit_device::kaneko_hit_type0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	uint16_t data = 0;
@@ -200,7 +200,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type0_r)
 	return 0;
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
+void kaneko_hit_device::kaneko_hit_type0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	data &= mem_mask;
@@ -231,7 +231,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type0_w)
  bloorwar
 *********************************************************************/
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
+uint16_t kaneko_hit_device::kaneko_hit_type1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	uint16_t data = 0;
@@ -293,7 +293,7 @@ READ16_MEMBER(kaneko_hit_device::kaneko_hit_type1_r)
 	return 0;
 }
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type1_w)
+void kaneko_hit_device::kaneko_hit_type1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc1_hit_t &hit = m_hit;
 	data &= mem_mask;
@@ -365,7 +365,7 @@ int16_t kaneko_hit_device::calc_compute_y(calc1_hit_t &hit)
 *********************************************************************/
 
 
-WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
+void kaneko_hit_device::kaneko_hit_type2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	calc3_hit_t &hit3 = m_hit3;
 	data &= mem_mask;
@@ -433,7 +433,7 @@ WRITE16_MEMBER(kaneko_hit_device::kaneko_hit_type2_w)
 }
 
 
-READ16_MEMBER(kaneko_hit_device::kaneko_hit_type2_r)
+uint16_t kaneko_hit_device::kaneko_hit_type2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	calc3_hit_t &hit3 = m_hit3;
 	int idx=offset*4;

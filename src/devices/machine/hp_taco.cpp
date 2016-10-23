@@ -302,7 +302,7 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, d
 		clear_state();
 }
 
-WRITE16_MEMBER(hp_taco_device::reg_w)
+void hp_taco_device::reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 		LOG_0(("wr R%u = %04x\n", 4 + offset , data));
 
@@ -334,7 +334,7 @@ WRITE16_MEMBER(hp_taco_device::reg_w)
 		}
 }
 
-READ16_MEMBER(hp_taco_device::reg_r)
+uint16_t hp_taco_device::reg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		uint16_t res = 0;
 

@@ -172,7 +172,7 @@
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
+uint8_t mw8080bw_state::mw8080bw_shift_result_rev_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_mb14241->shift_result_r(space, 0);
 
@@ -180,7 +180,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 }
 
 
-READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
+uint8_t mw8080bw_state::mw8080bw_reversable_shift_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -196,7 +196,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
+void mw8080bw_state::mw8080bw_reversable_shift_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mb14241->shift_count_w(space, offset, data);
 
@@ -252,7 +252,7 @@ MACHINE_CONFIG_END
 #define SEAWOLF_ERASE_DIP_PORT_TAG  ("ERASEDIP")
 
 
-WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
+void mw8080bw_state::seawolf_explosion_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  D0-D3 are column drivers and D4-D7 are row drivers.
     The following table shows values that light up individual lamps.
@@ -304,7 +304,7 @@ WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
+void mw8080bw_state::seawolf_periscope_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the schematics and the connecting diagrams show the
 	   torpedo light order differently, but this order is
@@ -425,7 +425,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
+void mw8080bw_state::gunfight_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 		gunfight_audio_w(space, 0, data);
@@ -620,7 +620,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
+void mw8080bw_state::tornbase_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)
 		tornbase_audio_w(space, 0, data);
@@ -894,7 +894,7 @@ void mw8080bw_state::machine_start_maze()
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
+void mw8080bw_state::maze_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the data is not used, just pulse the counter */
 	machine().bookkeeping().coin_counter_w(0, 0);
@@ -902,7 +902,7 @@ WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::maze_io_w)
+void mw8080bw_state::maze_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
 
@@ -1066,7 +1066,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
+void mw8080bw_state::checkmat_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x01)  checkmat_audio_w(space, 0, data);
 
@@ -2149,7 +2149,7 @@ void mw8080bw_state::machine_start_spcenctr()
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
+void mw8080bw_state::spcenctr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {                                               /* A7 A6 A5 A4 A3 A2 A1 A0 */
 
 	if ((offset & 0x07) == 0x02)
@@ -2377,7 +2377,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
+uint8_t mw8080bw_state::bowler_shift_result_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* ZV - not too sure why this is needed, I don't see
 	   anything unusual on the schematics that would cause
@@ -2386,7 +2386,7 @@ READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 	return ~m_mb14241->shift_result_r(space, 0);
 }
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
+void mw8080bw_state::bowler_lights_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
@@ -2407,7 +2407,7 @@ WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 }
 
 
-WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
+void mw8080bw_state::bowler_lights_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
 	output().set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);

@@ -24,19 +24,19 @@
 
 
 
-WRITE8_MEMBER( liberatr_state::bitmap_xy_w )
+void liberatr_state::bitmap_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[(*m_ycoord << 8) | *m_xcoord] = data & 0xe0;
 }
 
 
-READ8_MEMBER( liberatr_state::bitmap_xy_r )
+uint8_t liberatr_state::bitmap_xy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[(*m_ycoord << 8) | *m_xcoord];
 }
 
 
-WRITE8_MEMBER( liberatr_state::bitmap_w )
+void liberatr_state::bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t x, y;
 

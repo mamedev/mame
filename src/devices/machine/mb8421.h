@@ -47,10 +47,10 @@ public:
 	DECLARE_READ_LINE_MEMBER( busy_r ) { return 0; } // _BUSY pin - not emulated
 	uint8_t peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
 
-	DECLARE_WRITE8_MEMBER( left_w );
-	DECLARE_READ8_MEMBER( left_r );
-	DECLARE_WRITE8_MEMBER( right_w );
-	DECLARE_READ8_MEMBER( right_r );
+	void left_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t left_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void right_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t right_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

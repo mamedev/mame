@@ -46,12 +46,12 @@ public:
 	template<class _Object> static devcb_base &set_hsync_changed_callback(device_t &device, _Object object) { return downcast<huc6260_device &>(device).m_hsync_changed_cb.set_callback(object); }
 
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(huc6260);
 
-	READ8_MEMBER(palette_direct_read);
-	WRITE8_MEMBER(palette_direct_write);
+	uint8_t palette_direct_read(address_space &space, offs_t offset, uint8_t mem_mask);
+	void palette_direct_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	// device-level overrides

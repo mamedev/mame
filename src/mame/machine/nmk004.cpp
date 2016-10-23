@@ -9,19 +9,19 @@
 #include "emu.h"
 #include "nmk004.h"
 
-WRITE8_MEMBER( nmk004_device::write )
+void nmk004_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize();
 	to_nmk004 = data;
 }
 
-READ8_MEMBER( nmk004_device::read )
+uint8_t nmk004_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize();
 	return to_main;
 }
 
-WRITE8_MEMBER(nmk004_device::nmk004_port4_w)
+void nmk004_device::nmk004_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0x08 toggles frequently but is connected to nothing?
 
@@ -29,25 +29,25 @@ WRITE8_MEMBER(nmk004_device::nmk004_port4_w)
 	m_systemcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(nmk004_device::nmk004_oki0_bankswitch_w)
+void nmk004_device::nmk004_oki0_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	membank(":okibank1")->set_entry(data);
 }
 
-WRITE8_MEMBER(nmk004_device::nmk004_oki1_bankswitch_w)
+void nmk004_device::nmk004_oki1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 3;
 	membank(":okibank2")->set_entry(data);
 }
 
-READ8_MEMBER(nmk004_device::nmk004_tonmk004_r)
+uint8_t nmk004_device::nmk004_tonmk004_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize();
 	return to_nmk004;
 }
 
-WRITE8_MEMBER(nmk004_device::nmk004_tomain_w)
+void nmk004_device::nmk004_tomain_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize();
 	to_main = data;

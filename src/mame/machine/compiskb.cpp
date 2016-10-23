@@ -274,7 +274,7 @@ WRITE_LINE_MEMBER( compis_keyboard_device::si_w )
 //  bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( compis_keyboard_device::bus_r )
+uint8_t compis_keyboard_device::bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// HACK this should be handled in mcs48.c
 	return m_bus;
@@ -285,7 +285,7 @@ READ8_MEMBER( compis_keyboard_device::bus_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( compis_keyboard_device::bus_w )
+void compis_keyboard_device::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -322,7 +322,7 @@ WRITE8_MEMBER( compis_keyboard_device::bus_w )
 //  bus_w -
 //-------------------------------------------------
 
-READ8_MEMBER( compis_keyboard_device::p1_r )
+uint8_t compis_keyboard_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -347,7 +347,7 @@ READ8_MEMBER( compis_keyboard_device::p1_r )
 //  p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( compis_keyboard_device::p2_r )
+uint8_t compis_keyboard_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

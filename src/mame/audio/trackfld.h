@@ -10,12 +10,12 @@ public:
 	trackfld_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~trackfld_audio_device() {}
 
-	DECLARE_WRITE8_MEMBER(konami_sh_irqtrigger_w );
-	DECLARE_READ8_MEMBER(trackfld_sh_timer_r );
-	DECLARE_READ8_MEMBER(trackfld_speech_r );
-	DECLARE_WRITE8_MEMBER(trackfld_sound_w );
-	DECLARE_READ8_MEMBER(hyperspt_sh_timer_r );
-	DECLARE_WRITE8_MEMBER(hyperspt_sound_w );
+	void konami_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t trackfld_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t trackfld_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void trackfld_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hyperspt_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hyperspt_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

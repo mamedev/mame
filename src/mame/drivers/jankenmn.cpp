@@ -166,9 +166,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(lamps3_w);
+	void lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
 };
@@ -181,7 +181,7 @@ public:
 static const uint8_t led_map[16] = // 7748 IC?
 	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
-WRITE8_MEMBER(jankenmn_state::lamps1_w)
+void jankenmn_state::lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
 	output().set_lamp_value(8, (data & 7) != 0);
@@ -197,7 +197,7 @@ WRITE8_MEMBER(jankenmn_state::lamps1_w)
 	// d3: ? (only set if game is over)
 }
 
-WRITE8_MEMBER(jankenmn_state::lamps2_w)
+void jankenmn_state::lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
 	output().set_lamp_value(2, data >> 3 & 1);
@@ -216,7 +216,7 @@ WRITE8_MEMBER(jankenmn_state::lamps2_w)
 	output().set_digit_value(0, led_map[data & 1]);
 }
 
-WRITE8_MEMBER(jankenmn_state::lamps3_w)
+void jankenmn_state::lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d1: blue rotating lamp on top of cab
 	output().set_lamp_value(15, data >> 1 & 1);

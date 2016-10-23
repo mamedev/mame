@@ -52,9 +52,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( sound_w );
 
-	DECLARE_WRITE8_MEMBER( pio_a_w );
-	DECLARE_READ8_MEMBER( pio_b_r );
-	DECLARE_READ8_MEMBER( card_r );
+	void pio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t card_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	required_device<cpu_device>             m_cpu;

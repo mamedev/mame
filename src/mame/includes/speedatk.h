@@ -30,12 +30,12 @@ public:
 	uint8_t m_coin_settings;
 	uint8_t m_coin_impulse;
 
-	DECLARE_READ8_MEMBER(key_matrix_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_w);
-	DECLARE_READ8_MEMBER(key_matrix_status_r);
-	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
-	DECLARE_WRITE8_MEMBER(m6845_w);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t key_matrix_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_matrix_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

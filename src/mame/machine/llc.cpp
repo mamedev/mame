@@ -13,7 +13,7 @@
 
 
 // LLC1 BASIC keyboard
-READ8_MEMBER(llc_state::llc1_port2_b_r)
+uint8_t llc_state::llc1_port2_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0;
 
@@ -28,13 +28,13 @@ READ8_MEMBER(llc_state::llc1_port2_b_r)
 	return retVal;
 }
 
-READ8_MEMBER(llc_state::llc1_port2_a_r)
+uint8_t llc_state::llc1_port2_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 // LLC1 Monitor keyboard
-READ8_MEMBER(llc_state::llc1_port1_a_r)
+uint8_t llc_state::llc1_port1_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	if (!BIT(m_porta, 4))
@@ -63,12 +63,12 @@ READ8_MEMBER(llc_state::llc1_port1_a_r)
 	return data;
 }
 
-WRITE8_MEMBER(llc_state::llc1_port1_a_w)
+void llc_state::llc1_port1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
-WRITE8_MEMBER(llc_state::llc1_port1_b_w)
+void llc_state::llc1_port1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint8_t count = 0, digit = 0;
 
@@ -128,7 +128,7 @@ void llc_state::machine_reset_llc2()
 
 }
 
-WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
+void llc_state::llc2_rom_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
 	uint8_t *ram = m_ram->pointer();
@@ -147,7 +147,7 @@ WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 
 }
 
-WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
+void llc_state::llc2_basic_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
 	if (data & 0x02)
@@ -163,18 +163,18 @@ WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 
 }
 
-READ8_MEMBER(llc_state::llc2_port1_b_r)
+uint8_t llc_state::llc2_port1_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(llc_state::llc2_port1_b_w)
+void llc_state::llc2_port1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 6));
 	m_rv = BIT(data, 5);
 }
 
-READ8_MEMBER(llc_state::llc2_port2_a_r)
+uint8_t llc_state::llc2_port2_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; // bit 2 low or hangs on ^Z^X^C sequence
 }

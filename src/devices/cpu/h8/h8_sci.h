@@ -35,19 +35,19 @@ public:
 	void set_info(const char *intc, int eri, int rxi, int txi, int tei);
 	void set_external_clock_period(const attotime &_period);
 
-	DECLARE_WRITE8_MEMBER(smr_w);
-	DECLARE_READ8_MEMBER(smr_r);
-	DECLARE_WRITE8_MEMBER(brr_w);
-	DECLARE_READ8_MEMBER(brr_r);
-	DECLARE_WRITE8_MEMBER(scr_w);
-	DECLARE_READ8_MEMBER(scr_r);
-	DECLARE_WRITE8_MEMBER(tdr_w);
-	DECLARE_READ8_MEMBER(tdr_r);
-	DECLARE_WRITE8_MEMBER(ssr_w);
-	DECLARE_READ8_MEMBER(ssr_r);
-	DECLARE_READ8_MEMBER(rdr_r);
-	DECLARE_WRITE8_MEMBER(scmr_w);
-	DECLARE_READ8_MEMBER(scmr_r);
+	void smr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t smr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void brr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t brr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ssr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ssr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scmr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(rx_w);
 	DECLARE_WRITE_LINE_MEMBER(clk_w);

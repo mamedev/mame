@@ -35,8 +35,8 @@ public:
 
 	void set_base(int8_t* base) { m_base = base; }
 
-	DECLARE_WRITE32_MEMBER( cps3_sound_w );
-	DECLARE_READ32_MEMBER( cps3_sound_r );
+	void cps3_sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cps3_sound_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

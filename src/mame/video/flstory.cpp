@@ -101,13 +101,13 @@ void flstory_state::video_start_victnine()
 	save_item(NAME(m_paletteram_ext));
 }
 
-WRITE8_MEMBER(flstory_state::flstory_videoram_w)
+void flstory_state::flstory_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(flstory_state::flstory_palette_w)
+void flstory_state::flstory_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(flstory_state::flstory_palette_w)
 		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(flstory_state::flstory_palette_r)
+uint8_t flstory_state::flstory_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -123,7 +123,7 @@ READ8_MEMBER(flstory_state::flstory_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
+void flstory_state::flstory_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxctrl = data;
 
@@ -139,12 +139,12 @@ WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 
 }
 
-READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
+uint8_t flstory_state::victnine_gfxctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfxctrl;
 }
 
-WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
+void flstory_state::victnine_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfxctrl = data;
 
@@ -157,7 +157,7 @@ WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 
 }
 
-WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
+void flstory_state::flstory_scrlram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);

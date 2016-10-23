@@ -40,10 +40,10 @@ public:
 
 	required_shared_ptr<uint8_t> m_led_vram_lo;
 	required_shared_ptr<uint8_t> m_led_vram_hi;
-	DECLARE_READ8_MEMBER(test1_r);
-	DECLARE_READ8_MEMBER(test2_r);
-	DECLARE_READ8_MEMBER(in_r);
-	DECLARE_READ8_MEMBER(ld_r);
+	uint8_t test1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t test2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ld_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -63,24 +63,24 @@ uint32_t timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ8_MEMBER(timetrv_state::test1_r)
+uint8_t timetrv_state::test1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();//machine().rand();
 }
 
-READ8_MEMBER(timetrv_state::test2_r)
+uint8_t timetrv_state::test2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*bit 7,eeprom read bit*/
 	return (ioport("IN1")->read() & 0x7f);//machine().rand();
 }
 
 
-READ8_MEMBER(timetrv_state::in_r)
+uint8_t timetrv_state::in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(timetrv_state::ld_r)
+uint8_t timetrv_state::ld_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

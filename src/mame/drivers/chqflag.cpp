@@ -25,7 +25,7 @@
 
 
 /* these trampolines are less confusing than nested address_map_bank_devices */
-READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
+uint8_t chqflag_state::k051316_1_ramrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k051316_readroms)
 		return m_k051316_1->rom_r(space, offset);
@@ -33,7 +33,7 @@ READ8_MEMBER(chqflag_state::k051316_1_ramrom_r)
 		return m_k051316_1->read(space, offset);
 }
 
-READ8_MEMBER(chqflag_state::k051316_2_ramrom_r)
+uint8_t chqflag_state::k051316_2_ramrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k051316_readroms)
 		return m_k051316_2->rom_r(space, offset);
@@ -41,7 +41,7 @@ READ8_MEMBER(chqflag_state::k051316_2_ramrom_r)
 		return m_k051316_2->read(space, offset);
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
+void chqflag_state::chqflag_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-4 = ROM bank # (0x00-0x11) */
 	int bankaddress = data & 0x1f;
@@ -54,7 +54,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	/* other bits unknown/unused */
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
+void chqflag_state::chqflag_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 & 1 = coin counters */
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);
@@ -92,12 +92,12 @@ WRITE8_MEMBER(chqflag_state::chqflag_vreg_w)
 	/* other bits unknown. bit 5 is used. */
 }
 
-WRITE8_MEMBER(chqflag_state::select_analog_ctrl_w)
+void chqflag_state::select_analog_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_analog_ctrl = data;
 }
 
-READ8_MEMBER(chqflag_state::analog_read_r)
+uint8_t chqflag_state::analog_read_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_analog_ctrl & 0x03)
 	{
@@ -110,7 +110,7 @@ READ8_MEMBER(chqflag_state::analog_read_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(chqflag_state::chqflag_sh_irqtrigger_w)
+void chqflag_state::chqflag_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(chqflag_state::k007232_bankswitch_w)
+void chqflag_state::k007232_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_A, bank_B;
 
@@ -245,21 +245,21 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(chqflag_state::volume_callback0)
+void chqflag_state::volume_callback0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
 	m_k007232_1->set_volume(0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
+void chqflag_state::k007232_extvolume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume/pan for one of the channels on this chip
 	// which channel and which bits are left/right is a guess
 	m_k007232_1->set_volume(1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-WRITE8_MEMBER(chqflag_state::volume_callback1)
+void chqflag_state::volume_callback1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);

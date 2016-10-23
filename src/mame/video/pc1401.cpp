@@ -19,12 +19,12 @@
   603d: 0 BUSY, 1 DEF, 2 SHIFT, 3 BGN, 4 STAT, 5 FIN, 6 PRINT
   607c: 0 E, 1 M, 2 BAL, 3 INT, 4 PRN, 5 Sum-Sign, 6 PRO */
 
-READ8_MEMBER(pc1401_state::pc1401_lcd_read)
+uint8_t pc1401_state::pc1401_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_reg[offset & 0xff];
 }
 
-WRITE8_MEMBER(pc1401_state::pc1401_lcd_write)
+void pc1401_state::pc1401_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg[offset & 0xff]=data;
 }

@@ -19,15 +19,15 @@ public:
 	taito_zoom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~taito_zoom_device() {}
 
-	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_irq_r);
-	DECLARE_WRITE16_MEMBER(reg_data_w);
-	DECLARE_WRITE16_MEMBER(reg_address_w);
+	void sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reg_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reg_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER(shared_ram_r);
-	DECLARE_WRITE8_MEMBER(shared_ram_w);
-	DECLARE_READ8_MEMBER(tms_ctrl_r);
-	DECLARE_WRITE8_MEMBER(tms_ctrl_w);
+	uint8_t shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tms_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

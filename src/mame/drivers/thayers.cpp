@@ -66,29 +66,29 @@ public:
 	int m_cart_present;
 	int m_pr7820_enter;
 	struct ssi263_t m_ssi263;
-	DECLARE_WRITE8_MEMBER(intrq_w);
-	DECLARE_READ8_MEMBER(irqstate_r);
-	DECLARE_WRITE8_MEMBER(timer_int_ack_w);
-	DECLARE_WRITE8_MEMBER(data_rdy_int_ack_w);
-	DECLARE_WRITE8_MEMBER(cop_d_w);
-	DECLARE_READ8_MEMBER(cop_data_r);
-	DECLARE_WRITE8_MEMBER(cop_data_w);
-	DECLARE_READ8_MEMBER(cop_l_r);
-	DECLARE_WRITE8_MEMBER(cop_l_w);
-	DECLARE_READ8_MEMBER(cop_g_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(cop_g_w);
+	void intrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irqstate_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data_rdy_int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cop_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cop_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop_l_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cop_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cop_g_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cop_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(cop_si_r);
 	DECLARE_WRITE_LINE_MEMBER(cop_so_w);
-	DECLARE_WRITE8_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(dsw_b_r);
-	DECLARE_READ8_MEMBER(laserdsc_data_r);
-	DECLARE_WRITE8_MEMBER(laserdsc_data_w);
-	DECLARE_WRITE8_MEMBER(laserdsc_control_w);
-	DECLARE_WRITE8_MEMBER(den1_w);
-	DECLARE_WRITE8_MEMBER(den2_w);
-	DECLARE_WRITE8_MEMBER(ssi263_register_w);
-	DECLARE_READ8_MEMBER(ssi263_register_r);
+	void control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsw_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t laserdsc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void laserdsc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void laserdsc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void den1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ssi263_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ssi263_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
 	virtual void machine_start() override;
@@ -133,7 +133,7 @@ void thayers_state::check_interrupt()
 	}
 }
 
-WRITE8_MEMBER(thayers_state::intrq_w)
+void thayers_state::intrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
@@ -142,7 +142,7 @@ WRITE8_MEMBER(thayers_state::intrq_w)
 	timer_set(attotime::from_usec(8250), TIMER_INTRQ_TICK);
 }
 
-READ8_MEMBER(thayers_state::irqstate_r)
+uint8_t thayers_state::irqstate_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -162,21 +162,21 @@ READ8_MEMBER(thayers_state::irqstate_r)
 	return (m_data_rdy_int << 5) | (m_timer_int << 4) | 0x08 | (m_ssi_data_request << 2);
 }
 
-WRITE8_MEMBER(thayers_state::timer_int_ack_w)
+void thayers_state::timer_int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_int = 1;
 
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
+void thayers_state::data_rdy_int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_rdy_int = 1;
 
 	check_interrupt();
 }
 
-WRITE8_MEMBER(thayers_state::cop_d_w)
+void thayers_state::cop_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -204,7 +204,7 @@ WRITE8_MEMBER(thayers_state::cop_d_w)
 
 /* COP Communication */
 
-READ8_MEMBER(thayers_state::cop_data_r)
+uint8_t thayers_state::cop_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -216,12 +216,12 @@ READ8_MEMBER(thayers_state::cop_data_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_data_w)
+void thayers_state::cop_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cop_data_latch = data;
 }
 
-READ8_MEMBER(thayers_state::cop_l_r)
+uint8_t thayers_state::cop_l_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_cop_data_latch_enable)
 	{
@@ -233,12 +233,12 @@ READ8_MEMBER(thayers_state::cop_l_r)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::cop_l_w)
+void thayers_state::cop_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cop_l = data;
 }
 
-READ8_MEMBER(thayers_state::cop_g_r)
+uint8_t thayers_state::cop_g_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -254,7 +254,7 @@ READ8_MEMBER(thayers_state::cop_g_r)
 	return m_cop_cmd_latch;
 }
 
-WRITE8_MEMBER(thayers_state::control_w)
+void thayers_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER(thayers_state::control_w)
 	m_cop_cmd_latch = (data >> 5) & 0x07;
 }
 
-WRITE8_MEMBER(thayers_state::cop_g_w)
+void thayers_state::cop_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(thayers_state::cop_so_w)
 
 /* I/O Board */
 
-WRITE8_MEMBER(thayers_state::control2_w)
+void thayers_state::control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -372,24 +372,24 @@ WRITE8_MEMBER(thayers_state::control2_w)
 	}
 }
 
-READ8_MEMBER(thayers_state::dsw_b_r)
+uint8_t thayers_state::dsw_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("COIN")->read() & 0xf0) | (ioport("DSWB")->read() & 0x0f);
 }
 
-READ8_MEMBER(thayers_state::laserdsc_data_r)
+uint8_t thayers_state::laserdsc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_ldv1000 != nullptr) return m_ldv1000->status_r();
 	if (m_pr7820 != nullptr) return m_pr7820->data_r();
 	return 0;
 }
 
-WRITE8_MEMBER(thayers_state::laserdsc_data_w)
+void thayers_state::laserdsc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc_data = data;
 }
 
-WRITE8_MEMBER(thayers_state::laserdsc_control_w)
+void thayers_state::laserdsc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -425,7 +425,7 @@ WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 	}
 }
 
-WRITE8_MEMBER(thayers_state::den1_w)
+void thayers_state::den1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -445,7 +445,7 @@ WRITE8_MEMBER(thayers_state::den1_w)
 	output().set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
 
-WRITE8_MEMBER(thayers_state::den2_w)
+void thayers_state::den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -485,7 +485,7 @@ static const char SSI263_PHONEMES[0x40][5] =
 };
 #endif
 
-WRITE8_MEMBER(thayers_state::ssi263_register_w)
+void thayers_state::ssi263_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct ssi263_t &ssi263 = m_ssi263;
 	switch (offset)
@@ -587,7 +587,7 @@ WRITE8_MEMBER(thayers_state::ssi263_register_w)
 	}
 }
 
-READ8_MEMBER(thayers_state::ssi263_register_r)
+uint8_t thayers_state::ssi263_register_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// D7 becomes an output, as the inverted state of A/_R. The register address bits are ignored.
 

@@ -77,16 +77,16 @@ public:
 	uint8_t m_status;
 	uint8_t m_clr_status;
 
-	DECLARE_READ8_MEMBER(disk_iobank_r);
-	DECLARE_WRITE8_MEMBER(disk_iobank_w);
-	DECLARE_READ8_MEMBER(fdc765_status_r);
-	DECLARE_READ8_MEMBER(fdc765_data_r);
-	DECLARE_WRITE8_MEMBER(fdc765_data_w);
-	DECLARE_WRITE8_MEMBER(fdc_dor_w);
-	DECLARE_READ8_MEMBER(port_a_r);
-	DECLARE_READ8_MEMBER(port_b_r);
-	DECLARE_READ8_MEMBER(port_c_r);
-	DECLARE_WRITE8_MEMBER(port_b_w);
+	uint8_t disk_iobank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void disk_iobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc765_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fdc765_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc765_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -137,8 +137,8 @@ public:
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(bg_bank_r);
-	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	uint8_t bg_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_bg_bank;
 };
@@ -164,12 +164,12 @@ void isa8_cga_tetriskr_device::device_start()
 	m_isa->install_device(0x3c0, 0x3c0, read8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_r), this ), write8_delegate( FUNC(isa8_cga_tetriskr_device::bg_bank_w), this ) );
 }
 
-WRITE8_MEMBER(isa8_cga_tetriskr_device::bg_bank_w)
+void isa8_cga_tetriskr_device::bg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_bank = (data & 0x0f) ^ 8;
 }
 
-READ8_MEMBER(isa8_cga_tetriskr_device::bg_bank_r)
+uint8_t isa8_cga_tetriskr_device::bg_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -233,7 +233,7 @@ const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 	return ROM_NAME( tetriskr_cga );
 }
 
-READ8_MEMBER(pcxt_state::disk_iobank_r)
+uint8_t pcxt_state::disk_iobank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,space.device().safe_pc());
 	//if(offset == 0) return ioport("DSW")->read();
@@ -242,7 +242,7 @@ READ8_MEMBER(pcxt_state::disk_iobank_r)
 	return m_disk_data[offset];
 }
 
-WRITE8_MEMBER(pcxt_state::disk_iobank_w)
+void pcxt_state::disk_iobank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     BIOS does a single out $0310,$F0 on reset
@@ -291,17 +291,17 @@ WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 	m_disk_data[offset] = data;
 }
 
-READ8_MEMBER(pcxt_state::port_a_r)
+uint8_t pcxt_state::port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xaa;//harmless keyboard error occurs without this
 }
 
-READ8_MEMBER(pcxt_state::port_b_r)
+uint8_t pcxt_state::port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_b_data;
 }
 
-READ8_MEMBER(pcxt_state::port_c_r)
+uint8_t pcxt_state::port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;// DIPS?
 }
@@ -309,7 +309,7 @@ READ8_MEMBER(pcxt_state::port_c_r)
 /*'buzzer' sound routes here*/
 /* Filetto uses this for either beep and um5100 sound routing,probably there's a mux somewhere.*/
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
-WRITE8_MEMBER(pcxt_state::port_b_w)
+void pcxt_state::port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mb->m_pit8253->write_gate2(BIT(data, 0));
 	m_mb->pc_speaker_set_spkrdata(BIT(data, 1));
@@ -325,7 +325,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 #define FDC_WRITE 0x40
 #define FDC_READ 0x00 /*~0x40*/
 
-READ8_MEMBER(pcxt_state::fdc765_status_r)
+uint8_t pcxt_state::fdc765_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tmp;
 	tmp = m_status | 0x80;
@@ -338,20 +338,20 @@ READ8_MEMBER(pcxt_state::fdc765_status_r)
 	return tmp;
 }
 
-READ8_MEMBER(pcxt_state::fdc765_data_r)
+uint8_t pcxt_state::fdc765_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_status = (FDC_READ);
 	m_mb->m_pic8259->ir6_w(0);
 	return 0xc0;
 }
 
-WRITE8_MEMBER(pcxt_state::fdc765_data_w)
+void pcxt_state::fdc765_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status = (FDC_WRITE);
 }
 
 
-WRITE8_MEMBER(pcxt_state::fdc_dor_w)
+void pcxt_state::fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mb->m_pic8259->ir6_w(1);
 }

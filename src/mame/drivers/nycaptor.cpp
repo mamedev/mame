@@ -203,27 +203,27 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(nycaptor_state::sub_cpu_halt_w)
+void nycaptor_state::sub_cpu_halt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, (data) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(nycaptor_state::from_snd_r)
+uint8_t nycaptor_state::from_snd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_data;
 }
 
-WRITE8_MEMBER(nycaptor_state::to_main_w)
+void nycaptor_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_data = data;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_b_r)
+uint8_t nycaptor_state::nycaptor_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_by_r)
+uint8_t nycaptor_state::nycaptor_by_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int port = ioport("LIGHTY")->read();
 
@@ -233,13 +233,13 @@ READ8_MEMBER(nycaptor_state::nycaptor_by_r)
 	return port - 8;
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_bx_r)
+uint8_t nycaptor_state::nycaptor_bx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("LIGHTX")->read() + 0x27) | 1;
 }
 
 
-WRITE8_MEMBER(nycaptor_state::sound_cpu_reset_w)
+void nycaptor_state::sound_cpu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
@@ -270,18 +270,18 @@ TIMER_CALLBACK_MEMBER(nycaptor_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(nycaptor_state::sound_command_w)
+void nycaptor_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nycaptor_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(nycaptor_state::nmi_disable_w)
+void nycaptor_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
+void nycaptor_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 
@@ -292,16 +292,16 @@ WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(nycaptor_state::unk_w)
+void nycaptor_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(nycaptor_state::nycaptor_generic_control_r)
+uint8_t nycaptor_state::nycaptor_generic_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_generic_control_reg;
 }
 
-WRITE8_MEMBER(nycaptor_state::nycaptor_generic_control_w)
+void nycaptor_state::nycaptor_generic_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data&0x08)>>3);
@@ -384,26 +384,26 @@ ADDRESS_MAP_END
 /* Cycle Shooting */
 
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_r)
+uint8_t nycaptor_state::cyclshtg_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 7;
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_mcu_w)
+void nycaptor_state::cyclshtg_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r1)
+uint8_t nycaptor_state::cyclshtg_mcu_status_r1(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(nycaptor_state::cyclshtg_generic_control_w)
+void nycaptor_state::cyclshtg_generic_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_generic_control_reg = data;
 	membank("bank1")->set_entry((data >> 2) & 3);
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( cyclshtg_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_IMPORT_FROM( nycaptor_sound_map )
 ADDRESS_MAP_END
 
-READ8_MEMBER(nycaptor_state::unk_r)
+uint8_t nycaptor_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

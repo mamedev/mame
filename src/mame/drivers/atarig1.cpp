@@ -61,7 +61,7 @@ void atarig1_state::machine_reset_atarig1()
  *
  *************************************/
 
-WRITE16_MEMBER(atarig1_state::mo_command_w)
+void atarig1_state::mo_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	m_rle->command_write(space, offset, (data == 0 && m_is_pitfight) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
@@ -75,7 +75,7 @@ WRITE16_MEMBER(atarig1_state::mo_command_w)
  *
  *************************************/
 
-READ16_MEMBER(atarig1_state::special_port0_r)
+uint16_t atarig1_state::special_port0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = ioport("IN0")->read();
 	temp ^= 0x2000;     /* A2DOK always high for now */
@@ -83,13 +83,13 @@ READ16_MEMBER(atarig1_state::special_port0_r)
 }
 
 
-WRITE16_MEMBER(atarig1_state::a2d_select_w)
+void atarig1_state::a2d_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_which_input = offset;
 }
 
 
-READ16_MEMBER(atarig1_state::a2d_data_r)
+uint16_t atarig1_state::a2d_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
 
@@ -140,7 +140,7 @@ void atarig1_state::device_post_load()
 }
 
 
-READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
+uint16_t atarig1_state::pitfightb_cheap_slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = m_bslapstic_base[offset & 0xfff];
 

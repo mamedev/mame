@@ -92,14 +92,14 @@ public:
 
 	uint8_t m_wdog;
 
-	DECLARE_READ8_MEMBER(rng_r);
-	DECLARE_WRITE8_MEMBER(wdog8000_w);
-	DECLARE_WRITE8_MEMBER(debug8004_w);
-	DECLARE_WRITE8_MEMBER(debug7c00_w);
-	DECLARE_WRITE8_MEMBER(coinin_w);
-	DECLARE_WRITE8_MEMBER(payout_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputa_w);
-	DECLARE_WRITE8_MEMBER(ay8910_outputb_w);
+	uint8_t rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wdog8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void debug8004_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void debug7c00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coinin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void payout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -179,12 +179,12 @@ PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
                             R/W Handlers
 **********************************************************************/
 
-READ8_MEMBER(supdrapo_state::rng_r)
+uint8_t supdrapo_state::rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(supdrapo_state::wdog8000_w)
+void supdrapo_state::wdog8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Kind of state watchdog alternating 0x00 & 0x01 writes.
     Used when exit the test mode (writes 2 consecutive 0's).
@@ -223,7 +223,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 }
 
 
-WRITE8_MEMBER(supdrapo_state::debug8004_w)
+void supdrapo_state::debug8004_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Writes 0x00 each time the machine is initialized */
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(supdrapo_state::debug8004_w)
 //  popmessage("written : %02X", data);
 }
 
-WRITE8_MEMBER(supdrapo_state::debug7c00_w)
+void supdrapo_state::debug7c00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  This one write 0's constantly when the input test mode is running */
 	logerror("debug7c00: %02X\n", data);
@@ -242,12 +242,12 @@ WRITE8_MEMBER(supdrapo_state::debug7c00_w)
                          Coin I/O Counters
 **********************************************************************/
 
-WRITE8_MEMBER(supdrapo_state::coinin_w)
+void supdrapo_state::coinin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  /* Coin In */
 }
 
-WRITE8_MEMBER(supdrapo_state::payout_w)
+void supdrapo_state::payout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01);  /* Payout */
 }
@@ -432,12 +432,12 @@ GFXDECODE_END
                          Sound Interface
 **********************************************************************/
 
-WRITE8_MEMBER(supdrapo_state::ay8910_outputa_w)
+void supdrapo_state::ay8910_outputa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("ay8910_outputa_w %02x",data);
 }
 
-WRITE8_MEMBER(supdrapo_state::ay8910_outputb_w)
+void supdrapo_state::ay8910_outputb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("ay8910_outputb_w %02x",data);
 }

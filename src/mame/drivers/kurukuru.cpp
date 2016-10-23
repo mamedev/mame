@@ -287,15 +287,15 @@ public:
 	uint8_t m_sound_irq_cause;
 	uint8_t m_adpcm_data;
 
-	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
-	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
-	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
-	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
-	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
+	void kurukuru_out_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kurukuru_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kurukuru_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kurukuru_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kurukuru_adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kurukuru_adpcm_timer_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kurukuru_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2149_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ym2149_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void update_sound_irq(uint8_t cause);
 	virtual void machine_start() override;
@@ -349,7 +349,7 @@ WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 
 // Main CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
+void kurukuru_state::kurukuru_out_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
    00-0f is output latch (controls jamma output pins)
@@ -375,7 +375,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
+void kurukuru_state::kurukuru_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank1->set_entry(7); // remove banked rom
 /*
@@ -394,7 +394,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 	}
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
+void kurukuru_state::kurukuru_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	update_sound_irq(m_sound_irq_cause | 1);
@@ -461,7 +461,7 @@ ADDRESS_MAP_END
 
 // Audio CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
+void kurukuru_state::kurukuru_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
      6-bit latch. only 4 connected...
@@ -470,7 +470,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 	m_adpcm_data = data & 0xf;
 }
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
+void kurukuru_state::kurukuru_adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
      6-bit latch. only 4 connected...
@@ -483,13 +483,13 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 	m_adpcm->reset_w(data & 1);
 }
 
-READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
+uint8_t kurukuru_state::kurukuru_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_sound_irq(m_sound_irq_cause & ~1);
 	return m_soundlatch->read(space, 0);
 }
 
-READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
+uint8_t kurukuru_state::kurukuru_adpcm_timer_irqack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_sound_irq(m_sound_irq_cause & ~2);
 	return 0;
@@ -528,12 +528,12 @@ ADDRESS_MAP_END
 */
 
 /* YM2149 ports */
-WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
+void kurukuru_state::ym2149_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("YM2149: Port A out: %02X\n", data);
 }
 
-WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
+void kurukuru_state::ym2149_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("YM2149: Port B out: %02X\n", data);
 }

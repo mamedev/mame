@@ -20,9 +20,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_cart) override { return m_subslot->read_cart(space, offset); }
-	virtual DECLARE_WRITE8_MEMBER(write_cart) override { m_subslot->write_cart(space, offset, data); }
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) override { m_subslot->write_mapper(space, offset, data); }
+	virtual uint8_t read_cart(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { return m_subslot->read_cart(space, offset); }
+	virtual void write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { m_subslot->write_cart(space, offset, data); }
+	virtual void write_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { m_subslot->write_mapper(space, offset, data); }
 	virtual int get_lphaser_xoffs() override { return m_subslot->m_cart ? m_subslot->m_cart->get_lphaser_xoffs() : -1; }
 
 	virtual machine_config_constructor device_mconfig_additions() const override;

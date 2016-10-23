@@ -57,7 +57,7 @@ TODO:
 #include "includes/sonson.h"
 
 
-WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
+void sonson_state::sonson_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;
 
@@ -70,12 +70,12 @@ WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
 	m_last_irq = data;
 }
 
-WRITE8_MEMBER(sonson_state::sonson_coin1_counter_w)
+void sonson_state::sonson_coin1_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_coin2_counter_w)
+void sonson_state::sonson_coin2_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 1);
 }

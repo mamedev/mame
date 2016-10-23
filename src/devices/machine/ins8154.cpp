@@ -92,7 +92,7 @@ void ins8154_device::device_reset()
 }
 
 
-READ8_MEMBER(ins8154_device::ins8154_r)
+uint8_t ins8154_device::ins8154_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -146,7 +146,7 @@ READ8_MEMBER(ins8154_device::ins8154_r)
 	return val;
 }
 
-WRITE8_MEMBER(ins8154_device::ins8154_porta_w)
+void ins8154_device::ins8154_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_a = data;
 
@@ -157,7 +157,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_porta_w)
 	}
 }
 
-WRITE8_MEMBER(ins8154_device::ins8154_portb_w)
+void ins8154_device::ins8154_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_b = data;
 
@@ -168,7 +168,7 @@ WRITE8_MEMBER(ins8154_device::ins8154_portb_w)
 	}
 }
 
-WRITE8_MEMBER(ins8154_device::ins8154_w)
+void ins8154_device::ins8154_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset > 0x24)
 	{

@@ -27,10 +27,10 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 16);
 
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(flag_r);
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(reset_w);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t flag_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual uint16_t dack16_r(int line) override;
 protected:
 	// device-level overrides

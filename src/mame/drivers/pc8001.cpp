@@ -27,7 +27,7 @@
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( pc8001_state::port10_w )
+void pc8001_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -54,7 +54,7 @@ WRITE8_MEMBER( pc8001_state::port10_w )
 	m_cent_data_out->write(space, 0, data);
 }
 
-WRITE8_MEMBER( pc8001_state::port30_w )
+void pc8001_state::port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -81,7 +81,7 @@ WRITE8_MEMBER( pc8001_state::port30_w )
 	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE8_MEMBER( pc8001mk2_state::port31_w )
+void pc8001mk2_state::port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER( pc8001_state::write_centronics_ack )
 	m_centronics_ack = state;
 }
 
-READ8_MEMBER( pc8001_state::port40_r )
+uint8_t pc8001_state::port40_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -136,7 +136,7 @@ READ8_MEMBER( pc8001_state::port40_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc8001_state::port40_w )
+void pc8001_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -410,7 +410,7 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_dma->hlda_w(state);
 }
 
-READ8_MEMBER( pc8001_state::dma_mem_r )
+uint8_t pc8001_state::dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 

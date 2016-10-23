@@ -45,21 +45,21 @@ public:
 
 	static void set_dma_offs_callback(device_t &device, st0016_dma_offs_delegate callback) { downcast<st0016_cpu_device &>(device).m_dma_offs_cb = callback; }
 
-	DECLARE_WRITE8_MEMBER(st0016_sprite_bank_w);
-	DECLARE_WRITE8_MEMBER(st0016_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(st0016_character_bank_w);
-	DECLARE_READ8_MEMBER(st0016_sprite_ram_r);
-	DECLARE_WRITE8_MEMBER(st0016_sprite_ram_w);
-	DECLARE_READ8_MEMBER(st0016_sprite2_ram_r);
-	DECLARE_WRITE8_MEMBER(st0016_sprite2_ram_w);
-	DECLARE_READ8_MEMBER(st0016_palette_ram_r);
-	DECLARE_WRITE8_MEMBER(st0016_palette_ram_w);
-	DECLARE_READ8_MEMBER(st0016_character_ram_r);
-	DECLARE_WRITE8_MEMBER(st0016_character_ram_w);
-	DECLARE_READ8_MEMBER(st0016_vregs_r);
-	DECLARE_READ8_MEMBER(st0016_dma_r);
-	DECLARE_WRITE8_MEMBER(st0016_vregs_w);
-	DECLARE_READ8_MEMBER(soundram_read);
+	void st0016_sprite_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void st0016_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void st0016_character_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t st0016_sprite_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void st0016_sprite_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t st0016_sprite2_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void st0016_sprite2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t st0016_palette_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void st0016_palette_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t st0016_character_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void st0016_character_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t st0016_vregs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t st0016_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void st0016_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t soundram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_st0016_game_flag(uint32_t flag) { m_game_flag = flag; }
 

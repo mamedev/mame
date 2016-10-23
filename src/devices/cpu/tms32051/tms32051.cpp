@@ -435,7 +435,7 @@ void tms32051_device::execute_run()
 
 /*****************************************************************************/
 
-READ16_MEMBER( tms32051_device::cpuregs_r )
+uint16_t tms32051_device::cpuregs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -520,7 +520,7 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 	return 0;
 }
 
-WRITE16_MEMBER( tms32051_device::cpuregs_w )
+void tms32051_device::cpuregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

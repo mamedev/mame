@@ -27,9 +27,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// ppi8255 callback
-	DECLARE_WRITE8_MEMBER(x_write);
-	DECLARE_WRITE8_MEMBER(y_write);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void x_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void y_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

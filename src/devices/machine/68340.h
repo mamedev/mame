@@ -40,20 +40,20 @@ public:
 
 	uint16_t get_cs(offs_t address);
 
-	READ32_MEMBER( m68340_internal_base_r );
-	WRITE32_MEMBER( m68340_internal_base_w );
-	READ32_MEMBER( m68340_internal_dma_r );
-	WRITE32_MEMBER( m68340_internal_dma_w );
-	READ32_MEMBER( m68340_internal_serial_r );
-	WRITE32_MEMBER( m68340_internal_serial_w );
-	READ16_MEMBER( m68340_internal_sim_r );
-	READ8_MEMBER( m68340_internal_sim_ports_r );
-	READ32_MEMBER( m68340_internal_sim_cs_r );
-	WRITE16_MEMBER( m68340_internal_sim_w );
-	WRITE8_MEMBER( m68340_internal_sim_ports_w );
-	WRITE32_MEMBER( m68340_internal_sim_cs_w );
-	READ32_MEMBER( m68340_internal_timer_r );
-	WRITE32_MEMBER( m68340_internal_timer_w );
+	uint32_t m68340_internal_base_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void m68340_internal_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t m68340_internal_dma_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void m68340_internal_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t m68340_internal_serial_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void m68340_internal_serial_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint16_t m68340_internal_sim_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint8_t m68340_internal_sim_ports_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint32_t m68340_internal_sim_cs_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void m68340_internal_sim_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	void m68340_internal_sim_ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void m68340_internal_sim_cs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t m68340_internal_timer_r(address_space &space, offs_t offset, uint32_t mem_mask);
+	void m68340_internal_timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	emu_timer *m_irq_timer;
 	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);

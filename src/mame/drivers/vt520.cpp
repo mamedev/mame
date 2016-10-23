@@ -20,7 +20,7 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ8_MEMBER(vt520_some_r);
+	uint8_t vt520_some_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -38,7 +38,7 @@ ADDRESS_MAP_END
     there is 43.430MHz xtal near by
 */
 
-READ8_MEMBER( vt520_state::vt520_some_r )
+uint8_t vt520_state::vt520_some_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//bit 5 0
 	//bit 6 1

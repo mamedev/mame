@@ -218,11 +218,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( ptm_out0 );
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( rp_w );
-	DECLARE_WRITE8_MEMBER( ws_dir_w );
+	void rp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ws_dir_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( tri_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_ca2_w );
 	DECLARE_WRITE_LINE_MEMBER( pia_0_cb2_w );
@@ -231,8 +231,8 @@ public:
 
 	DECLARE_READ_LINE_MEMBER( eosi_r );
 	DECLARE_READ_LINE_MEMBER( zx_r );
-	DECLARE_WRITE8_MEMBER( pia_1_a_w );
-	DECLARE_WRITE8_MEMBER( pia_1_b_w );
+	void pia_1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_1_irqb );
 
@@ -469,87 +469,87 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq1 );
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq2 );
 	DECLARE_WRITE_LINE_MEMBER( q133_acia_irq3 );
-	DECLARE_WRITE8_MEMBER( i8214_cpu1_w );
-	DECLARE_WRITE8_MEMBER( i8214_cpu2_w );
+	void i8214_cpu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8214_cpu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( i8214_1_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_2_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_3_int_w );
 	DECLARE_WRITE_LINE_MEMBER( i8214_3_enlg );
-	DECLARE_READ8_MEMBER( shared_ram_r );
-	DECLARE_WRITE8_MEMBER( shared_ram_w );
+	uint8_t shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( q133_1_porta_r );
-	DECLARE_WRITE8_MEMBER( q133_1_porta_w );
-	DECLARE_WRITE8_MEMBER( q133_1_portb_w );
+	uint8_t q133_1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void q133_1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void q133_1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	INTERRUPT_GEN_MEMBER( cmi_iix_vblank );
 	IRQ_CALLBACK_MEMBER( cpu1_interrupt_callback );
 	IRQ_CALLBACK_MEMBER( cpu2_interrupt_callback );
 
 	// Video-related
-	DECLARE_READ8_MEMBER( video_r );
-	DECLARE_READ8_MEMBER( lightpen_r );
-	DECLARE_READ8_MEMBER( pia_q219_b_r );
-	DECLARE_WRITE8_MEMBER( video_w );
-	DECLARE_WRITE8_MEMBER( vscroll_w );
-	DECLARE_WRITE8_MEMBER( video_attr_w );
-	DECLARE_READ8_MEMBER( vram_r );
-	DECLARE_WRITE8_MEMBER( vram_w );
+	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lightpen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_q219_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqa );
 	DECLARE_WRITE_LINE_MEMBER( pia_q219_irqb );
 	DECLARE_WRITE_LINE_MEMBER( ptm_q219_irq );
 	uint32_t screen_update_cmi2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Memory mapping
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( map_ram_w );
-	DECLARE_READ8_MEMBER( vector_r );
-	DECLARE_READ8_MEMBER( map_r );
-	DECLARE_WRITE8_MEMBER( map_w );
-	DECLARE_READ8_MEMBER( atomic_r );
-	DECLARE_WRITE8_MEMBER( cpufunc_w );
-	DECLARE_READ8_MEMBER( parity_r );
-	DECLARE_WRITE8_MEMBER( mapsel_w );
-	DECLARE_READ8_MEMBER( irq_ram_r );
-	DECLARE_WRITE8_MEMBER( irq_ram_w );
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void map_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t map_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t atomic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpufunc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t parity_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mapsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// MIDI/SMPTE
-	DECLARE_WRITE16_MEMBER( midi_dma_w );
-	DECLARE_READ16_MEMBER( midi_dma_r );
+	void midi_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t midi_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// Floppy
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_READ8_MEMBER( fdc_r );
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( wd1791_irq );
 	DECLARE_WRITE_LINE_MEMBER( wd1791_drq );
 
 	// Master card
-	DECLARE_READ8_MEMBER( cmi02_r );
-	DECLARE_WRITE8_MEMBER( cmi02_w );
-	DECLARE_WRITE8_MEMBER( master_tune_w );
+	uint8_t cmi02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmi02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void master_tune_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_irq );
 	DECLARE_WRITE_LINE_MEMBER( cmi02_ptm_o1 );
 
 	// Alphanumeric keyboard
-	DECLARE_READ8_MEMBER( ank_col_r );
+	uint8_t ank_col_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( ank_rts_r );
 	DECLARE_WRITE_LINE_MEMBER( ank_irqa_w );
 	DECLARE_WRITE_LINE_MEMBER( ank_irqb_w );
 
 	// ???
-	DECLARE_READ8_MEMBER( cmi07_r );
-	DECLARE_WRITE8_MEMBER( cmi07_w );
+	uint8_t cmi07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmi07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// Music keyboard/alphanumeric display/keypad
-	DECLARE_WRITE8_MEMBER( cmi10_u20_a_w );
-	DECLARE_WRITE8_MEMBER( cmi10_u20_b_w );
+	void cmi10_u20_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cmi10_u20_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( cmi10_u20_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u20_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( cmi10_u21_cb2_w );
-	DECLARE_READ8_MEMBER( cmi10_u21_a_r );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp1 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp2 );
-	DECLARE_WRITE16_MEMBER( cmi_iix_update_dp3 );
+	uint8_t cmi10_u21_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmi_iix_update_dp1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cmi_iix_update_dp2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cmi_iix_update_dp3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER( msm5832_irq );
 	DECLARE_WRITE_LINE_MEMBER( mkbd_kbd_acia_int );
@@ -828,7 +828,7 @@ void cmi_state::video_write(int offset)
 	}
 }
 
-READ8_MEMBER( cmi_state::video_r )
+uint8_t cmi_state::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return m_video_data;
@@ -839,7 +839,7 @@ READ8_MEMBER( cmi_state::video_r )
 	return m_video_data;
 }
 
-READ8_MEMBER( cmi_state::lightpen_r )
+uint8_t cmi_state::lightpen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 2)
 		return m_lp_y;
@@ -847,34 +847,34 @@ READ8_MEMBER( cmi_state::lightpen_r )
 		return m_lp_x >> 1;
 }
 
-READ8_MEMBER( cmi_state::pia_q219_b_r )
+uint8_t cmi_state::pia_q219_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_lp_x << 7) & 0x80) | m_q219_b_touch;
 }
 
 
-WRITE8_MEMBER( cmi_state::video_w )
+void cmi_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_data = data;
 	video_write(offset);
 }
 
-WRITE8_MEMBER( cmi_state::vscroll_w )
+void cmi_state::vscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: Partial updates. Also, this should be done through a PIA
 }
 
-WRITE8_MEMBER( cmi_state::video_attr_w )
+void cmi_state::video_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO
 }
 
-WRITE8_MEMBER( cmi_state::vram_w )
+void cmi_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_ram[offset] = data;
 }
 
-READ8_MEMBER( cmi_state::vram_r )
+uint8_t cmi_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return m_video_ram[offset];
@@ -890,13 +890,13 @@ READ8_MEMBER( cmi_state::vram_r )
 
 /* Memory handling */
 
-READ8_MEMBER( cmi_state::rom_r )
+uint8_t cmi_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t base = (&space == m_cpu2space ? 0x1000 : 0x2000);
 	return *(((uint8_t *)m_q133_region->base()) + base + offset);
 }
 
-WRITE8_MEMBER( cmi_state::map_ram_w )
+void cmi_state::map_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 	{
@@ -922,26 +922,26 @@ WRITE8_MEMBER( cmi_state::map_ram_w )
 	}
 }
 
-READ8_MEMBER( cmi_state::vector_r )
+uint8_t cmi_state::vector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_q133_rom[((&space.device() == m_maincpu2) ? 0xbfe : 0xffe) + offset];
 }
 
-READ8_MEMBER( cmi_state::map_r )
+uint8_t cmi_state::map_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 	uint8_t data = (m_cpu_active_space[1] << 2) | (m_cpu_active_space[0] << 1) | cpunum;
 	return data;
 }
 
-WRITE8_MEMBER( cmi_state::map_w )
+void cmi_state::map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 
 	m_map_switch_timer->adjust(attotime::from_ticks(data & 0xf, M6809_CLOCK), cpunum);
 }
 
-READ8_MEMBER( cmi_state::irq_ram_r )
+uint8_t cmi_state::irq_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 
@@ -956,7 +956,7 @@ READ8_MEMBER( cmi_state::irq_ram_r )
 	return m_scratch_ram[cpunum][0xf8 + offset];
 }
 
-WRITE8_MEMBER( cmi_state::irq_ram_w )
+void cmi_state::irq_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cpunum = (&space.device() == m_maincpu1) ? 0 : 1;
 	m_scratch_ram[cpunum][0xf8 + offset] = data;
@@ -994,14 +994,14 @@ void cmi_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-READ8_MEMBER( cmi_state::atomic_r )
+uint8_t cmi_state::atomic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO
 	//printf("atomic access\n");
 	return 0;
 }
 
-WRITE8_MEMBER( cmi_state::cpufunc_w )
+void cmi_state::cpufunc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cpunum = data & 1;
 	int idx = data & 6;
@@ -1024,14 +1024,14 @@ WRITE8_MEMBER( cmi_state::cpufunc_w )
 	}
 }
 
-READ8_MEMBER( cmi_state::parity_r )
+uint8_t cmi_state::parity_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("parity_r %04x\n", offset);
 	// TODO
 	return 0xff;
 }
 
-WRITE8_MEMBER( cmi_state::mapsel_w )
+void cmi_state::mapsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data ^= 0x1f;
 	m_map_sel[offset] = data;
@@ -1049,7 +1049,7 @@ WRITE8_MEMBER( cmi_state::mapsel_w )
 
 
 
-WRITE16_MEMBER( cmi_state::midi_dma_w )
+void cmi_state::midi_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
@@ -1060,7 +1060,7 @@ WRITE16_MEMBER( cmi_state::midi_dma_w )
 		cmi_space->write_byte(offset * 2, data >> 8);
 }
 
-READ16_MEMBER( cmi_state::midi_dma_r )
+uint16_t cmi_state::midi_dma_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space *cmi_space = ((offset & 0x8000) ? m_cpu2space : m_cpu1space);
 	offset &= 0x7fff;
@@ -1428,7 +1428,7 @@ void cmi_state::update_address_space(int cpunum, uint8_t mapinfo)
 		install_peripherals(cpunum);
 }
 
-WRITE8_MEMBER( cmi_state::cmi07_w )
+void cmi_state::cmi07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cmi07_ctrl = data;
 
@@ -1445,7 +1445,7 @@ WRITE8_MEMBER( cmi_state::cmi07_w )
 	update_address_space(1, map_info);
 }
 
-READ8_MEMBER( cmi_state::cmi07_r )
+uint8_t cmi_state::cmi07_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("CMI 07 R: %x\n", offset);
 	return 0xff;
@@ -1475,7 +1475,7 @@ WRITE_LINE_MEMBER( cmi_state::q133_acia_irq3 )
 	set_interrupt(CPU_1, IRQ_ACINT_LEVEL, m_q133_acia_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( cmi_state::ank_col_r )
+uint8_t cmi_state::ank_col_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int row = m_ank_pia->b_output() ^ 0xff;
 
@@ -1556,7 +1556,7 @@ void cmi_state::write_fdc_ctrl(uint8_t data)
 	m_fdc_ctrl = data;
 }
 
-WRITE8_MEMBER( cmi_state::fdc_w )
+void cmi_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1579,7 +1579,7 @@ WRITE8_MEMBER( cmi_state::fdc_w )
 		m_fdc_addr = data;
 }
 
-READ8_MEMBER( cmi_state::fdc_r )
+uint8_t cmi_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -1710,7 +1710,7 @@ WRITE_LINE_MEMBER( cmi_state::wd1791_drq )
 28 - 2B = PIA
 */
 
-WRITE8_MEMBER( cmi_state::master_tune_w )
+void cmi_state::master_tune_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  double mfreq = (double)data * ((double)MASTER_OSCILLATOR / 2.0) / 256.0;
 }
@@ -1740,21 +1740,21 @@ WRITE_LINE_MEMBER( cmi01a_device::pia_0_irqb )
 	update_interrupts();
 }
 
-WRITE8_MEMBER( cmi01a_device::pia_1_a_w )
+void cmi01a_device::pia_1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // top two
 }
 
-WRITE8_MEMBER( cmi01a_device::pia_1_b_w )
+void cmi01a_device::pia_1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( cmi01a_device::rp_w )
+void cmi01a_device::rp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rp = data;
 }
 
-WRITE8_MEMBER( cmi01a_device::ws_dir_w )
+void cmi01a_device::ws_dir_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ws = data & 0x7f;
 	m_dir = (data >> 7) & 1;
@@ -1945,7 +1945,7 @@ READ_LINE_MEMBER( cmi01a_device::zx_r )
 	return m_segment_cnt & 0x40;
 }
 
-WRITE8_MEMBER( cmi01a_device::write )
+void cmi01a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("C%d W: %02x = %02x\n", m_channel, offset, data);
 
@@ -2001,7 +2001,7 @@ WRITE8_MEMBER( cmi01a_device::write )
 	}
 }
 
-READ8_MEMBER( cmi01a_device::read )
+uint8_t cmi01a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -2075,7 +2075,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi02_ptm_o1 )
 	m_cmi02_ptm->set_c3(state);
 }
 
-READ8_MEMBER( cmi_state::cmi02_r )
+uint8_t cmi_state::cmi02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -2124,7 +2124,7 @@ READ8_MEMBER( cmi_state::cmi02_r )
 	}
 }
 
-WRITE8_MEMBER( cmi_state::cmi02_w )
+void cmi_state::cmi02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset <= 0x1f)
 	{
@@ -2180,7 +2180,7 @@ void cmi_state::install_video_ram(int cpunum)
 	space->install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(cmi_state::vram_r),this), write8_delegate(FUNC(cmi_state::vram_w),this));
 }
 
-WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
+void cmi_state::i8214_cpu1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("i8214_cpu1_w: %02x\n", data);
 	m_maincpu1->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
@@ -2190,7 +2190,7 @@ WRITE8_MEMBER( cmi_state::i8214_cpu1_w )
 }
 
 
-WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
+void cmi_state::i8214_cpu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("i8214_cpu2_w: %02x\n", data);
 	m_maincpu2->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
@@ -2200,12 +2200,12 @@ WRITE8_MEMBER( cmi_state::i8214_cpu2_w )
 }
 
 // TODO: replace with AM_SHARE
-READ8_MEMBER( cmi_state::shared_ram_r )
+uint8_t cmi_state::shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER( cmi_state::shared_ram_w )
+void cmi_state::shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared_ram[offset] = data;
 }
@@ -2399,7 +2399,7 @@ WRITE_LINE_MEMBER( cmi_state::pia_q219_irqb )
     IRQA/B = /RTINT?
 */
 
-READ8_MEMBER( cmi_state::q133_1_porta_r )
+uint8_t cmi_state::q133_1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_q133_pia_0->b_output(), 1))
 	{
@@ -2408,13 +2408,13 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( cmi_state::q133_1_porta_w )
+void cmi_state::q133_1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5832_addr = data & 0xf;
 	m_msm5832->address_w(data & 0x0f);
 }
 
-WRITE8_MEMBER( cmi_state::q133_1_portb_w )
+void cmi_state::q133_1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5832->hold_w(BIT(data, 0));
 	m_msm5832->read_w(BIT(data, 1));
@@ -2438,7 +2438,7 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
     CB2 = /DWS
 */
 
-WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
+void cmi_state::cmi10_u20_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	int bk = data;
@@ -2453,7 +2453,7 @@ WRITE8_MEMBER( cmi_state::cmi10_u20_a_w )
 	*/
 }
 
-WRITE8_MEMBER( cmi_state::cmi10_u20_b_w )
+void cmi_state::cmi10_u20_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -2496,17 +2496,17 @@ WRITE_LINE_MEMBER( cmi_state::cmi10_u20_cb2_w )
 	m_dp3->data_w(space, addr & 3, data, 0xff);
 }
 
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp1 )
+void cmi_state::cmi_iix_update_dp1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(0 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp2 )
+void cmi_state::cmi_iix_update_dp2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(4 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( cmi_state::cmi_iix_update_dp3 )
+void cmi_state::cmi_iix_update_dp3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(8 + (offset ^ 3), data);
 }
@@ -2519,7 +2519,7 @@ WRITE_LINE_MEMBER( cmi_state::cmi10_u21_cb2_w )
 }
 
 
-READ8_MEMBER( cmi_state::cmi10_u21_a_r )
+uint8_t cmi_state::cmi10_u21_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 #if 0
 //  int thld = m_cmi10_pia_u21->ca2_output();

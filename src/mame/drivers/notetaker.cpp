@@ -119,28 +119,28 @@ public:
 	// screen
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	// basic io
-	DECLARE_WRITE16_MEMBER(IPConReg_w);
-	DECLARE_WRITE16_MEMBER(FIFOReg_w);
-	DECLARE_WRITE16_MEMBER(FIFOBus_w);
-	DECLARE_WRITE16_MEMBER(DiskReg_w);
-	DECLARE_WRITE16_MEMBER(LoadDispAddr_w);
+	void IPConReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void FIFOReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void FIFOBus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void DiskReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void LoadDispAddr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// uarts
-	DECLARE_READ16_MEMBER(ReadKeyData_r);
-	DECLARE_READ16_MEMBER(ReadOPStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadKeyData_w);
-	DECLARE_WRITE16_MEMBER(LoadKeyCtlReg_w);
-	DECLARE_WRITE16_MEMBER(KeyDataReset_w);
-	DECLARE_WRITE16_MEMBER(KeyChipReset_w);
-	DECLARE_READ16_MEMBER(ReadEIAData_r);
-	DECLARE_READ16_MEMBER(ReadEIAStatus_r);
-	DECLARE_WRITE16_MEMBER(LoadEIAData_w);
-	DECLARE_WRITE16_MEMBER(LoadEIACtlReg_w);
-	DECLARE_WRITE16_MEMBER(EIADataReset_w);
-	DECLARE_WRITE16_MEMBER(EIAChipReset_w);
+	uint16_t ReadKeyData_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ReadOPStatus_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void LoadKeyData_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void LoadKeyCtlReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void KeyDataReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void KeyChipReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ReadEIAData_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ReadEIAStatus_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void LoadEIAData_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void LoadEIACtlReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void EIADataReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void EIAChipReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	// mem map stuff
-	DECLARE_READ16_MEMBER(iocpu_r);
-	DECLARE_WRITE16_MEMBER(iocpu_w);
+	uint16_t iocpu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void iocpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_notetakr();
 	//variables
 	//  IPConReg
@@ -264,7 +264,7 @@ uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE16_MEMBER(notetaker_state::IPConReg_w)
+void notetaker_state::IPConReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_BootSeqDone = (data&0x80)?1:0;
 	m_ProcLock = (data&0x40)?1:0; // bus lock for this processor (hold other processor in wait state)
@@ -279,12 +279,12 @@ WRITE16_MEMBER(notetaker_state::IPConReg_w)
 
 /* handlers for the two system hd6402s (ay-5-1013 equivalent) */
 /* * Keyboard hd6402 */
-READ16_MEMBER( notetaker_state::ReadKeyData_r )
+uint16_t notetaker_state::ReadKeyData_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xFF00||m_kbduart->get_received_data();
 }
 
-READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
+uint16_t notetaker_state::ReadOPStatus_r(address_space &space, offs_t offset, uint16_t mem_mask) // 74ls368 hex inverter at #l7 provides 4 bits, inverted
 {
 	uint16_t data = 0xFFF0;
 	data |= (m_outfifo_count >= 1) ? 0 : 0x08; // m_FIFOOutRdy is true if the fifo has at least 1 word in it, false otherwise
@@ -298,12 +298,12 @@ READ16_MEMBER( notetaker_state::ReadOPStatus_r ) // 74ls368 hex inverter at #l7 
 	return data;
 }
 
-WRITE16_MEMBER( notetaker_state::LoadKeyData_w )
+void notetaker_state::LoadKeyData_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_kbduart->set_transmit_data(data&0xFF);
 }
 
-WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
+void notetaker_state::LoadKeyCtlReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_kbduart->set_input_pin(AY31015_CS, 0);
 	m_kbduart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
@@ -314,20 +314,20 @@ WRITE16_MEMBER( notetaker_state::LoadKeyCtlReg_w )
 	m_kbduart->set_input_pin(AY31015_CS, 1);
 }
 
-WRITE16_MEMBER( notetaker_state::KeyDataReset_w )
+void notetaker_state::KeyDataReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_kbduart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
 	m_kbduart->set_input_pin(AY31015_RDAV, 1); // ''
 }
 
-WRITE16_MEMBER( notetaker_state::KeyChipReset_w )
+void notetaker_state::KeyChipReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_kbduart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_kbduart->set_input_pin(AY31015_XR, 1); // ''
 }
 
 /* FIFO (DAC) Stuff and ADC stuff */
-WRITE16_MEMBER(notetaker_state::FIFOReg_w)
+void notetaker_state::FIFOReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_SetSH = (data&0x8000)?1:0;
 	m_SHConA = (data&0x4000)?1:0;
@@ -341,7 +341,7 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
-WRITE16_MEMBER(notetaker_state::FIFOBus_w)
+void notetaker_state::FIFOBus_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_outfifo_count == 16)
 	{
@@ -356,7 +356,7 @@ WRITE16_MEMBER(notetaker_state::FIFOBus_w)
 	m_outfifo_head_ptr&=0xF;
 }
 
-WRITE16_MEMBER( notetaker_state::DiskReg_w )
+void notetaker_state::DiskReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// See http://bitsavers.trailing-edge.com/pdf/xerox/notetaker/memos/19781023_More_NoteTaker_IO_Information.pdf but note that bit 12 (called bit 3 in documentation) was changed between oct 1978 and 1979 to reset the disk controller digital-PLL as ClrDiskCont' rather than acting as ProgBitClk0, which is permanently wired high instead, meaning only the 4.5Mhz - 18Mhz dot clocks are available for the CRTC.
 	m_ADCSpd0 = (data&0x8000)?1:0;
@@ -407,19 +407,19 @@ WRITE16_MEMBER( notetaker_state::DiskReg_w )
 	//TODO
 }
 
-WRITE16_MEMBER( notetaker_state::LoadDispAddr_w )
+void notetaker_state::LoadDispAddr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_DispAddr = data;
 	// for future low level emulation: clear the current counter position here as well, as well as empty/reset the display fifo, and the setmemrq state.
 }
 
 /* EIA hd6402 */
-READ16_MEMBER( notetaker_state::ReadEIAData_r )
+uint16_t notetaker_state::ReadEIAData_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xFF00||m_eiauart->get_received_data();
 }
 
-READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
+uint16_t notetaker_state::ReadEIAStatus_r(address_space &space, offs_t offset, uint16_t mem_mask) // 74ls368 hex inverter at #f1 provides 2 bits, inverted
 {
 	uint16_t data = 0xFFFC;
 	// note /SWE is permanently enabled, so we don't enable it here for HD6402 reading
@@ -428,12 +428,12 @@ READ16_MEMBER( notetaker_state::ReadEIAStatus_r ) // 74ls368 hex inverter at #f1
 	return data;
 }
 
-WRITE16_MEMBER( notetaker_state::LoadEIAData_w )
+void notetaker_state::LoadEIAData_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eiauart->set_transmit_data(data&0xFF);
 }
 
-WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
+void notetaker_state::LoadEIACtlReg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eiauart->set_input_pin(AY31015_CS, 0);
 	m_eiauart->set_input_pin(AY31015_NP,  BIT(data, 4)); // PI - pin 35
@@ -444,13 +444,13 @@ WRITE16_MEMBER( notetaker_state::LoadEIACtlReg_w )
 	m_eiauart->set_input_pin(AY31015_CS, 1);
 }
 
-WRITE16_MEMBER( notetaker_state::EIADataReset_w )
+void notetaker_state::EIADataReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eiauart->set_input_pin(AY31015_RDAV, 0); // DDR - pin 18
 	m_eiauart->set_input_pin(AY31015_RDAV, 1); // ''
 }
 
-WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
+void notetaker_state::EIAChipReset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eiauart->set_input_pin(AY31015_XR, 0); // MR - pin 21
 	m_eiauart->set_input_pin(AY31015_XR, 1); // ''
@@ -458,7 +458,7 @@ WRITE16_MEMBER( notetaker_state::EIAChipReset_w )
 
 
 /* These next two members are memory map related for the iocpu */
-READ16_MEMBER(notetaker_state::iocpu_r)
+uint16_t notetaker_state::iocpu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *rom = (uint16_t *)(memregion("iocpu")->base());
 	rom += 0x7f800;
@@ -477,7 +477,7 @@ READ16_MEMBER(notetaker_state::iocpu_r)
 	}
 }
 
-WRITE16_MEMBER(notetaker_state::iocpu_w)
+void notetaker_state::iocpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//uint16_t tempword;
 	uint16_t *ram = (uint16_t *)(memregion("mainram")->base());

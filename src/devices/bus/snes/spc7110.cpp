@@ -1067,7 +1067,7 @@ void sns_rom_spc7110_device::spc7110_update_time(uint8_t offset)
 	}
 }
 
-READ8_MEMBER(sns_rom_spc7110_device::chip_read)
+uint8_t sns_rom_spc7110_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = get_rom_base();
 	uint32_t len = get_rom_size();
@@ -1253,7 +1253,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 	return 0xff;
 }
 
-WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
+void sns_rom_spc7110_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = get_rom_base();
 	uint32_t len = get_rom_size();
@@ -1639,7 +1639,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 	}
 }
 
-READ8_MEMBER(sns_rom_spc7110_device::read_l)
+uint8_t sns_rom_spc7110_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
@@ -1647,7 +1647,7 @@ READ8_MEMBER(sns_rom_spc7110_device::read_l)
 	return 0xff;
 }
 
-READ8_MEMBER(sns_rom_spc7110_device::read_h)
+uint8_t sns_rom_spc7110_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t address = offset & 0xfffff;
 
@@ -1674,12 +1674,12 @@ READ8_MEMBER(sns_rom_spc7110_device::read_h)
 }
 
 
-READ8_MEMBER( sns_rom_spc7110_device::read_ram )
+uint8_t sns_rom_spc7110_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[offset & 0x1fff];
 }
 
-WRITE8_MEMBER( sns_rom_spc7110_device::write_ram )
+void sns_rom_spc7110_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset & 0x1fff] = data;
 }

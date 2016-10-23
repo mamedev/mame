@@ -76,12 +76,12 @@ void seicross_state::machine_reset()
 
 
 
-READ8_MEMBER(seicross_state::portB_r)
+uint8_t seicross_state::portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
-WRITE8_MEMBER(seicross_state::portB_w)
+void seicross_state::portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
 	/* bit 0 is IRQ enable */
@@ -101,7 +101,7 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	m_portb = data;
 }
 
-WRITE8_MEMBER(seicross_state::dac_w)
+void seicross_state::dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(data >> 4);
 }

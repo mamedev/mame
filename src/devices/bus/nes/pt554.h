@@ -16,7 +16,7 @@ public:
 
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	required_device<samples_device> m_samples;

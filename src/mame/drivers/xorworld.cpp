@@ -46,30 +46,30 @@ EEPROM chip: 93C46
                 EEPROM read/write/control
 ****************************************************************/
 
-WRITE16_MEMBER(xorworld_state::eeprom_chip_select_w)
+void xorworld_state::eeprom_chip_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is CS (active low) */
 	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(xorworld_state::eeprom_serial_clock_w)
+void xorworld_state::eeprom_serial_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is SK (active high) */
 	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(xorworld_state::eeprom_data_w)
+void xorworld_state::eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0 is EEPROM data (DIN) */
 	m_eeprom->di_write(data & 0x01);
 }
 
-WRITE16_MEMBER(xorworld_state::irq2_ack_w)
+void xorworld_state::irq2_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE16_MEMBER(xorworld_state::irq6_ack_w)
+void xorworld_state::irq6_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }

@@ -32,10 +32,10 @@ public:
 		dev.m_yoffset = y_offset;
 	}
 
-	DECLARE_WRITE8_MEMBER ( spriteram_w );
-	DECLARE_READ8_MEMBER( spriteram_r );
-	DECLARE_WRITE16_MEMBER( spriteram_LSB_w );
-	DECLARE_READ16_MEMBER( spriteram_LSB_r );
+	void spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spriteram_LSB_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t spriteram_LSB_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_clear_bitmap( int clear );
 	void eof();

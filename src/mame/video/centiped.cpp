@@ -134,7 +134,7 @@ void centiped_state::video_start_bullsdrt()
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_videoram_w)
+void centiped_state::centiped_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER(centiped_state::centiped_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
+void centiped_state::centiped_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data >> 7;
 }
@@ -163,7 +163,7 @@ WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::multiped_gfxbank_w)
+void centiped_state::multiped_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d6: N/C?
 	// d7: gfx rom bank
@@ -176,14 +176,14 @@ WRITE8_MEMBER(centiped_state::multiped_gfxbank_w)
 }
 
 
-WRITE8_MEMBER(centiped_state::bullsdrt_tilesbank_w)
+void centiped_state::bullsdrt_tilesbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bullsdrt_tiles_bankram[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
 }
 
 
-WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
+void centiped_state::bullsdrt_sprites_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bullsdrt_sprites_bank = data;
 }
@@ -217,7 +217,7 @@ WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
+void centiped_state::centiped_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -400,7 +400,7 @@ void centiped_state::milliped_set_color(offs_t offset, uint8_t data)
 }
 
 
-WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
+void centiped_state::milliped_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 
@@ -408,7 +408,7 @@ WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
 }
 
 
-WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
+void centiped_state::mazeinv_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paletteram[offset] = data;
 

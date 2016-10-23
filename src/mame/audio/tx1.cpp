@@ -124,7 +124,7 @@ void tx1_sound_device::device_reset()
 }
 
 
-WRITE8_MEMBER( tx1_sound_device::pit8253_w )
+void tx1_sound_device::pit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 
@@ -156,7 +156,7 @@ WRITE8_MEMBER( tx1_sound_device::pit8253_w )
 	}
 }
 
-READ8_MEMBER( tx1_sound_device::pit8253_r )
+uint8_t tx1_sound_device::pit8253_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	osd_printf_debug("PIT R: %x", offset);
 	return 0;
@@ -180,7 +180,7 @@ READ8_MEMBER( tx1_sound_device::pit8253_r )
 
 ***************************************************************************/
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
+void tx1_sound_device::ay8910_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER( tx1_sound_device::ay8910_a_w )
 	m_ay_outputa = ~data;
 }
 
-WRITE8_MEMBER( tx1_sound_device::ay8910_b_w )
+void tx1_sound_device::ay8910_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	double gain;
 
@@ -440,19 +440,19 @@ void buggyboy_sound_device::device_reset()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( buggyboy_sound_device::ym1_a_w )
+void buggyboy_sound_device::ym1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_ym1_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
+void buggyboy_sound_device::ym2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_ym2_outputa = data ^ 0xff;
 }
 
-WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
+void buggyboy_sound_device::ym2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *ym1 = space.machine().device("ym1");
 	device_t *ym2 = space.machine().device("ym2");

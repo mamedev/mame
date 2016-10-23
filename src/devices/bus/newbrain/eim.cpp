@@ -196,7 +196,7 @@ void newbrain_eim_t::iorq_w(address_space &space, offs_t offset, uint8_t data, b
 //  anout_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anout_r )
+uint8_t newbrain_eim_t::anout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -206,7 +206,7 @@ READ8_MEMBER( newbrain_eim_t::anout_r )
 //  anout_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anout_w )
+void newbrain_eim_t::anout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER( newbrain_eim_t::anout_w )
 //  anin_r -
 //-------------------------------------------------
 
-READ8_MEMBER( newbrain_eim_t::anin_r )
+uint8_t newbrain_eim_t::anin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -225,7 +225,7 @@ READ8_MEMBER( newbrain_eim_t::anin_r )
 //  anio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( newbrain_eim_t::anio_w )
+void newbrain_eim_t::anio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

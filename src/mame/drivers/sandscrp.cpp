@@ -111,17 +111,17 @@ public:
 	uint8_t m_latch1_full;
 	uint8_t m_latch2_full;
 
-	DECLARE_READ16_MEMBER(irq_cause_r);
-	DECLARE_WRITE16_MEMBER(irq_cause_w);
-	DECLARE_WRITE16_MEMBER(coincounter_w);
-	DECLARE_READ16_MEMBER(latchstatus_word_r);
-	DECLARE_WRITE16_MEMBER(latchstatus_word_w);
-	DECLARE_READ16_MEMBER(soundlatch_word_r);
-	DECLARE_WRITE16_MEMBER(soundlatch_word_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(latchstatus_r);
-	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
+	uint16_t irq_cause_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void irq_cause_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t latchstatus_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void latchstatus_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t soundlatch_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void soundlatch_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t latchstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 
@@ -198,7 +198,7 @@ void sandscrp_state::screen_eof(screen_device &screen, bool state)
 }
 
 /* Reads the cause of the interrupt */
-READ16_MEMBER(sandscrp_state::irq_cause_r)
+uint16_t sandscrp_state::irq_cause_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  ( m_sprite_irq  ?  0x08  : 0 ) |
 			( m_unknown_irq ?  0x10  : 0 ) |
@@ -207,7 +207,7 @@ READ16_MEMBER(sandscrp_state::irq_cause_r)
 
 
 /* Clear the cause of the interrupt */
-WRITE16_MEMBER(sandscrp_state::irq_cause_w)
+void sandscrp_state::irq_cause_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,7 +228,7 @@ WRITE16_MEMBER(sandscrp_state::irq_cause_w)
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE16_MEMBER(sandscrp_state::coincounter_w)
+void sandscrp_state::coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -238,13 +238,13 @@ WRITE16_MEMBER(sandscrp_state::coincounter_w)
 }
 
 
-READ16_MEMBER(sandscrp_state::latchstatus_word_r)
+uint16_t sandscrp_state::latchstatus_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return  (m_latch1_full ? 0x80 : 0) |
 			(m_latch2_full ? 0x40 : 0) ;
 }
 
-WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
+void sandscrp_state::latchstatus_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -253,13 +253,13 @@ WRITE16_MEMBER(sandscrp_state::latchstatus_word_w)
 	}
 }
 
-READ16_MEMBER(sandscrp_state::soundlatch_word_r)
+uint16_t sandscrp_state::soundlatch_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_latch2_full = 0;
 	return m_soundlatch2->read(space,0);
 }
 
-WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
+void sandscrp_state::soundlatch_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -297,24 +297,24 @@ ADDRESS_MAP_END
                                 Sand Scorpion
 ***************************************************************************/
 
-WRITE8_MEMBER(sandscrp_state::bankswitch_w)
+void sandscrp_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 7);
 }
 
-READ8_MEMBER(sandscrp_state::latchstatus_r)
+uint8_t sandscrp_state::latchstatus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return  (m_latch2_full ? 0x80 : 0) |    // swapped!?
 			(m_latch1_full ? 0x40 : 0) ;
 }
 
-READ8_MEMBER(sandscrp_state::soundlatch_r)
+uint8_t sandscrp_state::soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_latch1_full = 0;
 	return m_soundlatch->read(space,0);
 }
 
-WRITE8_MEMBER(sandscrp_state::soundlatch_w)
+void sandscrp_state::soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch2_full = 1;
 	m_soundlatch2->write(space,0,data);

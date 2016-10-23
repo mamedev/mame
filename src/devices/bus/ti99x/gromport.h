@@ -24,15 +24,15 @@ class gromport_device : public bus8z_device, public device_slot_interface
 public:
 	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
 
 	// Combined GROM select lines
-	DECLARE_WRITE8_MEMBER(set_gromlines);
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
@@ -89,13 +89,13 @@ public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(ready_line);
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	DECLARE_WRITE8_MEMBER(set_gromlines);
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
@@ -148,12 +148,12 @@ class ti99_cartridge_connector_device : public bus8z_device
 {
 public:
 	virtual DECLARE_READ8Z_MEMBER(readz) override =0;
-	virtual DECLARE_WRITE8_MEMBER(write) override =0;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override =0;
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) = 0;
+	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) =0;
-	virtual DECLARE_WRITE8_MEMBER(set_gromlines) =0;
+	virtual void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) =0;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(gclock_in) =0;
 
@@ -180,11 +180,11 @@ public:
 	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	bool is_grom_idle() override;
@@ -213,11 +213,11 @@ public:
 	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
@@ -252,11 +252,11 @@ public:
 	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
@@ -311,16 +311,16 @@ public:
 
 protected:
 	virtual DECLARE_READ8Z_MEMBER(readz);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual DECLARE_READ8Z_MEMBER(crureadz);
-	virtual DECLARE_WRITE8_MEMBER(cruwrite);
+	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(romgq_line);
-	virtual DECLARE_WRITE8_MEMBER(set_gromlines);
+	virtual void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(gclock_in);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
-	DECLARE_WRITE8_MEMBER(gromwrite);
+	void gromwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	inline void         set_grom_pointer(int number, device_t *dev);
 	void                set_cartridge(ti99_cartridge_device *cart);
 	const char*         tag() { return m_tag; }
@@ -361,7 +361,7 @@ class ti99_paged12k_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_paged12k_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /*********** Paged cartridge (others) ********************/
@@ -371,7 +371,7 @@ class ti99_paged16k_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_paged16k_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************** Mini Memory ***********************************/
@@ -381,7 +381,7 @@ class ti99_minimem_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_minimem_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************* Super Space II *********************************/
@@ -391,9 +391,9 @@ class ti99_super_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_super_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /************************* MBX  ***************************************/
@@ -403,7 +403,7 @@ class ti99_mbx_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_mbx_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************** Paged 379i ************************************/
@@ -413,7 +413,7 @@ class ti99_paged379i_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_paged379i_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 private:
 	int     get_paged379i_bank(int rompage);
 };
@@ -425,7 +425,7 @@ class ti99_paged378_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_paged378_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************** Paged 377 ************************************/
@@ -435,7 +435,7 @@ class ti99_paged377_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_paged377_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************** Paged CRU  ************************************/
@@ -445,9 +445,9 @@ class ti99_pagedcru_cartridge : public ti99_cartridge_pcb
 public:
 	~ti99_pagedcru_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 /********************** GROM emulation cartridge  ************************************/
@@ -459,10 +459,10 @@ public:
 	{  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(gromemureadz);
-	DECLARE_WRITE8_MEMBER(gromemuwrite);
-	DECLARE_WRITE8_MEMBER(set_gromlines) override;
+	void gromemuwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	bool    m_waddr_LSB;

@@ -100,7 +100,7 @@ A                                                   12.000MHz
 #define MCLK    XTAL_12MHz // this is on the video board
 #define CLK2    XTAL_8MHz // near the CPUs
 
-WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
+void himesiki_state::himesiki_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(((data & 0x0c) >> 2));
 
@@ -111,7 +111,7 @@ WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 		logerror("p06_w %02x\n", data);
 }
 
-WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
+void himesiki_state::himesiki_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

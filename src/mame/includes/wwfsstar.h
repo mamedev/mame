@@ -35,12 +35,12 @@ public:
 	tilemap_t *m_fg0_tilemap;
 	tilemap_t *m_bg0_tilemap;
 
-	DECLARE_WRITE16_MEMBER(scroll_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(irqack_w);
-	DECLARE_WRITE16_MEMBER(fg0_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg0_videoram_w);
+	void scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irqack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
 

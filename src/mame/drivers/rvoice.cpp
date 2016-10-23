@@ -82,11 +82,11 @@ public:
 
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
-	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
-	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
+	uint8_t main_hd63701_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void main_hd63701_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_rvoicepc();
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(null_kbd_put);
+	void null_kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -136,7 +136,7 @@ void rvoice_state::machine_reset()
 	m_hd63701y0.P6CSR = 0x00;
 }
 
-READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
+uint8_t rvoice_state::main_hd63701_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", space.device().safe_pc(), offset);
@@ -219,7 +219,7 @@ READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 }
 
 
-WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
+void rvoice_state::main_hd63701_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", space.device().safe_pc(), offset);
 	switch(offset)
@@ -354,7 +354,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-WRITE8_MEMBER(rvoice_state::null_kbd_put)
+void rvoice_state::null_kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

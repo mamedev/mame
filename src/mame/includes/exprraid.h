@@ -48,22 +48,22 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(exprraid_int_clear_w);
-	DECLARE_READ8_MEMBER(exprraid_prot_status_r);
-	DECLARE_READ8_MEMBER(exprraid_prot_data_r);
-	DECLARE_WRITE8_MEMBER(exprraid_prot_data_w);
-	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(exprraid_videoram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_colorram_w);
-	DECLARE_WRITE8_MEMBER(exprraid_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(exprraid_bgselect_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrollx_w);
-	DECLARE_WRITE8_MEMBER(exprraid_scrolly_w);
+	void exprraid_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exprraid_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t exprraid_prot_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exprraid_prot_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exprraid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_bgselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void exprraid_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 
-	DECLARE_READ8_MEMBER(sound_cpu_command_r);
+	uint8_t sound_cpu_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	void init_exprraid();

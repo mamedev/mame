@@ -95,8 +95,8 @@ public:
 	virtual const char *file_extensions() const override { return "hdf"; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
-	DECLARE_WRITE16_MEMBER( hdc_w );
-	DECLARE_READ16_MEMBER( hdc_r );
+	void hdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hdc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;

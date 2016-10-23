@@ -69,14 +69,14 @@ public:
 	emu_timer *m_int6_timer;
 
 	// generic
-	DECLARE_READ16_MEMBER(service_input_r);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(msb_sound_w);
-	DECLARE_READ16_MEMBER(msb_sound_r);
+	uint16_t service_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msb_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t msb_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// opwolf specific
-	DECLARE_READ16_MEMBER(opwolf3_adc_r);
-	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
+	uint16_t opwolf3_adc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void opwolf3_adc_req_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_slapshot();
 	virtual void machine_start() override;

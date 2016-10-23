@@ -63,13 +63,13 @@ PALETTE_INIT_MEMBER(yiear_state, yiear)
 	}
 }
 
-WRITE8_MEMBER(yiear_state::yiear_videoram_w)
+void yiear_state::yiear_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(yiear_state::yiear_control_w)
+void yiear_state::yiear_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 flips screen */
 	if (flip_screen() != (data & 0x01))

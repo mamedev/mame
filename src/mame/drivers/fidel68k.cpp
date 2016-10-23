@@ -163,12 +163,12 @@ public:
 
 	// EAG(6114/6117)
 	void eag_prepare_display();
-	DECLARE_READ8_MEMBER(eag_input1_r);
-	DECLARE_WRITE8_MEMBER(eag_leds_w);
-	DECLARE_WRITE8_MEMBER(eag_7seg_w);
-	DECLARE_WRITE8_MEMBER(eag_mux_w);
-	DECLARE_READ8_MEMBER(eag_input2_r);
-	DECLARE_READ8_MEMBER(eag_cart_r);
+	uint8_t eag_input1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eag_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eag_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eag_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t eag_input2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t eag_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
@@ -192,33 +192,33 @@ void fidel68k_state::eag_prepare_display()
 
 // TTL/generic
 
-READ8_MEMBER(fidel68k_state::eag_input1_r)
+uint8_t fidel68k_state::eag_input1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// a1-a3,d7: multiplexed inputs (active low)
 	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
 }
 
-READ8_MEMBER(fidel68k_state::eag_input2_r)
+uint8_t fidel68k_state::eag_input2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d7: multiplexed inputs highest bit
 	return (read_inputs(9) & 0x100) ? 0x80 : 0;
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_leds_w)
+void fidel68k_state::eag_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a1-a3,d0: led data
 	m_led_data = (m_led_data & ~(1 << offset)) | ((data & 1) << offset);
 	eag_prepare_display();
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_7seg_w)
+void fidel68k_state::eag_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a1-a3,d0(d8): digit segment data
 	m_7seg_data = (m_7seg_data & ~(1 << offset)) | ((data & 1) << offset);
 	eag_prepare_display();
 }
 
-WRITE8_MEMBER(fidel68k_state::eag_mux_w)
+void fidel68k_state::eag_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: 74145 A-D
 	// 74145 0-8: input mux, digit/led select
@@ -229,7 +229,7 @@ WRITE8_MEMBER(fidel68k_state::eag_mux_w)
 	eag_prepare_display();
 }
 
-READ8_MEMBER(fidel68k_state::eag_cart_r)
+uint8_t fidel68k_state::eag_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart->exists())
 		return m_cart->read_rom(space, offset);

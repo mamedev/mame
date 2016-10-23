@@ -287,7 +287,7 @@ void tmnt_state::video_start_blswhstl()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
+void tmnt_state::tmnt_0a0000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -311,7 +311,7 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
+void tmnt_state::punkshot_0a0020_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -329,7 +329,7 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
+void tmnt_state::lgtnfght_0a0018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -348,7 +348,7 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
+void tmnt_state::blswhstl_700300_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -371,7 +371,7 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_rom_r)
+uint16_t tmnt_state::glfgreat_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_glfgreat_roz_rom_mode)
 		return memregion("zoom")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
@@ -384,7 +384,7 @@ READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 		return memregion("user1")->base()[((offset & 0x3ffff) >> 2) + 0x100000 + m_glfgreat_roz_rom_bank * 0x10000];
 }
 
-WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
+void tmnt_state::glfgreat_122000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -415,7 +415,7 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 }
 
 
-WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
+void tmnt_state::ssriders_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -434,7 +434,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
+void tmnt_state::ssriders_1c0300_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -450,7 +450,7 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
+void tmnt_state::prmrsocr_122000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -472,7 +472,7 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 	}
 }
 
-READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
+uint16_t tmnt_state::prmrsocr_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(m_glfgreat_roz_char_bank)
 		return memregion("zoom")->base()[offset];
@@ -483,7 +483,7 @@ READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 	}
 }
 
-WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
+void tmnt_state::tmnt_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -604,7 +604,7 @@ uint32_t tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 
 }
 
 
-READ16_MEMBER(tmnt_state::glfgreat_ball_r)
+uint16_t tmnt_state::glfgreat_ball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 #ifdef MAME_DEBUG
 popmessage("%04x", m_glfgreat_pixel);

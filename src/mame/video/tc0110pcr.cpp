@@ -107,7 +107,7 @@ void tc0110pcr_device::restore_colors()
 }
 
 
-READ16_MEMBER(tc0110pcr_device::word_r )
+uint16_t tc0110pcr_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -120,7 +120,7 @@ READ16_MEMBER(tc0110pcr_device::word_r )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::word_w )
+void tc0110pcr_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -142,7 +142,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
+void tc0110pcr_device::step1_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -163,7 +163,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
+void tc0110pcr_device::step1_rbswap_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_type = 1;    /* xRRRRRGGGGGBBBBB */
 
@@ -186,7 +186,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 	}
 }
 
-WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
+void tc0110pcr_device::step1_4bpg_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_type = 2;    /* xxxxBBBBGGGGRRRR */
 

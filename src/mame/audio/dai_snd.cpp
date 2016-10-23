@@ -75,7 +75,7 @@ const uint16_t dai_sound_device::s_noise_volume_table[] = {
 //  set_volume
 //-------------------------------------------------
 
-WRITE8_MEMBER(dai_sound_device::set_volume)
+void dai_sound_device::set_volume(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mixer_channel->update();
 

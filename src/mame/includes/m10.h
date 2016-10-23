@@ -84,17 +84,17 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m15_ctrl_w);
-	DECLARE_WRITE8_MEMBER(m10_a500_w);
-	DECLARE_WRITE8_MEMBER(m11_a100_w);
-	DECLARE_WRITE8_MEMBER(m15_a100_w);
-	DECLARE_READ8_MEMBER(m10_a700_r);
-	DECLARE_READ8_MEMBER(m11_a700_r);
-	DECLARE_WRITE8_MEMBER(m10_colorram_w);
-	DECLARE_WRITE8_MEMBER(m10_chargen_w);
-	DECLARE_WRITE8_MEMBER(m15_chargen_w);
+	void m10_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m11_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m15_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m10_a500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m11_a100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m15_a100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m10_a700_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m11_a700_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m10_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m10_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m15_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_andromed();
 	void init_ipminva1();
@@ -109,8 +109,8 @@ public:
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);
-	DECLARE_WRITE8_MEMBER(ic8j2_output_changed);
+	void ic8j1_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic8j2_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
 
 protected:

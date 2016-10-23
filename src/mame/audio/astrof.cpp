@@ -32,7 +32,7 @@
 #define CHANNEL_FUEL      3
 
 
-WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
+void astrof_state::astrof_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_port_1_last;
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER(astrof_state::astrof_audio_1_w)
 }
 
 
-WRITE8_MEMBER(astrof_state::astrof_audio_2_w)
+void astrof_state::astrof_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_port_2_last;
 
@@ -154,7 +154,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(astrof_state::spfghmk2_audio_w)
+void astrof_state::spfghmk2_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* nothing yet */
 }
@@ -172,7 +172,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
+void astrof_state::tomahawk_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0 - sonar */
 

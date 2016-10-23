@@ -32,9 +32,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	DECLARE_READ32_MEMBER(a7000_iomd_r);
-	DECLARE_WRITE32_MEMBER(a7000_iomd_w);
-	DECLARE_WRITE32_MEMBER(a7000_vidc20_w);
+	uint32_t a7000_iomd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void a7000_iomd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void a7000_vidc20_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	uint8_t m_vidc20_pal_index;
 	uint16_t m_vidc20_horz_reg[0x10];
@@ -195,7 +195,7 @@ void riscpc_state::vidc20_dynamic_screen_change()
 	}
 }
 
-WRITE32_MEMBER( riscpc_state::a7000_vidc20_w )
+void riscpc_state::a7000_vidc20_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b,cursor_index,horz_reg,vert_reg,reg = data >> 28;
 
@@ -630,7 +630,7 @@ void riscpc_state::viddma_transfer_start()
 	}
 }
 
-READ32_MEMBER( riscpc_state::a7000_iomd_r )
+uint32_t riscpc_state::a7000_iomd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if(offset != IOMD_KBDCR)
 //      logerror("IOMD: %s Register (%04x) read\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4);
@@ -684,7 +684,7 @@ READ32_MEMBER( riscpc_state::a7000_iomd_r )
 	return 0;
 }
 
-WRITE32_MEMBER( riscpc_state::a7000_iomd_w )
+void riscpc_state::a7000_iomd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  logerror("IOMD: %s Register (%04x) write = %08x\n",iomd_regnames[offset & (0x1ff >> 2)],offset*4,data);
 

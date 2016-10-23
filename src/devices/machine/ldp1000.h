@@ -37,8 +37,8 @@ public:
 	sony_ldp1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations TODO: both actually protected
-	DECLARE_WRITE8_MEMBER( command_w );
-	DECLARE_READ8_MEMBER( status_r );
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

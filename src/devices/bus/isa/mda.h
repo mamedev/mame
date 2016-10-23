@@ -31,10 +31,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-	virtual DECLARE_READ8_MEMBER(io_read);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
-	virtual DECLARE_READ8_MEMBER(status_r);
-	virtual DECLARE_WRITE8_MEMBER(mode_control_w);
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	WRITE_LINE_MEMBER(pc_cpu_line);
 
@@ -76,10 +76,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_READ8_MEMBER(io_read) override;
-	virtual DECLARE_WRITE8_MEMBER(io_write) override;
-	virtual DECLARE_READ8_MEMBER(status_r) override;
-	virtual DECLARE_WRITE8_MEMBER(mode_control_w) override;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( hercules_gfx_update_row );
@@ -108,7 +108,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE8_MEMBER(mode_control_w) override;
+	virtual void mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( mda_lowres_text_inten_update_row );

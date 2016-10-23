@@ -160,7 +160,7 @@ void laser_64k_device::device_reset()
 	m_slot->m_io->install_write_handler(0x70, 0x7f, write8_delegate(FUNC(laser_64k_device::bankswitch_w), this));
 }
 
-WRITE8_MEMBER( laser_64k_device::bankswitch_w )
+void laser_64k_device::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank(tag())->set_entry(data & 0x03);
 }

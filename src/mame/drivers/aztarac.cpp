@@ -49,7 +49,7 @@ void aztarac_state::machine_start()
  *
  *************************************/
 
-READ16_MEMBER(aztarac_state::nvram_r)
+uint16_t aztarac_state::nvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_nvram[offset] | 0xfff0;
 }
@@ -62,7 +62,7 @@ READ16_MEMBER(aztarac_state::nvram_r)
  *
  *************************************/
 
-READ16_MEMBER(aztarac_state::joystick_r)
+uint16_t aztarac_state::joystick_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (((ioport("STICKZ")->read() - 0xf) << 8) |
 			((ioport("STICKY")->read() - 0xf) & 0xff));

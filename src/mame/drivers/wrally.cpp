@@ -131,14 +131,14 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                        /* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
-READ8_MEMBER(wrally_state::dallas_share_r)
+uint8_t wrally_state::dallas_share_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *shareram = (uint8_t *)m_shareram.target();
 
 	return shareram[BYTE_XOR_BE(offset)];
 }
 
-WRITE8_MEMBER(wrally_state::dallas_share_w)
+void wrally_state::dallas_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *shareram = (uint8_t *)m_shareram.target();
 

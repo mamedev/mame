@@ -305,7 +305,7 @@ void othunder_state::update_irq(  )
 	m_maincpu->set_input_line(5, m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(othunder_state::irq_ack_w)
+void othunder_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -349,7 +349,7 @@ The eeprom unlock command is different, and the write/clock/reset
 bits are different.
 ******************************************************************/
 
-WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
+void othunder_state::othunder_tc0220ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -389,7 +389,7 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
             GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
+uint16_t othunder_state::othunder_tc0220ioc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -407,13 +407,13 @@ READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 #define P2Y_PORT_TAG     "P2Y"
 #define ROTARY_PORT_TAG  "ROTARY"
 
-READ16_MEMBER(othunder_state::othunder_lightgun_r)
+uint16_t othunder_state::othunder_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
 	return ioport(portname[offset])->read();
 }
 
-WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
+void othunder_state::othunder_lightgun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* A write starts the A/D conversion. An interrupt will be triggered when
 	   the conversion is complete.
@@ -428,12 +428,12 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
             SOUND
 *****************************************/
 
-WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
+void othunder_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 3);
 }
 
-WRITE16_MEMBER(othunder_state::othunder_sound_w)
+void othunder_state::othunder_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -441,7 +441,7 @@ WRITE16_MEMBER(othunder_state::othunder_sound_w)
 		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(othunder_state::othunder_sound_r)
+uint16_t othunder_state::othunder_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
@@ -449,7 +449,7 @@ READ16_MEMBER(othunder_state::othunder_sound_r)
 		return 0;
 }
 
-WRITE8_MEMBER(othunder_state::othunder_TC0310FAM_w)
+void othunder_state::othunder_TC0310FAM_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
 	   PSG output is routed to both chips. */

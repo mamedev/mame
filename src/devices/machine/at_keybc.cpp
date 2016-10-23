@@ -134,12 +134,12 @@ void at_keyboard_controller_device::device_reset()
 //  INTERNAL 8042 READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( at_keyboard_controller_device::t0_r )
+uint8_t at_keyboard_controller_device::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_clock_signal;
 }
 
-READ8_MEMBER( at_keyboard_controller_device::t1_r )
+uint8_t at_keyboard_controller_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data_signal;
 }
@@ -155,12 +155,12 @@ READ8_MEMBER( at_keyboard_controller_device::t1_r )
     6 - P16 - Display type switch (1 = Monochrome display, 0 = Color display)
     7 - P17 - Keyboard inhibit switch (1 = Keyboard enabled, 0 = Keyboard inhibited)
 */
-READ8_MEMBER( at_keyboard_controller_device::p1_r )
+uint8_t at_keyboard_controller_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("DSW")->read();
 }
 
-READ8_MEMBER( at_keyboard_controller_device::p2_r )
+uint8_t at_keyboard_controller_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -176,7 +176,7 @@ READ8_MEMBER( at_keyboard_controller_device::p2_r )
     6 - P26 - Keyboard Clock (1 = Pull Clock low, 0 = High-Z)
     7 - P27 - Keyboard Data (1 = Pull Data low, 0 = High-Z)
 */
-WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
+void at_keyboard_controller_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_system_reset_cb(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	m_gate_a20_cb(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -195,22 +195,22 @@ WRITE8_MEMBER( at_keyboard_controller_device::p2_w )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ8_MEMBER( at_keyboard_controller_device::data_r )
+uint8_t at_keyboard_controller_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cpu->upi41_master_r(space, 0);
 }
 
-WRITE8_MEMBER( at_keyboard_controller_device::data_w )
+void at_keyboard_controller_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu->upi41_master_w(space, 0, data);
 }
 
-READ8_MEMBER( at_keyboard_controller_device::status_r )
+uint8_t at_keyboard_controller_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cpu->upi41_master_r(space, 1);
 }
 
-WRITE8_MEMBER( at_keyboard_controller_device::command_w )
+void at_keyboard_controller_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu->upi41_master_w(space, 1, data);
 }

@@ -59,17 +59,17 @@ public:
 	int m_bwp3_nmimask;
 	int m_bwp3_u8F_d;
 
-	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);
-	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
-	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(fgscrollram_w);
-	DECLARE_WRITE8_MEMBER(bgscrollram_w);
-	DECLARE_WRITE8_MEMBER(gfxram_w);
-	DECLARE_WRITE8_MEMBER(scrollreg_w);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
+	void bwp3_u8F_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp3_nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp3_nmiack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bwp2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgscrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);

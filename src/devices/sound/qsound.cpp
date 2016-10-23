@@ -191,7 +191,7 @@ void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 }
 
 
-WRITE8_MEMBER(qsound_device::qsound_w)
+void qsound_device::qsound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -215,7 +215,7 @@ WRITE8_MEMBER(qsound_device::qsound_w)
 }
 
 
-READ8_MEMBER(qsound_device::qsound_r)
+uint8_t qsound_device::qsound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Port ready bit (0x80 if ready) */
 	return 0x80;

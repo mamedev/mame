@@ -45,12 +45,12 @@ Has word-wide registers as follows:
 // K055550/K053990 protection chips, perform simple memset() and other game logic operations
 
 
-READ16_MEMBER(konamigx_state::K055550_word_r)
+uint16_t konamigx_state::K055550_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(m_prot_data[offset]);
 }
 
-WRITE16_MEMBER(konamigx_state::K055550_word_w)
+void konamigx_state::K055550_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t adr, bsize, count, i, lim;
 	int src, tgt, srcend, tgtend, skip, cx1, sx1, wx1, cy1, sy1, wy1, cz1, sz1, wz1, c2, s2, w2;
@@ -175,7 +175,7 @@ WRITE16_MEMBER(konamigx_state::K055550_word_w)
 	}
 }
 
-WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
+void konamigx_state::K053990_martchmp_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int src_addr, src_count, src_skip;
 	int dst_addr, /*dst_count,*/ dst_skip;
@@ -472,7 +472,7 @@ void konamigx_state::fantjour_dma_install()
 	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
 
-WRITE32_MEMBER(konamigx_state::fantjour_dma_w)
+void konamigx_state::fantjour_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_fantjour_dma + offset);
 	if(!offset && ACCESSING_BITS_24_31) {

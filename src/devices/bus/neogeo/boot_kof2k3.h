@@ -22,9 +22,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
+	virtual void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
+	virtual uint16_t addon_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -49,8 +49,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003p_w(space, offset, data, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
+	virtual void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { m_kof2k3bl_prot->kof2003p_w(space, offset, data, mem_mask); }
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;
@@ -75,9 +75,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual uint32_t get_bank_base(uint16_t sel) override { return m_kof2k3bl_prot->get_bank_base(); }
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
-	virtual DECLARE_WRITE16_MEMBER(protection_w) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_kof2k3bl_prot->protection_r(space, offset, mem_mask); }
+	virtual void protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { m_kof2k3bl_prot->kof2003_w(space, offset, data, mem_mask); }
+	virtual uint16_t addon_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_kof2k3bl_prot->overlay_r(space, offset, mem_mask); }
 
 private:
 	required_device<cmc_prot_device> m_cmc_prot;

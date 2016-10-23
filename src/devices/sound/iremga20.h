@@ -58,8 +58,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( irem_ga20_w );
-	DECLARE_READ8_MEMBER( irem_ga20_r );
+	void irem_ga20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irem_ga20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	void iremga20_reset();

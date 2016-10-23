@@ -395,7 +395,7 @@ WRITE_LINE_MEMBER( ms7004_device::write_rxd )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::p1_w )
+void ms7004_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -420,7 +420,7 @@ WRITE8_MEMBER( ms7004_device::p1_w )
 //  p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::p2_w )
+void ms7004_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bit     description
@@ -445,7 +445,7 @@ WRITE8_MEMBER( ms7004_device::p2_w )
 //  prog_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ms7004_device::i8243_port_w )
+void ms7004_device::i8243_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sense = 0;
 
@@ -470,7 +470,7 @@ WRITE8_MEMBER( ms7004_device::i8243_port_w )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ms7004_device::t1_r )
+uint8_t ms7004_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_p1,4))
 		return m_keylatch;

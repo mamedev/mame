@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(gyruss_state, gyruss)
 
 
 
-WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
+void gyruss_state::gyruss_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -120,7 +120,7 @@ void gyruss_state::video_start()
 
 
 
-READ8_MEMBER(gyruss_state::gyruss_scanline_r)
+uint8_t gyruss_state::gyruss_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();

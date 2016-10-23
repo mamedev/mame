@@ -77,25 +77,25 @@ PALETTE_INIT_MEMBER(dynax_state,janyuki)
 #define LAYOUT_MJDIALQ2 3   // 2 layers
 #define LAYOUT_JANTOUKI 4   // 2 x (4 couples of layers, interleaved)
 
-WRITE8_MEMBER(dynax_state::dynax_extra_scrollx_w)
+void dynax_state::dynax_extra_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_extra_scroll_x = data;
 }
 
-WRITE8_MEMBER(dynax_state::dynax_extra_scrolly_w)
+void dynax_state::dynax_extra_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_extra_scroll_y = data;
 }
 
 
 /* Destination Pen */
-WRITE8_MEMBER(dynax_state::dynax_blit_pen_w)
+void dynax_state::dynax_blit_pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_pen = data;
 	LOG(("P=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_pen_w)
+void dynax_state::dynax_blit2_pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit2_pen = data;
 	LOG(("P'=%02X ", data));
@@ -103,7 +103,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_pen_w)
 
 
 /* Destination Layers */
-WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
+void dynax_state::dynax_blit_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_dest = data;
 	if (m_layer_layout == LAYOUT_HNORIDUR)
@@ -112,13 +112,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_dest_w)
 	LOG(("D=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_dest_w)
+void dynax_state::dynax_blit2_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit2_dest = data;
 	LOG(("D'=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
+void dynax_state::tenkai_blit_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3));
 }
@@ -127,14 +127,14 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_dest_w)
 mjelctrn:   7 d e -> 1 - 4 8
 mjembase:   b d e -> - 2 4 8
 */
-WRITE8_MEMBER(dynax_state::mjembase_blit_dest_w)
+void dynax_state::mjembase_blit_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7, 6, 5, 4, 2, 3, 1, 0));
 }
 
 
 /* Background Color */
-WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
+void dynax_state::dynax_blit_backpen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_backpen = data;
 	LOG(("B=%02X ", data));
@@ -142,7 +142,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_backpen_w)
 
 
 /* Layers 0&1 Palettes (Low Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palette01_w)
+void dynax_state::dynax_blit_palette01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
@@ -151,7 +151,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette01_w)
 	LOG(("P01=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
+void dynax_state::tenkai_blit_palette01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_palettes = (m_blit_palettes & 0xff00) | data;
 	LOG(("P01=%02X ", data));
@@ -159,7 +159,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
 
 
 /* Layers 4&5 Palettes (Low Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
+void dynax_state::dynax_blit_palette45_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
@@ -170,7 +170,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 
 
 /* Layer 2&3 Palettes (Low Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
+void dynax_state::dynax_blit_palette23_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit_palettes = (m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
@@ -179,20 +179,20 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
 	LOG(("P23=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
+void dynax_state::tenkai_blit_palette23_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_palettes = (m_blit_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	LOG(("P23=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::mjembase_blit_palette23_w)
+void dynax_state::mjembase_blit_palette23_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dynax_blit_palette23_w(space, offset, BITSWAP8(data, 3, 2, 1, 0, 7, 6, 5, 4), mem_mask);
 }
 
 
 /* Layer 6&7 Palettes (Low Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
+void dynax_state::dynax_blit_palette67_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
@@ -203,13 +203,13 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 
 
 /* Layers Palettes (High Bits) */
-WRITE8_MEMBER(dynax_state::dynax_blit_palbank_w)
+void dynax_state::dynax_blit_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit_palbank = data;
 	LOG(("PB=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_palbank_w)
+void dynax_state::dynax_blit2_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blit2_palbank = data;
 	LOG(("PB'=%02X ", data));
@@ -217,7 +217,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_palbank_w)
 
 
 /* Which half of the layers to write to (interleaved games only) */
-WRITE8_MEMBER(dynax_state::hanamai_layer_half_w)
+void dynax_state::hanamai_layer_half_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hanamai_layer_half = (~data) & 1;
 	LOG(("H=%02X ", data));
@@ -225,13 +225,13 @@ WRITE8_MEMBER(dynax_state::hanamai_layer_half_w)
 
 
 /* Write to both halves of the layers (interleaved games only) */
-WRITE8_MEMBER(dynax_state::hnoridur_layer_half2_w)
+void dynax_state::hnoridur_layer_half2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hnoridur_layer_half2 = (~data) & 1;
 	LOG(("H2=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::mjdialq2_blit_dest_w)
+void dynax_state::mjdialq2_blit_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mask = (2 >> offset);   /* 1 or 2 */
 
@@ -243,20 +243,20 @@ WRITE8_MEMBER(dynax_state::mjdialq2_blit_dest_w)
 
 
 /* Layers Enable */
-WRITE8_MEMBER(dynax_state::dynax_layer_enable_w)
+void dynax_state::dynax_layer_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer_enable = data;
 	LOG(("E=%02X ", data));
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_layer_enable_w)
+void dynax_state::jantouki_layer_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mask = 1 << (7 - offset);
 	m_layer_enable = (m_layer_enable & ~mask) | ((data & 1) ? mask : 0);
 	m_layer_enable |= 1;
 }
 
-WRITE8_MEMBER(dynax_state::mjdialq2_layer_enable_w)
+void dynax_state::mjdialq2_layer_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mask = (2 >> offset);   /* 1 or 2 */
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(dynax_state::mjdialq2_layer_enable_w)
 }
 
 
-WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
+void dynax_state::dynax_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 1;
 	if (data & ~1)
@@ -277,14 +277,14 @@ WRITE8_MEMBER(dynax_state::dynax_flipscreen_w)
 
 
 
-WRITE8_MEMBER(dynax_state::dynax_blit_romregion_w)
+void dynax_state::dynax_blit_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data < 8)
 		m_blit_romregion = data;
 	LOG(("GFX%X ", data + 1));
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_romregion_w)
+void dynax_state::dynax_blit2_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data + 1 < 8)
 		m_blit2_romregion = data + 1;
@@ -626,7 +626,7 @@ void dynax_state::jantouki_blitter2_start( int flags )
 
 
 
-WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
+void dynax_state::dynax_blit_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_blit_src & 0xc00000)
 	{
@@ -644,7 +644,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
 }
 
 // inverted scroll values
-WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
+void dynax_state::tenkai_blit_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_blit_src & 0xc00000)
 	{
@@ -661,7 +661,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
+void dynax_state::dynax_blit2_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_blit2_src & 0xc00000)
 	{
@@ -678,7 +678,7 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
+void dynax_state::dynax_blitter_rev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -693,7 +693,7 @@ WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
 }
 
 // different scroll_w
-WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
+void dynax_state::tenkai_blitter_rev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -709,7 +709,7 @@ WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
 
 
 // two blitters/screens
-WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
+void dynax_state::jantouki_blitter_rev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -723,7 +723,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
+void dynax_state::jantouki_blitter2_rev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -738,7 +738,7 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 }
 
 // first register does not trigger a blit, it sets the destination
-WRITE8_MEMBER(dynax_state::cdracula_blitter_rev2_w)
+void dynax_state::cdracula_blitter_rev2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -765,7 +765,7 @@ WRITE8_MEMBER(dynax_state::cdracula_blitter_rev2_w)
 	}
 }
 
-WRITE8_MEMBER(dynax_state::dynax_blit_flags_w)
+void dynax_state::dynax_blit_flags_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("FLG=%02X ", data));
 
@@ -1220,12 +1220,12 @@ void dynax_state::mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cli
 	}
 }
 
-WRITE8_MEMBER(dynax_state::hanamai_priority_w)
+void dynax_state::hanamai_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hanamai_priority = data;
 }
 
-WRITE8_MEMBER(dynax_state::tenkai_priority_w)
+void dynax_state::tenkai_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hanamai_priority = BITSWAP8(data, 3, 2, 1, 0, 4, 7, 5, 6);
 }
@@ -1235,7 +1235,7 @@ mjembase:   priority: 00 08 10 18 20 28; enable: 1,2,4
 Convert to:
 mjelctrn:   priority: 00 20 10 40 30 50; enable: 1,2,8
 */
-WRITE8_MEMBER(dynax_state::mjembase_priority_w)
+void dynax_state::mjembase_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hanamai_priority = BITSWAP8(data, 6, 5, 4, 3, 2, 7, 1, 0);
 }

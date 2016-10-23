@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(nbmj8688_state::ff_r)
+uint8_t nbmj8688_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* possibly because of a bug, reads from port 0xd0 must return 0xff
 	   otherwise apparel doesn't clear the background when you insert a coin */
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( secolove_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(nbmj8688_state::barline_output_w)
+void nbmj8688_state::barline_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 0x80);
 	machine().bookkeeping().coin_counter_w(0,data & 0x02);
@@ -2435,12 +2435,12 @@ static INPUT_PORTS_START( nightlov )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(nbmj8688_state::dipsw1_r)
+uint8_t nbmj8688_state::dipsw1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nb1413m3->dipsw1_r(space,offset);
 }
 
-READ8_MEMBER(nbmj8688_state::dipsw2_r)
+uint8_t nbmj8688_state::dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nb1413m3->dipsw2_r(space,offset);
 }

@@ -38,7 +38,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_r)
 	m_zaccept = 1;
 }
 
-READ8_MEMBER(pitnrun_state::mcu_data_r)
+uint8_t pitnrun_state::mcu_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_r),this));
 	return m_toz80;
@@ -51,13 +51,13 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_w)
 	m_fromz80 = param;
 }
 
-WRITE8_MEMBER(pitnrun_state::mcu_data_w)
+void pitnrun_state::mcu_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::mcu_real_data_w),this), data);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(5));
 }
 
-READ8_MEMBER(pitnrun_state::mcu_status_r)
+uint8_t pitnrun_state::mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* mcu synchronization */
 	/* bit 0 = the 68705 has read data from the Z80 */
@@ -66,12 +66,12 @@ READ8_MEMBER(pitnrun_state::mcu_status_r)
 }
 
 
-READ8_MEMBER(pitnrun_state::m68705_portA_r)
+uint8_t pitnrun_state::m68705_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_portA_in;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_portA_w)
+void pitnrun_state::m68705_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA_out = data;
 }
@@ -96,7 +96,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_portA_w)
  *               the main Z80 memory location to access)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portB_r)
+uint8_t pitnrun_state::m68705_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -113,7 +113,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_status_real_w)
 	m_zaccept = 0;
 }
 
-WRITE8_MEMBER(pitnrun_state::m68705_portB_w)
+void pitnrun_state::m68705_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	if (~data & 0x02)
@@ -156,7 +156,7 @@ WRITE8_MEMBER(pitnrun_state::m68705_portB_w)
  *                  passes through)
  */
 
-READ8_MEMBER(pitnrun_state::m68705_portC_r)
+uint8_t pitnrun_state::m68705_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_zready << 0) | (m_zaccept << 1);
 }

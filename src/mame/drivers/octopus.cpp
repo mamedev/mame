@@ -168,32 +168,32 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_READ8_MEMBER(bank_sel_r);
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_READ8_MEMBER(dma_read);
-	DECLARE_WRITE8_MEMBER(dma_write);
+	uint8_t bank_sel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_READ8_MEMBER(system_r);
-	DECLARE_WRITE8_MEMBER(system_w);
-	DECLARE_READ8_MEMBER(cntl_r);
-	DECLARE_WRITE8_MEMBER(cntl_w);
-	DECLARE_READ8_MEMBER(gpo_r);
-	DECLARE_WRITE8_MEMBER(gpo_w);
-	DECLARE_READ8_MEMBER(vidcontrol_r);
-	DECLARE_WRITE8_MEMBER(vidcontrol_w);
-	DECLARE_READ8_MEMBER(z80_io_r);
-	DECLARE_WRITE8_MEMBER(z80_io_w);
+	uint8_t system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cntl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gpo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gpo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vidcontrol_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vidcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER(x86_irq_cb);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(z80_vector_r);
-	DECLARE_WRITE8_MEMBER(z80_vector_w);
-	DECLARE_READ8_MEMBER(parallel_r);
-	DECLARE_WRITE8_MEMBER(parallel_w);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_vector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t parallel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void parallel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -359,12 +359,12 @@ void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-WRITE8_MEMBER(octopus_state::vram_w)
+void octopus_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 }
 
-READ8_MEMBER(octopus_state::vram_r)
+uint8_t octopus_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram[offset];
 }
@@ -374,7 +374,7 @@ WRITE_LINE_MEMBER(octopus_state::fdc_drq)
 	// TODO
 }
 
-READ8_MEMBER(octopus_state::bank_sel_r)
+uint8_t octopus_state::bank_sel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -388,7 +388,7 @@ READ8_MEMBER(octopus_state::bank_sel_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::bank_sel_w)
+void octopus_state::bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -414,7 +414,7 @@ WRITE8_MEMBER(octopus_state::bank_sel_w)
 //       write: parity fail reset
 // ports 0x20 and 0x21 read out the DIP switch configuration (the firmware function to get system config simply does IN AX,20h)
 // 0x28: write: Z80 enable
-WRITE8_MEMBER(octopus_state::system_w)
+void octopus_state::system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("SYS: System control offset %i data %02x\n",offset+1,data);
 	switch(offset)
@@ -427,7 +427,7 @@ WRITE8_MEMBER(octopus_state::system_w)
 	}
 }
 
-READ8_MEMBER(octopus_state::system_r)
+uint8_t octopus_state::system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0x00;
 	switch(offset)
@@ -443,13 +443,13 @@ READ8_MEMBER(octopus_state::system_r)
 }
 
 // Any I/O cycle relinquishes control of the bus
-READ8_MEMBER(octopus_state::z80_io_r)
+uint8_t octopus_state::z80_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	z80_io_w(space,offset,0);
 	return 0x00;
 }
 
-WRITE8_MEMBER(octopus_state::z80_io_w)
+void octopus_state::z80_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -457,7 +457,7 @@ WRITE8_MEMBER(octopus_state::z80_io_w)
 }
 
 // Z80 vector for RS232 and RS422
-READ8_MEMBER(octopus_state::z80_vector_r)
+uint8_t octopus_state::z80_vector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -471,7 +471,7 @@ READ8_MEMBER(octopus_state::z80_vector_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::z80_vector_w)
+void octopus_state::z80_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -496,7 +496,7 @@ WRITE8_MEMBER(octopus_state::z80_vector_w)
 // bit 1 = PPI Port A strobe?
 // bit 2 = Data strobe?
 // bit 3 = Address strobe?
-READ8_MEMBER(octopus_state::rtc_r)
+uint8_t octopus_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -508,7 +508,7 @@ READ8_MEMBER(octopus_state::rtc_r)
 	return ret;
 }
 
-WRITE8_MEMBER(octopus_state::rtc_w)
+void octopus_state::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_rtc_data)
 		m_rtc->write(space,1,data);
@@ -520,12 +520,12 @@ WRITE8_MEMBER(octopus_state::rtc_w)
 // bits0-3: RTC control lines
 // bit4-5: write precomp.
 // bit6-7: drive select
-READ8_MEMBER(octopus_state::cntl_r)
+uint8_t octopus_state::cntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cntl;
 }
 
-WRITE8_MEMBER(octopus_state::cntl_w)
+void octopus_state::cntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cntl = data;
 
@@ -560,12 +560,12 @@ WRITE8_MEMBER(octopus_state::cntl_w)
 // bit 2 - floppy side select
 // bit 1 - parallel data I/O (0 = output)
 // bit 0 - parallel control I/O (0 = output)
-READ8_MEMBER(octopus_state::gpo_r)
+uint8_t octopus_state::gpo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gpo;
 }
 
-WRITE8_MEMBER(octopus_state::gpo_w)
+void octopus_state::gpo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gpo = data;
 	switch(m_current_drive)
@@ -588,12 +588,12 @@ WRITE8_MEMBER(octopus_state::gpo_w)
 // bits 4-5 - character width - 0=10 dots, 1=6 dots, 2=8 dots, 3=9 dots
 // bit 6 - cursor mode (colour only) - 0=inverse cursor, 1=white cursor (normal)
 // bit 7 - 1=monochrome mode, 0=colour mode
-READ8_MEMBER(octopus_state::vidcontrol_r)
+uint8_t octopus_state::vidcontrol_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vidctrl;
 }
 
-WRITE8_MEMBER(octopus_state::vidcontrol_w)
+void octopus_state::vidcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidctrl = data;
 	m_fdc->dden_w(data & 0x04);
@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER(octopus_state::serial_clock_w)
 // 0xf1 : control
 //      bit 2 = INIT?  On boot, bits 0 and 1 are set high, bit 2 is set low then high again, all other bits are set low
 // can generate interrupts - tech manual suggests that Strobe, Init, Ack, and Busy can trigger an interrupt (IRQ14)
-READ8_MEMBER(octopus_state::parallel_r)
+uint8_t octopus_state::parallel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -649,7 +649,7 @@ READ8_MEMBER(octopus_state::parallel_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(octopus_state::parallel_w)
+void octopus_state::parallel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -676,7 +676,7 @@ WRITE8_MEMBER(octopus_state::parallel_w)
 	}
 }
 
-READ8_MEMBER(octopus_state::dma_read)
+uint8_t octopus_state::dma_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t byte;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
@@ -686,7 +686,7 @@ READ8_MEMBER(octopus_state::dma_read)
 	return byte;
 }
 
-WRITE8_MEMBER(octopus_state::dma_write)
+void octopus_state::dma_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 	if(m_current_dma == -1)
@@ -755,7 +755,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 	}
 }
 
-READ8_MEMBER( octopus_state::get_slave_ack )
+uint8_t octopus_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==7)
 		return m_pic2->acknowledge();

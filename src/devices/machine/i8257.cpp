@@ -489,7 +489,7 @@ void i8257_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( i8257_device::read )
+uint8_t i8257_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -544,7 +544,7 @@ READ8_MEMBER( i8257_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8257_device::write )
+void i8257_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(offset, 3))
 	{

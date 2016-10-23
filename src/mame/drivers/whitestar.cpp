@@ -32,11 +32,11 @@ public:
 	uint8_t m_dmd_status;
 	uint8_t m_dmd_busy;
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(dmddata_w);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dmddata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
 };
@@ -80,22 +80,22 @@ static ADDRESS_MAP_START( whitestar_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0x18000)
 ADDRESS_MAP_END
 
-READ8_MEMBER(whitestar_state::switch_r)
+uint8_t whitestar_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(whitestar_state::switch_w)
+void whitestar_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(whitestar_state::bank_w)
+void whitestar_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
 // Whitestar automatically pulses the DMD IRQ line?  DE hardware doesn't do that...
-WRITE8_MEMBER(whitestar_state::dmddata_w)
+void whitestar_state::dmddata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_decodmd->data_w(space,offset,data);
 	m_decodmd->ctrl_w(space,0,1);

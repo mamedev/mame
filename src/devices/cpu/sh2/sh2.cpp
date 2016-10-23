@@ -131,7 +131,7 @@ const device_type SH2A = &device_creator<sh2a_device>;
     SH2 internal map
 -------------------------------------------------*/
 
-READ32_MEMBER(sh2_device::sh2_internal_a5)
+uint32_t sh2_device::sh2_internal_a5(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xa5a5a5a5;
 }

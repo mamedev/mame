@@ -172,13 +172,13 @@ uint32_t aerofgt_state::aerofgt_ol2_tile_callback( uint32_t code )
 
 ***************************************************************************/
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1videoram_w)
+void aerofgt_state::aerofgt_bg1videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1videoram[offset]);
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2videoram_w)
+void aerofgt_state::aerofgt_bg2videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2videoram[offset]);
 	m_bg2_tilemap->mark_tile_dirty(offset);
@@ -194,7 +194,7 @@ void aerofgt_state::setbank( tilemap_t *tmap, int num, int bank )
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+void aerofgt_state::pspikes_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -204,7 +204,7 @@ WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 }
 
 
-WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+void aerofgt_state::karatblz_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -213,7 +213,7 @@ WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+void aerofgt_state::spinlbrk_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -222,7 +222,7 @@ WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
+void aerofgt_state::turbofrc_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tilemap_t *tmap = (offset == 0) ? m_bg1_tilemap : m_bg2_tilemap;
 
@@ -234,7 +234,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 	setbank(tmap, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
+void aerofgt_state::aerofgt_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	tilemap_t *tmap = (offset < 2) ? m_bg1_tilemap : m_bg2_tilemap;
 
@@ -244,27 +244,27 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 	setbank(tmap, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrollx_w)
+void aerofgt_state::aerofgt_bg1scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1scrollx);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrolly_w)
+void aerofgt_state::aerofgt_bg1scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg1scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrollx_w)
+void aerofgt_state::aerofgt_bg2scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2scrollx);
 }
 
-WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrolly_w)
+void aerofgt_state::aerofgt_bg2scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg2scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+void aerofgt_state::pspikes_palette_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -422,7 +422,7 @@ void aerofgt_state::video_start_wbbc97()
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
+void aerofgt_state::pspikesb_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
@@ -431,13 +431,13 @@ WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::spikes91_lookup_w)
+void aerofgt_state::spikes91_lookup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spikes91_lookup = data & 1;
 }
 
 // BOOTLEG
-WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
+void aerofgt_state::wbbc97_bitmap_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_wbbc97_bitmap_enable);
 }

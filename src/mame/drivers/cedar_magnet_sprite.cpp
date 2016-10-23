@@ -28,7 +28,7 @@ static ADDRESS_MAP_START( cedar_magnet_sprite_sub_ram_map, AS_PROGRAM, 8, cedar_
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-READ8_MEMBER(cedar_magnet_sprite_device::exzisus_hack_r)
+uint8_t cedar_magnet_sprite_device::exzisus_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("exzisus_hack_r\n");
 	int pc = m_cpu->pc();
@@ -156,7 +156,7 @@ void cedar_magnet_sprite_device::do_blit()
 	}
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port80_w)
+void cedar_magnet_sprite_device::sprite_port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritecodelow = data;
 //  printf("%s:sprite numlow / trigger %02x\n", machine().describe_context(), data);
@@ -164,28 +164,28 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port80_w)
 	do_blit();
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port84_w)
+void cedar_magnet_sprite_device::sprite_port84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritecodehigh = data;
 	m_high_write = 1;
 //  printf("%s:sprite numhigh %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port88_w)
+void cedar_magnet_sprite_device::sprite_port88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // frequent
 //  printf("%s:sprite_y_coordinate %02x\n", machine().describe_context(), data);
 	m_upperaddr = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pa_w)
+void cedar_magnet_sprite_device::pio2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // frequent
 //  printf("%s:sprite_x_coordinate %02x\n", machine().describe_context(), data);
 	m_loweraddr = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port8c_w)
+void cedar_magnet_sprite_device::sprite_port8c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int address = (m_upperaddr << 8) | m_loweraddr;
 	m_framebuffer[address] = data;
@@ -193,7 +193,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port8c_w)
 }
 
 // possible watchdog?
-WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
+void cedar_magnet_sprite_device::sprite_port9c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
 }
@@ -234,7 +234,7 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sprite )
 MACHINE_CONFIG_END
 
 
-READ8_MEMBER(cedar_magnet_sprite_device::pio0_pa_r)
+uint8_t cedar_magnet_sprite_device::pio0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  actually read
 //  printf("%s: pio0_pa_r\n", machine().describe_context());
@@ -243,29 +243,29 @@ READ8_MEMBER(cedar_magnet_sprite_device::pio0_pa_r)
 
 
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio0_pa_w)
+void cedar_magnet_sprite_device::pio0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritesize = data;
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio0_pb_w)
+void cedar_magnet_sprite_device::pio0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pio0_pb_data = data;
 	//printf("%s: pio0_pb_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio1_pa_w)
+void cedar_magnet_sprite_device::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%s: pio1_pa_w %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio1_pb_w)
+void cedar_magnet_sprite_device::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%s: pio1_pb_w %02x\n", machine().describe_context(), data);
 }
 
 
-WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pb_w)
+void cedar_magnet_sprite_device::pio2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// this feels like a hack
 	// the game writes here when creating the sprite list so that it can access the correct gfd data

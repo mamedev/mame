@@ -34,12 +34,12 @@
 
 /******************************************************************************/
 
-WRITE8_MEMBER(actfancr_state::triothep_control_select_w)
+void actfancr_state::triothep_control_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_trio_control_select = data;
 }
 
-READ8_MEMBER(actfancr_state::triothep_control_r)
+uint8_t actfancr_state::triothep_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_trio_control_select)
 	{
@@ -53,7 +53,7 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
+void actfancr_state::actfancr_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -61,7 +61,7 @@ WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
+void actfancr_state::actfancr_buffer_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *src = reinterpret_cast<uint8_t *>(memshare("spriteram")->ptr());
 	// copy to a 16-bit region for our sprite draw code too

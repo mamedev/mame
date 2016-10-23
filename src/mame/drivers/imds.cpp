@@ -35,21 +35,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(term_r);
-	DECLARE_READ8_MEMBER(term_status_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t term_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t term_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( imds_state::term_status_r )
+uint8_t imds_state::term_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( imds_state::term_r )
+uint8_t imds_state::term_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 0x21 : 0x20;
 }
@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( imds )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( imds_state::kbd_put )
+void imds_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

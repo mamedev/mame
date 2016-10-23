@@ -309,7 +309,7 @@ static GFXDECODE_START( psikyosh )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
+void psikyosh_state::psh_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -323,7 +323,7 @@ WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
 	logerror("Unk EEPROM write %x mask %x\n", data, mem_mask);
 }
 
-READ32_MEMBER(psikyosh_state::psh_eeprom_r)
+uint32_t psikyosh_state::psh_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -342,7 +342,7 @@ INTERRUPT_GEN_MEMBER(psikyosh_state::psikyosh_interrupt)
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
 // bit 0 controls game speed on readback, mechanism is a little weird
-WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
+void psikyosh_state::psikyosh_irqctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!(data & 0x00c00000))
 	{
@@ -351,7 +351,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
 }
 
 
-WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
+void psikyosh_state::psikyosh_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vidregs[offset]);
 
@@ -363,7 +363,7 @@ WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
 }
 
 /* Mahjong Panel */
-READ32_MEMBER(psikyosh_state::mjgtaste_input_r)
+uint32_t psikyosh_state::mjgtaste_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 /*
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.

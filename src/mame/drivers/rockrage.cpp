@@ -64,7 +64,7 @@ INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
+void rockrage_state::rockrage_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 4-6 = bank number */
 	m_rombank->set_entry((data & 0x70) >> 4);
@@ -76,18 +76,18 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
+void rockrage_state::rockrage_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-READ8_MEMBER(rockrage_state::rockrage_VLM5030_busy_r)
+uint8_t rockrage_state::rockrage_VLM5030_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_vlm->bsy() ? 1 : 0);
 }
 
-WRITE8_MEMBER(rockrage_state::rockrage_speech_w)
+void rockrage_state::rockrage_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit2 = data bus enable */
 	m_vlm->rst((data >> 1) & 0x01);

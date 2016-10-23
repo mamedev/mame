@@ -16,19 +16,19 @@
 /* once it's workings are fully understood.                   */
 /**************************************************************/
 
-WRITE8_MEMBER(zac2650_state::tinvader_videoram_w)
+void zac2650_state::tinvader_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(zac2650_state::zac_s2636_r)
+uint8_t zac2650_state::zac_s2636_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset!=0xCB) return m_s2636_0_ram[offset];
 	else return m_CollisionSprite;
 }
 
-WRITE8_MEMBER(zac2650_state::zac_s2636_w)
+void zac2650_state::zac_s2636_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s2636_0_ram[offset] = data;
 	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
@@ -39,7 +39,7 @@ WRITE8_MEMBER(zac2650_state::zac_s2636_w)
 	}
 }
 
-READ8_MEMBER(zac2650_state::tinvader_port_0_r)
+uint8_t zac2650_state::tinvader_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("1E80")->read() - m_CollisionBackground;
 }

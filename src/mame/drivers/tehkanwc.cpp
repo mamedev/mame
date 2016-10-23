@@ -104,7 +104,7 @@ void tehkanwc_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
+void tehkanwc_state::sub_cpu_halt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -113,7 +113,7 @@ WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 }
 
 
-READ8_MEMBER(tehkanwc_state::track_0_r)
+uint8_t tehkanwc_state::track_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int joy;
 
@@ -123,7 +123,7 @@ READ8_MEMBER(tehkanwc_state::track_0_r)
 	return ioport(offset ? "P1Y" : "P1X")->read() - m_track0[offset];
 }
 
-READ8_MEMBER(tehkanwc_state::track_1_r)
+uint8_t tehkanwc_state::track_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int joy;
 
@@ -133,13 +133,13 @@ READ8_MEMBER(tehkanwc_state::track_1_r)
 	return ioport(offset ? "P2Y" : "P2X")->read() - m_track1[offset];
 }
 
-WRITE8_MEMBER(tehkanwc_state::track_0_reset_w)
+void tehkanwc_state::track_0_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the trackball counters */
 	m_track0[offset] = ioport(offset ? "P1Y" : "P1X")->read() + data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
+void tehkanwc_state::track_1_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the trackball counters */
 	m_track1[offset] = ioport(offset ? "P2Y" : "P2X")->read() + data;
@@ -147,7 +147,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 
 
-WRITE8_MEMBER(tehkanwc_state::sound_command_w)
+void tehkanwc_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -165,7 +165,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
+void tehkanwc_state::sound_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, data);
 
@@ -178,27 +178,27 @@ WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 /* Emulate MSM sound samples with counters */
 
 
-READ8_MEMBER(tehkanwc_state::portA_r)
+uint8_t tehkanwc_state::portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_msm_data_offs & 0xff;
 }
 
-READ8_MEMBER(tehkanwc_state::portB_r)
+uint8_t tehkanwc_state::portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_msm_data_offs >> 8) & 0xff;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portA_w)
+void tehkanwc_state::portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0xff00) | data;
 }
 
-WRITE8_MEMBER(tehkanwc_state::portB_w)
+void tehkanwc_state::portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_data_offs = (m_msm_data_offs & 0x00ff) | (data << 8);
 }
 
-WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
+void tehkanwc_state::msm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(data ? 0 : 1);
 }

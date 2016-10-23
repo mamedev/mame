@@ -116,8 +116,8 @@ public:
 	// computer interface
 	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
-	DECLARE_READ8_MEMBER( nrdi_r ) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset) : 0xff; }
-	DECLARE_WRITE8_MEMBER( nwri_w ) { if (m_card != nullptr) m_card->nwri_w(space, offset, data); }
+	uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset) : 0xff; }
+	void nwri_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (m_card != nullptr) m_card->nwri_w(space, offset, data); }
 
 protected:
 	// device-level overrides

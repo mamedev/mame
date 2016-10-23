@@ -74,12 +74,12 @@ void aeroboto_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
+uint8_t aeroboto_state::aeroboto_in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
-WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
+void aeroboto_state::aeroboto_3000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 selects both flip screen and player1/player2 controls */
 	flip_screen_set(data & 0x01);
@@ -95,13 +95,13 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 	m_starsoff = data & 0x4;
 }
 
-WRITE8_MEMBER(aeroboto_state::aeroboto_videoram_w)
+void aeroboto_state::aeroboto_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(aeroboto_state::aeroboto_tilecolor_w)
+void aeroboto_state::aeroboto_tilecolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_tilecolor[offset] != data)
 	{

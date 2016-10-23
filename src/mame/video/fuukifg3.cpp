@@ -76,10 +76,10 @@ inline void fuuki32_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	m_tilemap[_N_]->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(fuuki32_state::vram_0_w){ vram_w(offset, data, mem_mask, 0); }
-WRITE32_MEMBER(fuuki32_state::vram_1_w){ vram_w(offset, data, mem_mask, 1); }
-WRITE32_MEMBER(fuuki32_state::vram_2_w){ vram_w(offset, data, mem_mask, 2); }
-WRITE32_MEMBER(fuuki32_state::vram_3_w){ vram_w(offset, data, mem_mask, 3); }
+void fuuki32_state::vram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ vram_w(offset, data, mem_mask, 0); }
+void fuuki32_state::vram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ vram_w(offset, data, mem_mask, 1); }
+void fuuki32_state::vram_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ vram_w(offset, data, mem_mask, 2); }
+void fuuki32_state::vram_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ vram_w(offset, data, mem_mask, 3); }
 
 
 /***************************************************************************

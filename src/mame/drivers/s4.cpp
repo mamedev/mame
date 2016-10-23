@@ -54,16 +54,16 @@ public:
 		, m_pias(*this, "pias")
 	{ }
 
-	DECLARE_READ8_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w);
-	DECLARE_WRITE8_MEMBER(sol0_w);
-	DECLARE_WRITE8_MEMBER(sol1_w);
-	DECLARE_READ8_MEMBER(dips_r);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dips_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
@@ -280,13 +280,13 @@ INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER( s4_state::sol0_w )
+void s4_state::sol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data, 4))
 		m_samples->start(2, 5); // outhole
 }
 
-WRITE8_MEMBER( s4_state::sol1_w )
+void s4_state::sol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_chimes)
 	{
@@ -332,12 +332,12 @@ WRITE8_MEMBER( s4_state::sol1_w )
 		m_samples->start(0, 6); // knocker
 }
 
-WRITE8_MEMBER( s4_state::lamp0_w )
+void s4_state::lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( s4_state::lamp1_w )
+void s4_state::lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -351,7 +351,7 @@ READ_LINE_MEMBER( s4_state::pia28_cb1_r )
 	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
 }
 
-READ8_MEMBER( s4_state::dips_r )
+uint8_t s4_state::dips_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(ioport("DIAGS")->read(), 4) )
 	{
@@ -370,7 +370,7 @@ READ8_MEMBER( s4_state::dips_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( s4_state::dig0_w )
+void s4_state::dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
@@ -378,7 +378,7 @@ WRITE8_MEMBER( s4_state::dig0_w )
 	output().set_value("led1", !BIT(data, 5));
 }
 
-WRITE8_MEMBER( s4_state::dig1_w )
+void s4_state::dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
 	if (m_data_ok)
@@ -389,19 +389,19 @@ WRITE8_MEMBER( s4_state::dig1_w )
 	m_data_ok = false;
 }
 
-READ8_MEMBER( s4_state::switch_r )
+uint8_t s4_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"X%X",m_kbdrow);
 	return ioport(kbdrow)->read() ^ 0xff;
 }
 
-WRITE8_MEMBER( s4_state::switch_w )
+void s4_state::switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kbdrow = data;
 }
 
-READ8_MEMBER( s4_state::sound_r )
+uint8_t s4_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_data;
 }

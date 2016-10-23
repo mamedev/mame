@@ -33,8 +33,8 @@ public:
 	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(beehive_60_r);
-	DECLARE_WRITE8_MEMBER(beehive_62_w);
+	uint8_t beehive_60_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void beehive_62_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint8_t m_keyline;
@@ -43,7 +43,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-READ8_MEMBER(beehive_state::beehive_60_r)
+uint8_t beehive_state::beehive_60_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (BIT(m_keyline, 4))
 	{
@@ -55,7 +55,7 @@ READ8_MEMBER(beehive_state::beehive_60_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(beehive_state::beehive_62_w)
+void beehive_state::beehive_62_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyline = data;
 }

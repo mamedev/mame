@@ -22,25 +22,25 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER(tcount_lo_r);
-	DECLARE_WRITE8_MEMBER(tcount_lo_w);
-	DECLARE_READ8_MEMBER(tcount_hi_r);
-	DECLARE_WRITE8_MEMBER(tcount_hi_w);
-	DECLARE_READ8_MEMBER(fifo_r);
-	DECLARE_WRITE8_MEMBER(fifo_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(bus_id_w);
-	DECLARE_READ8_MEMBER(istatus_r);
-	DECLARE_WRITE8_MEMBER(timeout_w);
-	DECLARE_READ8_MEMBER(seq_step_r);
-	DECLARE_WRITE8_MEMBER(sync_period_w);
-	DECLARE_READ8_MEMBER(fifo_flags_r);
-	DECLARE_WRITE8_MEMBER(sync_offset_w);
-	DECLARE_READ8_MEMBER(conf_r);
-	DECLARE_WRITE8_MEMBER(conf_w);
-	DECLARE_WRITE8_MEMBER(clock_w);
+	uint8_t tcount_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tcount_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tcount_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tcount_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fifo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fifo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bus_id_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t istatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timeout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seq_step_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sync_period_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fifo_flags_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sync_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t conf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void conf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void scsi_ctrl_changed() override;
 

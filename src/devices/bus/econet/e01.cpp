@@ -485,7 +485,7 @@ void e01_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::read )
+uint8_t e01_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -506,7 +506,7 @@ READ8_MEMBER( e01_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::write )
+void e01_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[offset] = data;
 }
@@ -516,7 +516,7 @@ WRITE8_MEMBER( e01_device::write )
 //  eprom_r - ROM/RAM select read
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::ram_select_r )
+uint8_t e01_device::ram_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ram_en = true;
 
@@ -528,7 +528,7 @@ READ8_MEMBER( e01_device::ram_select_r )
 //  floppy_w - floppy control write
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::floppy_w )
+void e01_device::floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -576,7 +576,7 @@ WRITE8_MEMBER( e01_device::floppy_w )
 //  network_irq_disable_r -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::network_irq_disable_r )
+uint8_t e01_device::network_irq_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	network_irq_enable(0);
 
@@ -588,7 +588,7 @@ READ8_MEMBER( e01_device::network_irq_disable_r )
 //  network_irq_disable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::network_irq_disable_w )
+void e01_device::network_irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	network_irq_enable(0);
 }
@@ -598,7 +598,7 @@ WRITE8_MEMBER( e01_device::network_irq_disable_w )
 //  network_irq_enable_r -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::network_irq_enable_r )
+uint8_t e01_device::network_irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	network_irq_enable(1);
 
@@ -610,7 +610,7 @@ READ8_MEMBER( e01_device::network_irq_enable_r )
 //  network_irq_enable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::network_irq_enable_w )
+void e01_device::network_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	network_irq_enable(1);
 }
@@ -620,7 +620,7 @@ WRITE8_MEMBER( e01_device::network_irq_enable_w )
 //  hdc_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::hdc_data_r )
+uint8_t e01_device::hdc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_scsi_data_in->read();
 
@@ -634,7 +634,7 @@ READ8_MEMBER( e01_device::hdc_data_r )
 //  hdc_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::hdc_data_w )
+void e01_device::hdc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scsi_data_out->write(data);
 
@@ -646,7 +646,7 @@ WRITE8_MEMBER( e01_device::hdc_data_w )
 //  hdc_select_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::hdc_select_w )
+void e01_device::hdc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scsibus->write_sel(1);
 }
@@ -656,7 +656,7 @@ WRITE8_MEMBER( e01_device::hdc_select_w )
 //  hdc_irq_enable_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::hdc_irq_enable_w )
+void e01_device::hdc_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hdc_irq_enable(BIT(data, 0));
 }
@@ -666,7 +666,7 @@ WRITE8_MEMBER( e01_device::hdc_irq_enable_w )
 //  rtc_address_r -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::rtc_address_r )
+uint8_t e01_device::rtc_address_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->read(space, 0);
 }
@@ -676,7 +676,7 @@ READ8_MEMBER( e01_device::rtc_address_r )
 //  rtc_address_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::rtc_address_w )
+void e01_device::rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, 0, data);
 }
@@ -686,7 +686,7 @@ WRITE8_MEMBER( e01_device::rtc_address_w )
 //  rtc_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( e01_device::rtc_data_r )
+uint8_t e01_device::rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->read(space, 1);
 }
@@ -696,7 +696,7 @@ READ8_MEMBER( e01_device::rtc_data_r )
 //  rtc_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( e01_device::rtc_data_w )
+void e01_device::rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, 1, data);
 }

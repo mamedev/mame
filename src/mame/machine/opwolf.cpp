@@ -624,7 +624,7 @@ void opwolf_state::updateDifficulty( int mode )
  *
  *************************************/
 
-WRITE16_MEMBER(opwolf_state::opwolf_cchip_status_w)
+void opwolf_state::opwolf_cchip_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// This is written once after the C-Chip init is complete (and passes)
 	// We use it to setup some initial state (it's not clear if the real
@@ -636,12 +636,12 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_status_w)
 	updateDifficulty(0);
 }
 
-WRITE16_MEMBER(opwolf_state::opwolf_cchip_bank_w)
+void opwolf_state::opwolf_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
+void opwolf_state::opwolf_cchip_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//int logValue=1;
 	//if (offset==0x1c && offset==0x1d && offset==0x1e && offset==0x1f && offset==0x20) // Enemies, tanks, choppers, boats
@@ -740,7 +740,7 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
  *
  *************************************/
 
-READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
+uint16_t opwolf_state::opwolf_cchip_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    Bit 0x4 = Error signal
@@ -749,7 +749,7 @@ READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
 	return 0x1; /* Return 0x5 for C-Chip error */
 }
 
-READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
+uint16_t opwolf_state::opwolf_cchip_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  if (offset!=0x7f && && space.device().safe_pc()!=0xc18 && space.device().safe_pc()!=0xc2e && space.device().safe_pc()!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
 //      logerror("%08x:  opwolf c read %04x (bank %04x)\n", space.device().safe_pc(), offset, m_current_bank);

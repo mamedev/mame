@@ -272,7 +272,7 @@ void vdt911_device::device_timer(emu_timer &timer, device_timer_id id, int param
 /*
     CRU interface read
 */
-READ8_MEMBER( vdt911_device::cru_r )
+uint8_t vdt911_device::cru_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply=0;
 
@@ -323,7 +323,7 @@ READ8_MEMBER( vdt911_device::cru_r )
 /*
     CRU interface write
 */
-WRITE8_MEMBER( vdt911_device::cru_w )
+void vdt911_device::cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0xf;
 

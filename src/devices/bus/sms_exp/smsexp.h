@@ -45,11 +45,11 @@ public:
 	virtual ~sms_expansion_slot_device();
 
 	// reading and writing
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_mapper);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_ram);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int get_lphaser_xoffs();
 
@@ -72,11 +72,11 @@ public:
 	virtual ~device_sms_expansion_slot_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER(write) { };
-	virtual DECLARE_WRITE8_MEMBER(write_mapper) {};
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { };
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	virtual void write_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 
 	virtual int get_lphaser_xoffs() { return 0; };
 };

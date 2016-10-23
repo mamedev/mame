@@ -32,12 +32,12 @@ public:
 	virtual ~device_o2_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_rom0c) { return 0xff; }
+	virtual uint8_t read_rom04(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_rom0c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
 	virtual void write_bank(int bank) {}
 
-	virtual DECLARE_WRITE8_MEMBER(io_write) {}
-	virtual DECLARE_READ8_MEMBER(t0_read) { return 0; }
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual uint8_t t0_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -89,10 +89,10 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom04);
-	virtual DECLARE_READ8_MEMBER(read_rom0c);
-	virtual DECLARE_WRITE8_MEMBER(io_write);
-	virtual DECLARE_READ8_MEMBER(t0_read) { if (m_cart) return m_cart->t0_read(space, offset); else return 0; }
+	virtual uint8_t read_rom04(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_rom0c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t t0_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if (m_cart) return m_cart->t0_read(space, offset); else return 0; }
 
 	virtual void write_bank(int bank)   { if (m_cart) m_cart->write_bank(bank); }
 

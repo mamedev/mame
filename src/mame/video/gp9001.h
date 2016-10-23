@@ -67,22 +67,22 @@ public:
 	DECLARE_ADDRESS_MAP(map, 16);
 
 	// access to VDP
-	DECLARE_READ16_MEMBER( gp9001_vdp_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_w );
-	DECLARE_READ16_MEMBER( gp9001_vdp_alt_r );
-	DECLARE_WRITE16_MEMBER( gp9001_vdp_alt_w );
+	uint16_t gp9001_vdp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gp9001_vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gp9001_vdp_alt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gp9001_vdp_alt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// this bootleg has strange access
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_videoram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_videoram16_w );
-	DECLARE_READ16_MEMBER( pipibibi_bootleg_spriteram16_r );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_spriteram16_w );
-	DECLARE_WRITE16_MEMBER( pipibibi_bootleg_scroll_w );
+	uint16_t pipibibi_bootleg_videoram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pipibibi_bootleg_videoram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pipibibi_bootleg_spriteram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pipibibi_bootleg_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pipibibi_bootleg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// internal handlers
-	DECLARE_WRITE16_MEMBER( gp9001_bg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_fg_tmap_w );
-	DECLARE_WRITE16_MEMBER( gp9001_top_tmap_w );
+	void gp9001_bg_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gp9001_fg_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gp9001_top_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

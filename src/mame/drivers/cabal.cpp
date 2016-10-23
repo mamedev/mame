@@ -70,7 +70,7 @@ void cabal_state::machine_reset_cabalbl()
 
 /******************************************************************************************/
 
-WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
+void cabal_state::cabalbl_sndcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -86,7 +86,7 @@ WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 
 
 
-WRITE16_MEMBER(cabal_state::track_reset_w)
+void cabal_state::track_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -95,7 +95,7 @@ WRITE16_MEMBER(cabal_state::track_reset_w)
 		m_last[i] = ioport(track_names[i])->read();
 }
 
-READ16_MEMBER(cabal_state::track_r)
+uint16_t cabal_state::track_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -108,7 +108,7 @@ READ16_MEMBER(cabal_state::track_r)
 }
 
 
-WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
+void cabal_state::sound_irq_trigger_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space,4,data,mem_mask);
 
@@ -116,7 +116,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 	space.device().execute().spin_until_time(attotime::from_usec(50));
 }
 
-WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
+void cabal_state::cabalbl_sound_irq_trigger_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
@@ -164,17 +164,17 @@ ADDRESS_MAP_END
 /*********************************************************************/
 
 
-READ8_MEMBER(cabal_state::cabalbl_snd2_r)
+uint8_t cabal_state::cabalbl_snd2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
-READ8_MEMBER(cabal_state::cabalbl_snd1_r)
+uint8_t cabal_state::cabalbl_snd1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
-WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
+void cabal_state::cabalbl_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 
 /* the bootleg has 2x z80 sample players */
 
-WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
+void cabal_state::cabalbl_1_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm1->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */
@@ -226,7 +226,7 @@ WRITE8_MEMBER(cabal_state::cabalbl_1_adpcm_w)
 	m_msm1->vclk_w(1);
 	m_msm1->vclk_w(0);
 }
-WRITE8_MEMBER(cabal_state::cabalbl_2_adpcm_w)
+void cabal_state::cabalbl_2_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm2->reset_w(BIT(data, 7));
 	/* ?? bit 6?? */

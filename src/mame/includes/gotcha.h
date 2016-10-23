@@ -37,13 +37,13 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
-	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
-	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
-	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
-	DECLARE_WRITE16_MEMBER(gotcha_oki_bank_w);
+	void gotcha_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_gfxbank_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gotcha_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);

@@ -56,11 +56,11 @@ public:
 	tilemap_t* m_tilemap;
 	int m_nmi;
 
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	void flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -78,12 +78,12 @@ void skyarmy_state::machine_start()
 	save_item(NAME(m_nmi));
 }
 
-WRITE8_MEMBER(skyarmy_state::flip_screen_x_w)
+void skyarmy_state::flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(data & 0x01);
 }
 
-WRITE8_MEMBER(skyarmy_state::flip_screen_y_w)
+void skyarmy_state::flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(data & 0x01);
 }
@@ -96,13 +96,13 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-WRITE8_MEMBER(skyarmy_state::videoram_w)
+void skyarmy_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(skyarmy_state::colorram_w)
+void skyarmy_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -179,7 +179,7 @@ INTERRUPT_GEN_MEMBER(skyarmy_state::nmi_source)
 }
 
 
-WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
+void skyarmy_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi=data & 1;
 }

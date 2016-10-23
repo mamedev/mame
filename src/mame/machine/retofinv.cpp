@@ -12,19 +12,19 @@
 ***************************************************************************/
 
 
-READ8_MEMBER(retofinv_state::mcu_portA_r)
+uint8_t retofinv_state::mcu_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //logerror("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in);
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_portA_w)
+void retofinv_state::mcu_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("%04x: 68705 port A write %02x\n",space.device().safe_pc(),data);
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_ddrA_w)
+void retofinv_state::mcu_ddrA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
@@ -41,12 +41,12 @@ WRITE8_MEMBER(retofinv_state::mcu_ddrA_w)
  */
 
 
-READ8_MEMBER(retofinv_state::mcu_portB_r)
+uint8_t retofinv_state::mcu_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_portB_w)
+void retofinv_state::mcu_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("%04x: 68705 port B write %02x\n",space.device().safe_pc(),data);
 
@@ -67,7 +67,7 @@ WRITE8_MEMBER(retofinv_state::mcu_portB_w)
 	m_portB_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_ddrB_w)
+void retofinv_state::mcu_ddrB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
@@ -83,7 +83,7 @@ WRITE8_MEMBER(retofinv_state::mcu_ddrB_w)
  */
 
 
-READ8_MEMBER(retofinv_state::mcu_portC_r)
+uint8_t retofinv_state::mcu_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portC_in = 0;
 	if (m_main_sent) m_portC_in |= 0x01;
@@ -92,19 +92,19 @@ READ8_MEMBER(retofinv_state::mcu_portC_r)
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_portC_w)
+void retofinv_state::mcu_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("%04x: 68705 port C write %02x\n",space.device().safe_pc(),data);
 	m_portC_out = data;
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_ddrC_w)
+void retofinv_state::mcu_ddrC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
 
 
-WRITE8_MEMBER(retofinv_state::mcu_w)
+void retofinv_state::mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_from_main = data;
@@ -112,14 +112,14 @@ logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_68705->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER(retofinv_state::mcu_r)
+uint8_t retofinv_state::mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 logerror("%04x: mcu_r %02x\n",space.device().safe_pc(),m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
-READ8_MEMBER(retofinv_state::mcu_status_r)
+uint8_t retofinv_state::mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0;
 

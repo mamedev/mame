@@ -55,11 +55,11 @@ public:
 
 	void init_rc702();
 	void machine_reset_rc702();
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_WRITE8_MEMBER(port14_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
-	DECLARE_WRITE8_MEMBER(port1c_w);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(qbar_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t *m_p_chargen;
@@ -213,19 +213,19 @@ WRITE_LINE_MEMBER( rc702_state::dack1_w )
 		m_fdc->tc_w(0);
 }
 
-WRITE8_MEMBER( rc702_state::port14_w )
+void rc702_state::port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = m_floppy0->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(!BIT(data, 0));
 }
 
-WRITE8_MEMBER( rc702_state::port18_w )
+void rc702_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(1); // replace roms with ram
 }
 
-WRITE8_MEMBER( rc702_state::port1c_w )
+void rc702_state::port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_beep->set_state(1);
 		m_beepcnt = 0x3000;
@@ -302,13 +302,13 @@ WRITE_LINE_MEMBER( rc702_state::busreq_w )
 	m_dma->hack_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( rc702_state::memory_read_byte )
+uint8_t rc702_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( rc702_state::memory_write_byte )
+void rc702_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
@@ -322,7 +322,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ nullptr }
 };
 
-WRITE8_MEMBER( rc702_state::kbd_put )
+void rc702_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio->pa_w(space, 0, data);
 	m_pio->strobe_a(0);

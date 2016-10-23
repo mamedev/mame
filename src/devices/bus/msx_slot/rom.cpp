@@ -44,7 +44,7 @@ void msx_slot_rom_device::device_start()
 }
 
 
-READ8_MEMBER(msx_slot_rom_device::read)
+uint8_t msx_slot_rom_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= m_start_address && offset < m_end_address )
 	{

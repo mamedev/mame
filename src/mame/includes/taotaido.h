@@ -38,13 +38,13 @@ public:
 	std::unique_ptr<uint16_t[]> m_spriteram2_old;
 	std::unique_ptr<uint16_t[]> m_spriteram2_older;
 
-	DECLARE_READ16_MEMBER(pending_command_r);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sprite_character_bank_select_w);
-	DECLARE_WRITE16_MEMBER(tileregs_w);
-	DECLARE_WRITE16_MEMBER(bgvideoram_w);
+	uint16_t pending_command_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_character_bank_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tileregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);

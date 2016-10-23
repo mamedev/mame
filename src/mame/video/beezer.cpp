@@ -35,7 +35,7 @@ uint32_t beezer_state::screen_update_beezer(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE8_MEMBER(beezer_state::beezer_map_w)
+void beezer_state::beezer_map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  bit 7 -- 330  ohm resistor  -- BLUE
@@ -68,7 +68,7 @@ WRITE8_MEMBER(beezer_state::beezer_map_w)
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 }
 
-READ8_MEMBER(beezer_state::beezer_line_r)
+uint8_t beezer_state::beezer_line_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vpos();
 //  Note: was (m_scanline & 0xfe) << 1; with scanline % 128

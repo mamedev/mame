@@ -24,7 +24,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(redalert_state::redalert_bitmap_videoram_w)
+void redalert_state::redalert_bitmap_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitmap_videoram[offset     ] = data;
 	m_bitmap_colorram[offset >> 3] = *m_bitmap_color & 0x07;

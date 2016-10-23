@@ -58,19 +58,19 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ8_MEMBER(kb_r);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	UPD65031_MEMORY_UPDATE(bankswitch_update);
 	UPD65031_SCREEN_UPDATE(lcd_update);
 
 	// cartridges read/write
-	DECLARE_READ8_MEMBER(bank0_cart_r);
-	DECLARE_READ8_MEMBER(bank1_cart_r);
-	DECLARE_READ8_MEMBER(bank2_cart_r);
-	DECLARE_READ8_MEMBER(bank3_cart_r);
-	DECLARE_WRITE8_MEMBER(bank0_cart_w);
-	DECLARE_WRITE8_MEMBER(bank1_cart_w);
-	DECLARE_WRITE8_MEMBER(bank2_cart_w);
-	DECLARE_WRITE8_MEMBER(bank3_cart_w);
+	uint8_t bank0_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank1_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank2_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t bank3_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank0_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank1_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank3_cart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// defined in video/z88.c
 	inline void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint16_t color);

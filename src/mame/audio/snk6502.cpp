@@ -383,7 +383,7 @@ int snk6502_sound_device::music0_playing()
 }
 
 
-WRITE8_MEMBER( snk6502_sound_device::sasuke_sound_w )
+void snk6502_sound_device::sasuke_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -448,7 +448,7 @@ WRITE8_MEMBER( snk6502_sound_device::sasuke_sound_w )
 	}
 }
 
-WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
+void snk6502_sound_device::satansat_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -510,7 +510,7 @@ WRITE8_MEMBER( snk6502_sound_device::satansat_sound_w )
 	}
 }
 
-WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
+void snk6502_sound_device::vanguard_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -606,7 +606,7 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_sound_w )
 	}
 }
 
-WRITE8_MEMBER( snk6502_sound_device::fantasy_sound_w )
+void snk6502_sound_device::fantasy_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -884,7 +884,7 @@ void snk6502_sound_device::speech_w(uint8_t data, const uint16_t *table, int sta
   10 operations
 */
 
-WRITE8_MEMBER( snk6502_sound_device::vanguard_speech_w )
+void snk6502_sound_device::vanguard_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint16_t vanguard_table[16] =
 	{
@@ -909,7 +909,7 @@ WRITE8_MEMBER( snk6502_sound_device::vanguard_speech_w )
 	speech_w(data, vanguard_table, 2);
 }
 
-WRITE8_MEMBER( snk6502_sound_device::fantasy_speech_w )
+void snk6502_sound_device::fantasy_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint16_t fantasy_table[16] =
 	{

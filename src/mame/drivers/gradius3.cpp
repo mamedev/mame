@@ -32,12 +32,12 @@
 #include "includes/konamipt.h"
 #include "includes/gradius3.h"
 
-READ16_MEMBER(gradius3_state::k052109_halfword_r)
+uint16_t gradius3_state::k052109_halfword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_k052109->read(space, offset);
 }
 
-WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
+void gradius3_state::k052109_halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_k052109->write(space, offset, data & 0xff);
@@ -48,29 +48,29 @@ WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 //      logerror("%06x half %04x = %04x\n",space.device().safe_pc(),offset,data);
 }
 
-READ16_MEMBER(gradius3_state::k051937_halfword_r)
+uint16_t gradius3_state::k051937_halfword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_k051960->k051937_r(space, offset);
 }
 
-WRITE16_MEMBER(gradius3_state::k051937_halfword_w)
+void gradius3_state::k051937_halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_k051960->k051937_w(space, offset, data & 0xff);
 }
 
-READ16_MEMBER(gradius3_state::k051960_halfword_r)
+uint16_t gradius3_state::k051960_halfword_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_k051960->k051960_r(space, offset);
 }
 
-WRITE16_MEMBER(gradius3_state::k051960_halfword_w)
+void gradius3_state::k051960_halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_k051960->k051960_w(space, offset, data & 0xff);
 }
 
-WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
+void gradius3_state::cpuA_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -94,7 +94,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 	}
 }
 
-WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
+void gradius3_state::cpuB_irqenable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_irqBmask = (data >> 8) & 0x07;
@@ -118,7 +118,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
+void gradius3_state::cpuB_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_irqBmask & 4)
 	{
@@ -129,12 +129,12 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 		logerror("%04x MISSED cpu B irq 4 %02x\n",space.device().safe_pc(),data);
 }
 
-WRITE16_MEMBER(gradius3_state::sound_irq_w)
+void gradius3_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(gradius3_state::sound_bank_w)
+void gradius3_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_A, bank_B;
 
@@ -248,7 +248,7 @@ static INPUT_PORTS_START( gradius3 )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(gradius3_state::volume_callback)
+void gradius3_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232->set_volume(1, 0, (data & 0x0f) * 0x11);

@@ -78,18 +78,18 @@ public:
 	};
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ16_MEMBER(vram_addr_r);
-	DECLARE_READ16_MEMBER(vram_data_r);
-	DECLARE_READ16_MEMBER(vram_mmap_r);
-	DECLARE_WRITE16_MEMBER(vram_addr_w);
-	DECLARE_WRITE16_MEMBER(vram_data_w);
-	DECLARE_WRITE16_MEMBER(vram_mmap_w);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE16_MEMBER(status_w);
-	DECLARE_READ8_MEMBER(palette_index_r);
-	DECLARE_READ8_MEMBER(palette_data_r);
-	DECLARE_WRITE8_MEMBER(palette_index_w);
-	DECLARE_WRITE8_MEMBER(palette_data_w);
+	uint16_t vram_addr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vram_mmap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_mmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t palette_index_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t palette_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	emu_timer *m_vsync_on_timer;
 	emu_timer *m_vsync_off_timer;
@@ -184,65 +184,65 @@ PALETTE_INIT_MEMBER(kcgd_state, kcgd)
     VRAM is 128K and is word-addressable, so address fits into 16 bits.
     Low 32K of VRAM are not used to store pixel data -- XXX.
 */
-WRITE16_MEMBER(kcgd_state::vram_addr_w)
+void kcgd_state::vram_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(3,"VRAM WA", ("%06o\n", data));
 	m_video.vram_addr = data;
 }
 
-READ16_MEMBER(kcgd_state::vram_addr_r)
+uint16_t kcgd_state::vram_addr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	DBG_LOG(3,"VRAM RA", ("\n"));
 	return m_video.vram_addr;
 }
 
-WRITE16_MEMBER(kcgd_state::vram_data_w)
+void kcgd_state::vram_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(1,"VRAM W2", ("%06o <- %04XH\n", m_video.vram_addr, data));
 	m_videoram[m_video.vram_addr] = data | (BIT(m_video.control, 7) << 16);
 }
 
-READ16_MEMBER(kcgd_state::vram_data_r)
+uint16_t kcgd_state::vram_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	DBG_LOG(2,"VRAM R2", ("%06o\n", m_video.vram_addr));
 	m_video.status = (m_video.status & 0xff7f) | (BIT(m_videoram[m_video.vram_addr], 16) << 7);
 	return (uint16_t) (m_videoram[m_video.vram_addr] & 0xffff);
 }
 
-WRITE16_MEMBER(kcgd_state::vram_mmap_w)
+void kcgd_state::vram_mmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(3,"VRAM W1", ("%06o <- %04XH\n", offset, data));
 	m_videoram[offset] = data | (BIT(m_video.control, 7) << 16);
 }
 
-READ16_MEMBER(kcgd_state::vram_mmap_r)
+uint16_t kcgd_state::vram_mmap_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	DBG_LOG(3,"VRAM R1", ("%06o\n", offset));
 	return (uint16_t) (m_videoram[offset] & 0xffff);
 }
 
-WRITE16_MEMBER(kcgd_state::status_w)
+void kcgd_state::status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(1,"Status W", ("data %04XH (useful %02XH)\n", data, data & 0x63));
 	// bits 7 and 15 are read-only
 	m_video.status = (m_video.status & 0x8080) | (data & 0x7f7f);
 }
 
-READ16_MEMBER(kcgd_state::status_r)
+uint16_t kcgd_state::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_video.status ^ (BIT(m_video.control, 6) << 7);
 	DBG_LOG(1,"Status R", ("data %04X index %d\n", data, m_video.palette_index));
 	return data;
 }
 
-WRITE8_MEMBER(kcgd_state::palette_index_w)
+void kcgd_state::palette_index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video.control = data;
 	m_video.palette_index = ((data >> 2) & 15);
 	DBG_LOG(1,"Palette index, Control W", ("data %02XH index %d\n", data, m_video.palette_index));
 }
 
-WRITE8_MEMBER(kcgd_state::palette_data_w)
+void kcgd_state::palette_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"Palette data W", ("data %02XH index %d\n", data, m_video.palette_index));
 	m_video.palette[m_video.palette_index] = data;
@@ -250,12 +250,12 @@ WRITE8_MEMBER(kcgd_state::palette_data_w)
 		85*(data & 3), 85*((data >> 2) & 3), 85*((data >> 4) & 3));
 }
 
-READ8_MEMBER(kcgd_state::palette_index_r)
+uint8_t kcgd_state::palette_index_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(kcgd_state::palette_data_r)
+uint8_t kcgd_state::palette_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	DBG_LOG(1,"Palette data R", ("index %d\n", m_video.palette_index));
 	return m_video.palette[m_video.palette_index];

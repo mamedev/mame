@@ -389,7 +389,7 @@ void mpcc68561_t::set_reg_a(int reg, uint8_t data)
     mpcc68561_r
 -------------------------------------------------*/
 
-READ8_MEMBER( mpcc68561_t::reg_r)
+uint8_t mpcc68561_t::reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -421,7 +421,7 @@ READ8_MEMBER( mpcc68561_t::reg_r)
     mpcc68561_w
 -------------------------------------------------*/
 
-WRITE8_MEMBER( mpcc68561_t::reg_w )
+void mpcc68561_t::reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	Chan *pChan;
 

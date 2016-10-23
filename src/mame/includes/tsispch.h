@@ -39,13 +39,13 @@ public:
 	uint8_t m_paramReg;           // status leds and resets and etc
 
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(i8251_rxd);
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_WRITE8_MEMBER(peripheral_w);
-	DECLARE_READ16_MEMBER(dsp_data_r);
-	DECLARE_WRITE16_MEMBER(dsp_data_w);
-	DECLARE_READ16_MEMBER(dsp_status_r);
-	DECLARE_WRITE16_MEMBER(dsp_status_w);
+	void i8251_rxd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dsp_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_prose2k();
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);

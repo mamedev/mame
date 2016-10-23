@@ -164,37 +164,37 @@ public:
 	template<class _Object> static devcb_base &set_cd_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(object); }
 
 	// public interfaces
-	DECLARE_WRITE32_MEMBER( berr_w );
-	DECLARE_READ32_MEMBER( berr_r );
+	void berr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t berr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t exp_base();
 
-	DECLARE_WRITE32_MEMBER( exp_base_w );
-	DECLARE_READ32_MEMBER( exp_base_r );
+	void exp_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t exp_base_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( exp_config_w );
-	DECLARE_READ32_MEMBER( exp_config_r );
+	void exp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t exp_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( ram_config_w );
-	DECLARE_READ32_MEMBER( ram_config_r );
+	void ram_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ram_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( rom_config_w );
-	DECLARE_READ32_MEMBER( rom_config_r );
+	void rom_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t rom_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( biu_w );
-	DECLARE_READ32_MEMBER( biu_r );
+	void biu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t biu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER( gpu_w );
-	DECLARE_READ32_MEMBER( gpu_r );
+	void gpu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gpu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE16_MEMBER( spu_w );
-	DECLARE_READ16_MEMBER( spu_r );
+	void spu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t spu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER( cd_w );
-	DECLARE_READ8_MEMBER( cd_r );
+	void cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE32_MEMBER( com_delay_w );
-	DECLARE_READ32_MEMBER( com_delay_r );
+	void com_delay_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t com_delay_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 	void set_disable_rom_berr(bool mode);

@@ -15,35 +15,35 @@ driver by Nicola Salmoria
 #include "sound/ay8910.h"
 
 
-READ8_MEMBER(dogfgt_state::sharedram_r)
+uint8_t dogfgt_state::sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(dogfgt_state::sharedram_w)
+void dogfgt_state::sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sharedram[offset] = data;
 }
 
 
-WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
+void dogfgt_state::subirqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 used but unknown */
 	if (data & 0x04)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
+void dogfgt_state::sub_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_soundlatch_w)
+void dogfgt_state::dogfgt_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch = data;
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
+void dogfgt_state::dogfgt_soundcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)

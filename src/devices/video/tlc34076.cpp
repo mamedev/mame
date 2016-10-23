@@ -136,7 +136,7 @@ const rgb_t *tlc34076_device::get_pens()
 //  read - read access
 //-------------------------------------------------
 
-READ8_MEMBER( tlc34076_device::read )
+uint8_t tlc34076_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -171,7 +171,7 @@ READ8_MEMBER( tlc34076_device::read )
 //  write - write access
 //-------------------------------------------------
 
-WRITE8_MEMBER( tlc34076_device::write )
+void tlc34076_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  uint8_t oldval;
 

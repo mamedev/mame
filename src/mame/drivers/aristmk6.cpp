@@ -41,9 +41,9 @@ public:
 
 	uint32_t m_test_x,m_test_y,m_start_offs;
 	uint8_t m_type;
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE64_MEMBER(eeprom_w);
-	DECLARE_READ64_MEMBER(hwver_r);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eeprom_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t hwver_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	virtual void video_start() override;
 	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -137,7 +137,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-READ8_MEMBER(aristmk6_state::test_r)
+uint8_t aristmk6_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int flip;
 
@@ -156,14 +156,14 @@ READ8_MEMBER(aristmk6_state::test_r)
 	return 0;
 }
 
-WRITE64_MEMBER(aristmk6_state::eeprom_w)
+void aristmk6_state::eeprom_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	m_eeprom0->di_write((data & 0x01) >> 0);
 	m_eeprom0->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom0->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ64_MEMBER(aristmk6_state::hwver_r)
+uint64_t aristmk6_state::hwver_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	// hardware version/revison register
 	// bit 0-3: acceptable values 0-2 (deadloop otherwise), if > 0 - add 4 to unk B3800000 registers offsets

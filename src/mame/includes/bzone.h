@@ -31,17 +31,17 @@ public:
 
 	uint8_t m_analog_data;
 	uint8_t m_rb_input_select;
-	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
-	DECLARE_READ8_MEMBER(analog_data_r);
-	DECLARE_WRITE8_MEMBER(analog_select_w);
+	void bzone_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t analog_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void analog_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
-	DECLARE_READ8_MEMBER(redbaron_joy_r);
-	DECLARE_WRITE8_MEMBER(redbaron_joysound_w);
+	uint8_t redbaron_joy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void redbaron_joysound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_bradley();
 	virtual void machine_start() override;
 	void machine_start_redbaron();
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
-	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+	void bzone_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 

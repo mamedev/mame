@@ -461,7 +461,7 @@ void tms9902_device::initiate_transmit()
     bit 13-15: not emulated, normally used for diagnostics
     bit 16: RBINT (RBRL&RIENB)
 */
-READ8_MEMBER( tms9902_device::cruread )
+uint8_t tms9902_device::cruread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t answer = 0;
 
@@ -580,7 +580,7 @@ void tms9902_device::reset_uart()
 /*
     TMS9902 CRU write
 */
-WRITE8_MEMBER( tms9902_device::cruwrite )
+void tms9902_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 1;  /* clear extra bits */
 

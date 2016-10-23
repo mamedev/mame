@@ -61,14 +61,14 @@ Stephh's notes (based on the games M6809 code and some tests) :
  *
  *************************************/
 
-READ8_MEMBER(mikie_state::mikie_sh_timer_r)
+uint8_t mikie_state::mikie_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int clock = m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
 }
 
-WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
+void mikie_state::mikie_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_last_irq == 0 && data == 1)
 	{
@@ -79,12 +79,12 @@ WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
 	m_last_irq = data;
 }
 
-WRITE8_MEMBER(mikie_state::mikie_coin_counter_w)
+void mikie_state::mikie_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(mikie_state::irq_mask_w)
+void mikie_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

@@ -27,7 +27,7 @@ public:
 
 	uint16_t          m_h256;
 	virtual void update_interrupts() override;
-	DECLARE_READ16_MEMBER(special_port1_r);
+	uint16_t special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_xybots();
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

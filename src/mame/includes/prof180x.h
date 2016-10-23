@@ -26,13 +26,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( flr_w );
-	DECLARE_READ8_MEMBER( status0_r );
-	DECLARE_READ8_MEMBER( status1_r );
-	DECLARE_READ8_MEMBER( status_r );
+	void flr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void ls259_w(int flag, int value);
 

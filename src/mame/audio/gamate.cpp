@@ -172,7 +172,7 @@ void gamate_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	}
 }
 
-WRITE8_MEMBER( gamate_sound_device::device_w )
+void gamate_sound_device::device_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t size;
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( gamate_sound_device::device_w )
 	envelope.first=true;
 }
 
-READ8_MEMBER( gamate_sound_device::device_r )
+uint8_t gamate_sound_device::device_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	if ((offset&0xf)<ARRAY_LENGTH(Mask))

@@ -20,9 +20,9 @@ public:
 
 	virtual void initialize_cartridge() override;
 
-	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual uint8_t read_cart(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE8_MEMBER(banking);
+	void banking(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void restore_banks();
 

@@ -204,8 +204,8 @@ class dsp56k_device : public cpu_device
 public:
 	dsp56k_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	DECLARE_READ16_MEMBER( peripheral_register_r );
-	DECLARE_WRITE16_MEMBER( peripheral_register_w );
+	uint16_t peripheral_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void peripheral_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void  host_interface_write(uint8_t offset, uint8_t data);
 	uint8_t host_interface_read(uint8_t offset);

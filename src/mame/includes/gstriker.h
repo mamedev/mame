@@ -53,20 +53,20 @@ public:
 	uint16_t m_prot_reg[2];
 
 	// common
-	DECLARE_READ16_MEMBER(dmmy_8f);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(sh_pending_command_clear_w);
-	DECLARE_WRITE8_MEMBER(sh_bankswitch_w);
+	uint16_t dmmy_8f(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sh_pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// vgoalsoc and twrldc
-	DECLARE_WRITE16_MEMBER(twrldc94_mcu_w);
-	DECLARE_READ16_MEMBER(twrldc94_mcu_r);
-	DECLARE_WRITE16_MEMBER(twrldc94_prot_reg_w);
-	DECLARE_READ16_MEMBER(twrldc94_prot_reg_r);
+	void twrldc94_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t twrldc94_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void twrldc94_prot_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t twrldc94_prot_reg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// vgoalsoc only
-	DECLARE_READ16_MEMBER(vbl_toggle_r);
-	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
+	uint16_t vbl_toggle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vbl_toggle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

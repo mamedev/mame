@@ -29,8 +29,8 @@ public:
 	void set_timer0_clock(uint32_t clk) { m_timer0_clock = clk; }
 	void set_timer1_clock(uint32_t clk) { m_timer1_clock = clk; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

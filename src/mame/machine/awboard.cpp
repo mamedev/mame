@@ -296,7 +296,7 @@ void aw_rom_board::device_reset()
 	dma_limit  = 0;
 }
 
-READ16_MEMBER(aw_rom_board::pio_r)
+uint16_t aw_rom_board::pio_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t roffset = epr_offset & 0x3ffffff;
 	if (roffset >= (mpr_offset / 2))
@@ -305,44 +305,44 @@ READ16_MEMBER(aw_rom_board::pio_r)
 	return retval;
 }
 
-WRITE16_MEMBER(aw_rom_board::pio_w)
+void aw_rom_board::pio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to ROM board address space, including FlashROM programming using CFI (TODO)
 	if (epr_offset == 0x7fffff)
 		mpr_bank = data & 3;
 }
 
-WRITE16_MEMBER(aw_rom_board::epr_offsetl_w)
+void aw_rom_board::epr_offsetl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	epr_offset = (epr_offset & 0xffff0000) | data;
 	recalc_dma_offset(EPR);
 }
 
-WRITE16_MEMBER(aw_rom_board::epr_offseth_w)
+void aw_rom_board::epr_offseth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	epr_offset = (epr_offset & 0x0000ffff) | (data << 16);
 	recalc_dma_offset(EPR);
 }
 
-WRITE16_MEMBER(aw_rom_board::mpr_record_index_w)
+void aw_rom_board::mpr_record_index_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mpr_record_index = data;
 	recalc_dma_offset(MPR_RECORD);
 }
 
-WRITE16_MEMBER(aw_rom_board::mpr_first_file_index_w)
+void aw_rom_board::mpr_first_file_index_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mpr_first_file_index = data;
 	recalc_dma_offset(MPR_FILE);
 }
 
-WRITE16_MEMBER(aw_rom_board::mpr_file_offsetl_w)
+void aw_rom_board::mpr_file_offsetl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mpr_file_offset = (mpr_file_offset & 0xffff0000) | data;
 	recalc_dma_offset(MPR_FILE);
 }
 
-WRITE16_MEMBER(aw_rom_board::mpr_file_offseth_w)
+void aw_rom_board::mpr_file_offseth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mpr_file_offset = (mpr_file_offset & 0x0000ffff) | (data << 16);
 

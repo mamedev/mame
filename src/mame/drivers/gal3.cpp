@@ -151,16 +151,16 @@ public:
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	uint32_t m_led_mst;
 	uint32_t m_led_slv;
-	DECLARE_READ32_MEMBER(led_mst_r);
-	DECLARE_WRITE32_MEMBER(led_mst_w);
-	DECLARE_READ32_MEMBER(led_slv_r);
-	DECLARE_WRITE32_MEMBER(led_slv_w);
-	DECLARE_READ32_MEMBER(paletteram32_r);
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(namcos21_video_enable_r);
-	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
-	DECLARE_READ32_MEMBER(rso_r);
-	DECLARE_WRITE32_MEMBER(rso_w);
+	uint32_t led_mst_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void led_mst_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t led_slv_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void led_slv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t paletteram32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t namcos21_video_enable_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void namcos21_video_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t rso_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void rso_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void video_start_gal3();
 	uint32_t screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_palette(  );
@@ -257,35 +257,35 @@ uint32_t gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bit
 
 /***************************************************************************************/
 
-READ32_MEMBER(gal3_state::led_mst_r)
+uint32_t gal3_state::led_mst_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_led_mst;
 }
 
-WRITE32_MEMBER(gal3_state::led_mst_w)
+void gal3_state::led_mst_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_mst);
 }
 
-READ32_MEMBER(gal3_state::led_slv_r)
+uint32_t gal3_state::led_slv_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_led_slv;
 }
 
-WRITE32_MEMBER(gal3_state::led_slv_w)
+void gal3_state::led_slv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_led_slv);
 }
 
 /* palette memory handlers */
 
-READ32_MEMBER(gal3_state::paletteram32_r)
+uint32_t gal3_state::paletteram32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset *= 2;
 	return (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
 }
 
-WRITE32_MEMBER(gal3_state::paletteram32_w)
+void gal3_state::paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 	offset *= 2;
@@ -295,12 +295,12 @@ WRITE32_MEMBER(gal3_state::paletteram32_w)
 	m_generic_paletteram_16[offset+1] = v&0xffff;
 }
 
-READ32_MEMBER(gal3_state::namcos21_video_enable_r)
+uint32_t gal3_state::namcos21_video_enable_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_namcos21_video_enable<<16;
 }
 
-WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
+void gal3_state::namcos21_video_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 	v = m_namcos21_video_enable<<16;
@@ -308,7 +308,7 @@ WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
 	m_namcos21_video_enable = v>>16;
 }
 
-READ32_MEMBER(gal3_state::rso_r)
+uint32_t gal3_state::rso_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*store $5555 @$0046, and readback @$0000
 	read @$0144 and store at A6_21e & A4_5c
@@ -318,7 +318,7 @@ READ32_MEMBER(gal3_state::rso_r)
 	return (m_rso_shared_ram[offset]<<16)|m_rso_shared_ram[offset+1];
 }
 
-WRITE32_MEMBER(gal3_state::rso_w)
+void gal3_state::rso_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t v;
 	offset *= 2;

@@ -209,8 +209,8 @@ public:
 
 	int m_palwrite_base; // if we want to write to the actual MAME palette..
 
-	DECLARE_READ16_MEMBER( vdp_r );
-	DECLARE_WRITE16_MEMBER( vdp_w );
+	uint16_t vdp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	int get_scanline_counter();
 

@@ -175,12 +175,12 @@ public:
 
 	required_device<airraid_video_device> m_airraid_video;
 
-	DECLARE_READ8_MEMBER(cshooter_coin_r);
-	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
-	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
-	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
+	uint8_t cshooter_coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cshooter_c500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cshooter_c700_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seibu_sound_comms_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void seibu_sound_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_cshootere();
 	void init_cshooter();
 	void machine_reset_cshooter();
@@ -207,15 +207,15 @@ void airraid_state::machine_reset_cshooter()
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c500_w)
+void airraid_state::cshooter_c500_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(airraid_state::cshooter_c700_w)
+void airraid_state::cshooter_c700_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(airraid_state::bank_w)
+void airraid_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// format of this address is TTBB tbfs
 
@@ -233,12 +233,12 @@ WRITE8_MEMBER(airraid_state::bank_w)
 }
 
 
-READ8_MEMBER(airraid_state::seibu_sound_comms_r)
+uint8_t airraid_state::seibu_sound_comms_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_seibu_sound->main_word_r(space,offset,0x00ff);
 }
 
-WRITE8_MEMBER(airraid_state::seibu_sound_comms_w)
+void airraid_state::seibu_sound_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space,offset,data,0x00ff);
 }

@@ -350,7 +350,7 @@ const address_space_config *i8155_device::memory_space_config(address_spacenum s
 //  io_r - register read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::io_r )
+uint8_t i8155_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -511,7 +511,7 @@ void i8155_device::register_w(int offset, uint8_t data)
 //  io_w - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::io_w )
+void i8155_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	register_w(offset, data);
 }
@@ -521,7 +521,7 @@ WRITE8_MEMBER( i8155_device::io_w )
 //  memory_r - internal RAM read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::memory_r )
+uint8_t i8155_device::memory_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return this->space().read_byte(offset);
 }
@@ -531,7 +531,7 @@ READ8_MEMBER( i8155_device::memory_r )
 //  memory_w - internal RAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::memory_w )
+void i8155_device::memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	this->space().write_byte(offset, data);
 }
@@ -541,7 +541,7 @@ WRITE8_MEMBER( i8155_device::memory_w )
 //  ale_w - address latch write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::ale_w )
+void i8155_device::ale_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I/O / memory select
 	m_io_m = BIT(offset, 0);
@@ -555,7 +555,7 @@ WRITE8_MEMBER( i8155_device::ale_w )
 //  read - memory or I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( i8155_device::read )
+uint8_t i8155_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -578,7 +578,7 @@ READ8_MEMBER( i8155_device::read )
 //  write - memory or I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8155_device::write )
+void i8155_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_io_m)
 	{

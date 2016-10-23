@@ -212,7 +212,7 @@ uint32_t nubus_wsportrait_device::screen_update(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
+void nubus_wsportrait_device::wsportrait_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 //  if (offset != 0x8000) printf("wsportrait: Write %08x @ %x, mask %08x\n", data, offset, mem_mask);
@@ -272,7 +272,7 @@ WRITE32_MEMBER( nubus_wsportrait_device::wsportrait_w )
 	}
 }
 
-READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
+uint32_t nubus_wsportrait_device::wsportrait_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("wsportrait: Read @ %x, mask %08x\n", offset, mem_mask);
 
@@ -298,13 +298,13 @@ READ32_MEMBER( nubus_wsportrait_device::wsportrait_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_wsportrait_device::vram_w )
+void nubus_wsportrait_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	data ^= 0xffffffff;
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_wsportrait_device::vram_r )
+uint32_t nubus_wsportrait_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset] ^ 0xffffffff;
 }

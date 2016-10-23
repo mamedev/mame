@@ -30,10 +30,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void x68k_neptune_irq_w(int state);
-	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
-	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);
-	DECLARE_READ16_MEMBER(x68k_neptune_port_r);
-	DECLARE_WRITE16_MEMBER(x68k_neptune_port_w);
+	uint8_t x68k_neptune_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void x68k_neptune_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t x68k_neptune_port_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void x68k_neptune_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

@@ -87,14 +87,14 @@ INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(galaxia_state::galaxia_video_w)
+void galaxia_state::galaxia_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  m_screen->update_partial(m_screen->vpos());
 	m_bg_tilemap->mark_tile_dirty(offset);
 	cvs_video_or_color_ram_w(space, offset, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
+void galaxia_state::galaxia_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 
@@ -103,24 +103,24 @@ WRITE8_MEMBER(galaxia_state::galaxia_scroll_w)
 		m_bg_tilemap->set_scrolly(i, data);
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_ctrlport_w)
+void galaxia_state::galaxia_ctrlport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0/d1: maybe coincounter
 	// other bits: unknown
 }
 
-WRITE8_MEMBER(galaxia_state::galaxia_dataport_w)
+void galaxia_state::galaxia_dataport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// cvs-style video fx? or lamps?
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_r)
+uint8_t galaxia_state::galaxia_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	return m_collision_register;
 }
 
-READ8_MEMBER(galaxia_state::galaxia_collision_clear)
+uint8_t galaxia_state::galaxia_collision_clear(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_collision_register = 0;

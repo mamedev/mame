@@ -269,7 +269,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 }
 
 
-WRITE16_MEMBER( tc0080vco_device::scrollram_w )
+void tc0080vco_device::scrollram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -307,12 +307,12 @@ WRITE16_MEMBER( tc0080vco_device::scrollram_w )
 	}
 }
 
-READ16_MEMBER( tc0080vco_device::word_r )
+uint16_t tc0080vco_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0080vco_device::word_w )
+void tc0080vco_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 
@@ -662,22 +662,22 @@ void tc0080vco_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap
 
 /* FIXME: maybe it would be better to provide pointers to these RAM regions
 which can be accessed directly by the drivers... */
-READ16_MEMBER( tc0080vco_device::cram_0_r )
+uint16_t tc0080vco_device::cram_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_chain_ram_0[offset];
 }
 
-READ16_MEMBER( tc0080vco_device::cram_1_r )
+uint16_t tc0080vco_device::cram_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_chain_ram_1[offset];
 }
 
-READ16_MEMBER( tc0080vco_device::sprram_r )
+uint16_t tc0080vco_device::sprram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-READ16_MEMBER( tc0080vco_device::scrram_r )
+uint16_t tc0080vco_device::scrram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scroll_ram[offset];
 }

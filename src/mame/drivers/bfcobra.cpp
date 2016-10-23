@@ -257,19 +257,19 @@ public:
 	uint8_t m_col6bit[256];
 	struct bf_blitter_t m_blitter;
 	struct fdc_t m_fdc;
-	DECLARE_READ8_MEMBER(chipset_r);
-	DECLARE_WRITE8_MEMBER(chipset_w);
-	DECLARE_WRITE8_MEMBER(rombank_w);
-	DECLARE_READ8_MEMBER(fdctrl_r);
-	DECLARE_READ8_MEMBER(fddata_r);
-	DECLARE_WRITE8_MEMBER(fdctrl_w);
-	DECLARE_READ8_MEMBER(int_latch_r);
-	DECLARE_READ8_MEMBER(meter_r);
-	DECLARE_WRITE8_MEMBER(meter_w);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-	DECLARE_READ8_MEMBER(upd_r);
-	DECLARE_WRITE8_MEMBER(upd_w);
+	uint8_t chipset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void chipset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fddata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t int_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t upd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void upd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
 	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
@@ -797,7 +797,7 @@ void bfcobra_state::update_irqs()
 	}
 }
 
-READ8_MEMBER(bfcobra_state::chipset_r)
+uint8_t bfcobra_state::chipset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -851,7 +851,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 	return val;
 }
 
-WRITE8_MEMBER(bfcobra_state::chipset_w)
+void bfcobra_state::chipset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -959,7 +959,7 @@ void bfcobra_state::z80_bank(int num, int data)
 	}
 }
 
-WRITE8_MEMBER(bfcobra_state::rombank_w)
+void bfcobra_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_data[0] = data;
 	z80_bank(1, m_bank_data[1]);
@@ -1018,7 +1018,7 @@ void bfcobra_state::reset_fdc()
 	m_fdc.phase = COMMAND;
 }
 
-READ8_MEMBER(bfcobra_state::fdctrl_r)
+uint8_t bfcobra_state::fdctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -1027,7 +1027,7 @@ READ8_MEMBER(bfcobra_state::fdctrl_r)
 	return val;
 }
 
-READ8_MEMBER(bfcobra_state::fddata_r)
+uint8_t bfcobra_state::fddata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct fdc_t &fdc = m_fdc;
 	#define BPS     1024
@@ -1100,7 +1100,7 @@ READ8_MEMBER(bfcobra_state::fddata_r)
 	return val;
 }
 
-WRITE8_MEMBER(bfcobra_state::fdctrl_w)
+void bfcobra_state::fdctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct fdc_t &fdc = m_fdc;
 	switch (fdc.phase)
@@ -1220,11 +1220,11 @@ uint8_t bfcobra_state::results_phase(void)
 	return 0;
 }
 
-WRITE8_MEMBER(bfcobra_state::fd_op_w)
+void bfcobra_state::fd_op_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(bfcobra_state::fd_ctrl_w)
+void bfcobra_state::fd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 #endif
@@ -1301,19 +1301,19 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::int_latch_r)
+uint8_t bfcobra_state::int_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 2 | 1;
 }
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::meter_r)
+uint8_t bfcobra_state::meter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_meter_latch;
 }
 
 /* TODO: This is borrowed from Scorpion 1 */
-WRITE8_MEMBER(bfcobra_state::meter_w)
+void bfcobra_state::meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	int  changed = m_meter_latch ^ data;
@@ -1335,12 +1335,12 @@ WRITE8_MEMBER(bfcobra_state::meter_w)
 }
 
 /* TODO */
-READ8_MEMBER(bfcobra_state::latch_r)
+uint8_t bfcobra_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_input;
 }
 
-WRITE8_MEMBER(bfcobra_state::latch_w)
+void bfcobra_state::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: This is borrowed from Scorpion 1 */
 	switch(offset)
@@ -1376,12 +1376,12 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 	}
 }
 
-READ8_MEMBER(bfcobra_state::upd_r)
+uint8_t bfcobra_state::upd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 2 | m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(bfcobra_state::upd_w)
+void bfcobra_state::upd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 0x80);
 	m_upd7759->port_w(space, 0, data & 0x3f);

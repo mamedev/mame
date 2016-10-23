@@ -56,7 +56,7 @@ void jedi_state::sound_reset()
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::irq_ack_w)
+void jedi_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -69,7 +69,7 @@ WRITE8_MEMBER(jedi_state::irq_ack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::jedi_audio_reset_w)
+void jedi_state::jedi_audio_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -82,13 +82,13 @@ TIMER_CALLBACK_MEMBER(jedi_state::delayed_audio_latch_w)
 }
 
 
-WRITE8_MEMBER(jedi_state::jedi_audio_latch_w)
+void jedi_state::jedi_audio_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(jedi_state::delayed_audio_latch_w), this), data);
 }
 
 
-READ8_MEMBER(jedi_state::audio_latch_r)
+uint8_t jedi_state::audio_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	*m_audio_comm_stat &= ~0x80;
 	return m_audio_latch;
@@ -108,14 +108,14 @@ CUSTOM_INPUT_MEMBER(jedi_state::jedi_audio_comm_stat_r)
  *
  *************************************/
 
-READ8_MEMBER(jedi_state::jedi_audio_ack_latch_r)
+uint8_t jedi_state::jedi_audio_ack_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	*m_audio_comm_stat &= ~0x40;
 	return m_audio_ack_latch;
 }
 
 
-WRITE8_MEMBER(jedi_state::audio_ack_latch_w)
+void jedi_state::audio_ack_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audio_ack_latch = data;
 	*m_audio_comm_stat |= 0x40;
@@ -129,7 +129,7 @@ WRITE8_MEMBER(jedi_state::audio_ack_latch_w)
  *
  *************************************/
 
-WRITE8_MEMBER(jedi_state::speech_strobe_w)
+void jedi_state::speech_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int new_speech_strobe_state = (~offset >> 8) & 1;
 
@@ -142,14 +142,14 @@ WRITE8_MEMBER(jedi_state::speech_strobe_w)
 }
 
 
-READ8_MEMBER(jedi_state::speech_ready_r)
+uint8_t jedi_state::speech_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	return (tms5220->readyq_r()) << 7;
 }
 
 
-WRITE8_MEMBER(jedi_state::speech_reset_w)
+void jedi_state::speech_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* not supported by the TMS5220 emulator */
 }

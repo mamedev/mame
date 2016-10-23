@@ -254,27 +254,27 @@ void dmv_k230_device::switch16_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, (m_hold || !m_switch16) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(dmv_k230_device::rom_r)
+uint8_t dmv_k230_device::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom->base()[offset & 0x0fff];
 }
 
-READ8_MEMBER( dmv_k230_device::io_r )
+uint8_t dmv_k230_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( dmv_k230_device::io_w )
+void dmv_k230_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io->write_byte(offset, data);
 }
 
-READ8_MEMBER( dmv_k230_device::program_r )
+uint8_t dmv_k230_device::program_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bus->m_prog_read_cb(space, offset);
 }
 
-WRITE8_MEMBER( dmv_k230_device::program_w )
+void dmv_k230_device::program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus->m_prog_write_cb(space, offset, data);
 }
@@ -296,7 +296,7 @@ void dmv_k234_device::switch16_w(int state)
 	}
 }
 
-READ8_MEMBER( dmv_k234_device::snr_r )
+uint8_t dmv_k234_device::snr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -306,7 +306,7 @@ READ8_MEMBER( dmv_k234_device::snr_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( dmv_k234_device::snr_w )
+void dmv_k234_device::snr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snr = ASSERT_LINE;
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);

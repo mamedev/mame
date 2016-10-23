@@ -32,10 +32,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(out0_w);
-	DECLARE_WRITE8_MEMBER(out1_w);
-	DECLARE_WRITE8_MEMBER(digit_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -185,7 +185,7 @@ static INPUT_PORTS_START( zac_proto )
 INPUT_PORTS_END
 
 // solenoids (not knocker)
-WRITE8_MEMBER( zac_proto_state::out0_w )
+void zac_proto_state::out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t t = data | (offset << 8);
 
@@ -206,13 +206,13 @@ WRITE8_MEMBER( zac_proto_state::out0_w )
 	}
 }
 
-WRITE8_MEMBER( zac_proto_state::out1_w )
+void zac_proto_state::out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // lamps
 }
 
 // need to implement blanking of leading zeroes
-WRITE8_MEMBER( zac_proto_state::digit_w )
+void zac_proto_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // 9368 (outputs 0-9,A-F)
 	static const uint8_t decimals[10] = { 0, 0, 0x80, 0, 0, 0x80, 0, 0, 0, 0 };
@@ -222,7 +222,7 @@ WRITE8_MEMBER( zac_proto_state::digit_w )
 	output().set_digit_value(offset, patterns[data>>4] | decimals[offset]);
 }
 
-WRITE8_MEMBER( zac_proto_state::sound_w )
+void zac_proto_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // to unknown sound board
 }

@@ -36,12 +36,12 @@ public:
 	int m_bgcharbank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(f1dream_control_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_soundcmd_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_videoram_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_videoctrl_w);
-	DECLARE_WRITE16_MEMBER(tigeroad_scroll_w);
-	DECLARE_WRITE8_MEMBER(msm5205_w);
+	void f1dream_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tigeroad_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tigeroad_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tigeroad_videoctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tigeroad_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_f1dream();
 	void init_pushman();
 	void init_bballs();
@@ -69,12 +69,12 @@ public:
 	int m_has_coinlock;
 
 	/* protection handling */
-	DECLARE_READ16_MEMBER(pushman_68705_r);
-	DECLARE_WRITE16_MEMBER(pushman_68705_w);
-	DECLARE_READ16_MEMBER(bballs_68705_r);
-	DECLARE_WRITE16_MEMBER(bballs_68705_w);
-	DECLARE_READ8_MEMBER(pushman_68000_r);
-	DECLARE_WRITE8_MEMBER(pushman_68000_w);
+	uint16_t pushman_68705_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pushman_68705_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bballs_68705_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bballs_68705_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t pushman_68000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pushman_68000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_pushman();
 	void machine_reset_bballs();
 

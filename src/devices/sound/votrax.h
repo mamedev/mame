@@ -40,8 +40,8 @@ public:
 	template<class _Object> static devcb_base &set_request_callback(device_t &device, _Object object) { return downcast<votrax_sc01_device &>(device).m_request_cb.set_callback(object); }
 
 	// writers
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( inflection_w );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void inflection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( request ) { m_stream->update(); return m_request_state; }
 
 protected:

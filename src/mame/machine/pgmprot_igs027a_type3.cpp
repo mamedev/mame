@@ -47,27 +47,27 @@
 #include "includes/pgm.h"
 #include "machine/pgmprot_igs027a_type3.h"
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
+void pgm_arm_type3_state::svg_arm7_ram_sel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
 	machine().scheduler().synchronize(); // force resync
 	m_svg_ram_sel = data & 1;
 }
 
-READ32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_r )
+uint32_t pgm_arm_type3_state::svg_arm7_shareram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retdata = m_svg_shareram[m_svg_ram_sel & 1][offset];
 //  printf("(%08x) ARM7: shared read (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, retdata, mem_mask );
 	return retdata;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_shareram_w )
+void pgm_arm_type3_state::svg_arm7_shareram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("(%08x) ARM7: shared write (bank %02x) offset - %08x retdata - %08x mask - %08x\n", space.device().safe_pc(), m_svg_ram_sel, offset*4, data, mem_mask );
 	COMBINE_DATA(&m_svg_shareram[m_svg_ram_sel & 1][offset]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
+uint16_t pgm_arm_type3_state::svg_m68k_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
 	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
@@ -75,7 +75,7 @@ READ16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_r )
 	return share16[BYTE_XOR_LE(offset)];
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_w )
+void pgm_arm_type3_state::svg_m68k_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int ram_sel = (m_svg_ram_sel & 1) ^ 1;
 	uint16_t *share16 = (uint16_t *)(m_svg_shareram[ram_sel & 1].get());
@@ -83,17 +83,17 @@ WRITE16_MEMBER(pgm_arm_type3_state::svg_m68k_ram_w )
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
-READ16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_r )
+uint16_t pgm_arm_type3_state::svg_68k_nmi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_68k_nmi_w )
+void pgm_arm_type3_state::svg_68k_nmi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	generic_pulse_irq_line(*m_prot, ARM7_FIRQ_LINE, 1);
 }
 
-WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )
+void pgm_arm_type3_state::svg_latch_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, space.device().safe_pc());
@@ -101,7 +101,7 @@ WRITE16_MEMBER(pgm_arm_type3_state::svg_latch_68k_w )
 }
 
 
-READ16_MEMBER(pgm_arm_type3_state::svg_latch_68k_r )
+uint16_t pgm_arm_type3_state::svg_latch_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, space.device().safe_pc());
@@ -110,14 +110,14 @@ READ16_MEMBER(pgm_arm_type3_state::svg_latch_68k_r )
 
 
 
-READ32_MEMBER(pgm_arm_type3_state::svg_latch_arm_r )
+uint32_t pgm_arm_type3_state::svg_latch_arm_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", m_svg_latchdata_68k_w, mem_mask, space.device().safe_pc());
 	return m_svg_latchdata_68k_w;
 }
 
-WRITE32_MEMBER(pgm_arm_type3_state::svg_latch_arm_w )
+void pgm_arm_type3_state::svg_latch_arm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, space.device().safe_pc());
@@ -250,7 +250,7 @@ void pgm_arm_type3_state::svg_latch_init()
 	save_item(NAME(m_svg_latchdata_arm_w));
 }
 
-READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
+uint32_t pgm_arm_type3_state::theglad_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x7c4) space.device().execute().eat_cycles(500);
@@ -259,7 +259,7 @@ READ32_MEMBER(pgm_arm_type3_state::theglad_speedup_r )
 }
 
 
-READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
+uint32_t pgm_arm_type3_state::happy6_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x0a08) space.device().execute().eat_cycles(500);
@@ -268,14 +268,14 @@ READ32_MEMBER(pgm_arm_type3_state::happy6_speedup_r )
 }
 
 // installed over rom
-READ32_MEMBER(pgm_arm_type3_state::svg_speedup_r )
+uint32_t pgm_arm_type3_state::svg_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0xb90) space.device().execute().eat_cycles(500);
 	return m_armrom[0xb90/4];
 }
 
-READ32_MEMBER(pgm_arm_type3_state::svgpcb_speedup_r )
+uint32_t pgm_arm_type3_state::svgpcb_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x9e0) space.device().execute().eat_cycles(500);
@@ -654,7 +654,7 @@ void pgm_arm_type3_state::init_svgpcb()
 }
 
 
-READ32_MEMBER(pgm_arm_type3_state::killbldp_speedup_r )
+uint32_t pgm_arm_type3_state::killbldp_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x7d8) space.device().execute().eat_cycles(500);
@@ -685,7 +685,7 @@ void pgm_arm_type3_state::init_killbldp()
 
 }
 
-READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
+uint32_t pgm_arm_type3_state::dmnfrnt_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	if (pc == 0x8000fea) space.device().execute().eat_cycles(500);
@@ -693,7 +693,7 @@ READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
 	return m_arm_ram[0x000444/4];
 }
 
-READ16_MEMBER(pgm_arm_type3_state::dmnfrnt_main_speedup_r )
+uint16_t pgm_arm_type3_state::dmnfrnt_main_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_mainram[0xa03c/2];
 	int pc = space.device().safe_pc();

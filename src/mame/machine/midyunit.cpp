@@ -27,14 +27,14 @@
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_cmos_w)
+void midyunit_state::midyunit_cmos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x:CMOS Write @ %05X\n", space.device().safe_pc(), offset);
 	COMBINE_DATA(&m_cmos_ram[offset + m_cmos_page]);
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_cmos_r)
+uint16_t midyunit_state::midyunit_cmos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cmos_ram[offset + m_cmos_page];
 }
@@ -47,7 +47,7 @@ READ16_MEMBER(midyunit_state::midyunit_cmos_r)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
+void midyunit_state::midyunit_cmos_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cmos_w_enable = (~data >> 9) & 1;
 
@@ -97,7 +97,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_cmos_enable_w)
 }
 
 
-READ16_MEMBER(midyunit_state::midyunit_protection_r)
+uint16_t midyunit_state::midyunit_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* return the most recently clocked value */
 	logerror("%08X:Protection read = %04X\n", space.device().safe_pc(), m_prot_result);
@@ -112,7 +112,7 @@ READ16_MEMBER(midyunit_state::midyunit_protection_r)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::midyunit_input_r)
+uint16_t midyunit_state::midyunit_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ports[offset]->read();
 }
@@ -125,7 +125,7 @@ READ16_MEMBER(midyunit_state::midyunit_input_r)
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::term2_input_r)
+uint16_t midyunit_state::term2_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset != 2)
 		return m_ports[offset]->read();
@@ -140,7 +140,7 @@ READ16_MEMBER(midyunit_state::term2_input_r)
 	}
 }
 
-WRITE16_MEMBER(midyunit_state::term2_sound_w)
+void midyunit_state::term2_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Flash Lamp Output Data */
 	if  ( ((data & 0x800) != 0x800) && ((data & 0x400) == 0x400 ) )
@@ -181,7 +181,7 @@ WRITE16_MEMBER(midyunit_state::term2_sound_w)
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::term2_hack_w)
+void midyunit_state::term2_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1 && space.device().safe_pc() == 0xffce6520)
 	{
@@ -191,7 +191,7 @@ WRITE16_MEMBER(midyunit_state::term2_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
+void midyunit_state::term2la3_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && space.device().safe_pc() == 0xffce5230)
 	{
@@ -201,7 +201,7 @@ WRITE16_MEMBER(midyunit_state::term2la3_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
+void midyunit_state::term2la2_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && space.device().safe_pc() == 0xffce4b80)
 	{
@@ -211,7 +211,7 @@ WRITE16_MEMBER(midyunit_state::term2la2_hack_w)
 	COMBINE_DATA(&m_t2_hack_mem[offset]);
 }
 
-WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
+void midyunit_state::term2la1_hack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && space.device().safe_pc() == 0xffce33f0)
 	{
@@ -229,7 +229,7 @@ WRITE16_MEMBER(midyunit_state::term2la1_hack_w)
  *
  *************************************/
 
-WRITE8_MEMBER(midyunit_state::cvsd_protection_w)
+void midyunit_state::cvsd_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* because the entire CVSD ROM is banked, we have to make sure that writes */
 	/* go to the proper location (i.e., bank 0); currently bank 0 always lives */
@@ -465,7 +465,7 @@ void midyunit_state::init_mkyawdim()
  *
  *************************************/
 
-READ16_MEMBER(midyunit_state::mkturbo_prot_r)
+uint16_t midyunit_state::mkturbo_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* the security GAL overlays a counter of some sort at 0xfffff400 in ROM space.
 	 * A startup protection check expects to read back two different values in succession */
@@ -571,7 +571,7 @@ void midyunit_state::machine_reset_midyunit()
  *
  *************************************/
 
-WRITE16_MEMBER(midyunit_state::midyunit_sound_w)
+void midyunit_state::midyunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* check for out-of-bounds accesses */
 	if (offset)

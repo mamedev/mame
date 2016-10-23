@@ -34,7 +34,7 @@ INTERRUPT_GEN_MEMBER(spy_state::spy_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-READ8_MEMBER(spy_state::spy_bankedram1_r)
+uint8_t spy_state::spy_bankedram1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_rambank & 1)
 	{
@@ -57,7 +57,7 @@ READ8_MEMBER(spy_state::spy_bankedram1_r)
 		return m_ram[offset];
 }
 
-WRITE8_MEMBER(spy_state::spy_bankedram1_w)
+void spy_state::spy_bankedram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_rambank & 1)
 	{
@@ -145,7 +145,7 @@ this is the data written to internal ram on startup:
 3f: 5f 7e 00 ce 08
 */
 
-WRITE8_MEMBER(spy_state::bankswitch_w)
+void spy_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 
@@ -244,7 +244,7 @@ void spy_state::spy_collision(  )
 }
 
 
-WRITE8_MEMBER(spy_state::spy_3f90_w)
+void spy_state::spy_3f90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*********************************************************************
 	*
@@ -327,12 +327,12 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 }
 
 
-WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
+void spy_state::spy_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(spy_state::sound_bank_w)
+void spy_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank_A, bank_B;
 
@@ -346,7 +346,7 @@ WRITE8_MEMBER(spy_state::sound_bank_w)
 }
 
 
-READ8_MEMBER(spy_state::k052109_051960_r)
+uint8_t spy_state::k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
@@ -361,7 +361,7 @@ READ8_MEMBER(spy_state::k052109_051960_r)
 		return m_k052109->read(space, offset);
 }
 
-WRITE8_MEMBER(spy_state::k052109_051960_w)
+void spy_state::k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
 		m_k051960->k051937_w(space, offset - 0x3800, data);
@@ -449,13 +449,13 @@ INPUT_PORTS_END
 
 
 
-WRITE8_MEMBER(spy_state::volume_callback0)
+void spy_state::volume_callback0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232_1->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_1->set_volume(1, 0, (data & 0x0f) * 0x11);
 }
 
-WRITE8_MEMBER(spy_state::volume_callback1)
+void spy_state::volume_callback1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232_2->set_volume(0, (data >> 4) * 0x11, 0);
 	m_k007232_2->set_volume(1, 0, (data & 0x0f) * 0x11);

@@ -60,12 +60,12 @@ static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
-READ8_MEMBER(scramble_state::scramble_soundram_r)
+uint8_t scramble_state::scramble_soundram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundram[offset & 0x03ff];
 }
 
-WRITE8_MEMBER(scramble_state::scramble_soundram_w)
+void scramble_state::scramble_soundram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundram[offset & 0x03ff] = data;
 }
@@ -105,22 +105,22 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(scramble_state::mars_ppi8255_0_r)
+uint8_t scramble_state::mars_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi8255_0->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
-READ8_MEMBER(scramble_state::mars_ppi8255_1_r)
+uint8_t scramble_state::mars_ppi8255_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi8255_1->read(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01));
 }
 
-WRITE8_MEMBER(scramble_state::mars_ppi8255_0_w)
+void scramble_state::mars_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi8255_0->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
-WRITE8_MEMBER(scramble_state::mars_ppi8255_1_w)
+void scramble_state::mars_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi8255_1->write(space, ((offset >> 2) & 0x02) | ((offset >> 1) & 0x01), data);
 }
@@ -327,7 +327,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(scramble_state::hncholms_prot_r)
+uint8_t scramble_state::hncholms_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x2b || space.device().safe_pc() == 0xa27)
 		return 1;

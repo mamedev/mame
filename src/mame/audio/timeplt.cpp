@@ -81,7 +81,7 @@ void timeplt_audio_device::device_start()
 /* Bit 7 comes from the QA output of the LS90 producing a sequence of   */
 /*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
 
-READ8_MEMBER( timeplt_audio_device::portB_r )
+uint8_t timeplt_audio_device::portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const int timeplt_timer[10] =
 	{
@@ -112,7 +112,7 @@ void timeplt_audio_device::filter_w( device_t *device, int data )
 }
 
 
-WRITE8_MEMBER( timeplt_audio_device::filter_w )
+void timeplt_audio_device::filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_w(m_filter_1_0, (offset >>  0) & 3);
 	filter_w(m_filter_1_1, (offset >>  2) & 3);
@@ -130,7 +130,7 @@ WRITE8_MEMBER( timeplt_audio_device::filter_w )
  *
  *************************************/
 
-WRITE8_MEMBER( timeplt_audio_device::sh_irqtrigger_w )
+void timeplt_audio_device::sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_last_irq_state == 0 && data)
 	{

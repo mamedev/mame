@@ -101,13 +101,13 @@ protected:
 
 public:
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8049_pia_r );
-	DECLARE_WRITE8_MEMBER( i8049_pia_w );
-	DECLARE_READ8_MEMBER( i8049_bus_r );
-	DECLARE_WRITE8_MEMBER( i8049_port1_w );
-	DECLARE_WRITE8_MEMBER( i8049_port2_w );
-	DECLARE_READ8_MEMBER( i8049_t0_r );
-	DECLARE_READ8_MEMBER( i8049_t1_r );
+	uint8_t i8049_pia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8049_pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8049_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8049_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8049_t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8049_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// internal overlay helpers
@@ -173,10 +173,10 @@ protected:
 
 public:
 	// internal read/write handlers
-	DECLARE_READ8_MEMBER( i8748_port2_r );
-	DECLARE_WRITE8_MEMBER( i8748_port2_w );
-	DECLARE_READ8_MEMBER( i8748_data_r );
-	DECLARE_READ8_MEMBER( i8748_t0_r );
+	uint8_t i8748_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8748_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8748_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8748_t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// internal state

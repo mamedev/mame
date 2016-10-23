@@ -2493,7 +2493,7 @@ void h6280_device::set_irq_line(int irqline, int state)
 //  REGISTER HANDLING
 //**************************************************************************
 
-READ8_MEMBER( h6280_device::irq_status_r )
+uint8_t h6280_device::irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int status;
 
@@ -2517,7 +2517,7 @@ READ8_MEMBER( h6280_device::irq_status_r )
 	}
 }
 
-WRITE8_MEMBER( h6280_device::irq_status_w )
+void h6280_device::irq_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_buffer = data;
 	switch (offset & 3)
@@ -2537,13 +2537,13 @@ WRITE8_MEMBER( h6280_device::irq_status_w )
 	}
 }
 
-READ8_MEMBER( h6280_device::timer_r )
+uint8_t h6280_device::timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* only returns countdown */
 	return ((m_timer_value >> 10) & 0x7F) | (m_io_buffer & 0x80);
 }
 
-WRITE8_MEMBER( h6280_device::timer_w )
+void h6280_device::timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_buffer = data;
 	switch (offset & 1)

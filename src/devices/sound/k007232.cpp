@@ -243,7 +243,7 @@ void k007232_device::KDAC_A_make_fncode()
 /************************************************/
 /*    Konami PCM write register                 */
 /************************************************/
-WRITE8_MEMBER( k007232_device::write )
+void k007232_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r = offset;
 	int v = data;
@@ -307,7 +307,7 @@ WRITE8_MEMBER( k007232_device::write )
 /************************************************/
 /*    Konami PCM read register                  */
 /************************************************/
-READ8_MEMBER( k007232_device::read )
+uint8_t k007232_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int r = offset;
 	int  ch;

@@ -40,7 +40,7 @@ enum
 };
 
 
-WRITE8_MEMBER( vicdual_state::depthch_audio_w )
+void vicdual_state::depthch_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bitsChanged;
 	int bitsGoneHigh;

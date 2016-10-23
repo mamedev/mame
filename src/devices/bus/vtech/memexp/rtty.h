@@ -27,9 +27,9 @@ public:
 	// construction/destruction
 	rtty_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( receive_data_r );
-	DECLARE_WRITE8_MEMBER( transmit_data_w );
-	DECLARE_WRITE8_MEMBER( relay_w );
+	uint8_t receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void relay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

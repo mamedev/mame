@@ -110,7 +110,7 @@ void el2_3c503_device::dack_w(int line, uint8_t data) {
 	el2_3c503_mem_write(m_regs.da++, data);
 }
 
-READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
+uint8_t el2_3c503_device::el2_3c503_loport_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -125,7 +125,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_loport_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
+void el2_3c503_device::el2_3c503_loport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	switch((m_regs.ctrl >> 2) & 3) {
 	case 0:
 		m_dp8390->dp8390_cs(CLEAR_LINE);
@@ -140,7 +140,7 @@ WRITE8_MEMBER(el2_3c503_device::el2_3c503_loport_w) {
 	}
 }
 
-READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
+uint8_t el2_3c503_device::el2_3c503_hiport_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	switch(offset) {
 	case 0:
 		return m_regs.pstr;
@@ -180,7 +180,7 @@ READ8_MEMBER(el2_3c503_device::el2_3c503_hiport_r) {
 	return 0;
 }
 
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_hiport_w) {
+void el2_3c503_device::el2_3c503_hiport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	switch(offset) {
 	case 0:
 		m_regs.pstr = data;  // pstr and pspr are supposed to be set same as 8390 pstart and pstop
@@ -287,11 +287,11 @@ WRITE_LINE_MEMBER(el2_3c503_device::el2_3c503_irq_w) {
 	if(!(m_regs.gacfr & 0x80)) set_irq(state);
 }
 
-READ8_MEMBER(el2_3c503_device::el2_3c503_mem_read) {
+uint8_t el2_3c503_device::el2_3c503_mem_read(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return el2_3c503_mem_read(offset);
 }
 
-WRITE8_MEMBER(el2_3c503_device::el2_3c503_mem_write) {
+void el2_3c503_device::el2_3c503_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	el2_3c503_mem_write(offset, data);
 }
 

@@ -64,7 +64,7 @@ void marineb_state::machine_start()
 	save_item(NAME(m_marineb_active_low_flipscreen));
 }
 
-WRITE8_MEMBER(marineb_state::irq_mask_w)
+void marineb_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

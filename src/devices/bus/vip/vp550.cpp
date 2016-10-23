@@ -183,7 +183,7 @@ void vp550_device::vip_run_w(int state)
 //  octave_w - octave select write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::octave_w )
+void vp550_device::octave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int channel = (data >> 2) & 0x03;
 	int clock2 = 0;
@@ -213,7 +213,7 @@ WRITE8_MEMBER( vp550_device::octave_w )
 //  vlmna_w - channel A amplitude write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::vlmna_w )
+void vp550_device::vlmna_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("VP550 '%s' A Volume: %u\n", tag(), data & 0x0f);
 
@@ -227,7 +227,7 @@ WRITE8_MEMBER( vp550_device::vlmna_w )
 //  vlmnb_w - channel B amplitude write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::vlmnb_w )
+void vp550_device::vlmnb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("VP550 '%s' B Volume: %u\n", tag(), data & 0x0f);
 
@@ -241,7 +241,7 @@ WRITE8_MEMBER( vp550_device::vlmnb_w )
 //  sync_w - interrupt enable write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vp550_device::sync_w )
+void vp550_device::sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("VP550 '%s' Interrupt Enable: %u\n", tag(), BIT(data, 0));
 

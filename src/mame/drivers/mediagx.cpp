@@ -149,35 +149,35 @@ public:
 	uint32_t m_speedup_hits[12];
 	int m_speedup_count;
 #endif
-	DECLARE_READ32_MEMBER(disp_ctrl_r);
-	DECLARE_WRITE32_MEMBER(disp_ctrl_w);
-	DECLARE_READ32_MEMBER(memory_ctrl_r);
-	DECLARE_WRITE32_MEMBER(memory_ctrl_w);
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_READ32_MEMBER(parallel_port_r);
-	DECLARE_WRITE32_MEMBER(parallel_port_w);
-	DECLARE_READ32_MEMBER(ad1847_r);
-	DECLARE_WRITE32_MEMBER(ad1847_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
+	uint32_t disp_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void disp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t memory_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void memory_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t parallel_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void parallel_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ad1847_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ad1847_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t io20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_a51site4();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mediagx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER(speedup0_r);
-	DECLARE_READ32_MEMBER(speedup1_r);
-	DECLARE_READ32_MEMBER(speedup2_r);
-	DECLARE_READ32_MEMBER(speedup3_r);
-	DECLARE_READ32_MEMBER(speedup4_r);
-	DECLARE_READ32_MEMBER(speedup5_r);
-	DECLARE_READ32_MEMBER(speedup6_r);
-	DECLARE_READ32_MEMBER(speedup7_r);
-	DECLARE_READ32_MEMBER(speedup8_r);
-	DECLARE_READ32_MEMBER(speedup9_r);
-	DECLARE_READ32_MEMBER(speedup10_r);
-	DECLARE_READ32_MEMBER(speedup11_r);
+	uint32_t speedup0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup4_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup5_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup6_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup7_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup8_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup9_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup10_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t speedup11_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -391,7 +391,7 @@ uint32_t mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ32_MEMBER(mediagx_state::disp_ctrl_r)
+uint32_t mediagx_state::disp_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = m_disp_ctrl_reg[offset];
 
@@ -413,19 +413,19 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
+void mediagx_state::disp_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
 
 
-READ32_MEMBER(mediagx_state::memory_ctrl_r)
+uint32_t mediagx_state::memory_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_memory_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
+void mediagx_state::memory_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
@@ -461,7 +461,7 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 
 
 
-READ32_MEMBER(mediagx_state::biu_ctrl_r)
+uint32_t mediagx_state::biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -470,7 +470,7 @@ READ32_MEMBER(mediagx_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
+void mediagx_state::biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -482,12 +482,12 @@ WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER(mediagx_state::bios_ram_w)
+void mediagx_state::bios_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 #endif
 
-READ8_MEMBER(mediagx_state::io20_r)
+uint8_t mediagx_state::io20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0;
 
@@ -502,7 +502,7 @@ READ8_MEMBER(mediagx_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(mediagx_state::io20_w)
+void mediagx_state::io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -515,7 +515,7 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 	}
 }
 
-READ32_MEMBER(mediagx_state::parallel_port_r)
+uint32_t mediagx_state::parallel_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -549,7 +549,7 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 	return r;
 }
 
-WRITE32_MEMBER(mediagx_state::parallel_port_w)
+void mediagx_state::parallel_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_parport );
 
@@ -703,7 +703,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	}
 }
 
-READ32_MEMBER(mediagx_state::ad1847_r)
+uint32_t mediagx_state::ad1847_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -713,7 +713,7 @@ READ32_MEMBER(mediagx_state::ad1847_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mediagx_state::ad1847_w)
+void mediagx_state::ad1847_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -927,18 +927,18 @@ uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 	return m_main_ram[m_speedup_table[idx].offset/4];
 }
 
-READ32_MEMBER(mediagx_state::speedup0_r) { return generic_speedup(space, 0); }
-READ32_MEMBER(mediagx_state::speedup1_r) { return generic_speedup(space, 1); }
-READ32_MEMBER(mediagx_state::speedup2_r) { return generic_speedup(space, 2); }
-READ32_MEMBER(mediagx_state::speedup3_r) { return generic_speedup(space, 3); }
-READ32_MEMBER(mediagx_state::speedup4_r) { return generic_speedup(space, 4); }
-READ32_MEMBER(mediagx_state::speedup5_r) { return generic_speedup(space, 5); }
-READ32_MEMBER(mediagx_state::speedup6_r) { return generic_speedup(space, 6); }
-READ32_MEMBER(mediagx_state::speedup7_r) { return generic_speedup(space, 7); }
-READ32_MEMBER(mediagx_state::speedup8_r) { return generic_speedup(space, 8); }
-READ32_MEMBER(mediagx_state::speedup9_r) { return generic_speedup(space, 9); }
-READ32_MEMBER(mediagx_state::speedup10_r) { return generic_speedup(space, 10); }
-READ32_MEMBER(mediagx_state::speedup11_r) { return generic_speedup(space, 11); }
+uint32_t mediagx_state::speedup0_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 0); }
+uint32_t mediagx_state::speedup1_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 1); }
+uint32_t mediagx_state::speedup2_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 2); }
+uint32_t mediagx_state::speedup3_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 3); }
+uint32_t mediagx_state::speedup4_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 4); }
+uint32_t mediagx_state::speedup5_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 5); }
+uint32_t mediagx_state::speedup6_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 6); }
+uint32_t mediagx_state::speedup7_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 7); }
+uint32_t mediagx_state::speedup8_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 8); }
+uint32_t mediagx_state::speedup9_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 9); }
+uint32_t mediagx_state::speedup10_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 10); }
+uint32_t mediagx_state::speedup11_r(address_space &space, offs_t offset, uint32_t mem_mask) { return generic_speedup(space, 11); }
 
 static const struct { read32_delegate func; } speedup_handlers[] =
 {

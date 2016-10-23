@@ -263,181 +263,181 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
-	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_bgcolor2_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_bgcolor_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_priority_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_priority2_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_priority_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_layer_enable2_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_layer_enable_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_blitter_reg_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_blitter_data_w);
-	DECLARE_WRITE8_MEMBER(rongrong_blitter_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr_blitter_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr_blitter_irq_ack_w);
-	DECLARE_READ8_MEMBER(rongrong_gfxrom_r);
-	DECLARE_READ16_MEMBER(ddenlovr_gfxrom_r);
-	DECLARE_WRITE16_MEMBER(ddenlovr_coincounter_0_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr_coincounter_1_w);
-	DECLARE_WRITE8_MEMBER(rongrong_palette_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr_palette_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_palette_base2_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_palette_mask_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_palette_mask2_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_pen_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_pen2_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_mask_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_transparency_mask2_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_palette_base_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_palette_mask_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_transparency_pen_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr16_transparency_mask_w);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ16_MEMBER(unk16_r);
-	DECLARE_WRITE16_MEMBER(ddenlovr_select_16_w);
-	DECLARE_WRITE8_MEMBER(ddenlovr_select2_w);
-	DECLARE_WRITE16_MEMBER(ddenlovr_select2_16_w);
-	DECLARE_READ8_MEMBER(rongrong_input2_r);
-	DECLARE_READ16_MEMBER(quiz365_input2_r);
-	DECLARE_WRITE8_MEMBER(rongrong_blitter_busy_w);
-	DECLARE_READ8_MEMBER(rongrong_blitter_busy_r);
-	DECLARE_WRITE16_MEMBER(quiz365_coincounter_w);
-	DECLARE_READ16_MEMBER(quiz365_protection_r);
-	DECLARE_WRITE16_MEMBER(quiz365_protection_w);
-	DECLARE_READ16_MEMBER(ddenlovj_dsw_r);
-	DECLARE_WRITE16_MEMBER(ddenlovj_coincounter_w);
-	DECLARE_READ16_MEMBER(ddenlovrk_protection1_r);
-	DECLARE_READ16_MEMBER(ddenlovrk_protection2_r);
-	DECLARE_WRITE16_MEMBER(ddenlovrk_protection2_w);
-	DECLARE_READ16_MEMBER(nettoqc_input_r);
-	DECLARE_READ16_MEMBER(nettoqc_protection1_r);
-	DECLARE_WRITE16_MEMBER(nettoqc_coincounter_w);
-	DECLARE_READ16_MEMBER(ultrchmp_protection2_r);
-	DECLARE_WRITE16_MEMBER(ultrchmp_protection2_w);
-	DECLARE_READ8_MEMBER(rongrong_input_r);
-	DECLARE_WRITE8_MEMBER(rongrong_select_w);
-	DECLARE_READ8_MEMBER(magic_r);
-	DECLARE_WRITE8_MEMBER(mmpanic_rombank_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_blitter_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_blitter2_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_leds_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_leds2_w);
-	DECLARE_WRITE8_MEMBER(mmpanic_lockout_w);
-	DECLARE_READ8_MEMBER(mmpanic_link_r);
-	DECLARE_READ8_MEMBER(funkyfig_busy_r);
-	DECLARE_WRITE8_MEMBER(funkyfig_blitter_w);
-	DECLARE_WRITE8_MEMBER(funkyfig_rombank_w);
-	DECLARE_READ8_MEMBER(funkyfig_dsw_r);
-	DECLARE_READ8_MEMBER(funkyfig_coin_r);
-	DECLARE_READ8_MEMBER(funkyfig_key_r);
-	DECLARE_WRITE8_MEMBER(funkyfig_lockout_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_rombank_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_keyb_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_dsw_w);
-	DECLARE_READ8_MEMBER(hanakanz_keyb_r);
-	DECLARE_READ8_MEMBER(hanakanz_dsw_r);
-	DECLARE_READ8_MEMBER(hanakanz_busy_r);
-	DECLARE_READ8_MEMBER(hanakanz_gfxrom_r);
-	DECLARE_WRITE8_MEMBER(hanakanz_coincounter_w);
-	DECLARE_WRITE8_MEMBER(hanakanz_palette_w);
-	DECLARE_READ8_MEMBER(hanakanz_rand_r);
-	DECLARE_WRITE8_MEMBER(mjreach1_protection_w);
-	DECLARE_READ8_MEMBER(mjreach1_protection_r);
-	DECLARE_WRITE8_MEMBER(mjschuka_protection_w);
-	DECLARE_READ8_MEMBER(mjschuka_protection_r);
-	DECLARE_READ8_MEMBER(mjchuuka_keyb_r);
-	DECLARE_WRITE8_MEMBER(mjchuuka_blitter_w);
-	DECLARE_READ8_MEMBER(mjchuuka_gfxrom_0_r);
-	DECLARE_READ8_MEMBER(mjchuuka_gfxrom_1_r);
-	DECLARE_WRITE8_MEMBER(mjchuuka_palette_w);
-	DECLARE_WRITE8_MEMBER(mjchuuka_coincounter_w);
-	DECLARE_WRITE8_MEMBER(mjmyster_rambank_w);
-	DECLARE_WRITE8_MEMBER(mjmyster_select2_w);
-	DECLARE_READ8_MEMBER(mjmyster_coins_r);
-	DECLARE_READ8_MEMBER(mjmyster_keyb_r);
-	DECLARE_READ8_MEMBER(mjmyster_dsw_r);
-	DECLARE_WRITE8_MEMBER(mjmyster_coincounter_w);
-	DECLARE_WRITE8_MEMBER(mjmyster_blitter_w);
-	DECLARE_WRITE8_MEMBER(hginga_rombank_w);
-	DECLARE_READ8_MEMBER(hginga_protection_r);
-	DECLARE_WRITE8_MEMBER(hginga_input_w);
-	DECLARE_READ8_MEMBER(hginga_coins_r);
-	DECLARE_WRITE8_MEMBER(hginga_80_w);
-	DECLARE_WRITE8_MEMBER(hginga_coins_w);
-	DECLARE_READ8_MEMBER(hginga_input_r);
-	DECLARE_WRITE8_MEMBER(hginga_blitter_w);
-	DECLARE_WRITE8_MEMBER(hgokou_dsw_sel_w);
-	DECLARE_READ8_MEMBER(hgokou_input_r);
-	DECLARE_WRITE8_MEMBER(hgokou_input_w);
-	DECLARE_READ8_MEMBER(hgokou_protection_r);
-	DECLARE_READ8_MEMBER(hgokbang_input_r);
-	DECLARE_WRITE8_MEMBER(hparadis_select_w);
-	DECLARE_READ8_MEMBER(hparadis_input_r);
-	DECLARE_READ8_MEMBER(hparadis_dsw_r);
-	DECLARE_WRITE8_MEMBER(hparadis_coin_w);
-	DECLARE_READ8_MEMBER(mjmywrld_coins_r);
-	DECLARE_READ16_MEMBER(akamaru_protection1_r);
-	DECLARE_WRITE16_MEMBER(akamaru_protection1_w);
-	DECLARE_READ16_MEMBER(akamaru_protection2_r);
-	DECLARE_READ16_MEMBER(akamaru_dsw_r);
-	DECLARE_READ16_MEMBER(akamaru_blitter_r);
-	DECLARE_READ16_MEMBER(akamaru_e0010d_r);
-	DECLARE_WRITE8_MEMBER(mjflove_rombank_w);
-	DECLARE_READ8_MEMBER(mjflove_protection_r);
-	DECLARE_READ8_MEMBER(mjflove_keyb_r);
-	DECLARE_WRITE8_MEMBER(mjflove_blitter_w);
-	DECLARE_WRITE8_MEMBER(mjflove_coincounter_w);
-	DECLARE_WRITE8_MEMBER(jongtei_dsw_keyb_w);
-	DECLARE_READ8_MEMBER(jongtei_busy_r);
-	DECLARE_READ8_MEMBER(mjgnight_protection_r);
-	DECLARE_WRITE8_MEMBER(mjgnight_protection_w);
-	DECLARE_WRITE8_MEMBER(mjgnight_coincounter_w);
-	DECLARE_READ8_MEMBER(sryudens_keyb_r);
-	DECLARE_WRITE8_MEMBER(sryudens_coincounter_w);
-	DECLARE_WRITE8_MEMBER(sryudens_rambank_w);
-	DECLARE_READ8_MEMBER(daimyojn_keyb1_r);
-	DECLARE_READ8_MEMBER(daimyojn_keyb2_r);
-	DECLARE_WRITE8_MEMBER(daimyojn_protection_w);
-	DECLARE_READ8_MEMBER(daimyojn_protection_r);
-	DECLARE_READ8_MEMBER(momotaro_protection_r);
-	DECLARE_WRITE8_MEMBER(daimyojn_palette_sel_w);
-	DECLARE_WRITE8_MEMBER(daimyojn_blitter_data_palette_w);
-	DECLARE_READ8_MEMBER(daimyojn_year_hack_r);
-	DECLARE_WRITE8_MEMBER(janshinp_coincounter_w);
-	DECLARE_READ8_MEMBER(seljan2_busy_r);
-	DECLARE_WRITE8_MEMBER(seljan2_rombank_w);
-	DECLARE_WRITE8_MEMBER(seljan2_palette_enab_w);
-	DECLARE_WRITE8_MEMBER(seljan2_palette_w);
+	void ddenlovr_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_bgcolor2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr16_bgcolor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_priority2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr16_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_layer_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_layer_enable2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr16_layer_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hanakanz_blitter_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanakanz_blitter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rongrong_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_blitter_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rongrong_gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t ddenlovr_gfxrom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ddenlovr_coincounter_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_coincounter_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rongrong_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_palette_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_palette_base2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_palette_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_palette_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_transparency_pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_transparency_pen2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_transparency_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_transparency_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr16_palette_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr16_palette_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr16_transparency_pen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr16_transparency_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t unk16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ddenlovr_select_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_select2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_select2_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rongrong_input2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t quiz365_input2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rongrong_blitter_busy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rongrong_blitter_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void quiz365_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t quiz365_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void quiz365_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ddenlovj_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ddenlovj_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ddenlovrk_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t ddenlovrk_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ddenlovrk_protection2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nettoqc_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t nettoqc_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nettoqc_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ultrchmp_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ultrchmp_protection2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rongrong_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rongrong_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t magic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmpanic_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_blitter2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_leds2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmpanic_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmpanic_link_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t funkyfig_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void funkyfig_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funkyfig_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t funkyfig_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t funkyfig_coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t funkyfig_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void funkyfig_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanakanz_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanakanz_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanakanz_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hanakanz_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hanakanz_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hanakanz_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hanakanz_gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hanakanz_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hanakanz_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hanakanz_rand_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjreach1_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjreach1_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjschuka_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjschuka_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjchuuka_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjchuuka_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjchuuka_gfxrom_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjchuuka_gfxrom_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjchuuka_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjchuuka_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjmyster_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjmyster_select2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjmyster_coins_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjmyster_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjmyster_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjmyster_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjmyster_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hginga_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hginga_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hginga_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hginga_coins_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hginga_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hginga_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hginga_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hginga_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hgokou_dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hgokou_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hgokou_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hgokou_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hgokbang_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hparadis_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hparadis_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hparadis_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hparadis_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjmywrld_coins_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t akamaru_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void akamaru_protection1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t akamaru_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t akamaru_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t akamaru_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t akamaru_e0010d_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mjflove_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjflove_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjflove_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjflove_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjflove_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jongtei_dsw_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jongtei_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjgnight_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjgnight_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjgnight_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sryudens_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sryudens_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sryudens_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t daimyojn_keyb1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t daimyojn_keyb2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void daimyojn_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t daimyojn_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t momotaro_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void daimyojn_palette_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void daimyojn_blitter_data_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t daimyojn_year_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void janshinp_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seljan2_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void seljan2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seljan2_palette_enab_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void seljan2_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_rongrong();
 	void init_momotaro();
-	DECLARE_WRITE8_MEMBER(htengoku_select_w);
-	DECLARE_WRITE8_MEMBER(htengoku_coin_w);
-	DECLARE_READ8_MEMBER(htengoku_input_r);
-	DECLARE_READ8_MEMBER(htengoku_coin_r);
-	DECLARE_WRITE8_MEMBER(htengoku_rombank_w);
-	DECLARE_WRITE8_MEMBER(htengoku_blit_romregion_w);
+	void htengoku_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void htengoku_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t htengoku_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t htengoku_coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void htengoku_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void htengoku_blit_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_htengoku();
 	void video_start_htengoku();
-	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
-	DECLARE_READ8_MEMBER(htengoku_dsw_r);
-	DECLARE_WRITE8_MEMBER( quizchq_oki_bank_w );
-	DECLARE_WRITE16_MEMBER( ddenlovr_oki_bank_w );
-	DECLARE_WRITE16_MEMBER( quiz365_oki_bank1_w );
-	DECLARE_WRITE16_MEMBER( quiz365_oki_bank2_w );
-	DECLARE_WRITE8_MEMBER( ddenlovr_select_w );
-	DECLARE_READ8_MEMBER( quiz365_input_r );
-	DECLARE_WRITE16_MEMBER( nettoqc_oki_bank_w );
-	DECLARE_WRITE8_MEMBER( hanakanz_oki_bank_w );
-	DECLARE_WRITE8_MEMBER( mjchuuka_oki_bank_w );
-	DECLARE_READ8_MEMBER( hginga_dsw_r );
-	DECLARE_WRITE8_MEMBER( mjflove_okibank_w );
-	DECLARE_WRITE8_MEMBER( jongtei_okibank_w );
-	DECLARE_READ8_MEMBER( seljan2_dsw_r );
-	DECLARE_WRITE8_MEMBER( daimyojn_okibank_w );
+	void htengoku_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t htengoku_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void quizchq_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddenlovr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void quiz365_oki_bank1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void quiz365_oki_bank2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddenlovr_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t quiz365_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nettoqc_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hanakanz_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjchuuka_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hginga_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjflove_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jongtei_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t seljan2_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void daimyojn_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void ddenlovr_flipscreen_w( uint8_t data );
 	void ddenlovr_blit_flip_w( uint8_t data );
@@ -595,52 +595,52 @@ void ddenlovr_state::ddenlovr_blit_flip_w( uint8_t data )
 	m_ddenlovr_blit_flip = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_bgcolor_w)
+void ddenlovr_state::ddenlovr_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_bgcolor = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_bgcolor2_w)
+void ddenlovr_state::ddenlovr_bgcolor2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_bgcolor2 = data;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_bgcolor_w)
+void ddenlovr_state::ddenlovr16_bgcolor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		ddenlovr_bgcolor_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_priority_w)
+void ddenlovr_state::ddenlovr_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_priority = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_priority2_w)
+void ddenlovr_state::ddenlovr_priority2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_priority2 = data;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_priority_w)
+void ddenlovr_state::ddenlovr16_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		ddenlovr_priority_w(space, offset, data);
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_layer_enable_w)
+void ddenlovr_state::ddenlovr_layer_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_layer_enable = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_layer_enable2_w)
+void ddenlovr_state::ddenlovr_layer_enable2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_layer_enable2 = data;
 }
 
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_layer_enable_w)
+void ddenlovr_state::ddenlovr16_layer_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		ddenlovr_layer_enable_w(space, offset, data);
@@ -1310,13 +1310,13 @@ g_profiler.stop();
 
 
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_blitter_reg_w)
+void ddenlovr_state::hanakanz_blitter_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_blit_latch = data;
 }
 
 // differences wrt blitter_data_w: registers are shuffled around, hi_bits in the low bits, clip_w/h, includes layers registers
-WRITE8_MEMBER(ddenlovr_state::hanakanz_blitter_data_w)
+void ddenlovr_state::hanakanz_blitter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int hi_bits;
 
@@ -1506,19 +1506,19 @@ g_profiler.stop();
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_w)
+void ddenlovr_state::rongrong_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w(space, 0, offset, data, 0xf8);
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_blitter_w)
+void ddenlovr_state::ddenlovr_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		blitter_w(space, 0, offset, data & 0xff, 0);
 }
 
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_ack_w)
+void ddenlovr_state::ddenlovr_blitter_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1535,7 +1535,7 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_ack_w)
 }
 
 
-READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
+uint8_t ddenlovr_state::rongrong_gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
@@ -1552,7 +1552,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_gfxrom_r)
 	return rom[address];
 }
 
-READ16_MEMBER(ddenlovr_state::ddenlovr_gfxrom_r)
+uint16_t ddenlovr_state::ddenlovr_gfxrom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return rongrong_gfxrom_r(space, offset);
 }
@@ -1701,19 +1701,19 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
 	return m_ddenlovr_blitter_irq_flag;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_0_w)
+void ddenlovr_state::ddenlovr_coincounter_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().bookkeeping().coin_counter_w(0, data & 1);
 }
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_coincounter_1_w)
+void ddenlovr_state::ddenlovr_coincounter_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().bookkeeping().coin_counter_w(1, data & 1);
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::rongrong_palette_w)
+void ddenlovr_state::rongrong_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b, d1, d2, indx;
 
@@ -1731,87 +1731,87 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_palette_w)
 	m_palette->set_pen_color(indx, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_palette_w)
+void ddenlovr_state::ddenlovr_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		rongrong_palette_w(space, offset, data & 0xff);
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_palette_base_w)
+void ddenlovr_state::ddenlovr_palette_base_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_palette_base[offset] = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_palette_base2_w)
+void ddenlovr_state::ddenlovr_palette_base2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_palette_base[offset + 4] = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_palette_mask_w)
+void ddenlovr_state::ddenlovr_palette_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_palette_mask[offset] = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_palette_mask2_w)
+void ddenlovr_state::ddenlovr_palette_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_palette_mask[offset + 4] = data;
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_transparency_pen_w)
+void ddenlovr_state::ddenlovr_transparency_pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_transparency_pen[offset] = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_transparency_pen2_w)
+void ddenlovr_state::ddenlovr_transparency_pen2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_transparency_pen[offset + 4] = data;
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_transparency_mask_w)
+void ddenlovr_state::ddenlovr_transparency_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_transparency_mask[offset] = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_transparency_mask2_w)
+void ddenlovr_state::ddenlovr_transparency_mask2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddenlovr_transparency_mask[offset + 4] = data;
 }
 
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_palette_base_w)
+void ddenlovr_state::ddenlovr16_palette_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ddenlovr_palette_base[offset] = data & 0xff;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_palette_mask_w)
+void ddenlovr_state::ddenlovr16_palette_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ddenlovr_palette_mask[offset] = data & 0xff;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_transparency_pen_w)
+void ddenlovr_state::ddenlovr16_transparency_pen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ddenlovr_transparency_pen[offset] = data & 0xff;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr16_transparency_mask_w)
+void ddenlovr_state::ddenlovr16_transparency_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_ddenlovr_transparency_mask[offset] = data & 0xff;
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::quizchq_oki_bank_w )
+void ddenlovr_state::quizchq_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_oki_bank_w )
+void ddenlovr_state::ddenlovr_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1821,7 +1821,7 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr_oki_bank_w )
 
 
 
-WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank1_w )
+void ddenlovr_state::quiz365_oki_bank1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1830,7 +1830,7 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank1_w )
 	}
 }
 
-WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank2_w )
+void ddenlovr_state::quiz365_oki_bank2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1841,40 +1841,40 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank2_w )
 
 
 
-READ8_MEMBER(ddenlovr_state::unk_r)
+uint8_t ddenlovr_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x78;
 }
 
-READ16_MEMBER(ddenlovr_state::unk16_r)
+uint16_t ddenlovr_state::unk16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return unk_r(space, offset);
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_select_w )
+void ddenlovr_state::ddenlovr_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_select_16_w)
+void ddenlovr_state::ddenlovr_select_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_dsw_sel = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::ddenlovr_select2_w)
+void ddenlovr_state::ddenlovr_select2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel = data;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovr_select2_16_w)
+void ddenlovr_state::ddenlovr_select2_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_input_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
+uint8_t ddenlovr_state::rongrong_input2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("%04x: input2_r offset %d select %x\n", space.device().safe_pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
@@ -1888,7 +1888,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
 }
 
 
-READ8_MEMBER(ddenlovr_state::quiz365_input_r )
+uint8_t ddenlovr_state::quiz365_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
@@ -1898,7 +1898,7 @@ READ8_MEMBER(ddenlovr_state::quiz365_input_r )
 	return 0xff;
 }
 
-READ16_MEMBER(ddenlovr_state::quiz365_input2_r)
+uint16_t ddenlovr_state::quiz365_input2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  logerror("%04x: input2_r offset %d select %x\n",space.device().safe_pc(), offset, m_input_sel);
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
@@ -1912,7 +1912,7 @@ READ16_MEMBER(ddenlovr_state::quiz365_input2_r)
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_busy_w)
+void ddenlovr_state::rongrong_blitter_busy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rongrong_blitter_busy_select = data;
 
@@ -1920,7 +1920,7 @@ WRITE8_MEMBER(ddenlovr_state::rongrong_blitter_busy_w)
 		logerror("%04x: rongrong_blitter_busy_w data = %02x\n", space.device().safe_pc(), data);
 }
 
-READ8_MEMBER(ddenlovr_state::rongrong_blitter_busy_r)
+uint8_t ddenlovr_state::rongrong_blitter_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_rongrong_blitter_busy_select)
 	{
@@ -1933,7 +1933,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_blitter_busy_r)
 }
 
 
-WRITE16_MEMBER(ddenlovr_state::quiz365_coincounter_w)
+void ddenlovr_state::quiz365_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1949,7 +1949,7 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_coincounter_w)
 37,28,12    11      ->      88
 67,4c,3a    ??      ->      51
 */
-READ16_MEMBER(ddenlovr_state::quiz365_protection_r)
+uint16_t ddenlovr_state::quiz365_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_quiz365_protection[0])
 	{
@@ -1960,7 +1960,7 @@ READ16_MEMBER(ddenlovr_state::quiz365_protection_r)
 	}
 }
 
-WRITE16_MEMBER(ddenlovr_state::quiz365_protection_w)
+void ddenlovr_state::quiz365_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_quiz365_protection + offset);
 }
@@ -2002,7 +2002,7 @@ static ADDRESS_MAP_START( quiz365_map, AS_PROGRAM, 16, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(ddenlovr_state::ddenlovj_dsw_r)
+uint16_t ddenlovr_state::ddenlovj_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t dsw = 0;
 	if ((~*m_dsw_sel16) & 0x01) dsw |= ioport("DSW1")->read();
@@ -2011,7 +2011,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovj_dsw_r)
 	return dsw;
 }
 
-WRITE16_MEMBER(ddenlovr_state::ddenlovj_coincounter_w)
+void ddenlovr_state::ddenlovj_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2058,7 +2058,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(ddenlovr_state::ddenlovrk_protection1_r)
+uint16_t ddenlovr_state::ddenlovrk_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (*m_protection1)
 	{
@@ -2067,7 +2067,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovrk_protection1_r)
 	return *m_protection1;
 }
 
-READ16_MEMBER(ddenlovr_state::ddenlovrk_protection2_r)
+uint16_t ddenlovr_state::ddenlovrk_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (*m_protection1)
 	{
@@ -2075,7 +2075,7 @@ READ16_MEMBER(ddenlovr_state::ddenlovrk_protection2_r)
 	}
 	return 0x80;
 }
-WRITE16_MEMBER(ddenlovr_state::ddenlovrk_protection2_w)
+void ddenlovr_state::ddenlovrk_protection2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_protection2);
 	m_oki->set_rom_bank((*m_protection2) & 0x7);
@@ -2161,7 +2161,7 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::nettoqc_special_r)
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;
 }
 
-READ16_MEMBER(ddenlovr_state::nettoqc_input_r)
+uint16_t ddenlovr_state::nettoqc_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW2")->read();
@@ -2176,7 +2176,7 @@ READ16_MEMBER(ddenlovr_state::nettoqc_input_r)
     Writes 67 4c 3a to 200e0b then 19 to 200e0d. Expects to read 51 from 200c03
 */
 
-READ16_MEMBER(ddenlovr_state::nettoqc_protection1_r)
+uint16_t ddenlovr_state::nettoqc_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (*m_protection1 & 0xff)
 	{
@@ -2185,7 +2185,7 @@ READ16_MEMBER(ddenlovr_state::nettoqc_protection1_r)
 	}
 }
 
-WRITE16_MEMBER(ddenlovr_state::nettoqc_coincounter_w)
+void ddenlovr_state::nettoqc_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2195,7 +2195,7 @@ WRITE16_MEMBER(ddenlovr_state::nettoqc_coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(ddenlovr_state::nettoqc_oki_bank_w )
+void ddenlovr_state::nettoqc_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2237,7 +2237,7 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(ddenlovr_state::ultrchmp_protection2_r)
+uint16_t ddenlovr_state::ultrchmp_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (*m_protection2)
 	{
@@ -2246,7 +2246,7 @@ READ16_MEMBER(ddenlovr_state::ultrchmp_protection2_r)
 	}
 	return *m_protection2;
 }
-WRITE16_MEMBER(ddenlovr_state::ultrchmp_protection2_w)
+void ddenlovr_state::ultrchmp_protection2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  COMBINE_DATA(m_protection2);
 	m_oki->set_rom_bank(data & 0xf);
@@ -2297,7 +2297,7 @@ ADDRESS_MAP_END
                                 Rong Rong
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::rongrong_input_r)
+uint8_t ddenlovr_state::rongrong_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW2")->read();
@@ -2307,7 +2307,7 @@ READ8_MEMBER(ddenlovr_state::rongrong_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::rongrong_select_w)
+void ddenlovr_state::rongrong_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("%04x: rongrong_select_w %02x\n",space.device().safe_pc(),data);
 
@@ -2405,28 +2405,28 @@ a0 input select,a2 input read (protection?)
 ***************************************************************************/
 
 
-READ8_MEMBER(ddenlovr_state::magic_r)
+uint8_t ddenlovr_state::magic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x01;
 }
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_rombank_w)
+void ddenlovr_state::mmpanic_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x7);
 	/* Bit 4? */
 }
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_soundlatch_w)
+void ddenlovr_state::mmpanic_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter_w)
+void ddenlovr_state::mmpanic_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w(space, 0, offset, data, 0xdf);    // RST 18
 }
-WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
+void ddenlovr_state::mmpanic_blitter2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w(space, 1, offset, data, 0xdf);    // RST 18
 }
@@ -2437,20 +2437,20 @@ void ddenlovr_state::mmpanic_update_leds()
 }
 
 /* leds 1-8 */
-WRITE8_MEMBER(ddenlovr_state::mmpanic_leds_w)
+void ddenlovr_state::mmpanic_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xff00) | data;
 	mmpanic_update_leds();
 }
 /* led 9 */
-WRITE8_MEMBER(ddenlovr_state::mmpanic_leds2_w)
+void ddenlovr_state::mmpanic_leds2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xfeff) | (data ? 0x0100 : 0);
 	mmpanic_update_leds();
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
+void ddenlovr_state::mmpanic_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_dsw_sel == 0x0c)
 	{
@@ -2460,7 +2460,7 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_lockout_w)
 	}
 }
 
-READ8_MEMBER(ddenlovr_state::mmpanic_link_r){ return 0xff; }
+uint8_t ddenlovr_state::mmpanic_link_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
 
 /* Main CPU */
 
@@ -2555,18 +2555,18 @@ static ADDRESS_MAP_START( funkyfig_map, AS_PROGRAM, 8, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(ddenlovr_state::funkyfig_busy_r)
+uint8_t ddenlovr_state::funkyfig_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 					// bit 0 ?
 	return 0x00;    // bit 7 = blitter busy
 }
 
-WRITE8_MEMBER(ddenlovr_state::funkyfig_blitter_w)
+void ddenlovr_state::funkyfig_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w_funkyfig(0, offset, data, 0xe0);
 }
 
-WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
+void ddenlovr_state::funkyfig_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 
@@ -2575,7 +2575,7 @@ WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
 	membank("bank2")->set_entry(((data & 0xe0) >> 5));
 }
 
-READ8_MEMBER(ddenlovr_state::funkyfig_dsw_r)
+uint8_t ddenlovr_state::funkyfig_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
@@ -2584,7 +2584,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_dsw_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::funkyfig_coin_r)
+uint8_t ddenlovr_state::funkyfig_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -2595,7 +2595,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_coin_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::funkyfig_key_r)
+uint8_t ddenlovr_state::funkyfig_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -2606,7 +2606,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_key_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::funkyfig_lockout_w)
+void ddenlovr_state::funkyfig_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -2672,7 +2672,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_rombank_w)
+void ddenlovr_state::hanakanz_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 	membank("bank2")->set_entry(((data & 0xf0) >> 4));
@@ -2686,17 +2686,17 @@ static ADDRESS_MAP_START( hanakanz_map, AS_PROGRAM, 8, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_keyb_w)
+void ddenlovr_state::hanakanz_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_dsw_w)
+void ddenlovr_state::hanakanz_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_keyb_r)
+uint8_t ddenlovr_state::hanakanz_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -2710,7 +2710,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_keyb_r)
 	return val;
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_dsw_r)
+uint8_t ddenlovr_state::hanakanz_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
@@ -2720,12 +2720,12 @@ READ8_MEMBER(ddenlovr_state::hanakanz_dsw_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_busy_r)
+uint8_t ddenlovr_state::hanakanz_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;    // bit 7 == 0 -> blitter busy
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
+uint8_t ddenlovr_state::hanakanz_gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom  = memregion("blitter")->base();
 	size_t size = memregion("blitter")->bytes();
@@ -2753,7 +2753,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_gfxrom_r)
 }
 
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_coincounter_w)
+void ddenlovr_state::hanakanz_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = coin counter
 	// bit 1 = out counter
@@ -2771,7 +2771,7 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_palette_w)
+void ddenlovr_state::hanakanz_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ddenlovr_blit_latch & 0x80)
 	{
@@ -2789,12 +2789,12 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_palette_w)
 	}
 }
 
-WRITE8_MEMBER(ddenlovr_state::hanakanz_oki_bank_w )
+void ddenlovr_state::hanakanz_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank((data >> 6) & 1);
 }
 
-READ8_MEMBER(ddenlovr_state::hanakanz_rand_r)
+uint8_t ddenlovr_state::hanakanz_rand_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
@@ -2889,12 +2889,12 @@ static ADDRESS_MAP_START( kotbinsp_portmap, AS_IO, 8, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(ddenlovr_state::mjreach1_protection_w)
+void ddenlovr_state::mjreach1_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_val = data;
 }
 
-READ8_MEMBER(ddenlovr_state::mjreach1_protection_r)
+uint8_t ddenlovr_state::mjreach1_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prot_val;
 }
@@ -2925,7 +2925,7 @@ ADDRESS_MAP_END
      Mahjong Chuukanejyo
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::mjchuuka_keyb_r)
+uint8_t ddenlovr_state::mjchuuka_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -2943,7 +2943,7 @@ READ8_MEMBER(ddenlovr_state::mjchuuka_keyb_r)
 	return val;
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjchuuka_blitter_w)
+void ddenlovr_state::mjchuuka_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hanakanz_blitter_reg_w(space, 0, offset >> 8);
 	hanakanz_blitter_data_w(space, 0, data);
@@ -2965,19 +2965,19 @@ void ddenlovr_state::mjchuuka_get_romdata()
 	m_romdata[1] = rom[address + 1];
 }
 
-READ8_MEMBER(ddenlovr_state::mjchuuka_gfxrom_0_r)
+uint8_t ddenlovr_state::mjchuuka_gfxrom_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	mjchuuka_get_romdata();
 	m_ddenlovr_blit_address++;
 	return m_romdata[0];
 }
 
-READ8_MEMBER(ddenlovr_state::mjchuuka_gfxrom_1_r)
+uint8_t ddenlovr_state::mjchuuka_gfxrom_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_romdata[1];
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjchuuka_palette_w)
+void ddenlovr_state::mjchuuka_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t rgb = (offset & 0xff00) | data;
 
@@ -2997,7 +2997,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_palette_w)
 	}
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
+void ddenlovr_state::mjchuuka_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = in counter
 	// bit 1 = out counter
@@ -3015,7 +3015,7 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjchuuka_oki_bank_w )
+void ddenlovr_state::mjchuuka_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// data & 0x08 ?
 	m_oki->set_rom_bank(data & 1);
@@ -3056,12 +3056,12 @@ ADDRESS_MAP_END
 // 255F: 13 34 7A 96 A8
 // 2564: 13 34 7A 96 13
 
-WRITE8_MEMBER(ddenlovr_state::mjschuka_protection_w)
+void ddenlovr_state::mjschuka_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_val = data;
 }
 
-READ8_MEMBER(ddenlovr_state::mjschuka_protection_r)
+uint8_t ddenlovr_state::mjschuka_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_prot_val)
 	{
@@ -3122,13 +3122,13 @@ static ADDRESS_MAP_START( mjmyster_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0xf200, 0xffff) AM_WRITENOP                    // ""
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(ddenlovr_state::mjmyster_rambank_w)
+void ddenlovr_state::mjmyster_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x07);
 	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjmyster_select2_w)
+void ddenlovr_state::mjmyster_select2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel = data;
 
@@ -3136,7 +3136,7 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_select2_w)
 		m_keyb = 1;
 }
 
-READ8_MEMBER(ddenlovr_state::mjmyster_coins_r)
+uint8_t ddenlovr_state::mjmyster_coins_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3151,7 +3151,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_coins_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::mjmyster_keyb_r)
+uint8_t ddenlovr_state::mjmyster_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -3167,7 +3167,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_keyb_r)
 	return ret;
 }
 
-READ8_MEMBER(ddenlovr_state::mjmyster_dsw_r)
+uint8_t ddenlovr_state::mjmyster_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW4")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW3")->read();
@@ -3178,7 +3178,7 @@ READ8_MEMBER(ddenlovr_state::mjmyster_dsw_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
+void ddenlovr_state::mjmyster_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3196,7 +3196,7 @@ WRITE8_MEMBER(ddenlovr_state::mjmyster_coincounter_w)
 	}
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjmyster_blitter_w)
+void ddenlovr_state::mjmyster_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w(space, 0, offset, data, 0xfc);
 }
@@ -3233,14 +3233,14 @@ ADDRESS_MAP_END
                             Hanafuda Hana Ginga
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hginga_rombank_w)
+void ddenlovr_state::hginga_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x7);
 	m_hginga_rombank = data;
 }
 
 // similar to rongrong
-READ8_MEMBER(ddenlovr_state::hginga_protection_r)
+uint8_t ddenlovr_state::hginga_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3259,7 +3259,7 @@ static ADDRESS_MAP_START( hginga_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0xf700, 0xf706) AM_WRITENOP
 ADDRESS_MAP_END
 
-READ8_MEMBER(ddenlovr_state::hginga_dsw_r )
+uint8_t ddenlovr_state::hginga_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW4")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW3")->read();
@@ -3271,13 +3271,13 @@ READ8_MEMBER(ddenlovr_state::hginga_dsw_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hginga_input_w)
+void ddenlovr_state::hginga_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel = data;
 	m_keyb = 0;
 }
 
-READ8_MEMBER(ddenlovr_state::hginga_coins_r)
+uint8_t ddenlovr_state::hginga_coins_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3290,12 +3290,12 @@ READ8_MEMBER(ddenlovr_state::hginga_coins_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hginga_80_w)
+void ddenlovr_state::hginga_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("port 80 = %02x", data);
 }
 
-WRITE8_MEMBER(ddenlovr_state::hginga_coins_w)
+void ddenlovr_state::hginga_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3319,7 +3319,7 @@ WRITE8_MEMBER(ddenlovr_state::hginga_coins_w)
 	}
 }
 
-READ8_MEMBER(ddenlovr_state::hginga_input_r)
+uint8_t ddenlovr_state::hginga_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -3341,7 +3341,7 @@ READ8_MEMBER(ddenlovr_state::hginga_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hginga_blitter_w)
+void ddenlovr_state::hginga_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -3415,12 +3415,12 @@ uint8_t ddenlovr_state::hgokou_player_r(int player )
 	return 0x7f;    // bit 7 = blitter busy, bit 6 = hopper
 }
 
-WRITE8_MEMBER(ddenlovr_state::hgokou_dsw_sel_w)
+void ddenlovr_state::hgokou_dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::hgokou_input_r)
+uint8_t ddenlovr_state::hgokou_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dsw_sel)
 	{
@@ -3433,7 +3433,7 @@ READ8_MEMBER(ddenlovr_state::hgokou_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
+void ddenlovr_state::hgokou_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_dsw_sel)
 	{
@@ -3461,7 +3461,7 @@ WRITE8_MEMBER(ddenlovr_state::hgokou_input_w)
 }
 
 // similar to rongrong
-READ8_MEMBER(ddenlovr_state::hgokou_protection_r)
+uint8_t ddenlovr_state::hgokou_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -3512,7 +3512,7 @@ ADDRESS_MAP_END
                         Hanafuda Hana Gokou Bangaihen
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
+uint8_t ddenlovr_state::hgokbang_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 	switch (m_dsw_sel)
@@ -3568,7 +3568,7 @@ ADDRESS_MAP_END
                             Super Hana Paradise
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::hparadis_select_w)
+void ddenlovr_state::hparadis_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 	m_keyb = 0;
@@ -3578,7 +3578,7 @@ WRITE8_MEMBER(ddenlovr_state::hparadis_select_w)
 }
 
 
-READ8_MEMBER(ddenlovr_state::hparadis_input_r)
+uint8_t ddenlovr_state::hparadis_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -3596,7 +3596,7 @@ READ8_MEMBER(ddenlovr_state::hparadis_input_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::hparadis_dsw_r)
+uint8_t ddenlovr_state::hparadis_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW2")->read();
@@ -3606,7 +3606,7 @@ READ8_MEMBER(ddenlovr_state::hparadis_dsw_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::hparadis_coin_w)
+void ddenlovr_state::hparadis_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3654,7 +3654,7 @@ ADDRESS_MAP_END
                           Mahjong Mysterious World
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::mjmywrld_coins_r)
+uint8_t ddenlovr_state::mjmywrld_coins_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -3702,12 +3702,12 @@ ADDRESS_MAP_END
                   Panel & Variety Akamaru Q Jousyou Dont-R
 ***************************************************************************/
 
-READ16_MEMBER(ddenlovr_state::akamaru_protection1_r)
+uint16_t ddenlovr_state::akamaru_protection1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_prot_16 & 0x0008) ? 0x0001 : 0x0000;
 }
 
-WRITE16_MEMBER(ddenlovr_state::akamaru_protection1_w)
+void ddenlovr_state::akamaru_protection1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank;
 
@@ -3719,12 +3719,12 @@ WRITE16_MEMBER(ddenlovr_state::akamaru_protection1_w)
 //  popmessage("bank $%0x (%d)", m_prot_16, bank);
 }
 
-READ16_MEMBER(ddenlovr_state::akamaru_protection2_r)
+uint16_t ddenlovr_state::akamaru_protection2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x55;
 }
 
-READ16_MEMBER(ddenlovr_state::akamaru_dsw_r)
+uint16_t ddenlovr_state::akamaru_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t dsw = 0;
 
@@ -3733,12 +3733,12 @@ READ16_MEMBER(ddenlovr_state::akamaru_dsw_r)
 	return dsw;
 }
 
-READ16_MEMBER(ddenlovr_state::akamaru_blitter_r)
+uint16_t ddenlovr_state::akamaru_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ddenlovr_blitter_irq_flag << 6;    // bit 7 = 1 -> blitter busy
 }
 
-READ16_MEMBER(ddenlovr_state::akamaru_e0010d_r)
+uint16_t ddenlovr_state::akamaru_e0010d_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;  // read but not used, it seems
 }
@@ -3793,24 +3793,24 @@ ADDRESS_MAP_END
                           Mahjong Fantasic Love
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::mjflove_rombank_w)
+void ddenlovr_state::mjflove_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0xf);
 	// bit 4 enables palette ram
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjflove_okibank_w )
+void ddenlovr_state::mjflove_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 0x07);
 	//popmessage("SOUND = %02x", data);
 }
 
-READ8_MEMBER(ddenlovr_state::mjflove_protection_r)
+uint8_t ddenlovr_state::mjflove_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x27;
 }
 
-READ8_MEMBER(ddenlovr_state::mjflove_keyb_r)
+uint8_t ddenlovr_state::mjflove_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0xff;
 
@@ -3831,12 +3831,12 @@ CUSTOM_INPUT_MEMBER(ddenlovr_state::mjflove_blitter_r)
 	return m_mjflove_irq_cause;
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjflove_blitter_w)
+void ddenlovr_state::mjflove_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	blitter_w(space, 0, offset, data, 0);
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjflove_coincounter_w)
+void ddenlovr_state::mjflove_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = in counter
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -3882,18 +3882,18 @@ ADDRESS_MAP_END
                           Mahjong Jong-Tei
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::jongtei_okibank_w )
+void ddenlovr_state::jongtei_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x07);
 }
 
-WRITE8_MEMBER(ddenlovr_state::jongtei_dsw_keyb_w)
+void ddenlovr_state::jongtei_dsw_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 	m_keyb = data;
 }
 
-READ8_MEMBER(ddenlovr_state::jongtei_busy_r)
+uint8_t ddenlovr_state::jongtei_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x04;    // !bit 2 = blitter busy
 }
@@ -3922,7 +3922,7 @@ ADDRESS_MAP_END
                           Mahjong Gorgeous Night
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
+void ddenlovr_state::mjgnight_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_val = data;
 
@@ -3939,12 +3939,12 @@ WRITE8_MEMBER(ddenlovr_state::mjgnight_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::mjgnight_protection_w)
+void ddenlovr_state::mjgnight_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_val = data;
 }
 
-READ8_MEMBER(ddenlovr_state::mjgnight_protection_r)
+uint8_t ddenlovr_state::mjgnight_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_prot_val)
 	{
@@ -3987,7 +3987,7 @@ static ADDRESS_MAP_START( sryudens_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(ddenlovr_state::sryudens_keyb_r)
+uint8_t ddenlovr_state::sryudens_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0x3f;
 
@@ -4003,7 +4003,7 @@ READ8_MEMBER(ddenlovr_state::sryudens_keyb_r)
 	return val;
 }
 
-WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
+void ddenlovr_state::sryudens_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = coin counter
 	// bit 1 = out counter
@@ -4023,7 +4023,7 @@ WRITE8_MEMBER(ddenlovr_state::sryudens_coincounter_w)
 #endif
 }
 
-WRITE8_MEMBER(ddenlovr_state::sryudens_rambank_w)
+void ddenlovr_state::sryudens_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 0x0f);
 	//logerror("%04x: rambank = %02x\n", space.device().safe_pc(), data);
@@ -4065,7 +4065,7 @@ ADDRESS_MAP_END
                             Mahjong Janshin Plus
 ***************************************************************************/
 
-WRITE8_MEMBER(ddenlovr_state::janshinp_coincounter_w)
+void ddenlovr_state::janshinp_coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0 = coin counter
 	// bit 1 = out counter
@@ -4128,24 +4128,24 @@ ADDRESS_MAP_END
                              Return Of Sel Jan II
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::seljan2_busy_r)
+uint8_t ddenlovr_state::seljan2_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;    // bit 7 = blitter busy
 }
 
-WRITE8_MEMBER(ddenlovr_state::seljan2_rombank_w)
+void ddenlovr_state::seljan2_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);   // disable palette?
 }
 
-WRITE8_MEMBER(ddenlovr_state::seljan2_palette_enab_w)
+void ddenlovr_state::seljan2_palette_enab_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry((membank("bank1")->entry() & 0x0f) | ((data & 0x01) << 4));
 	if (data & ~0x01)
 		logerror("%s: warning, unknown palette_enab bits written = %02x\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(ddenlovr_state::seljan2_palette_w)
+void ddenlovr_state::seljan2_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((membank("bank1")->entry() & 0x10) && offset >= 0xb000-0x8000 && offset <= 0xb1ff-0x8000)
 	{
@@ -4156,7 +4156,7 @@ WRITE8_MEMBER(ddenlovr_state::seljan2_palette_w)
 		logerror("%s: warning, palette_w with palette disabled, %04x <- %02x\n", machine().describe_context(), offset, data);
 }
 
-READ8_MEMBER(ddenlovr_state::seljan2_dsw_r )
+uint8_t ddenlovr_state::seljan2_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
@@ -4244,18 +4244,18 @@ void ddenlovr_state::machine_start_htengoku()
 	machine_start_dynax();
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_select_w)
+void ddenlovr_state::htengoku_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_sel = data;
 	m_keyb = 0;
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_dsw_w)
+void ddenlovr_state::htengoku_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_sel = data;
 }
 
-READ8_MEMBER(ddenlovr_state::htengoku_dsw_r)
+uint8_t ddenlovr_state::htengoku_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
@@ -4267,7 +4267,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_dsw_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_coin_w)
+void ddenlovr_state::htengoku_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -4290,7 +4290,7 @@ WRITE8_MEMBER(ddenlovr_state::htengoku_coin_w)
 	}
 }
 
-READ8_MEMBER(ddenlovr_state::htengoku_input_r)
+uint8_t ddenlovr_state::htengoku_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -4305,7 +4305,7 @@ READ8_MEMBER(ddenlovr_state::htengoku_input_r)
 	return 0xff;
 }
 
-READ8_MEMBER(ddenlovr_state::htengoku_coin_r)
+uint8_t ddenlovr_state::htengoku_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_input_sel)
 	{
@@ -4318,13 +4318,13 @@ READ8_MEMBER(ddenlovr_state::htengoku_coin_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_rombank_w)
+void ddenlovr_state::htengoku_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 	m_hnoridur_bank = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::htengoku_blit_romregion_w)
+void ddenlovr_state::htengoku_blit_romregion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -4429,7 +4429,7 @@ MACHINE_CONFIG_END
                             Mahjong Daimyojin
 ***************************************************************************/
 
-READ8_MEMBER(ddenlovr_state::daimyojn_keyb1_r)
+uint8_t ddenlovr_state::daimyojn_keyb1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0x3f;
 
@@ -4445,7 +4445,7 @@ READ8_MEMBER(ddenlovr_state::daimyojn_keyb1_r)
 	return val;
 }
 
-READ8_MEMBER(ddenlovr_state::daimyojn_keyb2_r)
+uint8_t ddenlovr_state::daimyojn_keyb2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0x3f;
 
@@ -4462,12 +4462,12 @@ READ8_MEMBER(ddenlovr_state::daimyojn_keyb2_r)
 // 1B18: D4 ED 76 C9 CB
 // 1B1D: 96 AF 34 8B 89
 
-WRITE8_MEMBER(ddenlovr_state::daimyojn_protection_w)
+void ddenlovr_state::daimyojn_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_val = data;
 }
 
-READ8_MEMBER(ddenlovr_state::daimyojn_protection_r)
+uint8_t ddenlovr_state::daimyojn_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_prot_val)
 	{
@@ -4483,7 +4483,7 @@ READ8_MEMBER(ddenlovr_state::daimyojn_protection_r)
 // 1ADD: D4 ED 76 C9 CB
 // 1AE2: D9 E0 7B C4 C6
 
-READ8_MEMBER(ddenlovr_state::momotaro_protection_r)
+uint8_t ddenlovr_state::momotaro_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_prot_val)
 	{
@@ -4497,17 +4497,17 @@ READ8_MEMBER(ddenlovr_state::momotaro_protection_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(ddenlovr_state::daimyojn_okibank_w )
+void ddenlovr_state::daimyojn_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x01);
 }
 
-WRITE8_MEMBER(ddenlovr_state::daimyojn_palette_sel_w)
+void ddenlovr_state::daimyojn_palette_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_daimyojn_palette_sel = data;
 }
 
-WRITE8_MEMBER(ddenlovr_state::daimyojn_blitter_data_palette_w)
+void ddenlovr_state::daimyojn_blitter_data_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_daimyojn_palette_sel & 0x01)
 		hanakanz_palette_w(space, offset, data);
@@ -4515,7 +4515,7 @@ WRITE8_MEMBER(ddenlovr_state::daimyojn_blitter_data_palette_w)
 		hanakanz_blitter_data_w(space, offset, data);
 }
 
-READ8_MEMBER(ddenlovr_state::daimyojn_year_hack_r)
+uint8_t ddenlovr_state::daimyojn_year_hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// See code at C8D7, 633f holds reg B of the RTC
 	return offset ? 1 : 0;  // year = 0x10 (BCD)

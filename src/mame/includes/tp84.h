@@ -38,12 +38,12 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	uint8_t m_sub_irq_mask;
-	DECLARE_READ8_MEMBER(tp84_sh_timer_r);
-	DECLARE_WRITE8_MEMBER(tp84_filter_w);
-	DECLARE_WRITE8_MEMBER(tp84_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(sub_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(tp84_spriteram_w);
-	DECLARE_READ8_MEMBER(tp84_scanline_r);
+	uint8_t tp84_sh_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tp84_filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tp84_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sub_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tp84_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tp84_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;

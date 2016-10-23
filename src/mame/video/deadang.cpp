@@ -6,19 +6,19 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(deadang_state::foreground_w)
+void deadang_state::foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_data[offset]);
 	m_pf1_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(deadang_state::text_w)
+void deadang_state::text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_text_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_MEMBER(deadang_state::bank_w)
+void deadang_state::bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

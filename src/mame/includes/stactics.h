@@ -50,13 +50,13 @@ public:
 	uint16_t m_old_beam_state;
 	uint16_t m_beam_states_per_frame;
 
-	DECLARE_READ8_MEMBER(vert_pos_r);
-	DECLARE_READ8_MEMBER(horiz_pos_r);
-	DECLARE_WRITE8_MEMBER(coinlockout_w);
-	DECLARE_WRITE8_MEMBER(scroll_ram_w);
-	DECLARE_WRITE8_MEMBER(speed_latch_w);
-	DECLARE_WRITE8_MEMBER(shot_trigger_w);
-	DECLARE_WRITE8_MEMBER(shot_flag_clear_w);
+	uint8_t vert_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t horiz_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speed_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shot_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void shot_flag_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(get_frame_count_d3);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_shot_standby);

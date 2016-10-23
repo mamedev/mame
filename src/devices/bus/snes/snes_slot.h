@@ -106,14 +106,14 @@ public:
 	virtual ~device_sns_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }   // ROM access in range [00-7f]
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }   // ROM access in range [80-ff]
-	virtual DECLARE_READ8_MEMBER(read_ram) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
-	virtual DECLARE_WRITE8_MEMBER(write_l) {}   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_h) {}   // used by carts with subslots
-	virtual DECLARE_WRITE8_MEMBER(write_ram) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
-	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }   // ROM access in range [00-7f]
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }   // ROM access in range [80-ff]
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if (!m_nvram.empty()) return m_nvram[offset & (m_nvram.size()-1)]; else return 0xff; }   // NVRAM access
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}   // used by carts with subslots
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}   // used by carts with subslots
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if (!m_nvram.empty()) m_nvram[offset & (m_nvram.size()-1)] = data; } // NVRAM access
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 	virtual void speedup_addon_bios_access() {};
 
 	void rom_alloc(uint32_t size, const char *tag);
@@ -185,14 +185,14 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_READ8_MEMBER(chip_read);
-	virtual DECLARE_WRITE8_MEMBER(chip_write);
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly

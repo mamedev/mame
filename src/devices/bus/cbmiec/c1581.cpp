@@ -114,7 +114,7 @@ WRITE_LINE_MEMBER( c1581_t::sp_w )
 	update_iec();
 }
 
-READ8_MEMBER( c1581_t::cia_pa_r )
+uint8_t c1581_t::cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -145,7 +145,7 @@ READ8_MEMBER( c1581_t::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_t::cia_pa_w )
+void c1581_t::cia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -175,7 +175,7 @@ WRITE8_MEMBER( c1581_t::cia_pa_w )
 	machine().output().set_led_value(LED_ACT, BIT(data, 6));
 }
 
-READ8_MEMBER( c1581_t::cia_pb_r )
+uint8_t c1581_t::cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -209,7 +209,7 @@ READ8_MEMBER( c1581_t::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1581_t::cia_pb_w )
+void c1581_t::cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

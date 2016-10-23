@@ -310,7 +310,7 @@ void arcadia_state::video_start()
 	}
 }
 
-READ8_MEMBER( arcadia_state::video_r )
+uint8_t arcadia_state::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	switch (offset)
@@ -372,7 +372,7 @@ READ8_MEMBER( arcadia_state::video_r )
 	return data;
 }
 
-WRITE8_MEMBER( arcadia_state::video_w )
+void arcadia_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reg.data[offset]=data;
 	switch (offset)
@@ -664,7 +664,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::video_line)
 		draw_sprites();
 }
 
-READ8_MEMBER( arcadia_state::vsync_r )
+uint8_t arcadia_state::vsync_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_line>=216 ? 0x80 : 0 ;
 }

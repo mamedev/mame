@@ -94,7 +94,7 @@ public:
 	{ }
 
 	void init_wms();
-	DECLARE_READ8_MEMBER(test_r);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( wms_map, AS_PROGRAM, 8, wms_state )
 	AM_RANGE(0x60000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x60000) // TODO: fix me
 ADDRESS_MAP_END
 
-READ8_MEMBER(wms_state::test_r)
+uint8_t wms_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }

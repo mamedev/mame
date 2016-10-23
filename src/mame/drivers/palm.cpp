@@ -43,11 +43,11 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
 	DECLARE_INPUT_CHANGED_MEMBER(button_check);
-	DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	DECLARE_READ8_MEMBER(palm_port_c_in);
-	DECLARE_READ8_MEMBER(palm_port_f_in);
-	DECLARE_WRITE16_MEMBER(palm_spim_out);
-	DECLARE_READ16_MEMBER(palm_spim_in);
+	void palm_port_f_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palm_port_c_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palm_spim_out(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t palm_spim_in(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	DECLARE_PALETTE_INIT(palm);
 
@@ -80,27 +80,27 @@ INPUT_CHANGED_MEMBER(palm_state::button_check)
 	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
-WRITE8_MEMBER(palm_state::palm_port_f_out)
+void palm_state::palm_port_f_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_f_latch = data;
 }
 
-READ8_MEMBER(palm_state::palm_port_c_in)
+uint8_t palm_state::palm_port_c_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x10;
 }
 
-READ8_MEMBER(palm_state::palm_port_f_in)
+uint8_t palm_state::palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_f_latch;
 }
 
-WRITE16_MEMBER(palm_state::palm_spim_out)
+void palm_state::palm_spim_out(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spim_data = data;
 }
 
-READ16_MEMBER(palm_state::palm_spim_in)
+uint16_t palm_state::palm_spim_in(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spim_data;
 }

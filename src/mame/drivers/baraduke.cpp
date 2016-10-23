@@ -114,7 +114,7 @@ DIP locations verified for:
 #include "includes/baraduke.h"
 
 
-WRITE8_MEMBER(baraduke_state::inputport_select_w)
+void baraduke_state::inputport_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -126,7 +126,7 @@ WRITE8_MEMBER(baraduke_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(baraduke_state::inputport_r)
+uint8_t baraduke_state::inputport_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_inputport_selected)
 	{
@@ -149,13 +149,13 @@ READ8_MEMBER(baraduke_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_lamps_w)
+void baraduke_state::baraduke_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,data & 0x08);
 	output().set_led_value(1,data & 0x10);
 }
 
-WRITE8_MEMBER(baraduke_state::baraduke_irq_ack_w)
+void baraduke_state::baraduke_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8, baraduke_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM                             /* ROM */
 ADDRESS_MAP_END
 
-READ8_MEMBER(baraduke_state::soundkludge_r)
+uint8_t baraduke_state::soundkludge_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_counter++) >> 4) & 0xff;
 }
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, baraduke_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(baraduke_state::readFF)
+uint8_t baraduke_state::readFF(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

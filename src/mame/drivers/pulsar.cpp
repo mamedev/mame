@@ -62,13 +62,13 @@ public:
 	void init_pulsar();
 	void machine_reset_pulsar();
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
-	DECLARE_WRITE8_MEMBER(baud_w);
+	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fr_w);
 	DECLARE_WRITE_LINE_MEMBER(ft_w);
-	DECLARE_WRITE8_MEMBER(ppi_pa_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
-	DECLARE_READ8_MEMBER(ppi_pc_r);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	floppy_image_device *m_floppy;
@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER( pulsar_state::ft_w )
 	m_dart->txcb_w(state);
 }
 
-WRITE8_MEMBER( pulsar_state::baud_w )
+void pulsar_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_brg->str_w(data & 0x0f);
 	m_brg->stt_w(data >> 4);
@@ -135,7 +135,7 @@ d5     /DDEN
 d6     /DSK_WAITEN (don't know what this is, not emulated)
 d7     XMEMEX line (for external memory, not emulated)
 */
-WRITE8_MEMBER( pulsar_state::ppi_pa_w )
+void pulsar_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_floppy = nullptr;
 	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
@@ -150,7 +150,7 @@ d5     RTC write line (inverted in emulation)
 d6     RTC hold line
 d7     Allow 64k of ram
 */
-WRITE8_MEMBER( pulsar_state::ppi_pb_w )
+void pulsar_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->address_w(data & 0x0f);
 	m_rtc->read_w(!BIT(data, 4));
@@ -163,14 +163,14 @@ WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 d0..d3 Data lines to rtc
 d7     /2 SIDES (assumed to be side select)
 */
-WRITE8_MEMBER( pulsar_state::ppi_pc_w )
+void pulsar_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->data_w(space, 0, data & 15);
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 7));
 }
 
-READ8_MEMBER( pulsar_state::ppi_pc_r )
+uint8_t pulsar_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->data_r(space, 0);
 }

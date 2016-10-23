@@ -12,8 +12,8 @@ public:
 
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	DECLARE_READ8_MEMBER( ctrlram_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t ctrlram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* shall we move source in the interface? */
 	/* also notice that now we directly pass *gfx[chip] instead of **gfx !! */

@@ -49,24 +49,24 @@ public:
 	/* Read and Write members */
 	DECLARE_WRITE_LINE_MEMBER(i8237_hreq_w);
 	DECLARE_WRITE_LINE_MEMBER(i8237_eop_w);
-	DECLARE_READ8_MEMBER(i8237_dma_mem_r);
-	DECLARE_WRITE8_MEMBER(i8237_dma_mem_w);
-	DECLARE_READ8_MEMBER(i8237_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(i8237_fdc_dma_w);
+	uint8_t i8237_dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8237_dma_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8237_fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8237_fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(hdd_irq);
 
-	DECLARE_READ8_MEMBER(p0_7_r);
-	DECLARE_WRITE8_MEMBER(p0_7_w);
-	DECLARE_READ8_MEMBER(fdd_68k_r);
-	DECLARE_WRITE8_MEMBER(fdd_68k_w);
-	DECLARE_WRITE8_MEMBER(p38_w);
-	DECLARE_READ8_MEMBER(p38_r);
-	DECLARE_READ8_MEMBER(p39_r);
-	DECLARE_WRITE8_MEMBER(p50_5f_w);
+	uint8_t p0_7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p0_7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdd_68k_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdd_68k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p38_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p38_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p39_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p50_5f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(m68k_dma_r);
-	DECLARE_WRITE8_MEMBER(m68k_dma_w);
+	uint8_t m68k_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m68k_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

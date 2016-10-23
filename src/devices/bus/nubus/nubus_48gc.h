@@ -37,8 +37,8 @@ protected:
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
-		DECLARE_READ32_MEMBER(mac_48gc_r);
-		DECLARE_WRITE32_MEMBER(mac_48gc_w);
+		uint32_t mac_48gc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void mac_48gc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 public:
 		std::vector<uint8_t> m_vram;

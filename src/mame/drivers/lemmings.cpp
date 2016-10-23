@@ -24,7 +24,7 @@
 #include "sound/okim6295.h"
 #include "includes/lemmings.h"
 
-WRITE16_MEMBER(lemmings_state::lemmings_control_w)
+void lemmings_state::lemmings_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
@@ -32,7 +32,7 @@ WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 	COMBINE_DATA(&m_control_data[offset]);
 }
 
-READ16_MEMBER(lemmings_state::lemmings_trackball_r)
+uint16_t lemmings_state::lemmings_trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -54,12 +54,12 @@ void lemmings_state::lemmings_sound_cb( address_space &space, uint16_t data, uin
 	m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE8_MEMBER(lemmings_state::lemmings_sound_ack_w)
+void lemmings_state::lemmings_sound_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(1, CLEAR_LINE);
 }
 
-READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
+uint16_t lemmings_state::lem_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
@@ -68,7 +68,7 @@ READ16_MEMBER( lemmings_state::lem_protection_region_0_146_r )
 	return data;
 }
 
-WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
+void lemmings_state::lem_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;

@@ -31,13 +31,13 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(foreground_videoram_w);
-	DECLARE_WRITE8_MEMBER(background_videoram_w);
-	DECLARE_WRITE8_MEMBER(maincpu_50_w);
-	DECLARE_WRITE8_MEMBER(leds_output_block);
-	DECLARE_WRITE8_MEMBER(leds_start_block);
-	DECLARE_WRITE8_MEMBER(leds_shift_bit);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void foreground_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void maincpu_50_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_output_block(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_start_block(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_shift_bit(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);

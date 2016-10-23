@@ -31,7 +31,7 @@ void fastfred_state::machine_start()
 // These values were derived based on disassembly of the code. Usually, it
 // was pretty obvious what the values should be. Of course, this will have
 // to change if a different ROM set ever surfaces.
-READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
+uint8_t fastfred_state::fastfred_custom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -63,7 +63,7 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
+uint8_t fastfred_state::flyboy_custom1_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -90,7 +90,7 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
+uint8_t fastfred_state::flyboy_custom2_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (space.device().safe_pc())
 	{
@@ -115,14 +115,14 @@ READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 }
 
 
-READ8_MEMBER(fastfred_state::jumpcoas_custom_io_r)
+uint8_t fastfred_state::jumpcoas_custom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x100)  return 0x63;
 
 	return 0x00;
 }
 
-READ8_MEMBER(fastfred_state::boggy84_custom_io_r)
+uint8_t fastfred_state::boggy84_custom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x100)  return 0x6a;
 
@@ -140,17 +140,17 @@ void fastfred_state::machine_start_imago()
 	m_gfxdecode->gfx(1)->set_source(m_imago_sprites);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
+void fastfred_state::imago_dma_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
+void fastfred_state::imago_sprites_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_imago_sprites_bank = (data & 2) >> 1;
 }
 
-WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
+void fastfred_state::imago_sprites_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
 	uint8_t sprites_data;
@@ -167,18 +167,18 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/32);
 }
 
-READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
+uint8_t fastfred_state::imago_sprites_offset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_imago_sprites_address = offset;
 	return 0xff; //not really used
 }
 
-WRITE8_MEMBER(fastfred_state::nmi_mask_w)
+void fastfred_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
 
-WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
+void fastfred_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }

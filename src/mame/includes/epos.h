@@ -22,10 +22,10 @@ public:
 
 	/* misc */
 	int      m_counter;
-	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
-	DECLARE_WRITE8_MEMBER(port_1_w);
-	DECLARE_WRITE8_MEMBER(write_prtc);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	void dealer_decrypt_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_prtc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_dealer();
 	virtual void machine_reset() override;
 	void machine_start_epos();

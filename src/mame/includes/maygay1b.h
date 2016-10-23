@@ -95,41 +95,41 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
 	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	DECLARE_WRITE8_MEMBER(scanlines_w);
-	DECLARE_WRITE8_MEMBER(scanlines_2_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_2_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(reel56_w);
-	DECLARE_WRITE8_MEMBER(m1_latch_w);
-	DECLARE_WRITE8_MEMBER(latch_ch2_w);
-	DECLARE_READ8_MEMBER(latch_st_hi);
-	DECLARE_READ8_MEMBER(latch_st_lo);
-	DECLARE_WRITE8_MEMBER(m1ab_no_oki_w);
-	DECLARE_WRITE8_MEMBER(m1_pia_porta_w);
-	DECLARE_WRITE8_MEMBER(m1_pia_portb_w);
-	DECLARE_WRITE8_MEMBER(m1_lockout_w);
-	DECLARE_WRITE8_MEMBER(m1_meter_w);
-	DECLARE_READ8_MEMBER(m1_meter_r);
-	DECLARE_READ8_MEMBER(m1_firq_clr_r);
-	DECLARE_READ8_MEMBER(m1_firq_trg_r);
-	DECLARE_READ8_MEMBER(m1_firq_nec_r);
-	DECLARE_READ8_MEMBER(nec_reset_r);
-	DECLARE_WRITE8_MEMBER(nec_bank0_w);
-	DECLARE_WRITE8_MEMBER(nec_bank1_w);
+	void scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scanlines_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_data_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel56_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m1_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void latch_ch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t latch_st_hi(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t latch_st_lo(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m1ab_no_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m1_pia_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m1_pia_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m1_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m1_meter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m1_meter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m1_firq_clr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m1_firq_trg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m1_firq_nec_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nec_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nec_bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nec_bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ8_MEMBER(m1_duart_r);
-	DECLARE_WRITE8_MEMBER(mcu_port0_w);
-	DECLARE_WRITE8_MEMBER(mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(mcu_port3_w);
-	DECLARE_READ8_MEMBER(mcu_port0_r);
-	DECLARE_READ8_MEMBER(mcu_port2_r);
+	uint8_t m1_duart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(main_to_mcu_0_w);
-	DECLARE_WRITE8_MEMBER(main_to_mcu_1_w);
+	void main_to_mcu_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_to_mcu_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_main_to_mcu;
 

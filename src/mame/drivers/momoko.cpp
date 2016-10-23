@@ -53,7 +53,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/momoko.h"
 
 
-WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
+void momoko_state::momoko_bg_read_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x1f);
 }

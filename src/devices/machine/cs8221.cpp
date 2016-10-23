@@ -110,13 +110,13 @@ DEVICE_ADDRESS_MAP_START( map, 16, cs8221_device )
 	AM_RANGE(0x0022, 0x0023) AM_DEVREADWRITE8("cs8221", cs8221_device, data_r, data_w, 0xff00)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( cs8221_device::address_w )
+void cs8221_device::address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_address = data;
 	m_address_valid = ((m_address & 0x60)== 0x60) ? true : false;
 }
 
-READ8_MEMBER( cs8221_device::data_r )
+uint8_t cs8221_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -134,7 +134,7 @@ READ8_MEMBER( cs8221_device::data_r )
 	return result;
 }
 
-WRITE8_MEMBER( cs8221_device::data_w )
+void cs8221_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_address_valid)
 	{

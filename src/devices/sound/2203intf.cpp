@@ -171,32 +171,32 @@ void ym2203_device::device_reset()
 }
 
 
-READ8_MEMBER( ym2203_device::read )
+uint8_t ym2203_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ym2203_read(m_chip, offset & 1);
 }
 
-WRITE8_MEMBER( ym2203_device::write )
+void ym2203_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ym2203_write(m_chip, offset & 1, data);
 }
 
-READ8_MEMBER( ym2203_device::status_port_r )
+uint8_t ym2203_device::status_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read(space, 0);
 }
 
-READ8_MEMBER( ym2203_device::read_port_r )
+uint8_t ym2203_device::read_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read(space, 1);
 }
 
-WRITE8_MEMBER( ym2203_device::control_port_w )
+void ym2203_device::control_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write(space, 0, data);
 }
 
-WRITE8_MEMBER( ym2203_device::write_port_w )
+void ym2203_device::write_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write(space, 1, data);
 }

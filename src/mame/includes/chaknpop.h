@@ -45,19 +45,19 @@ public:
 	uint8_t    m_flip_x;
 	uint8_t    m_flip_y;
 
-	DECLARE_WRITE8_MEMBER(coinlock_w);
-	DECLARE_READ8_MEMBER(mcu_port_a_r);
-	DECLARE_READ8_MEMBER(mcu_port_b_r);
-	DECLARE_READ8_MEMBER(mcu_port_c_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_b_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_c_w);
-	DECLARE_READ8_MEMBER(gfxmode_r);
-	DECLARE_WRITE8_MEMBER(gfxmode_w);
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(attrram_w);
-	DECLARE_WRITE8_MEMBER(unknown_port_1_w);
-	DECLARE_WRITE8_MEMBER(unknown_port_2_w);
+	void coinlock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gfxmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gfxmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unknown_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unknown_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
 	virtual void machine_start() override;

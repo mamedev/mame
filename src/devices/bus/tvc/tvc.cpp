@@ -123,7 +123,7 @@ uint8_t tvcexp_slot_device::int_r()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(tvcexp_slot_device::read)
+uint8_t tvcexp_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read(space, offset);
@@ -136,7 +136,7 @@ READ8_MEMBER(tvcexp_slot_device::read)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(tvcexp_slot_device::write)
+void tvcexp_slot_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write(space, offset, data);
@@ -146,7 +146,7 @@ WRITE8_MEMBER(tvcexp_slot_device::write)
     IO read
 -------------------------------------------------*/
 
-READ8_MEMBER(tvcexp_slot_device::io_read)
+uint8_t tvcexp_slot_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->io_read(space, offset);
@@ -159,7 +159,7 @@ READ8_MEMBER(tvcexp_slot_device::io_read)
    IO write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(tvcexp_slot_device::io_write)
+void tvcexp_slot_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->io_write(space, offset, data);

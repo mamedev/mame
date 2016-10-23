@@ -14,7 +14,7 @@
 #include "sound/2203intf.h"
 #include "includes/mosaic.h"
 
-WRITE8_MEMBER(mosaic_state::protection_w)
+void mosaic_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(data, 7))
 	{
@@ -38,7 +38,7 @@ WRITE8_MEMBER(mosaic_state::protection_w)
 	}
 }
 
-READ8_MEMBER(mosaic_state::protection_r)
+uint8_t mosaic_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = (m_prot_val >> 8) & 0xff;
 
@@ -49,7 +49,7 @@ READ8_MEMBER(mosaic_state::protection_r)
 	return res;
 }
 
-WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
+void mosaic_state::gfire2_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%06x: protection_w %02x\n", space.device().safe_pc(), data);
 
@@ -76,7 +76,7 @@ WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
 	}
 }
 
-READ8_MEMBER(mosaic_state::gfire2_protection_r)
+uint8_t mosaic_state::gfire2_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = m_prot_val & 0xff;
 

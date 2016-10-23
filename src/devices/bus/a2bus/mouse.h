@@ -35,24 +35,24 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_READ8_MEMBER(pia_in_a);
-	DECLARE_READ8_MEMBER(pia_in_b);
-	DECLARE_WRITE8_MEMBER(pia_out_a);
-	DECLARE_WRITE8_MEMBER(pia_out_b);
+	uint8_t pia_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
 
-	DECLARE_READ8_MEMBER(mcu_port_a_r);
-	DECLARE_READ8_MEMBER(mcu_port_b_r);
-	DECLARE_READ8_MEMBER(mcu_port_c_r);
-	DECLARE_WRITE8_MEMBER(mcu_port_a_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_b_w);
-	DECLARE_WRITE8_MEMBER(mcu_port_c_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_a_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_b_w);
-	DECLARE_WRITE8_MEMBER(mcu_ddr_c_w);
-	DECLARE_READ8_MEMBER(mcu_timer_r);
-	DECLARE_WRITE8_MEMBER(mcu_timer_w);
+	uint8_t mcu_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mcu_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

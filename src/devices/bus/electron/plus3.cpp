@@ -133,7 +133,7 @@ void electron_plus3_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_plus3_device::wd1770_status_w)
+void electron_plus3_device::wd1770_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

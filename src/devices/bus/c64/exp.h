@@ -118,8 +118,8 @@ public:
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_dma_cd(offset); }
+	void dma_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_w ) { m_write_dma(state); }

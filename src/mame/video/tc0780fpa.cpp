@@ -450,12 +450,12 @@ void tc0780fpa_device::device_stop()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ16_MEMBER(tc0780fpa_device::tex_addr_r)
+uint16_t tc0780fpa_device::tex_addr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tex_address;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::tex_addr_w)
+void tc0780fpa_device::tex_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tex_address = data;
 
@@ -465,7 +465,7 @@ WRITE16_MEMBER(tc0780fpa_device::tex_addr_w)
 	m_tex_offset = 0;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::tex_w)
+void tc0780fpa_device::tex_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int x = ((m_tex_offset >> 0) & 0x1f) | ((m_tex_offset >> 5) & 0x20);
 	int y = ((m_tex_offset >> 5) & 0x1f) | ((m_tex_offset >> 6) & 0x20);
@@ -476,7 +476,7 @@ WRITE16_MEMBER(tc0780fpa_device::tex_w)
 	m_tex_offset++;
 }
 
-WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
+void tc0780fpa_device::poly_fifo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	assert (m_poly_fifo_ptr < POLY_FIFO_SIZE); // never happens
 	m_poly_fifo[m_poly_fifo_ptr++] = data;
@@ -492,7 +492,7 @@ WRITE16_MEMBER(tc0780fpa_device::poly_fifo_w)
 
 }
 
-WRITE16_MEMBER(tc0780fpa_device::render_w)
+void tc0780fpa_device::render_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 

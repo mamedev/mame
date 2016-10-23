@@ -43,10 +43,10 @@ public:
 	std::unique_ptr<uint8_t[]> m_colorram;
 	uint8_t m_output;
 
-	DECLARE_READ8_MEMBER(colorram_r) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
-	DECLARE_WRITE8_MEMBER(colorram_w) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
-	DECLARE_READ8_MEMBER(input_r);
-	DECLARE_WRITE8_MEMBER(output_w);
+	uint8_t colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] | 0x0f; }
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_colorram[(offset >> 2 & 0x1e0) | (offset & 0x1f)] = data & 0xf0; }
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -105,12 +105,12 @@ static ADDRESS_MAP_START( horse_io_map, AS_IO, 8, horse_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(horse_state::input_r)
+uint8_t horse_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_inp_matrix[m_output >> 6 & 3]->read();
 }
 
-WRITE8_MEMBER(horse_state::output_w)
+void horse_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_output = data;
 

@@ -111,18 +111,18 @@ public:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	int m_crtc_select;
-	DECLARE_WRITE16_MEMBER(main_video_write);
-	DECLARE_READ16_MEMBER(control_1_r);
-	DECLARE_READ16_MEMBER(control_2_r);
-	DECLARE_READ16_MEMBER(control_3_r);
-	DECLARE_WRITE16_MEMBER(wiggle_i860p0_pins_w);
-	DECLARE_WRITE16_MEMBER(wiggle_i860p1_pins_w);
-	DECLARE_READ16_MEMBER(main_irqiack_r);
-	DECLARE_READ16_MEMBER(sound_resetmain_r);
-	DECLARE_WRITE64_MEMBER(v0_fb_w);
-	DECLARE_WRITE64_MEMBER(v1_fb_w);
-	DECLARE_WRITE16_MEMBER(crtc_w);
-	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
+	void main_video_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t control_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t control_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t control_3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wiggle_i860p0_pins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wiggle_i860p1_pins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t main_irqiack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sound_resetmain_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void v0_fb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void v1_fb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vcombat_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 	void init_shadfgtr();
 	void init_vcombat();
@@ -190,7 +190,7 @@ uint32_t vcombat_state::screen_update_vcombat_main(screen_device &screen, bitmap
 uint32_t vcombat_state::screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 1); }
 
 
-WRITE16_MEMBER(vcombat_state::main_video_write)
+void vcombat_state::main_video_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int fb = (*m_framebuffer_ctrl & 0x20) ? 0 : 1;
 	uint16_t old_data = m_m68k_framebuffer[fb][offset];
@@ -214,17 +214,17 @@ WRITE16_MEMBER(vcombat_state::main_video_write)
 	}
 }
 
-READ16_MEMBER(vcombat_state::control_1_r)
+uint16_t vcombat_state::control_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("IN0")->read() << 8);
 }
 
-READ16_MEMBER(vcombat_state::control_2_r)
+uint16_t vcombat_state::control_2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("IN1")->read() << 8);
 }
 
-READ16_MEMBER(vcombat_state::control_3_r)
+uint16_t vcombat_state::control_3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("IN2")->read() << 8);
 }
@@ -256,17 +256,17 @@ static void wiggle_i860_common(i860_cpu_device *device, uint16_t data)
 		device->i860_set_pin(DEC_PIN_RESET, 0);
 }
 
-WRITE16_MEMBER(vcombat_state::wiggle_i860p0_pins_w)
+void vcombat_state::wiggle_i860p0_pins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	wiggle_i860_common(m_vid_0, data);
 }
 
-WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
+void vcombat_state::wiggle_i860p1_pins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	wiggle_i860_common(m_vid_1, data);
 }
 
-READ16_MEMBER(vcombat_state::main_irqiack_r)
+uint16_t vcombat_state::main_irqiack_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//fprintf(stderr, "M0: irq iack\n");
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -274,14 +274,14 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 	return 0;
 }
 
-READ16_MEMBER(vcombat_state::sound_resetmain_r)
+uint16_t vcombat_state::sound_resetmain_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
-WRITE64_MEMBER(vcombat_state::v0_fb_w)
+void vcombat_state::v0_fb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
 	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
@@ -304,7 +304,7 @@ WRITE64_MEMBER(vcombat_state::v0_fb_w)
 
 /* This is just temporary so we can see what each i860 is doing to the
    framebuffer.  */
-WRITE64_MEMBER(vcombat_state::v1_fb_w)
+void vcombat_state::v1_fb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	/* The frame buffer seems to sit on a 32-bit data bus, while the
 	   i860 uses a 64-bit data bus.  Adjust accordingly.  */
@@ -325,7 +325,7 @@ WRITE64_MEMBER(vcombat_state::v1_fb_w)
 	}
 }
 
-WRITE16_MEMBER(vcombat_state::crtc_w)
+void vcombat_state::crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mc6845_device *crtc = machine().device<mc6845_device>("crtc");
 
@@ -340,7 +340,7 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 	m_crtc_select ^= 1;
 }
 
-WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
+void vcombat_state::vcombat_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dac->write(data >> 5);
 	if (data & 0x801f)

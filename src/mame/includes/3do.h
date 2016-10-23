@@ -160,16 +160,16 @@ public:
 	uint8_t m_nvmem[0x8000];
 
 //  uint8_t m_video_bits[512];
-	DECLARE_READ8_MEMBER(_3do_nvarea_r);
-	DECLARE_WRITE8_MEMBER(_3do_nvarea_w);
-	DECLARE_READ32_MEMBER(_3do_slow2_r);
-	DECLARE_WRITE32_MEMBER(_3do_slow2_w);
-	DECLARE_READ32_MEMBER(_3do_svf_r);
-	DECLARE_WRITE32_MEMBER(_3do_svf_w);
-	DECLARE_READ32_MEMBER(_3do_madam_r);
-	DECLARE_WRITE32_MEMBER(_3do_madam_w);
-	DECLARE_READ32_MEMBER(_3do_clio_r);
-	DECLARE_WRITE32_MEMBER(_3do_clio_w);
+	uint8_t _3do_nvarea_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void _3do_nvarea_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t _3do_slow2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void _3do_slow2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t _3do_svf_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void _3do_svf_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t _3do_madam_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void _3do_madam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t _3do_clio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void _3do_clio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start__3do();

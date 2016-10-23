@@ -126,39 +126,39 @@ void skykid_state::video_start()
 
 ***************************************************************************/
 
-READ8_MEMBER(skykid_state::skykid_videoram_r)
+uint8_t skykid_state::skykid_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(skykid_state::skykid_videoram_w)
+void skykid_state::skykid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER(skykid_state::skykid_textram_r)
+uint8_t skykid_state::skykid_textram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_textram[offset];
 }
 
-WRITE8_MEMBER(skykid_state::skykid_textram_w)
+void skykid_state::skykid_textram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_textram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_scroll_x_w)
+void skykid_state::skykid_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x = offset;
 }
 
-WRITE8_MEMBER(skykid_state::skykid_scroll_y_w)
+void skykid_state::skykid_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_y = offset;
 }
 
-WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
+void skykid_state::skykid_flipscreen_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_priority = data;
 	flip_screen_set(offset & 1);

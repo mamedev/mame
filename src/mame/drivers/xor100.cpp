@@ -109,7 +109,7 @@ void xor100_state::bankswitch()
 	}
 }
 
-WRITE8_MEMBER( xor100_state::mmu_w )
+void xor100_state::mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -131,7 +131,7 @@ WRITE8_MEMBER( xor100_state::mmu_w )
 	bankswitch();
 }
 
-WRITE8_MEMBER( xor100_state::prom_toggle_w )
+void xor100_state::prom_toggle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_mode)
 	{
@@ -142,7 +142,7 @@ WRITE8_MEMBER( xor100_state::prom_toggle_w )
 	bankswitch();
 }
 
-READ8_MEMBER( xor100_state::prom_disable_r )
+uint8_t xor100_state::prom_disable_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mode = EPROM_F800;
 
@@ -151,23 +151,23 @@ READ8_MEMBER( xor100_state::prom_disable_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::baud_w )
+void xor100_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
 }
 
-READ8_MEMBER( xor100_state::fdc_r )
+uint8_t xor100_state::fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_w )
+void xor100_state::fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
-READ8_MEMBER( xor100_state::fdc_wait_r )
+uint8_t xor100_state::fdc_wait_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -196,7 +196,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 	return !m_fdc_irq << 7;
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dcont_w )
+void xor100_state::fdc_dcont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 	if (floppy) floppy->mon_w(0);
 }
 
-WRITE8_MEMBER( xor100_state::fdc_dsel_w )
+void xor100_state::fdc_dsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -386,7 +386,7 @@ WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER(xor100_state::i8255_pc_r)
+uint8_t xor100_state::i8255_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

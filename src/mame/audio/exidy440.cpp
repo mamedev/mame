@@ -222,7 +222,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::sound_command_r )
+uint8_t exidy440_sound_device::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
 	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
@@ -253,12 +253,12 @@ uint8_t exidy440_sound_device::exidy440_sound_command_ack()
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::sound_volume_r )
+uint8_t exidy440_sound_device::sound_volume_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_volume[offset];
 }
 
-WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
+void exidy440_sound_device::sound_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (SOUND_LOG && m_debuglog)
 		fprintf(m_debuglog, "Volume %02X=%02X\n", offset, data);
@@ -278,7 +278,7 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
  *
  *************************************/
 
-WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
+void exidy440_sound_device::sound_interrupt_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
@@ -320,7 +320,7 @@ void exidy440_sound_device::m6844_finished(m6844_channel_data *channel)
  *
  *************************************/
 
-READ8_MEMBER( exidy440_sound_device::m6844_r )
+uint8_t exidy440_sound_device::m6844_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int result = 0;
@@ -405,7 +405,7 @@ READ8_MEMBER( exidy440_sound_device::m6844_r )
 }
 
 
-WRITE8_MEMBER( exidy440_sound_device::m6844_w )
+void exidy440_sound_device::m6844_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m6844_channel_data *m6844_channel = m_m6844_channel;
 	int i;
@@ -790,7 +790,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 }
 
 
-WRITE8_MEMBER( exidy440_sound_device::sound_banks_w )
+void exidy440_sound_device::sound_banks_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_banks[offset] = data;
 }

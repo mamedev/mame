@@ -52,7 +52,7 @@ public:
 	// inline configuration helpers
 	static void static_set_clock2(device_t &device, int clock2);
 
-	DECLARE_WRITE8_MEMBER( str_w );
+	void str_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void str_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );

@@ -64,7 +64,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
  *************************************/
 
 
-READ8_MEMBER( trs80_state::trs80m4_e0_r )
+uint8_t trs80_state::trs80m4_e0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* Indicates which devices are interrupting - d6..d3 not emulated.
     Whenever an interrupt occurs, this port is immediately read
@@ -84,7 +84,7 @@ READ8_MEMBER( trs80_state::trs80m4_e0_r )
 	return ~(m_mask & m_irq);
 }
 
-READ8_MEMBER( trs80_state::trs80m4_e4_r )
+uint8_t trs80_state::trs80m4_e4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* Indicates which devices are interrupting - d6..d5 not emulated.
     Whenever an NMI occurs, this port is immediately read
@@ -101,7 +101,7 @@ READ8_MEMBER( trs80_state::trs80m4_e4_r )
 	return ~(m_nmi_mask & m_nmi_data);
 }
 
-READ8_MEMBER( trs80_state::trs80m4_e8_r )
+uint8_t trs80_state::trs80m4_e8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* not emulated
     d7 Clear-to-Send (CTS), Pin 5
@@ -114,7 +114,7 @@ READ8_MEMBER( trs80_state::trs80m4_e8_r )
 	return 0;
 }
 
-READ8_MEMBER( trs80_state::trs80m4_ea_r )
+uint8_t trs80_state::trs80m4_ea_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* UART Status Register
     d7 Data Received ('1'=condition true)
@@ -136,7 +136,7 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::trs80m4_eb_r )
+uint8_t trs80_state::trs80m4_eb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* UART received data */
 	uint8_t data = m_ay31015->get_received_data();
@@ -145,14 +145,14 @@ READ8_MEMBER( trs80_state::trs80m4_eb_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::trs80m4_ec_r )
+uint8_t trs80_state::trs80m4_ec_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* Reset the RTC interrupt */
 	m_irq &= ~IRQ_M4_RTC;
 	return 0;
 }
 
-READ8_MEMBER( trs80_state::sys80_f9_r )
+uint8_t trs80_state::sys80_f9_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* UART Status Register - d6..d4 not emulated
     d7 Transmit buffer empty (inverted)
@@ -176,12 +176,12 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::lnw80_fe_r )
+uint8_t trs80_state::lnw80_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_mode & 0x78) >> 3) | 0xf0;
 }
 
-READ8_MEMBER( trs80_state::trs80_ff_r )
+uint8_t trs80_state::trs80_ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* ModeSel and cassette data
     d7 cassette data from tape
@@ -191,7 +191,7 @@ READ8_MEMBER( trs80_state::trs80_ff_r )
 	return data | m_cassette_data;
 }
 
-READ8_MEMBER( trs80_state::trs80m4_ff_r )
+uint8_t trs80_state::trs80m4_ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* Return of cassette data stream from tape
     d7 Low-speed data
@@ -204,7 +204,7 @@ READ8_MEMBER( trs80_state::trs80m4_ff_r )
 }
 
 
-WRITE8_MEMBER( trs80_state::trs80m4_84_w )
+void trs80_state::trs80m4_84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Hi-res graphics control - d6..d4 not emulated
     d7 Page Control
@@ -341,12 +341,12 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 	}
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_90_w )
+void trs80_state::trs80m4_90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(~data & 1);
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )     /* model 4P only - swaps the ROM with read-only RAM */
+void trs80_state::trs80m4p_9c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)     /* model 4P only - swaps the ROM with read-only RAM */
 {
 	/* Meaning of model4 variable:
 	    d5..d4 memory mode (as described in section above)
@@ -372,7 +372,7 @@ WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )     /* model 4P only - swaps the ROM
 	}
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_e0_w )
+void trs80_state::trs80m4_e0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Interrupt settings - which devices are allowed to interrupt - bits align with read of E0
     d6 Enable Rec Err
@@ -386,7 +386,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_e0_w )
 	m_mask = data;
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_e4_w )
+void trs80_state::trs80m4_e4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Disk to NMI interface
     d7 1=enable disk INTRQ to generate NMI
@@ -395,14 +395,14 @@ WRITE8_MEMBER( trs80_state::trs80m4_e4_w )
 	m_nmi_mask = data;
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_e8_w )
+void trs80_state::trs80m4_e8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* d1 when '1' enables control register load (see below) */
 
 	m_reg_load = data & 2;
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_e9_w )
+void trs80_state::trs80m4_e9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* UART set baud rate. Rx = bits 0..3, Tx = bits 4..7
     00h    50
@@ -429,7 +429,7 @@ Note: this may be a COM5016 dual baud rate generator, or may be an equivalent ci
 	m_ay31015->set_transmitter_clock(baud_clock[data >> 4]);
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
+void trs80_state::trs80m4_ea_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_reg_load)
 
@@ -468,12 +468,12 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
 	}
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_eb_w )
+void trs80_state::trs80m4_eb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay31015->set_transmit_data(data);
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_ec_w )
+void trs80_state::trs80m4_ec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Hardware settings - d5..d4 not emulated
     d6 CPU fast (1=4MHz, 0=2MHz)
@@ -503,7 +503,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_ec_w )
     d2 1=select drive 2
     d1 1=select drive 1
     d0 1=select drive 0 */
-WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
+void trs80_state::trs80m4_f4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -523,7 +523,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_f4_w )
 	m_fdc->dden_w(!BIT(data, 7));
 }
 
-WRITE8_MEMBER( trs80_state::sys80_f8_w )
+void trs80_state::sys80_f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* not emulated
     d2 reset UART (XR pin)
@@ -531,7 +531,7 @@ WRITE8_MEMBER( trs80_state::sys80_f8_w )
     d0 RTS */
 }
 
-WRITE8_MEMBER( trs80_state::sys80_fe_w )
+void trs80_state::sys80_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* not emulated
     d4 select internal or external cassette player */
@@ -540,7 +540,7 @@ WRITE8_MEMBER( trs80_state::sys80_fe_w )
 }
 
 /* lnw80 can switch out all the devices, roms and video ram to be replaced by graphics ram. */
-WRITE8_MEMBER( trs80_state::lnw80_fe_w )
+void trs80_state::lnw80_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* lnw80 video options
     d3 bankswitch lower 16k between roms and hires ram (1=hires)
@@ -575,7 +575,7 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 	}
 }
 
-WRITE8_MEMBER( trs80_state::trs80_ff_w )
+void trs80_state::trs80_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Standard output port of Model I
     d3 ModeSel bit
@@ -603,7 +603,7 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 		m_speaker->level_w(data & 3);
 }
 
-WRITE8_MEMBER( trs80_state::trs80m4_ff_w )
+void trs80_state::trs80m4_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Cassette port
     d1, d0 Cassette output */
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
  *                                   *
  *************************************/
 
-READ8_MEMBER( trs80_state::trs80_wd179x_r )
+uint8_t trs80_state::trs80_wd179x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
@@ -694,19 +694,19 @@ READ8_MEMBER( trs80_state::trs80_wd179x_r )
 	return data;
 }
 
-READ8_MEMBER( trs80_state::trs80_printer_r )
+uint8_t trs80_state::trs80_printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cent_status_in->read();
 }
 
-WRITE8_MEMBER( trs80_state::trs80_printer_w )
+void trs80_state::trs80_printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cent_data_out->write(space, 0, data);
 	m_centronics->write_strobe(0);
 	m_centronics->write_strobe(1);
 }
 
-WRITE8_MEMBER( trs80_state::trs80_cassunit_w )
+void trs80_state::trs80_cassunit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* not emulated
     01 for unit 1 (default)
@@ -715,7 +715,7 @@ WRITE8_MEMBER( trs80_state::trs80_cassunit_w )
 	m_tape_unit = data;
 }
 
-READ8_MEMBER( trs80_state::trs80_irq_status_r )
+uint8_t trs80_state::trs80_irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* (trs80l2) Whenever an interrupt occurs, 37E0 is read to see what devices require service.
     d7 = RTC
@@ -731,7 +731,7 @@ READ8_MEMBER( trs80_state::trs80_irq_status_r )
 }
 
 
-WRITE8_MEMBER( trs80_state::trs80_motor_w )
+void trs80_state::trs80_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -755,7 +755,7 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
 /*************************************
  *      Keyboard         *
  *************************************/
-READ8_MEMBER( trs80_state::trs80_keyboard_r )
+uint8_t trs80_state::trs80_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 

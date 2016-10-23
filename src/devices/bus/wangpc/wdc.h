@@ -37,16 +37,16 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( status_w );
-	DECLARE_READ8_MEMBER( ctc_ch0_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch0_w );
-	DECLARE_READ8_MEMBER( ctc_ch1_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch1_w );
-	DECLARE_READ8_MEMBER( ctc_ch2_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch2_w );
-	DECLARE_READ8_MEMBER( ctc_ch3_r );
-	DECLARE_WRITE8_MEMBER( ctc_ch3_w );
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctc_ch0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_ch0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctc_ch1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_ch1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctc_ch2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_ch2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctc_ch3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_ch3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

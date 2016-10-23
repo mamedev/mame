@@ -31,14 +31,14 @@ public:
 	static void set_slave_tag(device_t &device, const char *tag)  { downcast<tc0140syt_device &>(device).m_slavecpu.set_tag(tag); }
 
 	// MASTER (4-bit bus) control functions
-	DECLARE_WRITE8_MEMBER( master_port_w );
-	DECLARE_WRITE8_MEMBER( master_comm_w );
-	DECLARE_READ8_MEMBER( master_comm_r );
+	void master_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void master_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t master_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// SLAVE (4-bit bus) control functions ONLY
-	DECLARE_WRITE8_MEMBER( slave_port_w );
-	DECLARE_READ8_MEMBER( slave_comm_r );
-	DECLARE_WRITE8_MEMBER( slave_comm_w );
+	void slave_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slave_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void slave_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

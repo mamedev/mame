@@ -240,17 +240,17 @@ void bbusters_state::machine_start()
 	save_item(NAME(m_gun_select));
 }
 
-READ16_MEMBER(bbusters_state::sound_status_r)
+uint16_t bbusters_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sound_status;
 }
 
-WRITE8_MEMBER(bbusters_state::sound_status_w)
+void bbusters_state::sound_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_status = data;
 }
 
-WRITE16_MEMBER(bbusters_state::sound_cpu_w)
+void bbusters_state::sound_cpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -260,12 +260,12 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
-READ16_MEMBER(bbusters_state::eprom_r)
+uint16_t bbusters_state::eprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_eprom_data[offset]&0xff) | 0xff00;
 }
 
-READ16_MEMBER(bbusters_state::control_3_r)
+uint16_t bbusters_state::control_3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
@@ -276,7 +276,7 @@ READ16_MEMBER(bbusters_state::control_3_r)
 	return retdata;
 }
 
-WRITE16_MEMBER(bbusters_state::gun_select_w)
+void bbusters_state::gun_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%08x: gun r\n",space.device().safe_pc());
 
@@ -285,26 +285,26 @@ WRITE16_MEMBER(bbusters_state::gun_select_w)
 	m_gun_select = data & 0xff;
 }
 
-WRITE16_MEMBER(bbusters_state::two_gun_output_w)
+void bbusters_state::two_gun_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_value("Player1_Gun_Recoil",(data & 0x01));
 	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 }
 
-WRITE16_MEMBER(bbusters_state::three_gun_output_w)
+void bbusters_state::three_gun_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_value("Player1_Gun_Recoil",(data & 0x01));
 	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 	output().set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
 }
 
-READ16_MEMBER(bbusters_state::kludge_r)
+uint16_t bbusters_state::kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// might latch the gun value?
 	return 0x0000;
 }
 
-READ16_MEMBER(bbusters_state::mechatt_gun_r)
+uint16_t bbusters_state::mechatt_gun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int x, y;
 

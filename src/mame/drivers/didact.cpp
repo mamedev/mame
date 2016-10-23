@@ -159,10 +159,10 @@ class md6802_state : public didact_state
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_tb16_74145;
 	uint8_t m_segments;
-	DECLARE_READ8_MEMBER( pia2_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
-	DECLARE_READ8_MEMBER( pia2_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
+	uint8_t pia2_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w);
 
 	virtual void machine_reset() override;
@@ -173,7 +173,7 @@ protected:
 };
 
 /* Keyboard */
-READ8_MEMBER( md6802_state::pia2_kbA_r )
+uint8_t md6802_state::pia2_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ls145;
 	uint8_t pa = 0xff;
@@ -206,7 +206,7 @@ READ8_MEMBER( md6802_state::pia2_kbA_r )
 }
 
 /* Pull the cathodes low enabling the correct digit and lit the segments held by port B */
-WRITE8_MEMBER( md6802_state::pia2_kbA_w )
+void md6802_state::pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t digit_nbr;
 
@@ -221,7 +221,7 @@ WRITE8_MEMBER( md6802_state::pia2_kbA_w )
 }
 
 /* PIA 2 Port B is all outputs to drive the display so it is very unlikelly that this function is called */
-READ8_MEMBER( md6802_state::pia2_kbB_r )
+uint8_t md6802_state::pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG( ("Warning, trying to read from Port B designated to drive the display, please check why\n") );
 	logerror("Warning, trying to read from Port B designated to drive the display, please check why\n");
@@ -229,7 +229,7 @@ READ8_MEMBER( md6802_state::pia2_kbB_r )
 }
 
 /* Port B is fully used ouputting the segment pattern to the display */
-WRITE8_MEMBER( md6802_state::pia2_kbB_w )
+void md6802_state::pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  LOG(("--->%s(%02x)\n", FUNCNAME, data));
 
@@ -332,10 +332,10 @@ class mp68a_state : public didact_state
 	required_device<dm9368_device> m_digit4;
 	required_device<dm9368_device> m_digit5;
 
-	DECLARE_READ8_MEMBER( pia2_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbA_w );
-	DECLARE_READ8_MEMBER( pia2_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia2_kbB_w );
+	uint8_t pia2_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
 
 	virtual void machine_reset() override;
@@ -345,14 +345,14 @@ protected:
 	required_device<pia6820_device> m_pia2;
 };
 
-READ8_MEMBER( mp68a_state::pia2_kbA_r )
+uint8_t mp68a_state::pia2_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("--->%s\n", FUNCNAME));
 
 	return 0;
 }
 
-WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
+void mp68a_state::pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t digit_nbr;
 
@@ -375,7 +375,7 @@ WRITE8_MEMBER( mp68a_state::pia2_kbA_w )
 	}
 }
 
-READ8_MEMBER( mp68a_state::pia2_kbB_r )
+uint8_t mp68a_state::pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t a012, line, pb;
 
@@ -409,7 +409,7 @@ READ8_MEMBER( mp68a_state::pia2_kbB_r )
 	return pb;
 }
 
-WRITE8_MEMBER( mp68a_state::pia2_kbB_w )
+void mp68a_state::pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("--->%s(%02x)\n", FUNCNAME, data));
 }
@@ -529,12 +529,12 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override { m_maincpu->reset(); LOG(("--->%s()\n", FUNCNAME)); };
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_READ8_MEMBER( pia1_kbA_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbA_w );
-	DECLARE_READ8_MEMBER( pia1_kbB_r );
-	DECLARE_WRITE8_MEMBER( pia1_kbB_w );
+	uint8_t pia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia1_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia1_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
 	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
@@ -607,7 +607,7 @@ uint32_t e100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 /* PIA write - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-WRITE8_MEMBER( e100_state::pia_w )
+void e100_state::pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 	if ((offset & 0x08) == 0x08)
@@ -631,7 +631,7 @@ WRITE8_MEMBER( e100_state::pia_w )
 }
 
 /* PIA read  - the Esselte 100 allows the PIA:s to be accessed simultaneously */
-READ8_MEMBER( e100_state::pia_r )
+uint8_t e100_state::pia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -660,12 +660,12 @@ READ8_MEMBER( e100_state::pia_r )
 	return data;
 }
 
-WRITE8_MEMBER( e100_state::pia1_kbA_w )
+void e100_state::pia1_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 }
 
-READ8_MEMBER( e100_state::pia1_kbA_r )
+uint8_t e100_state::pia1_kbA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ls145;
 	uint8_t pa = 0x00;
@@ -723,7 +723,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
 #define SERIAL_IN  0x20
 #define CASS_OUT   0x40
 #define CASS_IN    0x80
-WRITE8_MEMBER( e100_state::pia1_kbB_w )
+void e100_state::pia1_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t col;
 
@@ -740,7 +740,7 @@ WRITE8_MEMBER( e100_state::pia1_kbB_w )
 	m_rs232->write_txd(data & SERIAL_OUT ? 0 : 1);
 }
 
-READ8_MEMBER( e100_state::pia1_kbB_r )
+uint8_t e100_state::pia1_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_pia1_B &= ~(CASS_IN|SERIAL_IN);
 

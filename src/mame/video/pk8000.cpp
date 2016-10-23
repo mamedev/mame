@@ -3,62 +3,62 @@
 #include "emu.h"
 #include "includes/pk8000.h"
 
-READ8_MEMBER(pk8000_base_state::pk8000_video_color_r)
+uint8_t pk8000_base_state::pk8000_video_color_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_video_color;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_video_color_w)
+void pk8000_base_state::pk8000_video_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_video_color = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_text_start_r)
+uint8_t pk8000_base_state::pk8000_text_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_text_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_text_start_w)
+void pk8000_base_state::pk8000_text_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_text_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_chargen_start_r)
+uint8_t pk8000_base_state::pk8000_chargen_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_chargen_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_chargen_start_w)
+void pk8000_base_state::pk8000_chargen_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_chargen_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_video_start_r)
+uint8_t pk8000_base_state::pk8000_video_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_video_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_video_start_w)
+void pk8000_base_state::pk8000_video_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_video_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_color_start_r)
+uint8_t pk8000_base_state::pk8000_color_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_color_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_color_start_w)
+void pk8000_base_state::pk8000_color_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_color_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_color_r)
+uint8_t pk8000_base_state::pk8000_color_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_color[offset];
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_color_w)
+void pk8000_base_state::pk8000_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_color[offset] = data;
 }
@@ -87,17 +87,17 @@ PALETTE_INIT_MEMBER(pk8000_base_state, pk8000)
 	palette.set_pen_colors(0, pk8000_palette, ARRAY_LENGTH(pk8000_palette));
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_84_porta_r)
+uint8_t pk8000_base_state::pk8000_84_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pk8000_video_mode;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_84_porta_w)
+void pk8000_base_state::pk8000_84_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_video_mode = data;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_84_portc_w)
+void pk8000_base_state::pk8000_84_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pk8000_video_enable = BIT(data,4);
 }

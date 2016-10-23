@@ -108,8 +108,8 @@ public:
 	screen_device *m_screen;              /* the screen we are acting on */
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ32_MEMBER( zeus2_r );
-	DECLARE_WRITE32_MEMBER( zeus2_w );
+	uint32_t zeus2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void zeus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(display_irq);
 

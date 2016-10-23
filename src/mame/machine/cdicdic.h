@@ -57,10 +57,10 @@ public:
 	void sample_trigger();
 	void process_delayed_command();
 
-	DECLARE_READ16_MEMBER( regs_r );
-	DECLARE_WRITE16_MEMBER( regs_w );
-	DECLARE_READ16_MEMBER( ram_r );
-	DECLARE_WRITE16_MEMBER( ram_w );
+	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 protected:

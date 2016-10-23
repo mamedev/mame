@@ -36,7 +36,7 @@ ide_controller_device::ide_controller_device(const machine_config &mconfig, devi
 {
 }
 
-READ16_MEMBER( ide_controller_device::read_cs0 )
+uint16_t ide_controller_device::read_cs0(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff && offset == 1 ){ offset = 0; popmessage( "requires ide_controller_32_device" ); }
 	if (mem_mask == 0xff00)
@@ -49,7 +49,7 @@ READ16_MEMBER( ide_controller_device::read_cs0 )
 	}
 }
 
-READ16_MEMBER( ide_controller_device::read_cs1 )
+uint16_t ide_controller_device::read_cs1(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (mem_mask == 0xff00)
 	{
@@ -61,7 +61,7 @@ READ16_MEMBER( ide_controller_device::read_cs1 )
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs0 )
+void ide_controller_device::write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff && offset == 1 ){ offset = 0; popmessage( "requires ide_controller_32_device" ); }
 	if (mem_mask == 0xff00)
@@ -74,7 +74,7 @@ WRITE16_MEMBER( ide_controller_device::write_cs0 )
 	}
 }
 
-WRITE16_MEMBER( ide_controller_device::write_cs1 )
+void ide_controller_device::write_cs1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xff00)
 	{
@@ -99,7 +99,7 @@ ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig
 {
 }
 
-READ32_MEMBER(ide_controller_32_device::read_cs0)
+uint32_t ide_controller_32_device::read_cs0(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 
@@ -118,7 +118,7 @@ READ32_MEMBER(ide_controller_32_device::read_cs0)
 	return data;
 }
 
-READ32_MEMBER(ide_controller_32_device::read_cs1)
+uint32_t ide_controller_32_device::read_cs1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 
@@ -134,7 +134,7 @@ READ32_MEMBER(ide_controller_32_device::read_cs1)
 	return data;
 }
 
-WRITE32_MEMBER(ide_controller_32_device::write_cs0)
+void ide_controller_32_device::write_cs0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -149,7 +149,7 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs0)
 	}
 }
 
-WRITE32_MEMBER(ide_controller_32_device::write_cs1)
+void ide_controller_32_device::write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -239,7 +239,7 @@ void bus_master_ide_controller_device::set_dmarq(int state)
  *
  *************************************/
 
-READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
+uint32_t bus_master_ide_controller_device::bmdma_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	LOG(("%s:ide_bus_master32_r(%d, %08x)\n", machine().describe_context(), offset, mem_mask));
 
@@ -265,7 +265,7 @@ READ32_MEMBER( bus_master_ide_controller_device::bmdma_r )
  *
  *************************************/
 
-WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
+void bus_master_ide_controller_device::bmdma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG(("%s:ide_bus_master32_w(%d, %08x, %08X)\n", machine().describe_context(), offset, mem_mask, data));
 

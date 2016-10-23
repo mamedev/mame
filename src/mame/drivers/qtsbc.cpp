@@ -29,23 +29,23 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER( qtsbc_06_r );
-	DECLARE_READ8_MEMBER( qtsbc_43_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t qtsbc_06_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t qtsbc_43_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_ram;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 
-READ8_MEMBER( qtsbc_state::qtsbc_06_r )
+uint8_t qtsbc_state::qtsbc_06_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( qtsbc_state::qtsbc_43_r )
+uint8_t qtsbc_state::qtsbc_43_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -73,7 +73,7 @@ void qtsbc_state::machine_reset()
 	memcpy(m_p_ram, bios, 0x800);
 }
 
-WRITE8_MEMBER( qtsbc_state::kbd_put )
+void qtsbc_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

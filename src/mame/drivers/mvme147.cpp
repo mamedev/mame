@@ -187,21 +187,21 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
-	DECLARE_READ32_MEMBER (bootvect_r);
-	DECLARE_WRITE32_MEMBER (bootvect_w);
+	uint32_t bootvect_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void bootvect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	/* PCC - Peripheral Channel Controller */
-	//DECLARE_READ32_MEMBER (pcc32_r);
-	//DECLARE_WRITE32_MEMBER (pcc32_w);
-	DECLARE_READ16_MEMBER (pcc16_r);
-	DECLARE_WRITE16_MEMBER (pcc16_w);
-	DECLARE_READ8_MEMBER (pcc8_r);
-	DECLARE_WRITE8_MEMBER (pcc8_w);
-	DECLARE_READ8_MEMBER (vmechip_r);
-	DECLARE_WRITE8_MEMBER (vmechip_w);
-	//DECLARE_READ16_MEMBER (vme_a24_r);
-	//DECLARE_WRITE16_MEMBER (vme_a24_w);
-	//DECLARE_READ16_MEMBER (vme_a16_r);
-	//DECLARE_WRITE16_MEMBER (vme_a16_w);
+	//uint32_t pcc32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	//void pcc32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t pcc16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pcc16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t pcc8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pcc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vmechip_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vmechip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	//uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	//uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	//void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
 protected:
@@ -271,11 +271,11 @@ void mvme147_state::machine_reset ()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
-READ32_MEMBER (mvme147_state::bootvect_r){
+uint32_t mvme147_state::bootvect_r(address_space &space, offs_t offset, uint32_t mem_mask){
 	return m_sysrom[offset];
 }
 
-WRITE32_MEMBER (mvme147_state::bootvect_w){
+void mvme147_state::bootvect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
@@ -285,7 +285,7 @@ WRITE32_MEMBER (mvme147_state::bootvect_w){
  * PCC - Periheral Channel Controller driver, might deserve its own driver but will rest here until another board wants it
  */
 #if 0 /* Doesn't compile atm */
-READ32_MEMBER (mvme147_state::pcc32_r){
+uint32_t mvme147_state::pcc32_r(address_space &space, offs_t offset, uint32_t mem_mask){
 	LOG(("--->%s[%04x]", FUNCNAME, offset));
 	switch(offset)
 	{
@@ -295,7 +295,7 @@ READ32_MEMBER (mvme147_state::pcc32_r){
 	return 0x00;
 }
 
-WRITE32_MEMBER (mvme147_state::pcc32_w){
+void mvme147_state::pcc32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){
 	LOG(("--->%s[%04x]= %08lx", FUNCNAME, offset, data));
 	switch(offset)
 	{
@@ -311,7 +311,7 @@ WRITE32_MEMBER (mvme147_state::pcc32_w){
 #define P16_TIMER2_PRELOAD (P16BASE + 4)
 #define P16_TIMER2_COUNT   (P16BASE + 6)
 
-READ16_MEMBER (mvme147_state::pcc16_r){
+uint16_t mvme147_state::pcc16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	uint16_t ret = 0;
 
 	LOG(("Call to %s[%04x]", FUNCNAME, offset));
@@ -327,7 +327,7 @@ READ16_MEMBER (mvme147_state::pcc16_r){
 	return ret;
 }
 
-WRITE16_MEMBER (mvme147_state::pcc16_w){
+void mvme147_state::pcc16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG(("Call to %s[%04x] <- %04x - ", FUNCNAME, offset, data));
 	switch(offset)
 	{
@@ -368,7 +368,7 @@ WRITE16_MEMBER (mvme147_state::pcc16_w){
 #define P8_PRINTER_DATA     0xfffe2800
 #define P8_PRINTER_STATUS   0xfffe2800
 
-READ8_MEMBER (mvme147_state::pcc8_r){
+uint8_t mvme147_state::pcc8_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t ret = 0;
 
 	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
@@ -415,7 +415,7 @@ READ8_MEMBER (mvme147_state::pcc8_r){
 	return ret;
 }
 
-WRITE8_MEMBER (mvme147_state::pcc8_w){
+void mvme147_state::pcc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("Call to %s[%04x] <- %02x    - ", FUNCNAME, offset, data));
 	switch(offset + P8BASE)
 	{
@@ -491,7 +491,7 @@ WRITE8_MEMBER (mvme147_state::pcc8_w){
 #define VC_GCSR_BASE_ADR    0xfffe201B
 
 
-READ8_MEMBER (mvme147_state::vmechip_r){
+uint8_t mvme147_state::vmechip_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t ret = 0;
 
 	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
@@ -578,7 +578,7 @@ READ8_MEMBER (mvme147_state::vmechip_r){
 	return ret;
 }
 
-WRITE8_MEMBER (mvme147_state::vmechip_w){
+void mvme147_state::vmechip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	LOG(("Call to %s[%04x] <- %02x - ", FUNCNAME, offset, data));
 	switch(offset * 2 + VCBASE)
 	{
@@ -607,21 +607,21 @@ WRITE8_MEMBER (mvme147_state::vmechip_w){
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (mvme147_state::vme_a24_r){
+uint16_t mvme147_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG (logerror ("vme_a24_r\n"));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (mvme147_state::vme_a24_w){
+void mvme147_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (logerror ("vme_a24_w\n"));
 }
 
-READ16_MEMBER (mvme147_state::vme_a16_r){
+uint16_t mvme147_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG (logerror ("vme_16_r\n"));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (mvme147_state::vme_a16_w){
+void mvme147_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (logerror ("vme_a16_w\n"));
 }
 #endif

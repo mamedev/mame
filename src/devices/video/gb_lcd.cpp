@@ -2881,7 +2881,7 @@ void dmg_ppu_device::lcd_switch_on(uint8_t new_data)
 }
 
 
-READ8_MEMBER(dmg_ppu_device::vram_r)
+uint8_t dmg_ppu_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -2893,7 +2893,7 @@ READ8_MEMBER(dmg_ppu_device::vram_r)
 }
 
 
-WRITE8_MEMBER(dmg_ppu_device::vram_w)
+void dmg_ppu_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_state();
 	if (m_vram_locked == LOCKED)
@@ -2903,7 +2903,7 @@ WRITE8_MEMBER(dmg_ppu_device::vram_w)
 }
 
 
-READ8_MEMBER(dmg_ppu_device::oam_r)
+uint8_t dmg_ppu_device::oam_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -2915,7 +2915,7 @@ READ8_MEMBER(dmg_ppu_device::oam_r)
 }
 
 
-WRITE8_MEMBER(dmg_ppu_device::oam_w)
+void dmg_ppu_device::oam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_state();
 	if (m_oam_locked == LOCKED || offset >= 0xa0 || m_oam_dma_processing)
@@ -2926,7 +2926,7 @@ WRITE8_MEMBER(dmg_ppu_device::oam_w)
 
 
 
-READ8_MEMBER(dmg_ppu_device::video_r)
+uint8_t dmg_ppu_device::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -3063,7 +3063,7 @@ void dmg_ppu_device::check_stat_irq()
 }
 
 
-WRITE8_MEMBER(dmg_ppu_device::video_w)
+void dmg_ppu_device::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_state();
 	LOG(("video_w: offset = %02x, data = %02x\n", offset, data));
@@ -3198,7 +3198,7 @@ WRITE8_MEMBER(dmg_ppu_device::video_w)
 	m_vid_regs[offset] = data;
 }
 
-READ8_MEMBER(cgb_ppu_device::video_r)
+uint8_t cgb_ppu_device::video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -3286,7 +3286,7 @@ bool cgb_ppu_device::stat_write(uint8_t new_data)
 }
 
 
-WRITE8_MEMBER(cgb_ppu_device::video_w)
+void cgb_ppu_device::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	update_state();
 	LOG(("video_w\n"));

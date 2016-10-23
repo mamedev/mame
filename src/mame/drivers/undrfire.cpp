@@ -225,7 +225,7 @@ CUSTOM_INPUT_MEMBER(undrfire_state::frame_counter_r)
 	return m_frame_counter;
 }
 
-READ32_MEMBER(undrfire_state::undrfire_input_r)
+uint32_t undrfire_state::undrfire_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -243,7 +243,7 @@ READ32_MEMBER(undrfire_state::undrfire_input_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(undrfire_state::undrfire_input_w)
+void undrfire_state::undrfire_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -280,13 +280,13 @@ WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 }
 
 
-READ16_MEMBER(undrfire_state::shared_ram_r)
+uint16_t undrfire_state::shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ((offset&1)==0) return (m_shared_ram[offset/2]&0xffff0000)>>16;
 	return (m_shared_ram[offset/2]&0x0000ffff);
 }
 
-WRITE16_MEMBER(undrfire_state::shared_ram_w)
+void undrfire_state::shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
@@ -305,7 +305,7 @@ WRITE16_MEMBER(undrfire_state::shared_ram_w)
 
 /* Some unknown hardware byte mapped at $600002-5 */
 
-READ32_MEMBER(undrfire_state::unknown_hardware_r)
+uint32_t undrfire_state::unknown_hardware_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset) /* four single bytes are read in sequence at $156e */
 	{
@@ -324,14 +324,14 @@ READ32_MEMBER(undrfire_state::unknown_hardware_r)
 }
 
 
-WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
+void undrfire_state::unknown_int_req_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* 10000 cycle delay is arbitrary */
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_INTERRUPT5);
 }
 
 
-READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
+uint32_t undrfire_state::undrfire_lightgun_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int x,y;
 
@@ -367,7 +367,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",space.
 }
 
 
-WRITE32_MEMBER(undrfire_state::rotate_control_w)/* only a guess that it's rotation */
+void undrfire_state::rotate_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)/* only a guess that it's rotation */
 {
 	if (ACCESSING_BITS_0_15)
 	{
@@ -382,7 +382,7 @@ WRITE32_MEMBER(undrfire_state::rotate_control_w)/* only a guess that it's rotati
 }
 
 
-WRITE32_MEMBER(undrfire_state::motor_control_w)
+void undrfire_state::motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
     Standard value poked is 0x00910200 (we ignore lsb and msb
@@ -406,7 +406,7 @@ WRITE32_MEMBER(undrfire_state::motor_control_w)
 	}
 }
 
-WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
+void undrfire_state::cbombers_cpua_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 /*
     ........ ..xxxxxx   Lamp 1-6 enables
@@ -423,12 +423,12 @@ WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ32_MEMBER(undrfire_state::cbombers_adc_r)
+uint32_t undrfire_state::cbombers_adc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (ioport("STEER")->read() << 24);
 }
 
-WRITE8_MEMBER(undrfire_state::cbombers_adc_w)
+void undrfire_state::cbombers_adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
 	    1000 cycle delay is arbitrary */

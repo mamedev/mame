@@ -22,11 +22,11 @@ public:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom20) override;
-	virtual DECLARE_READ8_MEMBER(read_rom30) override;
-	virtual DECLARE_READ8_MEMBER(read_rom40) override;
-	virtual DECLARE_READ8_MEMBER(read_io) override;
-	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+	virtual uint8_t read_rom20(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_rom30(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_rom40(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	uint8_t m_io_regs[0x10];
@@ -61,9 +61,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	uint32_t m_nvram_base;
@@ -83,8 +83,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_io) override;
-	virtual DECLARE_WRITE8_MEMBER(write_io) override;
+	virtual uint8_t read_io(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	uint8_t   m_eeprom_mode;       /* eeprom mode */

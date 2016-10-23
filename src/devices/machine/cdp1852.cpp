@@ -159,7 +159,7 @@ void cdp1852_device::set_sr_line(int state)
 //  read - data read
 //-------------------------------------------------
 
-READ8_MEMBER( cdp1852_device::read )
+uint8_t cdp1852_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_read_mode() && !clock())
 	{
@@ -177,7 +177,7 @@ READ8_MEMBER( cdp1852_device::read )
 //  write - data write
 //-------------------------------------------------
 
-WRITE8_MEMBER( cdp1852_device::write )
+void cdp1852_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_read_mode())
 	{

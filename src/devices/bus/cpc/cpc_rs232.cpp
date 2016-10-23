@@ -143,22 +143,22 @@ WRITE_LINE_MEMBER(cpc_rs232_device::pit_out2_w)
 	m_dart->rxcb_w(state);
 }
 
-READ8_MEMBER(cpc_rs232_device::dart_r)
+uint8_t cpc_rs232_device::dart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dart->ba_cd_r(space,offset);
 }
 
-WRITE8_MEMBER(cpc_rs232_device::dart_w)
+void cpc_rs232_device::dart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dart->ba_cd_w(space,offset,data);
 }
 
-READ8_MEMBER(cpc_rs232_device::pit_r)
+uint8_t cpc_rs232_device::pit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pit->read(space,offset);
 }
 
-WRITE8_MEMBER(cpc_rs232_device::pit_w)
+void cpc_rs232_device::pit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit->write(space,offset,data);
 }

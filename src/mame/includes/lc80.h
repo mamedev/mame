@@ -51,10 +51,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE8_MEMBER( pio1_pa_w );
-	DECLARE_READ8_MEMBER( pio1_pb_r );
-	DECLARE_WRITE8_MEMBER( pio1_pb_w );
-	DECLARE_READ8_MEMBER( pio2_pb_r );
+	void pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 

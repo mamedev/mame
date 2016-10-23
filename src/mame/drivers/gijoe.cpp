@@ -116,12 +116,12 @@ Known Issues
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
 
 
-READ16_MEMBER(gijoe_state::control2_r)
+uint16_t gijoe_state::control2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(gijoe_state::control2_w)
+void gijoe_state::control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -189,7 +189,7 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gijoe_state::sound_cmd_w)
+void gijoe_state::sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -198,12 +198,12 @@ WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 	}
 }
 
-WRITE16_MEMBER(gijoe_state::sound_irq_w)
+void gijoe_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(gijoe_state::sound_status_r)
+uint16_t gijoe_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundlatch2->read(space, 0);
 }

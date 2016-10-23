@@ -40,8 +40,8 @@ public:
 		m_x2(*this, "X2"),
 		m_x3(*this, "X3") { }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(hex_display_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hex_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t convert_key(uint8_t data);
 
 protected:
@@ -53,7 +53,7 @@ protected:
 };
 
 
-WRITE8_MEMBER(elekscmp_state::hex_display_w)
+void elekscmp_state::hex_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(offset, data);
 }
@@ -68,7 +68,7 @@ uint8_t elekscmp_state::convert_key(uint8_t data)
 	return 0xff;
 }
 
-READ8_MEMBER(elekscmp_state::keyboard_r)
+uint8_t elekscmp_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 

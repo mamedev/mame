@@ -36,7 +36,7 @@ INTERRUPT_GEN_MEMBER(asteroid_state::llander_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(asteroid_state::asteroid_IN0_r)
+uint8_t asteroid_state::asteroid_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("IN0")->read();
 	int bitmask = (1 << offset);
@@ -50,7 +50,7 @@ READ8_MEMBER(asteroid_state::asteroid_IN0_r)
 }
 
 
-READ8_MEMBER(asteroid_state::asterock_IN0_r)
+uint8_t asteroid_state::asterock_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("IN0")->read();
 	int bitmask = (1 << offset);
@@ -68,7 +68,7 @@ READ8_MEMBER(asteroid_state::asterock_IN0_r)
  * Typically, only the high bit is used. This is handled by one input port.
  */
 
-READ8_MEMBER(asteroid_state::asteroid_IN1_r)
+uint8_t asteroid_state::asteroid_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = ioport("IN1")->read();
 	int bitmask = (1 << (offset & 0x7));
@@ -82,7 +82,7 @@ READ8_MEMBER(asteroid_state::asteroid_IN1_r)
 }
 
 
-READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
+uint8_t asteroid_state::asteroid_DSW1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 	int res1;
@@ -94,7 +94,7 @@ READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 }
 
 
-WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
+void asteroid_state::asteroid_bank_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = BIT(data, 2);
 	m_ram1->set_entry(bank);
@@ -105,14 +105,14 @@ WRITE8_MEMBER(asteroid_state::asteroid_bank_switch_w)
 }
 
 
-WRITE8_MEMBER(asteroid_state::astdelux_bank_switch_w)
+void asteroid_state::astdelux_bank_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = BIT(data, 7);
 	m_ram1->set_entry(bank);
 	m_ram2->set_entry(bank);
 }
 
-WRITE8_MEMBER(asteroid_state::astdelux_led_w)
+void asteroid_state::astdelux_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, (data & 0x80) ? 0 : 1);
 }

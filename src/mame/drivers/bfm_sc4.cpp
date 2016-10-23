@@ -269,7 +269,7 @@ uint8_t sc4_state::read_input_matrix(int row)
 	return value;
 }
 
-READ16_MEMBER(sc4_state::sc4_cs1_r)
+uint16_t sc4_state::sc4_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -318,7 +318,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 	return 0x0000;
 }
 
-READ16_MEMBER(sc4_state::sc4_mem_r)
+uint16_t sc4_state::sc4_mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 2);
@@ -442,7 +442,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 	return 0x0000;
 }
 
-WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
+void bfm_sc45_state::mux_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	int off = offset<<3;
@@ -454,7 +454,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 	output().set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 }
 
-WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
+void bfm_sc45_state::mux_output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	int off = offset<<3;
@@ -496,7 +496,7 @@ WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 	}
 }
 
-WRITE16_MEMBER(sc4_state::sc4_mem_w)
+void sc4_state::sc4_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 2);
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 
 
 
-READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
+uint32_t sc4_adder4_state::adder4_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
@@ -643,7 +643,7 @@ READ32_MEMBER(sc4_adder4_state::adder4_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
+void sc4_adder4_state::adder4_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_adder4cpu->get_cs(offset * 4);
@@ -745,7 +745,7 @@ void sc4_state::bfm_sc4_68307_porta_w(address_space &space, bool dedicated, uint
 	}
 }
 
-WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
+void sc4_state::bfm_sc4_reel3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_latch = data;
 
@@ -756,7 +756,7 @@ WRITE8_MEMBER( sc4_state::bfm_sc4_reel3_w )
 	}
 }
 
-WRITE8_MEMBER( sc4_state::bfm_sc4_reel4_w )
+void sc4_state::bfm_sc4_reel4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_latch = data;
 
@@ -843,13 +843,13 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_txa)
 
 
 
-READ8_MEMBER(sc4_state::bfm_sc4_duart_input_r)
+uint8_t sc4_state::bfm_sc4_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  printf("bfm_sc4_duart_input_r\n");
 	return m_optic_pattern;
 }
 
-WRITE8_MEMBER(sc4_state::bfm_sc4_duart_output_w)
+void sc4_state::bfm_sc4_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("bfm_sc4_duart_output_w\n");
 	m_reel56_latch = data;
@@ -873,13 +873,13 @@ WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
 	logerror("m68307_duart_tx %02x\n", state);
 }
 
-READ8_MEMBER(sc4_state::m68307_duart_input_r)
+uint8_t sc4_state::m68307_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("m68307_duart_input_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(sc4_state::m68307_duart_output_w)
+void sc4_state::m68307_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("m68307_duart_output_w %02x\n", data);
 }

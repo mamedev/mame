@@ -88,11 +88,11 @@ public:
 	// bit 6 - pin 9 -
 	//
 	uint8_t joy_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_joy_r(); return data; }
-	DECLARE_READ8_MEMBER( joy_r ) { return joy_r(); }
+	uint8_t joy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return joy_r(); }
 	uint8_t pot_x_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_x_r(); return data; }
-	DECLARE_READ8_MEMBER( pot_x_r ) { return pot_x_r(); }
+	uint8_t pot_x_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return pot_x_r(); }
 	uint8_t pot_y_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_y_r(); return data; }
-	DECLARE_READ8_MEMBER( pot_y_r ) { return pot_y_r(); }
+	uint8_t pot_y_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return pot_y_r(); }
 
 	void joy_w( uint8_t data ) { if ( exists() ) m_device->vcs_joy_w( data ); }
 

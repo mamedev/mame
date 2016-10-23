@@ -35,10 +35,10 @@ public:
 	uint8_t *m_gfx;
 	emu_timer *m_timer;
 
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(snd1_w);
-	DECLARE_WRITE16_MEMBER(snd2_w);
-	DECLARE_WRITE16_MEMBER(blitter_w);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void snd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

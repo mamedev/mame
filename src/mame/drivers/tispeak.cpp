@@ -441,21 +441,21 @@ public:
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
 
-	DECLARE_READ8_MEMBER(snspell_read_k);
-	DECLARE_WRITE16_MEMBER(snmath_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_o);
-	DECLARE_WRITE16_MEMBER(snspell_write_r);
-	DECLARE_WRITE16_MEMBER(lantutor_write_r);
+	uint8_t snspell_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snmath_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snspell_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snspell_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lantutor_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER(snspellc_read_k);
-	DECLARE_WRITE16_MEMBER(snspellc_write_o);
-	DECLARE_WRITE16_MEMBER(snspellc_write_r);
-	DECLARE_READ8_MEMBER(tntell_read_k);
+	uint8_t snspellc_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snspellc_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void snspellc_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t tntell_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void k28_prepare_display(uint8_t old, uint8_t data);
-	DECLARE_READ8_MEMBER(k28_read_k);
-	DECLARE_WRITE16_MEMBER(k28_write_o);
-	DECLARE_WRITE16_MEMBER(k28_write_r);
+	uint8_t k28_read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k28_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void k28_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// cartridge
 	uint32_t m_cart_max_size;
@@ -554,7 +554,7 @@ void tispeak_state::prepare_display()
 	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_r)
+void tispeak_state::snspell_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R13: power-off request, on falling edge
 	if (~data & m_r & 0x2000)
@@ -568,7 +568,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_r)
 	prepare_display();
 }
 
-WRITE16_MEMBER(tispeak_state::snspell_write_o)
+void tispeak_state::snspell_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15:
 	// note: lantutor and snread VFD has an accent triangle instead of DP, and no AP
@@ -577,7 +577,7 @@ WRITE16_MEMBER(tispeak_state::snspell_write_o)
 	prepare_display();
 }
 
-READ8_MEMBER(tispeak_state::snspell_read_k)
+uint8_t tispeak_state::snspell_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
 	return m_inp_matrix[8]->read() | read_inputs(8);
@@ -595,7 +595,7 @@ void tispeak_state::power_off()
 
 // snmath specific
 
-WRITE16_MEMBER(tispeak_state::snmath_write_o)
+void tispeak_state::snmath_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// reorder opla to led14seg, plus DP as d14 and CT as d15:
 	// [DP],D,C,H,F,B,I,M,L,K,N,J,[CT],E,G,A (sidenote: TI KLMN = MAME MLNK)
@@ -606,7 +606,7 @@ WRITE16_MEMBER(tispeak_state::snmath_write_o)
 
 // lantutor specific
 
-WRITE16_MEMBER(tispeak_state::lantutor_write_r)
+void tispeak_state::lantutor_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// same as default, except R13 is used for an extra digit
 	m_r = m_inp_mux = data;
@@ -617,7 +617,7 @@ WRITE16_MEMBER(tispeak_state::lantutor_write_r)
 
 // snspellc specific
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_r)
+void tispeak_state::snspellc_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R10: TMS5100 PDC pin
 	m_tms5100->pdc_w(data >> 10);
@@ -630,14 +630,14 @@ WRITE16_MEMBER(tispeak_state::snspellc_write_r)
 	m_r = m_inp_mux = data;
 }
 
-WRITE16_MEMBER(tispeak_state::snspellc_write_o)
+void tispeak_state::snspellc_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O3210: TMS5100 CTL8124
 	m_o = BITSWAP8(data,7,6,5,4,3,0,1,2);
 	m_tms5100->ctl_w(space, 0, m_o & 0xf);
 }
 
-READ8_MEMBER(tispeak_state::snspellc_read_k)
+uint8_t tispeak_state::snspellc_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K4: TMS5100 CTL1
 	uint8_t k4 = m_tms5100->ctl_r(space, 0) << 2 & 4;
@@ -649,7 +649,7 @@ READ8_MEMBER(tispeak_state::snspellc_read_k)
 
 // tntell specific
 
-READ8_MEMBER(tispeak_state::tntell_read_k)
+uint8_t tispeak_state::tntell_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K8: overlay code from R5,O4-O7
 	uint8_t k8 = (((m_r >> 1 & 0x10) | (m_o >> 4 & 0xf)) & m_overlay) ? 8 : 0;
@@ -683,7 +683,7 @@ void tispeak_state::k28_prepare_display(uint8_t old, uint8_t data)
 	// ?
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_r)
+void tispeak_state::k28_write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// R1234: TMS5100 CTL8421
 	m_tms5100->ctl_w(space, 0, BITSWAP8(data,0,0,0,0,1,2,3,4) & 0xf);
@@ -703,13 +703,13 @@ WRITE16_MEMBER(tispeak_state::k28_write_r)
 	m_r = data;
 }
 
-WRITE16_MEMBER(tispeak_state::k28_write_o)
+void tispeak_state::k28_write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// O0-O7: input mux low
 	m_inp_mux = (m_inp_mux & ~0xff) | data;
 }
 
-READ8_MEMBER(tispeak_state::k28_read_k)
+uint8_t tispeak_state::k28_read_k(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// K: TMS5100 CTL, multiplexed inputs
 	return m_tms5100->ctl_r(space, 0) | read_inputs(9);

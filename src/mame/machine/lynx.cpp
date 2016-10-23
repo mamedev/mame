@@ -892,7 +892,7 @@ void lynx_state::lynx_multiply()
 	}
 }
 
-READ8_MEMBER(lynx_state::suzy_read)
+uint8_t lynx_state::suzy_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0, input;
 
@@ -1042,7 +1042,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::suzy_write)
+void lynx_state::suzy_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_suzy.data[offset] = data;
 	//logerror("suzy write %.2x %.2x\n",offset,data);
@@ -1635,7 +1635,7 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 	}
 }
 
-READ8_MEMBER(lynx_state::lynx_uart_r)
+uint8_t lynx_state::lynx_uart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0x00;
 	switch (offset)
@@ -1657,7 +1657,7 @@ READ8_MEMBER(lynx_state::lynx_uart_r)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_uart_w)
+void lynx_state::lynx_uart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("uart write %.2x %.2x\n", offset, data);
 	switch (offset)
@@ -1691,7 +1691,7 @@ WRITE8_MEMBER(lynx_state::lynx_uart_w)
 ****************************************/
 
 
-READ8_MEMBER(lynx_state::mikey_read)
+uint8_t lynx_state::mikey_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t direction, value = 0x00;
 
@@ -1760,7 +1760,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 	return value;
 }
 
-WRITE8_MEMBER(lynx_state::mikey_write)
+void lynx_state::mikey_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1875,12 +1875,12 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 
 ****************************************/
 
-READ8_MEMBER(lynx_state::lynx_memory_config_r)
+uint8_t lynx_state::lynx_memory_config_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memory_config;
 }
 
-WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
+void lynx_state::lynx_memory_config_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7: hispeed, uses page mode accesses (4 instead of 5 cycles )
 	 * when these are safe in the cpu */

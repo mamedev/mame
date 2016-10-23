@@ -383,12 +383,12 @@ void epson_lx810l_t::device_timer(emu_timer &timer, device_timer_id id, int para
     FAKEMEM READ/WRITE
 ***************************************************************************/
 
-READ8_MEMBER(epson_lx810l_t::fakemem_r)
+uint8_t epson_lx810l_t::fakemem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fakemem;
 }
 
-WRITE8_MEMBER(epson_lx810l_t::fakemem_w)
+void epson_lx810l_t::fakemem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fakemem = data;
 }
@@ -408,7 +408,7 @@ WRITE8_MEMBER(epson_lx810l_t::fakemem_w)
  * PA6  R   Line Feed SWITCH
  * PA7  R   Form Feed SWITCH
  */
-READ8_MEMBER( epson_lx810l_t::porta_r )
+uint8_t epson_lx810l_t::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 	uint8_t hp_sensor = m_cr_pos_abs <= 0 ? 0 : 1;
@@ -424,7 +424,7 @@ READ8_MEMBER( epson_lx810l_t::porta_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx810l_t::porta_w )
+void epson_lx810l_t::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LX810LLOG("%s: lx810l_PA_w(%02x): %02x: stepper vref %d\n", machine().describe_context(), offset, data, BIT(data, 3) | (BIT(data, 4)<<1) | (BIT(data, 5)<<2));
 }
@@ -439,7 +439,7 @@ WRITE8_MEMBER( epson_lx810l_t::porta_w )
  * PB6  R   DIP1.6
  * PB7  R   DIP1.7
  */
-READ8_MEMBER( epson_lx810l_t::portb_r )
+uint8_t epson_lx810l_t::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = ~ioport("DIPSW1")->read();
 
@@ -455,7 +455,7 @@ READ8_MEMBER( epson_lx810l_t::portb_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx810l_t::portb_w )
+void epson_lx810l_t::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t data_in = BIT(data, 1);
 
@@ -476,7 +476,7 @@ WRITE8_MEMBER( epson_lx810l_t::portb_w )
  * PC6   W  FIRE       drive pulse width signal, also E05A30.57
  * PC7   W  BUZZER     buzzer signal
  */
-READ8_MEMBER( epson_lx810l_t::portc_r )
+uint8_t epson_lx810l_t::portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -490,7 +490,7 @@ READ8_MEMBER( epson_lx810l_t::portc_r )
 	return result;
 }
 
-WRITE8_MEMBER( epson_lx810l_t::portc_w )
+void epson_lx810l_t::portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ioport("serial")->write(BIT(data, 0)); */
 
@@ -510,12 +510,12 @@ WRITE8_MEMBER( epson_lx810l_t::portc_w )
     GATE ARRAY
 ***************************************************************************/
 
-WRITE16_MEMBER( epson_lx810l_t::printhead )
+void epson_lx810l_t::printhead(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_printhead = data;
 }
 
-WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
+void epson_lx810l_t::pf_stepper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed = m_pf_stepper->update(data);
 	m_pf_pos_abs = -m_pf_stepper->get_absolute_position();
@@ -529,7 +529,7 @@ WRITE8_MEMBER( epson_lx810l_t::pf_stepper )
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
 }
 
-WRITE8_MEMBER( epson_lx810l_t::cr_stepper )
+void epson_lx810l_t::cr_stepper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int m_cr_pos_abs_prev = m_cr_pos_abs;
 
@@ -607,47 +607,47 @@ WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
     ADC
 ***************************************************************************/
 
-READ8_MEMBER(epson_lx810l_t::an0_r)
+uint8_t epson_lx810l_t::an0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = !!(ioport("DIPSW2")->read() & 0x01);
 	return res - 1; /* DIPSW2.1 */
 }
 
-READ8_MEMBER(epson_lx810l_t::an1_r)
+uint8_t epson_lx810l_t::an1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = !!(ioport("DIPSW2")->read() & 0x02);
 	return res - 1; /* DIPSW2.2 */
 }
 
-READ8_MEMBER(epson_lx810l_t::an2_r)
+uint8_t epson_lx810l_t::an2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = !!(ioport("DIPSW2")->read() & 0x04);
 	return res - 1; /* DIPSW2.3 */
 }
 
-READ8_MEMBER(epson_lx810l_t::an3_r)
+uint8_t epson_lx810l_t::an3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = !!(ioport("DIPSW2")->read() & 0x08);
 	return res - 1; /* DIPSW2.4 */
 }
 
-READ8_MEMBER(epson_lx810l_t::an4_r)
+uint8_t epson_lx810l_t::an4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(epson_lx810l_t::an5_r)
+uint8_t epson_lx810l_t::an5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xCB; /* motor voltage, 0xcb = 24V */
 }
 
-READ8_MEMBER(epson_lx810l_t::an6_r)
+uint8_t epson_lx810l_t::an6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = !ioport("LOADEJECT")->read();
 	return res - 1;
 }
 
-READ8_MEMBER(epson_lx810l_t::an7_r)
+uint8_t epson_lx810l_t::an7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

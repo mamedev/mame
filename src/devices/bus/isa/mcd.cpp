@@ -104,7 +104,7 @@ bool mcd_isa_device::read_sector(bool first)
 	return true;
 }
 
-READ8_MEMBER(mcd_isa_device::flag_r)
+uint8_t mcd_isa_device::flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	m_isa->irq5_w(CLEAR_LINE);
@@ -115,7 +115,7 @@ READ8_MEMBER(mcd_isa_device::flag_r)
 	return ret | FLAG_UNK;
 }
 
-READ8_MEMBER(mcd_isa_device::data_r)
+uint8_t mcd_isa_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_cmdbuf_count)
 	{
@@ -151,12 +151,12 @@ uint16_t mcd_isa_device::dack16_r(int line)
 	return 0;
 }
 
-WRITE8_MEMBER(mcd_isa_device::reset_w)
+void mcd_isa_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	reset();
 }
 
-WRITE8_MEMBER(mcd_isa_device::cmd_w)
+void mcd_isa_device::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_cmdrd_count)
 	{

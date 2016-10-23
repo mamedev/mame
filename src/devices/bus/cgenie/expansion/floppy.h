@@ -36,9 +36,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
 
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_READ8_MEMBER(irq_r);
-	DECLARE_WRITE8_MEMBER(select_w);
-	DECLARE_WRITE8_MEMBER(command_w);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

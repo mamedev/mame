@@ -83,7 +83,7 @@ uint8_t* z88_32k_rom_device::get_cart_base()
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(z88_32k_rom_device::read)
+uint8_t z88_32k_rom_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset & (get_cart_size() - 1)];
 }

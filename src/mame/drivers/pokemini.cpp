@@ -70,9 +70,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pokemini);
-	DECLARE_WRITE8_MEMBER(hwreg_w);
-	DECLARE_READ8_MEMBER(hwreg_r);
-	DECLARE_READ8_MEMBER(rom_r);
+	void hwreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hwreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
 protected:
@@ -113,7 +113,7 @@ protected:
 };
 
 
-READ8_MEMBER( pokemini_state::rom_r )
+uint8_t pokemini_state::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x2100;
 	return m_cart->read_rom(space, offset & 0x1fffff);
@@ -517,7 +517,7 @@ void pokemini_state::timer3_hi_callback()
 }
 
 
-WRITE8_MEMBER(pokemini_state::hwreg_w)
+void pokemini_state::hwreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
@@ -1474,7 +1474,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	m_pm_reg[offset] = data;
 }
 
-READ8_MEMBER(pokemini_state::hwreg_r)
+uint8_t pokemini_state::hwreg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_pm_reg[offset];
 

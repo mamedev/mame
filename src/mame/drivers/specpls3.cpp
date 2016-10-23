@@ -174,13 +174,13 @@ static const int spectrum_plus3_memory_selections[]=
 		4,7,6,3
 };
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
+void spectrum_state::spectrum_plus3_port_3ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_floppy==1)
 		m_upd765->fifo_w(space, 0, data, 0xff);
 }
 
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
+uint8_t spectrum_state::spectrum_plus3_port_3ffd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_floppy==0)
 		return 0xff;
@@ -189,7 +189,7 @@ READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
 }
 
 
-READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
+uint8_t spectrum_state::spectrum_plus3_port_2ffd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_floppy==0)
 		return 0xff;
@@ -270,7 +270,7 @@ void spectrum_state::spectrum_plus3_update_memory()
 
 
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
+void spectrum_state::spectrum_plus3_port_7ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 		/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -288,7 +288,7 @@ WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 	spectrum_plus3_update_memory();
 }
 
-WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_1ffd_w )
+void spectrum_state::spectrum_plus3_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0-D1: ROM/RAM paging */
 	/* D2: Affects if d0-d1 work on ram/rom */

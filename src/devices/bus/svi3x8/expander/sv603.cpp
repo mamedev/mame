@@ -107,7 +107,7 @@ void sv603_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( sv603_device::mreq_r )
+uint8_t sv603_device::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_expander->romdis_w(0);
 
@@ -123,12 +123,12 @@ READ8_MEMBER( sv603_device::mreq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv603_device::mreq_w )
+void sv603_device::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_expander->romdis_w(0);
 }
 
-READ8_MEMBER( sv603_device::iorq_r )
+uint8_t sv603_device::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0xa0 && offset <= 0xbf)
 		return m_expander->excs_r(space, offset);
@@ -136,7 +136,7 @@ READ8_MEMBER( sv603_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv603_device::iorq_w )
+void sv603_device::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0xa0 && offset <= 0xbf)
 		m_expander->excs_w(space, offset, data);

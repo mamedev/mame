@@ -352,7 +352,7 @@ ADDRESS_MAP_END
 **************************************************************************/
 
 // ad stick read select
-READ16_MEMBER(cischeat_state::wildplt_xy_r)
+uint16_t cischeat_state::wildplt_xy_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(m_ip_select)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER(cischeat_state::wildplt_xy_r)
 }
 
 // buttons & sensors are muxed. bit 0 routes to coin chute (single according to test mode)
-READ16_MEMBER(cischeat_state::wildplt_mux_r)
+uint16_t cischeat_state::wildplt_mux_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t split_in = 0xffff;
 	switch(m_wildplt_output & 0xc)
@@ -377,7 +377,7 @@ READ16_MEMBER(cischeat_state::wildplt_mux_r)
 	return split_in & ioport("IN1_COMMON")->read();
 }
 
-WRITE16_MEMBER(cischeat_state::wildplt_mux_w)
+void cischeat_state::wildplt_mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_wildplt_output = data & 0xc;
 }
@@ -481,13 +481,13 @@ ADDRESS_MAP_END
     ---- ---- ---- --1-     Up Limit
     ---- ---- ---- ---0     Down Limit  */
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_status_r)
+uint16_t cischeat_state::scudhamm_motor_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scudhamm_motor_command;    // Motor Status
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
+uint16_t cischeat_state::scudhamm_motor_pos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x00 << 8;
 }
@@ -501,13 +501,13 @@ READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
 
     Within $20 vblanks the motor must reach the target. */
 
-WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
+void cischeat_state::scudhamm_motor_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
 
-READ16_MEMBER(cischeat_state::scudhamm_analog_r)
+uint16_t cischeat_state::scudhamm_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int i=ioport("IN1")->read(),j;
 
@@ -533,7 +533,7 @@ READ16_MEMBER(cischeat_state::scudhamm_analog_r)
     port (coins, tilt, buttons, select etc.) triggers the corresponding bit
     in this word. I mapped the 3 buttons to the first 3 led.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
+void cischeat_state::scudhamm_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -554,12 +554,12 @@ WRITE16_MEMBER(cischeat_state::scudhamm_leds_w)
     $FFFC during self test, $FFFF onwards.
     It could be audio(L/R) or layers(0/2) enable.
 */
-WRITE16_MEMBER(cischeat_state::scudhamm_enable_w)
+void cischeat_state::scudhamm_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
+void cischeat_state::scudhamm_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -594,17 +594,17 @@ ADDRESS_MAP_END
                             Arm Champs II
 **************************************************************************/
 
-READ16_MEMBER(cischeat_state::armchmp2_motor_status_r)
+uint16_t cischeat_state::armchmp2_motor_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x11;
 }
 
-WRITE16_MEMBER(cischeat_state::armchmp2_motor_command_w)
+void cischeat_state::armchmp2_motor_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_scudhamm_motor_command );
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_analog_r)
+uint16_t cischeat_state::armchmp2_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int armdelta;
 
@@ -614,7 +614,7 @@ READ16_MEMBER(cischeat_state::armchmp2_analog_r)
 	return ~( m_scudhamm_motor_command + armdelta );    // + x : x<=0 and player loses, x>0 and player wins
 }
 
-READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
+uint16_t cischeat_state::armchmp2_buttons_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int arm_x = ioport("IN1")->read();
 
@@ -635,7 +635,7 @@ READ16_MEMBER(cischeat_state::armchmp2_buttons_r)
     ---- ---- 76-- ----     Coin counters
     ---- ---- --54 3210
 */
-WRITE16_MEMBER(cischeat_state::armchmp2_leds_w)
+void cischeat_state::armchmp2_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -679,7 +679,7 @@ ADDRESS_MAP_END
 #define RIGHT 0
 #define LEFT  1
 
-WRITE16_MEMBER(cischeat_state::captflag_leds_w)
+void cischeat_state::captflag_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_captflag_leds );
 	if (ACCESSING_BITS_8_15)
@@ -696,7 +696,7 @@ WRITE16_MEMBER(cischeat_state::captflag_leds_w)
 	}
 }
 
-WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
+void cischeat_state::captflag_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -707,7 +707,7 @@ WRITE16_MEMBER(cischeat_state::captflag_oki_bank_w)
 
 // Motors
 
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
+void cischeat_state::captflag_motor_command_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e09a up
@@ -717,7 +717,7 @@ WRITE16_MEMBER(cischeat_state::captflag_motor_command_right_w)
 	data = COMBINE_DATA( &m_captflag_motor_command[RIGHT] );
 	captflag_motor_move(RIGHT, data);
 }
-WRITE16_MEMBER(cischeat_state::captflag_motor_command_left_w)
+void cischeat_state::captflag_motor_command_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Output check:
 	// e0ba up
@@ -916,7 +916,7 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
+void cischeat_state::bigrun_soundbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -940,12 +940,12 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
+void cischeat_state::cischeat_soundbank_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
+void cischeat_state::cischeat_soundbank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) m_oki2->set_rom_bank(data & 1);
 }

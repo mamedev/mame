@@ -12,16 +12,16 @@ public:
 	irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~irem_audio_device() {}
 
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( m6803_port1_w );
-	DECLARE_WRITE8_MEMBER( m6803_port2_w );
-	DECLARE_READ8_MEMBER( m6803_port1_r );
-	DECLARE_READ8_MEMBER( m6803_port2_r );
-	DECLARE_WRITE8_MEMBER( ay8910_45M_portb_w );
-	DECLARE_WRITE8_MEMBER( ay8910_45L_porta_w );
-	DECLARE_WRITE8_MEMBER( sound_irq_ack_w );
-	DECLARE_WRITE8_MEMBER( m52_adpcm_w );
-	DECLARE_WRITE8_MEMBER( m62_adpcm_w );
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m6803_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m6803_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay8910_45M_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_45L_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m52_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m62_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void adpcm_int(int st);
 

@@ -73,26 +73,26 @@ public:
 	m_bioscpu(*this, "mtbios")
 	{ }
 
-	DECLARE_READ16_MEMBER(extra_ram_r);
-	DECLARE_WRITE16_MEMBER(extra_ram_w);
-	DECLARE_READ8_MEMBER(bios_banksel_r);
-	DECLARE_WRITE8_MEMBER(bios_banksel_w);
-	DECLARE_READ8_MEMBER(bios_gamesel_r);
-	DECLARE_WRITE8_MEMBER(bios_gamesel_w);
-	DECLARE_WRITE16_MEMBER(mp_io_write);
-	DECLARE_READ16_MEMBER(mp_io_read);
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(bios_6402_r);
-	DECLARE_WRITE8_MEMBER(bios_6402_w);
-	DECLARE_READ8_MEMBER(bios_6204_r);
-	DECLARE_WRITE8_MEMBER(bios_width_w);
-	DECLARE_READ8_MEMBER(bios_6404_r);
-	DECLARE_WRITE8_MEMBER(bios_6404_w);
-	DECLARE_READ8_MEMBER(bios_6600_r);
-	DECLARE_WRITE8_MEMBER(bios_6600_w);
-	DECLARE_WRITE8_MEMBER(game_w);
-	DECLARE_READ8_MEMBER(vdp1_count_r);
+	uint16_t extra_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void extra_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t bios_banksel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_gamesel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_gamesel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mp_io_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mp_io_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_6402_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_6402_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_6204_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_width_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_6404_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_6404_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_6600_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_6600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void game_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vdp1_count_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_megaplay();
 	void video_start_megplay();
@@ -390,12 +390,12 @@ INPUT_PORTS_END
 
 /*MEGAPLAY specific*/
 
-READ8_MEMBER(mplay_state::bios_banksel_r)
+uint8_t mplay_state::bios_banksel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bios_bank;
 }
 
-WRITE8_MEMBER(mplay_state::bios_banksel_w)
+void mplay_state::bios_banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Multi-slot note:
     Bits 0 and 1 appear to determine the selected game slot.
@@ -407,12 +407,12 @@ WRITE8_MEMBER(mplay_state::bios_banksel_w)
 //  logerror("BIOS: ROM bank %i selected [0x%02x]\n",bios_bank >> 6, data);
 }
 
-READ8_MEMBER(mplay_state::bios_gamesel_r)
+uint8_t mplay_state::bios_gamesel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bios_6403;
 }
 
-WRITE8_MEMBER(mplay_state::bios_gamesel_w)
+void mplay_state::bios_gamesel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bios_6403 = data;
 
@@ -420,7 +420,7 @@ WRITE8_MEMBER(mplay_state::bios_gamesel_w)
 	m_bios_mode = BIT(data, 4);
 }
 
-WRITE16_MEMBER(mplay_state::mp_io_write)
+void mplay_state::mp_io_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x03)
 		m_megadrive_io_data_regs[2] = (data & m_megadrive_io_ctrl_regs[2]) | (m_megadrive_io_data_regs[2] & ~m_megadrive_io_ctrl_regs[2]);
@@ -428,7 +428,7 @@ WRITE16_MEMBER(mplay_state::mp_io_write)
 		megadriv_68k_io_write(space, offset & 0x1f, data, 0xffff);
 }
 
-READ16_MEMBER(mplay_state::mp_io_read)
+uint16_t mplay_state::mp_io_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x03)
 		return m_megadrive_io_data_regs[2];
@@ -436,7 +436,7 @@ READ16_MEMBER(mplay_state::mp_io_read)
 		return megadriv_68k_io_read(space, offset & 0x1f, 0xffff);
 }
 
-READ8_MEMBER(mplay_state::bank_r)
+uint8_t mplay_state::bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t* bank = memregion("mtbios")->base();
 	uint32_t fulladdress = m_bios_bank_addr + offset;
@@ -472,7 +472,7 @@ READ8_MEMBER(mplay_state::bank_r)
 
 }
 
-WRITE8_MEMBER(mplay_state::bank_w)
+void mplay_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t fulladdress = m_bios_bank_addr + offset;
 
@@ -497,38 +497,38 @@ WRITE8_MEMBER(mplay_state::bank_w)
 /* Megaplay BIOS handles regs[2] at start in a different way compared to megadrive */
 /* other io data/ctrl regs are dealt with exactly like in the console              */
 
-READ8_MEMBER(mplay_state::bios_6402_r)
+uint8_t mplay_state::bios_6402_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_megadrive_io_data_regs[2];// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6402_w)
+void mplay_state::bios_6402_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0x70) >> 1);
 //  logerror("BIOS: 0x6402 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6204_r)
+uint8_t mplay_state::bios_6204_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_megadrive_io_data_regs[2];
 //  return (m_bios_width & 0xf8) + (m_bios_6204 & 0x07);
 }
 
-WRITE8_MEMBER(mplay_state::bios_width_w)
+void mplay_state::bios_width_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bios_width = data;
 	m_megadrive_io_data_regs[2] = (m_megadrive_io_data_regs[2] & 0x07) | ((data & 0xf8));
 //  logerror("BIOS: 0x6204 - Width write: %02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6404_r)
+uint8_t mplay_state::bios_6404_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("BIOS: 0x6404 read: returned 0x%02x\n",bios_6404 | (bios_6403 & 0x10) >> 4);
 	return (m_bios_6404 & 0xfe) | ((m_bios_6403 & 0x10) >> 4);
 //  return m_bios_6404 | (m_bios_6403 & 0x10) >> 4;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6404_w)
+void mplay_state::bios_6404_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -537,7 +537,7 @@ WRITE8_MEMBER(mplay_state::bios_6404_w)
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
 }
 
-READ8_MEMBER(mplay_state::bios_6600_r)
+uint8_t mplay_state::bios_6600_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*  Multi-slot note:
     0x6600 appears to be used to check for extra slots being used.
@@ -548,13 +548,13 @@ READ8_MEMBER(mplay_state::bios_6600_r)
 	return m_bios_6600;// & 0xfe;
 }
 
-WRITE8_MEMBER(mplay_state::bios_6600_w)
+void mplay_state::bios_6600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bios_6600 = data;
 //  logerror("BIOS: 0x6600 write: 0x%02x\n",data);
 }
 
-WRITE8_MEMBER(mplay_state::game_w)
+void mplay_state::game_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_readpos == 1)
 		m_game_banksel = 0;
@@ -595,7 +595,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(mplay_state::vdp1_count_r)
+uint8_t mplay_state::vdp1_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
@@ -852,12 +852,12 @@ ROM_START( mp_shnb3 ) /* Shinobi 3 */
 ROM_END
 
 
-READ16_MEMBER(mplay_state::extra_ram_r )
+uint16_t mplay_state::extra_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ic36_ram[(offset << 1) ^ 1] | (m_ic36_ram[(offset << 1)] << 8);
 }
 
-WRITE16_MEMBER(mplay_state::extra_ram_w )
+void mplay_state::extra_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{

@@ -55,16 +55,16 @@
  *
  ***************************************************************************/
 
-WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
-WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
+void decocass_state::mirrorcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
 
-READ8_MEMBER(decocass_state::mirrorvideoram_r)
+uint8_t decocass_state::mirrorvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_fgvideoram[offset];
 }
 
-READ8_MEMBER(decocass_state::mirrorcolorram_r)
+uint8_t decocass_state::mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5);
 	return m_colorram[offset];
@@ -1740,7 +1740,7 @@ void decocass_state::init_decocrom()
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(FUNC(decocass_state::decocass_e900_w),this));
 }
 
-READ8_MEMBER(decocass_state::cdsteljn_input_r )
+uint8_t decocass_state::cdsteljn_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 	static const char *const portnames[2][4] = {
@@ -1755,7 +1755,7 @@ READ8_MEMBER(decocass_state::cdsteljn_input_r )
 	return res;
 }
 
-WRITE8_MEMBER(decocass_state::cdsteljn_mux_w )
+void decocass_state::cdsteljn_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = (data & 0xc) >> 2;
 	/* bit 0 and 1 are p1/p2 lamps */

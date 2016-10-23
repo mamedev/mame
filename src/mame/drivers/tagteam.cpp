@@ -38,13 +38,13 @@ void tagteam_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(tagteam_state::sound_command_w)
+void tagteam_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(tagteam_state::irq_clear_w)
+void tagteam_state::irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
+void tagteam_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }

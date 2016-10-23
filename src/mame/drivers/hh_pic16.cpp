@@ -222,12 +222,12 @@ public:
 		: hh_pic16_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(maniac_state::output_w)
+void maniac_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// B,C: outputs
 	offset -= PIC16C5x_PORTB;

@@ -103,26 +103,26 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER( port_write );
-	DECLARE_READ8_MEMBER( port_read );
-	DECLARE_WRITE8_MEMBER( port_write_1b00 );
-	DECLARE_READ8_MEMBER( port_read_1b00 );
+	void port_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_write_1b00(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_read_1b00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( videoram_read );
-	DECLARE_WRITE8_MEMBER( videoram_write );
+	uint8_t videoram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t hiram[0x1000];
-	DECLARE_READ8_MEMBER( hiram_read );
-	DECLARE_WRITE8_MEMBER( hiram_write );
+	uint8_t hiram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hiram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( rm380z_portlow_r );
-	DECLARE_WRITE8_MEMBER( rm380z_portlow_w );
-	DECLARE_READ8_MEMBER( rm380z_porthi_r );
-	DECLARE_WRITE8_MEMBER( rm380z_porthi_w );
+	uint8_t rm380z_portlow_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rm380z_portlow_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rm380z_porthi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rm380z_porthi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(disk_0_control);
+	void disk_0_control(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( keyboard_put );
+	void keyboard_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);

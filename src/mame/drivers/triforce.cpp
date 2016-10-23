@@ -453,31 +453,31 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ64_MEMBER(gc_pi_r);
-	DECLARE_WRITE64_MEMBER(gc_pi_w);
-	DECLARE_READ64_MEMBER(gc_exi_r);
-	DECLARE_WRITE64_MEMBER(gc_exi_w);
+	uint64_t gc_pi_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gc_pi_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t gc_exi_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void gc_exi_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 };
 
-READ64_MEMBER(triforce_state::gc_pi_r)
+uint64_t triforce_state::gc_pi_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return 0;
 }
 
-WRITE64_MEMBER(triforce_state::gc_pi_w)
+void triforce_state::gc_pi_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 }
 
-READ64_MEMBER(triforce_state::gc_exi_r)
+uint64_t triforce_state::gc_exi_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return 0;
 }
 
-WRITE64_MEMBER(triforce_state::gc_exi_w)
+void triforce_state::gc_exi_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 }
 

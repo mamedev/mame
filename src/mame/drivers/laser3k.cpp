@@ -91,11 +91,11 @@ public:
 	required_device<sn76489_device> m_sn;
 	required_ioport m_kbspecial;
 
-	READ8_MEMBER( ram_r );
-	WRITE8_MEMBER( ram_w );
-	READ8_MEMBER( io_r );
-	WRITE8_MEMBER( io_w );
-	READ8_MEMBER( io2_r );
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t io2_r(address_space &space, offs_t offset, uint8_t mem_mask);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -235,12 +235,12 @@ void laser3k_state::machine_reset()
 	rom[0x4607] = 0;
 }
 
-READ8_MEMBER( laser3k_state::ram_r )
+uint8_t laser3k_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram->read(offset);
 }
 
-WRITE8_MEMBER( laser3k_state::ram_w )
+void laser3k_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->write(offset, data);
 }
@@ -383,7 +383,7 @@ void laser3k_state::do_io(int offset)
 	}
 }
 
-READ8_MEMBER( laser3k_state::io_r )
+uint8_t laser3k_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -417,7 +417,7 @@ READ8_MEMBER( laser3k_state::io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( laser3k_state::io_w )
+void laser3k_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -458,7 +458,7 @@ WRITE8_MEMBER( laser3k_state::io_w )
 	}
 }
 
-READ8_MEMBER( laser3k_state::io2_r )
+uint8_t laser3k_state::io2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{

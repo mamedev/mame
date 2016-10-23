@@ -22,7 +22,7 @@ public:
 	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_READ8_MEMBER(read);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(enable);
 
 	template<class _Object> static devcb_base &static_set_keypress_callback(device_t &device, _Object object)
@@ -85,7 +85,7 @@ class at_keyboard_device : public pc_keyboard_device
 public:
 	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	static void static_set_type(device_t &device, KEYBOARD_TYPE type, int default_set)
 		{ downcast<at_keyboard_device &>(device).m_scan_code_set = default_set; downcast<at_keyboard_device &>(device).m_type = type; }

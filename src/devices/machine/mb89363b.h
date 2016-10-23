@@ -68,21 +68,21 @@ public:
 	// construction/destruction
 	mb89363b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(i8255_a_port_a_r);
-	DECLARE_READ8_MEMBER(i8255_a_port_b_r);
-	DECLARE_READ8_MEMBER(i8255_a_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_a_w);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_b_w);
-	DECLARE_WRITE8_MEMBER(i8255_a_port_c_w);
-	DECLARE_READ8_MEMBER(i8255_b_port_a_r);
-	DECLARE_READ8_MEMBER(i8255_b_port_b_r);
-	DECLARE_READ8_MEMBER(i8255_b_port_c_r);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_a_w);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_b_w);
-	DECLARE_WRITE8_MEMBER(i8255_b_port_c_w);
+	uint8_t i8255_a_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8255_a_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8255_a_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_a_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_a_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_a_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_b_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8255_b_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t i8255_b_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_b_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_b_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_b_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	template<class _Object> static devcb_base &set_in_a_pa_callback(device_t &device, _Object object)  { return downcast<mb89363b_device &>(device).m_in_a_pa_cb.set_callback(object); }

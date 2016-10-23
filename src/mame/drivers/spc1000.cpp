@@ -159,16 +159,16 @@ public:
 		, m_centronics(*this, "centronics")
 	{}
 
-	DECLARE_WRITE8_MEMBER(iplk_w);
-	DECLARE_READ8_MEMBER(iplk_r);
+	void iplk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t iplk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE8_MEMBER(gmode_w);
-	DECLARE_READ8_MEMBER(gmode_r);
-	DECLARE_READ8_MEMBER(porta_r);
+	void gmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_READ8_MEMBER(mc6847_videoram_r);
-	DECLARE_WRITE8_MEMBER(cass_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	MC6847_GET_CHARROM_MEMBER(get_char_rom)
 	{
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
@@ -199,14 +199,14 @@ static ADDRESS_MAP_START(spc1000_mem, AS_PROGRAM, 8, spc1000_state )
 	AM_RANGE(0x8000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(spc1000_state::iplk_w)
+void spc1000_state::iplk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
 	membank("bank3")->set_entry(m_IPLK);
 }
 
-READ8_MEMBER(spc1000_state::iplk_r)
+uint8_t spc1000_state::iplk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_IPLK = m_IPLK ? 0 : 1;
 	membank("bank1")->set_entry(m_IPLK);
@@ -215,7 +215,7 @@ READ8_MEMBER(spc1000_state::iplk_r)
 	return 0;
 }
 
-WRITE8_MEMBER( spc1000_state::cass_w )
+void spc1000_state::cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	attotime time = machine().scheduler().time();
 	m_cass->output(BIT(data, 0) ? -1.0 : 1.0);
@@ -226,7 +226,7 @@ WRITE8_MEMBER( spc1000_state::cass_w )
 	m_centronics->write_strobe(BIT(data, 2) ? true : false);
 }
 
-WRITE8_MEMBER(spc1000_state::gmode_w)
+void spc1000_state::gmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_GMODE = data;
 
@@ -239,12 +239,12 @@ WRITE8_MEMBER(spc1000_state::gmode_w)
 	m_page = ((BIT(data, 5) << 1) | BIT(data, 4)) * 0x200;
 }
 
-READ8_MEMBER(spc1000_state::gmode_r)
+uint8_t spc1000_state::gmode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_GMODE;
 }
 
-READ8_MEMBER( spc1000_state::keyboard_r )
+uint8_t spc1000_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// most games just read kb in $8000-$8009 but a few of them
 	// (e.g. Toiler Adventure II and Vela) use mirrored addr instead
@@ -408,7 +408,7 @@ void spc1000_state::machine_reset()
 	m_IPLK = 1;
 }
 
-READ8_MEMBER(spc1000_state::mc6847_videoram_r)
+uint8_t spc1000_state::mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0)
 		return 0xff;
@@ -429,7 +429,7 @@ READ8_MEMBER(spc1000_state::mc6847_videoram_r)
 	}
 }
 
-READ8_MEMBER( spc1000_state::porta_r )
+uint8_t spc1000_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x3f;
 	data |= (m_cass->input() > 0.0038) ? 0x80 : 0;

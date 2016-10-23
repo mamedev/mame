@@ -84,13 +84,13 @@ PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
 
 ***************************************************************************/
 
-WRITE8_MEMBER(superqix_state::superqix_videoram_w)
+void superqix_state::superqix_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(superqix_state::superqix_bitmapram_w)
+void superqix_state::superqix_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bitmapram[offset] != data)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER(superqix_state::superqix_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
+void superqix_state::superqix_bitmapram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != m_bitmapram2[offset])
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
 	}
 }
 
-WRITE8_MEMBER(superqix_state::pbillian_0410_w)
+void superqix_state::pbillian_0410_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 -------0  ? [not used]
@@ -140,7 +140,7 @@ WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 	flip_screen_set(BIT(data,5));
 }
 
-WRITE8_MEMBER(superqix_state::superqix_0410_w)
+void superqix_state::superqix_0410_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 ------10  tile bank

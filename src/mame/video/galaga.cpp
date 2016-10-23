@@ -449,13 +449,13 @@ void galaga_state::video_start_galaga()
 ***************************************************************************/
 
 
-WRITE8_MEMBER(galaga_state::galaga_videoram_w)
+void galaga_state::galaga_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
+void galaga_state::gatsbee_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_galaga_gfxbank = data & 0x1;
 	m_fg_tilemap->mark_all_dirty();

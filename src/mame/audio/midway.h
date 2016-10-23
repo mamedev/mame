@@ -49,11 +49,11 @@ public:
 	midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
-	DECLARE_READ8_MEMBER(ioport_read);
-	DECLARE_WRITE8_MEMBER(ioport_write);
+	uint8_t ioport_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ioport_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// configuration
 	void set_custom_input(int which, uint8_t mask, read8_delegate handler);
@@ -61,13 +61,13 @@ public:
 
 	// internal communications
 	INTERRUPT_GEN_MEMBER(clock_14024);
-	DECLARE_READ8_MEMBER(irq_clear);
-	DECLARE_WRITE8_MEMBER(status_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(porta0_w);
-	DECLARE_WRITE8_MEMBER(portb0_w);
-	DECLARE_WRITE8_MEMBER(porta1_w);
-	DECLARE_WRITE8_MEMBER(portb1_w);
+	uint8_t irq_clear(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void porta1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -118,16 +118,16 @@ public:
 	midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_READ16_MEMBER(pia_r);
-	DECLARE_WRITE16_MEMBER(pia_w);
+	uint16_t pia_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -158,13 +158,13 @@ public:
 	midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
@@ -196,13 +196,13 @@ public:
 	midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:
@@ -234,14 +234,14 @@ public:
 	midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(porta1_w);
-	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_WRITE8_MEMBER(porta2_w);
-	DECLARE_WRITE8_MEMBER(portb2_w);
+	void porta1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void porta2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:

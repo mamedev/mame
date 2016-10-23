@@ -40,22 +40,22 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( ram_select_r );
-	DECLARE_WRITE8_MEMBER( floppy_w );
-	DECLARE_READ8_MEMBER( network_irq_disable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_disable_w );
-	DECLARE_READ8_MEMBER( network_irq_enable_r );
-	DECLARE_WRITE8_MEMBER( network_irq_enable_w );
-	DECLARE_READ8_MEMBER( hdc_data_r );
-	DECLARE_WRITE8_MEMBER( hdc_data_w );
-	DECLARE_WRITE8_MEMBER( hdc_select_w );
-	DECLARE_WRITE8_MEMBER( hdc_irq_enable_w );
-	DECLARE_READ8_MEMBER( rtc_address_r );
-	DECLARE_WRITE8_MEMBER( rtc_address_w );
-	DECLARE_READ8_MEMBER( rtc_data_r );
-	DECLARE_WRITE8_MEMBER( rtc_data_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ram_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t network_irq_disable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void network_irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t network_irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void network_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hdc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hdc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hdc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hdc_irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_address_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( econet_data_w );

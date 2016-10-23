@@ -94,7 +94,7 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 	output().set_value("tachometer2", (~m_misc_flags & 0x001f0000) >> 0x10);
 }
 
-WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
+void dragrace_state::dragrace_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Set/clear individual bit */
 	uint32_t mask = 1 << offset;
@@ -106,7 +106,7 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 	dragrace_update_misc_flags(space);
 }
 
-WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
+void dragrace_state::dragrace_misc_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Clear 8 bits */
 	uint32_t mask = 0xff << (((offset >> 3) & 0x03) * 8);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 	dragrace_update_misc_flags(space);
 }
 
-READ8_MEMBER(dragrace_state::dragrace_input_r)
+uint8_t dragrace_state::dragrace_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = ioport("IN2")->read();
 	static const char *const portnames[] = { "IN0", "IN1" };
@@ -138,7 +138,7 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 }
 
 
-READ8_MEMBER(dragrace_state::dragrace_steering_r)
+uint8_t dragrace_state::dragrace_steering_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bitA[2];
 	int bitB[2];
@@ -158,7 +158,7 @@ READ8_MEMBER(dragrace_state::dragrace_steering_r)
 }
 
 
-READ8_MEMBER(dragrace_state::dragrace_scanline_r)
+uint8_t dragrace_state::dragrace_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_screen->vpos() ^ 0xf0) | 0x0f;
 }

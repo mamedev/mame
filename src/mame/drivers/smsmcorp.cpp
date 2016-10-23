@@ -234,16 +234,16 @@ public:
 	uint8_t m_communication_port_status;
 	bitmap_ind16 m_bitmap;
 	uint8_t m_vid_regs[7];
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_READ8_MEMBER(link_r);
-	DECLARE_WRITE8_MEMBER(link_w);
-	DECLARE_READ8_MEMBER(z80_8088_r);
-	DECLARE_READ8_MEMBER(p03_r);
-	DECLARE_WRITE8_MEMBER(p03_w);
-	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_READ8_MEMBER(ppi0_c_r);
-	DECLARE_WRITE8_MEMBER(ppi0_a_w);
-	DECLARE_WRITE8_MEMBER(ppi0_b_w);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t link_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void link_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_8088_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p03_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi0_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -260,7 +260,7 @@ public:
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::bankswitch_w)
+void smsmfg_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -271,7 +271,7 @@ WRITE8_MEMBER(smsmfg_state::bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::link_r)
+uint8_t smsmfg_state::link_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -287,7 +287,7 @@ READ8_MEMBER(smsmfg_state::link_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::link_w)
+void smsmfg_state::link_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -302,12 +302,12 @@ WRITE8_MEMBER(smsmfg_state::link_w)
 	}
 }
 
-READ8_MEMBER(smsmfg_state::z80_8088_r)
+uint8_t smsmfg_state::z80_8088_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_communication_port_status;
 }
 
-READ8_MEMBER(smsmfg_state::p03_r)
+uint8_t smsmfg_state::p03_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -321,7 +321,7 @@ READ8_MEMBER(smsmfg_state::p03_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::p03_w)
+void smsmfg_state::p03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -381,7 +381,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(smsmfg_state::ppi0_c_r)
+uint8_t smsmfg_state::ppi0_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
   PC7 - unused
@@ -399,7 +399,7 @@ READ8_MEMBER(smsmfg_state::ppi0_c_r)
 	return 0;
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
+void smsmfg_state::ppi0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1) );
 	output().set_lamp_value(0, !BIT(data,7)); /* Display Light 1 */
@@ -412,7 +412,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_a_w)
 	output().set_lamp_value(7, !BIT(data,0)); /* Draw Light */
 }
 
-WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
+void smsmfg_state::ppi0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(8, !BIT(data,7)); /* Stand Light */
 	output().set_lamp_value(9, !BIT(data,6)); /* Cancel Light */
@@ -428,7 +428,7 @@ WRITE8_MEMBER(smsmfg_state::ppi0_b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(smsmfg_state::video_w)
+void smsmfg_state::video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vid_regs[offset] = data;
 	if ( offset == 5 )

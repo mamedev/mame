@@ -151,12 +151,12 @@ void bbc_cumanafdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(bbc_cumanafdc_device::ctrl_r)
+uint8_t bbc_cumanafdc_device::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_drive_control;
 }
 
-WRITE8_MEMBER(bbc_cumanafdc_device::ctrl_w)
+void bbc_cumanafdc_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

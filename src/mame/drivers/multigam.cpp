@@ -163,23 +163,23 @@ public:
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
 	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
-	DECLARE_WRITE8_MEMBER(multigam_nt_w);
-	DECLARE_READ8_MEMBER(multigam_nt_r);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_READ8_MEMBER(multigam_IN0_r);
-	DECLARE_WRITE8_MEMBER(multigam_IN0_w);
-	DECLARE_READ8_MEMBER(multigam_IN1_r);
-	DECLARE_WRITE8_MEMBER(multigam_switch_prg_rom);
-	DECLARE_WRITE8_MEMBER(multigam_switch_gfx_rom);
-	DECLARE_WRITE8_MEMBER(multigam_mapper2_w);
-	DECLARE_WRITE8_MEMBER(multigam3_mmc3_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(multigm3_mapper2_w);
-	DECLARE_WRITE8_MEMBER(multigm3_switch_gfx_rom);
-	DECLARE_WRITE8_MEMBER(multigm3_switch_prg_rom);
-	DECLARE_WRITE8_MEMBER(multigam3_mapper02_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(mmc1_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
-	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
+	void multigam_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t multigam_nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t multigam_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void multigam_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t multigam_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void multigam_switch_prg_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigam_switch_gfx_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigam_mapper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigam3_mmc3_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigm3_mapper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigm3_switch_gfx_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigm3_switch_prg_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multigam3_mapper02_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmc1_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supergm3_prg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supergm3_chr_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void set_mirroring(int mirroring);
 	void init_multigmt();
 	void init_multigam();
@@ -244,14 +244,14 @@ void multigam_state::set_mirroring(int mirroring)
 	}
 }
 
-WRITE8_MEMBER(multigam_state::multigam_nt_w)
+void multigam_state::multigam_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
-READ8_MEMBER(multigam_state::multigam_nt_r)
+uint8_t multigam_state::multigam_nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_page[page][offset & 0x3ff];
@@ -289,7 +289,7 @@ void multigam_state::set_videoram_bank( int start, int count, int bank, int bank
 
 *******************************************************/
 
-WRITE8_MEMBER(multigam_state::sprite_dma_w)
+void multigam_state::sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
@@ -303,12 +303,12 @@ WRITE8_MEMBER(multigam_state::sprite_dma_w)
 *******************************************************/
 
 
-READ8_MEMBER(multigam_state::multigam_IN0_r)
+uint8_t multigam_state::multigam_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(multigam_state::multigam_IN0_w)
+void multigam_state::multigam_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -325,7 +325,7 @@ WRITE8_MEMBER(multigam_state::multigam_IN0_w)
 	m_in_dsw = m_dsw.read_safe(0);
 }
 
-READ8_MEMBER(multigam_state::multigam_IN1_r)
+uint8_t multigam_state::multigam_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
@@ -345,7 +345,7 @@ CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
 *******************************************************/
 
 
-WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
+void multigam_state::multigam_switch_prg_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* switch PRG rom */
 	uint8_t* dst = memregion("maincpu")->base();
@@ -366,7 +366,7 @@ WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 	}
 }
 
-WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
+void multigam_state::multigam_switch_gfx_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -374,7 +374,7 @@ WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
 }
 
 
-WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
+void multigam_state::multigam_mapper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
@@ -443,7 +443,7 @@ void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int b
 	}
 }
 
-WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
+void multigam_state::multigam3_mmc3_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* basically, a MMC3 mapper from the nes */
 	int bankmask = m_multigam3_mmc3_prg_size == 0x40000 ? 0x1f : 0x0f;
@@ -614,7 +614,7 @@ void multigam_state::multigam_init_mmc3(uint8_t *prg_base, int prg_size, int chr
 	m_multigam3_mmc3_prg_size = prg_size;
 }
 
-WRITE8_MEMBER(multigam_state::multigm3_mapper2_w)
+void multigam_state::multigm3_mapper2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
@@ -626,14 +626,14 @@ WRITE8_MEMBER(multigam_state::multigm3_mapper2_w)
 	}
 }
 
-WRITE8_MEMBER(multigam_state::multigm3_switch_gfx_rom)
+void multigam_state::multigm3_switch_gfx_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_videorom_bank(0, 8, data & 0x3f, 8);
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
 }
 
-WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
+void multigam_state::multigm3_switch_prg_rom(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* switch PRG rom */
 	uint8_t* dst = memregion("maincpu")->base();
@@ -695,7 +695,7 @@ ADDRESS_MAP_END
 *******************************************************/
 
 
-WRITE8_MEMBER(multigam_state::multigam3_mapper02_rom_switch_w)
+void multigam_state::multigam3_mapper02_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	int bankmask = (m_mapper02_prg_size/0x4000) - 1;
@@ -725,7 +725,7 @@ TIMER_CALLBACK_MEMBER(multigam_state::mmc1_resync_callback)
 	m_mmc1_reg_write_enable = 1;
 }
 
-WRITE8_MEMBER(multigam_state::mmc1_rom_switch_w)
+void multigam_state::mmc1_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* basically, a MMC1 mapper from the nes */
 
@@ -954,12 +954,12 @@ void multigam_state::supergm3_set_bank()
 	}
 }
 
-WRITE8_MEMBER(multigam_state::supergm3_prg_bank_w)
+void multigam_state::supergm3_prg_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_supergm3_prg_bank = data;
 }
 
-WRITE8_MEMBER(multigam_state::supergm3_chr_bank_w)
+void multigam_state::supergm3_chr_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_supergm3_chr_bank = data;
 	supergm3_set_bank();

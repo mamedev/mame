@@ -94,8 +94,8 @@ public:
 	static void set_in_in_6_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_6_cb = callback; }
 	static void set_in_in_7_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_in_7_cb = callback; }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( ale_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ale_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( start_w );
 

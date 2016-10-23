@@ -149,7 +149,7 @@ void darius_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 	m_cpub->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(darius_state::cpua_ctrl_w)
+void darius_state::cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
@@ -166,7 +166,7 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
                         GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(darius_state::darius_ioc_r)
+uint16_t darius_state::darius_ioc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -194,7 +194,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.devic
 	return 0xff;
 }
 
-WRITE16_MEMBER(darius_state::darius_ioc_w)
+void darius_state::darius_ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -264,19 +264,19 @@ ADDRESS_MAP_END
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(darius_state::sound_bankswitch_w)
+void darius_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 3);
 }
 
-WRITE8_MEMBER(darius_state::adpcm_command_w)
+void darius_state::adpcm_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_command = data;
 	/* logerror("#ADPCM command write =%2x\n",data); */
 }
 
 #if 0
-WRITE8_MEMBER(darius_state::display_value)
+void darius_state::display_value(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("d800=%x", data);
 }
@@ -364,19 +364,19 @@ void darius_state::update_da(  )
 		m_msm5205_r->flt_volume_set_volume(right / 100.0);
 }
 
-WRITE8_MEMBER(darius_state::darius_fm0_pan)
+void darius_state::darius_fm0_pan(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
 	update_fm0();
 }
 
-WRITE8_MEMBER(darius_state::darius_fm1_pan)
+void darius_state::darius_fm1_pan(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pan[1] = data & 0xff;
 	update_fm1();
 }
 
-WRITE8_MEMBER(darius_state::darius_psg0_pan)
+void darius_state::darius_psg0_pan(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pan[2] = data & 0xff;
 	update_psg0(0);
@@ -384,7 +384,7 @@ WRITE8_MEMBER(darius_state::darius_psg0_pan)
 	update_psg0(2);
 }
 
-WRITE8_MEMBER(darius_state::darius_psg1_pan)
+void darius_state::darius_psg1_pan(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pan[3] = data & 0xff;
 	update_psg1( 0);
@@ -392,7 +392,7 @@ WRITE8_MEMBER(darius_state::darius_psg1_pan)
 	update_psg1( 2);
 }
 
-WRITE8_MEMBER(darius_state::darius_da_pan)
+void darius_state::darius_da_pan(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pan[4] = data & 0xff;
 	update_da();
@@ -400,7 +400,7 @@ WRITE8_MEMBER(darius_state::darius_da_pan)
 
 /**** Mixer Control ****/
 
-WRITE8_MEMBER(darius_state::darius_write_portA0)
+void darius_state::darius_write_portA0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -412,7 +412,7 @@ WRITE8_MEMBER(darius_state::darius_write_portA0)
 	update_psg0(0);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portA1)
+void darius_state::darius_write_portA1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -423,7 +423,7 @@ WRITE8_MEMBER(darius_state::darius_write_portA1)
 	update_psg1( 0);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portB0)
+void darius_state::darius_write_portB0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -434,7 +434,7 @@ WRITE8_MEMBER(darius_state::darius_write_portB0)
 	update_psg0(2);
 }
 
-WRITE8_MEMBER(darius_state::darius_write_portB1)
+void darius_state::darius_write_portB1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
@@ -480,35 +480,35 @@ WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(darius_state::adpcm_command_read)
+uint8_t darius_state::adpcm_command_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, space.device().safe_pc() ); */
 	return m_adpcm_command;
 }
 
-READ8_MEMBER(darius_state::readport2)
+uint8_t darius_state::readport2(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(darius_state::readport3)
+uint8_t darius_state::readport3(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
+void darius_state::adpcm_nmi_disable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = 0;
 	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, space.device().safe_pc() ); */
 }
 
-WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
+void darius_state::adpcm_nmi_enable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = 1;
 	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", space.device().safe_pc() ); */
 }
 
-WRITE8_MEMBER(darius_state::adpcm_data_w)
+void darius_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);
 	m_msm->reset_w(!(data & 0x20));    /* my best guess, but it could be output enable as well */

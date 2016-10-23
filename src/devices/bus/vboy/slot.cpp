@@ -230,7 +230,7 @@ std::string vboy_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(vboy_cart_slot_device::read_cart)
+uint32_t vboy_cart_slot_device::read_cart(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_cart(space, offset, mem_mask);
@@ -242,7 +242,7 @@ READ32_MEMBER(vboy_cart_slot_device::read_cart)
  read
  -------------------------------------------------*/
 
-READ32_MEMBER(vboy_cart_slot_device::read_eeprom)
+uint32_t vboy_cart_slot_device::read_eeprom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_eeprom(space, offset, mem_mask);
@@ -254,7 +254,7 @@ READ32_MEMBER(vboy_cart_slot_device::read_eeprom)
  write
  -------------------------------------------------*/
 
-WRITE32_MEMBER(vboy_cart_slot_device::write_eeprom)
+void vboy_cart_slot_device::write_eeprom(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_eeprom(space, offset, data, mem_mask);

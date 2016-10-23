@@ -35,7 +35,7 @@
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( sage2_state::read )
+uint8_t sage2_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -56,7 +56,7 @@ READ8_MEMBER( sage2_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::write )
+void sage2_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x080000)
 	{
@@ -204,7 +204,7 @@ INPUT_PORTS_END
 //  I8255A INTERFACE( ppi0_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::ppi0_pc_w )
+void sage2_state::ppi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -279,7 +279,7 @@ WRITE_LINE_MEMBER(sage2_state::write_centronics_fault)
 	m_centronics_fault = state;
 }
 
-READ8_MEMBER( sage2_state::ppi1_pb_r )
+uint8_t sage2_state::ppi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -317,7 +317,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( sage2_state::ppi1_pc_w )
+void sage2_state::ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -544,7 +544,7 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
+offs_t sage2_state::sage2_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (m_reset && address >= 0xfe0000)
 	{

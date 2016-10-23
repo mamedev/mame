@@ -62,59 +62,59 @@ void retofinv_state::machine_start()
 	}
 }
 
-WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
+void retofinv_state::cpu1_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
+void retofinv_state::cpu2_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::mcu_reset_w)
+void retofinv_state::mcu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
 	if (m_68705 != nullptr)
 		m_68705->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
+void retofinv_state::cpu2_m6000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu2_m6000 = data;
 }
 
-READ8_MEMBER(retofinv_state::cpu0_mf800_r)
+uint8_t retofinv_state::cpu0_mf800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cpu2_m6000;
 }
 
-WRITE8_MEMBER(retofinv_state::soundcommand_w)
+void retofinv_state::soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::irq0_ack_w)
+void retofinv_state::irq0_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_irq_mask = data & 1;
 	if (!m_main_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::irq1_ack_w)
+void retofinv_state::irq1_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sub_irq_mask = data & 1;
 	if (!m_sub_irq_mask)
 		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(retofinv_state::coincounter_w)
+void retofinv_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
 
-WRITE8_MEMBER(retofinv_state::coinlockout_w)
+void retofinv_state::coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0,~data & 1);
 }

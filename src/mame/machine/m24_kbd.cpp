@@ -237,12 +237,12 @@ void m24_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int
 	m_out_data(1);
 }
 
-READ8_MEMBER( m24_keyboard_device::p1_r )
+uint8_t m24_keyboard_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1 | (m_kbcdata ? 0 : 2);
 }
 
-WRITE8_MEMBER( m24_keyboard_device::p1_w )
+void m24_keyboard_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 3 and 4 are leds and bits 6 and 7 are jumpers to ground
 	m_p1 = data & ~0xc0;
@@ -253,22 +253,22 @@ WRITE8_MEMBER( m24_keyboard_device::p1_w )
 	m_out_data(!BIT(data, 2));
 }
 
-READ8_MEMBER( m24_keyboard_device::p2_r )
+uint8_t m24_keyboard_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_keypress << 7) | m_mousebtn->read();
 }
 
-READ8_MEMBER( m24_keyboard_device::t0_r )
+uint8_t m24_keyboard_device::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER( m24_keyboard_device::t1_r )
+uint8_t m24_keyboard_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( m24_keyboard_device::bus_w )
+void m24_keyboard_device::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t col = m_rows[(data >> 3) & 0xf]->read();
 	m_keypress = (col & (1 << (data & 7))) ? 1 : 0;

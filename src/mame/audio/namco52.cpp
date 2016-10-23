@@ -55,43 +55,43 @@ TIMER_CALLBACK_MEMBER( namco_52xx_device::latch_callback )
 	m_latched_cmd = param;
 }
 
-READ8_MEMBER( namco_52xx_device::K_r )
+uint8_t namco_52xx_device::K_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latched_cmd & 0x0f;
 }
 
-READ8_MEMBER( namco_52xx_device::SI_r )
+uint8_t namco_52xx_device::SI_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_si(0) ? 1 : 0;
 }
 
-READ8_MEMBER( namco_52xx_device::R0_r )
+uint8_t namco_52xx_device::R0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_romread(m_address) & 0x0f;
 }
 
-READ8_MEMBER( namco_52xx_device::R1_r )
+uint8_t namco_52xx_device::R1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_romread(m_address) >> 4;
 }
 
 
-WRITE8_MEMBER( namco_52xx_device::P_w )
+void namco_52xx_device::P_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, NAMCO_52XX_P_DATA(m_basenode), data & 0x0f);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R2_w )
+void namco_52xx_device::R2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_address = (m_address & 0xfff0) | ((data & 0xf) << 0);
 }
 
-WRITE8_MEMBER( namco_52xx_device::R3_w )
+void namco_52xx_device::R3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_address = (m_address & 0xff0f) | ((data & 0xf) << 4);
 }
 
-WRITE8_MEMBER( namco_52xx_device::O_w )
+void namco_52xx_device::O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x10)
 		m_address = (m_address & 0x0fff) | ((data & 0xf) << 12);
@@ -104,7 +104,7 @@ TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( namco_52xx_device::write )
+void namco_52xx_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_52xx_device::latch_callback),this), data);
 

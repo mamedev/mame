@@ -488,12 +488,12 @@ uint32_t xbox_base_state::screen_update_callback(screen_device &screen, bitmap_r
 	return nvidia_nv2a->screen_update_callback(screen, bitmap, cliprect);
 }
 
-READ32_MEMBER(xbox_base_state::geforce_r)
+uint32_t xbox_base_state::geforce_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return nvidia_nv2a->geforce_r(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER(xbox_base_state::geforce_w)
+void xbox_base_state::geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	nvidia_nv2a->geforce_w(space, offset, data, mem_mask);
 }
@@ -517,7 +517,7 @@ static void geforce_pci_w(device_t *busdevice, device_t *device, int function, i
  * Audio
  */
 
-READ32_MEMBER(xbox_base_state::audio_apu_r)
+uint32_t xbox_base_state::audio_apu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_APU: read from %08X mask %08X\n", 0xfe800000 + offset * 4, mem_mask);
@@ -527,7 +527,7 @@ READ32_MEMBER(xbox_base_state::audio_apu_r)
 	return apust.memory[offset];
 }
 
-WRITE32_MEMBER(xbox_base_state::audio_apu_w)
+void xbox_base_state::audio_apu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//uint32_t old;
 	uint32_t v;
@@ -636,7 +636,7 @@ WRITE32_MEMBER(xbox_base_state::audio_apu_w)
 		return;
 }
 
-READ32_MEMBER(xbox_base_state::audio_ac93_r)
+uint32_t xbox_base_state::audio_ac93_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = 0;
 
@@ -667,7 +667,7 @@ READ32_MEMBER(xbox_base_state::audio_ac93_r)
 	return ret;
 }
 
-WRITE32_MEMBER(xbox_base_state::audio_ac93_w)
+void xbox_base_state::audio_ac93_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 #ifdef LOG_AUDIO
 	logerror("Audio_AC3: write at %08X mask %08X value %08X\n", 0xfec00000 + offset * 4, mem_mask, data);
@@ -764,12 +764,12 @@ static void dummy_pci_w(device_t *busdevice, device_t *device, int function, int
 #endif
 }
 
-READ32_MEMBER(xbox_base_state::dummy_r)
+uint32_t xbox_base_state::dummy_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(xbox_base_state::dummy_w)
+void xbox_base_state::dummy_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
@@ -782,7 +782,7 @@ WRITE_LINE_MEMBER(xbox_base_state::xbox_pic8259_1_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(xbox_base_state::get_slave_ack)
+uint8_t xbox_base_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 2) { // IRQ = 2
 		return xbox_base_devs.pic8259_2->acknowledge();
@@ -903,7 +903,7 @@ void xbox_base_state::smbus_register_device(int address, int(*handler)(xbox_base
 		smbusst.devices[address] = handler;
 }
 
-READ32_MEMBER(xbox_base_state::smbus_r)
+uint32_t xbox_base_state::smbus_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
 		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | ((smbusst.status << 0) & mem_mask);
@@ -912,7 +912,7 @@ READ32_MEMBER(xbox_base_state::smbus_r)
 	return smbusst.words[offset];
 }
 
-WRITE32_MEMBER(xbox_base_state::smbus_w)
+void xbox_base_state::smbus_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(smbusst.words);
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
@@ -959,12 +959,12 @@ WRITE32_MEMBER(xbox_base_state::smbus_w)
 	//if ((offset == 2) && (mem_mask == 0x00ff0000)) ;
 }
 
-READ32_MEMBER(xbox_base_state::smbus2_r)
+uint32_t xbox_base_state::smbus2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(xbox_base_state::smbus2_w)
+void xbox_base_state::smbus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
@@ -972,21 +972,21 @@ WRITE32_MEMBER(xbox_base_state::smbus2_w)
 * Ethernet controller
 */
 
-READ32_MEMBER(xbox_base_state::network_r)
+uint32_t xbox_base_state::network_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(xbox_base_state::network_w)
+void xbox_base_state::network_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-READ32_MEMBER(xbox_base_state::networkio_r)
+uint32_t xbox_base_state::networkio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(xbox_base_state::networkio_w)
+void xbox_base_state::networkio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
@@ -994,7 +994,7 @@ WRITE32_MEMBER(xbox_base_state::networkio_w)
  * SuperIO
  */
 
-READ8_MEMBER(xbox_base_state::superio_read)
+uint8_t xbox_base_state::superio_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (superiost.configuration_mode == false)
 		return 0;
@@ -1010,7 +1010,7 @@ READ8_MEMBER(xbox_base_state::superio_read)
 	return 0;
 }
 
-WRITE8_MEMBER(xbox_base_state::superio_write)
+void xbox_base_state::superio_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (superiost.configuration_mode == false)
 	{
@@ -1046,14 +1046,14 @@ WRITE8_MEMBER(xbox_base_state::superio_write)
 	}
 }
 
-READ8_MEMBER(xbox_base_state::superiors232_read)
+uint8_t xbox_base_state::superiors232_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 5)
 		return 0x20;
 	return 0;
 }
 
-WRITE8_MEMBER(xbox_base_state::superiors232_write)
+void xbox_base_state::superiors232_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -1061,7 +1061,7 @@ WRITE8_MEMBER(xbox_base_state::superiors232_write)
 	}
 }
 
-READ32_MEMBER(xbox_base_state::ohci_usb_r)
+uint32_t xbox_base_state::ohci_usb_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0) /* hacks needed until usb (and jvs) is implemented */
 	{
@@ -1070,18 +1070,18 @@ READ32_MEMBER(xbox_base_state::ohci_usb_r)
 	return ohci_usb->read(space, offset, mem_mask);
 }
 
-WRITE32_MEMBER(xbox_base_state::ohci_usb_w)
+void xbox_base_state::ohci_usb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!usb_hack_enabled)
 		ohci_usb->write(space, offset, data, mem_mask);
 }
 
-READ32_MEMBER(xbox_base_state::ohci_usb2_r)
+uint32_t xbox_base_state::ohci_usb2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(xbox_base_state::ohci_usb2_w)
+void xbox_base_state::ohci_usb2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 

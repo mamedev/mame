@@ -106,15 +106,15 @@ public:
 	uint8_t m_adpcm_idle;
 	uint8_t m_trigger;
 	uint8_t m_adpcm_data;
-	DECLARE_WRITE8_MEMBER(controls_w);
-	DECLARE_READ8_MEMBER(controls_r);
+	void controls_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t controls_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER(pachifev_state::controls_w)
+void pachifev_state::controls_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!data)
 	{
@@ -129,7 +129,7 @@ WRITE8_MEMBER(pachifev_state::controls_w)
 	}
 }
 
-READ8_MEMBER(pachifev_state::controls_r)
+uint8_t pachifev_state::controls_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int output_bit=(m_power < m_max_power)?0:1;
 	++m_power;

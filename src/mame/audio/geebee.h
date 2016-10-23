@@ -12,7 +12,7 @@ public:
 		TIMER_VOLUME_DECAY
 	};
 
-	DECLARE_WRITE8_MEMBER( sound_w );
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

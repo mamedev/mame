@@ -32,7 +32,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(stadhero_state::stadhero_control_w)
+void stadhero_state::stadhero_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset<<1)
 	{

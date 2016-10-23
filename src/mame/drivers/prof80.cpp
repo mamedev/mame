@@ -161,7 +161,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 //  flr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_state::flr_w )
+void prof80_state::flr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -192,7 +192,7 @@ WRITE8_MEMBER( prof80_state::flr_w )
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_state::status_r )
+uint8_t prof80_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -229,7 +229,7 @@ READ8_MEMBER( prof80_state::status_r )
 //  status2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_state::status2_r )
+uint8_t prof80_state::status2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -284,7 +284,7 @@ READ8_MEMBER( prof80_state::status2_r )
 
 // UNIO
 /*
-WRITE8_MEMBER( prof80_state::unio_ctrl_w )
+void prof80_state::unio_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  int flag = BIT(data, 0);
     int flad = (data >> 1) & 0x07;

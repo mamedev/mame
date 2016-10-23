@@ -148,8 +148,8 @@ public:
 		isa8_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 		isa8_hdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-		DECLARE_READ8_MEMBER(pc_hdc_r);
-		DECLARE_WRITE8_MEMBER(pc_hdc_w);
+		uint8_t pc_hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void pc_hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		DECLARE_WRITE_LINE_MEMBER(irq_w);
 		DECLARE_WRITE_LINE_MEMBER(drq_w);
 		required_device<xt_hdc_device> m_hdc;

@@ -39,22 +39,22 @@ public:
 	uint8_t m_p1;
 	uint8_t m_p2;
 	uint8_t m_lum;
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_READ8_MEMBER(bus_read);
-	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(p1_read);
-	DECLARE_WRITE8_MEMBER(p1_write);
-	DECLARE_READ8_MEMBER(p2_read);
-	DECLARE_WRITE8_MEMBER(p2_write);
-	DECLARE_READ8_MEMBER(t1_read);
+	uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bus_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bus_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t t1_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_odyssey2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(odyssey2);
 	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+	void scanline_postprocess(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	/* constants */
@@ -86,11 +86,11 @@ public:
 	DECLARE_PALETTE_INIT(g7400);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(p2_write);
-	DECLARE_READ8_MEMBER(io_read);
-	DECLARE_WRITE8_MEMBER(io_write);
-	DECLARE_WRITE8_MEMBER(i8243_port_w);
-	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8243_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scanline_postprocess(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	uint8_t m_ic674_decode[8];
@@ -329,7 +329,7 @@ void g7400_state::machine_reset()
 
 /****** External RAM ******************************/
 
-READ8_MEMBER(odyssey2_state::io_read)
+uint8_t odyssey2_state::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
@@ -344,7 +344,7 @@ READ8_MEMBER(odyssey2_state::io_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::io_write)
+void odyssey2_state::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -362,7 +362,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 }
 
 
-READ8_MEMBER(g7400_state::io_read)
+uint8_t g7400_state::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
@@ -381,7 +381,7 @@ READ8_MEMBER(g7400_state::io_read)
 }
 
 
-WRITE8_MEMBER(g7400_state::io_write)
+void g7400_state::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(g7400_state::io_write)
 }
 
 
-WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
+void odyssey2_state::scanline_postprocess(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int vpos = data;
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
@@ -421,7 +421,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 }
 
 
-WRITE16_MEMBER(g7400_state::scanline_postprocess)
+void g7400_state::scanline_postprocess(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int vpos = data;
 	int y = vpos - i8244_device::START_Y - 5;
@@ -466,7 +466,7 @@ uint32_t odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_in
 }
 
 
-READ8_MEMBER(odyssey2_state::t1_read)
+uint8_t odyssey2_state::t1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_i8244->vblank() || m_i8244->hblank() )
 	{
@@ -476,7 +476,7 @@ READ8_MEMBER(odyssey2_state::t1_read)
 }
 
 
-READ8_MEMBER(odyssey2_state::p1_read)
+uint8_t odyssey2_state::p1_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_p1;
 
@@ -484,7 +484,7 @@ READ8_MEMBER(odyssey2_state::p1_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::p1_write)
+void odyssey2_state::p1_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 	m_lum = ( data & 0x80 ) >> 4;
@@ -492,7 +492,7 @@ WRITE8_MEMBER(odyssey2_state::p1_write)
 }
 
 
-READ8_MEMBER(odyssey2_state::p2_read)
+uint8_t odyssey2_state::p2_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t h = 0xFF;
 	int i, j;
@@ -529,20 +529,20 @@ READ8_MEMBER(odyssey2_state::p2_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::p2_write)
+void odyssey2_state::p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
 
 
-WRITE8_MEMBER(g7400_state::p2_write)
+void g7400_state::p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 	m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
 }
 
 
-READ8_MEMBER(odyssey2_state::bus_read)
+uint8_t odyssey2_state::bus_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -560,7 +560,7 @@ READ8_MEMBER(odyssey2_state::bus_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::bus_write)
+void odyssey2_state::bus_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
@@ -570,7 +570,7 @@ WRITE8_MEMBER(odyssey2_state::bus_write)
     i8243 in the g7400
 */
 
-WRITE8_MEMBER(g7400_state::i8243_port_w)
+void g7400_state::i8243_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset & 3 )
 	{

@@ -275,19 +275,19 @@ public:
 	DECLARE_PALETTE_INIT(geniusiq);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(input_r);
-	DECLARE_WRITE16_MEMBER(mouse_pos_w);
+	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mouse_pos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_INPUT_CHANGED_MEMBER(send_input);
 	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
-	DECLARE_WRITE16_MEMBER(gfx_base_w);
-	DECLARE_WRITE16_MEMBER(gfx_dest_w);
-	DECLARE_WRITE16_MEMBER(gfx_color_w);
-	DECLARE_WRITE16_MEMBER(gfx_idx_w);
+	void gfx_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfx_dest_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfx_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfx_idx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void queue_input(uint16_t data);
-	DECLARE_READ16_MEMBER(cart_state_r);
+	uint16_t cart_state_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
-	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
+	uint16_t unk0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0; }
+	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return machine().rand(); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
@@ -388,12 +388,12 @@ uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ16_MEMBER( geniusiq_state::cart_state_r )
+uint16_t geniusiq_state::cart_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cart_state;
 }
 
-WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
+void geniusiq_state::mouse_pos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		m_mouse_gfx_posy = data;
@@ -401,12 +401,12 @@ WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
 		m_mouse_gfx_posx = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_color_w)
+void geniusiq_state::gfx_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_gfx_color[offset & 1] = data & 0x0f;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
+void geniusiq_state::gfx_dest_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		m_gfx_y = data;
@@ -414,7 +414,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_dest_w)
 		m_gfx_x = data;
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_base_w)
+void geniusiq_state::gfx_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		m_gfx_base = (m_gfx_base & 0xffff0000) | (data<<0);
@@ -422,7 +422,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 		m_gfx_base = (m_gfx_base & 0x0000ffff) | (data<<16);
 }
 
-WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
+void geniusiq_state::gfx_idx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
 
@@ -442,7 +442,7 @@ WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 		}
 }
 
-READ16_MEMBER( geniusiq_state::input_r )
+uint16_t geniusiq_state::input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    this is guesswork and may not be correct

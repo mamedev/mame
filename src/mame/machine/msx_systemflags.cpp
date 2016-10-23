@@ -28,13 +28,13 @@ void msx_systemflags_device::device_start()
 }
 
 
-READ8_MEMBER(msx_systemflags_device::read)
+uint8_t msx_systemflags_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_system_flags;
 }
 
 
-WRITE8_MEMBER(msx_systemflags_device::write)
+void msx_systemflags_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_system_flags = data;
 }

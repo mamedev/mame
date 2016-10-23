@@ -1764,8 +1764,8 @@ public:
 	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<voodoo_device &>(device).m_vblank.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_stall_callback(device_t &device, _Object object)  { return downcast<voodoo_device &>(device).m_stall.set_callback(object); }
 
-	DECLARE_READ32_MEMBER( voodoo_r );
-	DECLARE_WRITE32_MEMBER( voodoo_w );
+	uint32_t voodoo_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void voodoo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// access to legacy token
 	void common_start_voodoo(uint8_t type);
@@ -1911,21 +1911,21 @@ public:
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_READ32_MEMBER( banshee_r );
-	DECLARE_WRITE32_MEMBER( banshee_w );
-	DECLARE_READ32_MEMBER( banshee_fb_r );
-	DECLARE_WRITE32_MEMBER( banshee_fb_w );
-	DECLARE_READ32_MEMBER( banshee_io_r );
-	DECLARE_WRITE32_MEMBER( banshee_io_w );
-	DECLARE_READ32_MEMBER( banshee_rom_r );
-	DECLARE_READ8_MEMBER(banshee_vga_r);
-	DECLARE_WRITE8_MEMBER(banshee_vga_w);
+	uint32_t banshee_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void banshee_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t banshee_fb_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void banshee_fb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t banshee_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void banshee_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t banshee_rom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t banshee_vga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void banshee_vga_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	DECLARE_READ32_MEMBER( banshee_agp_r );
-	DECLARE_WRITE32_MEMBER( banshee_agp_w );
+	uint32_t banshee_agp_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void banshee_agp_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 };
 
 extern const device_type VOODOO_BANSHEE;

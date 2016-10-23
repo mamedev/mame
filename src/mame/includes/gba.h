@@ -65,11 +65,11 @@ public:
 	uint32_t m_bios_last_address;
 	int m_bios_protected;
 
-	DIRECT_UPDATE_MEMBER(gba_direct);
-	DECLARE_READ32_MEMBER(gba_io_r);
-	DECLARE_WRITE32_MEMBER(gba_io_w);
-	DECLARE_READ32_MEMBER(gba_bios_r);
-	DECLARE_READ32_MEMBER(gba_10000000_r);
+	offs_t gba_direct(direct_read_data &direct, offs_t address);
+	uint32_t gba_io_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void gba_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_bios_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t gba_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_gbadv();
 	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
 	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);

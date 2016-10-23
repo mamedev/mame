@@ -115,60 +115,60 @@ public:
 	void update_fdc_drq();
 	void update_fdc_tc();
 
-	DECLARE_WRITE8_MEMBER( fdc_ctrl_w );
-	DECLARE_READ8_MEMBER( deselect_drive1_r );
-	DECLARE_WRITE8_MEMBER( deselect_drive1_w );
-	DECLARE_READ8_MEMBER( select_drive1_r );
-	DECLARE_WRITE8_MEMBER( select_drive1_w );
-	DECLARE_READ8_MEMBER( deselect_drive2_r );
-	DECLARE_WRITE8_MEMBER( deselect_drive2_w );
-	DECLARE_READ8_MEMBER( select_drive2_r );
-	DECLARE_WRITE8_MEMBER( select_drive2_w );
-	DECLARE_READ8_MEMBER( motor1_off_r );
-	DECLARE_WRITE8_MEMBER( motor1_off_w );
-	DECLARE_READ8_MEMBER( motor1_on_r );
-	DECLARE_WRITE8_MEMBER( motor1_on_w );
-	DECLARE_READ8_MEMBER( motor2_off_r );
-	DECLARE_WRITE8_MEMBER( motor2_off_w );
-	DECLARE_READ8_MEMBER( motor2_on_r );
-	DECLARE_WRITE8_MEMBER( motor2_on_w );
-	DECLARE_READ8_MEMBER( fdc_reset_r );
-	DECLARE_WRITE8_MEMBER( fdc_reset_w );
-	DECLARE_READ8_MEMBER( fdc_tc_r );
-	DECLARE_WRITE8_MEMBER( fdc_tc_w );
-	DECLARE_WRITE8_MEMBER( dma_page_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( timer0_irq_clr_w );
-	DECLARE_READ8_MEMBER( timer2_irq_clr_r );
-	DECLARE_WRITE8_MEMBER( nmi_mask_w );
-	DECLARE_READ8_MEMBER( led_on_r );
-	DECLARE_WRITE8_MEMBER( fpu_mask_w );
-	DECLARE_READ8_MEMBER( dma_eop_clr_r );
-	DECLARE_WRITE8_MEMBER( uart_tbre_clr_w );
-	DECLARE_READ8_MEMBER( uart_r );
-	DECLARE_WRITE8_MEMBER( uart_w );
-	DECLARE_READ8_MEMBER( centronics_r );
-	DECLARE_WRITE8_MEMBER( centronics_w );
-	DECLARE_READ8_MEMBER( busy_clr_r );
-	DECLARE_WRITE8_MEMBER( acknlg_clr_w );
-	DECLARE_READ8_MEMBER( led_off_r );
-	DECLARE_WRITE8_MEMBER( parity_nmi_clr_w );
-	DECLARE_READ8_MEMBER( option_id_r );
+	void fdc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t deselect_drive1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void deselect_drive1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t select_drive1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void select_drive1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t deselect_drive2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void deselect_drive2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t select_drive2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void select_drive2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t motor1_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void motor1_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t motor1_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void motor1_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t motor2_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void motor2_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t motor2_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void motor2_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer0_irq_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer2_irq_clr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t led_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fpu_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dma_eop_clr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void uart_tbre_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t uart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void uart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t centronics_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void centronics_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t busy_clr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acknlg_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t led_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void parity_nmi_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t option_id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE_LINE_MEMBER( eop_w );
-	DECLARE_READ8_MEMBER( memr_r );
-	DECLARE_WRITE8_MEMBER( memw_w );
-	DECLARE_READ8_MEMBER( ior2_r );
-	DECLARE_WRITE8_MEMBER( iow2_w );
+	uint8_t memr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ior2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dack0_w );
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pit2_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_dr_w );
 	DECLARE_WRITE_LINE_MEMBER( uart_tbre_w );
@@ -245,7 +245,7 @@ void wangpc_state::select_drive()
 	m_fdc->set_floppy(floppy);
 }
 
-WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
+void wangpc_state::fdc_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 }
 
 
-READ8_MEMBER( wangpc_state::deselect_drive1_r )
+uint8_t wangpc_state::deselect_drive1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ds1 = false;
 	select_drive();
@@ -287,12 +287,12 @@ READ8_MEMBER( wangpc_state::deselect_drive1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::deselect_drive1_w )
+void wangpc_state::deselect_drive1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	deselect_drive1_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::select_drive1_r )
+uint8_t wangpc_state::select_drive1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ds1 = true;
 	select_drive();
@@ -300,12 +300,12 @@ READ8_MEMBER( wangpc_state::select_drive1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::select_drive1_w )
+void wangpc_state::select_drive1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	select_drive1_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::deselect_drive2_r )
+uint8_t wangpc_state::deselect_drive2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ds2 = false;
 	select_drive();
@@ -313,12 +313,12 @@ READ8_MEMBER( wangpc_state::deselect_drive2_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::deselect_drive2_w )
+void wangpc_state::deselect_drive2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	deselect_drive2_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::select_drive2_r )
+uint8_t wangpc_state::select_drive2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ds2 = true;
 	select_drive();
@@ -326,12 +326,12 @@ READ8_MEMBER( wangpc_state::select_drive2_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::select_drive2_w )
+void wangpc_state::select_drive2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	select_drive2_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::motor1_off_r )
+uint8_t wangpc_state::motor1_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Drive 1 motor OFF\n", machine().describe_context());
 
@@ -340,12 +340,12 @@ READ8_MEMBER( wangpc_state::motor1_off_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::motor1_off_w )
+void wangpc_state::motor1_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	motor1_off_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::motor1_on_r )
+uint8_t wangpc_state::motor1_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Drive 1 motor ON\n", machine().describe_context());
 
@@ -354,12 +354,12 @@ READ8_MEMBER( wangpc_state::motor1_on_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::motor1_on_w )
+void wangpc_state::motor1_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	motor1_on_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::motor2_off_r )
+uint8_t wangpc_state::motor2_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Drive 2 motor OFF\n", machine().describe_context());
 
@@ -368,12 +368,12 @@ READ8_MEMBER( wangpc_state::motor2_off_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::motor2_off_w )
+void wangpc_state::motor2_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	motor2_off_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::motor2_on_r )
+uint8_t wangpc_state::motor2_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Drive 2 motor ON\n", machine().describe_context());
 
@@ -382,12 +382,12 @@ READ8_MEMBER( wangpc_state::motor2_on_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::motor2_on_w )
+void wangpc_state::motor2_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	motor2_on_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::fdc_reset_r )
+uint8_t wangpc_state::fdc_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: FDC reset\n", machine().describe_context());
 
@@ -396,12 +396,12 @@ READ8_MEMBER( wangpc_state::fdc_reset_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::fdc_reset_w )
+void wangpc_state::fdc_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fdc_reset_r(space, offset);
 }
 
-READ8_MEMBER( wangpc_state::fdc_tc_r )
+uint8_t wangpc_state::fdc_tc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: FDC TC\n", machine().describe_context());
 
@@ -411,7 +411,7 @@ READ8_MEMBER( wangpc_state::fdc_tc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( wangpc_state::fdc_tc_w )
+void wangpc_state::fdc_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fdc_tc_r(space, offset);
 }
@@ -421,7 +421,7 @@ WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 //  dma_page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::dma_page_w )
+void wangpc_state::dma_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: DMA page %u: %06x\n", machine().describe_context(), offset + 1, (data & 0x0f) << 16);
 
@@ -433,7 +433,7 @@ WRITE8_MEMBER( wangpc_state::dma_page_w )
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::status_r )
+uint8_t wangpc_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -467,7 +467,7 @@ READ8_MEMBER( wangpc_state::status_r )
 //  timer0_int_clr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
+void wangpc_state::timer0_irq_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
@@ -479,7 +479,7 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 //  timer2_irq_clr_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
+uint8_t wangpc_state::timer2_irq_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//if (LOG) logerror("%s: Timer 2 IRQ clear\n", machine().describe_context());
 
@@ -494,7 +494,7 @@ READ8_MEMBER( wangpc_state::timer2_irq_clr_r )
 //  nmi_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::nmi_mask_w )
+void wangpc_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: NMI mask %02x\n", machine().describe_context(), data);
 }
@@ -504,7 +504,7 @@ WRITE8_MEMBER( wangpc_state::nmi_mask_w )
 //  led_on_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::led_on_r )
+uint8_t wangpc_state::led_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Diagnostic LED on\n", machine().describe_context());
 
@@ -518,7 +518,7 @@ READ8_MEMBER( wangpc_state::led_on_r )
 //  fpu_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::fpu_mask_w )
+void wangpc_state::fpu_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: FPU mask %02x\n", machine().describe_context(), data);
 }
@@ -528,7 +528,7 @@ WRITE8_MEMBER( wangpc_state::fpu_mask_w )
 //  dma_eop_clr_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::dma_eop_clr_r )
+uint8_t wangpc_state::dma_eop_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: EOP clear\n", machine().describe_context());
 
@@ -544,7 +544,7 @@ READ8_MEMBER( wangpc_state::dma_eop_clr_r )
 //  uart_tbre_clr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
+void wangpc_state::uart_tbre_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: TBRE clear\n", machine().describe_context());
 
@@ -558,7 +558,7 @@ WRITE8_MEMBER( wangpc_state::uart_tbre_clr_w  )
 //  uart_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::uart_r )
+uint8_t wangpc_state::uart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_uart_dr = 0;
 
@@ -576,7 +576,7 @@ READ8_MEMBER( wangpc_state::uart_r )
 //  uart_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::uart_w  )
+void wangpc_state::uart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: UART write %02x\n", machine().describe_context(), data);
 
@@ -611,7 +611,7 @@ WRITE8_MEMBER( wangpc_state::uart_w  )
 //  centronics_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::centronics_r )
+uint8_t wangpc_state::centronics_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_dav = 1;
 	check_level1_interrupts();
@@ -624,7 +624,7 @@ READ8_MEMBER( wangpc_state::centronics_r )
 //  centronics_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::centronics_w )
+void wangpc_state::centronics_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_centronics_ack = 1;
 	check_level1_interrupts();
@@ -640,7 +640,7 @@ WRITE8_MEMBER( wangpc_state::centronics_w )
 //  busy_clr_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::busy_clr_r )
+uint8_t wangpc_state::busy_clr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: BUSY clear\n", machine().describe_context());
 
@@ -655,7 +655,7 @@ READ8_MEMBER( wangpc_state::busy_clr_r )
 //  acknlg_clr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
+void wangpc_state::acknlg_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: ACKNLG clear\n", machine().describe_context());
 
@@ -668,7 +668,7 @@ WRITE8_MEMBER( wangpc_state::acknlg_clr_w )
 //  led_off_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::led_off_r )
+uint8_t wangpc_state::led_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Diagnostic LED off\n", machine().describe_context());
 
@@ -682,7 +682,7 @@ READ8_MEMBER( wangpc_state::led_off_r )
 //  parity_nmi_clr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wangpc_state::parity_nmi_clr_w )
+void wangpc_state::parity_nmi_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s: Parity NMI clear\n", machine().describe_context());
 }
@@ -692,7 +692,7 @@ WRITE8_MEMBER( wangpc_state::parity_nmi_clr_w )
 //  option_id_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::option_id_r )
+uint8_t wangpc_state::option_id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -850,7 +850,7 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 	m_bus->tc_w(state);
 }
 
-READ8_MEMBER( wangpc_state::memr_r )
+uint8_t wangpc_state::memr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
@@ -858,7 +858,7 @@ READ8_MEMBER( wangpc_state::memr_r )
 	return program.read_byte(addr);
 }
 
-WRITE8_MEMBER( wangpc_state::memw_w )
+void wangpc_state::memw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_page[m_dack] << 16) | offset;
@@ -866,7 +866,7 @@ WRITE8_MEMBER( wangpc_state::memw_w )
 	program.write_byte(addr, data);
 }
 
-READ8_MEMBER( wangpc_state::ior2_r )
+uint8_t wangpc_state::ior2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_disable_dreq2)
 		return m_bus->dack_r(space, 2);
@@ -874,7 +874,7 @@ READ8_MEMBER( wangpc_state::ior2_r )
 		return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER( wangpc_state::iow2_w )
+void wangpc_state::iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_disable_dreq2)
 		m_bus->dack_w(space, 2, data);
@@ -924,7 +924,7 @@ void wangpc_state::check_level2_interrupts()
 //  I8255A INTERFACE
 //-------------------------------------------------
 
-READ8_MEMBER( wangpc_state::ppi_pa_r )
+uint8_t wangpc_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -952,7 +952,7 @@ READ8_MEMBER( wangpc_state::ppi_pa_r )
 	return data;
 }
 
-READ8_MEMBER( wangpc_state::ppi_pb_r )
+uint8_t wangpc_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -996,7 +996,7 @@ READ8_MEMBER( wangpc_state::ppi_pb_r )
 	return data;
 }
 
-READ8_MEMBER( wangpc_state::ppi_pc_r )
+uint8_t wangpc_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1016,7 +1016,7 @@ READ8_MEMBER( wangpc_state::ppi_pc_r )
 	return m_sw->read() << 4;
 }
 
-WRITE8_MEMBER( wangpc_state::ppi_pc_w )
+void wangpc_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

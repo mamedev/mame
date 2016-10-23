@@ -433,12 +433,12 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 	}
 }
 
-READ8_MEMBER( multipcm_device::read )
+uint8_t multipcm_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( multipcm_device::write )
+void multipcm_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

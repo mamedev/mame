@@ -23,8 +23,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(protection_r) override { return m_sma_prot->prot_9a37_r(space, offset, mem_mask); }
-	virtual DECLARE_READ16_MEMBER(addon_r) override { return m_sma_prot->random_r(space, offset, mem_mask); }
+	virtual uint16_t protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_sma_prot->prot_9a37_r(space, offset, mem_mask); }
+	virtual uint16_t addon_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { return m_sma_prot->random_r(space, offset, mem_mask); }
 	virtual uint32_t get_bank_base(uint16_t sel) override { return 0; }
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}

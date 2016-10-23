@@ -87,7 +87,7 @@ Dip locations and factory settings verified from dip listing
 #include "buggychl.lh"
 
 
-WRITE8_MEMBER(buggychl_state::bankswitch_w)
+void buggychl_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
@@ -100,18 +100,18 @@ TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
 		m_pending_nmi = 1;
 }
 
-WRITE8_MEMBER(buggychl_state::sound_command_w)
+void buggychl_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(buggychl_state::nmi_callback),this), data);
 }
 
-WRITE8_MEMBER(buggychl_state::nmi_disable_w)
+void buggychl_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(buggychl_state::nmi_enable_w)
+void buggychl_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -121,7 +121,7 @@ WRITE8_MEMBER(buggychl_state::nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(buggychl_state::sound_enable_w)
+void buggychl_state::sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().sound().system_enable(data & 1);
 }
@@ -311,19 +311,19 @@ GFXDECODE_END
 
 
 
-WRITE8_MEMBER(buggychl_state::port_a_0_w)
+void buggychl_state::port_a_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-WRITE8_MEMBER(buggychl_state::port_b_0_w)
+void buggychl_state::port_b_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }
-WRITE8_MEMBER(buggychl_state::port_a_1_w)
+void buggychl_state::port_a_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VOL/BAL   for the 7630 on this 8910 output */
 }
-WRITE8_MEMBER(buggychl_state::port_b_1_w)
+void buggychl_state::port_b_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TRBL/BASS for the 7630 on this 8910 output */
 }

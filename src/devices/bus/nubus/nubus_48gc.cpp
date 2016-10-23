@@ -255,7 +255,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-WRITE32_MEMBER( jmfb_device::mac_48gc_w )
+void jmfb_device::mac_48gc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_registers[offset&0xff]);
 
@@ -350,7 +350,7 @@ WRITE32_MEMBER( jmfb_device::mac_48gc_w )
 	}
 }
 
-READ32_MEMBER( jmfb_device::mac_48gc_r )
+uint32_t jmfb_device::mac_48gc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("48gc_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, m_maincpu->safe_pc());
 

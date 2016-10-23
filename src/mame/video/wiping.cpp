@@ -79,7 +79,7 @@ PALETTE_INIT_MEMBER(wiping_state, wiping)
 
 
 
-WRITE8_MEMBER(wiping_state::flipscreen_w)
+void wiping_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = (data & 1);
 }

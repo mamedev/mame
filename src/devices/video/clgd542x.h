@@ -18,14 +18,14 @@ public:
 	// construction/destruction
 	cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	cirrus_gd5428_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 protected:

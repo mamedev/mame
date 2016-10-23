@@ -65,11 +65,11 @@ public:
 	// public interfaces
 	void set_irq_line(int irqline, int state);
 
-	DECLARE_READ8_MEMBER( irq_status_r );
-	DECLARE_WRITE8_MEMBER( irq_status_w );
+	uint8_t irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( timer_r );
-	DECLARE_WRITE8_MEMBER( timer_w );
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* functions for use by the PSG and joypad port only! */
 	uint8_t io_get_buffer();

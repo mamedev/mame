@@ -34,11 +34,11 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_WRITE8_MEMBER( display_w );
-	DECLARE_READ8_MEMBER( test_r );
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
-WRITE8_MEMBER( z80dev_state::display_w )
+void z80dev_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ---- xxxx digit
 	// xxxx ---- ???
@@ -47,7 +47,7 @@ WRITE8_MEMBER( z80dev_state::display_w )
 	output().set_digit_value(offset, hex_7seg[data&0x0f]);
 }
 
-READ8_MEMBER( z80dev_state::test_r )
+uint8_t z80dev_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.machine().rand();
 }

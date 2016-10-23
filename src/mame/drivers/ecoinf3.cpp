@@ -56,49 +56,49 @@ public:
 
 	int m_percent_mux;
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b)
+	uint8_t ppi8255_intf_a_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_a_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN1")->read();
 		logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c)
+	uint8_t ppi8255_intf_a_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN5")->read();
 		logerror("%04x - ppi8255_intf_a_(used)read_c %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_b_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_b_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_b_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_b)
+	uint8_t ppi8255_intf_c_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_c_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN2")->read();
 		logerror("%04x - ppi8255_intf_c_(used)read_b %02x (COINS+TEST)\n", m_maincpu->pcbase(), ret);
 		return ret;
 	} // changing to 00 gives coin tamper
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c)
+	uint8_t ppi8255_intf_c_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN6")->read();
 		logerror("%04x - ppi8255_intf_c_(used)read_c %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b)
+	uint8_t ppi8255_intf_d_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_d_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN7")->read();
 		logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c)
+	uint8_t ppi8255_intf_d_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		// guess, what are the bottom 4 bits, if anything?
 
@@ -116,8 +116,8 @@ public:
 
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b)
+	uint8_t ppi8255_intf_e_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_e_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{   // changing gives no % key error in sphinx
 
 		int ret;
@@ -141,30 +141,30 @@ public:
 
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_e_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a)
+	uint8_t ppi8255_intf_f_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN4")->read();
 		logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_f_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_f_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_g_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_g_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_g_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_b)
+	uint8_t ppi8255_intf_h_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_h_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int ret = ioport("IN5")->read();
 		logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	uint8_t ppi8255_intf_h_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
 	void update_lamps(void)
 	{
@@ -180,7 +180,7 @@ public:
 
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a_strobedat0)
+	void ppi8255_intf_a_write_a_strobedat0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
 		if (strobe_amount)
@@ -190,7 +190,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b_strobedat1)
+	void ppi8255_intf_a_write_b_strobedat1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
 		if (strobe_amount)
@@ -199,7 +199,7 @@ public:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c_strobe)
+	void ppi8255_intf_a_write_c_strobe(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (data>=0xf0)
 		{
@@ -215,15 +215,15 @@ public:
 		else logerror("%04x - ppi8255_intf_a_(used)write_c %02x (UNUSUAL?)\n", m_maincpu->pcbase(), data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_a) { logerror("%04x - ppi8255_intf_b_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_b) { logerror("%04x - ppi8255_intf_b_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_c) { logerror("%04x - ppi8255_intf_b_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_b_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_b_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_b_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_b_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_b_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_b_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_a) { logerror("%04x - ppi8255_intf_c_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_b) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_c) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_c_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_c_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_c_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_c_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel01)
+	void ppi8255_intf_d_write_a_reel01(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 //      logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", m_maincpu->pcbase(), data);
 		m_reel0->update( data    &0x0f);
@@ -233,7 +233,7 @@ public:
 		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
+	void ppi8255_intf_d_write_b_reel23(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 //      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", m_maincpu->pcbase(), data);
 
@@ -244,28 +244,28 @@ public:
 		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
+	void ppi8255_intf_d_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a_alpha_display);
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c)
+	void ppi8255_intf_e_write_a_alpha_display(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi8255_intf_e_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_e_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_percent_mux = data;
 
 		logerror("%04x - ppi8255_intf_e_write_c %02x (INPUT MUX?)\n", m_maincpu->pcbase(), data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_a) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_b) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_c) { logerror("%04x - ppi8255_intf_f_write_c %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_f_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_f_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_f_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_f_write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_a) { logerror("%04x - ppi8255_intf_g_write_a %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_b) { logerror("%04x - ppi8255_intf_g_write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_c) { logerror("%04x - ppi8255_intf_g_write_c %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_g_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_g_write_a %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_g_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_g_write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_g_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_g_write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_a) { logerror("%04x - ppi8255_intf_h_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_b) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_c) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_h_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_h_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_h_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	void ppi8255_intf_h_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
 
 	void init_ecoinf3();
@@ -359,7 +359,7 @@ void ecoinf3_state::update_display()
 }
 
 // is the 2 digit bank display part of this, or multiplexed elsewhere
-WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
+void ecoinf3_state::ppi8255_intf_e_write_a_alpha_display(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", m_maincpu->pcbase(), data, data);
 	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", m_maincpu->pcbase(), data);

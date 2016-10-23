@@ -46,9 +46,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_keyrow;
 	bool m_ledready;
@@ -57,20 +57,20 @@ private:
 };
 
 
-READ8_MEMBER( pmi80_state::keyboard_r)
+uint8_t pmi80_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"%X",m_keyrow);
 	return ioport(kbdrow)->read();
 }
 
-WRITE8_MEMBER( pmi80_state::keyboard_w )
+void pmi80_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyrow = data;
 	m_ledready = true;
 }
 
-WRITE8_MEMBER( pmi80_state::leds_w )
+void pmi80_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ledready)
 	{

@@ -299,7 +299,7 @@ READ8Z_MEMBER(ti_rs232_pio_device::crureadz)
 /*
     CRU write
 */
-WRITE8_MEMBER(ti_rs232_pio_device::cruwrite)
+void ti_rs232_pio_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -428,7 +428,7 @@ READ8Z_MEMBER( ti_rs232_pio_device::readz )
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_rs232_pio_device::write )
+void ti_rs232_pio_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
@@ -986,12 +986,12 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv1_callback )
 	receive_data_or_line_state(1);
 }
 
-WRITE8_MEMBER( ti_rs232_pio_device::xmit0_callback )
+void ti_rs232_pio_device::xmit0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	transmit_data(0, data);
 }
 
-WRITE8_MEMBER( ti_rs232_pio_device::xmit1_callback )
+void ti_rs232_pio_device::xmit1_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	transmit_data(1, data);
 }
@@ -1017,12 +1017,12 @@ void ti_rs232_pio_device::ctrl_callback(int uartind, int offset, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( ti_rs232_pio_device::ctrl0_callback )
+void ti_rs232_pio_device::ctrl0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ctrl_callback(0, offset, data);
 }
 
-WRITE8_MEMBER( ti_rs232_pio_device::ctrl1_callback )
+void ti_rs232_pio_device::ctrl1_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ctrl_callback(1, offset, data);
 }

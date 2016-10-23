@@ -34,7 +34,7 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
 /* this looks like some kind of protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
-READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
+uint8_t mrdo_state::mrdo_SECRE_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	return RAM[space.device().state().state_int(Z80_HL)];

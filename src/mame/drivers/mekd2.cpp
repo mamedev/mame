@@ -102,10 +102,10 @@ public:
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
-	DECLARE_READ8_MEMBER(mekd2_key_r);
+	uint8_t mekd2_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
-	DECLARE_WRITE8_MEMBER(mekd2_digit_w);
-	DECLARE_WRITE8_MEMBER(mekd2_segment_w);
+	void mekd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mekd2_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
@@ -231,7 +231,7 @@ READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
 	return BIT(m_keydata, 6);
 }
 
-READ8_MEMBER( mekd2_state::mekd2_key_r )
+uint8_t mekd2_state::mekd2_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[4];
 	uint8_t i;
@@ -269,12 +269,12 @@ READ8_MEMBER( mekd2_state::mekd2_key_r )
 
 ************************************************************/
 
-WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
+void mekd2_state::mekd2_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment = data & 0x7f;
 }
 
-WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
+void mekd2_state::mekd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t i;
 	if (data < 0x3f)

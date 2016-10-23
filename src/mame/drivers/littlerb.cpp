@@ -95,8 +95,8 @@ public:
 	int m_soundframe;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
-	DECLARE_WRITE16_MEMBER(littlerb_l_sound_w);
-	DECLARE_WRITE16_MEMBER(littlerb_r_sound_w);
+	void littlerb_l_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t sound_data_shift();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
@@ -112,14 +112,14 @@ uint8_t littlerb_state::sound_data_shift()
 }
 
 /* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
-WRITE16_MEMBER(littlerb_state::littlerb_l_sound_w)
+void littlerb_state::littlerb_l_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sound_index_l = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_l = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
-WRITE16_MEMBER(littlerb_state::littlerb_r_sound_w)
+void littlerb_state::littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sound_index_r = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_r = 0;

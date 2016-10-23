@@ -167,22 +167,22 @@ OSC3: 48.384MHz
 #include "includes/namcofl.h"
 
 
-READ32_MEMBER(namcofl_state::fl_unk1_r)
+uint32_t namcofl_state::fl_unk1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::fl_network_r)
+uint32_t namcofl_state::fl_network_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(namcofl_state::namcofl_sysreg_r)
+uint32_t namcofl_state::namcofl_sysreg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
+void namcofl_state::namcofl_sysreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
@@ -200,7 +200,7 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 }
 
 // FIXME: remove this trampoline once the IRQ is moved into the actual device
-WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
+void namcofl_state::namcofl_c116_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_c116->write(space, offset, data);
 
@@ -211,12 +211,12 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 	}
 }
 
-READ32_MEMBER(namcofl_state::namcofl_share_r)
+uint32_t namcofl_state::namcofl_share_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_shareram[offset*2+1] << 16) | m_shareram[offset*2];
 }
 
-WRITE32_MEMBER(namcofl_state::namcofl_share_w)
+void namcofl_state::namcofl_share_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_shareram+offset*2);
 	data >>= 16;
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 ADDRESS_MAP_END
 
 
-WRITE16_MEMBER(namcofl_state::mcu_shared_w)
+void namcofl_state::mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
@@ -267,17 +267,17 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 }
 
 
-READ8_MEMBER(namcofl_state::port6_r)
+uint8_t namcofl_state::port6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_port6;
 }
 
-WRITE8_MEMBER(namcofl_state::port6_w)
+void namcofl_state::port6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_port6 = data;
 }
 
-READ8_MEMBER(namcofl_state::port7_r)
+uint8_t namcofl_state::port7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_mcu_port6 & 0xf0)
 	{
@@ -300,26 +300,26 @@ READ8_MEMBER(namcofl_state::port7_r)
 	return 0xff;
 }
 
-READ8_MEMBER(namcofl_state::dac7_r)
+uint8_t namcofl_state::dac7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_accel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac6_r)
+uint8_t namcofl_state::dac6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_brake.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac5_r)
+uint8_t namcofl_state::dac5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wheel.read_safe(0xff);
 }
 
-READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac3_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
-READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
+uint8_t namcofl_state::dac4_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac3_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac2_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac1_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
+uint8_t namcofl_state::dac0_r(address_space &space, offs_t offset, uint8_t mem_mask){ return 0xff; }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)

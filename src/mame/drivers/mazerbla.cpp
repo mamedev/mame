@@ -194,25 +194,25 @@ public:
 
 	int m_planes_enabled[4];
 #endif
-	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
-	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
-	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
-	DECLARE_READ8_MEMBER(ls670_0_r);
-	DECLARE_WRITE8_MEMBER(ls670_0_w);
-	DECLARE_READ8_MEMBER(ls670_1_r);
-	DECLARE_WRITE8_MEMBER(ls670_1_w);
-	DECLARE_WRITE8_MEMBER(zpu_bcd_decoder_w);
-	DECLARE_READ8_MEMBER(zpu_inputs_r);
-	DECLARE_WRITE8_MEMBER(zpu_led_w);
-	DECLARE_WRITE8_MEMBER(zpu_lamps_w);
-	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(cfb_led_w);
-	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
-	DECLARE_WRITE8_MEMBER(main_sound_w);
-	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
-	DECLARE_WRITE8_MEMBER(gg_led_ctrl_w);
-	DECLARE_READ8_MEMBER(soundcommand_r);
+	void cfb_rom_bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cfb_zpu_int_req_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cfb_zpu_int_req_clr(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ls670_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ls670_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ls670_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ls670_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zpu_bcd_decoder_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t zpu_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zpu_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zpu_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zpu_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cfb_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vsb_ls273_audio_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gg_led_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t soundcommand_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_mazerbla();
 	void init_greatgun();
 	virtual void machine_start() override;
@@ -300,7 +300,7 @@ void mazerbla_state::screen_eof(screen_device &screen, bool state)
 
 /* reference */
 #if 0
-WRITE8_MEMBER(mazerbla_state::cfb_backgnd_color_w)
+void mazerbla_state::cfb_backgnd_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bknd_col != data)
 	{
@@ -332,7 +332,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_backgnd_color_w)
 #endif
 
 #if 0
-WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
+void mazerbla_state::cfb_vbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only bit 6 connected */
 	m_vbank = BIT(data, 6);
@@ -340,7 +340,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 #endif
 
 
-WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
+void mazerbla_state::cfb_rom_bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_rom_bank = data;
 
@@ -348,7 +348,7 @@ WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)
 }
 
 #if 0
-WRITE8_MEMBER(mazerbla_state::vcu_video_reg_w)
+void mazerbla_state::vcu_video_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_vcu_video_reg[offset] != data)
 	{
@@ -358,7 +358,7 @@ WRITE8_MEMBER(mazerbla_state::vcu_video_reg_w)
 	}
 }
 
-READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
+uint8_t mazerbla_state::vcu_set_cmd_param_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_vcu_gfx_param_addr = offset;
 
@@ -377,7 +377,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 }
 
 
-READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
+uint8_t mazerbla_state::vcu_set_gfx_addr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
@@ -541,7 +541,7 @@ READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 	return machine().rand();
 }
 
-READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
+uint8_t mazerbla_state::vcu_set_clr_addr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t * rom = memregion("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
@@ -741,14 +741,14 @@ READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
  *
  *************************************/
 
-WRITE8_MEMBER(mazerbla_state::cfb_zpu_int_req_set_w)
+void mazerbla_state::cfb_zpu_int_req_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zpu_int_vector &= ~2; /* clear D1 on INTA (interrupt acknowledge) */
 
 	m_maincpu->set_input_line(0, ASSERT_LINE);  /* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
-READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
+uint8_t mazerbla_state::cfb_zpu_int_req_clr(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this clears all interrupts
 	m_zpu_int_vector = 0xff;
@@ -757,7 +757,7 @@ READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
 	return 0;
 }
 
-READ8_MEMBER(mazerbla_state::ls670_0_r)
+uint8_t mazerbla_state::ls670_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
@@ -773,13 +773,13 @@ TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_0_w)
 	m_ls670_0[offset] = data;
 }
 
-WRITE8_MEMBER(mazerbla_state::ls670_0_w)
+void mazerbla_state::ls670_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* do this on a timer to let the CPUs synchronize */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_0_w),this), (offset << 8) | data);
 }
 
-READ8_MEMBER(mazerbla_state::ls670_1_r)
+uint8_t mazerbla_state::ls670_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
@@ -795,7 +795,7 @@ TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_1_w)
 	m_ls670_1[offset] = data;
 }
 
-WRITE8_MEMBER(mazerbla_state::ls670_1_w)
+void mazerbla_state::ls670_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* do this on a timer to let the CPUs synchronize */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_1_w),this), (offset << 8) | data);
@@ -854,13 +854,13 @@ Vertical movement of gun is Strobe 9, Bits 0-7.
 
 */
 
-WRITE8_MEMBER(mazerbla_state::zpu_bcd_decoder_w)
+void mazerbla_state::zpu_bcd_decoder_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bcd decoder used a input select (a mux) for reads from port 0x62 */
 	m_bcd_7445 = data & 0xf;
 }
 
-READ8_MEMBER(mazerbla_state::zpu_inputs_r)
+uint8_t mazerbla_state::zpu_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
 												"STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
@@ -872,14 +872,14 @@ READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mazerbla_state::zpu_led_w)
+void mazerbla_state::zpu_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
 	output().set_led_value(0, offset & 1);
 }
 
-WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
+void mazerbla_state::zpu_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
@@ -888,19 +888,19 @@ WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 	/*output().set_led_value(1, (data & 0x20) >> 4);*/
 }
 
-WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
+void mazerbla_state::zpu_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 6 = coin counter */
 	machine().bookkeeping().coin_counter_w(offset, BIT(data, 6));
 }
 
-WRITE8_MEMBER(mazerbla_state::cfb_led_w)
+void mazerbla_state::cfb_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 - led on */
 	output().set_led_value(2, BIT(data, 7));
 }
 
-WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
+void mazerbla_state::gg_led_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0, bit 1 - led on */
 	output().set_led_value(1, BIT(data, 0));
@@ -913,7 +913,7 @@ WRITE8_MEMBER(mazerbla_state::gg_led_ctrl_w)
  *
  *************************************/
 
-WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
+void mazerbla_state::vsb_ls273_audio_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vsb_ls273 = data;
 
@@ -921,7 +921,7 @@ WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 	output().set_led_value(1, BIT(data, 5));
 }
 
-READ8_MEMBER(mazerbla_state::soundcommand_r)
+uint8_t mazerbla_state::soundcommand_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch;
 }
@@ -934,17 +934,17 @@ TIMER_CALLBACK_MEMBER(mazerbla_state::delayed_sound_w)
 	m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(mazerbla_state::main_sound_w)
+void mazerbla_state::main_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::delayed_sound_w),this), data & 0xff);
 }
 
-WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
+void mazerbla_state::sound_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(mazerbla_state::sound_nmi_clear_w)
+void mazerbla_state::sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }

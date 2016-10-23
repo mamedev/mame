@@ -386,7 +386,7 @@ void rallyx_state::video_start_commsega()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(rallyx_state::rallyx_videoram_w)
+void rallyx_state::rallyx_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset & 0x400)
@@ -395,17 +395,17 @@ WRITE8_MEMBER(rallyx_state::rallyx_videoram_w)
 		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_scrollx_w)
+void rallyx_state::rallyx_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(rallyx_state::rallyx_scrolly_w)
+void rallyx_state::rallyx_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(rallyx_state::tactcian_starson_w)
+void rallyx_state::tactcian_starson_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stars_enable = data & 1;
 }

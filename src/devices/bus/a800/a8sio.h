@@ -98,7 +98,7 @@ public:
 	//DECLARE_WRITE_LINE_MEMBER( command_w );   // pin 7
 	DECLARE_WRITE_LINE_MEMBER( motor_w );     // pin 8
 	//DECLARE_WRITE_LINE_MEMBER( proceed_w );   // pin 9
-	DECLARE_WRITE8_MEMBER( audio_in_w );      // pin 11
+	void audio_in_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);      // pin 11
 
 protected:
 	// device-level overrides

@@ -748,12 +748,12 @@ public:
 	static void static_set_transparent_pen(device_t &device, pen_t pen);
 
 	// write handlers
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_WRITE8_MEMBER(write_ext);
-	DECLARE_WRITE16_MEMBER(write_ext);
-	DECLARE_WRITE32_MEMBER(write_ext);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void write_ext(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_ext(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void write_ext(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// pick one to use to avoid ambiguity errors
 	using device_t::machine;

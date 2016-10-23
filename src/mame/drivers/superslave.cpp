@@ -32,7 +32,7 @@ Oxx,yy          = Out port
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( superslave_state::read )
+uint8_t superslave_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -66,7 +66,7 @@ READ8_MEMBER( superslave_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::write )
+void superslave_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
@@ -92,7 +92,7 @@ WRITE8_MEMBER( superslave_state::write )
 //  baud_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::baud_w )
+void superslave_state::baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dbrg->str_w(data & 0x0f);
 	m_dbrg->stt_w(data >> 4);
@@ -103,7 +103,7 @@ WRITE8_MEMBER( superslave_state::baud_w )
 //  memctrl_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::memctrl_w )
+void superslave_state::memctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER( superslave_state::memctrl_w )
 //  status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( superslave_state::status_r)
+uint8_t superslave_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -161,7 +161,7 @@ READ8_MEMBER( superslave_state::status_r)
 //  cmd_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( superslave_state::cmd_w )
+void superslave_state::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

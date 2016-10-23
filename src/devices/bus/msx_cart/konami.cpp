@@ -81,13 +81,13 @@ void msx_cart_konami::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_konami::read_cart)
+uint8_t msx_cart_konami::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_base[offset >> 13][offset & 0x1fff];
 }
 
 
-WRITE8_MEMBER(msx_cart_konami::write_cart)
+void msx_cart_konami::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xe000)
 	{
@@ -206,7 +206,7 @@ void msx_cart_konami_scc::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_konami_scc::read_cart)
+uint8_t msx_cart_konami_scc::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_scc_active && offset >= 0x9800 && offset < 0xa000 )
 	{
@@ -228,7 +228,7 @@ READ8_MEMBER(msx_cart_konami_scc::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_konami_scc::write_cart)
+void msx_cart_konami_scc::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xf800)
 	{
@@ -400,7 +400,7 @@ void msx_cart_gamemaster2::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_gamemaster2::read_cart)
+uint8_t msx_cart_gamemaster2::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t bank = offset >> 13;
 
@@ -434,7 +434,7 @@ READ8_MEMBER(msx_cart_gamemaster2::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_gamemaster2::write_cart)
+void msx_cart_gamemaster2::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xf000)
 	{
@@ -506,7 +506,7 @@ void msx_cart_synthesizer::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_synthesizer::read_cart)
+uint8_t msx_cart_synthesizer::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0xc000 )
 	{
@@ -516,7 +516,7 @@ READ8_MEMBER(msx_cart_synthesizer::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_synthesizer::write_cart)
+void msx_cart_synthesizer::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xc010) == 0x4000)
 	{
@@ -633,7 +633,7 @@ void msx_cart_konami_sound::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_konami_sound::read_cart)
+uint8_t msx_cart_konami_sound::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_scc_active && offset >= 0x9800 && offset < 0x9fe0 )
 	{
@@ -681,7 +681,7 @@ READ8_MEMBER(msx_cart_konami_sound::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_konami_sound::write_cart)
+void msx_cart_konami_sound::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xe000)
 	{
@@ -920,7 +920,7 @@ void msx_cart_keyboard_master::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_keyboard_master::read_cart)
+uint8_t msx_cart_keyboard_master::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0x4000 && offset < 0x8000)
 	{
@@ -930,13 +930,13 @@ READ8_MEMBER(msx_cart_keyboard_master::read_cart)
 }
 
 
-READ8_MEMBER(msx_cart_keyboard_master::read_vlm)
+uint8_t msx_cart_keyboard_master::read_vlm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom_vlm5030[offset];
 }
 
 
-WRITE8_MEMBER(msx_cart_keyboard_master::io_20_w)
+void msx_cart_keyboard_master::io_20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm5030->rst((data & 0x01) ? 1 : 0);
 	m_vlm5030->vcu((data & 0x04) ? 1 : 0);
@@ -944,7 +944,7 @@ WRITE8_MEMBER(msx_cart_keyboard_master::io_20_w)
 }
 
 
-READ8_MEMBER(msx_cart_keyboard_master::io_00_r)
+uint8_t msx_cart_keyboard_master::io_00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vlm5030->bsy() ? 0x10 : 0x00;
 }

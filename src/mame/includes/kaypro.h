@@ -39,21 +39,21 @@ public:
 	{}
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_READ8_MEMBER(kaypro2x_87_r);
-	DECLARE_READ8_MEMBER(kaypro2x_system_port_r);
-	DECLARE_READ8_MEMBER(kaypro2x_status_r);
-	DECLARE_READ8_MEMBER(kaypro2x_videoram_r);
-	DECLARE_WRITE8_MEMBER(kaypro2x_system_port_w);
-	DECLARE_WRITE8_MEMBER(kaypro2x_index_w);
-	DECLARE_WRITE8_MEMBER(kaypro2x_register_w);
-	DECLARE_WRITE8_MEMBER(kaypro2x_videoram_w);
-	DECLARE_READ8_MEMBER(pio_system_r);
-	DECLARE_WRITE8_MEMBER(kayproii_pio_system_w);
-	DECLARE_WRITE8_MEMBER(kaypro4_pio_system_w);
+	uint8_t kaypro2x_87_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kaypro2x_system_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kaypro2x_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kaypro2x_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kaypro2x_system_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kaypro2x_index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kaypro2x_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kaypro2x_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kayproii_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kaypro4_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_READ8_MEMBER(kaypro_videoram_r);
-	DECLARE_WRITE8_MEMBER(kaypro_videoram_w);
+	uint8_t kaypro_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kaypro_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_kayproii();
 	void machine_reset_kaypro();
 	void video_start_kaypro();
@@ -66,8 +66,8 @@ public:
 	uint32_t screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
-	DECLARE_READ8_MEMBER(kaypro_sio_r);
-	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
+	uint8_t kaypro_sio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kaypro_sio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
 	const uint8_t *m_p_chargen;

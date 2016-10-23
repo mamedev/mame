@@ -18,16 +18,16 @@ public:
 	required_device<m68000_base_device> m_maincpu;
 
 	void init_sc5();
-	DECLARE_READ8_MEMBER( sc5_10202F0_r );
-	DECLARE_WRITE8_MEMBER( sc5_10202F0_w );
-	DECLARE_WRITE16_MEMBER( sc5_duart_w );
+	uint8_t sc5_10202F0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sc5_10202F0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc5_duart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER( sc5_mux1_r );
-	DECLARE_WRITE8_MEMBER( sc5_mux1_w );
-	DECLARE_WRITE8_MEMBER( sc5_mux2_w );
+	uint8_t sc5_mux1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sc5_mux1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc5_mux2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
-	DECLARE_READ8_MEMBER(bfm_sc5_duart_input_r);
-	DECLARE_WRITE8_MEMBER(bfm_sc5_duart_output_w);
+	uint8_t bfm_sc5_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bfm_sc5_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

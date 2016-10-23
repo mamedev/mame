@@ -43,7 +43,7 @@ const uint32_t MASTER_CLOCK_8MHz = 8000000;
 //  display enable, lamps, and coin counters
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::video_lamps_w )
+void segahang_state::video_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  Main PPI port B
@@ -82,7 +82,7 @@ WRITE8_MEMBER( segahang_state::video_lamps_w )
 //  tilemap control and global sound mute
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::tilemap_sound_w )
+void segahang_state::tilemap_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  Main PPI port C
@@ -114,7 +114,7 @@ WRITE8_MEMBER( segahang_state::tilemap_sound_w )
 //  selects
 //-------------------------------------------------
 
-WRITE8_MEMBER( segahang_state::sub_control_adc_w )
+void segahang_state::sub_control_adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  Sub PPI port A
@@ -139,7 +139,7 @@ WRITE8_MEMBER( segahang_state::sub_control_adc_w )
 //  adc_status_r - get ADC status
 //-------------------------------------------------
 
-READ8_MEMBER( segahang_state::adc_status_r )
+uint8_t segahang_state::adc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//
 	// D7 = 0 (left open)
@@ -160,7 +160,7 @@ READ8_MEMBER( segahang_state::adc_status_r )
 //  hangon_io_r - I/O handler for Hang-On boards
 //-------------------------------------------------
 
-READ16_MEMBER( segahang_state::hangon_io_r )
+uint16_t segahang_state::hangon_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x3020/2)
 	{
@@ -189,7 +189,7 @@ READ16_MEMBER( segahang_state::hangon_io_r )
 //  hangon_io_w - I/O handler for Hang-On boards
 //-------------------------------------------------
 
-WRITE16_MEMBER( segahang_state::hangon_io_w )
+void segahang_state::hangon_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x3020/2)
@@ -217,7 +217,7 @@ WRITE16_MEMBER( segahang_state::hangon_io_w )
 //  boards
 //-------------------------------------------------
 
-READ16_MEMBER( segahang_state::sharrier_io_r )
+uint16_t segahang_state::sharrier_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0x0030/2)
 	{
@@ -248,7 +248,7 @@ READ16_MEMBER( segahang_state::sharrier_io_r )
 //  boards
 //-------------------------------------------------
 
-WRITE16_MEMBER( segahang_state::sharrier_io_w )
+void segahang_state::sharrier_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		switch (offset & 0x0030/2)
@@ -295,7 +295,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 //  sound_data_r - read data from the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segahang_state::sound_data_r )
+uint8_t segahang_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// assert ACK
 	m_i8255_1->pc6_w(CLEAR_LINE);

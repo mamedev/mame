@@ -34,10 +34,10 @@ public:
 
 	template<class _Object> static devcb_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<rtc65271_device &>(device).m_interrupt_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_READ8_MEMBER( xram_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_WRITE8_MEMBER( xram_w );
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t xram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t read(int xramsel, offs_t offset);
 	void write(int xramsel, offs_t offset, uint8_t data);

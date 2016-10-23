@@ -287,7 +287,7 @@ READ_LINE_MEMBER( trs80m2_keyboard_device::data_r )
 //  kb_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( trs80m2_keyboard_device::kb_t1_r )
+uint8_t trs80m2_keyboard_device::kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_busy;
 }
@@ -297,7 +297,7 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_t1_r )
 //  kb_p0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
+uint8_t trs80m2_keyboard_device::kb_p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -314,7 +314,7 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
 //  kb_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
+void trs80m2_keyboard_device::kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -349,7 +349,7 @@ WRITE8_MEMBER( trs80m2_keyboard_device::kb_p1_w )
 //  kb_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( trs80m2_keyboard_device::kb_p2_w )
+void trs80m2_keyboard_device::kb_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

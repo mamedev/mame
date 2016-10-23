@@ -122,7 +122,7 @@ void upd7752_device::status_change(uint8_t flag,bool type)
 		m_status &= ~flag;
 }
 
-READ8_MEMBER( upd7752_device::read )
+uint8_t upd7752_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 3)
 	{
@@ -140,7 +140,7 @@ READ8_MEMBER( upd7752_device::read )
 	return 0xff;
 }
 
-WRITE8_MEMBER( upd7752_device::write )
+void upd7752_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset & 3)
 	{

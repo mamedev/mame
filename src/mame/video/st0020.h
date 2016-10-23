@@ -21,12 +21,12 @@ public:
 
 	void st0020_draw_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(st0020_gfxram_r);
-	DECLARE_WRITE16_MEMBER(st0020_gfxram_w);
-	DECLARE_READ16_MEMBER(st0020_blitram_r);
-	DECLARE_WRITE16_MEMBER(st0020_blitram_w);
-	DECLARE_READ16_MEMBER(st0020_sprram_r);
-	DECLARE_WRITE16_MEMBER(st0020_sprram_w);
+	uint16_t st0020_gfxram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void st0020_gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t st0020_blitram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void st0020_blitram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t st0020_sprram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void st0020_sprram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;
@@ -39,8 +39,8 @@ private:
 	std::unique_ptr<uint16_t[]> m_st0020_spriteram;
 	std::unique_ptr<uint16_t[]> m_st0020_blitram;
 	void st0020_draw_zooming_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	DECLARE_READ16_MEMBER(st0020_blit_r);
-	DECLARE_WRITE16_MEMBER(st0020_blit_w);
+	uint16_t st0020_blit_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void st0020_blit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t* m_rom_ptr;
 	size_t m_rom_size;
 };

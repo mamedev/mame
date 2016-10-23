@@ -56,14 +56,14 @@ public:
 	int m_ycenter;
 	emu_timer *m_refresh_end_timer;
 
-	DECLARE_WRITE16_MEMBER(led_w);
-	DECLARE_WRITE16_MEMBER(refresh_control_w);
-	DECLARE_WRITE8_MEMBER(reset_coin_flag_w);
-	DECLARE_READ8_MEMBER(coin_sound_r);
-	DECLARE_READ8_MEMBER(soundlatch2_r);
-	DECLARE_WRITE8_MEMBER(soundlatch4_w);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(io_r);
+	void led_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void refresh_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reset_coin_flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t coin_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t soundlatch2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void soundlatch4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
 

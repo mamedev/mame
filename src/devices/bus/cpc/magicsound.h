@@ -43,14 +43,14 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(dmac_r);
-	DECLARE_WRITE8_MEMBER(dmac_w);
-	DECLARE_WRITE8_MEMBER(timer_w);
-	DECLARE_WRITE8_MEMBER(volume_w);
-	DECLARE_WRITE8_MEMBER(mapper_w);
+	uint8_t dmac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(da0_w);
-	DECLARE_READ8_MEMBER(dma_read_byte);
-	DECLARE_WRITE8_MEMBER(dma_write_byte);
+	uint8_t dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(dack2_w);

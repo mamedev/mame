@@ -132,18 +132,18 @@ static const uint16_t mHoreKidProtData[] =
 	0x1800 /* checksum */
 };
 
-WRITE16_MEMBER(terracre_state::amazon_sound_w)
+void terracre_state::amazon_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(terracre_state::soundlatch_clear_r)
+uint8_t terracre_state::soundlatch_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch->clear_w(space,0,0);
 	return 0;
 }
 
-READ16_MEMBER(terracre_state::amazon_protection_r)
+uint16_t terracre_state::amazon_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset = m_mAmazonProtReg[2];
 	if( offset<=0x56 )
@@ -156,7 +156,7 @@ READ16_MEMBER(terracre_state::amazon_protection_r)
 	return 0;
 }
 
-WRITE16_MEMBER(terracre_state::amazon_protection_w)
+void terracre_state::amazon_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{

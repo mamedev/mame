@@ -167,13 +167,13 @@ void liberatr_state::machine_reset()
  *
  *************************************/
 
-WRITE8_MEMBER( liberatr_state::led_w )
+void liberatr_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset, ~data & 0x10);
 }
 
 
-WRITE8_MEMBER( liberatr_state::coin_counter_w )
+void liberatr_state::coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset ^ 0x01, data & 0x10);
 }
@@ -186,7 +186,7 @@ WRITE8_MEMBER( liberatr_state::coin_counter_w )
  *
  *************************************/
 
-WRITE8_MEMBER( liberatr_state::trackball_reset_w )
+void liberatr_state::trackball_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* on the rising edge of /ctrld, the /ld signal on the LS191 is released and the value of the switches */
 	/* input becomes the starting point for the trackball counters */
@@ -200,7 +200,7 @@ WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 }
 
 
-READ8_MEMBER( liberatr_state::port0_r )
+uint8_t liberatr_state::port0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
@@ -222,14 +222,14 @@ READ8_MEMBER( liberatr_state::port0_r )
  *
  *************************************/
 
-READ8_MEMBER( liberatr_state::earom_r )
+uint8_t liberatr_state::earom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// return data latched from previous clock
 	return m_earom->data();
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_w )
+void liberatr_state::earom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// remember the value written
 	m_earom_data = data;
@@ -243,7 +243,7 @@ WRITE8_MEMBER( liberatr_state::earom_w )
 }
 
 
-WRITE8_MEMBER( liberatr_state::earom_control_w )
+void liberatr_state::earom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// remember the control state
 	m_earom_control = data;

@@ -210,44 +210,44 @@ void nmk16_state::video_start_bjtwin()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram0_w)
+void nmk16_state::nmk_bgvideoram0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram0[offset]);
 	m_bg_tilemap0->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram1_w)
+void nmk16_state::nmk_bgvideoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram1[offset]);
 	m_bg_tilemap1->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram2_w)
+void nmk16_state::nmk_bgvideoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram2[offset]);
 	m_bg_tilemap2->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_bgvideoram3_w)
+void nmk16_state::nmk_bgvideoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_bgvideoram3[offset]);
 	m_bg_tilemap3->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_fgvideoram_w)
+void nmk16_state::nmk_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_txvideoram_w)
+void nmk16_state::nmk_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_nmk_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
+void nmk16_state::mustang_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
 
@@ -274,7 +274,7 @@ WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 	m_bg_tilemap0->set_scrollx(0,m_mustang_bg_xscroll - m_videoshift);
 }
 
-WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
+void nmk16_state::bioshipbg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -287,7 +287,7 @@ WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
+void nmk16_state::nmk_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -300,7 +300,7 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
+void nmk16_state::nmk_scroll_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -313,7 +313,7 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
+void nmk16_state::vandyke_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vscroll[offset] = data;
 
@@ -321,7 +321,7 @@ WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
+void nmk16_state::vandykeb_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -335,7 +335,7 @@ WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_vscroll[2] * 256 + (m_vscroll[3] >> 8));
 }
 
-WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
+void nmk16_state::manybloc_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);
 
@@ -343,13 +343,13 @@ WRITE16_MEMBER(nmk16_state::manybloc_scroll_w)
 	m_bg_tilemap0->set_scrolly(0,m_gunnail_scrollram[0xc2/2]);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_flipscreen_w)
+void nmk16_state::nmk_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		flip_screen_set(data & 0x01);
 }
 
-WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
+void nmk16_state::nmk_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -364,13 +364,13 @@ WRITE16_MEMBER(nmk16_state::nmk_tilebank_w)
 	}
 }
 
-WRITE16_MEMBER(nmk16_state::bioship_scroll_w)
+void nmk16_state::bioship_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_bioship_scroll[offset]=data>>8;
 }
 
-WRITE16_MEMBER(nmk16_state::bioship_bank_w)
+void nmk16_state::bioship_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

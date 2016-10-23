@@ -101,51 +101,51 @@ public:
 	uint8_t m_i8255_1_pc;
 	uint8_t m_fdc_mode;
 	uint8_t m_fdc_irq_opcode;
-	DECLARE_READ16_MEMBER(sys_mem_r);
-	DECLARE_WRITE16_MEMBER(sys_mem_w);
-	DECLARE_READ8_MEMBER(idp_status_r);
-	DECLARE_WRITE8_MEMBER(idp_command_w);
-	DECLARE_WRITE8_MEMBER(idp_param_w);
-	DECLARE_WRITE16_MEMBER(palette_ram_w);
-	DECLARE_READ16_MEMBER(sys_port4_r);
-	DECLARE_READ16_MEMBER(bios_bank_r);
-	DECLARE_WRITE16_MEMBER(bios_bank_w);
-	DECLARE_READ8_MEMBER(rom_bank_r);
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE16_MEMBER(backupram_wp_1_w);
-	DECLARE_WRITE16_MEMBER(backupram_wp_0_w);
-	DECLARE_READ8_MEMBER(hdd_status_r);
+	uint16_t sys_mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sys_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t idp_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void idp_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void idp_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sys_port4_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t bios_bank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bios_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void backupram_wp_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void backupram_wp_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t hdd_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	#if TEST_SUBFDC
-	DECLARE_READ8_MEMBER(upd765_tc_r);
-	DECLARE_WRITE8_MEMBER(upd765_mc_w);
+	uint8_t upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void upd765_mc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	#else
-	DECLARE_READ8_MEMBER(no_subfdc_r);
+	uint8_t no_subfdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	#endif
-	DECLARE_READ8_MEMBER(pc88va_fdc_r);
-	DECLARE_WRITE8_MEMBER(pc88va_fdc_w);
-	DECLARE_READ16_MEMBER(sysop_r);
-	DECLARE_READ16_MEMBER(screen_ctrl_r);
-	DECLARE_WRITE16_MEMBER(screen_ctrl_w);
-	DECLARE_WRITE8_MEMBER(timer3_ctrl_reg_w);
-	DECLARE_WRITE16_MEMBER(video_pri_w);
-	DECLARE_READ8_MEMBER(backupram_dsw_r);
-	DECLARE_WRITE8_MEMBER(sys_port1_w);
+	uint8_t pc88va_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc88va_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t sysop_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t screen_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void screen_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void timer3_ctrl_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_pri_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t backupram_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sys_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
-	DECLARE_READ8_MEMBER(cpu_8255_c_r);
-	DECLARE_WRITE8_MEMBER(cpu_8255_c_w);
-	DECLARE_READ8_MEMBER(fdc_8255_c_r);
-	DECLARE_WRITE8_MEMBER(fdc_8255_c_w);
-	DECLARE_READ8_MEMBER(r232_ctrl_porta_r);
-	DECLARE_READ8_MEMBER(r232_ctrl_portb_r);
-	DECLARE_READ8_MEMBER(r232_ctrl_portc_r);
-	DECLARE_WRITE8_MEMBER(r232_ctrl_porta_w);
-	DECLARE_WRITE8_MEMBER(r232_ctrl_portb_w);
-	DECLARE_WRITE8_MEMBER(r232_ctrl_portc_w);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r232_ctrl_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t r232_ctrl_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t r232_ctrl_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r232_ctrl_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void r232_ctrl_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void r232_ctrl_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 //  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	uint8_t m_fdc_ctrl_2;
@@ -158,10 +158,10 @@ public:
 //  void m_fdc_dma_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
-DECLARE_READ8_MEMBER(dma_memr_cb);
-DECLARE_WRITE8_MEMBER(dma_memw_cb);
+	uint8_t fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+uint8_t dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+void dma_memw_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
@@ -563,7 +563,7 @@ void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-READ16_MEMBER(pc88va_state::sys_mem_r)
+uint16_t pc88va_state::sys_mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch((m_bank_reg & 0xf00) >> 8)
 	{
@@ -614,7 +614,7 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(pc88va_state::sys_mem_w)
+void pc88va_state::sys_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch((m_bank_reg & 0xf00) >> 8)
 	{
@@ -669,7 +669,7 @@ static ADDRESS_MAP_START( pc88va_map, AS_PROGRAM, 16, pc88va_state )
 ADDRESS_MAP_END
 
 /* IDP = NEC uPD72022 */
-READ8_MEMBER(pc88va_state::idp_status_r)
+uint8_t pc88va_state::idp_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     x--- ---- LP   Light-pen signal detection (with VA use failure)
@@ -699,7 +699,7 @@ READ8_MEMBER(pc88va_state::idp_status_r)
 #define SPRSW  0x85
 #define SPROV  0x81
 
-WRITE8_MEMBER(pc88va_state::idp_command_w)
+void pc88va_state::idp_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(data)
 	{
@@ -911,7 +911,7 @@ void pc88va_state::execute_sprsw_cmd()
 	tsp_sprite_enable(0xa0000 + m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 
-WRITE8_MEMBER(pc88va_state::idp_param_w)
+void pc88va_state::idp_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_cmd == DSPOFF || m_cmd == EXIT || m_cmd == SPROFF || m_cmd == SPROV) // no param commands
 		return;
@@ -941,7 +941,7 @@ WRITE8_MEMBER(pc88va_state::idp_param_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::palette_ram_w)
+void pc88va_state::palette_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b;
 	COMBINE_DATA(&m_palram[offset]);
@@ -953,7 +953,7 @@ WRITE16_MEMBER(pc88va_state::palette_ram_w)
 	m_palette->set_pen_color(offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
-READ16_MEMBER(pc88va_state::sys_port4_r)
+uint16_t pc88va_state::sys_port4_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t vrtc,sw1;
 	vrtc = (machine().first_screen()->vpos() < 200) ? 0x20 : 0x00; // vblank
@@ -963,12 +963,12 @@ READ16_MEMBER(pc88va_state::sys_port4_r)
 	return vrtc | sw1 | 0xc0;
 }
 
-READ16_MEMBER(pc88va_state::bios_bank_r)
+uint16_t pc88va_state::bios_bank_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bank_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::bios_bank_w)
+void pc88va_state::bios_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	-x-- ---- ---- ---- SMM (compatibility mode)
@@ -1001,12 +1001,12 @@ WRITE16_MEMBER(pc88va_state::bios_bank_w)
 	}
 }
 
-READ8_MEMBER(pc88va_state::rom_bank_r)
+uint8_t pc88va_state::rom_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff; // bit 7 low is va91 rom bank status
 }
 
-READ8_MEMBER(pc88va_state::key_r)
+uint8_t pc88va_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// note row D bit 2 does something at POST ... some kind of test mode?
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
@@ -1017,22 +1017,22 @@ READ8_MEMBER(pc88va_state::key_r)
 	return ioport(keynames[offset])->read();
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_1_w)
+void pc88va_state::backupram_wp_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_backupram_wp = 1;
 }
 
-WRITE16_MEMBER(pc88va_state::backupram_wp_0_w)
+void pc88va_state::backupram_wp_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_backupram_wp = 0;
 }
 
-READ8_MEMBER(pc88va_state::hdd_status_r)
+uint8_t pc88va_state::hdd_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x20;
 }
 
-READ8_MEMBER(pc88va_state::pc88va_fdc_r)
+uint8_t pc88va_state::pc88va_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("%08x\n",offset);
 
@@ -1085,7 +1085,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	m_fdc->ready_w(ready);
 }
 
-WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
+void pc88va_state::pc88va_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%08x %02x\n",offset<<1,data);
 	switch(offset<<1)
@@ -1162,7 +1162,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 }
 
 
-READ16_MEMBER(pc88va_state::sysop_r)
+uint16_t pc88va_state::sysop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t sys_op;
 
@@ -1171,12 +1171,12 @@ READ16_MEMBER(pc88va_state::sysop_r)
 	return 0xfffc | sys_op; // docs says all the other bits are high
 }
 
-READ16_MEMBER(pc88va_state::screen_ctrl_r)
+uint16_t pc88va_state::screen_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_screen_ctrl_reg;
 }
 
-WRITE16_MEMBER(pc88va_state::screen_ctrl_w)
+void pc88va_state::screen_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_screen_ctrl_reg = data;
 }
@@ -1191,7 +1191,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 	}
 }
 
-WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
+void pc88va_state::timer3_ctrl_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- MINTEN (TCU irq enable)
@@ -1208,12 +1208,12 @@ WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
 	}
 }
 
-WRITE16_MEMBER(pc88va_state::video_pri_w)
+void pc88va_state::video_pri_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_video_pri_reg[offset]);
 }
 
-READ8_MEMBER(pc88va_state::backupram_dsw_r)
+uint8_t pc88va_state::backupram_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t *knj_ram = (uint16_t *)(memregion("kanji")->base());
 
@@ -1223,13 +1223,13 @@ READ8_MEMBER(pc88va_state::backupram_dsw_r)
 	return knj_ram[(0x50000 + 0x1fc6) / 2] & 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::sys_port1_w)
+void pc88va_state::sys_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
 #if !TEST_SUBFDC
-READ8_MEMBER(pc88va_state::no_subfdc_r)
+uint8_t pc88va_state::no_subfdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
@@ -1324,19 +1324,19 @@ static ADDRESS_MAP_START( pc88va_z80_map, AS_PROGRAM, 8, pc88va_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(pc88va_state::upd765_tc_r)
+uint8_t pc88va_state::upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	machine().device<upd765a_device>("upd765")->tc_w(true);
 	timer_set(attotime::from_usec(50), TIMER_PC8801FD_UPD765_TC_TO_ZERO);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_irq_vector_w)
+void pc88va_state::fdc_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc_irq_opcode = data;
 }
 
-WRITE8_MEMBER(pc88va_state::upd765_mc_w)
+void pc88va_state::upd765_mc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
 	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
@@ -1569,27 +1569,27 @@ static GFXDECODE_START( pc88va )
 	GFXDECODE_ENTRY( "kanji",   0x00000, pc88va_chars_16x16,  0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(pc88va_state::cpu_8255_c_r)
+uint8_t pc88va_state::cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8255_1_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::cpu_8255_c_w)
+void pc88va_state::cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8255_0_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::fdc_8255_c_r)
+uint8_t pc88va_state::fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_8255_c_w)
+void pc88va_state::fdc_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8255_1_pc = data;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
+uint8_t pc88va_state::r232_ctrl_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t sw5, sw4, sw3, sw2,speed_sw;
 
@@ -1602,7 +1602,7 @@ READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
+uint8_t pc88va_state::r232_ctrl_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t xsw1;
 
@@ -1611,27 +1611,27 @@ READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
 	return 0xf7 | xsw1;
 }
 
-READ8_MEMBER(pc88va_state::r232_ctrl_portc_r)
+uint8_t pc88va_state::r232_ctrl_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_porta_w)
+void pc88va_state::r232_ctrl_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portb_w)
+void pc88va_state::r232_ctrl_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
-WRITE8_MEMBER(pc88va_state::r232_ctrl_portc_w)
+void pc88va_state::r232_ctrl_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
-READ8_MEMBER(pc88va_state::get_slave_ack)
+uint8_t pc88va_state::get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==7) { // IRQ = 7
 		return machine().device<pic8259_device>( "pic8259_slave")->acknowledge();
@@ -1741,13 +1741,13 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 }
 
 
-READ8_MEMBER(pc88va_state::fdc_dma_r)
+uint8_t pc88va_state::fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("R DMA\n");
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(pc88va_state::fdc_dma_w)
+void pc88va_state::fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("W DMA %08x\n",data);
 	m_fdc->dma_w(data);
@@ -1761,13 +1761,13 @@ static SLOT_INTERFACE_START( pc88va_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-READ8_MEMBER(pc88va_state::dma_memr_cb)
+uint8_t pc88va_state::dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 printf("%08x\n",offset);
 	return 0;
 }
 
-WRITE8_MEMBER(pc88va_state::dma_memw_cb)
+void pc88va_state::dma_memw_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 printf("%08x %02x\n",offset,data);
 }

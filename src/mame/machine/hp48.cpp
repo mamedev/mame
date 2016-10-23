@@ -157,7 +157,7 @@ void hp48_state::hp48_rs232_send_byte(  )
 
 
 /* CPU sets OUT register (keyboard + beeper) */
-WRITE32_MEMBER( hp48_state::hp48_reg_out )
+void hp48_state::hp48_reg_out(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOG(( "%s %f hp48_reg_out: %03x\n",
 			machine().describe_context(), machine().time().as_double(), data ));
@@ -193,7 +193,7 @@ int hp48_state::hp48_get_in(  )
 }
 
 /* CPU reads IN register (keyboard) */
-READ32_MEMBER( hp48_state::hp48_reg_in )
+uint32_t hp48_state::hp48_reg_in(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int in = hp48_get_in();
 	LOG(( "%s %f hp48_reg_in: %04x\n",
@@ -278,7 +278,7 @@ void hp48_state::hp48_update_annunciators()
    - perform some action on read / write
  */
 
-WRITE8_MEMBER(hp48_state::hp48_io_w)
+void hp48_state::hp48_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(( "%s %f hp48_io_w: off=%02x data=%x\n",
 			space.machine().describe_context(), space.machine().time().as_double(), offset, data ));
@@ -392,7 +392,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 }
 
 
-READ8_MEMBER(hp48_state::hp48_io_r)
+uint8_t hp48_state::hp48_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -505,7 +505,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 
 /* ---------- bank switcher --------- */
 
-READ8_MEMBER(hp48_state::hp48_bank_r)
+uint8_t hp48_state::hp48_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* HP48 GX
 	   bit 0: ignored
@@ -529,7 +529,7 @@ READ8_MEMBER(hp48_state::hp48_bank_r)
 }
 
 
-WRITE8_MEMBER(hp48_state::hp49_bank_w)
+void hp48_state::hp49_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
@@ -788,7 +788,7 @@ WRITE_LINE_MEMBER( hp48_state::hp48_mem_reset )
 
 
 /* CONFIG opcode */
-WRITE32_MEMBER( hp48_state::hp48_mem_config )
+void hp48_state::hp48_mem_config(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 
@@ -820,7 +820,7 @@ WRITE32_MEMBER( hp48_state::hp48_mem_config )
 
 
 /* UNCFG opcode */
-WRITE32_MEMBER( hp48_state::hp48_mem_unconfig )
+void hp48_state::hp48_mem_unconfig(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int i;
 	LOG(( "%s %f hp48_mem_unconfig: %05x\n", machine().describe_context(), machine().time().as_double(), data ));
@@ -842,7 +842,7 @@ WRITE32_MEMBER( hp48_state::hp48_mem_unconfig )
 
 
 /* C=ID opcode */
-READ32_MEMBER( hp48_state::hp48_mem_id )
+uint32_t hp48_state::hp48_mem_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int i;
 	int data = 0; /* 0 = everything is configured */
@@ -876,7 +876,7 @@ READ32_MEMBER( hp48_state::hp48_mem_id )
 /* --------- CRC ---------- */
 
 /* each memory read by the CPU updates the internal CRC state */
-WRITE32_MEMBER( hp48_state::hp48_mem_crc )
+void hp48_state::hp48_mem_crc(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* no CRC for I/O RAM */
 	if ( offset >= m_io_addr && offset < m_io_addr + 0x40 ) return;

@@ -110,14 +110,14 @@ public:
 		void queue_r(uint8_t data);
 		uint8_t dequeue_r();
 
-		DECLARE_READ8_MEMBER(dsp_reset_r);
-		DECLARE_WRITE8_MEMBER(dsp_reset_w);
-		DECLARE_READ8_MEMBER(dsp_data_r);
-		DECLARE_WRITE8_MEMBER(dsp_data_w);
-		DECLARE_READ8_MEMBER(dsp_rbuf_status_r);
-		DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
-		DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
-		DECLARE_WRITE8_MEMBER(dsp_cmd_w);
+		uint8_t dsp_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		uint8_t dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void dsp_rbuf_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		void dsp_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
 
@@ -161,8 +161,8 @@ public:
 		// construction/destruction
 		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source);
 
-		DECLARE_READ8_MEMBER(ym3812_16_r);
-		DECLARE_WRITE8_MEMBER(ym3812_16_w);
+		uint8_t ym3812_16_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void ym3812_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;
@@ -183,9 +183,9 @@ public:
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
 
-		DECLARE_READ8_MEMBER(saa1099_16_r);
-		DECLARE_WRITE8_MEMBER(saa1099_1_16_w);
-		DECLARE_WRITE8_MEMBER(saa1099_2_16_w);
+		uint8_t saa1099_16_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void saa1099_1_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		void saa1099_2_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -215,10 +215,10 @@ class sb16_device : public sb_device,
 public:
 		// construction/destruction
 		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname, const char *source);
-		DECLARE_READ8_MEMBER(mpu401_r);
-		DECLARE_WRITE8_MEMBER(mpu401_w);
-		DECLARE_READ8_MEMBER(mixer_r);
-		DECLARE_WRITE8_MEMBER(mixer_w);
+		uint8_t mpu401_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void mpu401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+		uint8_t mixer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+		void mixer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		virtual ioport_constructor device_input_ports() const override;
 protected:
 		virtual void device_start() override;

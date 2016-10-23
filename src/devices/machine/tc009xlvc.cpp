@@ -17,12 +17,12 @@
 const device_type TC0091LVC = &device_creator<tc0091lvc_device>;
 
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_r)
+uint8_t tc0091lvc_device::tc0091lvc_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette_ram[offset & 0x1ff];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
+void tc0091lvc_device::tc0091lvc_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_ram[offset & 0x1ff] = data;
 
@@ -50,12 +50,12 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_paletteram_w)
 	}
 }
 
-READ8_MEMBER(tc0091lvc_device::vregs_r)
+uint8_t tc0091lvc_device::vregs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vregs[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::vregs_w)
+void tc0091lvc_device::vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset & 0xfc) == 0)
 	{
@@ -66,47 +66,47 @@ WRITE8_MEMBER(tc0091lvc_device::vregs_w)
 	m_vregs[offset] = data;
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_r)
+uint8_t tc0091lvc_device::tc0091lvc_bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bitmap_ram[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_bitmap_w)
+void tc0091lvc_device::tc0091lvc_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bitmap_ram[offset] = data;
 }
 
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_r)
+uint8_t tc0091lvc_device::tc0091lvc_pcg1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pcg1_ram[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg1_w)
+void tc0091lvc_device::tc0091lvc_pcg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pcg1_ram[offset] = data;
 	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0x4000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_r)
+uint8_t tc0091lvc_device::tc0091lvc_pcg2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pcg2_ram[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_pcg2_w)
+void tc0091lvc_device::tc0091lvc_pcg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pcg2_ram[offset] = data;
 	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xc000) / 32);
 	tx_tilemap->mark_all_dirty();
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_r)
+uint8_t tc0091lvc_device::tc0091lvc_vram0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram0[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
+void tc0091lvc_device::tc0091lvc_vram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram0[offset] = data;
 	bg0_tilemap->mark_tile_dirty(offset/2);
@@ -115,12 +115,12 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram0_w)
 
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_r)
+uint8_t tc0091lvc_device::tc0091lvc_vram1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram1[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
+void tc0091lvc_device::tc0091lvc_vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram1[offset] = data;
 	bg1_tilemap->mark_tile_dirty(offset/2);
@@ -128,12 +128,12 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_vram1_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_r)
+uint8_t tc0091lvc_device::tc0091lvc_tvram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tvram[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
+void tc0091lvc_device::tc0091lvc_tvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tvram[offset] = data;
 	tx_tilemap->mark_tile_dirty(offset/2);
@@ -141,12 +141,12 @@ WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_tvram_w)
 	tx_tilemap->mark_all_dirty();
 }
 
-READ8_MEMBER(tc0091lvc_device::tc0091lvc_spr_r)
+uint8_t tc0091lvc_device::tc0091lvc_spr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sprram[offset];
 }
 
-WRITE8_MEMBER(tc0091lvc_device::tc0091lvc_spr_w)
+void tc0091lvc_device::tc0091lvc_spr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprram[offset] = data;
 	m_gfxdecode->gfx(m_gfx_index)->mark_dirty((offset+0xb000) / 32);

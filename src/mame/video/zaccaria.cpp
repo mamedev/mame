@@ -144,13 +144,13 @@ void zaccaria_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(zaccaria_state::videoram_w)
+void zaccaria_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(zaccaria_state::attributes_w)
+void zaccaria_state::attributes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -168,12 +168,12 @@ WRITE8_MEMBER(zaccaria_state::attributes_w)
 	m_attributesram[offset] = data;
 }
 
-WRITE8_MEMBER(zaccaria_state::flip_screen_x_w)
+void zaccaria_state::flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(data & 1);
 }
 
-WRITE8_MEMBER(zaccaria_state::flip_screen_y_w)
+void zaccaria_state::flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(data & 1);
 }

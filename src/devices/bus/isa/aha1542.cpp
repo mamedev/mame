@@ -137,13 +137,13 @@ const device_type AHA1542 = &device_creator<aha1542_device>;
 
 #define Z84C0010_TAG "u5"
 
-READ8_MEMBER( aha1542_device::aha1542_r )
+uint8_t aha1542_device::aha1542_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s aha1542_r(): offset=%d\n", machine().describe_context(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( aha1542_device::aha1542_w )
+void aha1542_device::aha1542_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s aha1542_w(): offset=%d data=0x%02x\n", machine().describe_context(), offset, data);
 }

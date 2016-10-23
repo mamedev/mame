@@ -63,7 +63,7 @@ public:
 	int       m_silvmil_tilebank[4];
 	int     m_whichbank;
 
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank_w)
+	void silvmil_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_silvmil_tilebank[m_whichbank] = (data>>8) & 0x1f;
 
@@ -72,45 +72,45 @@ public:
 		m_bg_layer->mark_all_dirty();
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_tilebank1_w)
+	void silvmil_tilebank1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_whichbank = (data>>8)&0x3;
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrolly_w)
+	void silvmil_fg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_fg_layer->set_scrolly(0, data + 8);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrolly_w)
+	void silvmil_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_bg_layer->set_scrolly(0, data + 8);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_scrollx_w)
+	void silvmil_fg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_fg_layer->set_scrollx(0, data);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_scrollx_w)
+	void silvmil_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		m_bg_layer->set_scrollx(0, data + 4);
 	}
 
 
-	DECLARE_WRITE16_MEMBER(silvmil_fg_videoram_w)
+	void silvmil_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_fg_videoram[offset]);
 		m_fg_layer->mark_tile_dirty(offset);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_bg_videoram_w)
+	void silvmil_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		COMBINE_DATA(&m_bg_videoram[offset]);
 		m_bg_layer->mark_tile_dirty(offset);
 	}
 
-	DECLARE_WRITE16_MEMBER(silvmil_soundcmd_w)
+	void silvmil_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		if (ACCESSING_BITS_0_7)
 		{

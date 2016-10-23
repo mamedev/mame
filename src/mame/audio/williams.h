@@ -41,14 +41,14 @@ public:
 	williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_WRITE16_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(talkback_w);
-	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
-	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
+	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
 	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
@@ -81,22 +81,22 @@ public:
 	williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_WRITE16_MEMBER(write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(master_bank_select_w);
-	DECLARE_WRITE8_MEMBER(slave_bank_select_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command2_w);
-	DECLARE_READ8_MEMBER(command2_r);
-	DECLARE_WRITE8_MEMBER(master_talkback_w);
-	DECLARE_WRITE8_MEMBER(master_sync_w);
-	DECLARE_WRITE8_MEMBER(slave_talkback_w);
-	DECLARE_WRITE8_MEMBER(slave_sync_w);
-	DECLARE_WRITE8_MEMBER(cvsd_digit_clock_clear_w);
-	DECLARE_WRITE8_MEMBER(cvsd_clock_set_w);
+	void master_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void command2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t command2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void master_talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void master_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 
 protected:
@@ -139,15 +139,15 @@ public:
 	williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_WRITE16_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(reset_write);
 	DECLARE_READ_LINE_MEMBER(irq_read);
 
 	// internal communications
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(oki6295_bank_select_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(talkback_w);
+	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void oki6295_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 
 protected:

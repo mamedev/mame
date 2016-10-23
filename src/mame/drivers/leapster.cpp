@@ -229,12 +229,12 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
 	void init_leapster();
 
-	DECLARE_READ32_MEMBER(leapster_random_r)
+	uint32_t leapster_random_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
 	{
 		return rand() | (rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
-	DECLARE_WRITE32_MEMBER(leapster_aux004b_w)
+	void leapster_aux004b_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)
 	{
 		printf("leapster_aux004b_w %04x\n", data);
 	}

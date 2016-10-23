@@ -100,29 +100,29 @@ public:
 	uint8_t          m_colorram[0x40 * 0x20];
 	uint8_t          m_colorram2[0x40 * 0x8];
 	uint8_t          m_paldata[3 * 256];
-	DECLARE_WRITE8_MEMBER(dunhuang_pos_x_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_pos_y_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_tile_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_tile2_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_clear_y_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_horiz_clear_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_vert_clear_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_dest_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_x_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_y_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_w_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_c_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_block_h_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_paloffs_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_paldata_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_layers_w);
-	DECLARE_WRITE8_MEMBER(dunhuang_input_w);
-	DECLARE_READ8_MEMBER(dunhuang_service_r);
-	DECLARE_READ8_MEMBER(dunhuang_input_r);
-	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
-	DECLARE_READ8_MEMBER(dunhuang_dsw_r);
+	void dunhuang_pos_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_pos_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_tile2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_clear_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_horiz_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_vert_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_block_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_paloffs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_paldata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_layers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dunhuang_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dunhuang_service_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dunhuang_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dunhuang_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dunhuang_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 	virtual void machine_start() override;
@@ -206,21 +206,21 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 // Tilemaps access
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_pos_x_w)
+void dunhuang_state::dunhuang_pos_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pos_x = data & 0x3f;
 	m_written = 0;
 	m_written2 = 0;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_pos_y_w)
+void dunhuang_state::dunhuang_pos_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pos_y = data;
 	m_written = 0;
 	m_written2 = 0;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_tile_w)
+void dunhuang_state::dunhuang_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addr;
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_tile_w)
 	m_tmap->mark_tile_dirty(addr);
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_tile2_w)
+void dunhuang_state::dunhuang_tile2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addr;
 
@@ -274,11 +274,11 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_tile2_w)
 
 // Clear a row of tiles (videoram)
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_clear_y_w)
+void dunhuang_state::dunhuang_clear_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clear_y = data;
 }
-WRITE8_MEMBER(dunhuang_state::dunhuang_horiz_clear_w)
+void dunhuang_state::dunhuang_horiz_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 //  logerror("%06x: horiz clear, y = %02x, data = %02d\n", space.device().safe_pc(), m_clear_y,data);
@@ -294,7 +294,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_horiz_clear_w)
 
 // Clear a column of tiles (videoram2)
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_vert_clear_w)
+void dunhuang_state::dunhuang_vert_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 //  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", space.device().safe_pc(), m_pos_x,m_pos_y,data);
@@ -314,43 +314,43 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_vert_clear_w)
 // The tiles codes are read from the graphics roms too!
 //
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_dest_w)
+void dunhuang_state::dunhuang_block_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_dest = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_x_w)
+void dunhuang_state::dunhuang_block_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_x = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_y_w)
+void dunhuang_state::dunhuang_block_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_y = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_w_w)
+void dunhuang_state::dunhuang_block_w_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_w = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_c_w)
+void dunhuang_state::dunhuang_block_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_c = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_addr_lo_w)
+void dunhuang_state::dunhuang_block_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_addr_lo = data;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_addr_hi_w)
+void dunhuang_state::dunhuang_block_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_block_addr_hi = data;
 }
 
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
+void dunhuang_state::dunhuang_block_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i,j, addr;
 	uint8_t *tile_addr;
@@ -400,12 +400,12 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_paloffs_w)
+void dunhuang_state::dunhuang_paloffs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paloffs = data * 3;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_paldata_w)
+void dunhuang_state::dunhuang_paldata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_paldata[m_paloffs] = data;
 
@@ -420,7 +420,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_paldata_w)
 
 // Layers control (not understood)
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_layers_w)
+void dunhuang_state::dunhuang_layers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("layers %02x",data);
 	m_layers = data;
@@ -438,12 +438,12 @@ ADDRESS_MAP_END
 
 // Inputs
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_input_w)
+void dunhuang_state::dunhuang_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input = data;
 }
 
-READ8_MEMBER(dunhuang_state::dunhuang_service_r)
+uint8_t dunhuang_state::dunhuang_service_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("SERVICE")->read()
 		| ((m_hopper && !(m_screen->frame_number() % 10)) ? 0x00 : 0x08)    // bit 3: hopper sensor
@@ -451,7 +451,7 @@ READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 	;
 }
 
-READ8_MEMBER(dunhuang_state::dunhuang_dsw_r)
+uint8_t dunhuang_state::dunhuang_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!(m_input & 0x01))  return ioport("DSW1")->read();
 	if (!(m_input & 0x02))  return ioport("DSW2")->read();
@@ -461,7 +461,7 @@ READ8_MEMBER(dunhuang_state::dunhuang_dsw_r)
 	logerror("%s: warning, unknown dsw bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
-READ8_MEMBER(dunhuang_state::dunhuang_input_r)
+uint8_t dunhuang_state::dunhuang_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!(m_input & 0x01))  return ioport("IN0")->read();
 	if (!(m_input & 0x02))  return ioport("IN1")->read();
@@ -472,7 +472,7 @@ READ8_MEMBER(dunhuang_state::dunhuang_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
+void dunhuang_state::dunhuang_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ?                data & 0x01
 	// ?                data & 0x02
@@ -486,7 +486,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(dunhuang_state::dunhuang_82_w)
+void dunhuang_state::dunhuang_82_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("82 = %02x",dunhuang_82);
 }

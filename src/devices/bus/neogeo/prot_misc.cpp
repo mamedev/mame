@@ -266,7 +266,7 @@ void neoboot_prot_device::samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndr
 
 /* Metal Slug 5 Plus (bootleg) */
 
-READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
+uint16_t neoboot_prot_device::mslug5p_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("PC %06x: access protected\n", space.device().safe_pc());
 	return 0xa0;
@@ -274,7 +274,7 @@ READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 
 // FIXME: temporarily moved to the driver, through mslug5p_bank_base() below
 /*
-WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
+void neoboot_prot_device::ms5plus_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
     int bankaddress;
     logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);

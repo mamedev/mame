@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER( tmc0430_device::gsq_line )
     3 -> MO=1, M=1
     Data: gsq line (ASSERT, CLEAR)
 */
-WRITE8_MEMBER( tmc0430_device::set_lines )
+void tmc0430_device::set_lines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_read_mode = ((offset & GROM_M_LINE)!=0);
 	m_address_mode = ((offset & GROM_MO_LINE)!=0);
@@ -306,7 +306,7 @@ READ8Z_MEMBER( tmc0430_device::readz )
     This operation occurs in parallel to phase 4. The real GROM will pick up
     the value from the data bus some phases later.
 */
-WRITE8_MEMBER( tmc0430_device::write )
+void tmc0430_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_selected) return;
 

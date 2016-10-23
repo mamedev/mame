@@ -39,13 +39,13 @@ public:
 		, m_dac1(*this, "dac1")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(sound0_w);
-	DECLARE_WRITE8_MEMBER(sound1_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(sol0_w);
-	DECLARE_WRITE8_MEMBER(sol1_w) { };
-	DECLARE_WRITE8_MEMBER(intack_w);
-	DECLARE_WRITE8_MEMBER(display_w);
+	void sound0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void sol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void intack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 private:
@@ -323,7 +323,7 @@ INPUT_PORTS_END
         14  = total plays counter
 */
 
-WRITE8_MEMBER( atari_s2_state::sol0_w )
+void atari_s2_state::sol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER( atari_s2_state::sol0_w )
 	}
 }
 
-WRITE8_MEMBER( atari_s2_state::display_w )
+void atari_s2_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	if (offset<7)
@@ -356,7 +356,7 @@ WRITE8_MEMBER( atari_s2_state::display_w )
 	}
 }
 
-WRITE8_MEMBER( atari_s2_state::intack_w )
+void atari_s2_state::intack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
@@ -415,7 +415,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 // d4-5 = select initial clock frequency
 // d6 h = enable wave
 // d7 h = enable noise
-WRITE8_MEMBER( atari_s2_state::sound0_w )
+void atari_s2_state::sound0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound0 = data;
 	offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
@@ -425,7 +425,7 @@ WRITE8_MEMBER( atari_s2_state::sound0_w )
 
 // d0-3 = volume
 // d4-7 = preset on 74LS161
-WRITE8_MEMBER( atari_s2_state::sound1_w )
+void atari_s2_state::sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound1 = data >> 4;
 

@@ -1945,7 +1945,7 @@ void saturn_state::cd_writeWord(uint32_t addr, uint16_t data)
 	}
 }
 
-READ32_MEMBER( saturn_state::stvcd_r )
+uint32_t saturn_state::stvcd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t rv = 0;
 
@@ -2009,7 +2009,7 @@ READ32_MEMBER( saturn_state::stvcd_r )
 	return rv;
 }
 
-WRITE32_MEMBER( saturn_state::stvcd_w )
+void saturn_state::stvcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 2;
 

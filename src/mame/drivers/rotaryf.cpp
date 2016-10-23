@@ -36,9 +36,9 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ8_MEMBER(port29_r);
-	DECLARE_WRITE8_MEMBER(port28_w);
-	DECLARE_WRITE8_MEMBER(port30_w);
+	uint8_t port29_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port28_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool m_flipscreen;
 	uint8_t m_last;
@@ -73,7 +73,7 @@ void rotaryf_state::machine_start()
 	save_item(NAME(m_last));
 }
 
-READ8_MEMBER( rotaryf_state::port29_r )
+uint8_t rotaryf_state::port29_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("INPUTS")->read();
 
@@ -82,7 +82,7 @@ READ8_MEMBER( rotaryf_state::port29_r )
 	return (data & 0xCD) | ((data & 0x01) << 1) | ((data & 0x0c) << 2);
 }
 
-WRITE8_MEMBER( rotaryf_state::port28_w )
+void rotaryf_state::port28_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t rising_bits = data & ~m_last;
 
@@ -105,7 +105,7 @@ WRITE8_MEMBER( rotaryf_state::port28_w )
 	m_last = data;
 }
 
-WRITE8_MEMBER( rotaryf_state::port30_w )
+void rotaryf_state::port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = player 2 is playing */
 

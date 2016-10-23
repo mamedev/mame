@@ -68,12 +68,12 @@ public:
 
 	void set_volume(int volume);
 
-	DECLARE_READ8_MEMBER( spc_io_r );
-	DECLARE_READ8_MEMBER( spc_ram_r );
-	DECLARE_READ8_MEMBER( spc_port_out );
-	DECLARE_WRITE8_MEMBER( spc_io_w );
-	DECLARE_WRITE8_MEMBER( spc_ram_w );
-	DECLARE_WRITE8_MEMBER( spc_port_in );
+	uint8_t spc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spc_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spc_port_out(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spc_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spc_port_in(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 //  uint8_t *spc_get_ram() { return m_ram; }
 
@@ -88,8 +88,8 @@ protected:
 
 private:
 
-	DECLARE_READ8_MEMBER(dsp_io_r);
-	DECLARE_WRITE8_MEMBER(dsp_io_w);
+	uint8_t dsp_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dsp_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_CALLBACK_MEMBER(spc_timer);
 	void dsp_reset();
 	void dsp_update(short *sound_ptr);

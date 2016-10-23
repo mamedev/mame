@@ -316,7 +316,7 @@ void kc_d004_device::io_write(offs_t offset, uint8_t data)
 //  FDC emulation
 //**************************************************************************
 
-READ8_MEMBER(kc_d004_device::hw_input_gate_r)
+uint8_t kc_d004_device::hw_input_gate_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    bit 7: DMA Request (DRQ from FDC)
@@ -342,7 +342,7 @@ READ8_MEMBER(kc_d004_device::hw_input_gate_r)
 	return hw_input_gate;
 }
 
-WRITE8_MEMBER(kc_d004_device::fdd_select_w)
+void kc_d004_device::fdd_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 		m_floppy = m_floppy0->get_device();
@@ -361,7 +361,7 @@ WRITE8_MEMBER(kc_d004_device::fdd_select_w)
 	m_fdc->set_floppy(m_floppy);
 }
 
-WRITE8_MEMBER(kc_d004_device::hw_terminal_count_w)
+void kc_d004_device::hw_terminal_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->tc_w(true);
 }
@@ -423,7 +423,7 @@ void kc_d004_gide_device::device_reset()
 //  GIDE read
 //-------------------------------------------------
 
-READ8_MEMBER(kc_d004_gide_device::gide_r)
+uint8_t kc_d004_gide_device::gide_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	uint8_t io_addr = offset & 0x0f;
@@ -472,7 +472,7 @@ READ8_MEMBER(kc_d004_gide_device::gide_r)
 //  GIDE write
 //-------------------------------------------------
 
-WRITE8_MEMBER(kc_d004_gide_device::gide_w)
+void kc_d004_gide_device::gide_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t io_addr = offset & 0x0f;
 

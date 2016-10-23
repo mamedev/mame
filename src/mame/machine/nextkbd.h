@@ -24,19 +24,19 @@ public:
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 
-	DECLARE_READ8_MEMBER(status_snd_r);
-	DECLARE_READ8_MEMBER(status_kms_r);
-	DECLARE_READ8_MEMBER(status_dma_r);
-	DECLARE_READ8_MEMBER(status_cmd_r);
-	DECLARE_READ32_MEMBER(cdata_r);
-	DECLARE_READ32_MEMBER(kmdata_r);
+	uint8_t status_snd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_kms_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t cdata_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t kmdata_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE8_MEMBER(ctrl_snd_w);
-	DECLARE_WRITE8_MEMBER(ctrl_kms_w);
-	DECLARE_WRITE8_MEMBER(ctrl_dma_w);
-	DECLARE_WRITE8_MEMBER(ctrl_cmd_w);
-	DECLARE_WRITE32_MEMBER(cdata_w);
-	DECLARE_WRITE32_MEMBER(kmdata_w);
+	void ctrl_snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_kms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cdata_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void kmdata_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	DECLARE_INPUT_CHANGED_MEMBER(update);
 

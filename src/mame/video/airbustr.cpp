@@ -35,25 +35,25 @@
 #include "emu.h"
 #include "includes/airbustr.h"
 
-WRITE8_MEMBER(airbustr_state::videoram_w)
+void airbustr_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::colorram_w)
+void airbustr_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::videoram2_w)
+void airbustr_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(airbustr_state::colorram2_w)
+void airbustr_state::colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -71,7 +71,7 @@ WRITE8_MEMBER(airbustr_state::colorram2_w)
             Bg Y    Bg X    Fg Y    Fg X    <-Scroll High Bits (complemented!)
 */
 
-WRITE8_MEMBER(airbustr_state::scrollregs_w)
+void airbustr_state::scrollregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)     // offset 0 <-> port 4
 	{

@@ -51,7 +51,7 @@ void spcforce_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_latch_w)
+void spcforce_state::SN76496_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sn76496_latch = data;
 }
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
 	m_sn3_ready = state;
 }
 
-READ8_MEMBER(spcforce_state::SN76496_select_r)
+uint8_t spcforce_state::SN76496_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_sn76496_select & 0x40) return m_sn1_ready;
 	if (~m_sn76496_select & 0x20) return m_sn2_ready;
@@ -80,7 +80,7 @@ READ8_MEMBER(spcforce_state::SN76496_select_r)
 	return 0;
 }
 
-WRITE8_MEMBER(spcforce_state::SN76496_select_w)
+void spcforce_state::SN76496_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sn76496_select = data;
 
@@ -89,19 +89,19 @@ WRITE8_MEMBER(spcforce_state::SN76496_select_w)
 	if (~data & 0x10) m_sn3->write(space, 0, m_sn76496_latch);
 }
 
-READ8_MEMBER(spcforce_state::t0_r)
+uint8_t spcforce_state::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
 	return machine().rand() & 1;
 }
 
 
-WRITE8_MEMBER(spcforce_state::soundtrigger_w)
+void spcforce_state::soundtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(spcforce_state::irq_mask_w)
+void spcforce_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

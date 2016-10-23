@@ -30,10 +30,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
 
-	DECLARE_READ8_MEMBER(dart_r);
-	DECLARE_WRITE8_MEMBER(dart_w);
-	DECLARE_READ8_MEMBER(pit_r);
-	DECLARE_WRITE8_MEMBER(pit_w);
+	uint8_t dart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	required_device<pit8253_device> m_pit;
 	required_device<z80dart_device> m_dart;

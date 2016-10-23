@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(megazone_state, megazone)
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_flipscreen_w)
+void megazone_state::megazone_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 1;
 }

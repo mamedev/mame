@@ -62,21 +62,21 @@ public:
 	uint8_t m_keyb_input[10];
 	uint8_t m_keyb_mux;
 
-	DECLARE_READ8_MEMBER(vic4567_dummy_r);
-	DECLARE_WRITE8_MEMBER(vic4567_dummy_w);
-	DECLARE_WRITE8_MEMBER(PalRed_w);
-	DECLARE_WRITE8_MEMBER(PalGreen_w);
-	DECLARE_WRITE8_MEMBER(PalBlue_w);
-	DECLARE_WRITE8_MEMBER(DMAgic_w);
-	DECLARE_READ8_MEMBER(CIASelect_r);
-	DECLARE_WRITE8_MEMBER(CIASelect_w);
-	DECLARE_READ8_MEMBER(cia0_porta_r);
-	DECLARE_WRITE8_MEMBER(cia0_porta_w);
-	DECLARE_READ8_MEMBER(cia0_portb_r);
-	DECLARE_WRITE8_MEMBER(cia0_portb_w);
+	uint8_t vic4567_dummy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vic4567_dummy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalRed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalGreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void PalBlue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void DMAgic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t CIASelect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void CIASelect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cia0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
 
-	DECLARE_READ8_MEMBER(dummy_r);
+	uint8_t dummy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -154,7 +154,7 @@ uint32_t c65_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-READ8_MEMBER(c65_state::vic4567_dummy_r)
+uint8_t c65_state::vic4567_dummy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -189,7 +189,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::vic4567_dummy_w)
+void c65_state::vic4567_dummy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -231,19 +231,19 @@ void c65_state::PalEntryFlush(uint8_t offset)
 	m_palette->set_pen_color(offset, pal4bit(m_palred[offset]), pal4bit(m_palgreen[offset]), pal4bit(m_palblue[offset]));
 }
 
-WRITE8_MEMBER(c65_state::PalRed_w)
+void c65_state::PalRed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palred[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalGreen_w)
+void c65_state::PalGreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palgreen[offset] = data;
 	PalEntryFlush(offset);
 }
 
-WRITE8_MEMBER(c65_state::PalBlue_w)
+void c65_state::PalBlue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palblue[offset] = data;
 	PalEntryFlush(offset);
@@ -315,14 +315,14 @@ void c65_state::DMAgicExecute(address_space &space,uint32_t address)
 }
 
 
-WRITE8_MEMBER(c65_state::DMAgic_w)
+void c65_state::DMAgic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmalist[offset] = data;
 	if(offset == 0)
 		DMAgicExecute(space,(m_dmalist[0])|(m_dmalist[1]<<8)|(m_dmalist[2]<<16));
 }
 
-READ8_MEMBER(c65_state::CIASelect_r)
+uint8_t c65_state::CIASelect_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_VIC3_ControlA & 1)
 		return m_cram[offset];
@@ -345,7 +345,7 @@ READ8_MEMBER(c65_state::CIASelect_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(c65_state::CIASelect_w)
+void c65_state::CIASelect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_VIC3_ControlA & 1)
 		m_cram[offset] = data;
@@ -369,12 +369,12 @@ WRITE8_MEMBER(c65_state::CIASelect_w)
 
 }
 
-READ8_MEMBER(c65_state::cia0_porta_r)
+uint8_t c65_state::cia0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(c65_state::cia0_portb_r)
+uint8_t c65_state::cia0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const c64ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 	uint8_t res;
@@ -391,17 +391,17 @@ READ8_MEMBER(c65_state::cia0_portb_r)
 	return res;
 }
 
-WRITE8_MEMBER(c65_state::cia0_porta_w)
+void c65_state::cia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyb_mux = ~data;
 	printf("%02x\n",m_keyb_mux);
 }
 
-WRITE8_MEMBER(c65_state::cia0_portb_w)
+void c65_state::cia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(c65_state::dummy_r)
+uint8_t c65_state::dummy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

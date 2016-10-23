@@ -62,17 +62,17 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	DECLARE_READ8_MEMBER( key_r );
-	DECLARE_READ8_MEMBER( rx78_f0_r );
-	DECLARE_READ8_MEMBER( rx78_vram_r );
-	DECLARE_WRITE8_MEMBER( rx78_f0_w );
-	DECLARE_WRITE8_MEMBER( rx78_vram_w );
-	DECLARE_WRITE8_MEMBER( vram_read_bank_w );
-	DECLARE_WRITE8_MEMBER( vram_write_bank_w );
-	DECLARE_WRITE8_MEMBER( key_w );
-	DECLARE_WRITE8_MEMBER( vdp_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
-	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rx78_f0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rx78_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rx78_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rx78_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_read_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_write_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdp_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdp_bg_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vdp_pri_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
 	uint8_t m_pal_reg[7];
@@ -94,12 +94,12 @@ public:
 #define MASTER_CLOCK XTAL_28_63636MHz
 
 
-WRITE8_MEMBER( rx78_state::rx78_f0_w )
+void rx78_state::rx78_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
-READ8_MEMBER( rx78_state::rx78_f0_r )
+uint8_t rx78_state::rx78_f0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > 0.03);
 }
@@ -158,7 +158,7 @@ uint32_t rx78_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 }
 
 
-READ8_MEMBER( rx78_state::key_r )
+uint8_t rx78_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -182,12 +182,12 @@ READ8_MEMBER( rx78_state::key_r )
 	return 0;
 }
 
-WRITE8_MEMBER( rx78_state::key_w )
+void rx78_state::key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_key_mux = data;
 }
 
-READ8_MEMBER( rx78_state::rx78_vram_r )
+uint8_t rx78_state::rx78_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *vram = memregion("vram")->base();
 
@@ -197,7 +197,7 @@ READ8_MEMBER( rx78_state::rx78_vram_r )
 	return vram[offset + ((m_vram_read_bank - 1) * 0x2000)];
 }
 
-WRITE8_MEMBER( rx78_state::rx78_vram_w )
+void rx78_state::rx78_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *vram = memregion("vram")->base();
 
@@ -209,17 +209,17 @@ WRITE8_MEMBER( rx78_state::rx78_vram_w )
 	if(m_vram_write_bank & 0x20) { vram[offset + 5 * 0x2000] = data; }
 }
 
-WRITE8_MEMBER( rx78_state::vram_read_bank_w )
+void rx78_state::vram_read_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_read_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vram_write_bank_w )
+void rx78_state::vram_write_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_write_bank = data;
 }
 
-WRITE8_MEMBER( rx78_state::vdp_reg_w )
+void rx78_state::vdp_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t r,g,b,res,i;
 
@@ -239,7 +239,7 @@ WRITE8_MEMBER( rx78_state::vdp_reg_w )
 	}
 }
 
-WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
+void rx78_state::vdp_bg_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 
@@ -250,7 +250,7 @@ WRITE8_MEMBER( rx78_state::vdp_bg_reg_w )
 	m_palette->set_pen_color(0x10, rgb_t(r,g,b));
 }
 
-WRITE8_MEMBER( rx78_state::vdp_pri_mask_w )
+void rx78_state::vdp_pri_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pri_mask = data;
 }

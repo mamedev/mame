@@ -20,7 +20,7 @@
 *                                                                                   *
 ************************************************************************************/
 
-WRITE8_MEMBER(gaplus_state::customio_3_w)
+void gaplus_state::customio_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset == 0x09) && (data >= 0x0f))
 		m_samples->start(0,0);
@@ -29,7 +29,7 @@ WRITE8_MEMBER(gaplus_state::customio_3_w)
 }
 
 
-READ8_MEMBER(gaplus_state::customio_3_r)
+uint8_t gaplus_state::customio_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int mode = m_customio_3[8];
 

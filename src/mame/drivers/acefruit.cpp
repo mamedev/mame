@@ -39,11 +39,11 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	emu_timer *m_refresh_timer;
-	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
-	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
-	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
-	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
-	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
+	void acefruit_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acefruit_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
@@ -254,22 +254,22 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
+void acefruit_state::acefruit_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[ offset ] = data & 0xf;
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
+void acefruit_state::acefruit_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+void acefruit_state::acefruit_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: ? */
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
+void acefruit_state::acefruit_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -279,7 +279,7 @@ WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
 	}
 }
 
-WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
+void acefruit_state::acefruit_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 

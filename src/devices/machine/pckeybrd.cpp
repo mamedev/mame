@@ -660,7 +660,7 @@ void pc_keyboard_device::polling(void)
 	}
 }
 
-READ8_MEMBER(pc_keyboard_device::read)
+uint8_t pc_keyboard_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data;
 	if (m_tail == m_head)
@@ -734,7 +734,7 @@ Note:   each command is acknowledged by FAh (ACK), if not mentioned otherwise.
 SeeAlso: #P046
 */
 
-WRITE8_MEMBER(at_keyboard_device::write)
+void at_keyboard_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard write %.2x\n",data);

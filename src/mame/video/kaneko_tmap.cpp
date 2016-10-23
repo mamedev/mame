@@ -275,21 +275,21 @@ void kaneko_view2_tilemap_device::render_tilemap_chip_alt_common(screen_device &
 	m_tmap[1]->draw(screen, bitmap, cliprect, pri, v2pri ? pri : 0, 0);
 }
 
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_0_w){ kaneko16_vram_w(offset, data, mem_mask, 0); }
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_1_w){ kaneko16_vram_w(offset, data, mem_mask, 1); }
+void kaneko_view2_tilemap_device::kaneko16_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ kaneko16_vram_w(offset, data, mem_mask, 0); }
+void kaneko_view2_tilemap_device::kaneko16_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ kaneko16_vram_w(offset, data, mem_mask, 1); }
 
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_0_r){ return m_vram[0][offset]; }
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_vram_1_r){ return m_vram[1][offset]; }
-
-
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_0_w){ COMBINE_DATA(&m_vscroll[0][offset]); }
-WRITE16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_1_w){ COMBINE_DATA(&m_vscroll[1][offset]); }
-
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_0_r){ return m_vscroll[0][offset]; }
-READ16_MEMBER(kaneko_view2_tilemap_device::kaneko16_scroll_1_r){ return m_vscroll[1][offset]; }
+uint16_t kaneko_view2_tilemap_device::kaneko16_vram_0_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vram[0][offset]; }
+uint16_t kaneko_view2_tilemap_device::kaneko16_vram_1_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vram[1][offset]; }
 
 
-READ16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_r )
+void kaneko_view2_tilemap_device::kaneko16_scroll_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_vscroll[0][offset]); }
+void kaneko_view2_tilemap_device::kaneko16_scroll_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ COMBINE_DATA(&m_vscroll[1][offset]); }
+
+uint16_t kaneko_view2_tilemap_device::kaneko16_scroll_0_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vscroll[0][offset]; }
+uint16_t kaneko_view2_tilemap_device::kaneko16_scroll_1_r(address_space &space, offs_t offset, uint16_t mem_mask){ return m_vscroll[1][offset]; }
+
+
+uint16_t kaneko_view2_tilemap_device::kaneko_tmap_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if      (offset<(0x1000/2)) return kaneko16_vram_1_r(space, offset&((0x1000/2)-1),mem_mask);
 	else if (offset<(0x2000/2)) return kaneko16_vram_0_r(space, offset&((0x1000/2)-1),mem_mask);
@@ -299,7 +299,7 @@ READ16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_w )
+void kaneko_view2_tilemap_device::kaneko_tmap_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if      (offset<(0x1000/2)) kaneko16_vram_1_w(space, offset&((0x1000/2)-1),data,mem_mask);
 	else if (offset<(0x2000/2)) kaneko16_vram_0_w(space, offset&((0x1000/2)-1),data,mem_mask);
@@ -307,19 +307,19 @@ WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_vram_w )
 	else if (offset<(0x4000/2)) kaneko16_scroll_0_w(space, offset&((0x1000/2)-1),data,mem_mask);
 }
 
-READ16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_regs_r )
+uint16_t kaneko_view2_tilemap_device::kaneko_tmap_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_regs[offset];
 }
 
-WRITE16_MEMBER( kaneko_view2_tilemap_device::kaneko_tmap_regs_w )
+void kaneko_view2_tilemap_device::kaneko_tmap_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_regs[offset]);
 }
 
 
 /* some weird logic needed for Gals Panic on the EXPRO02 board */
-WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w)
+void kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -333,7 +333,7 @@ WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_0_tilebank_w)
 	}
 }
 
-WRITE16_MEMBER(kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w)
+void kaneko_view2_tilemap_device::galsnew_vram_1_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

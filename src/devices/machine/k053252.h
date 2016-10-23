@@ -44,8 +44,8 @@ public:
 	//template<class _Object> static devcb_base &set_int_time_callback(device_t &device, _Object object) { return downcast<k053252_device &>(device).m_int_time_cb.set_callback(object); }
 	static void set_offsets(device_t &device, int offsx, int offsy) { downcast<k053252_device &>(device).m_offsx = offsx; downcast<k053252_device &>(device).m_offsy = offsy;}
 
-	DECLARE_READ8_MEMBER( read );  // CCU registers
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);  // CCU registers
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void res_change();
 

@@ -264,7 +264,7 @@ DISCRETE_SOUND_END
 
 /* Keyboard */
 
-READ8_MEMBER( sb2m600_state::keyboard_r )
+uint8_t sb2m600_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_io_reset->read())
 		m_maincpu->reset();
@@ -291,7 +291,7 @@ READ8_MEMBER( sb2m600_state::keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( sb2m600_state::keyboard_w )
+void sb2m600_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 
@@ -299,12 +299,12 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 		m_discrete->write(space, NODE_01, (data >> 2) & 0x0f);
 }
 
-WRITE8_MEMBER( uk101_state::keyboard_w )
+void uk101_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
 
-WRITE8_MEMBER( sb2m600_state::ctrl_w )
+void sb2m600_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -327,7 +327,7 @@ WRITE8_MEMBER( sb2m600_state::ctrl_w )
 	m_discrete->write(space, NODE_10, BIT(data, 4));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
+void c1p_state::osi630_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 	m_beep->set_state(BIT(data, 1));
 }
 
-WRITE8_MEMBER( c1p_state::osi630_sound_w )
+void c1p_state::osi630_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0)
 		m_beep->set_clock(49152 / data);
@@ -394,7 +394,7 @@ void sb2m600_state::floppy_index_callback(floppy_image_device *floppy, int state
 	m_fdc_index = state;
 }
 
-READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
+uint8_t c1pmf_state::osi470_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -414,7 +414,7 @@ READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 	return (m_fdc_index << 7);
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
+void c1pmf_state::osi470_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER( c1pmf_state::osi470_pia_pa_w )
 	*/
 }
 
-WRITE8_MEMBER( c1pmf_state::osi470_pia_pb_w )
+void c1pmf_state::osi470_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

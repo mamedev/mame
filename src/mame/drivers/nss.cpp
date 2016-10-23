@@ -327,18 +327,18 @@ public:
 	uint8_t m_cart_sel;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_wp_r);
-	DECLARE_WRITE8_MEMBER(ram_wp_w);
-	DECLARE_READ8_MEMBER(nss_prot_r);
-	DECLARE_WRITE8_MEMBER(nss_prot_w);
+	uint8_t ram_wp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_wp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nss_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nss_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(port_00_r);
-	DECLARE_WRITE8_MEMBER(port_00_w);
-	DECLARE_WRITE8_MEMBER(port_01_w);
-	DECLARE_WRITE8_MEMBER(port_02_w);
-	DECLARE_WRITE8_MEMBER(port_03_w);
-	DECLARE_WRITE8_MEMBER(port_04_w);
-	DECLARE_WRITE8_MEMBER(port_07_w);
+	uint8_t port_00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_nss();
 
@@ -346,8 +346,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
-	DECLARE_READ8_MEMBER(spc_ram_100_r);
-	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	uint8_t spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
@@ -366,12 +366,12 @@ static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
-READ8_MEMBER(nss_state::spc_ram_100_r)
+uint8_t nss_state::spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spc700->spc_ram_r(space, offset + 0x100);
 }
 
-WRITE8_MEMBER(nss_state::spc_ram_100_w)
+void nss_state::spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spc700->spc_ram_w(space, offset + 0x100, data);
 }
@@ -461,19 +461,19 @@ SNES part:
 
 */
 
-READ8_MEMBER(nss_state::ram_wp_r)
+uint8_t nss_state::ram_wp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_wram[offset];
 }
 
-WRITE8_MEMBER(nss_state::ram_wp_w)
+void nss_state::ram_wp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_wram_wp_flag)
 		m_wram[offset] = data;
 }
 
 
-READ8_MEMBER(nss_state::nss_prot_r)
+uint8_t nss_state::nss_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xe7;
 
@@ -486,7 +486,7 @@ READ8_MEMBER(nss_state::nss_prot_r)
 	return data;
 }
 
-WRITE8_MEMBER(nss_state::nss_prot_w)
+void nss_state::nss_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart_sel == 0)
 	{
@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nss_prot_r,nss_prot_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(nss_state::port_00_r)
+uint8_t nss_state::port_00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     x--- ----   SNES Watchdog (0=SNES did read Joypads, 1=Didn't do so) (ack via 07h.W)
@@ -535,7 +535,7 @@ READ8_MEMBER(nss_state::port_00_r)
 	return res;
 }
 
-WRITE8_MEMBER(nss_state::port_00_w)
+void nss_state::port_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     xxxx ---- Unknown/unused      (should be always 0)
@@ -549,7 +549,7 @@ WRITE8_MEMBER(nss_state::port_00_w)
 
 }
 
-WRITE8_MEMBER(nss_state::port_01_w)
+void nss_state::port_01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     x--- ---- Maybe SNES Joypad Enable? (0=Disable/Demo, 1=Enable/Game)
@@ -574,7 +574,7 @@ WRITE8_MEMBER(nss_state::port_01_w)
 		m_spc700->reset();
 }
 
-WRITE8_MEMBER(nss_state::port_02_w)
+void nss_state::port_02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     x--- ----  OSD Clock ?       (usually same as Bit6)  ;\Chip Select when Bit6=Bit7 ?
@@ -590,7 +590,7 @@ WRITE8_MEMBER(nss_state::port_02_w)
 	ioport("RTC_OSD")->write(data, 0xff);
 }
 
-WRITE8_MEMBER(nss_state::port_03_w)
+void nss_state::port_03_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     x--- ----     Layer SNES Enable?             (used by token proc, see 7A46h) SNES?
@@ -605,13 +605,13 @@ WRITE8_MEMBER(nss_state::port_03_w)
 //  popmessage("%02x",data);
 }
 
-WRITE8_MEMBER(nss_state::port_04_w)
+void nss_state::port_04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 }
 
-WRITE8_MEMBER(nss_state::port_07_w)
+void nss_state::port_07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joy_flag = 1;
 }

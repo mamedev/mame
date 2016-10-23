@@ -41,20 +41,20 @@ public:
 	exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~exidy_sound_device() {}
 
-	DECLARE_READ8_MEMBER( sh6840_r );
-	DECLARE_WRITE8_MEMBER( sh6840_w );
-	DECLARE_WRITE8_MEMBER( sfxctrl_w );
+	uint8_t sh6840_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sh6840_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( update_irq_state );
 
-	DECLARE_WRITE8_MEMBER( r6532_porta_w );
-	DECLARE_READ8_MEMBER( r6532_porta_r );
-	DECLARE_WRITE8_MEMBER( r6532_portb_w );
-	DECLARE_READ8_MEMBER( r6532_portb_r );
+	void r6532_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r6532_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r6532_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r6532_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void r6532_irq(int state);
 
-	DECLARE_WRITE8_MEMBER( sh8253_w );
-	DECLARE_READ8_MEMBER( sh8253_r );
+	void sh8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sh8253_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -119,10 +119,10 @@ class venture_sound_device : public exidy_sound_device
 public:
 	venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( mtrap_voiceio_w );
-	DECLARE_READ8_MEMBER( mtrap_voiceio_r );
+	void mtrap_voiceio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mtrap_voiceio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( filter_w );
+	void filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -141,9 +141,9 @@ class victory_sound_device : public exidy_sound_device
 public:
 	victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( response_r );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( command_w );
+	uint8_t response_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( irq_clear_w );
 	DECLARE_WRITE_LINE_MEMBER( main_ack_w );
 

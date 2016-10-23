@@ -11,13 +11,13 @@ public:
 	hyprolyb_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~hyprolyb_adpcm_device() {}
 
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( busy_r );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	WRITE8_MEMBER( msm_data_w );
-	READ8_MEMBER( msm_vck_r );
-	READ8_MEMBER( ready_r );
-	READ8_MEMBER( data_r );
+	void msm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	uint8_t msm_vck_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t ready_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask);
 
 	void vck_callback( int st );
 

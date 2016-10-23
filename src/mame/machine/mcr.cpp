@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(mcr_state::sio_txdb_w)
 	m_sio->rxb_w(state);
 }
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
+void mcr_state::mcr_ipu_laserdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 3 enables (1) LD video regardless of PIX SW */
 	/* bit 2 enables (1) LD right channel audio */
@@ -204,7 +204,7 @@ TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
 }
 
 
-READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
+uint8_t mcr_state::mcr_ipu_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* watchdog counter is clocked by 7.3728MHz crystal / 16 */
 	/* watchdog is tripped when 14-bit counter overflows => / 32768 = 14.0625Hz*/
@@ -213,7 +213,7 @@ READ8_MEMBER(mcr_state::mcr_ipu_watchdog_r)
 }
 
 
-WRITE8_MEMBER(mcr_state::mcr_ipu_watchdog_w)
+void mcr_state::mcr_ipu_watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mcr_ipu_watchdog_r(space,0);
 }

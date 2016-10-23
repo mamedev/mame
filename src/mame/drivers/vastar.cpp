@@ -128,18 +128,18 @@ void vastar_state::machine_reset()
 	m_spriteram3 = m_fgvideoram + 0x800;
 }
 
-WRITE8_MEMBER(vastar_state::hold_cpu2_w)
+void vastar_state::hold_cpu2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* I'm not sure that this works exactly like this */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(vastar_state::flip_screen_w)
+void vastar_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(vastar_state::nmi_mask_w)
+void vastar_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

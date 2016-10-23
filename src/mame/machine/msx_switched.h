@@ -11,8 +11,8 @@ public:
 
 	virtual uint8_t get_id() = 0;
 
-	virtual DECLARE_READ8_MEMBER(io_read) = 0;
-	virtual DECLARE_WRITE8_MEMBER(io_write) = 0;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) = 0;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 
 protected:
 	virtual void device_start() override;

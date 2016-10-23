@@ -88,8 +88,8 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing to $FF40-$FF7F
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// sets a cartridge line
 	void cart_set_line(line line, line_value value);
@@ -154,8 +154,8 @@ public:
 	device_cococart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_cococart_interface();
 
-	virtual DECLARE_READ8_MEMBER(read);
-	virtual DECLARE_WRITE8_MEMBER(write);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual uint8_t* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);

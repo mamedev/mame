@@ -84,13 +84,13 @@ PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but dif
 	}
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_videoram_w)
+void lvcards_state::lvcards_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lvcards_state::lvcards_colorram_w)
+void lvcards_state::lvcards_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

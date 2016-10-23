@@ -42,9 +42,9 @@ public:
 
 	uint8_t m_bitvals[32];
 
-	DECLARE_WRITE16_MEMBER(bit_controls_w);
-	DECLARE_READ16_MEMBER(analogx_r);
-	DECLARE_READ16_MEMBER(analogy_watchdog_r);
+	void bit_controls_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t analogx_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t analogy_watchdog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 
@@ -143,7 +143,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(xtheball_state::from_shiftreg)
  *
  *************************************/
 
-WRITE16_MEMBER(xtheball_state::bit_controls_w)
+void xtheball_state::bit_controls_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *bitvals = m_bitvals;
 	if (ACCESSING_BITS_0_7)
@@ -212,13 +212,13 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
  *
  *************************************/
 
-READ16_MEMBER(xtheball_state::analogx_r)
+uint16_t xtheball_state::analogx_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_analog_x->read() << 8) | 0x00ff;
 }
 
 
-READ16_MEMBER(xtheball_state::analogy_watchdog_r)
+uint16_t xtheball_state::analogy_watchdog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* doubles as a watchdog address */
 	m_watchdog->reset_w(space,0,0);

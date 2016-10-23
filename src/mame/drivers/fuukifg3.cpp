@@ -172,14 +172,14 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 ***************************************************************************/
 
 /* Sound comms */
-READ32_MEMBER(fuuki32_state::snd_020_r)
+uint32_t fuuki32_state::snd_020_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	machine().scheduler().synchronize();
 	uint32_t retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
 	return retdata;
 }
 
-WRITE32_MEMBER(fuuki32_state::snd_020_w)
+void fuuki32_state::snd_020_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().scheduler().synchronize();
 
@@ -190,7 +190,7 @@ WRITE32_MEMBER(fuuki32_state::snd_020_w)
 		m_shared_ram[(offset * 2) + 1] = data & 0xff;
 }
 
-WRITE32_MEMBER(fuuki32_state::vregs_w)
+void fuuki32_state::vregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_vregs[offset] != data)
 	{
@@ -236,23 +236,23 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki32_state::sound_bw_w)
+void fuuki32_state::sound_bw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
 
-READ8_MEMBER(fuuki32_state::snd_z80_r)
+uint8_t fuuki32_state::snd_z80_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retdata = m_shared_ram[offset];
 	return retdata;
 }
 
-WRITE8_MEMBER(fuuki32_state::snd_z80_w)
+void fuuki32_state::snd_z80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared_ram[offset] = data;
 }
 
-WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
+void fuuki32_state::snd_ymf278b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
 }

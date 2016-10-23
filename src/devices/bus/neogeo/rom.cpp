@@ -48,7 +48,7 @@ void neogeo_rom_device::device_reset()
  mapper specific handlers
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_rom_device::rom_r)
+uint16_t neogeo_rom_device::rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// to speed up access to ROM, the access to ROM are actually replaced in the driver
 	// by accesses to the maincpu rom region, where we have anyway copied the rom content
@@ -57,7 +57,7 @@ READ16_MEMBER(neogeo_rom_device::rom_r)
 }
 
 
-WRITE16_MEMBER(neogeo_rom_device::banksel_w)
+void neogeo_rom_device::banksel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// to speed up access to ROM, the banking is taken care of at driver level
 	// by mapping higher banks to the corresponding offset in maincpu rom region

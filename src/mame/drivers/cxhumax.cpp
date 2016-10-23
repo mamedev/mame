@@ -30,7 +30,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, c
 	}
 }
 
-READ32_MEMBER ( cxhumax_state::cx_gxa_r )
+uint32_t cxhumax_state::cx_gxa_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res = m_gxa_cmd_regs[offset];
 	verboselog(*this, 9, "(GXA) %08X -> %08X\n", 0xE0600000 + (offset << 2), res);
@@ -54,7 +54,7 @@ READ32_MEMBER ( cxhumax_state::cx_gxa_r )
 	return res;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_gxa_w )
+void cxhumax_state::cx_gxa_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(GXA) %08X <- %08X\n", 0xE0600000 + (offset << 2), data);
 	uint8_t gxa_command_number = (offset >> 9) & 0x7F;
@@ -112,7 +112,7 @@ WRITE32_MEMBER( cxhumax_state::cx_gxa_w )
 	}
 }
 
-WRITE32_MEMBER ( cxhumax_state::flash_w )
+void cxhumax_state::flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
@@ -122,7 +122,7 @@ WRITE32_MEMBER ( cxhumax_state::flash_w )
 	verboselog(*this, 9, "(FLASH) %08X <- %08X\n", 0xF0000000 + (offset << 2), data);
 }
 
-READ32_MEMBER ( cxhumax_state::flash_r )
+uint32_t cxhumax_state::flash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res = 0;
 	offset *= 2;
@@ -134,12 +134,12 @@ READ32_MEMBER ( cxhumax_state::flash_r )
 	return res;
 }
 
-READ32_MEMBER ( cxhumax_state::dummy_flash_r )
+uint32_t cxhumax_state::dummy_flash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xFFFFFFFF;
 }
 
-WRITE32_MEMBER ( cxhumax_state::cx_remap_w )
+void cxhumax_state::cx_remap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(!(data&1)) {
 		verboselog(*this, 9, "(REMAP) %08X -> %08X\n", 0xE0400014 + (offset << 2), data);
@@ -147,7 +147,7 @@ WRITE32_MEMBER ( cxhumax_state::cx_remap_w )
 	}
 }
 
-READ32_MEMBER( cxhumax_state::cx_scratch_r )
+uint32_t cxhumax_state::cx_scratch_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_scratch_reg;
 	verboselog(*this, 9, "(SCRATCH) %08X -> %08X\n", 0xE0400024 + (offset << 2), data);
@@ -171,102 +171,102 @@ READ32_MEMBER( cxhumax_state::cx_scratch_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_scratch_w )
+void cxhumax_state::cx_scratch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(SCRATCH) %08X <- %08X\n", 0xE0400024 + (offset << 2), data);
 	COMBINE_DATA(&m_scratch_reg);
 }
 
-READ32_MEMBER( cxhumax_state::cx_hsx_r )
+uint32_t cxhumax_state::cx_hsx_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0; // dummy
 	verboselog(*this, 9, "(HSX) %08X -> %08X\n", 0xE0000000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_hsx_w )
+void cxhumax_state::cx_hsx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(HSX) %08X <- %08X\n", 0xE0000000 + (offset << 2), data);
 }
 
-READ32_MEMBER( cxhumax_state::cx_romdescr_r )
+uint32_t cxhumax_state::cx_romdescr_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_romdescr_reg;
 	verboselog(*this, 9, "(ROMDESC0) %08X -> %08X\n", 0xE0010000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_romdescr_w )
+void cxhumax_state::cx_romdescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(ROMDESC0) %08X <- %08X\n", 0xE0010000 + (offset << 2), data);
 	COMBINE_DATA(&m_romdescr_reg);
 }
 
-READ32_MEMBER( cxhumax_state::cx_isaromdescr_r )
+uint32_t cxhumax_state::cx_isaromdescr_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_isaromdescr_regs[offset];
 	verboselog(*this, 9, "(ISAROMDESC%d) %08X -> %08X\n", offset+1, 0xE0010004 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_isaromdescr_w )
+void cxhumax_state::cx_isaromdescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(ISAROMDESC%d) %08X <- %08X\n", offset+1, 0xE0010004 + (offset << 2), data);
 	COMBINE_DATA(&m_isaromdescr_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_isadescr_r )
+uint32_t cxhumax_state::cx_isadescr_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_isaromdescr_regs[offset];
 	verboselog(*this, 9, "(ISA_DESC%d) %08X -> %08X\n", offset+4, 0xE0010010 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_isadescr_w )
+void cxhumax_state::cx_isadescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(ISA_DESC%d) %08X <- %08X\n", offset+4, 0xE0010010 + (offset << 2), data);
 	COMBINE_DATA(&m_isaromdescr_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_rommap_r )
+uint32_t cxhumax_state::cx_rommap_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	verboselog(*this, 9, "(ROM%d_MAP) %08X -> %08X\n", offset, 0xE0010020 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_rommap_w )
+void cxhumax_state::cx_rommap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(ROM%d_MAP) %08X <- %08X\n", offset, 0xE0010020 + (offset << 2), data);
 }
 
-READ32_MEMBER( cxhumax_state::cx_rommode_r )
+uint32_t cxhumax_state::cx_rommode_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_rommode_reg;
 	verboselog(*this, 9, "(ROMMODE) %08X -> %08X\n", 0xE0010034 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_rommode_w )
+void cxhumax_state::cx_rommode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(ROMMODE) %08X <- %08X\n", 0xE0010034 + (offset << 2), data);
 	COMBINE_DATA(&m_rommode_reg);
 }
 
-READ32_MEMBER( cxhumax_state::cx_xoemask_r )
+uint32_t cxhumax_state::cx_xoemask_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_xoemask_reg;
 	verboselog(*this, 9, "(XOEMASK) %08X -> %08X\n", 0xE0010034 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_xoemask_w )
+void cxhumax_state::cx_xoemask_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(XOEMASK) %08X <- %08X\n", 0xE0010034 + (offset << 2), data);
 	COMBINE_DATA(&m_xoemask_reg);
 }
 
-READ32_MEMBER( cxhumax_state::cx_pci_r )
+uint32_t cxhumax_state::cx_pci_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	switch (offset) {
@@ -284,20 +284,20 @@ READ32_MEMBER( cxhumax_state::cx_pci_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_pci_w )
+void cxhumax_state::cx_pci_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(PCI) %08X <- %08X\n", 0xE0010040 + (offset << 2), data);
 	COMBINE_DATA(&m_pci_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_extdesc_r )
+uint32_t cxhumax_state::cx_extdesc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_extdesc_regs[offset];
 	verboselog(*this, 9, "(EXTDESC) %08X -> %08X\n", 0xE0010080 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_extdesc_w )
+void cxhumax_state::cx_extdesc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(EXTDESC) %08X <- %08X\n", 0xE0010080 + (offset << 2), data);
 	COMBINE_DATA(&m_extdesc_regs[offset]);
@@ -330,7 +330,7 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 	m_timer_regs.timer[param].timer->adjust(period,param);
 }
 
-READ32_MEMBER( cxhumax_state::cx_timers_r )
+uint32_t cxhumax_state::cx_timers_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	uint8_t index = offset>>2;
@@ -355,7 +355,7 @@ READ32_MEMBER( cxhumax_state::cx_timers_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_timers_w )
+void cxhumax_state::cx_timers_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t index = offset>>2;
 	if(index==16) {
@@ -387,7 +387,7 @@ WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 	}
 }
 
-READ32_MEMBER( cxhumax_state::cx_uart2_r )
+uint32_t cxhumax_state::cx_uart2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 	switch (offset) {
@@ -401,7 +401,7 @@ READ32_MEMBER( cxhumax_state::cx_uart2_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
+void cxhumax_state::cx_uart2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(UART2) %08X <- %08X\n", 0xE0411000 + (offset << 2), data);
 	switch (offset) {
@@ -428,66 +428,66 @@ WRITE32_MEMBER( cxhumax_state::cx_uart2_w )
 	}
 }
 
-READ32_MEMBER( cxhumax_state::cx_pll_r )
+uint32_t cxhumax_state::cx_pll_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_pll_regs[offset];
 	verboselog(*this, 9, "(PLL) %08X -> %08X\n", 0xE0440000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_pll_w )
+void cxhumax_state::cx_pll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(PLL) %08X <- %08X\n", 0xE0440000 + (offset << 2), data);
 	COMBINE_DATA(&m_pll_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_pllprescale_r )
+uint32_t cxhumax_state::cx_pllprescale_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_pllprescale_reg;
 	verboselog(*this, 9, "(PLLPRESCALE) %08X -> %08X\n", 0xE0440094 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_pllprescale_w )
+void cxhumax_state::cx_pllprescale_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(PLLPRESCALE) %08X <- %08X\n", 0xE0440094 + (offset << 2), data);
 	COMBINE_DATA(&m_pllprescale_reg);
 }
 
-READ32_MEMBER( cxhumax_state::cx_clkdiv_r )
+uint32_t cxhumax_state::cx_clkdiv_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_clkdiv_regs[offset];
 	verboselog(*this, 9, "(CLKDIV) %08X -> %08X\n", 0xE0440020 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_clkdiv_w )
+void cxhumax_state::cx_clkdiv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(CLKDIV) %08X <- %08X\n", 0xE0440020 + (offset << 2), data);
 	COMBINE_DATA(&m_clkdiv_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_chipcontrol_r )
+uint32_t cxhumax_state::cx_chipcontrol_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_chipcontrol_regs[offset];
 	verboselog(*this, 9, "(CHIPCONTROL) %08X -> %08X\n", 0xE0440100 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_chipcontrol_w )
+void cxhumax_state::cx_chipcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(CHIPCONTROL) %08X <- %08X\n", 0xE0440100 + (offset << 2), data);
 	COMBINE_DATA(&m_chipcontrol_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_intctrl_r )
+uint32_t cxhumax_state::cx_intctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_intctrl_regs[offset];
 	verboselog(*this, 9, "(INTCTRL) %08X -> %08X\n", 0xE0450000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
+void cxhumax_state::cx_intctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(INTCTRL) %08X <- %08X\n", 0xE0450000 + (offset << 2), data);
 	switch (offset >> 3) { // Decode the group
@@ -555,7 +555,7 @@ WRITE32_MEMBER( cxhumax_state::cx_intctrl_w )
 
 }
 
-READ32_MEMBER( cxhumax_state::cx_ss_r )
+uint32_t cxhumax_state::cx_ss_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
 	switch(offset) {
@@ -570,7 +570,7 @@ READ32_MEMBER( cxhumax_state::cx_ss_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_ss_w )
+void cxhumax_state::cx_ss_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(SS) %08X <- %08X\n", 0xE0490000 + (offset << 2), data);
 	switch(offset) {
@@ -613,14 +613,14 @@ WRITE32_MEMBER( cxhumax_state::cx_ss_w )
 	};
 }
 
-READ32_MEMBER( cxhumax_state::cx_i2c0_r )
+uint32_t cxhumax_state::cx_i2c0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_i2c0_regs[offset];
 	verboselog(*this, 9, "(I2C0) %08X -> %08X\n", 0xE04E0000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_i2c0_w )
+void cxhumax_state::cx_i2c0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(I2C0) %08X <- %08X\n", 0xE04E0000 + (offset << 2), data);
 	COMBINE_DATA(&m_i2c0_regs[offset]);
@@ -674,7 +674,7 @@ void cxhumax_state::i2cmem_stop()
 	m_i2cmem->write_scl(0);
 }
 
-READ32_MEMBER( cxhumax_state::cx_i2c1_r )
+uint32_t cxhumax_state::cx_i2c1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data=0;
 	switch(offset) {
@@ -688,7 +688,7 @@ READ32_MEMBER( cxhumax_state::cx_i2c1_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
+void cxhumax_state::cx_i2c1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(I2C1) %08X <- %08X\n", 0xE04E1000 + (offset << 2), data);
 	switch(offset) {
@@ -747,33 +747,33 @@ WRITE32_MEMBER( cxhumax_state::cx_i2c1_w )
 	}
 }
 
-READ32_MEMBER( cxhumax_state::cx_i2c2_r )
+uint32_t cxhumax_state::cx_i2c2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_i2c2_regs[offset];
 	verboselog(*this, 9, "(I2C2) %08X -> %08X\n", 0xE04E2000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_i2c2_w )
+void cxhumax_state::cx_i2c2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(I2C2) %08X <- %08X\n", 0xE04E2000 + (offset << 2), data);
 	COMBINE_DATA(&m_i2c2_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_mc_cfg_r )
+uint32_t cxhumax_state::cx_mc_cfg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_mccfg_regs[offset];
 	verboselog(*this, 9, "(MC_CFG) %08X -> %08X\n", 0xE0500300 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_mc_cfg_w )
+void cxhumax_state::cx_mc_cfg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(MC_CFG) %08X <- %08X\n", 0xE0500300 + (offset << 2), data);
 	COMBINE_DATA(&m_mccfg_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_drm0_r )
+uint32_t cxhumax_state::cx_drm0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_drm0_regs[offset];
 	verboselog(*this, 9, "(DRM0) %08X -> %08X\n", 0xE0560000 + (offset << 2), data);
@@ -785,33 +785,33 @@ READ32_MEMBER( cxhumax_state::cx_drm0_r )
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_drm0_w )
+void cxhumax_state::cx_drm0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(DRM0) %08X <- %08X\n", 0xE0560000 + (offset << 2), data);
 	COMBINE_DATA(&m_drm0_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_drm1_r )
+uint32_t cxhumax_state::cx_drm1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_drm1_regs[offset];
 	verboselog(*this, 9, "(DRM1) %08X -> %08X\n", 0xE0570000 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_drm1_w )
+void cxhumax_state::cx_drm1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(DRM1) %08X <- %08X\n", 0xE0570000 + (offset << 2), data);
 	COMBINE_DATA(&m_drm1_regs[offset]);
 }
 
-READ32_MEMBER( cxhumax_state::cx_hdmi_r )
+uint32_t cxhumax_state::cx_hdmi_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_hdmi_regs[offset];
 	verboselog(*this, 9, "(HDMI) %08X -> %08X\n", 0xE05D0800 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( cxhumax_state::cx_hdmi_w )
+void cxhumax_state::cx_hdmi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog(*this, 9, "(HDMI) %08X <- %08X\n", 0xE05D0800 + (offset << 2), data);
 	switch(offset) {

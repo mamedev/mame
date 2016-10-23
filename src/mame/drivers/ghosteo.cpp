@@ -104,15 +104,15 @@ public:
 	int m_security_count;
 	uint32_t m_bballoon_port[20];
 	struct nand_t m_nand;
-	DECLARE_READ32_MEMBER(bballoon_speedup_r);
-	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
-	DECLARE_WRITE32_MEMBER(soundlatch_w);
+	uint32_t bballoon_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t touryuu_port_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_rom_pagesize;
 	uint8_t* m_flash;
@@ -120,13 +120,13 @@ public:
 	void init_bballoon();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
-	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
-	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_command_w );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_address_w );
-	DECLARE_READ8_MEMBER(s3c2410_nand_data_r );
-	DECLARE_WRITE8_MEMBER(s3c2410_nand_data_w );
+	uint32_t s3c2410_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void s3c2410_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t s3c2410_core_pin_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void s3c2410_nand_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void s3c2410_nand_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t s3c2410_nand_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void s3c2410_nand_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
@@ -157,20 +157,20 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-READ8_MEMBER( ghosteo_state::qs1000_p1_r )
+uint8_t ghosteo_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
+void ghosteo_state::qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p2_w )
+void ghosteo_state::qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
+void ghosteo_state::qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
@@ -187,7 +187,7 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 
 static const uint8_t security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
 
-READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
+uint32_t ghosteo_state::s3c2410_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_bballoon_port[offset];
 	switch (offset)
@@ -207,7 +207,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
 	return data;
 }
 
-WRITE32_MEMBER(ghosteo_state::s3c2410_gpio_port_w)
+void ghosteo_state::s3c2410_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = m_bballoon_port[offset];
 	m_bballoon_port[offset] = data;
@@ -252,7 +252,7 @@ NCON : NAND flash memory address step selection
 
 */
 
-READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
+uint32_t ghosteo_state::s3c2410_core_pin_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int data = 0;
 	switch (offset)
@@ -266,7 +266,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_core_pin_r)
 
 // NAND
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
+void ghosteo_state::s3c2410_nand_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct nand_t &nand = m_nand;
 //  device_t *nand = space.machine().device( "nand");
@@ -291,7 +291,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_command_w )
 	}
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
+void ghosteo_state::s3c2410_nand_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct nand_t &nand = m_nand;
 //  device_t *nand = space.machine().device( "nand");
@@ -326,7 +326,7 @@ WRITE8_MEMBER(ghosteo_state::s3c2410_nand_address_w )
 	}
 }
 
-READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
+uint8_t ghosteo_state::s3c2410_nand_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	struct nand_t &nand = m_nand;
 //  device_t *nand = space.machine().device( "nand");
@@ -373,7 +373,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 	return data;
 }
 
-WRITE8_MEMBER(ghosteo_state::s3c2410_nand_data_w )
+void ghosteo_state::s3c2410_nand_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  device_t *nand = space.machine().device( "nand");
 	#if NAND_LOG
@@ -403,7 +403,7 @@ WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_w )
 	m_i2cmem->write_sda(state);
 }
 
-READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
+uint32_t ghosteo_state::touryuu_port_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
 	uint32_t data = 0xFFFFFFFF;
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
+uint32_t ghosteo_state::bballoon_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
 
@@ -587,7 +587,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	return ret;
 }
 
-WRITE32_MEMBER(ghosteo_state::soundlatch_w)
+void ghosteo_state::soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_qs1000->set_irq(ASSERT_LINE);

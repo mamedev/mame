@@ -43,12 +43,12 @@ public:
 	m_p_ram(*this, "ram")
 	{ }
 
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(serial_r);
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(reset_int_r);
-	DECLARE_WRITE8_MEMBER(reset_int_w);
+	uint8_t reset_int_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reset_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
 protected:
@@ -142,7 +142,7 @@ static INPUT_PORTS_START( zac_1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-READ8_MEMBER( zac_1_state::ctrl_r )
+uint8_t zac_1_state::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // reads inputs
 	if (m_input_line == 0xfe)
@@ -166,17 +166,17 @@ READ8_MEMBER( zac_1_state::ctrl_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( zac_1_state::ctrl_w )
+void zac_1_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_line = data;
 }
 
-WRITE8_MEMBER( zac_1_state::reset_int_w )
+void zac_1_state::reset_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-READ8_MEMBER( zac_1_state::serial_r )
+uint8_t zac_1_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // from printer
 	return 0;
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( locomotp_io, AS_IO, 8, zac_1_state)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(serial_r)
 ADDRESS_MAP_END
 
-READ8_MEMBER( zac_1_state::reset_int_r )
+uint8_t zac_1_state::reset_int_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0;

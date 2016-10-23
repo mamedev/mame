@@ -58,16 +58,16 @@ public:
 	required_device<screen_device> m_rscreen;
 	optional_ioport_array<8> m_keys;
 
-	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
-	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);
-	DECLARE_WRITE32_MEMBER(ps4_bgpen_2_dword_w);
-	DECLARE_WRITE32_MEMBER(ps4_screen1_brt_w);
-	DECLARE_WRITE32_MEMBER(ps4_screen2_brt_w);
-	DECLARE_WRITE32_MEMBER(ps4_vidregs_w);
-	DECLARE_WRITE32_MEMBER(io_select_w);
+	void ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ps4_bgpen_1_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ps4_bgpen_2_dword_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ps4_screen1_brt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ps4_screen2_brt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void ps4_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void io_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
-	DECLARE_WRITE32_MEMBER(ps4_eeprom_w);
-	DECLARE_READ32_MEMBER(ps4_eeprom_r);
+	void ps4_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ps4_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

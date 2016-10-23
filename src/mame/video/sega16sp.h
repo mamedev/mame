@@ -104,7 +104,7 @@ public:
 	};
 
 	// write trigger memory handler
-	DECLARE_WRITE16_MEMBER( draw_write );
+	void draw_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

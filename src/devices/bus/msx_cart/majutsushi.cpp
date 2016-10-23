@@ -79,13 +79,13 @@ void msx_cart_majutsushi::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_majutsushi::read_cart)
+uint8_t msx_cart_majutsushi::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_base[offset >> 13][offset & 0x1fff];
 }
 
 
-WRITE8_MEMBER(msx_cart_majutsushi::write_cart)
+void msx_cart_majutsushi::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xe000)
 	{

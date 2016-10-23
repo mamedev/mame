@@ -310,7 +310,7 @@ void zx8302_device::rcv_complete()
 //  rtc_r - real time clock read
 //-------------------------------------------------
 
-READ8_MEMBER( zx8302_device::rtc_r )
+uint8_t zx8302_device::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -338,7 +338,7 @@ READ8_MEMBER( zx8302_device::rtc_r )
 //  rtc_w - real time clock write
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8302_device::rtc_w )
+void zx8302_device::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Set Real Time Clock: %02x\n", tag(), data);
 }
@@ -348,7 +348,7 @@ WRITE8_MEMBER( zx8302_device::rtc_w )
 //  control_w - serial transmit clock
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8302_device::control_w )
+void zx8302_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Transmit Control: %02x\n", tag(), data);
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER( zx8302_device::control_w )
 //  mdv_track_r - microdrive track data
 //-------------------------------------------------
 
-READ8_MEMBER( zx8302_device::mdv_track_r )
+uint8_t zx8302_device::mdv_track_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Microdrive Track %u: %02x\n", tag(), m_track, m_mdv_data[m_track]);
 
@@ -384,7 +384,7 @@ READ8_MEMBER( zx8302_device::mdv_track_r )
 //  status_r - status register
 //-------------------------------------------------
 
-READ8_MEMBER( zx8302_device::status_r )
+uint8_t zx8302_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -442,7 +442,7 @@ READ8_MEMBER( zx8302_device::status_r )
 // At startup the IPC sits in a loop waiting for the comdata bit to go
 // high, the main CPU does this by writing 0x01 to output register.
 
-WRITE8_MEMBER( zx8302_device::ipc_command_w )
+void zx8302_device::ipc_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' IPC Command: %02x\n", tag(), data);
 
@@ -457,7 +457,7 @@ WRITE8_MEMBER( zx8302_device::ipc_command_w )
 //  mdv_control_w - microdrive control
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8302_device::mdv_control_w )
+void zx8302_device::mdv_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -492,7 +492,7 @@ WRITE8_MEMBER( zx8302_device::mdv_control_w )
 //  irq_status_r - interrupt status
 //-------------------------------------------------
 
-READ8_MEMBER( zx8302_device::irq_status_r )
+uint8_t zx8302_device::irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Interrupt Status: %02x\n", tag(), m_irq);
 
@@ -504,7 +504,7 @@ READ8_MEMBER( zx8302_device::irq_status_r )
 //  irq_acknowledge_w - interrupt acknowledge
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8302_device::irq_acknowledge_w )
+void zx8302_device::irq_acknowledge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Interrupt Acknowledge: %02x\n", tag(), data);
 
@@ -521,7 +521,7 @@ WRITE8_MEMBER( zx8302_device::irq_acknowledge_w )
 //  data_w - transmit buffer
 //-------------------------------------------------
 
-WRITE8_MEMBER( zx8302_device::data_w )
+void zx8302_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("ZX8302 '%s' Data Register: %02x\n", tag(), data);
 

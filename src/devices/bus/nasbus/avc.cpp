@@ -125,7 +125,7 @@ MC6845_UPDATE_ROW( nascom_avc_device::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( nascom_avc_device::control_w )
+void nascom_avc_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("nascom_avc_device::control_w: 0x%02x\n", data);
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	m_control = data;
 }
 
-READ8_MEMBER( nascom_avc_device::vram_r )
+uint8_t nascom_avc_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// manual says only one plane can be read, i assume this is the order
 	if (BIT(m_control, 0)) return m_r_ram[offset];
@@ -155,7 +155,7 @@ READ8_MEMBER( nascom_avc_device::vram_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( nascom_avc_device::vram_w )
+void nascom_avc_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// all planes can be written at the same time
 	if (BIT(m_control, 0)) m_r_ram[offset] = data;

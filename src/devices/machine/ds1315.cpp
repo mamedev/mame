@@ -90,7 +90,7 @@ static const uint8_t ds1315_pattern[] =
  read_0 (actual data)
  -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_0 )
+uint8_t ds1315_device::read_0(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (ds1315_pattern[m_count++] == 0)
 	{
@@ -115,7 +115,7 @@ READ8_MEMBER( ds1315_device::read_0 )
     read_1 (actual data)
 -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_1 )
+uint8_t ds1315_device::read_1(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (ds1315_pattern[m_count++] == 1)
 	{
@@ -133,7 +133,7 @@ READ8_MEMBER( ds1315_device::read_1 )
     read_data
 -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_data )
+uint8_t ds1315_device::read_data(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result;
 
@@ -198,7 +198,7 @@ void ds1315_device::fill_raw_data()
 write_data
 -------------------------------------------------*/
 
-READ8_MEMBER(ds1315_device::write_data)
+uint8_t ds1315_device::write_data(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static int write_count;
 	if (write_count >= 64)

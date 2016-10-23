@@ -77,7 +77,7 @@ void ohci_usb_controller::device_reset()
 {
 }
 
-READ32_MEMBER(ohci_usb_controller::read)
+uint32_t ohci_usb_controller::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret;
 
@@ -91,7 +91,7 @@ READ32_MEMBER(ohci_usb_controller::read)
 	return ret;
 }
 
-WRITE32_MEMBER(ohci_usb_controller::write)
+void ohci_usb_controller::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 

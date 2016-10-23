@@ -67,15 +67,15 @@ public:
 	int m_tape_index;
 	nascom1_portstat_t m_portstat;
 
-	DECLARE_READ8_MEMBER(nascom1_port_00_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_00_w);
-	DECLARE_READ8_MEMBER(nascom1_port_01_r);
-	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
-	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+	uint8_t nascom1_port_00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nascom1_port_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nascom1_port_01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nascom1_port_01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nascom1_port_02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_nascom();
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
-	DECLARE_READ8_MEMBER(nascom1_hd6402_si);
-	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
+	uint8_t nascom1_hd6402_si(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nascom1_hd6402_so(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
@@ -135,7 +135,7 @@ private:
 //  KEYBOARD
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_00_r )
+uint8_t nascom_state::nascom1_port_00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_portstat.stat_count < 9)
 		return ((m_keyboard[m_portstat.stat_count])->read() | ~0x7f);
@@ -143,7 +143,7 @@ READ8_MEMBER( nascom_state::nascom1_port_00_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
+void nascom_state::nascom1_port_00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->change_state(
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -170,18 +170,18 @@ WRITE8_MEMBER( nascom_state::nascom1_port_00_w )
 //  CASSETTE
 //**************************************************************************
 
-READ8_MEMBER( nascom_state::nascom1_port_01_r )
+uint8_t nascom_state::nascom1_port_01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_hd6402->get_received_data();
 }
 
 
-WRITE8_MEMBER( nascom_state::nascom1_port_01_w )
+void nascom_state::nascom1_port_01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hd6402->set_transmit_data(data);
 }
 
-READ8_MEMBER( nascom_state::nascom1_port_02_r )
+uint8_t nascom_state::nascom1_port_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x31;
 
@@ -196,12 +196,12 @@ READ8_MEMBER( nascom_state::nascom1_port_02_r )
 	return data;
 }
 
-READ8_MEMBER( nascom_state::nascom1_hd6402_si )
+uint8_t nascom_state::nascom1_hd6402_si(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-WRITE8_MEMBER( nascom_state::nascom1_hd6402_so )
+void nascom_state::nascom1_hd6402_so(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

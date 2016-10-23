@@ -124,7 +124,7 @@ void cpc_symbiface2_device::device_reset()
 // IDE controller (custom)
 // #FD00-07 - CS1
 // #FD08-0F - CS0
-READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
+uint8_t cpc_symbiface2_device::ide_cs0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// data is returned in words, so it must be buffered
 	if(offset == 0x00) // data register
@@ -145,17 +145,17 @@ READ8_MEMBER(cpc_symbiface2_device::ide_cs0_r)
 		return m_ide->read_cs0(space,offset);
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::ide_cs0_w)
+void cpc_symbiface2_device::ide_cs0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ide->write_cs0(space,offset,data);
 }
 
-READ8_MEMBER(cpc_symbiface2_device::ide_cs1_r)
+uint8_t cpc_symbiface2_device::ide_cs1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ide->read_cs1(space,offset);
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
+void cpc_symbiface2_device::ide_cs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ide->write_cs1(space,offset,data);
 }
@@ -163,7 +163,7 @@ WRITE8_MEMBER(cpc_symbiface2_device::ide_cs1_w)
 // RTC (Dallas DS1287A)
 // #FD15 (write only) register select
 // #FD14 (read/write) read from or write into selected register
-READ8_MEMBER(cpc_symbiface2_device::rtc_r)
+uint8_t cpc_symbiface2_device::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset & 0x01)
 	{
@@ -175,7 +175,7 @@ READ8_MEMBER(cpc_symbiface2_device::rtc_r)
 	return 0;
 }
 
-WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
+void cpc_symbiface2_device::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset & 0x01)
 	{
@@ -212,7 +212,7 @@ WRITE8_MEMBER(cpc_symbiface2_device::rtc_w)
                              D[bit4]   = backward button
               D[bit5] = 1 -> D[bit0-4] = scroll wheel offset (signed)
  */
-READ8_MEMBER(cpc_symbiface2_device::mouse_r)
+uint8_t cpc_symbiface2_device::mouse_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	int input;
@@ -266,7 +266,7 @@ INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_buttons)
 }
 
 // #FD17 (read) - map currently selected ROM to 0x4000 for read/write
-READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
+uint8_t cpc_symbiface2_device::rom_rewrite_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t bank = get_rom_bank();
 
@@ -286,7 +286,7 @@ READ8_MEMBER(cpc_symbiface2_device::rom_rewrite_r)
 }
 
 // #FD17 (write) - unmap selected ROM at 0x4000
-WRITE8_MEMBER(cpc_symbiface2_device::rom_rewrite_w)
+void cpc_symbiface2_device::rom_rewrite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().root_device().membank("bank3")->set_base(m_4xxx_ptr_r);
 	machine().root_device().membank("bank4")->set_base(m_6xxx_ptr_r);

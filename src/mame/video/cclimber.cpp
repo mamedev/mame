@@ -330,7 +330,7 @@ void cclimber_state::swimmer_set_background_pen()
 
 
 
-WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
+void cclimber_state::cclimber_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
 	m_colorram[offset & ~0x20] = data;
@@ -338,7 +338,7 @@ WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 }
 
 
-WRITE8_MEMBER(cclimber_state::cannonb_flip_screen_w)
+void cclimber_state::cannonb_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen[0] = data;
 	m_flip_screen[1] = data;

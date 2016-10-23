@@ -94,16 +94,16 @@ protected:
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
-	DECLARE_READ8_MEMBER( rb_r );
-	DECLARE_READ8_MEMBER( xi_r );
-	DECLARE_READ8_MEMBER( rst_r );
-	DECLARE_READ8_MEMBER( sta_r );
-	DECLARE_WRITE8_MEMBER( cmd_w );
-	DECLARE_WRITE8_MEMBER( rr_w );
-	DECLARE_WRITE8_MEMBER( tb_w );
-	DECLARE_WRITE8_MEMBER( xo_w );
-	DECLARE_WRITE8_MEMBER( mr_w );
-	DECLARE_WRITE8_MEMBER( tmr_w );
+	uint8_t rb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t xi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rst_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	enum

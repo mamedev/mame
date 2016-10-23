@@ -146,7 +146,7 @@ struct shaded_point
 
 
 
-READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
+uint16_t saturn_state::saturn_vdp1_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -285,7 +285,7 @@ void saturn_state::stv_set_framebuffer_config( void )
 	stv_prepare_framebuffers();
 }
 
-WRITE16_MEMBER( saturn_state::saturn_vdp1_regs_w )
+void saturn_state::saturn_vdp1_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vdp1_regs[offset]);
 
@@ -329,13 +329,13 @@ WRITE16_MEMBER( saturn_state::saturn_vdp1_regs_w )
 
 }
 
-READ32_MEMBER ( saturn_state::saturn_vdp1_vram_r )
+uint32_t saturn_state::saturn_vdp1_vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vdp1_vram[offset];
 }
 
 
-WRITE32_MEMBER ( saturn_state::saturn_vdp1_vram_w )
+void saturn_state::saturn_vdp1_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t *vdp1 = m_vdp1.gfx_decode.get();
 
@@ -354,7 +354,7 @@ WRITE32_MEMBER ( saturn_state::saturn_vdp1_vram_w )
 	vdp1[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
-WRITE32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_w )
+void saturn_state::saturn_vdp1_framebuffer0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//popmessage ("STV VDP1 Framebuffer 0 WRITE offset %08x data %08x",offset, data);
 	if ( STV_VDP1_TVM & 1 )
@@ -396,7 +396,7 @@ WRITE32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_w )
 	}
 }
 
-READ32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_r )
+uint32_t saturn_state::saturn_vdp1_framebuffer0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	//popmessage ("STV VDP1 Framebuffer 0 READ offset %08x",offset);
@@ -431,12 +431,12 @@ READ32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_r )
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_MEMBER ( saturn_state::saturn_vdp1_framebuffer1_w )
+void saturn_state::saturn_vdp1_framebuffer1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//popmessage ("STV VDP1 Framebuffer 1 WRITE offset %08x data %08x",offset, data);
 }
 
-READ32_MEMBER ( saturn_state::saturn_vdp1_framebuffer1_r )
+uint32_t saturn_state::saturn_vdp1_framebuffer1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//popmessage ("STV VDP1 Framebuffer 1 READ offset %08x",offset);
 	return 0xffff;

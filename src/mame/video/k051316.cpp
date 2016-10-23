@@ -187,19 +187,19 @@ void k051316_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k051316_device::read )
+uint8_t k051316_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( k051316_device::write )
+void k051316_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-READ8_MEMBER( k051316_device::rom_r )
+uint8_t k051316_device::rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	assert (m_zoom_rom.found());
 
@@ -220,7 +220,7 @@ READ8_MEMBER( k051316_device::rom_r )
 	}
 }
 
-WRITE8_MEMBER( k051316_device::ctrl_w )
+void k051316_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ctrlram[offset] = data;
 	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);

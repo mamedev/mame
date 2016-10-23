@@ -29,7 +29,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
 	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
 	DECLARE_WRITE_LINE_MEMBER(start_w); // START (pin 10)
-	DECLARE_WRITE8_MEMBER(data_w);      // 6-bit word
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);      // 6-bit word
 
 	void set_clock(uint32_t clock);       // set new CLK frequency
 	void force_update();                // update stream, eg. before external ROM bankswitch

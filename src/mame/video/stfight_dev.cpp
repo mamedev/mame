@@ -330,20 +330,20 @@ void stfight_video_device::device_reset()
 
 // public functions
 
-WRITE8_MEMBER(stfight_video_device::stfight_text_char_w)
+void stfight_video_device::stfight_text_char_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 
-WRITE8_MEMBER(stfight_video_device::stfight_sprite_bank_w)
+void stfight_video_device::stfight_sprite_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_base = ( ( data & 0x04 ) << 7 ) |
 							( ( data & 0x01 ) << 8 );
 }
 
-WRITE8_MEMBER(stfight_video_device::stfight_vh_latch_w)
+void stfight_video_device::stfight_vh_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scroll;
 

@@ -34,7 +34,7 @@ Notes:
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::sound_command_w)
+void tecmo16_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

@@ -37,12 +37,12 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(irisha_keyboard_r);
-	DECLARE_READ8_MEMBER(irisha_8255_portb_r);
-	DECLARE_READ8_MEMBER(irisha_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(irisha_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(irisha_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(irisha_8255_portc_w);
+	uint8_t irisha_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t irisha_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t irisha_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irisha_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irisha_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irisha_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	TIMER_CALLBACK_MEMBER(irisha_key);
@@ -245,7 +245,7 @@ GFXDECODE_END
 
 *************************************************/
 
-READ8_MEMBER(irisha_state::irisha_8255_portb_r)
+uint8_t irisha_state::irisha_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_keypressed==1)
 	{
@@ -256,13 +256,13 @@ READ8_MEMBER(irisha_state::irisha_8255_portb_r)
 	return 0x00;
 }
 
-READ8_MEMBER(irisha_state::irisha_8255_portc_r)
+uint8_t irisha_state::irisha_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("irisha_8255_portc_r\n");
 	return 0;
 }
 
-WRITE8_MEMBER(irisha_state::irisha_8255_porta_w)
+void irisha_state::irisha_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("irisha_8255_porta_w %02x\n",data);
 
@@ -271,12 +271,12 @@ WRITE8_MEMBER(irisha_state::irisha_8255_porta_w)
 	update_speaker();
 }
 
-WRITE8_MEMBER(irisha_state::irisha_8255_portb_w)
+void irisha_state::irisha_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("irisha_8255_portb_w %02x\n",data);
 }
 
-WRITE8_MEMBER(irisha_state::irisha_8255_portc_w)
+void irisha_state::irisha_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("irisha_8255_portc_w %02x\n",data);
 
@@ -322,7 +322,7 @@ TIMER_CALLBACK_MEMBER(irisha_state::irisha_key)
 	m_keyboard_cnt = 0;
 }
 
-READ8_MEMBER(irisha_state::irisha_keyboard_r)
+uint8_t irisha_state::irisha_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t keycode;
 

@@ -909,7 +909,7 @@ void mac_state::video_reset_macdafb()
 	memset(m_rbv_palette, 0, sizeof(m_rbv_palette));
 }
 
-READ32_MEMBER(mac_state::dafb_r)
+uint32_t mac_state::dafb_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  if (offset != 0x108/4) printf("DAFB: Read @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->pc());
 
@@ -940,7 +940,7 @@ READ32_MEMBER(mac_state::dafb_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::dafb_w)
+void mac_state::dafb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  if (offset != 0x10c/4) printf("DAFB: Write %08x @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->pc());
 
@@ -1004,14 +1004,14 @@ WRITE32_MEMBER(mac_state::dafb_w)
 	}
 }
 
-READ32_MEMBER(mac_state::dafb_dac_r)
+uint32_t mac_state::dafb_dac_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //  printf("DAFB: Read DAC @ %x (mask %x PC=%x)\n", offset*4, mem_mask, m_maincpu->pc());
 
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::dafb_dac_w)
+void mac_state::dafb_dac_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  if ((offset > 0) && (offset != 0x10/4)) printf("DAFB: Write %08x to DAC @ %x (mask %x PC=%x)\n", data, offset*4, mem_mask, m_maincpu->pc());
 
@@ -1197,7 +1197,7 @@ uint32_t mac_state::screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-READ32_MEMBER(mac_state::macwd_r)
+uint32_t mac_state::macwd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1218,7 +1218,7 @@ READ32_MEMBER(mac_state::macwd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(mac_state::macwd_w)
+void mac_state::macwd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{

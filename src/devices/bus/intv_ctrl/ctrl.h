@@ -45,7 +45,7 @@ public:
 	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~intv_control_port_device();
 
-	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read_ctrl(); }
 	uint8_t read_ctrl();
 
 protected:

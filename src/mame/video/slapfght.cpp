@@ -77,51 +77,51 @@ void slapfght_state::video_start_slapfight()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(slapfght_state::videoram_w)
+void slapfght_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::colorram_w)
+void slapfght_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::fixram_w)
+void slapfght_state::fixram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fixvideoram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::fixcol_w)
+void slapfght_state::fixcol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fixcolorram[offset] = data;
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(slapfght_state::scrollx_lo_w)
+void slapfght_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_lo = data;
 }
 
-WRITE8_MEMBER(slapfght_state::scrollx_hi_w)
+void slapfght_state::scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_hi = data;
 }
 
-WRITE8_MEMBER(slapfght_state::scrolly_w)
+void slapfght_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(slapfght_state::flipscreen_w)
+void slapfght_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(offset ? 0 : 1);
 }
 
-WRITE8_MEMBER(slapfght_state::palette_bank_w)
+void slapfght_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = offset;
 }

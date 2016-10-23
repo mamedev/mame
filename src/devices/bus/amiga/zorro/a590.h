@@ -36,8 +36,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER( dmac_scsi_r );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
+	uint8_t dmac_scsi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmac_scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
 	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );

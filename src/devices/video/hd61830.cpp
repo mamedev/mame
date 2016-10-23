@@ -194,7 +194,7 @@ void hd61830_device::set_busy_flag()
 //  status_r - status register read
 //-------------------------------------------------
 
-READ8_MEMBER( hd61830_device::status_r )
+uint8_t hd61830_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("HD61830 '%s' Status Read: %s\n", tag(), m_bf ? "busy" : "ready");
 
@@ -206,7 +206,7 @@ READ8_MEMBER( hd61830_device::status_r )
 //  control_w - instruction register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd61830_device::control_w )
+void hd61830_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ir = data;
 }
@@ -216,7 +216,7 @@ WRITE8_MEMBER( hd61830_device::control_w )
 //  data_r - data register read
 //-------------------------------------------------
 
-READ8_MEMBER( hd61830_device::data_r )
+uint8_t hd61830_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_dor;
 
@@ -234,7 +234,7 @@ READ8_MEMBER( hd61830_device::data_r )
 //  data_w - data register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd61830_device::data_w )
+void hd61830_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bf)
 	{

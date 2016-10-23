@@ -266,32 +266,32 @@ public:
 
 	void machine_reset_a400();
 
-	DECLARE_WRITE8_MEMBER(gtia_cb);
+	void gtia_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(a600xl_pia_pb_w);
-	DECLARE_WRITE8_MEMBER(a800xl_pia_pb_w);
+	void a600xl_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a800xl_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(read_d5xx);    // at least one cart type can enable/disable roms when reading
-	DECLARE_WRITE8_MEMBER(disable_cart);
+	uint8_t read_d5xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);    // at least one cart type can enable/disable roms when reading
+	void disable_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// these are needed to handle carts which can disable ROM without
 	// installing/disinstalling continuously RAM and ROM (with e.g. big
 	// preformance hit in Williams carts)
-	DECLARE_READ8_MEMBER(special_read_8000);
-	DECLARE_WRITE8_MEMBER(special_write_8000);
-	DECLARE_READ8_MEMBER(special_read_a000);
-	DECLARE_WRITE8_MEMBER(special_write_a000);
+	uint8_t special_read_8000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void special_write_8000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t special_read_a000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void special_write_a000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(a600xl_low_r);
-	DECLARE_READ8_MEMBER(a1200xl_low_r);
-	DECLARE_READ8_MEMBER(a800xl_low_r);
-	DECLARE_WRITE8_MEMBER(a800xl_low_w);
-	DECLARE_READ8_MEMBER(a800xl_high_r);
-	DECLARE_WRITE8_MEMBER(a800xl_high_w);
-	DECLARE_READ8_MEMBER(a130xe_low_r);
-	DECLARE_WRITE8_MEMBER(a130xe_low_w);
-	DECLARE_READ8_MEMBER(xegs_low_r);
-	DECLARE_WRITE8_MEMBER(xegs_low_w);
+	uint8_t a600xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t a1200xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t a800xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a800xl_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t a800xl_high_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a800xl_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t a130xe_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a130xe_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t xegs_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void xegs_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
@@ -325,7 +325,7 @@ protected:
  *
  **************************************************************/
 
-READ8_MEMBER(a400_state::a600xl_low_r)
+uint8_t a400_state::a600xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mmu & 0x80)
 		return 0xff;
@@ -334,7 +334,7 @@ READ8_MEMBER(a400_state::a600xl_low_r)
 }
 
 
-READ8_MEMBER(a400_state::a1200xl_low_r)
+uint8_t a400_state::a1200xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -356,7 +356,7 @@ READ8_MEMBER(a400_state::a1200xl_low_r)
 	}
 }
 
-READ8_MEMBER(a400_state::a800xl_low_r)
+uint8_t a400_state::a800xl_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -385,7 +385,7 @@ READ8_MEMBER(a400_state::a800xl_low_r)
 	}
 }
 
-WRITE8_MEMBER(a400_state::a800xl_low_w)
+void a400_state::a800xl_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
@@ -408,7 +408,7 @@ WRITE8_MEMBER(a400_state::a800xl_low_w)
 	}
 }
 
-READ8_MEMBER(a400_state::a800xl_high_r)
+uint8_t a400_state::a800xl_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mmu & 0x01)
 		return m_region_maincpu->base()[0xd800 + offset];
@@ -416,13 +416,13 @@ READ8_MEMBER(a400_state::a800xl_high_r)
 		return m_ram->pointer()[0xd800 + offset];
 }
 
-WRITE8_MEMBER(a400_state::a800xl_high_w)
+void a400_state::a800xl_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(m_mmu & 0x01))
 		m_ram->pointer()[0xd800 + offset] = data;
 }
 
-READ8_MEMBER(a400_state::a130xe_low_r)
+uint8_t a400_state::a130xe_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x4000)    // 0x0000-0x3fff
 		return m_ram->pointer()[offset];
@@ -454,7 +454,7 @@ READ8_MEMBER(a400_state::a130xe_low_r)
 	}
 }
 
-WRITE8_MEMBER(a400_state::a130xe_low_w)
+void a400_state::a130xe_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x4000)    // 0x0000-0x3fff
 		m_ram->pointer()[offset] = data;
@@ -482,7 +482,7 @@ WRITE8_MEMBER(a400_state::a130xe_low_w)
 	}
 }
 
-READ8_MEMBER(a400_state::xegs_low_r)
+uint8_t a400_state::xegs_low_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		return m_ram->pointer()[offset];
@@ -508,7 +508,7 @@ READ8_MEMBER(a400_state::xegs_low_r)
 	}
 }
 
-WRITE8_MEMBER(a400_state::xegs_low_w)
+void a400_state::xegs_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x5000)    // 0x0000-0x4fff
 		m_ram->pointer()[offset] = data;
@@ -1739,7 +1739,7 @@ void a400_state::setup_ram(int bank, uint32_t size)
 
 
 // these handle cart enable/disable without calling setup_ram thousands of times
-READ8_MEMBER(a400_state::special_read_8000)
+uint8_t a400_state::special_read_8000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_cart_disabled)
 		return m_cart->read_80xx(space, offset);
@@ -1753,7 +1753,7 @@ READ8_MEMBER(a400_state::special_read_8000)
 	}
 }
 
-WRITE8_MEMBER(a400_state::special_write_8000)
+void a400_state::special_write_8000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart_disabled)
 	{
@@ -1763,7 +1763,7 @@ WRITE8_MEMBER(a400_state::special_write_8000)
 	}
 }
 
-READ8_MEMBER(a400_state::special_read_a000)
+uint8_t a400_state::special_read_a000(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_cart_disabled)
 		return m_cart->read_80xx(space, offset);
@@ -1777,7 +1777,7 @@ READ8_MEMBER(a400_state::special_read_a000)
 	}
 }
 
-WRITE8_MEMBER(a400_state::special_write_a000)
+void a400_state::special_write_a000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart_disabled)
 	{
@@ -1788,13 +1788,13 @@ WRITE8_MEMBER(a400_state::special_write_a000)
 }
 
 
-READ8_MEMBER(a400_state::read_d5xx)
+uint8_t a400_state::read_d5xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	disable_cart(space, offset, 0);
 	return 0xff;
 }
 
-WRITE8_MEMBER(a400_state::disable_cart)
+void a400_state::disable_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart->exists())
 	{
@@ -2043,7 +2043,7 @@ void a400_state::machine_start_a5200()
  *
  **************************************************************/
 
-WRITE8_MEMBER(a400_state::gtia_cb)
+void a400_state::gtia_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(BIT(data, 3));
 }
@@ -2054,12 +2054,12 @@ WRITE8_MEMBER(a400_state::gtia_cb)
  *
  **************************************************************/
 
-WRITE8_MEMBER(a400_state::a600xl_pia_pb_w)
+void a400_state::a600xl_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mmu = data;
 }
 
-WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
+void a400_state::a800xl_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_pia->port_b_z_mask() != 0xff)
 	{

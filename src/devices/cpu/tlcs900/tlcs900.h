@@ -655,8 +655,8 @@ public:
 	template<class _Object> static devcb_base &set_portb_read(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_portb_read.set_callback(object); }
 	template<class _Object> static devcb_base &set_portb_write(device_t &device, _Object object) { return downcast<tmp95c061_device &>(device).m_portb_write.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( internal_r );
-	DECLARE_WRITE8_MEMBER( internal_w );
+	uint8_t internal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void internal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_config_complete() override;
@@ -758,8 +758,8 @@ public:
 	// construction/destruction
 	tmp95c063_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( internal_r );
-	DECLARE_WRITE8_MEMBER( internal_w );
+	uint8_t internal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void internal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_port1_read(device_t &device, _Object object) { return downcast<tmp95c063_device &>(device).m_port1_read.set_callback(object); }

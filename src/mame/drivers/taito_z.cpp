@@ -985,7 +985,7 @@ void taitoz_state::parse_cpu_control(  )
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
+void taitoz_state::cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 
@@ -996,7 +996,7 @@ WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 	parse_cpu_control();
 }
 
-WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
+void taitoz_state::chasehq_cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
@@ -1004,7 +1004,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
 	output().set_lamp_value(1, (m_cpua_ctrl & 0x40) ? 1 : 0);
 }
 
-WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
+void taitoz_state::dblaxle_cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cpua_ctrl_w(space, offset, data, mem_mask);
 
@@ -1069,13 +1069,13 @@ static const uint16_t spacegun_default_eeprom[64]=
 
 
 #if 0
-READ16_MEMBER(taitoz_state::eep_latch_r)
+uint16_t taitoz_state::eep_latch_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_eep_latch;
 }
 #endif
 
-WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
+void taitoz_state::spacegun_output_bypass_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1109,7 +1109,7 @@ CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 }
 
 
-READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
+uint8_t taitoz_state::contcirc_input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
@@ -1130,7 +1130,7 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 }
 
 
-READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
+uint8_t taitoz_state::chasehq_input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
@@ -1163,7 +1163,7 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 }
 
 
-READ16_MEMBER(taitoz_state::bshark_stick_r)
+uint16_t taitoz_state::bshark_stick_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1186,7 +1186,7 @@ READ16_MEMBER(taitoz_state::bshark_stick_r)
 }
 
 
-READ16_MEMBER(taitoz_state::nightstr_stick_r)
+uint16_t taitoz_state::nightstr_stick_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1208,7 +1208,7 @@ READ16_MEMBER(taitoz_state::nightstr_stick_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(taitoz_state::bshark_stick_w)
+void taitoz_state::bshark_stick_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Each write invites a new interrupt as soon as the
 	   hardware has got the next a/d conversion ready. We set a token
@@ -1220,7 +1220,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 }
 
 
-READ16_MEMBER(taitoz_state::sci_steer_input_r)
+uint16_t taitoz_state::sci_steer_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
@@ -1239,7 +1239,7 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 }
 
 
-READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
+uint16_t taitoz_state::spacegun_input_bypass_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1251,7 +1251,7 @@ READ16_MEMBER(taitoz_state::spacegun_input_bypass_r)
 	}
 }
 
-READ16_MEMBER(taitoz_state::spacegun_lightgun_r)
+uint16_t taitoz_state::spacegun_lightgun_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1271,7 +1271,7 @@ READ16_MEMBER(taitoz_state::spacegun_lightgun_r)
 	return 0x00;
 }
 
-WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
+void taitoz_state::spacegun_lightgun_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Each write invites a new lightgun interrupt as soon as the
 	   hardware has got the next coordinate ready. We set a token
@@ -1284,14 +1284,14 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
 	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
 }
 
-WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
+void taitoz_state::spacegun_gun_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_value("Player1_Gun_Recoil",(data & 0x01));
 	output().set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 }
 
 
-READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
+uint16_t taitoz_state::dblaxle_steer_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
@@ -1310,7 +1310,7 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 }
 
 
-READ16_MEMBER(taitoz_state::chasehq_motor_r)
+uint16_t taitoz_state::chasehq_motor_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1326,7 +1326,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 	}
 }
 
-WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
+void taitoz_state::chasehq_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Writes $e00000-25 and $e00200-219 */
 	switch (offset)
@@ -1343,7 +1343,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 }
 
 
-WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
+void taitoz_state::nightstr_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Despite the informative notes at the top, the high end of the word doesn't seem to output any useful data. */
 	/* I've added this so someone else can finish it.  */
@@ -1383,7 +1383,7 @@ WRITE16_MEMBER(taitoz_state::nightstr_motor_w)
 
 
 
-READ16_MEMBER(taitoz_state::aquajack_unknown_r)
+uint16_t taitoz_state::aquajack_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff;
 }
@@ -1393,12 +1393,12 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
                         SOUND
 *****************************************************/
 
-WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
+void taitoz_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
+void taitoz_state::taitoz_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -1416,7 +1416,7 @@ WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
 #endif
 }
 
-READ16_MEMBER(taitoz_state::taitoz_sound_r)
+uint16_t taitoz_state::taitoz_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return (m_tc0140syt->master_comm_r(space, 0) & 0xff);
@@ -1425,7 +1425,7 @@ READ16_MEMBER(taitoz_state::taitoz_sound_r)
 }
 
 #if 0
-WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
+void taitoz_state::taitoz_msb_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(0, (data >> 8) & 0xff);
@@ -1443,7 +1443,7 @@ WRITE16_MEMBER(taitoz_state::taitoz_msb_sound_w)
 #endif
 }
 
-READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
+uint16_t taitoz_state::taitoz_msb_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(0) & 0xff) << 8);
@@ -1454,7 +1454,7 @@ READ16_MEMBER(taitoz_state::taitoz_msb_sound_r)
 
 
 /**** sound pan control ****/
-WRITE8_MEMBER(taitoz_state::taitoz_pancontrol)
+void taitoz_state::taitoz_pancontrol(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const fltname[] = { "2610.1.r", "2610.1.l", "2610.2.r", "2610.2.l" };
 	dynamic_cast<filter_volume_device*>(machine().device(fltname[offset & 3]))->flt_volume_set_volume(data / 255.0f);

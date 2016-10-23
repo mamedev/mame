@@ -85,27 +85,27 @@ void marineb_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(marineb_state::marineb_videoram_w)
+void marineb_state::marineb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_colorram_w)
+void marineb_state::marineb_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_column_scroll_w)
+void marineb_state::marineb_column_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_column_scroll = data;
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
+void marineb_state::marineb_palette_bank_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t old = m_palette_bank;
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_0_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
+void marineb_state::marineb_palette_bank_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t old = m_palette_bank;
 
@@ -131,14 +131,14 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
+void marineb_state::marineb_flipscreen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen_x = data ^ m_marineb_active_low_flipscreen;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_y_w)
+void marineb_state::marineb_flipscreen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen_y = data ^ m_marineb_active_low_flipscreen;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));

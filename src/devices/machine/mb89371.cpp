@@ -21,11 +21,11 @@ void mb89371_device::device_start()
 {
 }
 
-WRITE8_MEMBER(mb89371_device::write)
+void mb89371_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(mb89371_device::read)
+uint8_t mb89371_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

@@ -64,15 +64,15 @@ public:
 
 	void update_fdc_int();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
-	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
-	DECLARE_READ8_MEMBER( ppi1_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi1_pc_w );
+	void ppi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
+	offs_t sage2_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 

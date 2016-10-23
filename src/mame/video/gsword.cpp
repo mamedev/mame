@@ -89,13 +89,13 @@ PALETTE_INIT_MEMBER(gsword_state,gsword)
 	}
 }
 
-WRITE8_MEMBER(gsword_state::videoram_w)
+void gsword_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(gsword_state::charbank_w)
+void gsword_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != data)
 	{
@@ -104,7 +104,7 @@ WRITE8_MEMBER(gsword_state::charbank_w)
 	}
 }
 
-WRITE8_MEMBER(gsword_state::videoctrl_w)
+void gsword_state::videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x8f)
 	{
@@ -132,7 +132,7 @@ WRITE8_MEMBER(gsword_state::videoctrl_w)
 	/* other bits unused */
 }
 
-WRITE8_MEMBER(gsword_state::scroll_w)
+void gsword_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }

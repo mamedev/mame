@@ -71,23 +71,23 @@ public:
 
 	void check_interrupts();
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( sid_potx_r );
-	DECLARE_READ8_MEMBER( sid_poty_r );
+	uint8_t sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_READ8_MEMBER( cia_pa_r );
-	DECLARE_READ8_MEMBER( cia_pb_r );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
+	uint8_t cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_WRITE8_MEMBER( cpu_w );
+	uint8_t cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
@@ -122,7 +122,7 @@ void vic10_state::check_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vic10_state::read )
+uint8_t vic10_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO this is really handled by the PLA
 
@@ -170,7 +170,7 @@ READ8_MEMBER( vic10_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vic10_state::write )
+void vic10_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO this is really handled by the PLA
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER( vic10_state::write )
 //  vic_videoram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vic10_state::vic_videoram_r )
+uint8_t vic10_state::vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -224,7 +224,7 @@ READ8_MEMBER( vic10_state::vic_videoram_r )
 //  vic_colorram_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vic10_state::vic_colorram_r )
+uint8_t vic10_state::vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_color_ram[offset];
 }
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 //  sid6581_interface sid_intf
 //-------------------------------------------------
 
-READ8_MEMBER( vic10_state::sid_potx_r )
+uint8_t vic10_state::sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -409,7 +409,7 @@ READ8_MEMBER( vic10_state::sid_potx_r )
 	return data;
 }
 
-READ8_MEMBER( vic10_state::sid_poty_r )
+uint8_t vic10_state::sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
 	check_interrupts();
 }
 
-READ8_MEMBER( vic10_state::cia_pa_r )
+uint8_t vic10_state::cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -496,7 +496,7 @@ READ8_MEMBER( vic10_state::cia_pa_r )
 	return data;
 }
 
-READ8_MEMBER( vic10_state::cia_pb_r )
+uint8_t vic10_state::cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -536,7 +536,7 @@ READ8_MEMBER( vic10_state::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic10_state::cia_pb_w )
+void vic10_state::cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -561,7 +561,7 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 //  M6510_INTERFACE( cpu_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( vic10_state::cpu_r )
+uint8_t vic10_state::cpu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -587,7 +587,7 @@ READ8_MEMBER( vic10_state::cpu_r )
 	return data;
 }
 
-WRITE8_MEMBER( vic10_state::cpu_w )
+void vic10_state::cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

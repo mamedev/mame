@@ -154,7 +154,7 @@ void srmp2_state::machine_start_mjyuugi()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
+void srmp2_state::srmp2_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     ---- ---x : Coin Counter
@@ -171,7 +171,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
+void srmp2_state::mjyuugi_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     ---- ---x : Coin Counter
@@ -183,7 +183,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
+void srmp2_state::mjyuugi_adpcm_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     ---- xxxx : ADPCM Bank
@@ -196,7 +196,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
+void srmp2_state::srmp2_adpcm_code_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
     - Received data may be playing ADPCM number.
@@ -219,7 +219,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
 }
 
 
-WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
+void srmp2_state::srmp3_adpcm_code_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     - Received data may be playing ADPCM number.
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 	}
 }
 
-READ8_MEMBER(srmp2_state::vox_status_r)
+uint8_t srmp2_state::vox_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
@@ -303,7 +303,7 @@ uint8_t srmp2_state::iox_key_matrix_calc(uint8_t p_side)
 	return 0;
 }
 
-READ8_MEMBER(srmp2_state::iox_mux_r)
+uint8_t srmp2_state::iox_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* first off check any pending protection value */
 	{
@@ -346,12 +346,12 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 	return ioport("SERVICE")->read() & 0xff;
 }
 
-READ8_MEMBER(srmp2_state::iox_status_r)
+uint8_t srmp2_state::iox_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-WRITE8_MEMBER(srmp2_state::iox_command_w)
+void srmp2_state::iox_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	bit wise command port apparently
@@ -364,7 +364,7 @@ WRITE8_MEMBER(srmp2_state::iox_command_w)
 	m_iox.ff = 0; // this also set flip flop back to 0
 }
 
-WRITE8_MEMBER(srmp2_state::iox_data_w)
+void srmp2_state::iox_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_iox.data = data;
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(srmp2_state::iox_data_w)
 		m_iox.ff = 1;
 }
 
-WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
+void srmp2_state::srmp3_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     ---- xxxx : MAIN ROM bank
@@ -396,12 +396,12 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 
 **************************************************************************/
 
-WRITE8_MEMBER(srmp2_state::srmp2_irq2_ack_w)
+void srmp2_state::srmp2_irq2_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
+void srmp2_state::srmp2_irq4_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
@@ -428,13 +428,13 @@ static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
-READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
+uint8_t srmp2_state::mjyuugi_irq2_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
-READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
+uint8_t srmp2_state::mjyuugi_irq4_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
@@ -467,7 +467,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
+void srmp2_state::srmp3_flags_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     ---- ---x : Coin Counter
@@ -481,7 +481,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 	m_gfx_bank = (data >> 6) & 0x03;
 }
 
-WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
+void srmp2_state::srmp3_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8, srmp2_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecodehigh_r8, spritecodehigh_w8)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
+void srmp2_state::rmgoldyh_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     ---x xxxx : MAIN ROM bank

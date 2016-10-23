@@ -26,20 +26,20 @@ public:
 	void init_dw2001();
 	void init_dwpc();
 	void machine_start_pgm_arm_type2();
-	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
-	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
-	DECLARE_READ32_MEMBER( arm7_shareram_r );
-	DECLARE_WRITE32_MEMBER( arm7_shareram_w );
-	DECLARE_READ16_MEMBER( arm7_latch_68k_r );
-	DECLARE_WRITE16_MEMBER( arm7_latch_68k_w );
-	DECLARE_READ16_MEMBER( arm7_ram_r );
-	DECLARE_WRITE16_MEMBER( arm7_ram_w );
+	uint32_t arm7_latch_arm_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void arm7_latch_arm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t arm7_shareram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void arm7_shareram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t arm7_latch_68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void arm7_latch_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t arm7_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void arm7_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void kov2_latch_init();
-	DECLARE_WRITE32_MEMBER( martmast_arm_region_w );
-	DECLARE_WRITE32_MEMBER( kov2_arm_region_w );
-	DECLARE_WRITE32_MEMBER( kov2p_arm_region_w );
-	DECLARE_READ32_MEMBER( ddp2_speedup_r );
-	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
+	void martmast_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void kov2_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void kov2p_arm_region_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ddp2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint16_t ddp2_main_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 /* emulations */

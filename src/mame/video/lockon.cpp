@@ -23,12 +23,12 @@
  *
  *************************************/
 
-READ16_MEMBER(lockon_state::lockon_crtc_r)
+uint16_t lockon_state::lockon_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_crtc_w)
+void lockon_state::lockon_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	data &= 0xff;
@@ -133,7 +133,7 @@ PALETTE_INIT_MEMBER(lockon_state, lockon)
  *
  *************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_char_w)
+void lockon_state::lockon_char_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_char_ram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -155,12 +155,12 @@ TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
 
 *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_scene_h_scr_w)
+void lockon_state::lockon_scene_h_scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scroll_h = data & 0x1ff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_scene_v_scr_w)
+void lockon_state::lockon_scene_v_scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scroll_v = data & 0x81ff;
 }
@@ -275,7 +275,7 @@ void lockon_state::scene_draw(  )
 
  *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
+void lockon_state::lockon_ground_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ground_ctrl = data & 0xff;
 }
@@ -599,7 +599,7 @@ void lockon_state::objects_draw(  )
 }
 
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
-WRITE16_MEMBER(lockon_state::lockon_tza112_w)
+void lockon_state::lockon_tza112_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_iden)
 	{
@@ -609,13 +609,13 @@ WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 	}
 }
 
-READ16_MEMBER(lockon_state::lockon_obj_4000_r)
+uint16_t lockon_state::lockon_obj_4000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
-WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
+void lockon_state::lockon_obj_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_iden = data & 1;
 }
@@ -643,7 +643,7 @@ WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
 
 *******************************************************************************************/
 
-WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
+void lockon_state::lockon_fb_clut_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	rgb_t color;
 
@@ -652,7 +652,7 @@ WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 }
 
 /* Rotation control register */
-WRITE16_MEMBER(lockon_state::lockon_rotate_w)
+void lockon_state::lockon_rotate_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & 7)
 	{

@@ -283,7 +283,7 @@ int beezer_sound_device::sh6840_update_noise(int clocks)
  *
  *************************************/
 
-READ8_MEMBER( beezer_sound_device::sh6840_r )
+uint8_t beezer_sound_device::sh6840_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* force an update of the stream */
 	m_stream->update();
@@ -307,7 +307,7 @@ READ8_MEMBER( beezer_sound_device::sh6840_r )
 	}
 }
 
-WRITE8_MEMBER( beezer_sound_device::timer1_w )
+void beezer_sound_device::timer1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* force an update of the stream */
 	m_stream->update();
@@ -319,14 +319,14 @@ WRITE8_MEMBER( beezer_sound_device::timer1_w )
 	}
 }
 
-READ8_MEMBER( beezer_sound_device::noise_r )
+uint8_t beezer_sound_device::noise_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* force an update of the stream */
 	m_stream->update();
 	return (m_sh6840_LFSR&0x1);
 }
 
-WRITE8_MEMBER( beezer_sound_device::sh6840_w )
+void beezer_sound_device::sh6840_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	struct sh6840_timer_channel_beez *sh6840_timer = m_sh6840_timer;
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER( beezer_sound_device::sh6840_w )
  *
  *************************************/
 
-WRITE8_MEMBER( beezer_sound_device::sfxctrl_w )
+void beezer_sound_device::sfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	m_sh6840_volume[offset] = data;

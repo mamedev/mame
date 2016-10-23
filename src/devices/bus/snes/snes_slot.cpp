@@ -1059,7 +1059,7 @@ std::string base_sns_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(base_sns_cart_slot_device::read_l)
+uint8_t base_sns_cart_slot_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_l(space, offset);
@@ -1067,7 +1067,7 @@ READ8_MEMBER(base_sns_cart_slot_device::read_l)
 		return 0xff;
 }
 
-READ8_MEMBER(base_sns_cart_slot_device::read_h)
+uint8_t base_sns_cart_slot_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_h(space, offset);
@@ -1075,7 +1075,7 @@ READ8_MEMBER(base_sns_cart_slot_device::read_h)
 		return 0xff;
 }
 
-READ8_MEMBER(base_sns_cart_slot_device::read_ram)
+uint8_t base_sns_cart_slot_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ram(space, offset);
@@ -1083,7 +1083,7 @@ READ8_MEMBER(base_sns_cart_slot_device::read_ram)
 		return 0xff;
 }
 
-READ8_MEMBER(base_sns_cart_slot_device::chip_read)
+uint8_t base_sns_cart_slot_device::chip_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->chip_read(space, offset);
@@ -1095,25 +1095,25 @@ READ8_MEMBER(base_sns_cart_slot_device::chip_read)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(base_sns_cart_slot_device::write_l)
+void base_sns_cart_slot_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_l(space, offset, data);
 }
 
-WRITE8_MEMBER(base_sns_cart_slot_device::write_h)
+void base_sns_cart_slot_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_h(space, offset, data);
 }
 
-WRITE8_MEMBER(base_sns_cart_slot_device::write_ram)
+void base_sns_cart_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);
 }
 
-WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)
+void base_sns_cart_slot_device::chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->chip_write(space, offset, data);

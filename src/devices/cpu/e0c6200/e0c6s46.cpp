@@ -618,7 +618,7 @@ uint32_t e0c6s46_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  internal I/O
 //-------------------------------------------------
 
-READ8_MEMBER(e0c6s46_device::io_r)
+uint8_t e0c6s46_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -712,7 +712,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(e0c6s46_device::io_w)
+void e0c6s46_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

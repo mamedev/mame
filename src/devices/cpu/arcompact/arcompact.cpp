@@ -27,15 +27,15 @@
 const device_type ARCA5 = &device_creator<arcompact_device>;
 
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg002_LPSTART_r) { return m_LP_START&0xfffffffe; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg002_LPSTART_w) { m_LP_START = data&0xfffffffe; }
-READ32_MEMBER( arcompact_device::arcompact_auxreg003_LPEND_r) { return m_LP_END&0xfffffffe; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg003_LPEND_w) { m_LP_END = data&0xfffffffe; }
+uint32_t arcompact_device::arcompact_auxreg002_LPSTART_r(address_space &space, offs_t offset, uint32_t mem_mask) { return m_LP_START&0xfffffffe; }
+void arcompact_device::arcompact_auxreg002_LPSTART_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { m_LP_START = data&0xfffffffe; }
+uint32_t arcompact_device::arcompact_auxreg003_LPEND_r(address_space &space, offs_t offset, uint32_t mem_mask) { return m_LP_END&0xfffffffe; }
+void arcompact_device::arcompact_auxreg003_LPEND_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { m_LP_END = data&0xfffffffe; }
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg00a_STATUS32_r) { return 0xffffdead; /*m_status32;*/ }
+uint32_t arcompact_device::arcompact_auxreg00a_STATUS32_r(address_space &space, offs_t offset, uint32_t mem_mask) { return 0xffffdead; /*m_status32;*/ }
 
-READ32_MEMBER( arcompact_device::arcompact_auxreg025_INTVECTORBASE_r) { return m_INTVECTORBASE&0xfffffc00; }
-WRITE32_MEMBER(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w) { m_INTVECTORBASE = data&0xfffffc00; }
+uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r(address_space &space, offs_t offset, uint32_t mem_mask) { return m_INTVECTORBASE&0xfffffc00; }
+void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { m_INTVECTORBASE = data&0xfffffc00; }
 
 
 

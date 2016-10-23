@@ -285,22 +285,22 @@ uint8_t a2bus_mouse_device::read_cnxx(address_space &space, uint8_t offset)
 	return m_rom[offset+m_rom_bank];
 }
 
-READ8_MEMBER(a2bus_mouse_device::pia_in_a)
+uint8_t a2bus_mouse_device::pia_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port_a_out;
 }
 
-READ8_MEMBER(a2bus_mouse_device::pia_in_b)
+uint8_t a2bus_mouse_device::pia_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_c_out << 4);
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::pia_out_a)
+void a2bus_mouse_device::pia_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_in = data;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::pia_out_b)
+void a2bus_mouse_device::pia_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c_in &= 0xf0;
 	m_port_c_in |= ((data >> 4) & 0xf);
@@ -316,22 +316,22 @@ WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqb_w)
 {
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_port_a_r)
+uint8_t a2bus_mouse_device::mcu_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_a_w)
+void a2bus_mouse_device::mcu_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_ddr_a_w)
+void a2bus_mouse_device::mcu_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)
+uint8_t a2bus_mouse_device::mcu_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t b_in = m_port_b_in;
 
@@ -341,7 +341,7 @@ READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)
 	return (m_port_b_out & m_ddr_b) | (b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
+void a2bus_mouse_device::mcu_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_b_out = data;
 
@@ -355,27 +355,27 @@ WRITE8_MEMBER(a2bus_mouse_device::mcu_port_b_w)
 	}
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_ddr_b_w)
+void a2bus_mouse_device::mcu_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_port_c_r)
+uint8_t a2bus_mouse_device::mcu_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_port_c_w)
+void a2bus_mouse_device::mcu_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_ddr_c_w)
+void a2bus_mouse_device::mcu_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_c = data;
 }
 
-READ8_MEMBER(a2bus_mouse_device::mcu_timer_r)
+uint8_t a2bus_mouse_device::mcu_timer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -385,7 +385,7 @@ READ8_MEMBER(a2bus_mouse_device::mcu_timer_r)
 	return m_timer_cnt;
 }
 
-WRITE8_MEMBER(a2bus_mouse_device::mcu_timer_w)
+void a2bus_mouse_device::mcu_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int prescale[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
 	bool recalc = false;

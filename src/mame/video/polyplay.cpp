@@ -31,7 +31,7 @@ PALETTE_INIT_MEMBER(polyplay_state, polyplay)
 }
 
 
-WRITE8_MEMBER(polyplay_state::polyplay_characterram_w)
+void polyplay_state::polyplay_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_characterram[offset] != data)
 	{

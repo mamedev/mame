@@ -305,7 +305,7 @@ uint8_t k7659_keyboard_device::key_pos(uint8_t val)
 	return 0;
 }
 
-READ8_MEMBER(k7659_keyboard_device::read)
+uint8_t k7659_keyboard_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_key;
 }

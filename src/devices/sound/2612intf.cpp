@@ -152,12 +152,12 @@ void ym2612_device::device_reset()
 }
 
 
-READ8_MEMBER( ym2612_device::read )
+uint8_t ym2612_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ym2612_read(m_chip, offset & 3);
 }
 
-WRITE8_MEMBER( ym2612_device::write )
+void ym2612_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ym2612_write(m_chip, offset & 3, data);
 }

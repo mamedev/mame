@@ -137,7 +137,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 	}
 }
 
-WRITE8_MEMBER(vball_state::irq_ack_w)
+void vball_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -156,7 +156,7 @@ WRITE8_MEMBER(vball_state::irq_ack_w)
    bit 6 = scroll y hi
    bit 7 = ?
 */
-WRITE8_MEMBER(vball_state::bankswitch_w)
+void vball_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("mainbank")->set_entry(data & 1);
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER(vball_state::bankswitch_w)
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
-WRITE8_MEMBER(vball_state::cpu_sound_command_w)
+void vball_state::cpu_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -185,7 +185,7 @@ WRITE8_MEMBER(vball_state::cpu_sound_command_w)
    bit 6 = sp prom bank
    bit 7 = sp prom bank
 */
-WRITE8_MEMBER(vball_state::scrollx_hi_w)
+void vball_state::scrollx_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data&1);
 	m_scrollx_hi = (data & 0x02) << 7;
@@ -194,7 +194,7 @@ WRITE8_MEMBER(vball_state::scrollx_hi_w)
 	//logerror("%04x: scrollx_hi = %d\n", space.device().safe_pcbase(), m_scrollx_hi);
 }
 
-WRITE8_MEMBER(vball_state::scrollx_lo_w)
+void vball_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx_lo = data;
 	//logerror("%04x: scrollx_lo =%d\n", space.device().safe_pcbase(), m_scrollx_lo);

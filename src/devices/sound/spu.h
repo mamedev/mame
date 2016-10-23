@@ -240,8 +240,8 @@ public:
 
 	sound_stream *m_stream;
 
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 extern reverb_params *spu_reverb_cfg;

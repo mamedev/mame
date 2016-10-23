@@ -157,7 +157,7 @@ void megasys1_tilemap_device::device_post_load()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(megasys1_tilemap_device::write)
+void megasys1_tilemap_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 	if (offset < 0x40000/2)
@@ -238,7 +238,7 @@ TILE_GET_INFO_MEMBER(megasys1_tilemap_device::get_scroll_tile_info_16x16)
 	SET_TILE_INFO_MEMBER(0, (code & 0xfff) * m_16x16_scroll_factor + (tile_index & 3), code >> (16 - m_bits_per_color_code), 0);
 }
 
-READ16_MEMBER(megasys1_tilemap_device::scroll_r)
+uint16_t megasys1_tilemap_device::scroll_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -249,7 +249,7 @@ READ16_MEMBER(megasys1_tilemap_device::scroll_r)
 	}
 }
 
-WRITE16_MEMBER(megasys1_tilemap_device::scroll_w)
+void megasys1_tilemap_device::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

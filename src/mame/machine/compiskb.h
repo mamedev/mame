@@ -48,10 +48,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( p1_r );
-	DECLARE_READ8_MEMBER( p2_r );
+	uint8_t bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -1656,7 +1656,7 @@ void ym2413_device::device_reset()
 }
 
 
-WRITE8_MEMBER( ym2413_device::write )
+void ym2413_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 		data_port_w(space, offset, data);
@@ -1664,12 +1664,12 @@ WRITE8_MEMBER( ym2413_device::write )
 		register_port_w(space, offset, data);
 }
 
-WRITE8_MEMBER( ym2413_device::register_port_w )
+void ym2413_device::register_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address = data;
 }
 
-WRITE8_MEMBER( ym2413_device::data_port_w )
+void ym2413_device::data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 	write_reg(address, data);

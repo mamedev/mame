@@ -49,12 +49,12 @@ public:
 
 	pcfx_pad_t m_pad;
 
-	DECLARE_READ16_MEMBER( irq_read );
-	DECLARE_WRITE16_MEMBER( irq_write );
-	DECLARE_READ16_MEMBER( pad_r );
-	DECLARE_WRITE16_MEMBER( pad_w );
-	DECLARE_READ8_MEMBER( extio_r );
-	DECLARE_WRITE8_MEMBER( extio_w );
+	uint16_t irq_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void irq_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pad_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t extio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void extio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
@@ -73,14 +73,14 @@ protected:
 };
 
 
-READ8_MEMBER(pcfx_state::extio_r)
+uint8_t pcfx_state::extio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
 	return io_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(pcfx_state::extio_w)
+void pcfx_state::extio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( pcfx_mem, AS_PROGRAM, 32, pcfx_state )
 	AM_RANGE( 0xFFF00000, 0xFFFFFFFF ) AM_ROMBANK("bank1")  /* ROM */
 ADDRESS_MAP_END
 
-READ16_MEMBER( pcfx_state::pad_r )
+uint16_t pcfx_state::pad_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res;
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
@@ -150,7 +150,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	set_irq_line(11, 1);
 }
 
-WRITE16_MEMBER( pcfx_state::pad_w )
+void pcfx_state::pad_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
 
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( pcfx )
 INPUT_PORTS_END
 
 
-READ16_MEMBER( pcfx_state::irq_read )
+uint16_t pcfx_state::irq_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 
@@ -322,7 +322,7 @@ READ16_MEMBER( pcfx_state::irq_read )
 }
 
 
-WRITE16_MEMBER( pcfx_state::irq_write )
+void pcfx_state::irq_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch( offset )
 	{

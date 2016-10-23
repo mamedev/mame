@@ -26,16 +26,16 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
 	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
-	DECLARE_WRITE8_MEMBER( scanlines_w );
-	DECLARE_WRITE8_MEMBER( digit_w );
-	DECLARE_READ8_MEMBER( kbd_r );
-	DECLARE_WRITE8_MEMBER( snd_ctrl_w );
-	DECLARE_WRITE8_MEMBER( ay_w );
-	DECLARE_READ8_MEMBER( ay_r );
-	DECLARE_WRITE8_MEMBER( ay8910_0_b_w );
-	DECLARE_WRITE8_MEMBER( ay8910_1_a_w );
-	DECLARE_WRITE8_MEMBER( ay8910_1_b_w );
-	DECLARE_WRITE8_MEMBER( motors_w );
+	void scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ay_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay8910_0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void motors_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -189,22 +189,22 @@ INPUT_CHANGED_MEMBER( icecold_state::test_switch_press )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( icecold_state::motors_w )
+void icecold_state::motors_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_motors_ctrl = data;
 }
 
-WRITE8_MEMBER( icecold_state::scanlines_w )
+void icecold_state::scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 }
 
-WRITE8_MEMBER( icecold_state::digit_w )
+void icecold_state::digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(m_digit, data & 0x7f);
 }
 
-READ8_MEMBER( icecold_state::kbd_r )
+uint8_t icecold_state::kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_digit)
 	{
@@ -221,7 +221,7 @@ READ8_MEMBER( icecold_state::kbd_r )
 }
 
 
-WRITE8_MEMBER( icecold_state::snd_ctrl_w )
+void icecold_state::snd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay_ctrl & ~data & 0x04)
 		m_ay8910_0->data_address_w(space, m_ay_ctrl & 0x01, m_sound_latch);
@@ -231,12 +231,12 @@ WRITE8_MEMBER( icecold_state::snd_ctrl_w )
 	m_ay_ctrl = data;
 }
 
-WRITE8_MEMBER( icecold_state::ay_w )
+void icecold_state::ay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_latch = data;
 }
 
-READ8_MEMBER( icecold_state::ay_r )
+uint8_t icecold_state::ay_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_ay_ctrl & 0x02)
 		return m_ay8910_0->data_r(space, 0);
@@ -246,7 +246,7 @@ READ8_MEMBER( icecold_state::ay_r )
 	return 0;
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
+void icecold_state::ay8910_0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(1, BIT(data, 0));
 	output().set_lamp_value(2, BIT(data, 1));
@@ -258,7 +258,7 @@ WRITE8_MEMBER( icecold_state::ay8910_0_b_w )
 	m_motenbl = BIT(data, 7);
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
+void icecold_state::ay8910_1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(6, BIT(data, 0));
 	output().set_lamp_value(7, BIT(data, 1));
@@ -270,7 +270,7 @@ WRITE8_MEMBER( icecold_state::ay8910_1_a_w )
 	// BIT 7 watchdog reset
 }
 
-WRITE8_MEMBER( icecold_state::ay8910_1_b_w )
+void icecold_state::ay8910_1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_motenbl == 0)
 	{

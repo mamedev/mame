@@ -137,10 +137,10 @@ public:
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
-	DECLARE_WRITE16_MEMBER( c123_tilemap_videoram_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_videoram_r );
-	DECLARE_WRITE16_MEMBER( c123_tilemap_control_w );
-	DECLARE_READ16_MEMBER( c123_tilemap_control_r );
+	void c123_tilemap_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c123_tilemap_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c123_tilemap_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c123_tilemap_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER( get_tile_info0 );
 	TILE_GET_INFO_MEMBER( get_tile_info1 );
 	TILE_GET_INFO_MEMBER( get_tile_info2 );
@@ -153,12 +153,12 @@ public:
 public:
 	void c169_roz_init(int gfxbank, const char *maskregion);
 	void c169_roz_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c169_roz_control_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_control_w );
-	DECLARE_READ16_MEMBER( c169_roz_bank_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_bank_w );
-	DECLARE_READ16_MEMBER( c169_roz_videoram_r );
-	DECLARE_WRITE16_MEMBER( c169_roz_videoram_w );
+	uint16_t c169_roz_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c169_roz_bank_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c169_roz_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c169_roz_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	struct roz_parameters
@@ -192,10 +192,10 @@ public:
 	int c355_obj_default_code2tile(int code);
 	void c355_obj_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void c355_obj_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	DECLARE_READ16_MEMBER( c355_obj_ram_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_ram_w );
-	DECLARE_READ16_MEMBER( c355_obj_position_r );
-	DECLARE_WRITE16_MEMBER( c355_obj_position_w );
+	uint16_t c355_obj_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c355_obj_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t c355_obj_position_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void c355_obj_position_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void machine_start_namcos2();
 	void machine_reset_namcos2();
 protected:
@@ -228,25 +228,25 @@ public:
 	uint16_t readwrite_c148( address_space &space, offs_t offset, uint16_t data, int bWrite );
 	int get_posirq_scanline();
 
-	DECLARE_WRITE8_MEMBER( namcos2_68k_eeprom_w );
-	DECLARE_READ8_MEMBER( namcos2_68k_eeprom_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_master_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_master_C148_r );
+	void namcos2_68k_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_68k_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_68k_master_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_68k_master_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( namcos2_68k_slave_C148_w );
-	DECLARE_READ16_MEMBER( namcos2_68k_slave_C148_r );
+	void namcos2_68k_slave_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_68k_slave_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_port_d_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_port_d_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_ctrl_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_ctrl_r );
-	DECLARE_WRITE8_MEMBER( namcos2_mcu_analog_port_w );
-	DECLARE_READ8_MEMBER( namcos2_mcu_analog_port_r );
-	DECLARE_WRITE8_MEMBER( namcos2_sound_bankselect_w );
+	void namcos2_mcu_port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_port_d_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_mcu_analog_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_analog_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_mcu_analog_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t namcos2_mcu_analog_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void namcos2_sound_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* TODO: this should belong to namcos21_state */
-	DECLARE_WRITE16_MEMBER( namcos21_68k_gpu_C148_w );
-	DECLARE_READ16_MEMBER( namcos21_68k_gpu_C148_r );
+	void namcos21_68k_gpu_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos21_68k_gpu_C148_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_slave;
@@ -270,13 +270,13 @@ public:
 			m_c45_road(*this, "c45_road")
 	{ }
 
-	DECLARE_READ8_MEMBER(c68_p5_r);
-	DECLARE_WRITE8_MEMBER(c68_p3_w);
-	DECLARE_READ16_MEMBER(dpram_word_r);
-	DECLARE_WRITE16_MEMBER(dpram_word_w);
-	DECLARE_READ8_MEMBER(dpram_byte_r);
-	DECLARE_WRITE8_MEMBER(dpram_byte_w);
-	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
+	uint8_t c68_p5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c68_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dpram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dpram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t dpram_byte_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dpram_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ack_mcu_vbl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_cosmogng();
 	void init_sgunner2();
 	void init_kyukaidk();
@@ -326,15 +326,15 @@ public:
 
 	TILE_GET_INFO_MEMBER( roz_tile_info );
 
-	DECLARE_READ16_MEMBER( paletteram_word_r );
-	DECLARE_WRITE16_MEMBER( paletteram_word_w );
-	DECLARE_WRITE16_MEMBER( rozram_word_w );
-	DECLARE_READ16_MEMBER( gfx_ctrl_r );
-	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-	DECLARE_READ16_MEMBER( serial_comms_ram_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ram_w );
-	DECLARE_READ16_MEMBER( serial_comms_ctrl_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ctrl_w );
+	uint16_t paletteram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void paletteram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rozram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gfx_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t serial_comms_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void serial_comms_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t serial_comms_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void serial_comms_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void draw_sprite_init();
 	void update_palette();
@@ -360,9 +360,9 @@ public:
 
 	optional_device<namco_c45_road_device> m_c45_road;
 
-	DECLARE_READ16_MEMBER( namcos2_68k_key_r );
-	DECLARE_WRITE16_MEMBER( namcos2_68k_key_w );
-	DECLARE_READ16_MEMBER( namcos2_finallap_prot_r );
+	uint16_t namcos2_68k_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void namcos2_68k_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t namcos2_finallap_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void GollyGhostUpdateLED_c4( int data );
 	void GollyGhostUpdateLED_c6( int data );
 	void GollyGhostUpdateLED_c8( int data );

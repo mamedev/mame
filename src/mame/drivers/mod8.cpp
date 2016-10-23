@@ -67,10 +67,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(out_w);
-	DECLARE_WRITE8_MEMBER(tty_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(tty_r);
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tty_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 private:
 	uint16_t m_tty_data;
@@ -81,7 +81,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 };
 
-WRITE8_MEMBER( mod8_state::out_w )
+void mod8_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tty_data >>= 1;
 	m_tty_data |= BIT(data, 0) ? 0x8000 : 0;
@@ -94,13 +94,13 @@ WRITE8_MEMBER( mod8_state::out_w )
 	}
 }
 
-WRITE8_MEMBER( mod8_state::tty_w )
+void mod8_state::tty_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tty_data = 0;
 	m_tty_cnt = 0;
 }
 
-READ8_MEMBER( mod8_state::tty_r )
+uint8_t mod8_state::tty_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t d = m_tty_key_data & 1;
 	m_tty_key_data >>= 1;
@@ -134,7 +134,7 @@ void mod8_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( mod8_state::kbd_put )
+void mod8_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tty_key_data = data ^ 0xff;
 	m_maincpu->set_input_line(0, HOLD_LINE);

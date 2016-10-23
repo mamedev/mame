@@ -32,24 +32,24 @@ public:
 	template<class _Object> static devcb_base &set_out_parallel_callback(device_t &device, _Object object) { return downcast<tmp68301_device &>(device).m_out_parallel_cb.set_callback(object); }
 
 	// Hardware Registers
-	DECLARE_READ16_MEMBER( regs_r );
-	DECLARE_WRITE16_MEMBER( regs_w );
+	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// Interrupts
 	void external_interrupt_0();
 	void external_interrupt_1();
 	void external_interrupt_2();
 
-	DECLARE_READ16_MEMBER(imr_r);
-	DECLARE_WRITE16_MEMBER(imr_w);
-	DECLARE_READ16_MEMBER(iisr_r);
-	DECLARE_WRITE16_MEMBER(iisr_w);
-	DECLARE_READ16_MEMBER(scr_r);
-	DECLARE_WRITE16_MEMBER(scr_w);
-	DECLARE_READ16_MEMBER(pdr_r);
-	DECLARE_WRITE16_MEMBER(pdr_w);
-	DECLARE_READ16_MEMBER(pdir_r);
-	DECLARE_WRITE16_MEMBER(pdir_w);
+	uint16_t imr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void imr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t iisr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void iisr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pdr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pdr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pdir_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pdir_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:

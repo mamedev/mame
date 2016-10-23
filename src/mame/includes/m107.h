@@ -55,18 +55,18 @@ public:
 	uint16_t m_control[0x10];
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
-	DECLARE_WRITE16_MEMBER(coincounter_w);
-	DECLARE_WRITE16_MEMBER(bankswitch_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_READ16_MEMBER(soundlatch_r);
-	DECLARE_WRITE16_MEMBER(sound_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
-	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(spritebuffer_w);
+	void coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t soundlatch_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wpksoc_output_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void spritebuffer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_pf_tile_info);
 

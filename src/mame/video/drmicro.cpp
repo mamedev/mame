@@ -15,7 +15,7 @@ Video hardware
 
 /****************************************************************************/
 
-WRITE8_MEMBER(drmicro_state::drmicro_videoram_w)
+void drmicro_state::drmicro_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 

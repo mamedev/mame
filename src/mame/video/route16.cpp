@@ -24,7 +24,7 @@ void route16_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(route16_state::out0_w)
+void route16_state::out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_1 = data & 0x1f;
 
@@ -32,7 +32,7 @@ WRITE8_MEMBER(route16_state::out0_w)
 }
 
 
-WRITE8_MEMBER(route16_state::out1_w)
+void route16_state::out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_2 = data & 0x1f;
 

@@ -238,7 +238,7 @@ void wd11c00_17_device::device_reset()
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::io_r )
+uint8_t wd11c00_17_device::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -271,7 +271,7 @@ READ8_MEMBER( wd11c00_17_device::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::io_w )
+void wd11c00_17_device::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -324,7 +324,7 @@ void wd11c00_17_device::dack_w(uint8_t data)
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( wd11c00_17_device::read )
+uint8_t wd11c00_17_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -349,7 +349,7 @@ READ8_MEMBER( wd11c00_17_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( wd11c00_17_device::write )
+void wd11c00_17_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

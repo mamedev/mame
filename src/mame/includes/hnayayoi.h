@@ -25,17 +25,17 @@ public:
 
 	/* misc */
 	int        m_keyb;
-	DECLARE_READ8_MEMBER(keyboard_0_r);
-	DECLARE_READ8_MEMBER(keyboard_1_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_param_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_start_w);
-	DECLARE_WRITE8_MEMBER(dynax_blitter_rev1_clear_w);
-	DECLARE_WRITE8_MEMBER(hnayayoi_palbank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(adpcm_vclk_w);
-	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
-	DECLARE_WRITE8_MEMBER(adpcm_reset_inv_w);
+	uint8_t keyboard_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dynax_blitter_rev1_param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dynax_blitter_rev1_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dynax_blitter_rev1_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hnayayoi_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_vclk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_reset_inv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_hnfubuki();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

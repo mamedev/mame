@@ -69,8 +69,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_READ8_MEMBER(wd1770l_read);
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
+	uint8_t wd1770l_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

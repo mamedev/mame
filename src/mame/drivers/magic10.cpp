@@ -125,13 +125,13 @@ public:
 	int m_layer2_offset[2];
 	required_shared_ptr<uint16_t> m_vregs;
 	uint16_t m_magic102_ret;
-	DECLARE_WRITE16_MEMBER(layer0_videoram_w);
-	DECLARE_WRITE16_MEMBER(layer1_videoram_w);
-	DECLARE_WRITE16_MEMBER(layer2_videoram_w);
-	DECLARE_READ16_MEMBER(magic102_r);
-	DECLARE_READ16_MEMBER(hotslot_copro_r);
-	DECLARE_WRITE16_MEMBER(hotslot_copro_w);
-	DECLARE_WRITE16_MEMBER(magic10_out_w);
+	void layer0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t magic102_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t hotslot_copro_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hotslot_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void magic10_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_sgsafari();
 	void init_suprpool();
 	void init_magic102();
@@ -153,19 +153,19 @@ public:
 *      Video Hardware      *
 ***************************/
 
-WRITE16_MEMBER(magic10_state::layer0_videoram_w)
+void magic10_state::layer0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer0_videoram[offset]);
 	m_layer0_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(magic10_state::layer1_videoram_w)
+void magic10_state::layer1_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer1_videoram[offset]);
 	m_layer1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE16_MEMBER(magic10_state::layer2_videoram_w)
+void magic10_state::layer2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_layer2_videoram[offset]);
 	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
@@ -230,23 +230,23 @@ uint32_t magic10_state::screen_update_magic10(screen_device &screen, bitmap_ind1
 *       R/W Handlers       *
 ***************************/
 
-READ16_MEMBER(magic10_state::magic102_r)
+uint16_t magic10_state::magic102_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_magic102_ret ^= 0x20;
 	return m_magic102_ret;
 }
 
-READ16_MEMBER(magic10_state::hotslot_copro_r)
+uint16_t magic10_state::hotslot_copro_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x80;
 }
 
-WRITE16_MEMBER(magic10_state::hotslot_copro_w)
+void magic10_state::hotslot_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("Writing to copro: %d \n", data);
 }
 
-WRITE16_MEMBER(magic10_state::magic10_out_w)
+void magic10_state::magic10_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 /*
   ----------------------------------------------

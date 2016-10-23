@@ -30,25 +30,25 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
-	DECLARE_READ8_MEMBER(scsidata_r);
-	DECLARE_WRITE8_MEMBER(outdata_w);
-	DECLARE_READ8_MEMBER(icmd_r);
-	DECLARE_WRITE8_MEMBER(icmd_w);
-	DECLARE_READ8_MEMBER(mode_r);
-	DECLARE_WRITE8_MEMBER(mode_w);
-	DECLARE_READ8_MEMBER(command_r);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(selenable_w);
-	DECLARE_READ8_MEMBER(busandstatus_r);
-	DECLARE_WRITE8_MEMBER(startdmasend_w);
-	DECLARE_READ8_MEMBER(indata_r);
-	DECLARE_WRITE8_MEMBER(startdmatargetrx_w);
-	DECLARE_READ8_MEMBER(resetparityirq_r);
-	DECLARE_WRITE8_MEMBER(startdmainitrx_w);
+	uint8_t scsidata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void outdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t icmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void icmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void selenable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t busandstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void startdmasend_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t indata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void startdmatargetrx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t resetparityirq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void startdmainitrx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void scsi_ctrl_changed() override;
 

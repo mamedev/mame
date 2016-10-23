@@ -18,13 +18,13 @@
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerh_mcu_r)
+uint8_t slapfght_state::tigerh_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mcu_sent = false;
 	return m_from_mcu;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
+void slapfght_state::tigerh_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_from_main = data;
 	m_main_sent = true;
@@ -34,7 +34,7 @@ WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
+uint8_t slapfght_state::tigerh_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0 is vblank
 	uint8_t res = m_screen->vblank() ? 1 : 0;
@@ -50,27 +50,27 @@ READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerh_68705_portA_r)
+uint8_t slapfght_state::tigerh_68705_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portA_w)
+void slapfght_state::tigerh_68705_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrA_w)
+void slapfght_state::tigerh_68705_ddrA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-READ8_MEMBER(slapfght_state::tigerh_68705_portB_r)
+uint8_t slapfght_state::tigerh_68705_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
+void slapfght_state::tigerh_68705_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
@@ -89,13 +89,13 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
 	m_portB_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrB_w)
+void slapfght_state::tigerh_68705_ddrB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
 
 
-READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
+uint8_t slapfght_state::tigerh_68705_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portC_in = 0;
 
@@ -107,12 +107,12 @@ READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portC_w)
+void slapfght_state::tigerh_68705_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portC_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
+void slapfght_state::tigerh_68705_ddrC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
@@ -125,27 +125,27 @@ WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::slapfight_68705_portA_r)
+uint8_t slapfght_state::slapfight_68705_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portA_w)
+void slapfght_state::slapfight_68705_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrA_w)
+void slapfght_state::slapfight_68705_ddrA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-READ8_MEMBER(slapfght_state::slapfight_68705_portB_r)
+uint8_t slapfght_state::slapfight_68705_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
+void slapfght_state::slapfight_68705_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
@@ -172,12 +172,12 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
 	m_portB_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrB_w)
+void slapfght_state::slapfight_68705_ddrB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
 
-READ8_MEMBER(slapfght_state::slapfight_68705_portC_r)
+uint8_t slapfght_state::slapfight_68705_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portC_in = 0;
 
@@ -189,12 +189,12 @@ READ8_MEMBER(slapfght_state::slapfight_68705_portC_r)
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portC_w)
+void slapfght_state::slapfight_68705_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portC_out = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrC_w)
+void slapfght_state::slapfight_68705_ddrC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
@@ -207,7 +207,7 @@ WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrC_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
+uint8_t slapfght_state::getstar_mcusim_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const int states[3]={ 0xc7, 0x55, 0x00 };
 
@@ -219,7 +219,7 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_status_r)
 	return m_getstar_status;
 }
 
-READ8_MEMBER(slapfght_state::getstar_mcusim_r)
+uint8_t slapfght_state::getstar_mcusim_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t tmp = 0;  /* needed for values computed on 16 bits */
 	uint8_t getstar_val = 0;
@@ -320,7 +320,7 @@ READ8_MEMBER(slapfght_state::getstar_mcusim_r)
 	return getstar_val;
 }
 
-WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
+void slapfght_state::getstar_mcusim_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ), register C is a unaltered copy of register A */
 	#define GS_SAVE_REGS  m_gs_a = space.device().state().state_int(Z80_BC) >> 0; \
@@ -791,7 +791,7 @@ WRITE8_MEMBER(slapfght_state::getstar_mcusim_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::tigerhb1_prot_r)
+uint8_t slapfght_state::tigerhb1_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t tigerhb_val = 0;
 	switch (m_tigerhb_cmd)
@@ -806,7 +806,7 @@ READ8_MEMBER(slapfght_state::tigerhb1_prot_r)
 	return tigerhb_val;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerhb1_prot_w)
+void slapfght_state::tigerhb1_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -824,7 +824,7 @@ WRITE8_MEMBER(slapfght_state::tigerhb1_prot_w)
 
 /**************************************************************************/
 
-READ8_MEMBER(slapfght_state::getstarb1_prot_r)
+uint8_t slapfght_state::getstarb1_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* The bootleg has it's own 'protection' on startup ?
 	    6D1A: 06 04         ld   b,$04

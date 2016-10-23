@@ -94,7 +94,7 @@
  *
  *************************************/
 
-WRITE8_MEMBER(irobot_state::irobot_nvram_w)
+void irobot_state::irobot_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[offset] = data & 0x0f;
 }
@@ -107,19 +107,19 @@ WRITE8_MEMBER(irobot_state::irobot_nvram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
+void irobot_state::irobot_clearirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
+void irobot_state::irobot_clearfirq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 
-READ8_MEMBER(irobot_state::quad_pokeyn_r)
+uint8_t irobot_state::quad_pokeyn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;
@@ -130,7 +130,7 @@ READ8_MEMBER(irobot_state::quad_pokeyn_r)
 	return pokey->read(pokey_reg);
 }
 
-WRITE8_MEMBER(irobot_state::quad_pokeyn_w)
+void irobot_state::quad_pokeyn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *const devname[4] = { "pokey1", "pokey2", "pokey3", "pokey4" };
 	int pokey_num = (offset >> 3) & ~0x04;

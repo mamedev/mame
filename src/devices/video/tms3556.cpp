@@ -148,7 +148,7 @@ uint32_t tms3556_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 //  vram_r - VRAM read
 //-------------------------------------------------
 
-READ8_MEMBER( tms3556_device::vram_r )
+uint8_t tms3556_device::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 	if (m_bamp_written) {
@@ -186,7 +186,7 @@ READ8_MEMBER( tms3556_device::vram_r )
 //  vram_w - VRAM write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms3556_device::vram_w )
+void tms3556_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bamp_written) {
 		m_bamp_written=false;
@@ -217,7 +217,7 @@ WRITE8_MEMBER( tms3556_device::vram_w )
 //  reg_r - read from register port
 //-------------------------------------------------
 
-READ8_MEMBER( tms3556_device::reg_r )
+uint8_t tms3556_device::reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG) logerror("TMS3556 Reg Read: %06x\n", offset);
 
@@ -230,7 +230,7 @@ READ8_MEMBER( tms3556_device::reg_r )
 //  reg_w - write to register port
 //-------------------------------------------------
 
-WRITE8_MEMBER( tms3556_device::reg_w )
+void tms3556_device::reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static int reg2=0; // FIXME : this static makes that only one TMS3556 will be present in one system...
 	static int reg=0;
@@ -307,7 +307,7 @@ WRITE8_MEMBER( tms3556_device::reg_w )
 //  initptr_r - set VDP in read mode (not exacly on the VDP but on the TAL)
 //--------------------------------------------------------------------------
 
-READ8_MEMBER( tms3556_device::initptr_r )
+uint8_t tms3556_device::initptr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_init_read=true;
 	return 0xff;

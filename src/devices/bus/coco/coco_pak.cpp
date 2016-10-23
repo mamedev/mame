@@ -168,7 +168,7 @@ void coco_pak_banked_device::banked_pak_set_bank(uint32_t bank)
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(coco_pak_banked_device::write)
+void coco_pak_banked_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

@@ -55,7 +55,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	void init_metlfrzr();
-	DECLARE_WRITE8_MEMBER(output_w);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
@@ -153,7 +153,7 @@ uint32_t metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(metlfrzr_state::output_w)
+void metlfrzr_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 7: flip screen
 	// bit 6-5: coin lockouts

@@ -213,12 +213,12 @@ void h83002_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_MEMBER(h83002_device::syscr_r)
+uint8_t h83002_device::syscr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83002_device::syscr_w)
+void h83002_device::syscr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	syscr = data;
 	update_irq_filter();

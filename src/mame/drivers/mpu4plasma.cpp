@@ -22,12 +22,12 @@ public:
 
 	required_shared_ptr<uint16_t> m_plasmaram;
 
-	DECLARE_READ16_MEMBER( mpu4plasma_unk_r )
+	uint16_t mpu4plasma_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)
 	{
 		return machine().rand();
 	}
 
-	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
+	void mpu4plasma_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

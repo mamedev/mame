@@ -100,9 +100,9 @@ public:
 	static void set_dma_fifo_data_available_callback(device_t &device, sh2_dma_fifo_data_available_delegate callback) { downcast<sh2_device &>(device).m_dma_fifo_data_available_cb = callback; }
 	static void set_ftcsr_read_callback(device_t &device, sh2_ftcsr_read_delegate callback) { downcast<sh2_device &>(device).m_ftcsr_read_cb = callback; }
 
-	DECLARE_WRITE32_MEMBER( sh7604_w );
-	DECLARE_READ32_MEMBER( sh7604_r );
-	DECLARE_READ32_MEMBER(sh2_internal_a5);
+	void sh7604_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sh7604_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sh2_internal_a5(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	void sh2_set_frt_input(int state);
 	void sh2drc_set_options(uint32_t options);
@@ -486,18 +486,18 @@ public:
 	// construction/destruction
 	sh2a_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	DECLARE_READ32_MEMBER(dma_sar0_r);
-	DECLARE_WRITE32_MEMBER(dma_sar0_w);
-	DECLARE_READ32_MEMBER(dma_dar0_r);
-	DECLARE_WRITE32_MEMBER(dma_dar0_w);
-	DECLARE_READ16_MEMBER(dmaor_r);
-	DECLARE_WRITE16_MEMBER(dmaor_w);
-	DECLARE_READ16_MEMBER(dma_tcr0_r);
-	DECLARE_WRITE16_MEMBER(dma_tcr0_w);
-	DECLARE_READ16_MEMBER(dma_chcr0_r);
-	DECLARE_WRITE16_MEMBER(dma_chcr0_w);
-	DECLARE_READ16_MEMBER(sh7021_r);
-	DECLARE_WRITE16_MEMBER(sh7021_w);
+	uint32_t dma_sar0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dma_sar0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dma_dar0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dma_dar0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t dmaor_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dmaor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dma_tcr0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dma_tcr0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dma_chcr0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dma_chcr0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sh7021_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sh7021_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sh7032_dma_exec(int ch);
 
 private:
@@ -519,8 +519,8 @@ public:
 	// construction/destruction
 	sh1_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
-	DECLARE_READ16_MEMBER(sh7032_r);
-	DECLARE_WRITE16_MEMBER(sh7032_w);
+	uint16_t sh7032_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sh7032_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 private:
 	uint16_t m_sh7032_regs[0x200];
 };

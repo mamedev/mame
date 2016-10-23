@@ -37,8 +37,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_neogeo_control_port_interface overrides
-	virtual DECLARE_READ8_MEMBER( in0_r ) override;
-	virtual DECLARE_READ8_MEMBER( in1_r ) override;
+	virtual uint8_t in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 	virtual void write_ctrlsel(uint8_t data) override;
 
 private:

@@ -16,7 +16,7 @@
 	DECLARE_READ_LINE_MEMBER( bsy );
 
 	/* latch contoll data */
-	DECLARE_WRITE8_MEMBER( data_w );
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* set RST pin level : reset / set table address A8-A15 */
 	DECLARE_WRITE_LINE_MEMBER( rst );

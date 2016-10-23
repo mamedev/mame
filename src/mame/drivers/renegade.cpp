@@ -118,13 +118,13 @@ $8000 - $ffff   ROM
 **  playback to work, but seems to be what the code expects
 */
 
-WRITE8_MEMBER(renegade_state::adpcm_start_w)
+void renegade_state::adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 	m_adpcm_playing = true;
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_addr_w)
+void renegade_state::adpcm_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// table at $CB52 in audiocpu program:
 	// 38 38 39 3A 3B 34 35 36 37 2C 2D 2E 2F
@@ -144,7 +144,7 @@ WRITE8_MEMBER(renegade_state::adpcm_addr_w)
 	m_adpcm_end = m_adpcm_pos + 0x2000 * 2;
 }
 
-WRITE8_MEMBER(renegade_state::adpcm_stop_w)
+void renegade_state::adpcm_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(1);
 	m_adpcm_playing = false;
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	}
 }
 
-WRITE8_MEMBER(renegade_state::sound_w)
+void renegade_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
@@ -252,27 +252,27 @@ void renegade_state::init_kuniokunb()
 
 ***************************************************************************/
 
-READ8_MEMBER(renegade_state::_68705_port_a_r)
+uint8_t renegade_state::_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(renegade_state::_68705_port_a_w)
+void renegade_state::_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::_68705_ddr_a_w)
+void renegade_state::_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(renegade_state::_68705_port_b_r)
+uint8_t renegade_state::_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(renegade_state::_68705_port_b_w)
+void renegade_state::_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
 	{
@@ -292,13 +292,13 @@ WRITE8_MEMBER(renegade_state::_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::_68705_ddr_b_w)
+void renegade_state::_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
 
-READ8_MEMBER(renegade_state::_68705_port_c_r)
+uint8_t renegade_state::_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_port_c_in = 0;
 	if (m_main_sent)
@@ -309,12 +309,12 @@ READ8_MEMBER(renegade_state::_68705_port_c_r)
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(renegade_state::_68705_port_c_w)
+void renegade_state::_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(renegade_state::_68705_ddr_c_w)
+void renegade_state::_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_c = data;
 }
@@ -326,7 +326,7 @@ WRITE8_MEMBER(renegade_state::_68705_ddr_c_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(renegade_state::mcu_reset_r)
+uint8_t renegade_state::mcu_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mcu_sim == true)
 	{
@@ -341,7 +341,7 @@ READ8_MEMBER(renegade_state::mcu_reset_r)
 	return 0;
 }
 
-WRITE8_MEMBER(renegade_state::mcu_w)
+void renegade_state::mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_mcu_sim == true)
 	{
@@ -535,7 +535,7 @@ void renegade_state::mcu_process_command()
 	}
 }
 
-READ8_MEMBER(renegade_state::mcu_r)
+uint8_t renegade_state::mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mcu_sim == true)
 	{
@@ -577,7 +577,7 @@ CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 
 /********************************************************************************************/
 
-WRITE8_MEMBER(renegade_state::bankswitch_w)
+void renegade_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank->set_entry(data & 1);
 }
@@ -592,7 +592,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(renegade_state::coincounter_w)
+void renegade_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//coin_counter_w(offset, data);
 }

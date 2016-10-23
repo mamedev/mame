@@ -88,12 +88,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( ls259_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
-	DECLARE_READ8_MEMBER( mpsc_dack_r );
-	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
+	uint8_t mpsc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mpsc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
 	DECLARE_WRITE_LINE_MEMBER( itxc_w );

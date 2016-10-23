@@ -69,7 +69,7 @@ const address_space_config *prof80_mmu_device::memory_space_config(address_space
 //  par_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_mmu_device::par_w )
+void prof80_mmu_device::par_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = offset >> 12;
 
@@ -91,7 +91,7 @@ WRITE_LINE_MEMBER( prof80_mmu_device::mme_w )
 //  program_r - program space read
 //-------------------------------------------------
 
-READ8_MEMBER( prof80_mmu_device::program_r )
+uint8_t prof80_mmu_device::program_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_enabled)
 	{
@@ -111,7 +111,7 @@ READ8_MEMBER( prof80_mmu_device::program_r )
 //  program_w - program space write
 //-------------------------------------------------
 
-WRITE8_MEMBER( prof80_mmu_device::program_w )
+void prof80_mmu_device::program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_enabled)
 	{

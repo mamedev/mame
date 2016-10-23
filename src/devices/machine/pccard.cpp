@@ -2,21 +2,21 @@
 // copyright-holders:smf
 #include "pccard.h"
 
-READ16_MEMBER( pccard_interface::read_memory )
+uint16_t pccard_interface::read_memory(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_interface::write_memory )
+void pccard_interface::write_memory(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER( pccard_interface::read_reg )
+uint16_t pccard_interface::read_reg(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_interface::write_reg )
+void pccard_interface::write_reg(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -39,7 +39,7 @@ READ_LINE_MEMBER(pccard_slot_device::read_line_inserted)
 	return m_pccard != nullptr;
 }
 
-READ16_MEMBER( pccard_slot_device::read_memory )
+uint16_t pccard_slot_device::read_memory(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( m_pccard != nullptr )
 	{
@@ -49,7 +49,7 @@ READ16_MEMBER( pccard_slot_device::read_memory )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_slot_device::write_memory )
+void pccard_slot_device::write_memory(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( m_pccard != nullptr )
 	{
@@ -57,7 +57,7 @@ WRITE16_MEMBER( pccard_slot_device::write_memory )
 	}
 }
 
-READ16_MEMBER( pccard_slot_device::read_reg )
+uint16_t pccard_slot_device::read_reg(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if( m_pccard != nullptr )
 	{
@@ -67,7 +67,7 @@ READ16_MEMBER( pccard_slot_device::read_reg )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( pccard_slot_device::write_reg )
+void pccard_slot_device::write_reg(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( m_pccard != nullptr )
 	{

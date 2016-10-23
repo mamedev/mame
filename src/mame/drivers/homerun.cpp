@@ -64,7 +64,7 @@ Notes:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(homerun_state::homerun_control_w)
+void homerun_state::homerun_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0, d1: somehow related to port $40?
 
@@ -93,7 +93,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 	m_control = data;
 }
 
-WRITE8_MEMBER(homerun_state::homerun_d7756_sample_w)
+void homerun_state::homerun_d7756_sample_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample = data;
 

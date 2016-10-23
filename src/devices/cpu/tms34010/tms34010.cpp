@@ -1083,7 +1083,7 @@ static const char *const ioreg_name[] =
 };
 #endif
 
-WRITE16_MEMBER( tms34010_device::io_register_w )
+void tms34010_device::io_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldreg, newreg;
 
@@ -1234,7 +1234,7 @@ static const char *const ioreg020_name[] =
 };
 #endif
 
-WRITE16_MEMBER( tms34020_device::io_register_w )
+void tms34020_device::io_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldreg, newreg;
 
@@ -1396,7 +1396,7 @@ WRITE16_MEMBER( tms34020_device::io_register_w )
     I/O REGISTER READS
 ***************************************************************************/
 
-READ16_MEMBER( tms34010_device::io_register_r )
+uint16_t tms34010_device::io_register_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result, total;
 
@@ -1438,7 +1438,7 @@ READ16_MEMBER( tms34010_device::io_register_r )
 }
 
 
-READ16_MEMBER( tms34020_device::io_register_r )
+uint16_t tms34020_device::io_register_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result, total;
 
@@ -1490,7 +1490,7 @@ void tms340x0_device::tms34010_state_postload()
     HOST INTERFACE WRITES
 ***************************************************************************/
 
-WRITE16_MEMBER( tms340x0_device::host_w )
+void tms340x0_device::host_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int reg = offset;
 	unsigned int addr;
@@ -1546,7 +1546,7 @@ WRITE16_MEMBER( tms340x0_device::host_w )
     HOST INTERFACE READS
 ***************************************************************************/
 
-READ16_MEMBER( tms340x0_device::host_r )
+uint16_t tms340x0_device::host_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int reg = offset;
 	unsigned int addr;

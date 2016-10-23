@@ -720,7 +720,7 @@ TODO:
 
 
 
-READ8_MEMBER(galaga_state::bosco_dsw_r)
+uint8_t galaga_state::bosco_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bit0,bit1;
 
@@ -730,18 +730,18 @@ READ8_MEMBER(galaga_state::bosco_dsw_r)
 	return bit0 | (bit1 << 1);
 }
 
-WRITE8_MEMBER(galaga_state::galaga_flip_screen_w)
+void galaga_state::galaga_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
+void bosco_state::bosco_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(~data & 1);
 }
 
 
-WRITE8_MEMBER(galaga_state::bosco_latch_w)
+void galaga_state::bosco_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -785,7 +785,7 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 
 CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)param)->read() >> 4; }
 
-WRITE8_MEMBER(galaga_state::out_0)
+void galaga_state::out_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1,data & 1);
 	output().set_led_value(0,data & 2);
@@ -793,12 +793,12 @@ WRITE8_MEMBER(galaga_state::out_0)
 	machine().bookkeeping().coin_counter_w(0,~data & 8);
 }
 
-WRITE8_MEMBER(galaga_state::out_1)
+void galaga_state::out_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(data & 1);
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_rom_r)
+uint8_t galaga_state::namco_52xx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t length = memregion("52xx")->bytes();
 //printf("ROM read %04X\n", offset);
@@ -813,13 +813,13 @@ READ8_MEMBER(galaga_state::namco_52xx_rom_r)
 	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
-READ8_MEMBER(galaga_state::namco_52xx_si_r)
+uint8_t galaga_state::namco_52xx_si_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* pulled to GND */
 	return 0;
 }
 
-READ8_MEMBER(galaga_state::custom_mod_r)
+uint8_t galaga_state::custom_mod_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* MOD0-2 is connected to K1-3; K0 is left unconnected */
 	return m_custom_mod << 1;

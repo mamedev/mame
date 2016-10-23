@@ -26,9 +26,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t m_term_data;
@@ -56,14 +56,14 @@ static INPUT_PORTS_START( ts816 )
 INPUT_PORTS_END
 
 
-READ8_MEMBER( ts816_state::keyin_r )
+uint8_t ts816_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ts816_state::status_r )
+uint8_t ts816_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_status)
 	{
@@ -74,7 +74,7 @@ READ8_MEMBER( ts816_state::status_r )
 		return 4;
 }
 
-WRITE8_MEMBER( ts816_state::kbd_put )
+void ts816_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_status = 3;

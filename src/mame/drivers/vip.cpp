@@ -260,7 +260,7 @@ void vip_state::update_interrupts()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::read )
+uint8_t vip_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -285,7 +285,7 @@ READ8_MEMBER( vip_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::write )
+void vip_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int cs = BIT(offset, 15) || m_8000;
 	int cdef = !((offset >= 0xc00) && (offset < 0x1000));
@@ -304,7 +304,7 @@ WRITE8_MEMBER( vip_state::write )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( vip_state::io_r )
+uint8_t vip_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_exp->io_r(space, offset);
 
@@ -333,7 +333,7 @@ READ8_MEMBER( vip_state::io_r )
 //  io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( vip_state::io_w )
+void vip_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->io_w(space, offset, data);
 
@@ -489,19 +489,19 @@ WRITE_LINE_MEMBER( vip_state::q_w )
 	m_exp->q_w(state);
 }
 
-READ8_MEMBER( vip_state::dma_r )
+uint8_t vip_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_exp->dma_r(space, offset);
 }
 
-WRITE8_MEMBER( vip_state::dma_w )
+void vip_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdc->dma_w(space, offset, data);
 
 	m_exp->dma_w(space, offset, data);
 }
 
-WRITE8_MEMBER( vip_state::sc_w )
+void vip_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_exp->sc_w(data);
 }

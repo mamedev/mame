@@ -160,12 +160,12 @@ Colscroll effects?
                           SOUND
 ***********************************************************/
 
-WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
+void warriorb_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(warriorb_state::sound_w)
+void warriorb_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -173,7 +173,7 @@ WRITE16_MEMBER(warriorb_state::sound_w)
 		m_tc0140syt->master_comm_w(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(warriorb_state::sound_r)
+uint16_t warriorb_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
@@ -182,7 +182,7 @@ READ16_MEMBER(warriorb_state::sound_r)
 }
 
 
-WRITE8_MEMBER(warriorb_state::pancontrol)
+void warriorb_state::pancontrol(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
@@ -201,7 +201,7 @@ WRITE8_MEMBER(warriorb_state::pancontrol)
 }
 
 
-WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
+void warriorb_state::tc0100scn_dual_screen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
 	m_tc0100scn_2->word_w(space, offset, data, mem_mask);

@@ -134,7 +134,7 @@ void s100_bus_t::add_card(device_s100_card_interface *card)
 //  smemr_r - memory read
 //-------------------------------------------------
 
-READ8_MEMBER( s100_bus_t::smemr_r )
+uint8_t s100_bus_t::smemr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -154,7 +154,7 @@ READ8_MEMBER( s100_bus_t::smemr_r )
 //  mwrt_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( s100_bus_t::mwrt_w )
+void s100_bus_t::mwrt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_s100_card_interface *entry = m_device_list.first();
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER( s100_bus_t::mwrt_w )
 //  sinp_r - I/O read
 //-------------------------------------------------
 
-READ8_MEMBER( s100_bus_t::sinp_r )
+uint8_t s100_bus_t::sinp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -190,7 +190,7 @@ READ8_MEMBER( s100_bus_t::sinp_r )
 //  sout_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( s100_bus_t::sout_w )
+void s100_bus_t::sout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_s100_card_interface *entry = m_device_list.first();
 

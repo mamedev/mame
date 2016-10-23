@@ -23,23 +23,23 @@
 
 
 
-WRITE8_MEMBER(pc1401_state::pc1401_outa)
+void pc1401_state::pc1401_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa = data;
 }
 
-WRITE8_MEMBER(pc1401_state::pc1401_outb)
+void pc1401_state::pc1401_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1401_state::pc1401_outc)
+void pc1401_state::pc1401_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%g outc %.2x\n", machine.time().as_double(), data);
 	m_portc = data;
 }
 
-READ8_MEMBER(pc1401_state::pc1401_ina)
+uint8_t pc1401_state::pc1401_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outa;
 
@@ -91,7 +91,7 @@ READ8_MEMBER(pc1401_state::pc1401_ina)
 	return data;
 }
 
-READ8_MEMBER(pc1401_state::pc1401_inb)
+uint8_t pc1401_state::pc1401_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=m_outb;
 

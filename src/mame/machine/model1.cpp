@@ -1890,7 +1890,7 @@ TGP_FUNCTION( model1_state::function_get_swa )
 	}
 }
 
-READ16_MEMBER(model1_state::model1_tgp_copro_r)
+uint16_t model1_state::model1_tgp_copro_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!offset) {
 		m_copro_r = fifoout_pop();
@@ -1899,7 +1899,7 @@ READ16_MEMBER(model1_state::model1_tgp_copro_r)
 		return m_copro_r >> 16;
 }
 
-WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
+void model1_state::model1_tgp_copro_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset) {
 		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
@@ -1909,17 +1909,17 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 		m_copro_w = (m_copro_w & 0xffff0000) | data;
 }
 
-READ16_MEMBER(model1_state::model1_tgp_copro_adr_r)
+uint16_t model1_state::model1_tgp_copro_adr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram_adr;
 }
 
-WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
+void model1_state::model1_tgp_copro_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram_adr);
 }
 
-READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
+uint16_t model1_state::model1_tgp_copro_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(!offset) {
 		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), space.device().safe_pc());
@@ -1928,7 +1928,7 @@ READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
 		return m_ram_data[m_ram_adr++] >> 16;
 }
 
-WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
+void model1_state::model1_tgp_copro_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_ram_latch+offset);
 	if(offset) {
@@ -2010,7 +2010,7 @@ READ_LINE_MEMBER(model1_state::copro_fifoin_pop_ok)
 	return ASSERT_LINE;
 }
 
-READ32_MEMBER(model1_state::copro_fifoin_pop)
+uint32_t model1_state::copro_fifoin_pop(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = m_copro_fifoin_data[m_copro_fifoin_rpos++];
 
@@ -2066,7 +2066,7 @@ uint32_t model1_state::copro_fifoout_pop()
 	return r;
 }
 
-WRITE32_MEMBER(model1_state::copro_fifoout_push)
+void model1_state::copro_fifoout_push(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (m_copro_fifoout_num == FIFO_SIZE)
 	{
@@ -2083,17 +2083,17 @@ WRITE32_MEMBER(model1_state::copro_fifoout_push)
 	m_copro_fifoout_num++;
 }
 
-READ32_MEMBER(model1_state::copro_ram_r)
+uint32_t model1_state::copro_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ram_data[offset & 0x7fff];
 }
 
-WRITE32_MEMBER(model1_state::copro_ram_w)
+void model1_state::copro_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ram_data[offset&0x7fff] = data;
 }
 
-READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
+uint16_t model1_state::model1_tgp_vr_adr_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
 	{
@@ -2104,12 +2104,12 @@ READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
 	return m_ram_adr;
 }
 
-WRITE16_MEMBER(model1_state::model1_tgp_vr_adr_w)
+void model1_state::model1_tgp_vr_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram_adr);
 }
 
-READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
+uint16_t model1_state::model1_vr_tgp_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t  r;
 
@@ -2134,7 +2134,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 	return r;
 }
 
-WRITE16_MEMBER(model1_state::model1_vr_tgp_ram_w)
+void model1_state::model1_vr_tgp_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_ram_latch+offset);
 
@@ -2147,7 +2147,7 @@ WRITE16_MEMBER(model1_state::model1_vr_tgp_ram_w)
 	}
 }
 
-READ16_MEMBER(model1_state::model1_vr_tgp_r)
+uint16_t model1_state::model1_vr_tgp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!offset)
 	{
@@ -2158,7 +2158,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_r)
 		return m_vr_r >> 16;
 }
 
-WRITE16_MEMBER(model1_state::model1_vr_tgp_w)
+void model1_state::model1_vr_tgp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 	{

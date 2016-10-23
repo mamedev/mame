@@ -91,7 +91,7 @@ void atari_rle_objects_device::static_set_config(device_t &device, const atari_r
 //  bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_rle_objects_device::control_write)
+void atari_rle_objects_device::control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //logerror("atarirle_control_w(%d)\n", bits);
 
@@ -144,7 +144,7 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 //  bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_rle_objects_device::command_write)
+void atari_rle_objects_device::command_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_command = data;
 }

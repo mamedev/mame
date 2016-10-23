@@ -107,8 +107,8 @@ public:
 	void cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_read_dma_cd(offset); }
+	void dma_cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
 	int phi2() { return clock(); }

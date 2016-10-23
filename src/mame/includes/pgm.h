@@ -78,17 +78,17 @@ public:
 	uint8_t        m_cal_cnt;
 	system_time  m_systime;
 
-	DECLARE_READ16_MEMBER(pgm_videoram_r);
-	DECLARE_WRITE16_MEMBER(pgm_videoram_w);
-	DECLARE_WRITE16_MEMBER(pgm_coin_counter_w);
-	DECLARE_READ16_MEMBER(z80_ram_r);
-	DECLARE_WRITE16_MEMBER(z80_ram_w);
-	DECLARE_WRITE16_MEMBER(z80_reset_w);
-	DECLARE_WRITE16_MEMBER(z80_ctrl_w);
-	DECLARE_WRITE16_MEMBER(m68k_l1_w);
-	DECLARE_WRITE8_MEMBER(z80_l3_w);
-	DECLARE_WRITE16_MEMBER(pgm_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(pgm_bg_videoram_w);
+	uint16_t pgm_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pgm_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pgm_coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t z80_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void z80_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void m68k_l1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void z80_l3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pgm_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pgm_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_pgm();
 

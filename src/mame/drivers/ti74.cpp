@@ -103,9 +103,9 @@ public:
 	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
 	void update_battery_status(int state);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -227,7 +227,7 @@ HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 
 ***************************************************************************/
 
-READ8_MEMBER(ti74_state::keyboard_r)
+uint8_t ti74_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -241,13 +241,13 @@ READ8_MEMBER(ti74_state::keyboard_r)
 	return ret;
 }
 
-WRITE8_MEMBER(ti74_state::keyboard_w)
+void ti74_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d(0-7): select keyboard column
 	m_key_select = data;
 }
 
-WRITE8_MEMBER(ti74_state::bankswitch_w)
+void ti74_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d1: system rom bankswitch
 	membank("sysbank")->set_entry(data & 3);

@@ -89,7 +89,7 @@ TODO:
  *
  *************************************/
 
-WRITE8_MEMBER(gameplan_state::io_select_w)
+void gameplan_state::io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER(gameplan_state::io_select_w)
 }
 
 
-READ8_MEMBER(gameplan_state::io_port_r)
+uint8_t gameplan_state::io_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 
@@ -136,7 +136,7 @@ WRITE_LINE_MEMBER(gameplan_state::audio_reset_w)
 }
 
 
-WRITE8_MEMBER(gameplan_state::audio_cmd_w)
+void gameplan_state::audio_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_riot->porta_in_set(data, 0x7f);
 }
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 }
 
 
-WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
+void gameplan_state::r6532_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &progspace = m_maincpu->space(AS_PROGRAM);
 	m_soundlatch->write(progspace, 0, data);

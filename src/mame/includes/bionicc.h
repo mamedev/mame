@@ -42,16 +42,16 @@ public:
 	uint16_t    m_inp[3];
 	uint16_t    m_soundcommand;
 
-	DECLARE_WRITE16_MEMBER(hacked_controls_w);
-	DECLARE_READ16_MEMBER(hacked_controls_r);
-	DECLARE_WRITE16_MEMBER(bionicc_mpu_trigger_w);
-	DECLARE_WRITE16_MEMBER(hacked_soundcommand_w);
-	DECLARE_READ16_MEMBER(hacked_soundcommand_r);
-	DECLARE_WRITE16_MEMBER(bionicc_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_fgvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_txvideoram_w);
-	DECLARE_WRITE16_MEMBER(bionicc_scroll_w);
-	DECLARE_WRITE16_MEMBER(bionicc_gfxctrl_w);
+	void hacked_controls_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hacked_controls_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bionicc_mpu_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hacked_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hacked_soundcommand_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bionicc_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bionicc_fgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bionicc_txvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bionicc_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bionicc_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

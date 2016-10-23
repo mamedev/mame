@@ -71,17 +71,17 @@ public:
 	DECLARE_PALETTE_INIT(cgc7900);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( keyboard_r );
-	DECLARE_WRITE16_MEMBER( keyboard_w );
-	DECLARE_WRITE16_MEMBER( interrupt_mask_w );
-	DECLARE_READ16_MEMBER( disk_data_r );
-	DECLARE_WRITE16_MEMBER( disk_data_w );
-	DECLARE_READ16_MEMBER( disk_status_r );
-	DECLARE_WRITE16_MEMBER( disk_command_w );
-	DECLARE_READ16_MEMBER( z_mode_r );
-	DECLARE_WRITE16_MEMBER( z_mode_w );
-	DECLARE_WRITE16_MEMBER( color_status_w );
-	DECLARE_READ16_MEMBER( sync_r );
+	uint16_t keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void keyboard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void interrupt_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t disk_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void disk_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t disk_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void disk_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t z_mode_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void z_mode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void color_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sync_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void update_clut();
 	void draw_bitmap(screen_device *screen, bitmap_rgb32 &bitmap);

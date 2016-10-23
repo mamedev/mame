@@ -89,7 +89,7 @@ void gamepock_state::lcd_update()
 }
 
 
-WRITE8_MEMBER( gamepock_state::port_a_w )
+void gamepock_state::port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t   old_port_a = m_port_a;
 
@@ -102,20 +102,20 @@ WRITE8_MEMBER( gamepock_state::port_a_w )
 }
 
 
-WRITE8_MEMBER( gamepock_state::port_b_w )
+void gamepock_state::port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_b = data;
 }
 
 
-READ8_MEMBER( gamepock_state::port_b_r )
+uint8_t gamepock_state::port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("gamepock_port_b_r: not implemented\n");
 	return 0xFF;
 }
 
 
-READ8_MEMBER( gamepock_state::port_c_r )
+uint8_t gamepock_state::port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t   data = 0xFF;
 

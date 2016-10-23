@@ -16,7 +16,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 };
@@ -34,8 +34,8 @@ public:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_WRITE8_MEMBER(tengen032_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { tengen032_write(space, offset, data, mem_mask); }
+	virtual void tengen032_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { tengen032_write(space, offset, data, mem_mask); }
 	virtual void chr_cb(int start, int bank, int source);
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
@@ -69,7 +69,7 @@ public:
 	nes_tengen037_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:

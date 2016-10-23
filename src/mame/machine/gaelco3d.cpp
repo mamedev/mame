@@ -331,12 +331,12 @@ TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
 
 
 
-WRITE8_MEMBER( gaelco_serial_device::irq_enable )
+void gaelco_serial_device::irq_enable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOGMSG(("???? irq enable %d\n", data));
 }
 
-READ8_MEMBER( gaelco_serial_device::status_r)
+uint8_t gaelco_serial_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -351,7 +351,7 @@ READ8_MEMBER( gaelco_serial_device::status_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::data_w)
+void gaelco_serial_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -364,7 +364,7 @@ WRITE8_MEMBER( gaelco_serial_device::data_w)
 	LOGMSG(("command send %02x at %d\n", data, m_out_ptr->cnt));
 }
 
-READ8_MEMBER( gaelco_serial_device::data_r)
+uint8_t gaelco_serial_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 
@@ -382,14 +382,14 @@ READ8_MEMBER( gaelco_serial_device::data_r)
 	return ret;
 }
 
-WRITE8_MEMBER( gaelco_serial_device::unknown_w)
+void gaelco_serial_device::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 	LOGMSG(("???? unknown serial access %d\n", data));
 
 }
 
-WRITE8_MEMBER( gaelco_serial_device::rts_w )
+void gaelco_serial_device::rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -403,7 +403,7 @@ WRITE8_MEMBER( gaelco_serial_device::rts_w )
 	}
 }
 
-WRITE8_MEMBER( gaelco_serial_device::tr_w)
+void gaelco_serial_device::tr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOGMSG(("set transmit %d\n", data));
 	std::lock_guard<std::mutex> guard(m_mutex);

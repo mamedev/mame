@@ -84,8 +84,8 @@ public:
 	static void static_set_config(device_t &device, const atari_rle_objects_config &config);
 
 	// control handlers
-	DECLARE_WRITE8_MEMBER(control_write);
-	DECLARE_WRITE8_MEMBER(command_write);
+	void control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void command_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// render helpers
 	void vblank_callback(screen_device &screen, bool state);

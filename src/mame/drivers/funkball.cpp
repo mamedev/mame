@@ -110,11 +110,11 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<16> m_inputs;
 
-	DECLARE_WRITE32_MEMBER( flash_w );
-//  DECLARE_WRITE8_MEMBER( bios_ram_w );
-	DECLARE_READ8_MEMBER( test_r );
-	DECLARE_READ8_MEMBER( serial_r );
-	DECLARE_WRITE8_MEMBER( serial_w );
+	void flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+//  void bios_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t funkball_config_reg_r();
 	void funkball_config_reg_w(uint8_t data);
@@ -130,11 +130,11 @@ public:
 
 		uint32_t init_enable;
 	} m_voodoo_pci_regs;
-	DECLARE_READ32_MEMBER(biu_ctrl_r);
-	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
-	DECLARE_WRITE8_MEMBER(bios_ram_w);
-	DECLARE_READ8_MEMBER(io20_r);
-	DECLARE_WRITE8_MEMBER(io20_w);
+	uint32_t biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bios_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io20_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 };
@@ -215,7 +215,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 	COMBINE_DATA(state->m_cx5510_regs + (reg/4));
 }
 
-READ8_MEMBER( funkball_state::serial_r )
+uint8_t funkball_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("%02x\n",offset);
 	if(offset == 5)
@@ -224,7 +224,7 @@ READ8_MEMBER( funkball_state::serial_r )
 	return 0;
 }
 
-WRITE8_MEMBER( funkball_state::serial_w )
+void funkball_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -248,7 +248,7 @@ void funkball_state::funkball_config_reg_w(uint8_t data)
 	m_funkball_config_regs[m_funkball_config_reg_sel] = data;
 }
 
-READ8_MEMBER(funkball_state::io20_r)
+uint8_t funkball_state::io20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0;
 
@@ -263,7 +263,7 @@ READ8_MEMBER(funkball_state::io20_r)
 	return r;
 }
 
-WRITE8_MEMBER(funkball_state::io20_w)
+void funkball_state::io20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -276,7 +276,7 @@ WRITE8_MEMBER(funkball_state::io20_w)
 	}
 }
 
-WRITE32_MEMBER(funkball_state::flash_w)
+void funkball_state::flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&flashbank_addr);
 	int tempbank = (flashbank_addr & 0x7fff) | ((flashbank_addr & 0x00800000) >> 8);
@@ -287,7 +287,7 @@ WRITE32_MEMBER(funkball_state::flash_w)
 }
 
 
-READ32_MEMBER(funkball_state::biu_ctrl_r)
+uint32_t funkball_state::biu_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -296,7 +296,7 @@ READ32_MEMBER(funkball_state::biu_ctrl_r)
 	return m_biu_ctrl_reg[offset];
 }
 
-WRITE32_MEMBER(funkball_state::biu_ctrl_w)
+void funkball_state::biu_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
@@ -316,7 +316,7 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 	}
 }
 
-WRITE8_MEMBER(funkball_state::bios_ram_w)
+void funkball_state::bios_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
 	{
@@ -324,7 +324,7 @@ WRITE8_MEMBER(funkball_state::bios_ram_w)
 	}
 }
 
-READ8_MEMBER( funkball_state::test_r )
+uint8_t funkball_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_inputs[offset]->read();
 }

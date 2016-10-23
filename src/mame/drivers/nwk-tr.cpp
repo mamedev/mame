@@ -307,17 +307,17 @@ public:
 	uint8_t m_lanc2_reg[3];
 	std::unique_ptr<uint8_t[]> m_lanc2_ram;
 	std::unique_ptr<uint32_t[]> m_sharc_dataram;
-	DECLARE_WRITE32_MEMBER(paletteram32_w);
-	DECLARE_READ32_MEMBER(sysreg_r);
-	DECLARE_WRITE32_MEMBER(sysreg_w);
-	DECLARE_READ32_MEMBER(lanc1_r);
-	DECLARE_WRITE32_MEMBER(lanc1_w);
-	DECLARE_READ32_MEMBER(lanc2_r);
-	DECLARE_WRITE32_MEMBER(lanc2_w);
-	DECLARE_READ32_MEMBER(dsp_dataram_r);
-	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_en_w);
-	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
+	void paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sysreg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void sysreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t lanc1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lanc1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t lanc2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void lanc2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
@@ -332,7 +332,7 @@ public:
 
 
 
-WRITE32_MEMBER(nwktr_state::paletteram32_w)
+void nwktr_state::paletteram32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 	data = m_generic_paletteram_32[offset];
@@ -365,7 +365,7 @@ uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &b
 
 /*****************************************************************************/
 
-READ32_MEMBER(nwktr_state::sysreg_r)
+uint32_t nwktr_state::sysreg_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 	if (offset == 0)
@@ -397,7 +397,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::sysreg_w)
+void nwktr_state::sysreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if( offset == 0 )
 	{
@@ -447,7 +447,7 @@ void nwktr_state::lanc2_init()
 	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
 }
 
-READ32_MEMBER(nwktr_state::lanc1_r)
+uint32_t nwktr_state::lanc1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -469,12 +469,12 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 	}
 }
 
-WRITE32_MEMBER(nwktr_state::lanc1_w)
+void nwktr_state::lanc1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 }
 
-READ32_MEMBER(nwktr_state::lanc2_r)
+uint32_t nwktr_state::lanc2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r = 0;
 
@@ -504,7 +504,7 @@ READ32_MEMBER(nwktr_state::lanc2_r)
 	return r;
 }
 
-WRITE32_MEMBER(nwktr_state::lanc2_w)
+void nwktr_state::lanc2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -589,7 +589,7 @@ TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
 }
 
 
-WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
+void nwktr_state::soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 1)
 	{
@@ -604,7 +604,7 @@ WRITE16_MEMBER(nwktr_state::soundtimer_en_w)
 	}
 }
 
-WRITE16_MEMBER(nwktr_state::soundtimer_count_w)
+void nwktr_state::soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Reset the count
 	m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -656,12 +656,12 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-READ32_MEMBER(nwktr_state::dsp_dataram_r)
+uint32_t nwktr_state::dsp_dataram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sharc_dataram[offset] & 0xffff;
 }
 
-WRITE32_MEMBER(nwktr_state::dsp_dataram_w)
+void nwktr_state::dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_sharc_dataram[offset] = data;
 }

@@ -56,7 +56,7 @@ void i82875p_host_device::set_ram_size(int _ram_size)
 	ram_size = _ram_size;
 }
 
-READ8_MEMBER(i82875p_host_device::capptr_r)
+uint8_t i82875p_host_device::capptr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xe4;
 }
@@ -82,71 +82,71 @@ void i82875p_host_device::device_start()
 	add_map(256*1024*1024, M_MEM, FUNC(i82875p_host_device::agp_translation_map));
 }
 
-READ8_MEMBER(  i82875p_host_device::agpm_r)
+uint8_t i82875p_host_device::agpm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return agpm;
 }
 
-WRITE8_MEMBER( i82875p_host_device::agpm_w)
+void i82875p_host_device::agpm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	agpm = data;
 	logerror("%s: agpm = %02x\n", tag(), agpm);
 }
 
-READ8_MEMBER(  i82875p_host_device::gc_r)
+uint8_t i82875p_host_device::gc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x08;
 }
 
-READ8_MEMBER(  i82875p_host_device::csabcont_r)
+uint8_t i82875p_host_device::csabcont_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ32_MEMBER( i82875p_host_device::eap_r)
+uint32_t i82875p_host_device::eap_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000000;
 }
 
-READ8_MEMBER(  i82875p_host_device::derrsyn_r)
+uint8_t i82875p_host_device::derrsyn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(  i82875p_host_device::des_r)
+uint8_t i82875p_host_device::des_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(  i82875p_host_device::fpllcont_r)
+uint8_t i82875p_host_device::fpllcont_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return fpllcont;
 }
 
-WRITE8_MEMBER( i82875p_host_device::fpllcont_w)
+void i82875p_host_device::fpllcont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fpllcont = data;
 	logerror("%s: fpllcont = %02x\n", tag(), data);
 }
 
-READ8_MEMBER(  i82875p_host_device::pam_r)
+uint8_t i82875p_host_device::pam_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pam[offset];
 }
 
-WRITE8_MEMBER( i82875p_host_device::pam_w)
+void i82875p_host_device::pam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pam[offset] = data;
 	logerror("%s: pam[%d] = %02x\n", tag(), offset, data);
 	remap_cb();
 }
 
-READ8_MEMBER(  i82875p_host_device::smram_r)
+uint8_t i82875p_host_device::smram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return smram;
 }
 
-WRITE8_MEMBER( i82875p_host_device::smram_w)
+void i82875p_host_device::smram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(smram & 0x10))
 		smram = (data & 0xfe) | 0x02;
@@ -154,12 +154,12 @@ WRITE8_MEMBER( i82875p_host_device::smram_w)
 	remap_cb();
 }
 
-READ8_MEMBER(  i82875p_host_device::esmramc_r)
+uint8_t i82875p_host_device::esmramc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return esmramc;
 }
 
-WRITE8_MEMBER( i82875p_host_device::esmramc_w)
+void i82875p_host_device::esmramc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(smram & 0x10))
 		esmramc = (data & 0x87) | 0x38;
@@ -167,80 +167,80 @@ WRITE8_MEMBER( i82875p_host_device::esmramc_w)
 	remap_cb();
 }
 
-READ32_MEMBER( i82875p_host_device::acapid_r)
+uint32_t i82875p_host_device::acapid_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00300002;
 }
 
-READ32_MEMBER( i82875p_host_device::agpstat_r)
+uint32_t i82875p_host_device::agpstat_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x1f004a13;
 }
 
-READ32_MEMBER( i82875p_host_device::agpcmd_r)
+uint32_t i82875p_host_device::agpcmd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000a00;
 }
 
-READ32_MEMBER( i82875p_host_device::agpctrl_r)
+uint32_t i82875p_host_device::agpctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return agpctrl;
 }
 
-WRITE32_MEMBER(i82875p_host_device::agpctrl_w)
+void i82875p_host_device::agpctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&agpctrl);
 	logerror("%s: agpctrl = %08x\n", tag(), agpctrl);
 }
 
-READ8_MEMBER(  i82875p_host_device::apsize_r)
+uint8_t i82875p_host_device::apsize_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return apsize;
 }
 
-WRITE8_MEMBER( i82875p_host_device::apsize_w)
+void i82875p_host_device::apsize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apsize = data;
 	logerror("%s: apsize = %02x\n", tag(), apsize);
 }
 
-READ32_MEMBER( i82875p_host_device::attbase_r)
+uint32_t i82875p_host_device::attbase_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return attbase;
 }
 
-WRITE32_MEMBER(i82875p_host_device::attbase_w)
+void i82875p_host_device::attbase_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&attbase);
 	logerror("%s: attbase = %08x\n", tag(), attbase);
 }
 
-READ8_MEMBER(  i82875p_host_device::amtt_r)
+uint8_t i82875p_host_device::amtt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return amtt;
 }
 
-WRITE8_MEMBER( i82875p_host_device::amtt_w)
+void i82875p_host_device::amtt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	amtt = data;
 }
 
-READ8_MEMBER(  i82875p_host_device::lptt_r)
+uint8_t i82875p_host_device::lptt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return lptt;
 }
 
-WRITE8_MEMBER( i82875p_host_device::lptt_w)
+void i82875p_host_device::lptt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	lptt = data;
 }
 
-READ16_MEMBER( i82875p_host_device::toud_r)
+uint16_t i82875p_host_device::toud_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return toud;
 }
 
-WRITE16_MEMBER(i82875p_host_device::toud_w)
+void i82875p_host_device::toud_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&toud);
 	toud &= ~7;
@@ -248,67 +248,67 @@ WRITE16_MEMBER(i82875p_host_device::toud_w)
 	remap_cb();
 }
 
-READ16_MEMBER( i82875p_host_device::mchcfg_r)
+uint16_t i82875p_host_device::mchcfg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mchcfg;
 }
 
-WRITE16_MEMBER(i82875p_host_device::mchcfg_w)
+void i82875p_host_device::mchcfg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&mchcfg);
 }
 
-READ16_MEMBER( i82875p_host_device::errsts_r)
+uint16_t i82875p_host_device::errsts_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;
 }
 
-READ16_MEMBER( i82875p_host_device::errcmd_r)
+uint16_t i82875p_host_device::errcmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return errcmd;
 }
 
-WRITE16_MEMBER(i82875p_host_device::errcmd_w)
+void i82875p_host_device::errcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&errcmd);
 }
 
-READ16_MEMBER( i82875p_host_device::smicmd_r)
+uint16_t i82875p_host_device::smicmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return smicmd;
 }
 
-WRITE16_MEMBER(i82875p_host_device::smicmd_w)
+void i82875p_host_device::smicmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&smicmd);
 }
 
-READ16_MEMBER( i82875p_host_device::scicmd_r)
+uint16_t i82875p_host_device::scicmd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return scicmd;
 }
 
-WRITE16_MEMBER(i82875p_host_device::scicmd_w)
+void i82875p_host_device::scicmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&scicmd);
 }
 
-READ16_MEMBER( i82875p_host_device::skpd_r)
+uint16_t i82875p_host_device::skpd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return skpd;
 }
 
-WRITE16_MEMBER(i82875p_host_device::skpd_w)
+void i82875p_host_device::skpd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&skpd);
 }
 
-READ32_MEMBER( i82875p_host_device::capreg1_r)
+uint32_t i82875p_host_device::capreg1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x0106a009;
 }
 
-READ8_MEMBER(  i82875p_host_device::capreg2_r)
+uint8_t i82875p_host_device::capreg2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
@@ -470,45 +470,45 @@ void i82875p_overflow_device::device_reset()
 	dram_controller_mode = 0x00010001;
 }
 
-READ8_MEMBER  (i82875p_overflow_device::dram_row_boundary_r)
+uint8_t i82875p_overflow_device::dram_row_boundary_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dram_row_boundary[offset];
 }
 
-WRITE8_MEMBER (i82875p_overflow_device::dram_row_boundary_w)
+void i82875p_overflow_device::dram_row_boundary_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dram_row_boundary[offset] = data;
 	logerror("%s: dram_row_boundary_w %d, %02x\n", tag(), offset, data);
 }
 
-READ8_MEMBER  (i82875p_overflow_device::dram_row_attribute_r)
+uint8_t i82875p_overflow_device::dram_row_attribute_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dram_row_attribute[offset];
 }
 
-WRITE8_MEMBER (i82875p_overflow_device::dram_row_attribute_w)
+void i82875p_overflow_device::dram_row_attribute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dram_row_attribute[offset] = data;
 	logerror("%s: dram_row_attribute_w %d, %02x\n", tag(), offset, data);
 }
 
-READ32_MEMBER (i82875p_overflow_device::dram_timing_r)
+uint32_t i82875p_overflow_device::dram_timing_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dram_timing;
 }
 
-WRITE32_MEMBER(i82875p_overflow_device::dram_timing_w)
+void i82875p_overflow_device::dram_timing_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&dram_timing);
 	logerror("%s: dram_timing_w %08x\n", tag(), dram_timing);
 }
 
-READ32_MEMBER (i82875p_overflow_device::dram_controller_mode_r)
+uint32_t i82875p_overflow_device::dram_controller_mode_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return dram_controller_mode;
 }
 
-WRITE32_MEMBER(i82875p_overflow_device::dram_controller_mode_w)
+void i82875p_overflow_device::dram_controller_mode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&dram_controller_mode);
 	logerror("%s: dram_controller_mode_w %08x\n", tag(), dram_controller_mode);

@@ -108,7 +108,7 @@ void battlera_state::machine_start()
 
 /******************************************************************************/
 
-WRITE8_MEMBER(battlera_state::sound_w)
+void battlera_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -119,12 +119,12 @@ WRITE8_MEMBER(battlera_state::sound_w)
 
 /******************************************************************************/
 
-WRITE8_MEMBER(battlera_state::control_data_w)
+void battlera_state::control_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control_port_select=data;
 }
 
-READ8_MEMBER(battlera_state::control_data_r)
+uint8_t battlera_state::control_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_control_port_select)
 	{
@@ -171,12 +171,12 @@ WRITE_LINE_MEMBER(battlera_state::adpcm_int)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE8_MEMBER(battlera_state::adpcm_data_w)
+void battlera_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-WRITE8_MEMBER(battlera_state::adpcm_reset_w)
+void battlera_state::adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->reset_w(0);
 }

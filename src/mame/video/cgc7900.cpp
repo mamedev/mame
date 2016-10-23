@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
     cgc7900_z_mode_r - Z mode read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::z_mode_r )
+uint16_t cgc7900_state::z_mode_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -53,7 +53,7 @@ READ16_MEMBER( cgc7900_state::z_mode_r )
     cgc7900_z_mode_w - Z mode write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::z_mode_w )
+void cgc7900_state::z_mode_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -61,7 +61,7 @@ WRITE16_MEMBER( cgc7900_state::z_mode_w )
     cgc7900_color_status_w - color status write
 -------------------------------------------------*/
 
-WRITE16_MEMBER( cgc7900_state::color_status_w )
+void cgc7900_state::color_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -69,7 +69,7 @@ WRITE16_MEMBER( cgc7900_state::color_status_w )
     cgc7900_sync_r - sync information read
 -------------------------------------------------*/
 
-READ16_MEMBER( cgc7900_state::sync_r )
+uint16_t cgc7900_state::sync_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 

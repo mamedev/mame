@@ -40,14 +40,14 @@ public:
 	uint8_t m_infifo_head_ptr;        // " head
 
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(rsws_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port3_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_READ8_MEMBER(port3_r);
-	DECLARE_WRITE8_MEMBER(pes_kbd_input);
-	DECLARE_READ8_MEMBER(data_to_i8031);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
+	void rsws_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pes_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 

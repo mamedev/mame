@@ -2120,7 +2120,7 @@ void avr8_device::change_spsr(uint8_t data)
 
 /*****************************************************************************/
 
-WRITE8_MEMBER( avr8_device::regs_w )
+void avr8_device::regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("<<< WRITE offset [%04x]=%02x >>>\n", offset, data);
 
@@ -2759,7 +2759,7 @@ WRITE8_MEMBER( avr8_device::regs_w )
 	}
 }
 
-READ8_MEMBER( avr8_device::regs_r )
+uint8_t avr8_device::regs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("--- READ offset %04x ---\n", offset);
 

@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(xorworld_state, xorworld)
 	}
 }
 
-WRITE16_MEMBER(xorworld_state::videoram_w)
+void xorworld_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);

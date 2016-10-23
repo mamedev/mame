@@ -99,21 +99,21 @@ public:
 
 	void qbert_knocker(uint8_t knock);
 
-	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
-	DECLARE_WRITE8_MEMBER(general_output_w);
-	DECLARE_WRITE8_MEMBER(reactor_output_w);
-	DECLARE_WRITE8_MEMBER(stooges_output_w);
-	DECLARE_WRITE8_MEMBER(qbertqub_output_w);
-	DECLARE_WRITE8_MEMBER(qbert_output_w);
-	DECLARE_READ8_MEMBER(laserdisc_status_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
-	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_paletteram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
-	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
+	void gottlieb_analog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void general_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reactor_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stooges_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qbertqub_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qbert_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t laserdisc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void laserdisc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void laserdisc_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_laserdisc_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gottlieb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 	void init_romtiles();

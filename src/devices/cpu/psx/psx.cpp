@@ -192,25 +192,25 @@ static const uint32_t mtc0_writemask[]=
 	0x00000000  /* PRID */
 };
 
-READ32_MEMBER( psxcpu_device::berr_r )
+uint32_t psxcpu_device::berr_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if( !space.debugger_access() )
 		m_berr = 1;
 	return 0;
 }
 
-WRITE32_MEMBER( psxcpu_device::berr_w )
+void psxcpu_device::berr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if( !space.debugger_access() )
 		m_berr = 1;
 }
 
-READ32_MEMBER( psxcpu_device::exp_base_r )
+uint32_t psxcpu_device::exp_base_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_exp_base;
 }
 
-WRITE32_MEMBER( psxcpu_device::exp_base_w )
+void psxcpu_device::exp_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_exp_base ); // TODO: check byte writes
 
@@ -222,24 +222,24 @@ uint32_t psxcpu_device::exp_base()
 	return m_exp_base;
 }
 
-READ32_MEMBER( psxcpu_device::exp_config_r )
+uint32_t psxcpu_device::exp_config_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_exp_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::exp_config_w )
+void psxcpu_device::exp_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_exp_config ); // TODO: check byte writes
 
 	m_exp_config &= 0xaf1fffff;
 }
 
-READ32_MEMBER( psxcpu_device::ram_config_r )
+uint32_t psxcpu_device::ram_config_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ram_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::ram_config_w )
+void psxcpu_device::ram_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_ram_config;
 
@@ -251,12 +251,12 @@ WRITE32_MEMBER( psxcpu_device::ram_config_w )
 	}
 }
 
-READ32_MEMBER( psxcpu_device::rom_config_r )
+uint32_t psxcpu_device::rom_config_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_rom_config;
 }
 
-WRITE32_MEMBER( psxcpu_device::rom_config_w )
+void psxcpu_device::rom_config_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_rom_config;
 
@@ -268,24 +268,24 @@ WRITE32_MEMBER( psxcpu_device::rom_config_w )
 	}
 }
 
-READ32_MEMBER( psxcpu_device::com_delay_r )
+uint32_t psxcpu_device::com_delay_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
 	return m_com_delay;
 }
 
-WRITE32_MEMBER( psxcpu_device::com_delay_w )
+void psxcpu_device::com_delay_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA( &m_com_delay ); // TODO: check byte writes
 	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
-READ32_MEMBER( psxcpu_device::biu_r )
+uint32_t psxcpu_device::biu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_biu;
 }
 
-WRITE32_MEMBER( psxcpu_device::biu_w )
+void psxcpu_device::biu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = m_biu;
 
@@ -3348,32 +3348,32 @@ psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
 }
 
-READ32_MEMBER( psxcpu_device::gpu_r )
+uint32_t psxcpu_device::gpu_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_gpu_read_handler( space, offset, mem_mask );
 }
 
-WRITE32_MEMBER( psxcpu_device::gpu_w )
+void psxcpu_device::gpu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_gpu_write_handler( space, offset, data, mem_mask );
 }
 
-READ16_MEMBER( psxcpu_device::spu_r )
+uint16_t psxcpu_device::spu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spu_read_handler( space, offset, mem_mask );
 }
 
-WRITE16_MEMBER( psxcpu_device::spu_w )
+void psxcpu_device::spu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_spu_write_handler( space, offset, data, mem_mask );
 }
 
-READ8_MEMBER( psxcpu_device::cd_r )
+uint8_t psxcpu_device::cd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cd_read_handler( space, offset, mem_mask );
 }
 
-WRITE8_MEMBER( psxcpu_device::cd_w )
+void psxcpu_device::cd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cd_write_handler( space, offset, data, mem_mask );
 }

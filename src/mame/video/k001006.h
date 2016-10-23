@@ -19,8 +19,8 @@ public:
 	uint32_t fetch_texel(int page, int pal_index, int u, int v);
 	void preprocess_texture_data(uint8_t *dst, uint8_t *src, int length, int gticlub);
 
-	DECLARE_READ32_MEMBER( read );
-	DECLARE_WRITE32_MEMBER( write );
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

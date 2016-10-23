@@ -80,10 +80,10 @@ public:
 	uint8_t m_cart_bank;
 	std::unique_ptr<uint8_t[]> m_ram1;
 	required_shared_ptr<uint8_t> m_ram2;
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(macs_input_r);
-	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
-	DECLARE_WRITE8_MEMBER(macs_output_w);
+	void rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t macs_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void macs_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void macs_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_macs();
 	void init_kisekaeh();
 	void init_kisekaem();
@@ -116,12 +116,12 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(macs_state::rambank_w)
+void macs_state::rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank3")->set_entry(2 + (data & 1));
 }
 
-READ8_MEMBER(macs_state::macs_input_r)
+uint8_t macs_state::macs_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -154,12 +154,12 @@ READ8_MEMBER(macs_state::macs_input_r)
 }
 
 
-WRITE8_MEMBER(macs_state::macs_rom_bank_w)
+void macs_state::macs_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(m_cart_bank * 0x100 + data);
 }
 
-WRITE8_MEMBER(macs_state::macs_output_w)
+void macs_state::macs_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

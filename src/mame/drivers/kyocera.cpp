@@ -71,7 +71,7 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( pc8201_state::bank_r )
+uint8_t pc8201_state::bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -150,7 +150,7 @@ void pc8201_state::bankswitch(uint8_t data)
 	membank("bank2")->set_entry(ram_bank);
 }
 
-WRITE8_MEMBER( pc8201_state::bank_w )
+void pc8201_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -170,7 +170,7 @@ printf("bank %02x\n",data);
 	bankswitch(data);
 }
 
-WRITE8_MEMBER( pc8201_state::scp_w )
+void pc8201_state::scp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER( pc8201_state::scp_w )
 	m_iosel = data >> 5;
 }
 
-WRITE8_MEMBER( kc85_state::uart_ctrl_w )
+void kc85_state::uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( kc85_state::uart_ctrl_w )
 	m_uart->crl_w(1);
 }
 
-READ8_MEMBER( kc85_state::uart_status_r )
+uint8_t kc85_state::uart_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -269,7 +269,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	return data;
 }
 
-READ8_MEMBER( pc8201_state::uart_status_r )
+uint8_t pc8201_state::uart_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -312,7 +312,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	return data;
 }
 
-WRITE8_MEMBER( pc8201_state::romah_w )
+void pc8201_state::romah_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER( pc8201_state::romah_w )
 	m_rom_sel = BIT(data, 1);
 }
 
-WRITE8_MEMBER( pc8201_state::romal_w )
+void pc8201_state::romal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER( pc8201_state::romal_w )
 	m_rom_addr = (m_rom_addr & 0x1ff00) | data;
 }
 
-WRITE8_MEMBER( pc8201_state::romam_w )
+void pc8201_state::romam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -376,7 +376,7 @@ WRITE8_MEMBER( pc8201_state::romam_w )
 	m_rom_addr = (m_rom_addr & 0x100ff) | (data << 8);
 }
 
-READ8_MEMBER( pc8201_state::romrd_r )
+uint8_t pc8201_state::romrd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -386,7 +386,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::modem_w )
+void kc85_state::modem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -406,7 +406,7 @@ WRITE8_MEMBER( kc85_state::modem_w )
 	//m_modem->en_w(BIT(data, 1));
 }
 
-WRITE8_MEMBER( kc85_state::ctrl_w )
+void kc85_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -436,7 +436,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 	m_cassette->change_state(BIT(data,3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::keyboard_r )
+uint8_t kc85_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -481,17 +481,17 @@ void tandy200_state::bankswitch(uint8_t data)
 	}
 }
 
-READ8_MEMBER( tandy200_state::bank_r )
+uint8_t tandy200_state::bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank;
 }
 
-WRITE8_MEMBER( tandy200_state::bank_w )
+void tandy200_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bankswitch(data);
 }
 
-READ8_MEMBER( tandy200_state::stbk_r )
+uint8_t tandy200_state::stbk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -503,7 +503,7 @@ READ8_MEMBER( tandy200_state::stbk_r )
 	return data;
 }
 
-WRITE8_MEMBER( tandy200_state::stbk_w )
+void tandy200_state::stbk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -527,7 +527,7 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 	m_cassette->change_state(BIT(data,1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-READ8_MEMBER( kc85_state::lcd_r )
+uint8_t kc85_state::lcd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -545,7 +545,7 @@ READ8_MEMBER( kc85_state::lcd_r )
 	return data;
 }
 
-WRITE8_MEMBER( kc85_state::lcd_w )
+void kc85_state::lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcdc0->write(space, offset, data);
 	m_lcdc1->write(space, offset, data);
@@ -934,7 +934,7 @@ INPUT_PORTS_END
 
 /* 8155 Interface */
 
-WRITE8_MEMBER( kc85_state::i8155_pa_w )
+void kc85_state::i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -972,7 +972,7 @@ WRITE8_MEMBER( kc85_state::i8155_pa_w )
 	m_rtc->data_in_w(BIT(data, 4));
 }
 
-WRITE8_MEMBER( kc85_state::i8155_pb_w )
+void kc85_state::i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1017,7 +1017,7 @@ WRITE_LINE_MEMBER( kc85_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( kc85_state::i8155_pc_r )
+uint8_t kc85_state::i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -1059,7 +1059,7 @@ WRITE_LINE_MEMBER( kc85_state::i8155_to_w )
 	m_uart->rrc_w(state);
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pa_w )
+void tandy200_state::i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1081,7 +1081,7 @@ WRITE8_MEMBER( tandy200_state::i8155_pa_w )
 	m_keylatch = (m_keylatch & 0x100) | data;
 }
 
-WRITE8_MEMBER( tandy200_state::i8155_pb_w )
+void tandy200_state::i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1118,7 +1118,7 @@ WRITE_LINE_MEMBER( tandy200_state::write_centronics_select )
 	m_centronics_select = state;
 }
 
-READ8_MEMBER( tandy200_state::i8155_pc_r )
+uint8_t tandy200_state::i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

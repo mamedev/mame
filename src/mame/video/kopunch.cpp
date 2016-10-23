@@ -43,30 +43,30 @@ PALETTE_INIT_MEMBER(kopunch_state, kopunch)
 	}
 }
 
-WRITE8_MEMBER(kopunch_state::vram_fg_w)
+void kopunch_state::vram_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_fg[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::vram_bg_w)
+void kopunch_state::vram_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_bg[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_x_w)
+void kopunch_state::scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx = data;
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::scroll_y_w)
+void kopunch_state::scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(kopunch_state::gfxbank_w)
+void kopunch_state::gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d2: bg gfx bank
 	if (m_gfxbank != (data & 0x07))

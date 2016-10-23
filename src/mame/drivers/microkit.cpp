@@ -50,8 +50,8 @@ public:
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(ram_r);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	virtual void machine_reset() override;
@@ -85,12 +85,12 @@ READ_LINE_MEMBER( microkit_state::clear_r )
 	return 1;
 }
 
-READ8_MEMBER( microkit_state::ram_r )
+uint8_t microkit_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram_data;
 }
 
-WRITE8_MEMBER( microkit_state::ram_w )
+void microkit_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_data = data;
 	if (data > 0 && data < 0x80)

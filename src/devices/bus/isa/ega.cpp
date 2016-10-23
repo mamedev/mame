@@ -959,7 +959,7 @@ void isa8_ega_device::change_mode()
 }
 
 
-READ8_MEMBER( isa8_ega_device::read )
+uint8_t isa8_ega_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -1019,7 +1019,7 @@ uint8_t isa8_ega_device::alu_op( uint8_t data, uint8_t latch_data )
 }
 
 
-WRITE8_MEMBER( isa8_ega_device::write )
+void isa8_ega_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t d[4];
 	uint8_t alu[4];
@@ -1165,7 +1165,7 @@ WRITE8_MEMBER( isa8_ega_device::write )
 }
 
 
-READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
+uint8_t isa8_ega_device::pc_ega8_3X0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 
@@ -1202,7 +1202,7 @@ READ8_MEMBER( isa8_ega_device::pc_ega8_3X0_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
+void isa8_ega_device::pc_ega8_3X0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( VERBOSE_EGA )
 	{
@@ -1238,19 +1238,19 @@ WRITE8_MEMBER( isa8_ega_device::pc_ega8_3X0_w )
 
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3b0_r )
+uint8_t isa8_ega_device::pc_ega8_3b0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(space, offset);
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3d0_r )
+uint8_t isa8_ega_device::pc_ega8_3d0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(space, offset) : 0xFF;
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3b0_w )
+void isa8_ega_device::pc_ega8_3b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ! ( m_misc_output & 0x01 ) )
 	{
@@ -1259,7 +1259,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3b0_w )
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
+void isa8_ega_device::pc_ega8_3d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_misc_output & 0x01 )
 	{
@@ -1268,7 +1268,7 @@ WRITE8_MEMBER(isa8_ega_device::pc_ega8_3d0_w )
 }
 
 
-READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
+uint8_t isa8_ega_device::pc_ega8_3c0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0xff;
 
@@ -1311,7 +1311,7 @@ READ8_MEMBER(isa8_ega_device::pc_ega8_3c0_r )
 }
 
 
-WRITE8_MEMBER(isa8_ega_device::pc_ega8_3c0_w )
+void isa8_ega_device::pc_ega8_3c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t ar_reg_mask[0x20] =
 		{

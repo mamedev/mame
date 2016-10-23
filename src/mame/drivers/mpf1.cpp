@@ -245,7 +245,7 @@ TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 	if (BIT(m_lednum, 0)) output().set_digit_value(5, param);
 }
 
-READ8_MEMBER( mpf1_state::ppi_pa_r )
+uint8_t mpf1_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x7f;
 
@@ -266,7 +266,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pb_w )
+void mpf1_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* swap bits around for the mame 7-segment emulation */
 	uint8_t led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
@@ -275,7 +275,7 @@ WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
 }
 
-WRITE8_MEMBER( mpf1_state::ppi_pc_w )
+void mpf1_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-5, led select and keyboard latch */
 	m_lednum = data & 0x3f;
@@ -458,7 +458,7 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
+offs_t mpf1_state::mpf1_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	if (!m_break)
 	{

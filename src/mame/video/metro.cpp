@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(metro_state::metro_k053936_w)
+void metro_state::metro_k053936_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_k053936_ram[offset]);
 	m_k053936_tilemap->mark_tile_dirty(offset);
@@ -228,13 +228,13 @@ inline void metro_state::metro_vram_w( offs_t offset, uint16_t data, uint16_t me
 	COMBINE_DATA(&vram[offset]);
 }
 
-WRITE16_MEMBER(metro_state::metro_vram_0_w){ metro_vram_w(offset, data, mem_mask, 0, m_vram_0); }
-WRITE16_MEMBER(metro_state::metro_vram_1_w){ metro_vram_w(offset, data, mem_mask, 1, m_vram_1); }
-WRITE16_MEMBER(metro_state::metro_vram_2_w){ metro_vram_w(offset, data, mem_mask, 2, m_vram_2); }
+void metro_state::metro_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_w(offset, data, mem_mask, 0, m_vram_0); }
+void metro_state::metro_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_w(offset, data, mem_mask, 1, m_vram_1); }
+void metro_state::metro_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ metro_vram_w(offset, data, mem_mask, 2, m_vram_2); }
 
 
 
-WRITE16_MEMBER(metro_state::metro_window_w)
+void metro_state::metro_window_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_window[offset]);
 }

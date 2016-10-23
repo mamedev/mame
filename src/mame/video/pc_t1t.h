@@ -41,7 +41,7 @@ public:
 	DECLARE_PALETTE_INIT( pcjr );
 
 	DECLARE_WRITE_LINE_MEMBER( t1000_de_changed );
-	DECLARE_READ8_MEMBER( read );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( t1000_text_inten_update_row );
@@ -95,7 +95,7 @@ public:
 	// construction/destruction
 	pcvideo_t1000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( t1000_vsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( disable_w );
 
@@ -122,7 +122,7 @@ public:
 	// construction/destruction
 	pcvideo_pcjr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pcjr_vsync_changed );
 
 	uint8_t   *m_jxkanji;

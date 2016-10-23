@@ -33,10 +33,10 @@ public:
 	jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( process_w );
-	DECLARE_WRITE8_MEMBER( alt_process_w );
-	DECLARE_WRITE8_MEMBER( vregs_w );
-	DECLARE_WRITE8_MEMBER( bltflip_w );
+	void process_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void alt_process_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bltflip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( status_r );
 
 	uint8_t        m_blit_buffer[256 * 256];

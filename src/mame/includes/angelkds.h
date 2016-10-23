@@ -39,21 +39,21 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_subcpu;
-	DECLARE_READ8_MEMBER(angeklds_ff_r) { return 0xff; };
-	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);
-	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
-	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);
-	DECLARE_READ8_MEMBER(angelkds_sub_sound_r);
-	DECLARE_WRITE8_MEMBER(angelkds_txvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_txbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgtopscroll_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotvideoram_w);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotbank_write);
-	DECLARE_WRITE8_MEMBER(angelkds_bgbotscroll_write);
-	DECLARE_WRITE8_MEMBER(angelkds_layer_ctrl_write);
+	uint8_t angeklds_ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	void angelkds_cpu_bank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_main_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t angelkds_main_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void angelkds_sub_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t angelkds_sub_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void angelkds_txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_txbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgtopvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgtopbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgtopscroll_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgbotvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgbotbank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_bgbotscroll_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void angelkds_layer_ctrl_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_angelkds();
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bgtop_tile_info);

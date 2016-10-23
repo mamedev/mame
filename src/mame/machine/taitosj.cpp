@@ -54,7 +54,7 @@ void taitosj_state::machine_reset()
 }
 
 
-WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
+void taitosj_state::taitosj_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~data & 1);
 
@@ -90,18 +90,18 @@ WRITE8_MEMBER(taitosj_state::taitosj_bankswitch_w)
  direct access to the Z80 memory space. It can also trigger IRQs on the Z80.
 
 ***************************************************************************/
-READ8_MEMBER(taitosj_state::taitosj_fake_data_r)
+uint8_t taitosj_state::taitosj_fake_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%04x: protection read\n",space.device().safe_pc()));
 	return 0;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_fake_data_w)
+void taitosj_state::taitosj_fake_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%04x: protection write %02x\n",space.device().safe_pc(),data));
 }
 
-READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
+uint8_t taitosj_state::taitosj_fake_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%04x: protection status read\n",space.device().safe_pc()));
 	return 0xff;
@@ -109,7 +109,7 @@ READ8_MEMBER(taitosj_state::taitosj_fake_status_r)
 
 
 /* timer callback : */
-READ8_MEMBER(taitosj_state::taitosj_mcu_data_r)
+uint8_t taitosj_state::taitosj_mcu_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%04x: protection read %02x\n",space.device().safe_pc(),m_toz80));
 	m_zaccept = 1;
@@ -124,7 +124,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_real_data_w)
 	m_fromz80 = param;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_mcu_data_w)
+void taitosj_state::taitosj_mcu_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%04x: protection write %02x\n",space.device().safe_pc(),data));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(taitosj_state::taitosj_mcu_real_data_w),this), data);
@@ -132,7 +132,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_mcu_data_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
 
-READ8_MEMBER(taitosj_state::taitosj_mcu_status_r)
+uint8_t taitosj_state::taitosj_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* temporarily boost the interleave to sync things up */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -142,13 +142,13 @@ READ8_MEMBER(taitosj_state::taitosj_mcu_status_r)
 	return ~((m_zready << 0) | (m_zaccept << 1));
 }
 
-READ8_MEMBER(taitosj_state::taitosj_68705_portA_r)
+uint8_t taitosj_state::taitosj_68705_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%04x: 68705 port A read %02x\n",space.device().safe_pc(),m_portA_in));
 	return m_portA_in;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_68705_portA_w)
+void taitosj_state::taitosj_68705_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%04x: 68705 port A write %02x\n",space.device().safe_pc(),data));
 	m_portA_out = data;
@@ -176,7 +176,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portA_w)
  *               the main Z80 memory location to access)
  */
 
-READ8_MEMBER(taitosj_state::taitosj_68705_portB_r)
+uint8_t taitosj_state::taitosj_68705_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -194,7 +194,7 @@ TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_status_real_w)
 	m_zaccept = 0;
 }
 
-WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
+void taitosj_state::taitosj_68705_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data));
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER(taitosj_state::taitosj_68705_portB_w)
  *                  passes through)
  */
 
-READ8_MEMBER(taitosj_state::taitosj_68705_portC_r)
+uint8_t taitosj_state::taitosj_68705_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -271,7 +271,7 @@ READ8_MEMBER(taitosj_state::taitosj_68705_portC_r)
 
 /* Space Cruiser protection (otherwise the game resets on the asteroids level) */
 
-READ8_MEMBER(taitosj_state::spacecr_prot_r)
+uint8_t taitosj_state::spacecr_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -286,7 +286,7 @@ READ8_MEMBER(taitosj_state::spacecr_prot_r)
 
 /* Alpine Ski protection crack routines */
 
-WRITE8_MEMBER(taitosj_state::alpine_protection_w)
+void taitosj_state::alpine_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -310,13 +310,13 @@ WRITE8_MEMBER(taitosj_state::alpine_protection_w)
 	}
 }
 
-WRITE8_MEMBER(taitosj_state::alpinea_bankswitch_w)
+void taitosj_state::alpinea_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	taitosj_bankswitch_w(space, offset, data);
 	m_protection_value = data >> 2;
 }
 
-READ8_MEMBER(taitosj_state::alpine_port_2_r)
+uint8_t taitosj_state::alpine_port_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN2")->read() | m_protection_value;
 }

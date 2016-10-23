@@ -636,8 +636,8 @@ public:
 	template<class _Object> static devcb_base &set_spim_xch_trigger_callback(device_t &device, _Object object) { return downcast<mc68328_device &>(device).m_spim_xch_trigger_cb.set_callback(object); }
 
 
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_READ16_MEMBER(read);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
 	void set_port_d_lines(uint8_t state, int bit);
 

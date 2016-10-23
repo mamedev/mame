@@ -79,17 +79,17 @@ INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
+void pitnrun_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		m_nmi = data & 1;
 }
 
-WRITE8_MEMBER(pitnrun_state::hflip_w)
+void pitnrun_state::hflip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_x_set(data);
 }
 
-WRITE8_MEMBER(pitnrun_state::vflip_w)
+void pitnrun_state::vflip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_y_set(data);
 }

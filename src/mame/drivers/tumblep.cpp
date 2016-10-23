@@ -56,27 +56,27 @@ Stephh's notes (based on the games M68000 code and some tests) :
 /******************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(tumblep_state::tumblep_oki_w)
+void tumblep_state::tumblep_oki_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	okim6295_device *oki = downcast<okim6295_device *>(device);
 	oki->write(0, data & 0xff);
 	/* STUFF IN OTHER BYTE TOO..*/
 }
 
-READ16_MEMBER(tumblep_state::tumblep_prot_r)
+uint16_t tumblep_state::tumblep_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ~0;
 }
 #endif
 
-WRITE16_MEMBER(tumblep_state::tumblep_sound_w)
+void tumblep_state::tumblep_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(tumblep_state::jumppop_sound_w)
+void tumblep_state::jumppop_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(ASSERT_LINE );
@@ -85,7 +85,7 @@ WRITE16_MEMBER(tumblep_state::jumppop_sound_w)
 
 /******************************************************************************/
 
-READ16_MEMBER(tumblep_state::tumblepop_controls_r)
+uint16_t tumblep_state::tumblepop_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{

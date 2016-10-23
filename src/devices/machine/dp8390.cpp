@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(dp8390_device::dp8390_reset) {
 	if(!state) device_reset();
 }
 
-READ16_MEMBER(dp8390_device::dp8390_r) {
+uint16_t dp8390_device::dp8390_r(address_space &space, offs_t offset, uint16_t mem_mask) {
 	uint16_t data;
 	if(m_cs) {
 		uint32_t high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
@@ -344,7 +344,7 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 	return data;
 }
 
-WRITE16_MEMBER(dp8390_device::dp8390_w) {
+void dp8390_device::dp8390_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) {
 	if(m_cs) {
 		uint32_t high16 = (m_regs.dcr & 4)?m_regs.rsar<<16:0;
 		if(m_regs.dcr & 1) {

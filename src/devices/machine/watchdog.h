@@ -43,12 +43,12 @@ public:
 	int32_t get_vblank_counter() const { return m_counter; }
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER( reset_w );
-	DECLARE_READ8_MEMBER( reset_r );
-	DECLARE_WRITE16_MEMBER( reset16_w );
-	DECLARE_READ16_MEMBER( reset16_r );
-	DECLARE_WRITE32_MEMBER( reset32_w );
-	DECLARE_READ32_MEMBER( reset32_r );
+	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reset16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t reset16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reset32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t reset32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

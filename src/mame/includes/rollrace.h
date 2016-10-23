@@ -33,19 +33,19 @@ public:
 	uint8_t m_nmi_mask;
 	uint8_t m_sound_nmi_mask;
 
-	DECLARE_READ8_MEMBER(fake_d800_r);
-	DECLARE_WRITE8_MEMBER(fake_d800_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(bkgpen_w);
-	DECLARE_WRITE8_MEMBER(spritebank_w);
-	DECLARE_WRITE8_MEMBER(backgroundpage_w);
-	DECLARE_WRITE8_MEMBER(backgroundcolor_w);
-	DECLARE_WRITE8_MEMBER(flipy_w);
-	DECLARE_WRITE8_MEMBER(flipx_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_WRITE8_MEMBER(cram_w);
+	uint8_t fake_d800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fake_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bkgpen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void backgroundpage_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void backgroundcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void tilemap_refresh_flip();
 

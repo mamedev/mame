@@ -59,7 +59,7 @@ void x68k_neptune_device::device_reset() {
 	memcpy(m_prom, m_dp8390->get_mac(), 6);
 }
 
-READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
+uint16_t x68k_neptune_device::x68k_neptune_port_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -88,7 +88,7 @@ READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 	return 0;
 }
 
-WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
+void x68k_neptune_device::x68k_neptune_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset >= 0x100+32 || offset < 0x100)
 		return;
@@ -121,7 +121,7 @@ WRITE16_MEMBER(x68k_neptune_device::x68k_neptune_port_w)
 	return;
 }
 
-READ8_MEMBER(x68k_neptune_device::x68k_neptune_mem_read)
+uint8_t x68k_neptune_device::x68k_neptune_mem_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024)))
@@ -132,7 +132,7 @@ READ8_MEMBER(x68k_neptune_device::x68k_neptune_mem_read)
 	return m_board_ram[offset - (16*1024)];
 }
 
-WRITE8_MEMBER(x68k_neptune_device::x68k_neptune_mem_write)
+void x68k_neptune_device::x68k_neptune_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((offset < (16*1024)) || (offset >= (32*1024)))
 	{

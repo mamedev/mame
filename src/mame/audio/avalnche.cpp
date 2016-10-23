@@ -22,17 +22,17 @@
   Avalanche memory audio output handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(avalnche_state::avalnche_noise_amplitude_w)
+void avalnche_state::avalnche_noise_amplitude_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
-WRITE8_MEMBER(avalnche_state::avalnche_attract_enable_w)
+void avalnche_state::avalnche_attract_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, AVALNCHE_ATTRACT_EN, data & 0x01);
 }
 
-WRITE8_MEMBER(avalnche_state::avalnche_audio_w)
+void avalnche_state::avalnche_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = data & 0x01;
 
@@ -130,7 +130,7 @@ DISCRETE_SOUND_END
   Catch memory audio output handlers
 ***************************************************************************/
 
-WRITE8_MEMBER(avalnche_state::catch_audio_w)
+void avalnche_state::catch_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
 	There's no indication that the game silences sound, it's probably done automatically. */

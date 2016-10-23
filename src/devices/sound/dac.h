@@ -24,21 +24,21 @@ class dac_bit_interface
 {
 public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 };
 
 class dac_byte_interface
 {
 public:
 	virtual void write(unsigned char data) = 0;
-	virtual DECLARE_WRITE8_MEMBER(write) = 0;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 };
 
 class dac_word_interface
 {
 public:
 	virtual void write(unsigned short data) = 0;
-	virtual DECLARE_WRITE16_MEMBER(write) = 0;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
 };
 
 template <int bits>
@@ -226,7 +226,7 @@ public:
 	}
 
 	virtual WRITE_LINE_MEMBER(write) override { this->setCode(state); }
-	virtual WRITE8_MEMBER(write) override { this->setCode(data); }
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -241,7 +241,7 @@ public:
 	}
 
 	virtual void write(unsigned char data) override { this->setCode(data); }
-	virtual DECLARE_WRITE8_MEMBER(write) override { this->setCode(data); }
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { this->setCode(data); }
 };
 
 template <typename _dac_code>
@@ -256,7 +256,7 @@ public:
 	}
 
 	virtual void write(unsigned short data) override { this->setCode(data); }
-	virtual DECLARE_WRITE16_MEMBER(write) override { this->setCode(data); }
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { this->setCode(data); }
 };
 
 const double dac_gain_r2r = 1.0;

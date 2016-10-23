@@ -97,25 +97,25 @@ void tankbust_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(tankbust_state::background_videoram_w)
+void tankbust_state::background_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::background_colorram_w)
+void tankbust_state::background_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::txtram_w)
+void tankbust_state::txtram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txtram[offset] = data;
 	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(tankbust_state::xscroll_w)
+void tankbust_state::xscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_xscroll[offset] != data )
 	{
@@ -131,7 +131,7 @@ WRITE8_MEMBER(tankbust_state::xscroll_w)
 }
 
 
-WRITE8_MEMBER(tankbust_state::yscroll_w)
+void tankbust_state::yscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_yscroll[offset] != data )
 	{

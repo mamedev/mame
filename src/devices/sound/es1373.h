@@ -101,8 +101,8 @@ public:
 
 	void set_irq_info(const char *tag, const int irq_num);
 
-	DECLARE_READ32_MEMBER (reg_r);
-	DECLARE_WRITE32_MEMBER(reg_w);
+	uint32_t reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -40,7 +40,7 @@ Notes:
 #include "includes/aquarium.h"
 
 
-READ16_MEMBER(aquarium_state::aquarium_coins_r)
+uint16_t aquarium_state::aquarium_coins_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int data;
 	data = (ioport("SYSTEM")->read() & 0x7fff);
@@ -50,12 +50,12 @@ READ16_MEMBER(aquarium_state::aquarium_coins_r)
 	return data;
 }
 
-WRITE8_MEMBER(aquarium_state::aquarium_snd_ack_w)
+void aquarium_state::aquarium_snd_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_aquarium_snd_ack = 0x8000;
 }
 
-WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
+void aquarium_state::aquarium_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  popmessage("sound write %04x",data);
 
@@ -63,7 +63,7 @@ WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
+void aquarium_state::aquarium_z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// uses bits ---x --xx
 	data = BITSWAP8(data, 7, 6, 5, 2, 3,      1, 4, 0);
@@ -94,12 +94,12 @@ uint8_t aquarium_state::aquarium_snd_bitswap( uint8_t scrambled_data )
 	return data;
 }
 
-READ8_MEMBER(aquarium_state::aquarium_oki_r)
+uint8_t aquarium_state::aquarium_oki_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return aquarium_snd_bitswap(m_oki->read(space, offset));
 }
 
-WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
+void aquarium_state::aquarium_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
 	m_oki->write(space, offset, (aquarium_snd_bitswap(data)));

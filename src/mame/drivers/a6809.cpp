@@ -71,10 +71,10 @@ public:
 		, m_crtc(*this, "mc6845")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(a6809_address_w);
-	DECLARE_WRITE8_MEMBER(a6809_register_w);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void a6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	void machine_reset_a6809();
 	TIMER_DEVICE_CALLBACK_MEMBER(a6809_c);
@@ -126,7 +126,7 @@ void a6809_state::machine_reset_a6809()
 	m_via->write_pb7(0);
 }
 
-READ8_MEMBER( a6809_state::videoram_r )
+uint8_t a6809_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += m_start_address;
 
@@ -136,14 +136,14 @@ READ8_MEMBER( a6809_state::videoram_r )
 		return m_p_videoram[offset&0x3ff];
 }
 
-WRITE8_MEMBER( a6809_state::a6809_address_w )
+void a6809_state::a6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc->address_w( space, 0, data );
 
 	m_video_index = data & 0x1f;
 }
 
-WRITE8_MEMBER( a6809_state::a6809_register_w )
+void a6809_state::a6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t temp = m_start_address;
 	uint16_t temq = m_cursor_address;
@@ -201,7 +201,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a6809_state::a6809_p)
 	}
 }
 
-WRITE8_MEMBER( a6809_state::kbd_put )
+void a6809_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t d = data & 0x7f;
 	if (d == 8) d = 0x7f; // allow backspace to work

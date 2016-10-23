@@ -9,11 +9,11 @@ public:
 	taitox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: seta_state(mconfig, type, tag) { }
 
-	DECLARE_READ16_MEMBER(superman_dsw_input_r);
-	DECLARE_READ16_MEMBER(daisenpu_input_r);
-	DECLARE_WRITE16_MEMBER(daisenpu_input_w);
-	DECLARE_WRITE16_MEMBER(kyustrkr_input_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	uint16_t superman_dsw_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t daisenpu_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void daisenpu_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kyustrkr_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_kyustrkr();
 	void machine_start_taitox();
 	void machine_start_superman();
@@ -21,9 +21,9 @@ public:
 	// superman c-chip
 	uint16_t m_current_bank;
 	uint8_t m_cc_port;
-	DECLARE_READ16_MEMBER( cchip1_ctrl_r );
-	DECLARE_READ16_MEMBER( cchip1_ram_r );
-	DECLARE_WRITE16_MEMBER( cchip1_ctrl_w );
-	DECLARE_WRITE16_MEMBER( cchip1_bank_w );
-	DECLARE_WRITE16_MEMBER( cchip1_ram_w );
+	uint16_t cchip1_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cchip1_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cchip1_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cchip1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cchip1_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };

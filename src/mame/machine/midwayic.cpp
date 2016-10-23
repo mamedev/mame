@@ -158,13 +158,13 @@ WRITE_LINE_MEMBER(midway_serial_pic_device::reset_w)
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::status_r)
+uint8_t midway_serial_pic_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
 
 
-READ8_MEMBER(midway_serial_pic_device::read)
+uint8_t midway_serial_pic_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s:security R = %04X\n", machine().describe_context(), m_buff);
 	m_status = 1;
@@ -172,7 +172,7 @@ READ8_MEMBER(midway_serial_pic_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic_device::write)
+void midway_serial_pic_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s:security W = %04X\n", machine().describe_context(), data);
 
@@ -302,7 +302,7 @@ void midway_serial_pic2_device::set_default_nvram(const uint8_t *nvram)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::status_r)
+uint8_t midway_serial_pic2_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -321,7 +321,7 @@ READ8_MEMBER(midway_serial_pic2_device::status_r)
 }
 
 
-READ8_MEMBER(midway_serial_pic2_device::read)
+uint8_t midway_serial_pic2_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -341,7 +341,7 @@ READ8_MEMBER(midway_serial_pic2_device::read)
 }
 
 
-WRITE8_MEMBER(midway_serial_pic2_device::write)
+void midway_serial_pic2_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static FILE *nvramlog;
 	if (LOG_NVRAM && !nvramlog)
@@ -724,7 +724,7 @@ void midway_ioasic_device::update_ioasic_irq()
 }
 
 
-WRITE8_MEMBER(midway_ioasic_device::cage_irq_handler)
+void midway_ioasic_device::cage_irq_handler(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CAGE irq handler: %d\n", data);
 	m_sound_irq_state = 0;
@@ -765,7 +765,7 @@ WRITE_LINE_MEMBER(midway_ioasic_device::ioasic_output_full)
  *
  *************************************/
 
-READ16_MEMBER(midway_ioasic_device::fifo_r)
+uint16_t midway_ioasic_device::fifo_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0;
 
@@ -800,7 +800,7 @@ READ16_MEMBER(midway_ioasic_device::fifo_r)
 }
 
 
-READ16_MEMBER(midway_ioasic_device::fifo_status_r)
+uint16_t midway_ioasic_device::fifo_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result = 0;
 
@@ -923,7 +923,7 @@ void midway_ioasic_device::output_w(uint32_t data)
  *
  *************************************/
 
-READ32_MEMBER( midway_ioasic_device::packed_r )
+uint32_t midway_ioasic_device::packed_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
@@ -934,7 +934,7 @@ READ32_MEMBER( midway_ioasic_device::packed_r )
 }
 
 
-READ32_MEMBER( midway_ioasic_device::read )
+uint32_t midway_ioasic_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result;
 
@@ -1020,7 +1020,7 @@ READ32_MEMBER( midway_ioasic_device::read )
 }
 
 
-WRITE32_MEMBER( midway_ioasic_device::packed_w )
+void midway_ioasic_device::packed_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		write(space, offset*2, data & 0xffff, 0x0000ffff);
@@ -1029,7 +1029,7 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 }
 
 
-WRITE32_MEMBER( midway_ioasic_device::write )
+void midway_ioasic_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldreg, newreg;
 

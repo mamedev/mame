@@ -46,14 +46,14 @@ To Do:
 ***************************************************************************/
 
 /* BBBBBGGGGGRRRRRx xxxxxxxxxxxxxxxx */
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_palette_w)
+void tetrisp2_state::tetrisp2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	if ((offset & 1) == 0)
 		m_palette->set_pen_color(offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
+void tetrisp2_state::rocknms_sub_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_sub_paletteram[offset]);
 	if ((offset & 1) == 0)
@@ -70,7 +70,7 @@ WRITE16_MEMBER(tetrisp2_state::rocknms_sub_palette_w)
 
 ***************************************************************************/
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_priority_w)
+void tetrisp2_state::tetrisp2_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_priority[offset] = data;
@@ -78,12 +78,12 @@ WRITE16_MEMBER(tetrisp2_state::tetrisp2_priority_w)
 		m_priority[offset] = data >> 8;
 }
 
-READ16_MEMBER(tetrisp2_state::tetrisp2_priority_r)
+uint16_t tetrisp2_state::tetrisp2_priority_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_priority[offset] | 0xff00;
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_priority_w)
+void tetrisp2_state::rocknms_sub_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_rocknms_sub_priority[offset] = data;
@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_bg_w)
+void tetrisp2_state::tetrisp2_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset/2);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_fg_w)
+void tetrisp2_state::tetrisp2_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_fg[offset]);
 	m_tilemap_fg->mark_tile_dirty(offset/2);
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::tetrisp2_vram_rot_w)
+void tetrisp2_state::tetrisp2_vram_rot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_rot[offset]);
 	m_tilemap_rot->mark_tile_dirty(offset/2);
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_bg_w)
+void tetrisp2_state::rocknms_sub_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_bg[offset]);
 	m_tilemap_sub_bg->mark_tile_dirty(offset/2);
@@ -191,7 +191,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_fg_w)
+void tetrisp2_state::rocknms_sub_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_fg[offset]);
 	m_tilemap_sub_fg->mark_tile_dirty(offset/2);
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
 			0);
 }
 
-WRITE16_MEMBER(tetrisp2_state::rocknms_sub_vram_rot_w)
+void tetrisp2_state::rocknms_sub_vram_rot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rocknms_sub_vram_rot[offset]);
 	m_tilemap_sub_rot->mark_tile_dirty(offset/2);
@@ -784,7 +784,7 @@ inline int stepstag_state::mypal(int x)
 //  return (x - 0x80);
 }
 
-WRITE16_MEMBER(stepstag_state::stepstag_palette_w)
+void stepstag_state::stepstag_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_paletteram[offset]);
 //  if ((offset & 1) == 0)

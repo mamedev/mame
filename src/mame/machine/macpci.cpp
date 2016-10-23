@@ -30,14 +30,14 @@ WRITE_LINE_MEMBER(macpci_state::mac_via_irq)
 {
 }
 
-READ8_MEMBER(macpci_state::mac_via_in_a)
+uint8_t macpci_state::mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //    printf("VIA1 IN_A (PC %x)\n", mac->m_maincpu->pc());
 
 	return 0x80;
 }
 
-READ8_MEMBER(macpci_state::mac_via_in_b)
+uint8_t macpci_state::mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = 0;
 	val |= m_cuda->get_treq()<<3;
@@ -47,12 +47,12 @@ READ8_MEMBER(macpci_state::mac_via_in_b)
 	return val;
 }
 
-WRITE8_MEMBER(macpci_state::mac_via_out_a)
+void macpci_state::mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->pc());
 }
 
-WRITE8_MEMBER(macpci_state::mac_via_out_b)
+void macpci_state::mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
@@ -63,7 +63,7 @@ WRITE8_MEMBER(macpci_state::mac_via_out_b)
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
 }
 
-READ16_MEMBER ( macpci_state::mac_via_r )
+uint16_t macpci_state::mac_via_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -79,7 +79,7 @@ READ16_MEMBER ( macpci_state::mac_via_r )
 	return data | (data<<8);
 }
 
-WRITE16_MEMBER ( macpci_state::mac_via_w )
+void macpci_state::mac_via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset >>= 8;
 	offset &= 0x0f;
@@ -144,7 +144,7 @@ void macpci_state::mac_driver_init(model_t model)
 
 void macpci_state::init_pippin() { mac_driver_init(PCIMODEL_MAC_PIPPIN ); }
 
-READ32_MEMBER(macpci_state::mac_read_id)
+uint32_t macpci_state::mac_read_id(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	printf("Mac read ID reg @ PC=%x\n", m_maincpu->pc());
 
@@ -160,7 +160,7 @@ READ32_MEMBER(macpci_state::mac_read_id)
 
 /* 8530 SCC interface */
 
-READ16_MEMBER ( macpci_state::mac_scc_r )
+uint16_t macpci_state::mac_scc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	uint16_t result;
@@ -169,19 +169,19 @@ READ16_MEMBER ( macpci_state::mac_scc_r )
 	return (result << 8) | result;
 }
 
-WRITE16_MEMBER ( macpci_state::mac_scc_w )
+void macpci_state::mac_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
-WRITE16_MEMBER ( macpci_state::mac_scc_2_w )
+void macpci_state::mac_scc_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
 }
 
-READ8_MEMBER(macpci_state::mac_5396_r)
+uint8_t macpci_state::mac_5396_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x100)
 	{
@@ -196,7 +196,7 @@ READ8_MEMBER(macpci_state::mac_5396_r)
 	//return 0;
 }
 
-WRITE8_MEMBER(macpci_state::mac_5396_w)
+void macpci_state::mac_5396_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x100)
 	{

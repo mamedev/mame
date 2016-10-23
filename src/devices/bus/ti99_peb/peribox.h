@@ -46,11 +46,11 @@ public:
 
 	// Next eight methods are called from the console
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(senila);
 	DECLARE_WRITE_LINE_MEMBER(senilb);
 
@@ -167,7 +167,7 @@ public:
 
 	// Called from the box (direction to card)
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_WRITE_LINE_MEMBER(senila);
@@ -181,7 +181,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_ready );
 
 	DECLARE_READ8Z_MEMBER(crureadz);
-	DECLARE_WRITE8_MEMBER(cruwrite);
+	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// called from the box itself
 	void set_genmod(bool set);
@@ -219,7 +219,7 @@ public:
 	}
 
 	virtual DECLARE_READ8Z_MEMBER(crureadz) =0;
-	virtual DECLARE_WRITE8_MEMBER(cruwrite) =0;
+	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) =0;
 
 	void    set_senila(int state) { m_senila = state; }
 	void    set_senilb(int state) { m_senilb = state; }

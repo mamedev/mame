@@ -312,7 +312,7 @@ uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bi
 	return 0;
 }
 
-WRITE8_MEMBER( generic_terminal_device::kbd_put )
+void generic_terminal_device::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_io_term_conf->read() & 0x100) term_write(data);
 	send_key(data);

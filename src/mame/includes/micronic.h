@@ -60,18 +60,18 @@ public:
 	virtual void machine_reset() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
-	DECLARE_READ8_MEMBER( keypad_r );
-	DECLARE_READ8_MEMBER( status_flag_r );
-	DECLARE_WRITE8_MEMBER( status_flag_w );
-	DECLARE_WRITE8_MEMBER( kp_matrix_w );
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_READ8_MEMBER( irq_flag_r );
-	DECLARE_WRITE8_MEMBER( port_2c_w );
-	DECLARE_WRITE8_MEMBER( bank_select_w );
-	DECLARE_WRITE8_MEMBER( lcd_contrast_w );
-	DECLARE_WRITE8_MEMBER( rtc_address_w );
-	DECLARE_READ8_MEMBER( rtc_data_r );
-	DECLARE_WRITE8_MEMBER( rtc_data_w );
+	uint8_t keypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_flag_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void status_flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kp_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_flag_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_2c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lcd_contrast_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
 
 	required_shared_ptr<uint8_t> m_ram_base;

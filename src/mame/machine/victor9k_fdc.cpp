@@ -381,7 +381,7 @@ void victor_9000_fdc_t::device_timer(emu_timer &timer, device_timer_id id, int p
 //  floppy_p1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::floppy_p1_r )
+uint8_t victor_9000_fdc_t::floppy_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -406,7 +406,7 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p1_r )
 //  floppy_p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_t::floppy_p1_w )
+void victor_9000_fdc_t::floppy_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -432,7 +432,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p1_w )
 //  floppy_p2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::floppy_p2_r )
+uint8_t victor_9000_fdc_t::floppy_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -462,7 +462,7 @@ READ8_MEMBER( victor_9000_fdc_t::floppy_p2_r )
 //  floppy_p2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
+void victor_9000_fdc_t::floppy_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -542,7 +542,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::floppy_p2_w )
 //  tach0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::tach0_r )
+uint8_t victor_9000_fdc_t::tach0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_SCP) logerror("%s %s Read TACH0 %u\n", machine().time().as_string(), machine().describe_context(), m_tach0);
 	return m_tach0;
@@ -553,7 +553,7 @@ READ8_MEMBER( victor_9000_fdc_t::tach0_r )
 //  tach1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( victor_9000_fdc_t::tach1_r )
+uint8_t victor_9000_fdc_t::tach1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_SCP) logerror("%s %s Read TACH1 %u\n", machine().time().as_string(), machine().describe_context(), m_tach1);
 	return m_tach1;
@@ -635,7 +635,7 @@ void victor_9000_fdc_t::update_rdy()
 //  da_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( victor_9000_fdc_t::da_w )
+void victor_9000_fdc_t::da_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_SCP) logerror("%s %s DA %02x SEL0 %u SEL1 %u\n", machine().time().as_string(), machine().describe_context(), data, m_sel0, m_sel1);
 
@@ -647,7 +647,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::da_w )
 	live_run();
 }
 
-READ8_MEMBER( victor_9000_fdc_t::via4_pa_r )
+uint8_t victor_9000_fdc_t::via4_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -667,7 +667,7 @@ READ8_MEMBER( victor_9000_fdc_t::via4_pa_r )
 	return m_scp_l0ms;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
+void victor_9000_fdc_t::via4_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -712,7 +712,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via4_pa_w )
 	}
 }
 
-READ8_MEMBER( victor_9000_fdc_t::via4_pb_r )
+uint8_t victor_9000_fdc_t::via4_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -732,7 +732,7 @@ READ8_MEMBER( victor_9000_fdc_t::via4_pb_r )
 	return m_scp_l1ms;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::via4_pb_w )
+void victor_9000_fdc_t::via4_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -797,7 +797,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::via4_irq_w )
 	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
-READ8_MEMBER( victor_9000_fdc_t::via5_pa_r )
+uint8_t victor_9000_fdc_t::via5_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -817,7 +817,7 @@ READ8_MEMBER( victor_9000_fdc_t::via5_pa_r )
 	return GCR_DECODE(checkpoint_live.e, checkpoint_live.i);
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::via5_pb_w )
+void victor_9000_fdc_t::via5_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -855,7 +855,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::via5_irq_w )
 }
 
 
-READ8_MEMBER( victor_9000_fdc_t::via6_pa_r )
+uint8_t victor_9000_fdc_t::via6_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -891,7 +891,7 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::via6_pa_w )
+void victor_9000_fdc_t::via6_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -943,7 +943,7 @@ WRITE8_MEMBER( victor_9000_fdc_t::via6_pa_w )
 	}
 }
 
-READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
+uint8_t victor_9000_fdc_t::via6_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -980,7 +980,7 @@ READ8_MEMBER( victor_9000_fdc_t::via6_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::via6_pb_w )
+void victor_9000_fdc_t::via6_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1069,7 +1069,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::via6_irq_w )
 	m_irq_cb(m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
-READ8_MEMBER( victor_9000_fdc_t::cs7_r )
+uint8_t victor_9000_fdc_t::cs7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_lbrdy_cb(1);
 
@@ -1078,7 +1078,7 @@ READ8_MEMBER( victor_9000_fdc_t::cs7_r )
 	return m_via5->read(space, offset);
 }
 
-WRITE8_MEMBER( victor_9000_fdc_t::cs7_w )
+void victor_9000_fdc_t::cs7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lbrdy_cb(1);
 

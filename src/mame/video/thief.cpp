@@ -22,21 +22,21 @@ enum {
 
 /***************************************************************************/
 
-READ8_MEMBER(thief_state::thief_context_ram_r){
+uint8_t thief_state::thief_context_ram_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	return m_coprocessor.context_ram[0x40*m_coprocessor.bank+offset];
 }
 
-WRITE8_MEMBER(thief_state::thief_context_ram_w){
+void thief_state::thief_context_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	m_coprocessor.context_ram[0x40*m_coprocessor.bank+offset] = data;
 }
 
-WRITE8_MEMBER(thief_state::thief_context_bank_w){
+void thief_state::thief_context_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	m_coprocessor.bank = data&0xf;
 }
 
 /***************************************************************************/
 
-WRITE8_MEMBER(thief_state::thief_video_control_w){
+void thief_state::thief_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	m_video_control = data;
 /*
     bit 0: screen flip
@@ -47,7 +47,7 @@ WRITE8_MEMBER(thief_state::thief_video_control_w){
 */
 }
 
-WRITE8_MEMBER(thief_state::thief_color_map_w){
+void thief_state::thief_color_map_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 /*
     --xx----    blue
     ----xx--    green
@@ -62,7 +62,7 @@ WRITE8_MEMBER(thief_state::thief_color_map_w){
 
 /***************************************************************************/
 
-WRITE8_MEMBER(thief_state::thief_color_plane_w){
+void thief_state::thief_color_plane_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 /*
     --xx----    selects bitplane to read from (0..3)
     ----xxxx    selects bitplane(s) to write to (0x0 = none, 0xf = all)
@@ -71,14 +71,14 @@ WRITE8_MEMBER(thief_state::thief_color_plane_w){
 	m_read_mask = (data>>4)&3;
 }
 
-READ8_MEMBER(thief_state::thief_videoram_r){
+uint8_t thief_state::thief_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t *videoram = m_videoram.get();
 	uint8_t *source = &videoram[offset];
 	if( m_video_control&0x02 ) source+=0x2000*4; /* foreground/background */
 	return source[m_read_mask*0x2000];
 }
 
-WRITE8_MEMBER(thief_state::thief_videoram_w){
+void thief_state::thief_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	uint8_t *videoram = m_videoram.get();
 	uint8_t *dest = &videoram[offset];
 	if( m_video_control&0x02 )
@@ -158,7 +158,7 @@ uint16_t thief_state::fetch_image_addr( coprocessor_t &thief_coprocessor )
 	return addr;
 }
 
-WRITE8_MEMBER(thief_state::thief_blit_w){
+void thief_state::thief_blit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	coprocessor_t &thief_coprocessor = m_coprocessor;
 	int i, offs, xoffset, dy;
 	uint8_t *gfx_rom = memregion( "gfx1" )->base();
@@ -219,7 +219,7 @@ WRITE8_MEMBER(thief_state::thief_blit_w){
 	}
 }
 
-READ8_MEMBER(thief_state::thief_coprocessor_r){
+uint8_t thief_state::thief_coprocessor_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	coprocessor_t &thief_coprocessor = m_coprocessor;
 	switch( offset ){
 	case SCREEN_XPOS: /* xpos */
@@ -261,7 +261,7 @@ READ8_MEMBER(thief_state::thief_coprocessor_r){
 	return thief_coprocessor.param[offset];
 }
 
-WRITE8_MEMBER(thief_state::thief_coprocessor_w){
+void thief_state::thief_coprocessor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	coprocessor_t &thief_coprocessor = m_coprocessor;
 	switch( offset ){
 	case GFX_PORT:

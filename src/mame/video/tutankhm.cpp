@@ -18,13 +18,13 @@
  *
  *************************************/
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_flip_screen_x_w)
+void tutankhm_state::tutankhm_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_x = data & 0x01;
 }
 
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_flip_screen_y_w)
+void tutankhm_state::tutankhm_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_y = data & 0x01;
 }

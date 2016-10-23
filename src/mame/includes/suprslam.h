@@ -55,12 +55,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_WRITE8_MEMBER(suprslam_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(suprslam_screen_videoram_w);
-	DECLARE_WRITE16_MEMBER(suprslam_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(suprslam_bank_w);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void suprslam_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void suprslam_screen_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void suprslam_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void suprslam_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_suprslam_tile_info);
 	TILE_GET_INFO_MEMBER(get_suprslam_bg_tile_info);
 	virtual void machine_start() override;

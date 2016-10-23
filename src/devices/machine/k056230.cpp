@@ -39,7 +39,7 @@ void k056230_device::device_start()
 }
 
 
-READ8_MEMBER(k056230_device::read)
+uint8_t k056230_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -61,7 +61,7 @@ TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
 }
 
 
-WRITE8_MEMBER(k056230_device::write)
+void k056230_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -94,13 +94,13 @@ WRITE8_MEMBER(k056230_device::write)
 //  osd_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, space.device().safe_pc());
 }
 
-READ32_MEMBER(k056230_device::lanc_ram_r)
+uint32_t k056230_device::lanc_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//osd_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
 	return m_ram[offset & 0x7ff];
 }
 
-WRITE32_MEMBER(k056230_device::lanc_ram_w)
+void k056230_device::lanc_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//osd_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));

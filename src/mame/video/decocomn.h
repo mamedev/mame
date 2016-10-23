@@ -26,12 +26,12 @@ public:
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
-	DECLARE_WRITE16_MEMBER( buffered_palette_w );
-	DECLARE_WRITE16_MEMBER( palette_dma_w );
-	DECLARE_WRITE16_MEMBER( priority_w );
-	DECLARE_READ16_MEMBER( priority_r );
-	DECLARE_READ16_MEMBER( d_71_r );
+	void nonbuffered_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void buffered_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void palette_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t priority_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t d_71_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

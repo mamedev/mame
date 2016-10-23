@@ -816,7 +816,7 @@ void _8080bw_state::init_spacecom()
 /*                                                     */
 /*******************************************************/
 
-READ8_MEMBER(_8080bw_state::invrvnge_02_r)
+uint8_t _8080bw_state::invrvnge_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
@@ -1171,7 +1171,7 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(_8080bw_state::cosmicmo_05_w)
+void _8080bw_state::cosmicmo_05_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	invaders_audio_2_w(space, offset, data);
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2);
@@ -1277,22 +1277,22 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
-READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram_r)
+uint8_t _8080bw_state::rollingc_scattered_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
 }
 
-WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram_w)
+void _8080bw_state::rollingc_scattered_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
 }
 
-READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_r)
+uint8_t _8080bw_state::rollingc_scattered_colorram2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
 }
 
-WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_w)
+void _8080bw_state::rollingc_scattered_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
 }
@@ -1373,12 +1373,12 @@ MACHINE_CONFIG_END
 /*******************************************************/
 
 
-READ8_MEMBER(_8080bw_state::schaser_scattered_colorram_r)
+uint8_t _8080bw_state::schaser_scattered_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
 }
 
-WRITE8_MEMBER(_8080bw_state::schaser_scattered_colorram_w)
+void _8080bw_state::schaser_scattered_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
 }
@@ -1537,7 +1537,7 @@ MACHINE_CONFIG_END
 /*******************************************************/
 
 
-READ8_MEMBER(_8080bw_state::schasercv_02_r)
+uint8_t _8080bw_state::schasercv_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
@@ -1884,7 +1884,7 @@ void _8080bw_state::machine_start_polaris()
 	machine_start_mw8080bw();
 }
 
-READ8_MEMBER(_8080bw_state::polaris_port00_r)
+uint8_t _8080bw_state::polaris_port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("IN0")->read();
 	if (m_flip_screen) return data;
@@ -2296,7 +2296,7 @@ INPUT_PORTS_END
 
 */
 
-READ8_MEMBER(_8080bw_state::indianbt_r)
+uint8_t _8080bw_state::indianbt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(space.device().safe_pc())
 	{
@@ -2307,7 +2307,7 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 	return machine().rand();
 }
 
-READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
+uint8_t _8080bw_state::indianbtbr_01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("IN1")->read();
 	if (!m_flip_screen) return data;
@@ -2392,7 +2392,7 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::steelwkr_sh_port_3_w)
+void _8080bw_state::steelwkr_sh_port_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(!(~data & 0x03));      /* possibly */
 }
@@ -2576,14 +2576,14 @@ static INPUT_PORTS_START( skylove )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
+uint8_t _8080bw_state::shuttlei_ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("INPUTS")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
 
-WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
+void _8080bw_state::shuttlei_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		/* bit 0 goes high when first coin inserted
 		   bit 1 also goes high when subsequent coins are inserted
@@ -2671,7 +2671,7 @@ void _8080bw_state::machine_reset_darthvdr()
 	/* do nothing for now - different interrupt system */
 }
 
-READ8_MEMBER(_8080bw_state::darthvdr_01_r)
+uint8_t _8080bw_state::darthvdr_01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = ioport("P2")->read();
 	if (m_flip_screen) return data;
@@ -3043,12 +3043,12 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 	}
 }
 
-READ8_MEMBER(_8080bw_state::claybust_gun_lo_r)
+uint8_t _8080bw_state::claybust_gun_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_claybust_gun_pos & 0xff;
 }
 
-READ8_MEMBER(_8080bw_state::claybust_gun_hi_r)
+uint8_t _8080bw_state::claybust_gun_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_claybust_gun_pos >> 8;
 }
@@ -3342,12 +3342,12 @@ static ADDRESS_MAP_START( invmulti_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(invmulti_bank_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
+uint8_t _8080bw_state::invmulti_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->do_read();
 }
 
-WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
+void _8080bw_state::invmulti_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: latch bit
 	m_eeprom->di_write(data & 1);
@@ -3359,7 +3359,7 @@ WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 	m_eeprom->clk_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)
+void _8080bw_state::invmulti_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0, d4, d6: bank
 	int bank = (data & 1) | (data >> 3 & 2) | (data >> 4 & 4);

@@ -99,7 +99,7 @@ void namco_c116_device::device_start()
 }
 
 
-READ8_MEMBER(namco_c116_device::read)
+uint8_t namco_c116_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *RAM;
 
@@ -128,7 +128,7 @@ READ8_MEMBER(namco_c116_device::read)
 }
 
 
-WRITE8_MEMBER(namco_c116_device::write)
+void namco_c116_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM;
 

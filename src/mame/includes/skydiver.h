@@ -46,21 +46,21 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_width;
 
-	DECLARE_WRITE8_MEMBER(nmion_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(wram_r);
-	DECLARE_WRITE8_MEMBER(wram_w);
-	DECLARE_WRITE8_MEMBER(width_w);
-	DECLARE_WRITE8_MEMBER(coin_lockout_w);
-	DECLARE_WRITE8_MEMBER(start_lamp_1_w);
-	DECLARE_WRITE8_MEMBER(start_lamp_2_w);
-	DECLARE_WRITE8_MEMBER(lamp_s_w);
-	DECLARE_WRITE8_MEMBER(lamp_k_w);
-	DECLARE_WRITE8_MEMBER(lamp_y_w);
-	DECLARE_WRITE8_MEMBER(lamp_d_w);
-	DECLARE_WRITE8_MEMBER(_2000_201F_w);
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_WRITE8_MEMBER(whistle_w);
+	void nmion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t wram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void width_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void start_lamp_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void start_lamp_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _2000_201F_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void whistle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

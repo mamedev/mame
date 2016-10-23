@@ -35,8 +35,8 @@ public:
 	ra17xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ra17xx_device() {}
 
-	DECLARE_READ8_MEMBER ( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	template<class _Object> static devcb_base &set_iord(device_t &device, _Object object) { return downcast<ra17xx_device &>(device).m_iord.set_callback(object); }
 	template<class _Object> static devcb_base &set_iowr(device_t &device, _Object object) { return downcast<ra17xx_device &>(device).m_iowr.set_callback(object); }

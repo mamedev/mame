@@ -256,18 +256,18 @@ TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_sound_1_w)
+void n8080_state::n8080_sound_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_1_callback), this), data); /* force CPUs to sync */
 }
 
-WRITE8_MEMBER(n8080_state::n8080_sound_2_w)
+void n8080_state::n8080_sound_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(n8080_state::delayed_sound_2_callback), this), data); /* force CPUs to sync */
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_p1_r)
+uint8_t n8080_state::n8080_8035_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -284,27 +284,27 @@ READ8_MEMBER(n8080_state::n8080_8035_p1_r)
 }
 
 
-READ8_MEMBER(n8080_state::n8080_8035_t0_r)
+uint8_t n8080_state::n8080_8035_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x7) & 1;
 }
-READ8_MEMBER(n8080_state::n8080_8035_t1_r)
+uint8_t n8080_state::n8080_8035_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0xc) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_t0_r)
+uint8_t n8080_state::helifire_8035_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x3) & 1;
 }
-READ8_MEMBER(n8080_state::helifire_8035_t1_r)
+uint8_t n8080_state::helifire_8035_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_curr_sound_pins >> 0x4) & 1;
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
+uint8_t n8080_state::helifire_8035_external_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -317,19 +317,19 @@ READ8_MEMBER(n8080_state::helifire_8035_external_ram_r)
 }
 
 
-READ8_MEMBER(n8080_state::helifire_8035_p2_r)
+uint8_t n8080_state::helifire_8035_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_curr_sound_pins >> 0xc) & 1) ? 0x10 : 0x00; /* not used */
 }
 
 
-WRITE8_MEMBER(n8080_state::n8080_dac_w)
+void n8080_state::n8080_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_n8080_dac->write(BIT(data, 7));
 }
 
 
-WRITE8_MEMBER(n8080_state::helifire_sound_ctrl_w)
+void n8080_state::helifire_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_helifire_dac_phase = data & 0x80;
 

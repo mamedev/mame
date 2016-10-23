@@ -39,16 +39,16 @@ public:
 		, m_beep(*this, "beeper")
 	{ }
 
-	DECLARE_READ8_MEMBER(pia51_r);
-	DECLARE_WRITE8_MEMBER(pia51_w);
-	DECLARE_READ8_MEMBER(p51b_r);
-	DECLARE_WRITE8_MEMBER(sol_w);
+	uint8_t pia51_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia51_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p51b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
-	DECLARE_WRITE8_MEMBER(sw_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
-	DECLARE_WRITE8_MEMBER(p50a_w);
-	DECLARE_WRITE8_MEMBER(p50b_w);
-	DECLARE_WRITE8_MEMBER(p51a_w);
+	void sw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p50a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p50b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p51a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_micropin();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
@@ -155,18 +155,18 @@ static INPUT_PORTS_START( micropin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
 INPUT_PORTS_END
 
-READ8_MEMBER( micropin_state::pia51_r )
+uint8_t micropin_state::pia51_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pia51->read(space, offset) ^ 0xff;
 }
 
-WRITE8_MEMBER( micropin_state::pia51_w )
+void micropin_state::pia51_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia51->write(space, offset, data ^ 0xff);
 }
 
 // lamps and disp strobes
-WRITE8_MEMBER( micropin_state::lamp_w )
+void micropin_state::lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row = data & 15;
 	m_counter = 0;
@@ -174,16 +174,16 @@ WRITE8_MEMBER( micropin_state::lamp_w )
 }
 
 // solenoids
-WRITE8_MEMBER( micropin_state::sol_w )
+void micropin_state::sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // offs 0,5 = solenoids; else lamps
-WRITE8_MEMBER( micropin_state::sw_w )
+void micropin_state::sw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( micropin_state::p50a_w )
+void micropin_state::p50a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter++;
 	if (m_counter == 1)
@@ -194,7 +194,7 @@ WRITE8_MEMBER( micropin_state::p50a_w )
 	}
 }
 
-WRITE8_MEMBER( micropin_state::p50b_w )
+void micropin_state::p50b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter++;
 	if (m_counter == 2)
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
 // The sound never gets muted, but is turned down with an electronic volume control,
 //   which must be the most complex circuit in this machine. We use a beeper to
 //   make the tones, and turn it off if no new commands arrive within .1 second.
-WRITE8_MEMBER( micropin_state::p51a_w )
+void micropin_state::p51a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static uint16_t frequency[16] = { 387, 435, 488, 517, 581, 652, 691, 775, 870, 977, 1035, 1161, 1304, 1381, 1550, 1740 };
 	m_beep->set_clock(frequency[data & 15]);
@@ -230,7 +230,7 @@ WRITE8_MEMBER( micropin_state::p51a_w )
 	m_beep->set_state(1);
 }
 
-READ8_MEMBER( micropin_state::p51b_r )
+uint8_t micropin_state::p51b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("X0")->read();
 }

@@ -41,36 +41,36 @@ void hyprolyb_adpcm_device::device_reset()
 	m_vck_ready = 0;
 }
 
-WRITE8_MEMBER( hyprolyb_adpcm_device::write )
+void hyprolyb_adpcm_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(*m_space, offset, data);
 	m_adpcm_ready = 0x80;
 }
 
-READ8_MEMBER( hyprolyb_adpcm_device::busy_r )
+uint8_t hyprolyb_adpcm_device::busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adpcm_busy ? 0x10 : 0x00;
 }
 
-WRITE8_MEMBER( hyprolyb_adpcm_device::msm_data_w )
+void hyprolyb_adpcm_device::msm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);
 	m_adpcm_busy = ~data & 0x80;
 }
 
-READ8_MEMBER( hyprolyb_adpcm_device::msm_vck_r )
+uint8_t hyprolyb_adpcm_device::msm_vck_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t old = m_vck_ready;
 	m_vck_ready = 0x00;
 	return old;
 }
 
-READ8_MEMBER( hyprolyb_adpcm_device::ready_r )
+uint8_t hyprolyb_adpcm_device::ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adpcm_ready;
 }
 
-READ8_MEMBER( hyprolyb_adpcm_device::data_r )
+uint8_t hyprolyb_adpcm_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_adpcm_ready = 0x00;
 	return m_soundlatch2->read(*m_space, offset);

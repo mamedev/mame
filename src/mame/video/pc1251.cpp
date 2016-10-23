@@ -97,14 +97,14 @@ static const POCKETC_FIGURE /*busy={
 	"1 1 11    1e"
 };
 
-READ8_MEMBER(pc1251_state::pc1251_lcd_read)
+uint8_t pc1251_state::pc1251_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_reg[offset&0xff];
 	logerror("pc1251 read %.3x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_lcd_write)
+void pc1251_state::pc1251_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pc1251 write %.3x %.2x\n",offset,data);
 	m_reg[offset&0xff] = data;

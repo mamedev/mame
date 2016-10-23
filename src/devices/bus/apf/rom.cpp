@@ -49,7 +49,7 @@ apf_spacedst_device::apf_spacedst_device(const machine_config &mconfig, const ch
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(apf_rom_device::read_rom)
+uint8_t apf_rom_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_rom_size)
 		return m_rom[offset];
@@ -58,7 +58,7 @@ READ8_MEMBER(apf_rom_device::read_rom)
 }
 
 
-READ8_MEMBER(apf_basic_device::extra_rom)
+uint8_t apf_basic_device::extra_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < (m_rom_size - 0x2000))
 		return m_rom[offset + 0x2000];
@@ -67,12 +67,12 @@ READ8_MEMBER(apf_basic_device::extra_rom)
 }
 
 
-READ8_MEMBER(apf_spacedst_device::read_ram)
+uint8_t apf_spacedst_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(apf_spacedst_device::write_ram)
+void apf_spacedst_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 }

@@ -728,7 +728,7 @@ uint32_t changela_state::screen_update_changela(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(changela_state::changela_colors_w)
+void changela_state::changela_colors_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Each color is combined from 3 bits from open-colelctor outputs of ram.
 	Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
@@ -765,7 +765,7 @@ WRITE8_MEMBER(changela_state::changela_colors_w)
 }
 
 
-WRITE8_MEMBER(changela_state::changela_mem_device_select_w)
+void changela_state::changela_mem_device_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem_dev_selected = (data & 0x07) * 0x800;
 	m_tree_en = (data & 0x30) >> 4;
@@ -781,7 +781,7 @@ WRITE8_MEMBER(changela_state::changela_mem_device_select_w)
 	*/
 }
 
-WRITE8_MEMBER(changela_state::changela_mem_device_w)
+void changela_state::changela_mem_device_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_memory_devices[m_mem_dev_selected + offset] = data;
 
@@ -793,18 +793,18 @@ WRITE8_MEMBER(changela_state::changela_mem_device_w)
 }
 
 
-READ8_MEMBER(changela_state::changela_mem_device_r)
+uint8_t changela_state::changela_mem_device_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memory_devices[m_mem_dev_selected + offset];
 }
 
 
-WRITE8_MEMBER(changela_state::changela_slope_rom_addr_hi_w)
+void changela_state::changela_slope_rom_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slopeROM_bank = (data & 0x03) << 9;
 }
 
-WRITE8_MEMBER(changela_state::changela_slope_rom_addr_lo_w)
+void changela_state::changela_slope_rom_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_horizon = data;
 }

@@ -180,19 +180,19 @@ void ds2404_device::ds2404_writemem(uint8_t value)
 	}
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_1w_reset_w )
+void ds2404_device::ds2404_1w_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_state[0] = DS2404_STATE_IDLE;
 	m_state_ptr = 0;
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_3w_reset_w )
+void ds2404_device::ds2404_3w_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_state[0] = DS2404_STATE_COMMAND;
 	m_state_ptr = 0;
 }
 
-READ8_MEMBER( ds2404_device::ds2404_data_r )
+uint8_t ds2404_device::ds2404_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	switch(m_state[m_state_ptr])
@@ -226,7 +226,7 @@ READ8_MEMBER( ds2404_device::ds2404_data_r )
 	return value;
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_data_w )
+void ds2404_device::ds2404_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( m_state[m_state_ptr] )
 	{
@@ -319,7 +319,7 @@ WRITE8_MEMBER( ds2404_device::ds2404_data_w )
 	}
 }
 
-WRITE8_MEMBER( ds2404_device::ds2404_clk_w )
+void ds2404_device::ds2404_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( m_state[m_state_ptr] )
 	{

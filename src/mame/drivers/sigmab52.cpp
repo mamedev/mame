@@ -148,18 +148,18 @@ public:
 		m_in0(*this, "IN0")
 	{ }
 
-	DECLARE_READ8_MEMBER(unk_f700_r);
-	DECLARE_READ8_MEMBER(unk_f760_r);
-	DECLARE_READ8_MEMBER(in0_r);
-	DECLARE_WRITE8_MEMBER(bank1_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_cmd_irq_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(hopper_w);
-	DECLARE_WRITE8_MEMBER(lamps1_w);
-	DECLARE_WRITE8_MEMBER(lamps2_w);
-	DECLARE_WRITE8_MEMBER(tower_lamps_w);
-	DECLARE_WRITE8_MEMBER(coin_enable_w);
+	uint8_t unk_f700_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unk_f760_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audiocpu_cmd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audiocpu_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tower_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jwildb52();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
@@ -195,17 +195,17 @@ WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
 	audiocpu_irq_update();
 }
 
-READ8_MEMBER(sigmab52_state::unk_f700_r)
+uint8_t sigmab52_state::unk_f700_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7f;
 }
 
-READ8_MEMBER(sigmab52_state::unk_f760_r)
+uint8_t sigmab52_state::unk_f760_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80;    // used for test the sound CPU
 }
 
-READ8_MEMBER(sigmab52_state::in0_r)
+uint8_t sigmab52_state::in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -246,43 +246,43 @@ READ8_MEMBER(sigmab52_state::in0_r)
 	return data;
 }
 
-WRITE8_MEMBER(sigmab52_state::bank1_w)
+void sigmab52_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank1->set_entry(BIT(data, 7));
 }
 
-WRITE8_MEMBER(sigmab52_state::hopper_w)
+void sigmab52_state::hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hopper_start_cycles = data & 0x01 ? m_maincpu->total_cycles() : 0;
 }
 
-WRITE8_MEMBER(sigmab52_state::lamps1_w)
+void sigmab52_state::lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(offset, data & 1);
 }
 
-WRITE8_MEMBER(sigmab52_state::lamps2_w)
+void sigmab52_state::lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_lamp_value(6 + offset, data & 1);
 }
 
-WRITE8_MEMBER(sigmab52_state::tower_lamps_w)
+void sigmab52_state::tower_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_indexed_value("towerlamp", offset, data & 1);
 }
 
-WRITE8_MEMBER(sigmab52_state::coin_enable_w)
+void sigmab52_state::coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 0x01 ? 0 : 1);
 }
 
-WRITE8_MEMBER(sigmab52_state::audiocpu_cmd_irq_w)
+void sigmab52_state::audiocpu_cmd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu_cmd_irq = ASSERT_LINE;
 	audiocpu_irq_update();
 }
 
-WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
+void sigmab52_state::audiocpu_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -291,7 +291,7 @@ WRITE8_MEMBER(sigmab52_state::audiocpu_irq_ack_w)
 	}
 }
 
-WRITE8_MEMBER(sigmab52_state::palette_bank_w)
+void sigmab52_state::palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x0f;
 

@@ -25,16 +25,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE8_MEMBER(tourtabl_led_w);
-	DECLARE_READ16_MEMBER(tourtabl_read_input_port);
-	DECLARE_READ8_MEMBER(tourtabl_get_databus_contents);
+	void tourtabl_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t tourtabl_read_input_port(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t tourtabl_get_databus_contents(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 
 #define MASTER_CLOCK    XTAL_3_579545MHz
 
 
-WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
+void tourtabl_state::tourtabl_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x40); /* start 1 */
 	output().set_led_value(1, data & 0x20); /* start 2 */
@@ -45,14 +45,14 @@ WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)
 }
 
 
-READ16_MEMBER(tourtabl_state::tourtabl_read_input_port)
+uint16_t tourtabl_state::tourtabl_read_input_port(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
 	return ioport(tianames[offset])->read();
 }
 
-READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)
+uint8_t tourtabl_state::tourtabl_get_databus_contents(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return offset;
 }

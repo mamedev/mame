@@ -39,16 +39,16 @@ public:
 
 	void init_pc1251();
 	uint32_t screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(pc1251_outa);
-	DECLARE_WRITE8_MEMBER(pc1251_outb);
-	DECLARE_WRITE8_MEMBER(pc1251_outc);
+	void pc1251_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc1251_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc1251_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_READ_LINE_MEMBER(pc1251_reset);
 	DECLARE_READ_LINE_MEMBER(pc1251_brk);
-	DECLARE_READ8_MEMBER(pc1251_ina);
-	DECLARE_READ8_MEMBER(pc1251_inb);
-	DECLARE_READ8_MEMBER(pc1251_lcd_read);
-	DECLARE_WRITE8_MEMBER(pc1251_lcd_write);
+	uint8_t pc1251_ina(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc1251_inb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc1251_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc1251_lcd_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	void machine_start_pc1260();
 	required_device<sc61860_device> m_maincpu;

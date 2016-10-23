@@ -255,7 +255,7 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 {
 }
 
-READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
+uint8_t zac1b111xx_melody_base::melodypia_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t const control = m_melodypia->b_output();
 	uint8_t data = 0xff;
@@ -269,7 +269,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 	return data;
 }
 
-WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
+void zac1b111xx_melody_base::melodypia_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t const control = m_melodypia->b_output();
 
@@ -280,7 +280,7 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 		m_melodypsg2->data_address_w(space, (control >> 2) & 0x01, data);
 }
 
-WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
+void zac1b111xx_melody_base::melodypia_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x02)
 		m_melodypsg1->data_address_w(space, (data >> 0) & 0x01, m_melodypia->a_output());
@@ -289,7 +289,7 @@ WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_portb_w)
 		m_melodypsg2->data_address_w(space, (data >> 2) & 0x01, m_melodypia->a_output());
 }
 
-READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
+uint8_t zac1b111xx_melody_base::melodypsg1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_melody_command;
 }
@@ -315,7 +315,7 @@ zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, 
 {
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::sound_w)
+void zac1b11107_audio_device::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// the sound program masks out the three most significant bits
 	// assume the top two bits are not connected and read high from the internal pull-ups
@@ -332,7 +332,7 @@ WRITE_LINE_MEMBER(zac1b11107_audio_device::reset_w)
 	// TODO: holds the reset line of m_melodypsg2 - can't implement this in MAME at this time
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::melodypsg1_porta_w)
+void zac1b11107_audio_device::melodypsg1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// similar to 1B11142
 	// TODO: move this to netlist audio where it belongs, along with the rest of the filtering
@@ -348,7 +348,7 @@ WRITE8_MEMBER(zac1b11107_audio_device::melodypsg1_porta_w)
 	m_melodypsg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
 }
 
-WRITE8_MEMBER(zac1b11107_audio_device::melodypsg2_porta_w)
+void zac1b11107_audio_device::melodypsg2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: assume LEVELT is controlled here as is the case for 1B11142?
 }
@@ -375,7 +375,7 @@ zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, 
 {
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::hs_w)
+void zac1b11142_audio_device::hs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_host_command = data;
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
@@ -398,36 +398,36 @@ WRITE_LINE_MEMBER(zac1b11142_audio_device::ressound_w)
 	// TODO: does some funky stuff with the VDD and VSS lines on the speech chip
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4g_porta_w)
+void zac1b11142_audio_device::ay_4g_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: (data & 0x07) controls tromba mix volume
 	// TODO: (data & 0x08) controls cassa gate
 	// TODO: (data & 0x10) controls rullante gate
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_porta_w)
+void zac1b11142_audio_device::ay_4h_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: data & 0x01 controls LEVEL
 	// TODO: data & 0x02 controls LEVELT
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::ay_4h_portb_w)
+void zac1b11142_audio_device::ay_4h_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: data & 0x01 controls ANAL3 filter
 }
 
-READ8_MEMBER(zac1b11142_audio_device::host_command_r)
+uint8_t zac1b11142_audio_device::host_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_host_command;
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::melody_command_w)
+void zac1b11142_audio_device::melody_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_melodypia->ca1_w((data >> 7) & 0x01);
 	m_melody_command = data;
 }
 
-WRITE8_MEMBER(zac1b11142_audio_device::pia_1i_portb_w)
+void zac1b11142_audio_device::pia_1i_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speech->rsq_w((data >> 0) & 0x01);
 	m_speech->wsq_w((data >> 1) & 0x01);

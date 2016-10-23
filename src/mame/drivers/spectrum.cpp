@@ -293,7 +293,7 @@ SamRam
  bit 2-0: border colour
 */
 
-WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
+void spectrum_state::spectrum_port_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	unsigned char Changed;
 
@@ -324,7 +324,7 @@ WRITE8_MEMBER(spectrum_state::spectrum_port_fe_w)
 
 /* KT: more accurate keyboard reading */
 /* DJR: Spectrum+ keys added */
-READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
+uint8_t spectrum_state::spectrum_port_fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int lines = offset >> 8;
 	int data = 0xff;
@@ -394,24 +394,24 @@ READ8_MEMBER(spectrum_state::spectrum_port_fe_r)
 }
 
 /* kempston joystick interface */
-READ8_MEMBER(spectrum_state::spectrum_port_1f_r)
+uint8_t spectrum_state::spectrum_port_1f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_kempston->read() & 0x1f;
 }
 
 /* fuller joystick interface */
-READ8_MEMBER(spectrum_state::spectrum_port_7f_r)
+uint8_t spectrum_state::spectrum_port_7f_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_fuller->read() | (0xff^0x8f);
 }
 
 /* mikrogen joystick interface */
-READ8_MEMBER(spectrum_state::spectrum_port_df_r)
+uint8_t spectrum_state::spectrum_port_df_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io_mikrogen->read() | (0xff^0x1f);
 }
 
-READ8_MEMBER(spectrum_state::spectrum_port_ula_r)
+uint8_t spectrum_state::spectrum_port_ula_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int vpos = machine().first_screen()->vpos();
 

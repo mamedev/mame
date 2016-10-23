@@ -37,11 +37,11 @@ public:
 
 	void init_ccs300();
 	void machine_reset_ccs300();
-	DECLARE_READ8_MEMBER(port10_r);
-	DECLARE_READ8_MEMBER(port11_r);
-	DECLARE_WRITE8_MEMBER(port10_w);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port11_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -71,24 +71,24 @@ INPUT_PORTS_END
 //  Keyboard
 //
 //*************************************
-READ8_MEMBER( ccs300_state::port10_r )
+uint8_t ccs300_state::port10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( ccs300_state::port11_r )
+uint8_t ccs300_state::port11_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 5 : 4;
 }
 
-WRITE8_MEMBER( ccs300_state::port10_w )
+void ccs300_state::port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_terminal->write(space, 0, data & 0x7f);
 }
 
-WRITE8_MEMBER( ccs300_state::kbd_put )
+void ccs300_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
@@ -98,7 +98,7 @@ WRITE8_MEMBER( ccs300_state::kbd_put )
 //  Machine
 //
 //*************************************
-WRITE8_MEMBER( ccs300_state::port40_w )
+void ccs300_state::port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry( (data) ? 1 : 0);
 }

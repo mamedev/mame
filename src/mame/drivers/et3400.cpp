@@ -43,12 +43,12 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ8_MEMBER(keypad_r);
-	DECLARE_WRITE8_MEMBER(display_w);
-	DECLARE_READ8_MEMBER(pia_ar);
-	DECLARE_WRITE8_MEMBER(pia_aw);
-	DECLARE_READ8_MEMBER(pia_br);
-	DECLARE_WRITE8_MEMBER(pia_bw);
+	uint8_t keypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_ar(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_aw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_br(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_bw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -58,7 +58,7 @@ private:
 
 
 
-READ8_MEMBER( et3400_state::keypad_r )
+uint8_t et3400_state::keypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -72,7 +72,7 @@ READ8_MEMBER( et3400_state::keypad_r )
 	return data;
 }
 
-WRITE8_MEMBER( et3400_state::display_w )
+void et3400_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* This computer sets each segment, one at a time. */
 
@@ -92,25 +92,25 @@ WRITE8_MEMBER( et3400_state::display_w )
 // d1,2,3 = Baud rate
 // d4 = gnd
 // d7 = rs232 in
-READ8_MEMBER( et3400_state::pia_ar )
+uint8_t et3400_state::pia_ar(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("BAUD")->read() | (m_rs232->rxd_r() << 7);
 }
 
 // d0 = rs232 out
-WRITE8_MEMBER( et3400_state::pia_aw )
+void et3400_state::pia_aw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_txd(BIT(data, 0));
 }
 
 // d7 = cass in
-READ8_MEMBER( et3400_state::pia_br )
+uint8_t et3400_state::pia_br(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cass->input() > +0.0) << 7;
 }
 
 // d0 = cass out
-WRITE8_MEMBER( et3400_state::pia_bw )
+void et3400_state::pia_bw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }

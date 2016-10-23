@@ -180,7 +180,7 @@ WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 	}
 }
 
-READ16_MEMBER( buddha_device::speed_r )
+uint16_t buddha_device::speed_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xffff;
 
@@ -190,7 +190,7 @@ READ16_MEMBER( buddha_device::speed_r )
 	return data;
 }
 
-WRITE16_MEMBER( buddha_device::speed_w )
+void buddha_device::speed_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): speed_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER( buddha_device::ide_1_interrupt_w)
 		m_slot->int2_w(state);
 }
 
-READ16_MEMBER( buddha_device::ide_0_interrupt_r )
+uint16_t buddha_device::ide_0_interrupt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -232,7 +232,7 @@ READ16_MEMBER( buddha_device::ide_0_interrupt_r )
 	return data;
 }
 
-READ16_MEMBER( buddha_device::ide_1_interrupt_r )
+uint16_t buddha_device::ide_1_interrupt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -244,7 +244,7 @@ READ16_MEMBER( buddha_device::ide_1_interrupt_r )
 	return data;
 }
 
-WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
+void buddha_device::ide_interrupt_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ide_interrupt_enable_w %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
@@ -253,7 +253,7 @@ WRITE16_MEMBER( buddha_device::ide_interrupt_enable_w )
 	m_ide_interrupts_enabled = true;
 }
 
-READ16_MEMBER( buddha_device::ide_0_cs0_r )
+uint16_t buddha_device::ide_0_cs0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -266,7 +266,7 @@ READ16_MEMBER( buddha_device::ide_0_cs0_r )
 	return (data << 8) | (data >> 8);
 }
 
-WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
+void buddha_device::ide_0_cs0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ide_0_cs0_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
@@ -277,7 +277,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs0_w )
 	m_ata_0->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
-READ16_MEMBER( buddha_device::ide_0_cs1_r )
+uint16_t buddha_device::ide_0_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -290,7 +290,7 @@ READ16_MEMBER( buddha_device::ide_0_cs1_r )
 	return (data << 8) | (data >> 8);
 }
 
-WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
+void buddha_device::ide_0_cs1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ide_0_cs1_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
@@ -301,7 +301,7 @@ WRITE16_MEMBER( buddha_device::ide_0_cs1_w )
 	m_ata_0->write_cs1(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
-READ16_MEMBER( buddha_device::ide_1_cs0_r )
+uint16_t buddha_device::ide_1_cs0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -314,7 +314,7 @@ READ16_MEMBER( buddha_device::ide_1_cs0_r )
 	return (data << 8) | (data >> 8);
 }
 
-WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
+void buddha_device::ide_1_cs0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ide_1_cs0_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
@@ -325,7 +325,7 @@ WRITE16_MEMBER( buddha_device::ide_1_cs0_w )
 	m_ata_1->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
-READ16_MEMBER( buddha_device::ide_1_cs1_r )
+uint16_t buddha_device::ide_1_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -338,7 +338,7 @@ READ16_MEMBER( buddha_device::ide_1_cs1_r )
 	return (data << 8) | (data >> 8);
 }
 
-WRITE16_MEMBER( buddha_device::ide_1_cs1_w )
+void buddha_device::ide_1_cs1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ide_1_cs1_w(%04x) %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);

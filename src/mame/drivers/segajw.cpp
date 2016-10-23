@@ -48,15 +48,15 @@ public:
 			m_soundlatch(*this, "soundlatch")
 	{ }
 
-	DECLARE_READ16_MEMBER(coin_counter_r);
-	DECLARE_WRITE16_MEMBER(coin_counter_w);
-	DECLARE_READ16_MEMBER(hopper_r);
-	DECLARE_WRITE16_MEMBER(hopper_w);
-	DECLARE_READ8_MEMBER(lamps_r);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_READ16_MEMBER(coinlockout_r);
-	DECLARE_WRITE16_MEMBER(coinlockout_w);
-	DECLARE_WRITE8_MEMBER(audiocpu_cmd_w);
+	uint16_t coin_counter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hopper_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hopper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t lamps_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t coinlockout_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void coinlockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void audiocpu_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
@@ -80,23 +80,23 @@ protected:
 };
 
 
-READ16_MEMBER(segajw_state::coin_counter_r)
+uint16_t segajw_state::coin_counter_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_coin_counter ^ 0xff;
 }
 
-WRITE16_MEMBER(segajw_state::coin_counter_w)
+void segajw_state::coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		m_coin_counter = data;
 }
 
-READ16_MEMBER(segajw_state::hopper_r)
+uint16_t segajw_state::hopper_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_hopper_ctrl;
 }
 
-WRITE16_MEMBER(segajw_state::hopper_w)
+void segajw_state::hopper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -105,12 +105,12 @@ WRITE16_MEMBER(segajw_state::hopper_w)
 	}
 }
 
-READ8_MEMBER(segajw_state::lamps_r)
+uint8_t segajw_state::lamps_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lamps[offset];
 }
 
-WRITE8_MEMBER(segajw_state::lamps_w)
+void segajw_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for(int i=0; i<8; i++)
 		output().set_lamp_value((offset * 8) + i, BIT(data, i));
@@ -118,12 +118,12 @@ WRITE8_MEMBER(segajw_state::lamps_w)
 	m_lamps[offset] = data;
 }
 
-READ16_MEMBER(segajw_state::coinlockout_r)
+uint16_t segajw_state::coinlockout_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_coin_lockout;
 }
 
-WRITE16_MEMBER(segajw_state::coinlockout_w)
+void segajw_state::coinlockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0, data & 1);
 	m_coin_lockout = data;
@@ -132,7 +132,7 @@ WRITE16_MEMBER(segajw_state::coinlockout_w)
 		output().set_indexed_value("towerlamp", i, BIT(data, 3 + i));
 }
 
-WRITE8_MEMBER(segajw_state::audiocpu_cmd_w)
+void segajw_state::audiocpu_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

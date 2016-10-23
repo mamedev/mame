@@ -159,7 +159,7 @@ READ8Z_MEMBER(mainboard8_device::crureadz)
 /*
     CRU handling. Mofetta is the only chip that bothers to handle it, beside the PEB
 */
-WRITE8_MEMBER(mainboard8_device::cruwrite)
+void mainboard8_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mofetta->cruwrite(space, offset, data);
 	m_peb->cruwrite(space, offset, data);
@@ -172,7 +172,7 @@ WRITE_LINE_MEMBER( mainboard8_device::dbin_in )
 	m_dbin_level = (line_state)state;
 }
 
-SETOFFSET_MEMBER( mainboard8_device::setoffset )
+void mainboard8_device::setoffset(address_space &space, offs_t offset)
 {
 	if (TRACE_ADDRESS) logerror("set %s %04x\n", (m_dbin_level==ASSERT_LINE)? "R" : "W", offset);
 
@@ -455,7 +455,7 @@ WRITE_LINE_MEMBER( mainboard8_device::msast_in )
 }
 
 
-READ8_MEMBER( mainboard8_device::read )
+uint8_t mainboard8_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	const char* what;
@@ -648,7 +648,7 @@ void mainboard8_device::cycle_end()
     If the READY line is pulled down due to the mapping process, we must
     store the data bus value until the physical address is available.
 */
-WRITE8_MEMBER( mainboard8_device::write )
+void mainboard8_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latched_data = data;
 	m_pending_write = true;
@@ -1483,7 +1483,7 @@ READ_LINE_MEMBER( mofetta_device::dbc_out )
 	return (m_lasreq || m_cmas || m_rom1cs || m_skdrcs || !m_pmemen)? CLEAR_LINE : ASSERT_LINE;
 }
 
-WRITE8_MEMBER(mofetta_device::cruwrite)
+void mofetta_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==0x2700)
 	{
@@ -1744,7 +1744,7 @@ WRITE_LINE_MEMBER( amigo_device::lascs_in )
     3. Set the physical address bus with the second 16 bits of the physical
        address. Clear the MSAST line. Forward any incoming READY=0 to the CPU.
 */
-SETOFFSET_MEMBER( amigo_device::set_address )
+void amigo_device::set_address(address_space &space, offs_t offset)
 {
 	// Check whether the mapper itself is accessed
 	int mapaddr = (m_crus==ASSERT_LINE)? 0x8810 : 0xf870;
@@ -1795,7 +1795,7 @@ SETOFFSET_MEMBER( amigo_device::set_address )
 /*
     Read the mapper status bits
 */
-READ8_MEMBER( amigo_device::read )
+uint8_t amigo_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Read the protection status bits and reset them
 	uint8_t value = m_protflag;
@@ -1806,7 +1806,7 @@ READ8_MEMBER( amigo_device::read )
 /*
     Configure the mapper. This is the only reason to write to the AMIGO.
 */
-WRITE8_MEMBER( amigo_device::write )
+void amigo_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Load or save map file
 	if ((data & 0xf0)==0x00)
@@ -2007,7 +2007,7 @@ oso_device::oso_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-READ8_MEMBER( oso_device::read )
+uint8_t oso_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int value = 0;
 	offset &= 0x03;
@@ -2037,7 +2037,7 @@ READ8_MEMBER( oso_device::read )
 	return value;
 }
 
-WRITE8_MEMBER( oso_device::write )
+void oso_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x03;
 	switch (offset)

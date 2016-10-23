@@ -151,7 +151,7 @@ void ::kickgoal_play(okim6295_device *oki, int melody, int data)
 	}
 }
 
-WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
+void kickgoal_state::kickgoal_snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -204,7 +204,7 @@ WRITE16_MEMBER(kickgoal_state::kickgoal_snd_w)
 }
 #endif
 
-WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
+void kickgoal_state::actionhw_snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%s: Writing %04x to Sound CPU - mask %04x\n",machine().describe_context(),data,mem_mask);
 
@@ -443,7 +443,7 @@ static const uint16_t kickgoal_default_eeprom_type1[64] = {
 
 
 
-READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
+uint16_t kickgoal_state::kickgoal_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -453,7 +453,7 @@ READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
 }
 
 
-WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
+void kickgoal_state::kickgoal_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

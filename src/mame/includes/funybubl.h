@@ -30,11 +30,11 @@ public:
 
 	/* memory */
 	uint8_t      m_banked_vram[0x2000];
-	DECLARE_WRITE8_MEMBER(funybubl_vidram_bank_w);
-	DECLARE_WRITE8_MEMBER(funybubl_cpurombank_w);
-	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(funybubl_paldatawrite);
-	DECLARE_WRITE8_MEMBER(funybubl_oki_bank_sw);
+	void funybubl_vidram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funybubl_cpurombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funybubl_soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funybubl_paldatawrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void funybubl_oki_bank_sw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_funybubl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

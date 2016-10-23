@@ -34,10 +34,10 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_int_handler(device_t &device, _Object object) { return downcast<k056800_device &>(device).m_int_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( host_r );
-	DECLARE_WRITE8_MEMBER( host_w );
-	DECLARE_READ8_MEMBER( sound_r );
-	DECLARE_WRITE8_MEMBER( sound_w );
+	uint8_t host_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void host_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

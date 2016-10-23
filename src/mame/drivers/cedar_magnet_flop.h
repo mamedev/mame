@@ -28,16 +28,16 @@ public:
 	uint8_t m_curtrack;
 	int m_secoffs;
 
-	DECLARE_READ8_MEMBER(port60_r);
-	DECLARE_READ8_MEMBER(port61_r);
-	DECLARE_READ8_MEMBER(port63_r);
+	uint8_t port60_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port61_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port63_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(port62_w);
-	DECLARE_WRITE8_MEMBER(port63_w);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port62_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port63_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

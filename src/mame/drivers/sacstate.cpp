@@ -52,17 +52,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
-	DECLARE_READ8_MEMBER(port04_r);
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint8_t m_val;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( sacstate_state::port01_r )
+uint8_t sacstate_state::port01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_val;
 	if (m_term_data)
@@ -70,20 +70,20 @@ READ8_MEMBER( sacstate_state::port01_r )
 	return ret;
 }
 
-READ8_MEMBER( sacstate_state::port00_r )
+uint8_t sacstate_state::port00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( sacstate_state::port04_r )
+uint8_t sacstate_state::port04_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("unknown_r\n");
 	return 0;
 }
 
-WRITE8_MEMBER( sacstate_state::port08_w )
+void sacstate_state::port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x40)
 		m_val = 0x40;
@@ -117,7 +117,7 @@ static INPUT_PORTS_START( sacstate )
 	PORT_CONFSETTING(    0x08, "B")
 INPUT_PORTS_END
 
-WRITE8_MEMBER( sacstate_state::kbd_put )
+void sacstate_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

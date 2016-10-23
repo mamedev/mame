@@ -174,7 +174,7 @@ DISCRETE_SOUND_END
 
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
+void spiders_state::spiders_audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia6821_device *pia = downcast<pia6821_device *>(machine().device("pia4"));
 	pia->porta_w(data & 0xf8);
@@ -182,18 +182,18 @@ WRITE8_MEMBER(spiders_state::spiders_audio_command_w)
 }
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_a_w)
+void spiders_state::spiders_audio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPIDER_WEB_SOUND_MOD_DATA, 1 + (data & 4) * 8 + (data & 2) * 4 + (data & 1) * 2);
 }
 
-WRITE8_MEMBER(spiders_state::spiders_audio_b_w)
+void spiders_state::spiders_audio_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPIDERS_WEB_SOUND_DATA, data);
 }
 
 
-WRITE8_MEMBER(spiders_state::spiders_audio_ctrl_w)
+void spiders_state::spiders_audio_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPIDERS_FIRE_EN, data & 0x10 ? 1 : 0);
 	m_discrete->write(space, SPIDERS_EXP_EN, data & 0x08 ? 1 : 0);

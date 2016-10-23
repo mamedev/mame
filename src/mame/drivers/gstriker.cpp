@@ -188,7 +188,7 @@ void gstriker_state::machine_start()
 
 /*** MISC READ / WRITE HANDLERS **********************************************/
 
-READ16_MEMBER(gstriker_state::dmmy_8f)
+uint16_t gstriker_state::dmmy_8f(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_dmmy_8f_ret = ~m_dmmy_8f_ret;
 	return m_dmmy_8f_ret;
@@ -197,7 +197,7 @@ READ16_MEMBER(gstriker_state::dmmy_8f)
 /*** SOUND RELATED ***********************************************************/
 
 
-WRITE16_MEMBER(gstriker_state::sound_command_w)
+void gstriker_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -208,18 +208,18 @@ WRITE16_MEMBER(gstriker_state::sound_command_w)
 }
 
 #if 0
-READ16_MEMBER(gstriker_state::pending_command_r)
+uint16_t gstriker_state::pending_command_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pending_command;
 }
 #endif
 
-WRITE8_MEMBER(gstriker_state::sh_pending_command_clear_w)
+void gstriker_state::sh_pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(gstriker_state::sh_bankswitch_w)
+void gstriker_state::sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data & 0x07);
 }
@@ -822,17 +822,17 @@ m_work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
 m_work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
 
-WRITE16_MEMBER(gstriker_state::twrldc94_mcu_w)
+void gstriker_state::twrldc94_mcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mcu_data = data & 0xff;
 }
 
-READ16_MEMBER(gstriker_state::twrldc94_mcu_r)
+uint16_t gstriker_state::twrldc94_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_mcu_data;
 }
 
-WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
+void gstriker_state::twrldc94_prot_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data & 0xff;
@@ -944,7 +944,7 @@ WRITE16_MEMBER(gstriker_state::twrldc94_prot_reg_w)
 	}
 }
 
-READ16_MEMBER(gstriker_state::twrldc94_prot_reg_r)
+uint16_t gstriker_state::twrldc94_prot_reg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// bit 0 is for debugging vgoalsoc?
 	// Setting it results in a hang with a digit displayed on screen
@@ -973,12 +973,12 @@ READ16_MEMBER(gstriker_state::twrldc94_prot_reg_r)
 #define TICKCOUNT_3 m_work_ram[0x290e/2]
 #define COUNTER_1 m_work_ram[0x2928/2]
 #define COUNTER_2 m_work_ram[0x292a/2]
-READ16_MEMBER(gstriker_state::vbl_toggle_r)
+uint16_t gstriker_state::vbl_toggle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
+void gstriker_state::vbl_toggle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( COUNTER1_ENABLE == 1 )
 	{

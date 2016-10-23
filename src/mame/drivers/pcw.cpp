@@ -200,7 +200,7 @@ ADDRESS_MAP_END
 
 
 /* Keyboard is read by the MCU and sent as serial data to the gate array ASIC */
-READ8_MEMBER(pcw_state::pcw_keyboard_r)
+uint8_t pcw_state::pcw_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
@@ -210,7 +210,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_r)
 	return ioport(keynames[offset])->read();
 }
 
-READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
+uint8_t pcw_state::pcw_keyboard_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mcu_keyboard_data[offset];
 }
@@ -345,7 +345,7 @@ int pcw_state::pcw_get_sys_status()
 		| (m_system_status & 0x20);
 }
 
-READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
+uint8_t pcw_state::pcw_interrupt_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data;
 
@@ -363,7 +363,7 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
+void pcw_state::pcw_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//LOG(("BANK: %2x %x\n",offset, data));
 	m_banks[offset] = data;
@@ -372,7 +372,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 //  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
+void pcw_state::pcw_bank_force_selection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_force = data;
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
 }
 
 
-WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
+void pcw_state::pcw_roller_ram_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	Address of roller RAM. b7-5: bank (0-7). b4-1: address / 512. */
@@ -393,19 +393,19 @@ WRITE8_MEMBER(pcw_state::pcw_roller_ram_addr_w)
 	LOG(("Roller-RAM: Address set to 0x%05x\n",m_roller_ram_addr));
 }
 
-WRITE8_MEMBER(pcw_state::pcw_pointer_table_top_scan_w)
+void pcw_state::pcw_pointer_table_top_scan_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_roller_ram_offset = data;
 	LOG(("Roller-RAM: offset set to 0x%05x\n",m_roller_ram_offset));
 }
 
-WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
+void pcw_state::pcw_vdu_video_control_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vdu_video_control_register = data;
 	LOG(("Roller-RAM: control reg set to 0x%02x\n",data));
 }
 
-WRITE8_MEMBER(pcw_state::pcw_system_control_w)
+void pcw_state::pcw_system_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOG(("SYSTEM CONTROL: %d\n",data));
@@ -559,7 +559,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 	}
 }
 
-READ8_MEMBER(pcw_state::pcw_system_status_r)
+uint8_t pcw_state::pcw_system_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* from Jacob Nevins docs */
 	uint8_t ret = pcw_get_sys_status();
@@ -569,7 +569,7 @@ READ8_MEMBER(pcw_state::pcw_system_status_r)
 
 /* read from expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-READ8_MEMBER(pcw_state::pcw_expansion_r)
+uint8_t pcw_state::pcw_expansion_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("pcw expansion r: %04x\n",offset+0x080);
 
@@ -618,7 +618,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 /* write to expansion hardware - additional hardware not part of
 the PCW custom ASIC */
-WRITE8_MEMBER(pcw_state::pcw_expansion_w)
+void pcw_state::pcw_expansion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
 }
@@ -639,14 +639,14 @@ void pcw_state::pcw_printer_fire_pins(uint16_t pins)
 //      m_printer_headpos++;
 }
 
-WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
+void pcw_state::pcw_printer_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_printer_data = data;
 	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,0,data);
 	logerror("PRN [0xFC]: Sent command %02x\n",data);
 }
 
-WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
+void pcw_state::pcw_printer_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_printer_command = data;
 	machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_w(space,1,data);
@@ -660,7 +660,7 @@ WRITE8_MEMBER(pcw_state::pcw_printer_command_w)
 // 3 = bad command
 // 5 = print error
 // anything else = no printer
-READ8_MEMBER(pcw_state::pcw_printer_data_r)
+uint8_t pcw_state::pcw_printer_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,0);
 }
@@ -674,7 +674,7 @@ READ8_MEMBER(pcw_state::pcw_printer_data_r)
 // bit 2 - paper is present
 // bit 1 - busy
 // bit 0 - controller fault
-READ8_MEMBER(pcw_state::pcw_printer_status_r)
+uint8_t pcw_state::pcw_printer_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().device<upi41_cpu_device>("printer_mcu")->upi41_master_r(space,1);
 }
@@ -761,20 +761,20 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 	m_printer_p2 |= 0x40;
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p1_r)
+uint8_t pcw_state::mcu_printer_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("PRN: MCU reading data from P1\n");
 	return m_printer_pins & 0x00ff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p1_w)
+void pcw_state::mcu_printer_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_printer_pins = (m_printer_pins & 0x0100) | data;
 	//popmessage("PRN: Print head position = %i",m_printer_headpos);
 	logerror("PRN: MCU writing %02x to P1 [%03x/%03x]\n",data,m_printer_pins,~m_printer_pins & 0x1ff);
 }
 
-READ8_MEMBER(pcw_state::mcu_printer_p2_r)
+uint8_t pcw_state::mcu_printer_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 //  logerror("PRN: MCU reading data from P2\n");
@@ -785,7 +785,7 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 	return ret;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
+void pcw_state::mcu_printer_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("PRN: MCU writing %02x to P2\n",data);
 	m_printer_p2 = data & 0x70;
@@ -818,13 +818,13 @@ WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 }
 
 // Paper sensor
-READ8_MEMBER(pcw_state::mcu_printer_t1_r)
+uint8_t pcw_state::mcu_printer_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
 // Print head location (0 if at left margin, otherwise 1)
-READ8_MEMBER(pcw_state::mcu_printer_t0_r)
+uint8_t pcw_state::mcu_printer_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_printer_headpos == 0)
 		return 0;
@@ -870,22 +870,22 @@ void pcw_state::mcu_transmit_serial(uint8_t bit)
 	}
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_r)
+uint8_t pcw_state::mcu_kb_scan_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_kb_scan_row & 0xff;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_w)
+void pcw_state::mcu_kb_scan_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_scan_row = (m_kb_scan_row & 0xff00) | data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_scan_high_r)
+uint8_t pcw_state::mcu_kb_scan_high_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_kb_scan_row & 0xff00) >> 8;
 }
 
-WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
+void pcw_state::mcu_kb_scan_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((m_mcu_prev & 0x02) && !(data & 0x02))  // bit is transmitted on high-to-low clock transition
 	{
@@ -904,7 +904,7 @@ WRITE8_MEMBER(pcw_state::mcu_kb_scan_high_w)
 	m_mcu_prev = data;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_data_r)
+uint8_t pcw_state::mcu_kb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t scan_bits = ((m_kb_scan_row & 0xf000) >> 4) | (m_kb_scan_row & 0xff);
 	int x;
@@ -919,18 +919,18 @@ READ8_MEMBER(pcw_state::mcu_kb_data_r)
 	return 0xff;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t1_r)
+uint8_t pcw_state::mcu_kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-READ8_MEMBER(pcw_state::mcu_kb_t0_r)
+uint8_t pcw_state::mcu_kb_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 /* TODO: Implement parallel port! */
-READ8_MEMBER(pcw_state::pcw9512_parallel_r)
+uint8_t pcw_state::pcw9512_parallel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==1)
 	{
@@ -942,7 +942,7 @@ READ8_MEMBER(pcw_state::pcw9512_parallel_r)
 }
 
 /* TODO: Implement parallel port! */
-WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
+void pcw_state::pcw9512_parallel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pcw9512 parallel w: offs: %04x data: %02x\n",offset,data);
 }

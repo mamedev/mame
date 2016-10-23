@@ -93,10 +93,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom) override { return m_rom[offset]; }
+	virtual uint32_t read_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override { return m_rom[offset]; }
 
-	virtual DECLARE_READ32_MEMBER(read_gpio) override;
-	virtual DECLARE_WRITE32_MEMBER(write_gpio) override;
+	virtual uint32_t read_gpio(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_gpio(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 	virtual uint16_t gpio_dev_read(int gpio_dirs) { return 0; }
 	virtual void gpio_dev_write(uint16_t data, int gpio_dirs) {}
@@ -117,8 +117,8 @@ public:
 	gba_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 };
 
 
@@ -173,8 +173,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 protected:
 	//uint32_t m_flash_size;
@@ -215,8 +215,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 protected:
 	//uint32_t m_flash_size;
@@ -256,8 +256,8 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 private:
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
@@ -278,8 +278,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_tilt) override;
-	virtual DECLARE_WRITE32_MEMBER(write_tilt) override;
+	virtual uint32_t read_tilt(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_tilt(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 private:
 	int m_tilt_ready;
@@ -302,8 +302,8 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE32_MEMBER(write_ram) override;
+	virtual uint32_t read_ram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 protected:
 	std::unique_ptr<gba_eeprom_device> m_eeprom;
@@ -347,7 +347,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_WRITE32_MEMBER(write_mapper) override;
+	virtual void write_mapper(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) override;
 
 private:
 	uint32_t m_src, m_dst, m_nblock;

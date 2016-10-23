@@ -118,16 +118,16 @@ public:
 	// this is shared among all video setups with vram
 	uint32_t *m_vram;
 
-	DECLARE_READ16_MEMBER ( mac_via_r );
-	DECLARE_WRITE16_MEMBER ( mac_via_w );
-	DECLARE_READ16_MEMBER ( mac_scc_r );
-	DECLARE_WRITE16_MEMBER ( mac_scc_w );
-	DECLARE_WRITE16_MEMBER ( mac_scc_2_w );
+	uint16_t mac_via_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mac_scc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mac_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mac_scc_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ32_MEMBER(mac_read_id);
+	uint32_t mac_read_id(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ8_MEMBER(mac_5396_r);
-	DECLARE_WRITE8_MEMBER(mac_5396_w);
+	uint8_t mac_5396_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_5396_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
@@ -136,8 +136,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cuda_adb_linechange_w);
 
 	// hack functions
-	DECLARE_READ64_MEMBER ( unk1_r );
-	DECLARE_READ64_MEMBER ( unk2_r );
+	uint64_t unk1_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t unk2_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	void init_pippin();
 private:
@@ -151,10 +151,10 @@ public:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	DECLARE_READ8_MEMBER(mac_via_in_a);
-	DECLARE_READ8_MEMBER(mac_via_in_b);
-	DECLARE_WRITE8_MEMBER(mac_via_out_a);
-	DECLARE_WRITE8_MEMBER(mac_via_out_b);
+	uint8_t mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);

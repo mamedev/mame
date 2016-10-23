@@ -31,12 +31,12 @@ public:
 	tilemap_t *m_tilemap_1;
 	int m_tile_bank;
 
-	DECLARE_WRITE8_MEMBER(powerinsa_okibank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(tilebank_w);
-	DECLARE_WRITE16_MEMBER(vram_0_w);
-	DECLARE_WRITE16_MEMBER(vram_1_w);
-	DECLARE_READ8_MEMBER(powerinsb_fake_ym2203_r);
+	void powerinsa_okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tilebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t powerinsb_fake_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void machine_start_powerinsa();
 

@@ -20,8 +20,8 @@ public:
 	static void set_tile_indirect_cb(device_t &device,snk68_tile_indirection_delegate newtilecb);
 	static void static_set_no_partial(device_t &device);
 
-	DECLARE_READ16_MEMBER(spriteram_r);
-	DECLARE_WRITE16_MEMBER(spriteram_w);
+	uint16_t spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group);
 	void draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

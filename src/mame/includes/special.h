@@ -65,25 +65,25 @@ public:
 		m_io_line12(*this, "LINE12"),
 		m_palette(*this, "palette")  { }
 
-	DECLARE_WRITE8_MEMBER(specimx_select_bank);
-	DECLARE_WRITE8_MEMBER(video_memory_w);
-	DECLARE_WRITE8_MEMBER(specimx_video_color_w);
-	DECLARE_READ8_MEMBER(specimx_video_color_r);
-	DECLARE_READ8_MEMBER(specimx_disk_ctrl_r);
-	DECLARE_WRITE8_MEMBER(specimx_disk_ctrl_w);
-	DECLARE_READ8_MEMBER(erik_rr_reg_r);
-	DECLARE_WRITE8_MEMBER(erik_rr_reg_w);
-	DECLARE_READ8_MEMBER(erik_rc_reg_r);
-	DECLARE_WRITE8_MEMBER(erik_rc_reg_w);
-	DECLARE_READ8_MEMBER(erik_disk_reg_r);
-	DECLARE_WRITE8_MEMBER(erik_disk_reg_w);
-	DECLARE_READ8_MEMBER(specialist_8255_porta_r);
-	DECLARE_READ8_MEMBER(specialist_8255_portb_r);
-	DECLARE_READ8_MEMBER(specimx_8255_portb_r);
-	DECLARE_READ8_MEMBER(specialist_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
+	void specimx_select_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void specimx_video_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t specimx_video_color_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t specimx_disk_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void specimx_disk_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t erik_rr_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void erik_rr_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t erik_rc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void erik_rc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t erik_disk_reg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void erik_disk_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t specialist_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t specialist_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t specimx_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t specialist_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void specialist_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void specialist_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void specialist_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;

@@ -285,7 +285,7 @@ DISCRETE_SOUND_START( skyraid )
 DISCRETE_SOUND_END
 
 
-WRITE8_MEMBER(skyraid_state::skyraid_sound_w)
+void skyraid_state::skyraid_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* BIT0 => PLANE SWEEP */
 	/* BIT1 => MISSILE     */

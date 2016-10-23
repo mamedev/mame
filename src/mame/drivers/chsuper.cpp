@@ -37,9 +37,9 @@ public:
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette")  { }
 
-	DECLARE_WRITE8_MEMBER(chsuper_vram_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outporta_w);
-	DECLARE_WRITE8_MEMBER(chsuper_outportb_w);
+	void chsuper_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chsuper_outporta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chsuper_outportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_tilexor;
 	uint8_t m_blacklamp;
@@ -94,7 +94,7 @@ uint32_t chsuper_state::screen_update( screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
+void chsuper_state::chsuper_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram[offset] = data;
 }
@@ -141,7 +141,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_vram_w )
 
 */
 
-WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
+void chsuper_state::chsuper_outporta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)  // Port EEh
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);  // Coin counter
 	output().set_lamp_value(0, (data >> 1) & 1);  // Hold 1 / Black (Nero) lamp.
@@ -167,7 +167,7 @@ WRITE8_MEMBER( chsuper_state::chsuper_outporta_w )  // Port EEh
 	}
 }
 
-WRITE8_MEMBER( chsuper_state::chsuper_outportb_w )  // Port EFh
+void chsuper_state::chsuper_outportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)  // Port EFh
 {
 	// D0: unknown...
 	// D1: unused...

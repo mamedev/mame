@@ -135,16 +135,16 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(port3_r);
-	DECLARE_WRITE16_MEMBER(port3_w);
-	DECLARE_READ16_MEMBER(port5_r);
-	DECLARE_WRITE16_MEMBER(port5_w);
-	DECLARE_READ16_MEMBER(port6_r);
-	DECLARE_WRITE16_MEMBER(port6_w);
-	DECLARE_READ16_MEMBER(porta_r);
-	DECLARE_READ16_MEMBER(portg_r);
+	uint16_t port3_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void port3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t port5_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void port5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t port6_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void port6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t porta_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t portg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(vctl_w);
+	void vctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// devices
@@ -227,47 +227,47 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	return 0;
 }
 
-READ16_MEMBER(invqix_state::port3_r)
+uint16_t invqix_state::port3_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_eeprom->do_read() << 5) | 0x03;
 }
 
-WRITE16_MEMBER(invqix_state::port3_w)
+void invqix_state::port3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_eeprom->cs_write((data >> 2) & 1);
 	m_eeprom->di_write((data >> 4) & 1);
 	m_eeprom->clk_write((data >> 3) & 1);
 }
 
-READ16_MEMBER(invqix_state::port5_r)
+uint16_t invqix_state::port5_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::port5_w)
+void invqix_state::port5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER(invqix_state::port6_r)
+uint16_t invqix_state::port6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::port6_w)
+void invqix_state::port6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
-READ16_MEMBER(invqix_state::porta_r)
+uint16_t invqix_state::porta_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xf0;
 }
 
-READ16_MEMBER(invqix_state::portg_r)
+uint16_t invqix_state::portg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-WRITE16_MEMBER(invqix_state::vctl_w)
+void invqix_state::vctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vctl = data;
 }

@@ -26,10 +26,10 @@ public:
 	static void set_vram_size(device_t &device, uint32_t vram_size) { downcast<huc6270_device &>(device).m_vram_size = vram_size; }
 	template<class _Object> static devcb_base &set_irq_changed_callback(device_t &device, _Object object) { return downcast<huc6270_device &>(device).m_irq_changed_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( next_pixel );
-	inline DECLARE_READ16_MEMBER( time_until_next_event )
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t next_pixel(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	inline uint16_t time_until_next_event(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)
 	{
 		return m_horz_to_go * 8 + m_horz_steps;
 	}

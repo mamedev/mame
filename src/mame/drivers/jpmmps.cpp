@@ -153,9 +153,9 @@ protected:
 	required_device<sn76489_device> m_psg;
 	required_device<meters_device> m_meters;
 public:
-	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
-	DECLARE_WRITE8_MEMBER(jpmmps_ic22_portc_w);
+	void jpmmps_meters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jpmmps_psg_buf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jpmmps_ic22_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 static ADDRESS_MAP_START( jpmmps_map, AS_PROGRAM, 8, jpmmps_state )
@@ -197,7 +197,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( jpmmps )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
+void jpmmps_state::jpmmps_meters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for (int meter = 0; meter < 8; meter ++)
 	{
@@ -206,12 +206,12 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_meters_w)
 }
 
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_psg_buf_w)
+void jpmmps_state::jpmmps_psg_buf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_buffer = data;
 }
 
-WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
+void jpmmps_state::jpmmps_ic22_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//Handle PSG
 

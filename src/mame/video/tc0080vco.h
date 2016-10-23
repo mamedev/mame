@@ -21,18 +21,18 @@ public:
 	}
 	static void set_bgflip_yoffs(device_t &device, int offs) { downcast<tc0080vco_device &>(device).m_bg_flip_yoffs = offs; }
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
 	void set_fg0_debug(bool debug) { m_has_fg0 = debug ? 0 : 1; }
 
-	DECLARE_READ16_MEMBER( cram_0_r );
-	DECLARE_READ16_MEMBER( cram_1_r );
-	DECLARE_READ16_MEMBER( sprram_r );
-	DECLARE_READ16_MEMBER( scrram_r );
-	DECLARE_WRITE16_MEMBER( scrollram_w );
+	uint16_t cram_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t cram_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sprram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t scrram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scrollram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	READ_LINE_MEMBER( flipscreen_r );
 	void postload();
 

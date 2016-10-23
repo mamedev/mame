@@ -709,7 +709,7 @@ uint8_t x1_state::get_game_key(uint8_t port)
 	return ret;
 }
 
-READ8_MEMBER( x1_state::x1_sub_io_r )
+uint8_t x1_state::x1_sub_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret,bus_res;
 
@@ -831,7 +831,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_sub_io_w )
+void x1_state::x1_sub_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* sub-routine at $10e sends to these sub-routines when a keyboard input is triggered:
 	 $17a -> floppy
@@ -961,7 +961,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
  *************************************/
 
 
-READ8_MEMBER( x1_state::x1_rom_r )
+uint8_t x1_state::x1_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 	if (m_cart->exists())
@@ -970,17 +970,17 @@ READ8_MEMBER( x1_state::x1_rom_r )
 		return 0;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_w )
+void x1_state::x1_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_index[offset] = data;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_bank_0_w )
+void x1_state::x1_rom_bank_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = 0x10;
 }
 
-WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
+void x1_state::x1_rom_bank_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = 0x00;
 }
@@ -991,7 +991,7 @@ WRITE8_MEMBER( x1_state::x1_rom_bank_1_w )
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_fdc_r )
+uint8_t x1_state::x1_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//uint8_t ret = 0;
 
@@ -1022,7 +1022,7 @@ READ8_MEMBER( x1_state::x1_fdc_r )
 	return 0x00;
 }
 
-WRITE8_MEMBER( x1_state::x1_fdc_w )
+void x1_state::x1_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -1126,7 +1126,7 @@ uint16_t x1_state::get_pcg_addr( uint16_t width, uint8_t y_char_size )
 	return pcg_offset;
 }
 
-READ8_MEMBER( x1_state::x1_pcg_r )
+uint8_t x1_state::x1_pcg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int addr;
 	int pcg_offset;
@@ -1162,7 +1162,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_pcg_w )
+void x1_state::x1_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int addr,pcg_offset;
 
@@ -1231,7 +1231,7 @@ void x1_state::set_current_palette()
 	//  machine().first_screen()->update_partial(machine().first_screen()->vpos());
 }
 
-WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
+void x1_state::x1turboz_4096_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t pal_entry;
 	uint8_t r,g,b;
@@ -1249,7 +1249,7 @@ WRITE8_MEMBER( x1_state::x1turboz_4096_palette_w )
 
 /* Note: docs claims that reading the palette ports makes the value to change somehow in X1 mode ...
          In 4096 color mode, it's used for reading the value back. */
-WRITE8_MEMBER( x1_state::x1_pal_r_w )
+void x1_state::x1_pal_r_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
 	{
@@ -1263,7 +1263,7 @@ WRITE8_MEMBER( x1_state::x1_pal_r_w )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_pal_g_w )
+void x1_state::x1_pal_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
 	{
@@ -1277,7 +1277,7 @@ WRITE8_MEMBER( x1_state::x1_pal_g_w )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_pal_b_w )
+void x1_state::x1_pal_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_turbo_reg.pal & 0x80) //AEN bit, Turbo Z
 	{
@@ -1291,7 +1291,7 @@ WRITE8_MEMBER( x1_state::x1_pal_b_w )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
+void x1_state::x1_ex_gfxram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t ex_mask;
 
@@ -1317,7 +1317,7 @@ WRITE8_MEMBER( x1_state::x1_ex_gfxram_w )
     d6(40) = 0:8-raster graphics      1:16-raster graphics
     d7(80) = 0:don't display          1:display  <- underline (when 1, graphics are not displayed)
 */
-WRITE8_MEMBER( x1_state::x1_scrn_w )
+void x1_state::x1_scrn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrn_reg.pcg_mode = BIT(data, 5);
 	m_scrn_reg.gfx_bank = BIT(data, 4);
@@ -1331,13 +1331,13 @@ WRITE8_MEMBER( x1_state::x1_scrn_w )
 		printf("SCRN sets true 400 lines mode\n");
 }
 
-WRITE8_MEMBER( x1_state::x1_pri_w )
+void x1_state::x1_pri_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrn_reg.pri = data;
 //  printf("PRI = %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_6845_w )
+void x1_state::x1_6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -1351,13 +1351,13 @@ WRITE8_MEMBER( x1_state::x1_6845_w )
 	}
 }
 
-READ8_MEMBER( x1_state::x1turboz_blackclip_r )
+uint8_t x1_state::x1turboz_blackclip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*  TODO: this returns only on x1turboz */
 	return m_scrn_reg.blackclip;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_blackclip_w )
+void x1_state::x1turbo_blackclip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	-x-- ---- replace blanking duration with black
@@ -1371,33 +1371,33 @@ WRITE8_MEMBER( x1_state::x1turbo_blackclip_w )
 		printf("Blackclip data access %02x\n",data);
 }
 
-READ8_MEMBER( x1_state::x1turbo_pal_r )
+uint8_t x1_state::x1turbo_pal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_turbo_reg.pal;
 }
 
-READ8_MEMBER( x1_state::x1turbo_txpal_r )
+uint8_t x1_state::x1turbo_txpal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_turbo_reg.txt_pal[offset];
 }
 
-READ8_MEMBER( x1_state::x1turbo_txdisp_r )
+uint8_t x1_state::x1turbo_txdisp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_turbo_reg.txt_disp;
 }
 
-READ8_MEMBER( x1_state::x1turbo_gfxpal_r )
+uint8_t x1_state::x1turbo_gfxpal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_turbo_reg.gfx_pal;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_pal_w )
+void x1_state::x1turbo_pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("TURBO PAL %02x\n",data);
 	m_turbo_reg.pal = data;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
+void x1_state::x1turbo_txpal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 
@@ -1414,13 +1414,13 @@ WRITE8_MEMBER( x1_state::x1turbo_txpal_w )
 	}
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_txdisp_w )
+void x1_state::x1turbo_txdisp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("TURBO TEXT DISPLAY %02x\n",data);
 	m_turbo_reg.txt_disp = data;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_gfxpal_w )
+void x1_state::x1turbo_gfxpal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("TURBO GFX PAL %02x\n",data);
 	m_turbo_reg.gfx_pal = data;
@@ -1446,7 +1446,7 @@ uint16_t x1_state::jis_convert(int kanji_addr)
 	return 0x0000;
 }
 
-READ8_MEMBER( x1_state::x1_kanji_r )
+uint8_t x1_state::x1_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -1458,7 +1458,7 @@ READ8_MEMBER( x1_state::x1_kanji_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_kanji_w )
+void x1_state::x1_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if(offset < 2)
 
@@ -1488,7 +1488,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 	}
 }
 
-READ8_MEMBER( x1_state::x1_emm_r )
+uint8_t x1_state::x1_emm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -1512,7 +1512,7 @@ READ8_MEMBER( x1_state::x1_emm_r )
 	return res;
 }
 
-WRITE8_MEMBER( x1_state::x1_emm_w )
+void x1_state::x1_emm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & ~3)
 	{
@@ -1535,13 +1535,13 @@ WRITE8_MEMBER( x1_state::x1_emm_w )
 /*
     CZ-141SF, CZ-127MF, X1turboZII, X1turboZ3 boards
 */
-READ8_MEMBER( x1_state::x1turbo_bank_r )
+uint8_t x1_state::x1turbo_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("BANK access read\n");
 	return m_ex_bank & 0x3f;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_bank_w )
+void x1_state::x1turbo_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//uint8_t *RAM = memregion("x1_cpu")->base();
 	/*
@@ -1555,7 +1555,7 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 }
 
 /* TODO: waitstate penalties */
-READ8_MEMBER( x1_state::x1_mem_r )
+uint8_t x1_state::x1_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
@@ -1565,12 +1565,12 @@ READ8_MEMBER( x1_state::x1_mem_r )
 	return m_work_ram[offset]; //RAM
 }
 
-WRITE8_MEMBER( x1_state::x1_mem_w )
+void x1_state::x1_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_work_ram[offset] = data; //RAM
 }
 
-READ8_MEMBER( x1_state::x1turbo_mem_r )
+uint8_t x1_state::x1turbo_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if((m_ex_bank & 0x10) == 0)
 		return m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)];
@@ -1578,7 +1578,7 @@ READ8_MEMBER( x1_state::x1turbo_mem_r )
 	return x1_mem_r(space,offset);
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_mem_w )
+void x1_state::x1turbo_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((m_ex_bank & 0x10) == 0)
 		m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
@@ -1592,7 +1592,7 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_io_r )
+uint8_t x1_state::x1_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
@@ -1622,7 +1622,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( x1_state::x1_io_w )
+void x1_state::x1_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_io_bank_mode == 1)                     { x1_ex_gfxram_w(space, offset, data); }
 	// TODO: user could install ym2151 on plain X1 too
@@ -1665,7 +1665,7 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 }
 
 /* TODO: I should actually simplify this, by just overwriting X1 Turbo specifics here, and call plain X1 functions otherwise */
-READ8_MEMBER( x1_state::x1turbo_io_r )
+uint8_t x1_state::x1turbo_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
@@ -1712,7 +1712,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( x1_state::x1turbo_io_w )
+void x1_state::x1turbo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// a * at the end states devices used on plain X1 too
 	if(m_io_bank_mode == 1)                    { x1_ex_gfxram_w(space, offset, data); }
@@ -1789,14 +1789,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-READ8_MEMBER( x1_state::x1_porta_r )
+uint8_t x1_state::x1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("PPI Port A read\n");
 	return 0xff;
 }
 
 /* this port is system related */
-READ8_MEMBER( x1_state::x1_portb_r )
+uint8_t x1_state::x1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("PPI Port B read\n");
 	/*
@@ -1839,7 +1839,7 @@ READ8_MEMBER( x1_state::x1_portb_r )
 }
 
 /* I/O system port */
-READ8_MEMBER( x1_state::x1_portc_r )
+uint8_t x1_state::x1_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("PPI Port C read\n");
 	/*
@@ -1852,17 +1852,17 @@ READ8_MEMBER( x1_state::x1_portc_r )
 	return (m_io_sys & 0x9f) | m_hres_320 | ~m_io_switch;
 }
 
-WRITE8_MEMBER( x1_state::x1_porta_w )
+void x1_state::x1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("PPI Port A write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portb_w )
+void x1_state::x1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("PPI Port B write %02x\n",data);
 }
 
-WRITE8_MEMBER( x1_state::x1_portc_w )
+void x1_state::x1_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hres_320 = data & 0x40;
 
@@ -1878,25 +1878,25 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	m_cassette->output(BIT(data, 0) ? +1.0 : -1.0);
 }
 
-READ8_MEMBER(x1_state::memory_read_byte)
+uint8_t x1_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::memory_write_byte)
+void x1_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(x1_state::io_read_byte)
+uint8_t x1_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(x1_state::io_write_byte)
+void x1_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.write_byte(offset, data);

@@ -27,14 +27,14 @@ void thoop2_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-WRITE16_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
+void thoop2_state::OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7){
 		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
-WRITE16_MEMBER(thoop2_state::coin_w)
+void thoop2_state::coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7){
 		switch ((offset >> 3)){
@@ -55,7 +55,7 @@ WRITE16_MEMBER(thoop2_state::coin_w)
 
 /* pretend that it's there */
 
-READ16_MEMBER(thoop2_state::DS5002FP_R)
+uint16_t thoop2_state::DS5002FP_R(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x55aa;
 }

@@ -274,7 +274,7 @@ std::string scv_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(scv_cart_slot_device::read_cart)
+uint8_t scv_cart_slot_device::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_cart(space, offset);
@@ -286,7 +286,7 @@ READ8_MEMBER(scv_cart_slot_device::read_cart)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(scv_cart_slot_device::write_cart)
+void scv_cart_slot_device::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_cart(space, offset, data);
@@ -297,7 +297,7 @@ WRITE8_MEMBER(scv_cart_slot_device::write_cart)
  write_bank
  -------------------------------------------------*/
 
-WRITE8_MEMBER(scv_cart_slot_device::write_bank)
+void scv_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_bank(space, offset, data);

@@ -76,11 +76,11 @@ public:
 	template<class _Object> static devcb_base &set_out_b_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_b_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_irq_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( ins8154_r );
-	DECLARE_WRITE8_MEMBER( ins8154_w );
+	uint8_t ins8154_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ins8154_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ins8154_porta_w );
-	DECLARE_WRITE8_MEMBER( ins8154_portb_w );
+	void ins8154_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ins8154_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

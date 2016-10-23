@@ -484,20 +484,20 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
 
-	DECLARE_WRITE8_MEMBER(fclown_videoram_w);
-	DECLARE_WRITE8_MEMBER(fclown_colorram_w);
-	DECLARE_WRITE8_MEMBER(cpu_c048_w);
-	DECLARE_WRITE8_MEMBER(cpu_d800_w);
-	DECLARE_READ8_MEMBER(snd_e06_r);
-	DECLARE_WRITE8_MEMBER(snd_800_w);
-	DECLARE_WRITE8_MEMBER(snd_a02_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(counters_w);
-	DECLARE_WRITE8_MEMBER(trigsnd_w);
-	DECLARE_READ8_MEMBER(pia0_b_r);
-	DECLARE_READ8_MEMBER(pia1_b_r);
-	DECLARE_WRITE8_MEMBER(fclown_ay8910_w);
+	void fclown_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fclown_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpu_c048_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpu_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t snd_e06_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void snd_800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void snd_a02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void trigsnd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fclown_ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_fclown();
 	TILE_GET_INFO_MEMBER(get_fclown_tile_info);
 	virtual void machine_start() override;
@@ -523,13 +523,13 @@ void _5clown_state::machine_start()
 
 
 
-WRITE8_MEMBER(_5clown_state::fclown_videoram_w)
+void _5clown_state::fclown_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(_5clown_state::fclown_colorram_w)
+void _5clown_state::fclown_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -619,7 +619,7 @@ PALETTE_INIT_MEMBER(_5clown_state, _5clown)
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
    The selector bits are located in PIA1, portB (bits 4-7).
 */
-READ8_MEMBER(_5clown_state::mux_port_r)
+uint8_t _5clown_state::mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_mux_data & 0xf0 )     /* bits 4-7 */
 	{
@@ -633,13 +633,13 @@ READ8_MEMBER(_5clown_state::mux_port_r)
 }
 
 
-WRITE8_MEMBER(_5clown_state::mux_w)
+void _5clown_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data ^ 0xff;   /* Inverted */
 }
 
 
-WRITE8_MEMBER(_5clown_state::counters_w)
+void _5clown_state::counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  Counters:
 
@@ -658,7 +658,7 @@ WRITE8_MEMBER(_5clown_state::counters_w)
 }
 
 
-WRITE8_MEMBER(_5clown_state::trigsnd_w)
+void _5clown_state::trigsnd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/************ Interrupts trigger **************
 
@@ -676,13 +676,13 @@ WRITE8_MEMBER(_5clown_state::trigsnd_w)
 
 }
 
-READ8_MEMBER(_5clown_state::pia0_b_r)
+uint8_t _5clown_state::pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* often read the port */
 	return 0x00;
 }
 
-READ8_MEMBER(_5clown_state::pia1_b_r)
+uint8_t _5clown_state::pia1_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* constantly read the port */
 	return 0x00;    /* bit 2 shouldn't be active to allow work the key out system */
@@ -692,12 +692,12 @@ READ8_MEMBER(_5clown_state::pia1_b_r)
 /**********************************/
 
 
-WRITE8_MEMBER(_5clown_state::cpu_c048_w)
+void _5clown_state::cpu_c048_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Main: Write to $C048: %02X\n", data);
 }
 
-WRITE8_MEMBER(_5clown_state::cpu_d800_w)
+void _5clown_state::cpu_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Main: Write to $D800: %02x\n", data);
 	m_main_latch_d800 = data;
@@ -708,7 +708,7 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 *  AY3-8910 R/W Handlers        *
 ********************************/
 
-WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
+void _5clown_state::fclown_ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ay8910->address_w(space, 0, offset);
 	m_ay8910->data_w(space, 0, data);
@@ -719,13 +719,13 @@ WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
 *  SOUND  R/W Handlers        *
 ******************************/
 
-READ8_MEMBER(_5clown_state::snd_e06_r)
+uint8_t _5clown_state::snd_e06_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("Sound: Read from $0E06 \n");
 	return m_main_latch_d800;
 }
 
-WRITE8_MEMBER(_5clown_state::snd_800_w)
+void _5clown_state::snd_800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_latch_0800 = data;
 
@@ -740,7 +740,7 @@ WRITE8_MEMBER(_5clown_state::snd_800_w)
 	}
 }
 
-WRITE8_MEMBER(_5clown_state::snd_a02_w)
+void _5clown_state::snd_a02_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_latch_0a02 = data & 0xff;
 	logerror("Sound: Write to $0A02: %02x\n", m_snd_latch_0a02);

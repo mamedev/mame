@@ -39,9 +39,9 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -49,8 +49,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_sg1000_expansion_slot_interface overrides
-	virtual DECLARE_READ8_MEMBER(peripheral_r) override;
-	virtual DECLARE_WRITE8_MEMBER(peripheral_w) override;
+	virtual uint8_t peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual bool is_readable(uint8_t offset) override;
 
 private:

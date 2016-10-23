@@ -46,12 +46,12 @@ public:
 
 	int m_sprxoffs;
 
-	DECLARE_WRITE16_MEMBER(stlforce_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(stlforce_tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_WRITE16_MEMBER(oki_bank_w);
+	void stlforce_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_mlow_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_mhigh_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void stlforce_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_twinbrat();
 	void init_stlforce();

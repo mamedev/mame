@@ -11,7 +11,7 @@
 #include "includes/bigevglf.h"
 
 
-WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
+void bigevglf_state::bigevglf_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int color;
 
@@ -20,7 +20,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
 	m_palette->set_pen_color(offset & 0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
-WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)
+void bigevglf_state::bigevglf_gfxcontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* bits used: 0,1,2,3
  0 and 2 select plane,
@@ -30,12 +30,12 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)
 	m_plane_visible = ((data & 8) >> 2) | ((data & 2) >> 1);
 }
 
-WRITE8_MEMBER(bigevglf_state::bigevglf_vidram_addr_w)
+void bigevglf_state::bigevglf_vidram_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vidram_bank = (data & 0xff) * 0x100;
 }
 
-WRITE8_MEMBER(bigevglf_state::bigevglf_vidram_w)
+void bigevglf_state::bigevglf_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t x, y, o;
 	o = m_vidram_bank + offset;
@@ -45,7 +45,7 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_vidram_w)
 	m_tmp_bitmap[m_plane_selected].pix16(y, x) = data;
 }
 
-READ8_MEMBER(bigevglf_state::bigevglf_vidram_r)
+uint8_t bigevglf_state::bigevglf_vidram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vidram[0x10000 * m_plane_selected + m_vidram_bank + offset];
 }

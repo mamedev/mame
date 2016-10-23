@@ -121,7 +121,7 @@ uint32_t t6a04_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-WRITE8_MEMBER(t6a04_device::control_write)
+void t6a04_device::control_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xc0) == 0xc0) // SCE (set contrast)
 	{
@@ -166,7 +166,7 @@ WRITE8_MEMBER(t6a04_device::control_write)
 	}
 }
 
-READ8_MEMBER(t6a04_device::control_read)
+uint8_t t6a04_device::control_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    status read
@@ -182,7 +182,7 @@ READ8_MEMBER(t6a04_device::control_read)
 	return (m_busy_flag<<7) | (m_word_len<<6) | (m_display_on<<5) | (m_active_counter<<1) | (m_direction == 1 ? 1 : 0);
 }
 
-WRITE8_MEMBER(t6a04_device::data_write)
+void t6a04_device::data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_word_len)
 	{
@@ -209,7 +209,7 @@ WRITE8_MEMBER(t6a04_device::data_write)
 
 }
 
-READ8_MEMBER(t6a04_device::data_read)
+uint8_t t6a04_device::data_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_output_reg;
 	uint8_t output_reg;

@@ -192,12 +192,12 @@ void egret_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( egret_device::ddr_r )
+uint8_t egret_device::ddr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( egret_device::ddr_w )
+void egret_device::ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  printf("%02x to DDR %c\n", data, 'A' + offset);*/
 
@@ -206,7 +206,7 @@ WRITE8_MEMBER( egret_device::ddr_w )
 	ddrs[offset] = data;
 }
 
-READ8_MEMBER( egret_device::ports_r )
+uint8_t egret_device::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t incoming = 0;
 
@@ -249,19 +249,19 @@ READ8_MEMBER( egret_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( egret_device::ports_w )
+void egret_device::ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	send_port(space, offset, data);
 
 	ports[offset] = data;
 }
 
-READ8_MEMBER( egret_device::pll_r )
+uint8_t egret_device::pll_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pll_ctrl;
 }
 
-WRITE8_MEMBER( egret_device::pll_w )
+void egret_device::pll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#ifdef EGRET_SUPER_VERBOSE
 	if (pll_ctrl != data)
@@ -278,34 +278,34 @@ WRITE8_MEMBER( egret_device::pll_w )
 	pll_ctrl = data;
 }
 
-READ8_MEMBER( egret_device::timer_ctrl_r )
+uint8_t egret_device::timer_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return timer_ctrl;
 }
 
-WRITE8_MEMBER( egret_device::timer_ctrl_w )
+void egret_device::timer_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to timer control\n", data);
 	timer_ctrl = data;
 }
 
-READ8_MEMBER( egret_device::timer_counter_r )
+uint8_t egret_device::timer_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return timer_counter;
 }
 
-WRITE8_MEMBER( egret_device::timer_counter_w )
+void egret_device::timer_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to timer/counter\n", data);
 	timer_counter = data;
 }
 
-READ8_MEMBER( egret_device::onesec_r )
+uint8_t egret_device::onesec_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return onesec;
 }
 
-WRITE8_MEMBER( egret_device::onesec_w )
+void egret_device::onesec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x to one-second control\n", data);
 
@@ -319,12 +319,12 @@ WRITE8_MEMBER( egret_device::onesec_w )
 	onesec = data;
 }
 
-READ8_MEMBER( egret_device::pram_r )
+uint8_t egret_device::pram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pram[offset];
 }
 
-WRITE8_MEMBER( egret_device::pram_w )
+void egret_device::pram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pram[offset] = data;
 }

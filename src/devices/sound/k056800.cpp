@@ -58,7 +58,7 @@ void k056800_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k056800_device::host_r )
+uint8_t k056800_device::host_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t r = offset & 7;
 	uint8_t data = 0;
@@ -80,7 +80,7 @@ READ8_MEMBER( k056800_device::host_r )
 }
 
 
-WRITE8_MEMBER( k056800_device::host_w )
+void k056800_device::host_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t r = offset & 7;
 
@@ -118,7 +118,7 @@ WRITE8_MEMBER( k056800_device::host_w )
 }
 
 
-READ8_MEMBER( k056800_device::sound_r )
+uint8_t k056800_device::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t r = offset & 7;
 	uint8_t data = 0;
@@ -137,7 +137,7 @@ READ8_MEMBER( k056800_device::sound_r )
 }
 
 
-WRITE8_MEMBER( k056800_device::sound_w )
+void k056800_device::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t r = offset & 7;
 

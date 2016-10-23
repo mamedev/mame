@@ -44,13 +44,13 @@ public:
 	uint8_t m_ay_sel;
 	uint8_t m_lastdataw;
 	uint16_t m_lastdatar;
-	DECLARE_READ16_MEMBER(ramdac_r);
-	DECLARE_WRITE16_MEMBER(ramdac_w);
-	DECLARE_WRITE8_MEMBER(tms_w);
-	DECLARE_READ8_MEMBER(tms_r);
-	DECLARE_READ8_MEMBER(hc11_porta_r);
-	DECLARE_WRITE8_MEMBER(hc11_porta_w);
-	DECLARE_WRITE8_MEMBER(ay8910_w);
+	uint16_t ramdac_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ramdac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tms_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hc11_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hc11_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(tms_irq);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	virtual void machine_reset() override;
@@ -98,7 +98,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(skeetsht_state::scanline_update)
 	}
 }
 
-READ16_MEMBER(skeetsht_state::ramdac_r)
+uint16_t skeetsht_state::ramdac_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset = (offset >> 12) & ~4;
 
@@ -108,7 +108,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	return m_tlc34076->read(space, offset);
 }
 
-WRITE16_MEMBER(skeetsht_state::ramdac_w)
+void skeetsht_state::ramdac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset = (offset >> 12) & ~4;
 
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(skeetsht_state::tms_irq)
 }
 
 
-WRITE8_MEMBER(skeetsht_state::tms_w)
+void skeetsht_state::tms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
@@ -139,7 +139,7 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 		m_tms->host_w(space, offset >> 1, (m_lastdataw << 8) | data, 0xffff);
 }
 
-READ8_MEMBER(skeetsht_state::tms_r)
+uint8_t skeetsht_state::tms_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((offset & 1) == 0)
 		m_lastdatar = m_tms->host_r(space, offset >> 1, 0xffff);
@@ -154,12 +154,12 @@ READ8_MEMBER(skeetsht_state::tms_r)
  *
  *************************************/
 
-READ8_MEMBER(skeetsht_state::hc11_porta_r)
+uint8_t skeetsht_state::hc11_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_porta_latch;
 }
 
-WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
+void skeetsht_state::hc11_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(data & 0x8) && (m_porta_latch & 8))
 		m_ay_sel = m_porta_latch & 0x10;
@@ -167,7 +167,7 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 	m_porta_latch = data;
 }
 
-WRITE8_MEMBER(skeetsht_state::ay8910_w)
+void skeetsht_state::ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_ay_sel)
 		m_ay->data_w(space, 0, data);

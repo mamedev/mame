@@ -53,19 +53,19 @@ public:
 		, m_floppy(nullptr)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(via_video_pba_w);
-	DECLARE_WRITE8_MEMBER(via_video_pbb_w);
+	void via_video_pba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_video_pbb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(via_video_ca2_w);
 
-	DECLARE_READ8_MEMBER(kbd1_r);
-	DECLARE_READ8_MEMBER(kbd2_r);
-	DECLARE_READ8_MEMBER(shift_kb1_r);
-	DECLARE_READ8_MEMBER(shift_kb2_r);
-	DECLARE_READ8_MEMBER(ctrl_kb1_r);
-	DECLARE_READ8_MEMBER(ctrl_kb2_r);
+	uint8_t kbd1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kbd2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t shift_kb1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t shift_kb2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ctrl_kb1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ctrl_kb2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(scanlines_kbd1_w);
-	DECLARE_WRITE8_MEMBER(scanlines_kbd2_w);
+	void scanlines_kbd1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scanlines_kbd2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_READ_LINE_MEMBER(via_keyb_ca2_r);
 
@@ -139,12 +139,12 @@ static ADDRESS_MAP_START( goupil_io, AS_IO, 8, goupil_g1_state)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( goupil_g1_state::scanlines_kbd1_w )
+void goupil_g1_state::scanlines_kbd1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row_kbd1 = data;
 }
 
-READ8_MEMBER( goupil_g1_state::ctrl_kb1_r )
+uint8_t goupil_g1_state::ctrl_kb1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	unsigned char data;
@@ -162,12 +162,12 @@ READ8_MEMBER( goupil_g1_state::ctrl_kb1_r )
 		return 0;
 }
 
-READ8_MEMBER( goupil_g1_state::ctrl_kb2_r )
+uint8_t goupil_g1_state::ctrl_kb2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-READ8_MEMBER( goupil_g1_state::shift_kb1_r )
+uint8_t goupil_g1_state::shift_kb1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	unsigned char data;
@@ -185,12 +185,12 @@ READ8_MEMBER( goupil_g1_state::shift_kb1_r )
 		return 0;
 }
 
-READ8_MEMBER( goupil_g1_state::shift_kb2_r )
+uint8_t goupil_g1_state::shift_kb2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
-READ8_MEMBER( goupil_g1_state::kbd1_r )
+uint8_t goupil_g1_state::kbd1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -205,7 +205,7 @@ READ8_MEMBER( goupil_g1_state::kbd1_r )
 	return data;
 }
 
-WRITE8_MEMBER( goupil_g1_state::scanlines_kbd2_w )
+void goupil_g1_state::scanlines_kbd2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row_kbd2 = data & 7;
 }
@@ -215,7 +215,7 @@ READ_LINE_MEMBER( goupil_g1_state::via_keyb_ca2_r )
 	return 0;
 }
 
-READ8_MEMBER( goupil_g1_state::kbd2_r )
+uint8_t goupil_g1_state::kbd2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	uint8_t data = 0xff;
@@ -399,7 +399,7 @@ void goupil_g1_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER(goupil_g1_state::via_video_pba_w)
+void goupil_g1_state::via_video_pba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#ifdef DBGMODE
 	printf("%s: write via_video_pba_w reg : 0x%X\n",machine().describe_context(),data);
@@ -407,7 +407,7 @@ WRITE8_MEMBER(goupil_g1_state::via_video_pba_w)
 	m_ef9364->char_latch_w(data);
 }
 
-WRITE8_MEMBER(goupil_g1_state::via_video_pbb_w)
+void goupil_g1_state::via_video_pbb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#ifdef DBGMODE
 	printf("%s: write via_video_pbb_w reg : 0x%X\n",machine().describe_context(),data);

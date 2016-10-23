@@ -11,12 +11,12 @@
 #include "includes/ladyfrog.h"
 
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_spriteram_w)
+void ladyfrog_state::ladyfrog_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spriteram[offset] = data;
 }
 
-READ8_MEMBER(ladyfrog_state::ladyfrog_spriteram_r)
+uint8_t ladyfrog_state::ladyfrog_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_spriteram[offset];
 }
@@ -31,18 +31,18 @@ TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
 			);
 }
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_videoram_w)
+void ladyfrog_state::ladyfrog_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-READ8_MEMBER(ladyfrog_state::ladyfrog_videoram_r)
+uint8_t ladyfrog_state::ladyfrog_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
+void ladyfrog_state::ladyfrog_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
@@ -50,7 +50,7 @@ WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
+uint8_t ladyfrog_state::ladyfrog_palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 0x100)
 		return m_paletteram_ext[(offset & 0xff) + (m_palette_bank << 8)];
@@ -58,12 +58,12 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
 		return m_paletteram[(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl_w)
+void ladyfrog_state::ladyfrog_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_bank = (data & 0x20) >> 5;
 }
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl2_w)
+void ladyfrog_state::ladyfrog_gfxctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tilebank = ((data & 0x18) >> 3) ^ 3;
 	m_bg_tilemap->mark_all_dirty();
@@ -73,18 +73,18 @@ WRITE8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl2_w)
 #ifdef UNUSED_FUNCTION
 int gfxctrl;
 
-READ8_MEMBER(ladyfrog_state::ladyfrog_gfxctrl_r)
+uint8_t ladyfrog_state::ladyfrog_gfxctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return gfxctrl;
 }
 #endif
 
-READ8_MEMBER(ladyfrog_state::ladyfrog_scrlram_r)
+uint8_t ladyfrog_state::ladyfrog_scrlram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scrlram[offset];
 }
 
-WRITE8_MEMBER(ladyfrog_state::ladyfrog_scrlram_w)
+void ladyfrog_state::ladyfrog_scrlram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);

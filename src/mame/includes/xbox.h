@@ -16,30 +16,30 @@ public:
 		usb_hack_enabled(false),
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ32_MEMBER(geforce_r);
-	DECLARE_WRITE32_MEMBER(geforce_w);
-	DECLARE_READ32_MEMBER(smbus_r);
-	DECLARE_WRITE32_MEMBER(smbus_w);
-	DECLARE_READ32_MEMBER(smbus2_r);
-	DECLARE_WRITE32_MEMBER(smbus2_w);
-	DECLARE_READ32_MEMBER(networkio_r);
-	DECLARE_WRITE32_MEMBER(networkio_w);
-	DECLARE_READ8_MEMBER(superio_read);
-	DECLARE_WRITE8_MEMBER(superio_write);
-	DECLARE_READ8_MEMBER(superiors232_read);
-	DECLARE_WRITE8_MEMBER(superiors232_write);
-	DECLARE_READ32_MEMBER(audio_apu_r);
-	DECLARE_WRITE32_MEMBER(audio_apu_w);
-	DECLARE_READ32_MEMBER(audio_ac93_r);
-	DECLARE_WRITE32_MEMBER(audio_ac93_w);
-	DECLARE_READ32_MEMBER(dummy_r);
-	DECLARE_WRITE32_MEMBER(dummy_w);
-	DECLARE_READ32_MEMBER(ohci_usb_r);
-	DECLARE_WRITE32_MEMBER(ohci_usb_w);
-	DECLARE_READ32_MEMBER(ohci_usb2_r);
-	DECLARE_WRITE32_MEMBER(ohci_usb2_w);
-	DECLARE_READ32_MEMBER(network_r);
-	DECLARE_WRITE32_MEMBER(network_w);
+	uint32_t geforce_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void geforce_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t smbus_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void smbus_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t smbus2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void smbus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t networkio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void networkio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint8_t superio_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void superio_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t superiors232_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void superiors232_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint32_t audio_apu_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void audio_apu_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t audio_ac93_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void audio_ac93_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t dummy_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void dummy_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ohci_usb_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ohci_usb_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ohci_usb2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ohci_usb2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t network_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void network_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void smbus_register_device(int address, int(*handler)(xbox_base_state &chs, int command, int rw, int data));
 	int smbus_pic16lc(int command, int rw, int data);
@@ -54,7 +54,7 @@ public:
 
 	virtual void machine_start() override;
 	DECLARE_WRITE_LINE_MEMBER(xbox_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_slave_ack);
+	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(xbox_pit8254_out2_changed);
 	DECLARE_WRITE_LINE_MEMBER(xbox_ohci_usb_interrupt_changed);

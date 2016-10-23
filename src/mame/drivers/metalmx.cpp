@@ -307,25 +307,25 @@ uint32_t metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-READ32_MEMBER(metalmx_state::unk_r)
+uint32_t metalmx_state::unk_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;//machine().rand();
 }
 
-READ32_MEMBER(metalmx_state::watchdog_r)
+uint32_t metalmx_state::watchdog_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(metalmx_state::shifter_w)
+void metalmx_state::shifter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-WRITE32_MEMBER(metalmx_state::motor_w)
+void metalmx_state::motor_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 
-WRITE32_MEMBER(metalmx_state::reset_w)
+void metalmx_state::reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -342,7 +342,7 @@ WRITE32_MEMBER(metalmx_state::reset_w)
  *
  *************************************/
 
-READ32_MEMBER(metalmx_state::sound_data_r)
+uint32_t metalmx_state::sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 
@@ -353,7 +353,7 @@ READ32_MEMBER(metalmx_state::sound_data_r)
 	return result;
 }
 
-WRITE32_MEMBER(metalmx_state::sound_data_w)
+void metalmx_state::sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		m_cage->control_w(data);
@@ -361,7 +361,7 @@ WRITE32_MEMBER(metalmx_state::sound_data_w)
 		m_cage->main_w(data >> 16);
 }
 
-WRITE8_MEMBER(metalmx_state::cage_irq_callback)
+void metalmx_state::cage_irq_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO */
 }
@@ -372,7 +372,7 @@ WRITE8_MEMBER(metalmx_state::cage_irq_callback)
  *
  *************************************/
 
-WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
+void metalmx_state::dsp32c_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 1;
 
@@ -384,7 +384,7 @@ WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
 	m_dsp32c_1->pio_w(offset, data);
 }
 
-READ32_MEMBER(metalmx_state::dsp32c_1_r)
+uint32_t metalmx_state::dsp32c_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -401,7 +401,7 @@ READ32_MEMBER(metalmx_state::dsp32c_1_r)
 	return data;
 }
 
-WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
+void metalmx_state::dsp32c_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 1;
 
@@ -413,7 +413,7 @@ WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
 	m_dsp32c_2->pio_w(offset, data);
 }
 
-READ32_MEMBER(metalmx_state::dsp32c_2_r)
+uint32_t metalmx_state::dsp32c_2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 
@@ -437,7 +437,7 @@ READ32_MEMBER(metalmx_state::dsp32c_2_r)
  *
  *************************************/
 
-WRITE32_MEMBER(metalmx_state::host_gsp_w)
+void metalmx_state::host_gsp_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
 
@@ -445,7 +445,7 @@ WRITE32_MEMBER(metalmx_state::host_gsp_w)
 	gsp_space.write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
 }
 
-READ32_MEMBER(metalmx_state::host_gsp_r)
+uint32_t metalmx_state::host_gsp_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
 	uint32_t val;
@@ -456,12 +456,12 @@ READ32_MEMBER(metalmx_state::host_gsp_r)
 }
 
 
-READ32_MEMBER(metalmx_state::host_dram_r)
+uint32_t metalmx_state::host_dram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_gsp_dram[offset * 2] << 16) | m_gsp_dram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(metalmx_state::host_dram_w)
+void metalmx_state::host_dram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_gsp_dram + offset * 2 + 1);
 	data >>= 16;
@@ -469,12 +469,12 @@ WRITE32_MEMBER(metalmx_state::host_dram_w)
 	COMBINE_DATA(m_gsp_dram + offset * 2);
 }
 
-READ32_MEMBER(metalmx_state::host_vram_r)
+uint32_t metalmx_state::host_vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return (m_gsp_vram[offset * 2] << 16) | m_gsp_vram[offset * 2 + 1];
 }
 
-WRITE32_MEMBER(metalmx_state::host_vram_w)
+void metalmx_state::host_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_gsp_vram + offset * 2 + 1);
 	data >>= 16;
@@ -483,7 +483,7 @@ WRITE32_MEMBER(metalmx_state::host_vram_w)
 }
 
 
-WRITE32_MEMBER(metalmx_state::timer_w)
+void metalmx_state::timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Offsets
 	// 9000 with 1 changes to external clock source

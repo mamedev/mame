@@ -37,9 +37,9 @@ public:
 
 	/* misc */
 	int       m_oki_bank;
-	DECLARE_WRITE16_MEMBER(drtomy_vram_fg_w);
-	DECLARE_WRITE16_MEMBER(drtomy_vram_bg_w);
-	DECLARE_WRITE16_MEMBER(drtomy_okibank_w);
+	void drtomy_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void drtomy_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void drtomy_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	virtual void machine_start() override;
@@ -147,19 +147,19 @@ uint32_t drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-WRITE16_MEMBER(drtomy_state::drtomy_vram_fg_w)
+void drtomy_state::drtomy_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram_fg[offset]);
 	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
+void drtomy_state::drtomy_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram_bg[offset]);
 	m_tilemap_bg->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(drtomy_state::drtomy_okibank_w)
+void drtomy_state::drtomy_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_oki_bank != (data & 3))
 	{

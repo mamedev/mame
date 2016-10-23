@@ -38,9 +38,9 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( rom_disable_r );
-	DECLARE_READ8_MEMBER( upd765_tc_r );
-	DECLARE_WRITE8_MEMBER( fdc_control_w );
+	uint8_t rom_disable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER( irq_callback );
 	DECLARE_WRITE_LINE_MEMBER( txda_w );
 	DECLARE_WRITE_LINE_MEMBER( dtra_w );

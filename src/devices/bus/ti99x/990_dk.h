@@ -16,8 +16,8 @@ class fd800_legacy_device : public device_t
 public:
 	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( cru_r );
-	DECLARE_WRITE8_MEMBER( cru_w );
+	uint8_t cru_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object)
 	{
 		return downcast<fd800_legacy_device &>(device).m_int_line.set_callback(object);

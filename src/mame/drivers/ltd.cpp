@@ -58,13 +58,13 @@ public:
 	void init_bhol_ltd();
 	void init_zephy();
 	void init_ltd();
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(port1_r);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_READ8_MEMBER(port2_r);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_WRITE8_MEMBER(count_reset_w);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 private:
@@ -236,7 +236,7 @@ INPUT_CHANGED_MEMBER( ltd_state::ficha )
 }
 
 // switches
-READ8_MEMBER( ltd_state::io_r )
+uint8_t ltd_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==0)
 		return ioport("X0")->read();
@@ -257,12 +257,12 @@ READ8_MEMBER( ltd_state::io_r )
 }
 
 // Lamps only used by Zephy
-WRITE8_MEMBER( ltd_state::io_w )
+void ltd_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset >>= 10; // reduces offsets to 1 per bank
 }
 
-READ8_MEMBER( ltd_state:: port1_r )
+uint8_t ltd_state:: port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_port2 & 0x10)
 	{
@@ -295,7 +295,7 @@ READ8_MEMBER( ltd_state:: port1_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( ltd_state::port1_w )
+void ltd_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_port2 & 0x10)
 	{
@@ -336,12 +336,12 @@ WRITE8_MEMBER( ltd_state::port1_w )
 	}
 }
 
-READ8_MEMBER( ltd_state:: port2_r )
+uint8_t ltd_state:: port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port2;
 }
 
-WRITE8_MEMBER( ltd_state::port2_w )
+void ltd_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (~m_port2 & data & 0x10)
 		m_counter++;
@@ -349,7 +349,7 @@ WRITE8_MEMBER( ltd_state::port2_w )
 	m_port2 = data;
 }
 
-WRITE8_MEMBER( ltd_state::count_reset_w )
+void ltd_state::count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter = 0;
 }

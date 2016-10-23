@@ -211,45 +211,45 @@ void h83337_device::device_reset()
 	syscr = 0x09;
 }
 
-READ8_MEMBER(h83337_device::syscr_r)
+uint8_t h83337_device::syscr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return syscr;
 }
 
-WRITE8_MEMBER(h83337_device::syscr_w)
+void h83337_device::syscr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	syscr = data;
 	logerror("syscr = %02x\n", data);
 }
 
-READ8_MEMBER(h83337_device::wscr_r)
+uint8_t h83337_device::wscr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::wscr_w)
+void h83337_device::wscr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("wscr = %02x\n", data);
 }
 
-READ8_MEMBER(h83337_device::stcr_r)
+uint8_t h83337_device::stcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::stcr_w)
+void h83337_device::stcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("stcr = %02x\n", data);
 	timer8_0->set_extra_clock_bit(data & 0x01);
 	timer8_1->set_extra_clock_bit(data & 0x02);
 }
 
-READ8_MEMBER(h83337_device::mdcr_r)
+uint8_t h83337_device::mdcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-WRITE8_MEMBER(h83337_device::mdcr_w)
+void h83337_device::mdcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("mdcr = %02x\n", data);
 }

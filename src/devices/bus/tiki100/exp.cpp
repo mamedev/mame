@@ -116,7 +116,7 @@ uint8_t tiki100_bus_t::mrq_r(address_space &space, offs_t offset, uint8_t data, 
 //  mrq_w - memory write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_bus_t::mrq_w )
+void tiki100_bus_t::mrq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 
@@ -150,7 +150,7 @@ uint8_t tiki100_bus_t::iorq_r(address_space &space, offs_t offset, uint8_t data)
 //  iorq_w - I/O write
 //-------------------------------------------------
 
-WRITE8_MEMBER( tiki100_bus_t::iorq_w )
+void tiki100_bus_t::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 

@@ -33,10 +33,10 @@ protected:
 		virtual void device_start() override;
 		virtual void device_reset() override;
 
-		DECLARE_READ32_MEMBER(viking_ack_r);
-		DECLARE_WRITE32_MEMBER(viking_ack_w);
-		DECLARE_READ32_MEMBER(viking_enable_r);
-		DECLARE_WRITE32_MEMBER(viking_disable_w);
+		uint32_t viking_ack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void viking_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+		uint32_t viking_enable_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+		void viking_disable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 public:
 		std::vector<uint8_t> m_vram;

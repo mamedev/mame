@@ -32,7 +32,7 @@ huc6202_device::huc6202_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-READ16_MEMBER( huc6202_device::next_pixel )
+uint16_t huc6202_device::next_pixel(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = huc6270_device::HUC6270_BACKGROUND;
 
@@ -150,7 +150,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 }
 
 
-READ16_MEMBER( huc6202_device::time_until_next_event )
+uint16_t huc6202_device::time_until_next_event(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t next_event_clocks_0 = m_time_til_next_event_0_cb( 0, 0xffff  );
 	uint16_t next_event_clocks_1 = m_time_til_next_event_1_cb( 0, 0xffff );
@@ -173,7 +173,7 @@ WRITE_LINE_MEMBER( huc6202_device::hsync_changed )
 }
 
 
-READ8_MEMBER( huc6202_device::read )
+uint8_t huc6202_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -218,7 +218,7 @@ READ8_MEMBER( huc6202_device::read )
 }
 
 
-WRITE8_MEMBER( huc6202_device::write )
+void huc6202_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset & 7 )
 	{
@@ -267,7 +267,7 @@ WRITE8_MEMBER( huc6202_device::write )
 }
 
 
-READ8_MEMBER( huc6202_device::io_read )
+uint8_t huc6202_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( m_io_device )
 	{
@@ -280,7 +280,7 @@ READ8_MEMBER( huc6202_device::io_read )
 }
 
 
-WRITE8_MEMBER( huc6202_device::io_write )
+void huc6202_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( m_io_device )
 	{

@@ -42,14 +42,14 @@ public:
 	void video_start_powerbal();
 	uint32_t screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
-	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
-	DECLARE_WRITE16_MEMBER(tile_banking_w);
-	DECLARE_WRITE16_MEMBER(oki_banking);
+	void magicstk_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void magicstk_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tile_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_banking(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 
-WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
+void powerbal_state::magicstk_coin_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -61,13 +61,13 @@ WRITE16_MEMBER(powerbal_state::magicstk_coin_eeprom_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::magicstk_bgvideoram_w)
+void powerbal_state::magicstk_bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(powerbal_state::tile_banking_w)
+void powerbal_state::tile_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (((data >> 12) & 0x0f) != m_tilebank)
 	{
@@ -76,7 +76,7 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 	}
 }
 
-WRITE16_MEMBER(powerbal_state::oki_banking)
+void powerbal_state::oki_banking(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 3)
 	{

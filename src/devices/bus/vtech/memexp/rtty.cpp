@@ -72,17 +72,17 @@ void rtty_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( rtty_interface_device::receive_data_r )
+uint8_t rtty_interface_device::receive_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( rtty_interface_device::transmit_data_w )
+void rtty_interface_device::transmit_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("transmit_w: %d\n", BIT(data, 7));
 }
 
-WRITE8_MEMBER( rtty_interface_device::relay_w )
+void rtty_interface_device::relay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("relay_w: %d\n", BIT(data, 7));
 }

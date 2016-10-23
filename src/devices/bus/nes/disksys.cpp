@@ -178,7 +178,7 @@ void nes_disksys_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_disksys_device::write_h)
+void nes_disksys_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -186,7 +186,7 @@ WRITE8_MEMBER(nes_disksys_device::write_h)
 		m_prgram[offset + 0x2000] = data;
 }
 
-READ8_MEMBER(nes_disksys_device::read_h)
+uint8_t nes_disksys_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System read_h, offset: %04x\n", offset));
 
@@ -196,13 +196,13 @@ READ8_MEMBER(nes_disksys_device::read_h)
 		return m_2c33_rom[offset & 0x1fff];
 }
 
-WRITE8_MEMBER(nes_disksys_device::write_m)
+void nes_disksys_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System write_m, offset: %04x, data: %02x\n", offset, data));
 	m_prgram[offset] = data;
 }
 
-READ8_MEMBER(nes_disksys_device::read_m)
+uint8_t nes_disksys_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System read_m, offset: %04x\n", offset));
 	return m_prgram[offset];
@@ -214,7 +214,7 @@ void nes_disksys_device::hblank_irq(int scanline, int vblank, int blanked)
 		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(nes_disksys_device::write_ex)
+void nes_disksys_device::write_ex(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System write_ex, offset: %04x, data: %02x\n", offset, data));
 
@@ -286,7 +286,7 @@ WRITE8_MEMBER(nes_disksys_device::write_ex)
 	}
 }
 
-READ8_MEMBER(nes_disksys_device::read_ex)
+uint8_t nes_disksys_device::read_ex(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Famicom Disk System read_ex, offset: %04x\n", offset));
 	uint8_t ret;

@@ -35,13 +35,13 @@ public:
 
 // serial vfd
 
-	DECLARE_WRITE16_MEMBER(vfd_w);
+	void vfd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 };
 
 /******************************************************************************/
 
-WRITE16_MEMBER(globalfr_state::vfd_w)
+void globalfr_state::vfd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  m_vfd->(data & 0x20) need to find reset
 	{

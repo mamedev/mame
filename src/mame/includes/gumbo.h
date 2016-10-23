@@ -23,8 +23,8 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
-	DECLARE_WRITE16_MEMBER(gumbo_bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(gumbo_fg_videoram_w);
+	void gumbo_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gumbo_fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_gumbo_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_gumbo_fg_tile_info);
 	virtual void video_start() override;

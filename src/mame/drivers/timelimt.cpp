@@ -33,12 +33,12 @@ void timelimt_state::machine_reset()
 	m_nmi_enabled = 0;
 }
 
-WRITE8_MEMBER(timelimt_state::nmi_enable_w)
+void timelimt_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = data & 1;   /* bit 0 = nmi enable */
 }
 
-WRITE8_MEMBER(timelimt_state::sound_reset_w)
+void timelimt_state::sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 1)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);

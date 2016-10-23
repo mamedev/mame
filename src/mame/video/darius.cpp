@@ -28,7 +28,7 @@ void darius_state::video_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(darius_state::darius_fg_layer_w)
+void darius_state::darius_fg_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_ram[offset]);
 	if (offset < 0x4000)

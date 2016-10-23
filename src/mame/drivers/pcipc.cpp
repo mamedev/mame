@@ -36,7 +36,7 @@ public:
 
 	static const boot_state_info boot_state_infos[];
 
-	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void boot_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
@@ -180,7 +180,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos[] = {
 	{ 0, nullptr }
 };
 
-WRITE8_MEMBER(pcipc_state::boot_state_w)
+void pcipc_state::boot_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const char *desc = "";
 	for(int i=0; boot_state_infos[i].message; i++)

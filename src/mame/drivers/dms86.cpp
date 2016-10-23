@@ -42,36 +42,36 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER( dms86_82_r );
-	DECLARE_READ16_MEMBER( dms86_84_r );
-	DECLARE_READ16_MEMBER( dms86_86_r );
-	DECLARE_READ16_MEMBER( dms86_9a_r );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint16_t dms86_82_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dms86_84_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dms86_86_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dms86_9a_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t *m_ram;
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ16_MEMBER( dms86_state::dms86_82_r )
+uint16_t dms86_state::dms86_82_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 // HiNet / Monitor switch
 
 	return 0xff;
 }
 
-READ16_MEMBER( dms86_state::dms86_84_r )
+uint16_t dms86_state::dms86_84_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ16_MEMBER( dms86_state::dms86_86_r )
+uint16_t dms86_state::dms86_86_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 4 | (m_term_data ? 1 : 0);
 }
 
-READ16_MEMBER( dms86_state::dms86_9a_r )
+uint16_t dms86_state::dms86_9a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -102,7 +102,7 @@ void dms86_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( dms86_state::kbd_put )
+void dms86_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

@@ -83,13 +83,13 @@ public:
 	int nes_ppu_vidaccess(int address, int data);
 	void ppu_nmi(int *ppu_regs);
 
-	DECLARE_READ8_MEMBER(nes_in0_r);
-	DECLARE_READ8_MEMBER(nes_in1_r);
-	DECLARE_WRITE8_MEMBER(nes_in0_w);
-	DECLARE_READ8_MEMBER(fc_in0_r);
-	DECLARE_READ8_MEMBER(fc_in1_r);
-	DECLARE_WRITE8_MEMBER(fc_in0_w);
-	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
+	uint8_t nes_in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nes_in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nes_in0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fc_in0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fc_in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fc_in0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nes_vh_sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

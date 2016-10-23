@@ -123,29 +123,29 @@ void hcastle_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(hcastle_state::hcastle_pf1_video_w)
+void hcastle_state::hcastle_pf1_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pf1_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_pf2_video_w)
+void hcastle_state::hcastle_pf2_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pf2_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0xbff);
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_gfxbank_w)
+void hcastle_state::hcastle_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_bank = data;
 }
 
-READ8_MEMBER(hcastle_state::hcastle_gfxbank_r)
+uint8_t hcastle_state::hcastle_gfxbank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfx_bank;
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_pf1_control_w)
+void hcastle_state::hcastle_pf1_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 3)
 	{
@@ -161,7 +161,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf1_control_w)
 	m_k007121_1->ctrl_w(space, offset, data);
 }
 
-WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
+void hcastle_state::hcastle_pf2_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 3)
 	{

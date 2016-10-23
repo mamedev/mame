@@ -272,14 +272,14 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(fg_videoram_w);
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
-	DECLARE_READ16_MEMBER(prot_r);
-	DECLARE_WRITE16_MEMBER(prot_w);
-	DECLARE_WRITE16_MEMBER(gfx_bank_w);
-	DECLARE_WRITE16_MEMBER(priority_reg_w);
-	DECLARE_WRITE8_MEMBER(oki_banking_w);
+	void fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nmg5_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void priority_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_prot_val_00();
 	void init_prot_val_10();
 	void init_prot_val_20();
@@ -295,19 +295,19 @@ public:
 
 
 
-WRITE16_MEMBER(nmg5_state::fg_videoram_w)
+void nmg5_state::fg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmg5_state::bg_videoram_w)
+void nmg5_state::bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
+void nmg5_state::nmg5_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -316,17 +316,17 @@ WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 	}
 }
 
-READ16_MEMBER(nmg5_state::prot_r)
+uint16_t nmg5_state::prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_prot_val | m_input_data;
 }
 
-WRITE16_MEMBER(nmg5_state::prot_w)
+void nmg5_state::prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_input_data = data & 0x0f;
 }
 
-WRITE16_MEMBER(nmg5_state::gfx_bank_w)
+void nmg5_state::gfx_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_gfx_bank != (data & 3))
 	{
@@ -335,7 +335,7 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 	}
 }
 
-WRITE16_MEMBER(nmg5_state::priority_reg_w)
+void nmg5_state::priority_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_priority_reg = data & 7;
 
@@ -343,7 +343,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
-WRITE8_MEMBER(nmg5_state::oki_banking_w)
+void nmg5_state::oki_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 1);
 }

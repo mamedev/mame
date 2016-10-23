@@ -122,7 +122,7 @@ void bw2_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_
 //  slot_r - slot read
 //-------------------------------------------------
 
-READ8_MEMBER( bw2_expansion_slot_device::slot_r )
+uint8_t bw2_expansion_slot_device::slot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -139,7 +139,7 @@ READ8_MEMBER( bw2_expansion_slot_device::slot_r )
 //  slot_w - slot write
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_expansion_slot_device::slot_w )
+void bw2_expansion_slot_device::slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart != nullptr)
 	{
@@ -152,7 +152,7 @@ WRITE8_MEMBER( bw2_expansion_slot_device::slot_w )
 //  modsel_r - modsel read
 //-------------------------------------------------
 
-READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
+uint8_t bw2_expansion_slot_device::modsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -169,7 +169,7 @@ READ8_MEMBER( bw2_expansion_slot_device::modsel_r )
 //  modsel_w - modsel write
 //-------------------------------------------------
 
-WRITE8_MEMBER( bw2_expansion_slot_device::modsel_w )
+void bw2_expansion_slot_device::modsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart != nullptr)
 	{

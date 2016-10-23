@@ -144,7 +144,7 @@ static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8, pcw16_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(pcw16_state::pcw16_palette_w)
+void pcw16_state::pcw16_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colour_palette[offset & 0x0f] = data & 31;
 }
@@ -228,7 +228,7 @@ void pcw16_state::pcw16_write_mem(uint8_t bank, uint16_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER(pcw16_state::pcw16_mem_r)
+uint8_t pcw16_state::pcw16_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset < 0x4000)
 		return pcw16_read_mem(0,offset);
@@ -242,7 +242,7 @@ READ8_MEMBER(pcw16_state::pcw16_mem_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pcw16_state::pcw16_mem_w)
+void pcw16_state::pcw16_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset < 0x4000)
 		pcw16_write_mem(0,offset,data);
@@ -254,21 +254,21 @@ WRITE8_MEMBER(pcw16_state::pcw16_mem_w)
 		pcw16_write_mem(3,offset-0xc000,data);
 }
 
-READ8_MEMBER(pcw16_state::pcw16_bankhw_r)
+uint8_t pcw16_state::pcw16_bankhw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("bank r: %d \n", offset);
 
 	return m_banks[offset];
 }
 
-WRITE8_MEMBER(pcw16_state::pcw16_bankhw_w)
+void pcw16_state::pcw16_bankhw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("bank w: %d block: %02x\n", offset, data);
 
 	m_banks[offset] = data;
 }
 
-WRITE8_MEMBER(pcw16_state::pcw16_video_control_w)
+void pcw16_state::pcw16_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("video control w: %02x\n", data);
 
@@ -372,7 +372,7 @@ void pcw16_state::pcw16_keyboard_reset()
 }
 
 /* interfaces to a pc-at keyboard */
-READ8_MEMBER(pcw16_state::pcw16_keyboard_data_shift_r)
+uint8_t pcw16_state::pcw16_keyboard_data_shift_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("keyboard data shift r: %02x\n", m_keyboard_data_shift);
 	m_keyboard_state &= ~(PCW16_KEYBOARD_BUSY_STATUS);
@@ -429,7 +429,7 @@ void pcw16_state::pcw16_keyboard_signal_byte_received(int data)
 }
 
 
-WRITE8_MEMBER(pcw16_state::pcw16_keyboard_data_shift_w)
+void pcw16_state::pcw16_keyboard_data_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("Keyboard Data Shift: %02x\n", data);
 	/* writing to shift register clears parity */
@@ -445,7 +445,7 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_data_shift_w)
 
 }
 
-READ8_MEMBER(pcw16_state::pcw16_keyboard_status_r)
+uint8_t pcw16_state::pcw16_keyboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit 2,3 are bits 8 and 9 of vdu pointer */
 	return (m_keyboard_state &
@@ -457,7 +457,7 @@ READ8_MEMBER(pcw16_state::pcw16_keyboard_status_r)
 			PCW16_KEYBOARD_TRANSMIT_MODE));
 }
 
-WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
+void pcw16_state::pcw16_keyboard_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("Keyboard control w: %02x\n",data);
 
@@ -638,74 +638,74 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::rtc_timer_callback)
 	}
 }
 
-READ8_MEMBER(pcw16_state::rtc_year_invalid_r)
+uint8_t pcw16_state::rtc_year_invalid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* year in lower 7 bits. RTC Invalid status is m_rtc_control bit 0
 	inverted */
 	return (m_rtc_years & 0x07f) | (((m_rtc_control & 0x01)<<7)^0x080);
 }
 
-READ8_MEMBER(pcw16_state::rtc_month_r)
+uint8_t pcw16_state::rtc_month_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_months;
 }
 
-READ8_MEMBER(pcw16_state::rtc_days_r)
+uint8_t pcw16_state::rtc_days_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_days;
 }
 
-READ8_MEMBER(pcw16_state::rtc_hours_r)
+uint8_t pcw16_state::rtc_hours_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_hours;
 }
 
-READ8_MEMBER(pcw16_state::rtc_minutes_r)
+uint8_t pcw16_state::rtc_minutes_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_minutes;
 }
 
-READ8_MEMBER(pcw16_state::rtc_seconds_r)
+uint8_t pcw16_state::rtc_seconds_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_seconds;
 }
 
-READ8_MEMBER(pcw16_state::rtc_256ths_seconds_r)
+uint8_t pcw16_state::rtc_256ths_seconds_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc_256ths_seconds;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_control_w)
+void pcw16_state::rtc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write control */
 	m_rtc_control = data;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_seconds_w)
+void pcw16_state::rtc_seconds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_seconds = data;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_minutes_w)
+void pcw16_state::rtc_minutes_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_minutes = data;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_hours_w)
+void pcw16_state::rtc_hours_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_hours = data;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_days_w)
+void pcw16_state::rtc_days_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_days = data;
 }
 
-WRITE8_MEMBER(pcw16_state::rtc_month_w)
+void pcw16_state::rtc_month_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_months = data;
@@ -714,7 +714,7 @@ WRITE8_MEMBER(pcw16_state::rtc_month_w)
 }
 
 
-WRITE8_MEMBER(pcw16_state::rtc_year_w)
+void pcw16_state::rtc_year_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: Writing register could cause next to increment! */
 	m_rtc_hours = data;
@@ -767,14 +767,14 @@ void pcw16_state::trigger_fdc_int()
 	m_previous_fdc_int_state = state;
 }
 
-READ8_MEMBER(pcw16_state::pcw16_system_status_r)
+uint8_t pcw16_state::pcw16_system_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("system status r: \n");
 
 	return m_system_status | (m_io_extra->read() & 0x04);
 }
 
-READ8_MEMBER(pcw16_state::pcw16_timer_interrupt_counter_r)
+uint8_t pcw16_state::pcw16_timer_interrupt_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data;
 
@@ -790,7 +790,7 @@ READ8_MEMBER(pcw16_state::pcw16_timer_interrupt_counter_r)
 }
 
 
-WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
+void pcw16_state::pcw16_system_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("0x0f8: function: %d\n",data);
 

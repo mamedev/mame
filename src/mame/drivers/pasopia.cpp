@@ -34,16 +34,16 @@ public:
 		, m_keyboard(*this, "KEY.%u", 0)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(pasopia_ctrl_w);
-	DECLARE_WRITE8_MEMBER(vram_addr_lo_w);
-	DECLARE_WRITE8_MEMBER(vram_latch_w);
-	DECLARE_READ8_MEMBER(vram_latch_r);
-	DECLARE_READ8_MEMBER(portb_1_r);
-	DECLARE_WRITE8_MEMBER(vram_addr_hi_w);
-	DECLARE_WRITE8_MEMBER(screen_mode_w);
-	DECLARE_READ8_MEMBER(rombank_r);
-	DECLARE_READ8_MEMBER(keyb_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
+	void pasopia_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portb_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void screen_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rombank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void init_pasopia();
 	TIMER_CALLBACK_MEMBER(pio_timer);
@@ -113,7 +113,7 @@ MC6845_UPDATE_ROW( pasopia_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( pasopia_state::pasopia_ctrl_w )
+void pasopia_state::pasopia_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = BIT(data, 1);
 	membank("bank1")->set_entry(m_ram_bank);
@@ -158,22 +158,22 @@ void pasopia_state::machine_reset()
 {
 }
 
-WRITE8_MEMBER( pasopia_state::vram_addr_lo_w )
+void pasopia_state::vram_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_addr = (m_vram_addr & 0x3f00) | data;
 }
 
-WRITE8_MEMBER( pasopia_state::vram_latch_w )
+void pasopia_state::vram_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_latch = data;
 }
 
-READ8_MEMBER( pasopia_state::vram_latch_r )
+uint8_t pasopia_state::vram_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p_vram[m_vram_addr];
 }
 
-READ8_MEMBER( pasopia_state::portb_1_r )
+uint8_t pasopia_state::portb_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	x--- ---- attribute latch
@@ -191,7 +191,7 @@ READ8_MEMBER( pasopia_state::portb_1_r )
 }
 
 
-WRITE8_MEMBER( pasopia_state::vram_addr_hi_w )
+void pasopia_state::vram_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_latch = (data & 0x80) | (m_attr_latch & 0x7f);
 	if ( BIT(data, 6) && !m_video_wl )
@@ -204,19 +204,19 @@ WRITE8_MEMBER( pasopia_state::vram_addr_hi_w )
 	m_vram_addr = (m_vram_addr & 0xff) | ((data & 0x3f) << 8);
 }
 
-WRITE8_MEMBER( pasopia_state::screen_mode_w )
+void pasopia_state::screen_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_gfx_mode = (data & 0xe0) >> 5; unused variable
 	m_attr_latch = (m_attr_latch & 0x80) | (data & 7);
 	printf("Screen Mode=%02x\n",data);
 }
 
-READ8_MEMBER( pasopia_state::rombank_r )
+uint8_t pasopia_state::rombank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_ram_bank) ? 4 : 0;
 }
 
-READ8_MEMBER( pasopia_state::keyb_r )
+uint8_t pasopia_state::keyb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,j,res = 0;
 	for (j=0; j<3; j++)
@@ -234,7 +234,7 @@ READ8_MEMBER( pasopia_state::keyb_r )
 	return res ^ 0xff;
 }
 
-WRITE8_MEMBER( pasopia_state::mux_w )
+void pasopia_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;
 }

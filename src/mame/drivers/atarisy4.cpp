@@ -78,21 +78,21 @@ public:
 	uint8_t m_csr[2];
 	std::unique_ptr<uint16_t[]> m_shared_ram[2];
 
-	DECLARE_WRITE16_MEMBER(gpu_w);
-	DECLARE_READ16_MEMBER(gpu_r);
-	DECLARE_READ16_MEMBER(m68k_shared_0_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_0_w);
-	DECLARE_READ16_MEMBER(m68k_shared_1_r);
-	DECLARE_WRITE16_MEMBER(m68k_shared_1_w);
-	DECLARE_READ16_MEMBER(dsp0_status_r);
-	DECLARE_WRITE16_MEMBER(dsp0_control_w);
+	void gpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gpu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t m68k_shared_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m68k_shared_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t m68k_shared_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m68k_shared_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp0_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp0_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp0_bank_w);
-	DECLARE_READ16_MEMBER(dsp1_status_r);
-	DECLARE_WRITE16_MEMBER(dsp1_control_w);
+	void dsp0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp1_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp1_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
-	DECLARE_WRITE16_MEMBER(dsp1_bank_w);
-	DECLARE_READ16_MEMBER(analog_r);
+	void dsp1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_airrace();
 	void init_laststar();
 	virtual void machine_reset() override;
@@ -478,7 +478,7 @@ void atarisy4_state::execute_gpu_command()
 	}
 }
 
-WRITE16_MEMBER(atarisy4_state::gpu_w)
+void atarisy4_state::gpu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -525,7 +525,7 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 	}
 }
 
-READ16_MEMBER(atarisy4_state::gpu_r)
+uint16_t atarisy4_state::gpu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
@@ -560,7 +560,7 @@ INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
+uint16_t atarisy4_state::m68k_shared_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[0], 3))
 		return (m_shared_ram[0][offset]);
@@ -568,13 +568,13 @@ READ16_MEMBER(atarisy4_state::m68k_shared_0_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_0_w)
+void atarisy4_state::m68k_shared_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[0], 3))
 		COMBINE_DATA(&m_shared_ram[0][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
+uint16_t atarisy4_state::m68k_shared_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[1], 3))
 		return (m_shared_ram[1][offset]);
@@ -582,18 +582,18 @@ READ16_MEMBER(atarisy4_state::m68k_shared_1_r)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(atarisy4_state::m68k_shared_1_w)
+void atarisy4_state::m68k_shared_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!BIT(m_csr[1], 3))
 		COMBINE_DATA(&m_shared_ram[1][offset]);
 }
 
-READ16_MEMBER(atarisy4_state::dsp0_status_r)
+uint16_t atarisy4_state::dsp0_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_csr[0];
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
+void atarisy4_state::dsp0_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp0->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp0->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -606,7 +606,7 @@ READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
 	return BIT(m_csr[0], 2);
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
+void atarisy4_state::dsp0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 0x4000)
 	{
@@ -622,12 +622,12 @@ WRITE16_MEMBER(atarisy4_state::dsp0_bank_w)
 	m_dsp_bank[0] = data;
 }
 
-READ16_MEMBER(atarisy4_state::dsp1_status_r)
+uint16_t atarisy4_state::dsp1_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_csr[1];
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
+void atarisy4_state::dsp1_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp1->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
@@ -640,7 +640,7 @@ READ_LINE_MEMBER(atarisy4_state::dsp1_bio_r)
 	return BIT(m_csr[1], 2);
 }
 
-WRITE16_MEMBER(atarisy4_state::dsp1_bank_w)
+void atarisy4_state::dsp1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & 0x4000)
 	{
@@ -718,7 +718,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-READ16_MEMBER(atarisy4_state::analog_r)
+uint16_t atarisy4_state::analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("STICKX")->read() << 8) | ioport("STICKY")->read();
 }

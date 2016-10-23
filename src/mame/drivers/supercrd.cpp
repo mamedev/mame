@@ -184,8 +184,8 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(supercrd_videoram_w);
-	DECLARE_WRITE8_MEMBER(supercrd_colorram_w);
+	void supercrd_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void supercrd_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_PALETTE_INIT(supercrd);
 	void video_start_supercrd();
@@ -237,13 +237,13 @@ PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 }
 
 
-WRITE8_MEMBER(supercrd_state::supercrd_videoram_w)
+void supercrd_state::supercrd_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(supercrd_state::supercrd_colorram_w)
+void supercrd_state::supercrd_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

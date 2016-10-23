@@ -118,7 +118,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
-	DECLARE_WRITE8_MEMBER(duart_output);
+	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_duart_io;
 	bool  m_bCalibSecondByte;
@@ -126,7 +126,7 @@ public:
 public:
 	void init_kt();
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
-	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
 void esqkt_state::machine_reset()
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 	#endif
 }
 
-READ16_MEMBER(esqkt_state::esq5506_read_adc)
+uint16_t esqkt_state::esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch ((m_duart_io & 7) ^ 7)
 	{
@@ -179,7 +179,7 @@ WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
-WRITE8_MEMBER(esqkt_state::duart_output)
+void esqkt_state::duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duart_io = data;
 

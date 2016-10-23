@@ -41,12 +41,12 @@
 
 /* Protection Handlers */
 
-WRITE8_MEMBER(_1943_state::c1943_protection_w)
+void _1943_state::c1943_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_value = data;
 }
 
-READ8_MEMBER(_1943_state::c1943_protection_r)
+uint8_t _1943_state::c1943_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// The game crashes (through a jump to 0x8000) if the return value is not what it expects..
 
@@ -91,7 +91,7 @@ READ8_MEMBER(_1943_state::c1943_protection_r)
 }
 
 // The bootleg expects 0x00 to be returned from the protection reads because the protection has been patched out.
-READ8_MEMBER(_1943_state::_1943b_c007_r)
+uint8_t _1943_state::_1943b_c007_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

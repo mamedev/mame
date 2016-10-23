@@ -51,10 +51,10 @@ public:
 		, m_p_ram(*this, "nvram")
 	{ }
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_WRITE8_MEMBER(portb_w);
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
 private:
@@ -125,7 +125,7 @@ void spectra_state::machine_reset()
 	m_t_c = 0;
 }
 
-READ8_MEMBER( spectra_state::porta_r )
+uint8_t spectra_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t row = (m_porta & 0x18) >> 3;
 	uint8_t key = m_switch[row]->read();
@@ -137,7 +137,7 @@ READ8_MEMBER( spectra_state::porta_r )
 	return ret;
 }
 
-READ8_MEMBER( spectra_state::portb_r )
+uint8_t spectra_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_p_ram[0xf0] != 1)
 		return 0x5a; // factory reset if first time
@@ -145,13 +145,13 @@ READ8_MEMBER( spectra_state::portb_r )
 		return m_portb;
 }
 
-WRITE8_MEMBER( spectra_state::porta_w )
+void spectra_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_porta = data;
 }
 
 // sound port
-WRITE8_MEMBER( spectra_state::portb_w )
+void spectra_state::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portb = data;
 	float vco = 5.0;

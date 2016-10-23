@@ -358,13 +358,13 @@ void i8279_device::timer_mainloop()
 }
 
 
-READ8_MEMBER( i8279_device::status_r )
+uint8_t i8279_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
 
 
-READ8_MEMBER( i8279_device::data_r )
+uint8_t i8279_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i;
 	bool sensor_mode = ((m_cmd[0] & 6)==4);
@@ -432,7 +432,7 @@ READ8_MEMBER( i8279_device::data_r )
 }
 
 
-WRITE8_MEMBER( i8279_device::cmd_w )
+void i8279_device::cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {//printf("Command: %X=%X ",data>>5,data&31);
 	uint8_t cmd = data >> 5;
 	data &= 0x1f;
@@ -475,7 +475,7 @@ WRITE8_MEMBER( i8279_device::cmd_w )
 }
 
 
-WRITE8_MEMBER( i8279_device::data_w )
+void i8279_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {//printf("Data: %X ",data);
 	if (BIT(m_cmd[0], 4) && m_autoinc)
 	{

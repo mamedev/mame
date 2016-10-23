@@ -17,11 +17,11 @@ public:
 	// static configuration
 	static void set_address(device_t &device, int addr) { downcast<x1_010_device &>(device).m_adr = addr; }
 
-	DECLARE_READ8_MEMBER ( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ16_MEMBER ( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void enable_w(int data);
 

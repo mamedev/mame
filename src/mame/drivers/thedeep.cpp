@@ -40,12 +40,12 @@ Notes:
 ***************************************************************************/
 
 
-WRITE8_MEMBER(thedeep_state::nmi_w)
+void thedeep_state::nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 }
 
-WRITE8_MEMBER(thedeep_state::sound_w)
+void thedeep_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -74,7 +74,7 @@ void thedeep_state::machine_reset()
 	m_protection_irq = 0;
 }
 
-WRITE8_MEMBER(thedeep_state::protection_w)
+void thedeep_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_protection_command = data;
 	switch (m_protection_command)
@@ -129,18 +129,18 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 	}
 }
 
-READ8_MEMBER(thedeep_state::e004_r)
+uint8_t thedeep_state::e004_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_protection_irq ? 1 : 0;
 }
 
-READ8_MEMBER(thedeep_state::protection_r)
+uint8_t thedeep_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_protection_irq = 0;
 	return m_protection_data;
 }
 
-WRITE8_MEMBER(thedeep_state::e100_w)
+void thedeep_state::e100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 1)
 		logerror("pc %04x: e100 = %02x\n", space.device().safe_pc(),data);
@@ -188,14 +188,14 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(thedeep_state::p1_w)
+void thedeep_state::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set((data & 1) ^ 1);
 	membank("bank1")->set_entry((data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }
 
-READ8_MEMBER(thedeep_state::from_main_r)
+uint8_t thedeep_state::from_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint8_t res;
 
@@ -205,12 +205,12 @@ READ8_MEMBER(thedeep_state::from_main_r)
 	return 0x20;
 }
 
-WRITE8_MEMBER(thedeep_state::to_main_w)
+void thedeep_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ...
 }
 
-WRITE8_MEMBER(thedeep_state::p3_w)
+void thedeep_state::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 0->1 transition IRQ0 to main */
 	if((!(m_mcu_p3_reg & 0x01)) && data & 0x01)
@@ -228,7 +228,7 @@ WRITE8_MEMBER(thedeep_state::p3_w)
 	logerror("P3 %02x\n",data);
 }
 
-READ8_MEMBER(thedeep_state::p0_r)
+uint8_t thedeep_state::p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t coin_mux;
 

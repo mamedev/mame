@@ -375,7 +375,7 @@ void mos6551_device::write_command(uint8_t data)
 	update_divider();
 }
 
-READ8_MEMBER( mos6551_device::read )
+uint8_t mos6551_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0xff;
@@ -397,7 +397,7 @@ READ8_MEMBER( mos6551_device::read )
 	}
 }
 
-WRITE8_MEMBER( mos6551_device::write )
+void mos6551_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x03)
 	{

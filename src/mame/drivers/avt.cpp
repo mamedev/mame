@@ -437,11 +437,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
-	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
-	DECLARE_READ8_MEMBER( avt_6845_data_r );
-	DECLARE_WRITE8_MEMBER(avt_videoram_w);
-	DECLARE_WRITE8_MEMBER(avt_colorram_w);
+	void avt_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avt_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t avt_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void avt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void avt_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
@@ -476,14 +476,14 @@ public:
 *********************************************/
 
 
-WRITE8_MEMBER( avt_state::avt_videoram_w )
+void avt_state::avt_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( avt_state::avt_colorram_w )
+void avt_state::avt_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -592,24 +592,24 @@ PALETTE_INIT_MEMBER(avt_state, avt)
 *            Read / Write Handlers            *
 **********************************************/
 
-//WRITE8_MEMBER(avt_state::debug_w)
+//void avt_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-WRITE8_MEMBER( avt_state::avt_6845_address_w )
+void avt_state::avt_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER( avt_state::avt_6845_data_w )
+void avt_state::avt_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
 }
 
-READ8_MEMBER( avt_state::avt_6845_data_r )
+uint8_t avt_state::avt_6845_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//m_crtc_vreg[m_crtc_index] = data;
 	return m_crtc->register_r(space, offset);

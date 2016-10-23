@@ -240,10 +240,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq3_w );
 
 	// 8 bit accessors for ISA-defined address spaces
-	DECLARE_READ8_MEMBER(prog_r);
-	DECLARE_WRITE8_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t prog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t dack_r(int line);
 	void dack_w(int line,uint8_t data);
@@ -387,15 +387,15 @@ public:
 	void dack16_w(int line,uint16_t data);
 
 	// 16 bit accessors for ISA-defined address spaces
-	DECLARE_READ16_MEMBER(prog16_r);
-	DECLARE_WRITE16_MEMBER(prog16_w);
-	DECLARE_READ16_MEMBER(io16_r);
-	DECLARE_WRITE16_MEMBER(io16_w);
+	uint16_t prog16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prog16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	// byte-swapped versions of 16-bit accessors
-	DECLARE_READ16_MEMBER(prog16_swap_r);
-	DECLARE_WRITE16_MEMBER(prog16_swap_w);
-	DECLARE_READ16_MEMBER(io16_swap_r);
-	DECLARE_WRITE16_MEMBER(io16_swap_w);
+	uint16_t prog16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void prog16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io16_swap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io16_swap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

@@ -34,7 +34,7 @@ Updates:
 #include "includes/kncljoe.h"
 
 
-WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
+void kncljoe_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x80) == 0)
 		m_soundlatch->write(space, 0, data & 0x7f);
@@ -62,12 +62,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(kncljoe_state::m6803_port1_w)
+void kncljoe_state::m6803_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port1 = data;
 }
 
-WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
+void kncljoe_state::m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* write latch */
 	if ((m_port2 & 0x01) && !(data & 0x01))
@@ -79,24 +79,24 @@ WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 	m_port2 = data;
 }
 
-READ8_MEMBER(kncljoe_state::m6803_port1_r)
+uint8_t kncljoe_state::m6803_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_port2 & 0x08)
 		return m_ay8910->data_r(space, 0);
 	return 0xff;
 }
 
-READ8_MEMBER(kncljoe_state::m6803_port2_r)
+uint8_t kncljoe_state::m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(kncljoe_state::sound_irq_ack_w)
+void kncljoe_state::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(kncljoe_state::unused_w)
+void kncljoe_state::unused_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//unused - no MSM on the pcb
 }

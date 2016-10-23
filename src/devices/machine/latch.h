@@ -42,7 +42,7 @@ public:
 	template<class _Object> static devcb_base &set_bit7_handler(device_t &device, _Object object) { return downcast<output_latch_device &>(device).m_bit7_handler.set_callback(object); }
 
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER(write) { write(data); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(data); }
 
 protected:
 	virtual void device_start() override;

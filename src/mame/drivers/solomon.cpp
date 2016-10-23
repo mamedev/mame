@@ -13,7 +13,7 @@ driver by Mirko Buffoni
 #include "sound/ay8910.h"
 #include "includes/solomon.h"
 
-WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
+void solomon_state::solomon_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -23,7 +23,7 @@ WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
    it could be a form of protection.  the real board needs to be analysed to find out
    what really lives here */
 
-READ8_MEMBER(solomon_state::solomon_0xe603_r)
+uint8_t solomon_state::solomon_0xe603_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.device().safe_pc() == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
@@ -40,7 +40,7 @@ READ8_MEMBER(solomon_state::solomon_0xe603_r)
 	}
 }
 
-WRITE8_MEMBER(solomon_state::nmi_mask_w)
+void solomon_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

@@ -71,10 +71,10 @@ public:
 	// interface
 	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
 
-	DECLARE_READ16_MEMBER( gayle_r );
-	DECLARE_WRITE16_MEMBER( gayle_w );
-	DECLARE_READ16_MEMBER( gayle_id_r );
-	DECLARE_WRITE16_MEMBER( gayle_id_w );
+	uint16_t gayle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gayle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t gayle_id_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gayle_id_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// inline configuration
 	static void set_id(device_t &device, uint8_t id);

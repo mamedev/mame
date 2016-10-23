@@ -11,10 +11,10 @@ class kaneko_calc3_device : public device_t
 public:
 	kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER(mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(mcu_com3_w);
+	void mcu_com0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void reset_run_timer();
 	void mcu_run();

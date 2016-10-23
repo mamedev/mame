@@ -51,11 +51,11 @@ public:
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	bool m_ld_video_visible;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_write);
-	DECLARE_WRITE8_MEMBER(led_writes);
-	DECLARE_WRITE8_MEMBER(nmi_line_w);
+	uint8_t ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_writes(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
@@ -136,17 +136,17 @@ uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitma
 
 
 /* MEMORY HANDLERS */
-READ8_MEMBER(esh_state::ldp_read)
+uint8_t esh_state::ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_laserdisc->status_r();
 }
 
-WRITE8_MEMBER(esh_state::ldp_write)
+void esh_state::ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_laserdisc->data_w(data);
 }
 
-WRITE8_MEMBER(esh_state::misc_write)
+void esh_state::misc_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Bit 0 unknown */
 
@@ -160,7 +160,7 @@ WRITE8_MEMBER(esh_state::misc_write)
 	/* They cycle through a repeating pattern though */
 }
 
-WRITE8_MEMBER(esh_state::led_writes)
+void esh_state::led_writes(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -191,7 +191,7 @@ WRITE8_MEMBER(esh_state::led_writes)
 	}
 }
 
-WRITE8_MEMBER(esh_state::nmi_line_w)
+void esh_state::nmi_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0 -> 1 transition enables this, else disabled?
 	m_nmi_enable = (data & 1) == 1;

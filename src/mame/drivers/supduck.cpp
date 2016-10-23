@@ -67,17 +67,17 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(text_videoram_w);
-	DECLARE_WRITE16_MEMBER(fore_videoram_w);
-	DECLARE_WRITE16_MEMBER(back_videoram_w);
-	DECLARE_WRITE16_MEMBER(supduck_scroll_w);
+	void text_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void fore_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void back_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void supduck_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(supduck_4000_w);
-	DECLARE_WRITE16_MEMBER(supduck_4002_w);
+	void supduck_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void supduck_4002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
 
-	DECLARE_WRITE8_MEMBER(okibank_w);
+	void okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 
@@ -138,19 +138,19 @@ uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-WRITE16_MEMBER(supduck_state::text_videoram_w)
+void supduck_state::text_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_text_videoram[offset]);
 	m_text_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::fore_videoram_w)
+void supduck_state::fore_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_videoram[offset]);
 	m_fore_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(supduck_state::back_videoram_w)
+void supduck_state::back_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_videoram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
@@ -203,12 +203,12 @@ TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 
 
 
-WRITE16_MEMBER(supduck_state::supduck_4000_w)
+void supduck_state::supduck_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-WRITE16_MEMBER(supduck_state::supduck_4002_w)
+void supduck_state::supduck_4002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -217,7 +217,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 
 }
 
-WRITE16_MEMBER(supduck_state::supduck_scroll_w)
+void supduck_state::supduck_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= mem_mask;
 
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( oki_map, AS_0, 8, supduck_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(supduck_state::okibank_w)
+void supduck_state::okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0x80 is written on startup?
 

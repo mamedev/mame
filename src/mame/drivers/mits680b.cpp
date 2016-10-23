@@ -41,25 +41,25 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ8_MEMBER(terminal_status_r);
-	DECLARE_READ8_MEMBER(terminal_r);
-	DECLARE_READ8_MEMBER(status_check_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t terminal_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t terminal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_check_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
-READ8_MEMBER( mits680b_state::status_check_r )
+uint8_t mits680b_state::status_check_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; // crashes at start if bit 7 high
 }
 
-READ8_MEMBER( mits680b_state::terminal_status_r )
+uint8_t mits680b_state::terminal_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 2;
 }
 
-READ8_MEMBER( mits680b_state::terminal_r )
+uint8_t mits680b_state::terminal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
@@ -87,7 +87,7 @@ void mits680b_state::machine_reset()
 	m_term_data = 0;
 }
 
-WRITE8_MEMBER( mits680b_state::kbd_put )
+void mits680b_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

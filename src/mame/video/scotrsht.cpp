@@ -36,19 +36,19 @@ PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
 	}
 }
 
-WRITE8_MEMBER(scotrsht_state::videoram_w)
+void scotrsht_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::colorram_w)
+void scotrsht_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(scotrsht_state::charbank_w)
+void scotrsht_state::charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 0x01))
 	{
@@ -59,7 +59,7 @@ WRITE8_MEMBER(scotrsht_state::charbank_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(scotrsht_state::palettebank_w)
+void scotrsht_state::palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != ((data & 0x70) >> 4))
 	{

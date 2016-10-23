@@ -1024,7 +1024,7 @@ void snes_sound_device::set_volume(int volume)
          I/O for DSP
  ***************************/
 
-READ8_MEMBER( snes_sound_device::dsp_io_r )
+uint8_t snes_sound_device::dsp_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_channel->update();
 
@@ -1037,7 +1037,7 @@ READ8_MEMBER( snes_sound_device::dsp_io_r )
 	return m_dsp_regs[offset & 0x7f];
 }
 
-WRITE8_MEMBER( snes_sound_device::dsp_io_w )
+void snes_sound_device::dsp_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 
@@ -1057,7 +1057,7 @@ WRITE8_MEMBER( snes_sound_device::dsp_io_w )
        I/O for SPC700
  ***************************/
 
-READ8_MEMBER( snes_sound_device::spc_io_r )
+uint8_t snes_sound_device::spc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset) /* Offset is from 0x00f0 */
 	{
@@ -1095,7 +1095,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 	return 0;
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_io_w )
+void snes_sound_device::spc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset) /* Offset is from 0x00f0 */
 	{
@@ -1158,7 +1158,7 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 	m_ram[0xf0 + offset] = data;
 }
 
-READ8_MEMBER( snes_sound_device::spc_ram_r )
+uint8_t snes_sound_device::spc_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* IPL ROM enabled */
 	if (offset >= 0xffc0 && m_ram[0xf1] & 0x80)
@@ -1167,20 +1167,20 @@ READ8_MEMBER( snes_sound_device::spc_ram_r )
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_ram_w )
+void snes_sound_device::spc_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 }
 
 
-READ8_MEMBER( snes_sound_device::spc_port_out )
+uint8_t snes_sound_device::spc_port_out(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	assert(offset < 4);
 
 	return m_port_out[offset];
 }
 
-WRITE8_MEMBER( snes_sound_device::spc_port_in )
+void snes_sound_device::spc_port_in(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset < 4);
 

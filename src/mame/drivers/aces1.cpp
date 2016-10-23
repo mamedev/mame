@@ -67,23 +67,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
 	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
-	DECLARE_READ8_MEMBER( aces1_unk_r )
+	uint8_t aces1_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_unk_port00_r )
+	uint8_t aces1_unk_port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return 0x00;
 	}
 
-	DECLARE_READ8_MEMBER( aces1_nmi_counter_reset_r )
+	uint8_t aces1_nmi_counter_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		aces1_reset_nmi_timer();
 		return 0x00;
 	}
 
-	DECLARE_WRITE8_MEMBER( aces1_nmi_counter_reset_w )
+	void aces1_nmi_counter_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		aces1_reset_nmi_timer();
 	}
@@ -103,7 +103,7 @@ public:
 	emu_timer *m_aces1_nmi_timer;
 
 
-	DECLARE_WRITE8_MEMBER(ic24_write_a)
+	void ic24_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (m_led_strobe != m_input_strobe)
 		{
@@ -112,7 +112,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_b)
+	void ic24_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//cheating a bit here, need persistence
 	int i;
@@ -130,22 +130,22 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ic24_write_c)
+	void ic24_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_input_strobe = (data & 0x0f);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_a)
+	void ic25_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  printf("extender lamps %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_b)
+	void ic25_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 	//  printf("meters, extender select %02x\n", data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ic25_write_c)
+	void ic25_write_c(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		//There needs to be some way of connecting these values to stepper coils, or doing the MCU properly
 		// We should be able to see an enable clock, a sense and a full/half step selector, we don't have the half step visible it seems.
@@ -191,18 +191,18 @@ public:
 //    printf("reels, extender strobe %02x\n", data);
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_a )
+	uint8_t ic37_read_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		//Should be coins and doors
 		return ioport("COINS")->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_b )
+	uint8_t ic37_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return (m_io_ports[m_input_strobe & 7])->read();
 	}
 
-	DECLARE_READ8_MEMBER( ic37_read_c )
+	uint8_t ic37_read_c(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int action =0;
 		for (int reel = 0; reel < 4; reel++)

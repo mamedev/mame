@@ -19,13 +19,13 @@
 #include "sound/okim6295.h"
 #include "includes/ultraman.h"
 
-WRITE16_MEMBER(ultraman_state::sound_cmd_w)
+void ultraman_state::sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
 }
 
-WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
+void ultraman_state::sound_irq_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

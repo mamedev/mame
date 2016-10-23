@@ -14,17 +14,17 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-READ8_MEMBER(spc1000_fdd_exp_device::i8255_c_r)
+uint8_t spc1000_fdd_exp_device::i8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8255_0_pc >> 4;
 }
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_b_w)
+void spc1000_fdd_exp_device::i8255_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8255_portb = data;
 }
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
+void spc1000_fdd_exp_device::i8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8255_1_pc = data;
 }
@@ -33,7 +33,7 @@ WRITE8_MEMBER(spc1000_fdd_exp_device::i8255_c_w)
 //  fdc interrupt
 //-------------------------------------------------
 
-READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
+uint8_t spc1000_fdd_exp_device::tc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: tc_r\n", space.machine().describe_context());
 
@@ -44,7 +44,7 @@ READ8_MEMBER( spc1000_fdd_exp_device::tc_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( spc1000_fdd_exp_device::control_w )
+void spc1000_fdd_exp_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: control_w(%02x)\n", space.machine().describe_context(), data);
 
@@ -183,7 +183,7 @@ void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, 
     read
 -------------------------------------------------*/
 
-READ8_MEMBER(spc1000_fdd_exp_device::read)
+uint8_t spc1000_fdd_exp_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this should be m_pio->read on the whole 0x00-0x03 range?
 	if (offset >= 3)
@@ -208,7 +208,7 @@ READ8_MEMBER(spc1000_fdd_exp_device::read)
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER(spc1000_fdd_exp_device::write)
+void spc1000_fdd_exp_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// this should be m_pio->write on the whole 0x00-0x03 range?
 	if (offset < 3)

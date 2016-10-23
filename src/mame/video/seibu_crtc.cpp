@@ -224,38 +224,38 @@ static ADDRESS_MAP_START( seibu_crtc_vregs, AS_0, 16, seibu_crtc_device )
 	AM_RANGE(0x0000, 0x004f) AM_RAM // debug
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(seibu_crtc_device::decrypt_key_w)
+void seibu_crtc_device::decrypt_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_decrypt_key_cb.isnull())
 		m_decrypt_key_cb(0, data, mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_en_w)
+void seibu_crtc_device::layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_en_cb.isnull())
 		m_layer_en_cb(0,data,mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_scroll_w)
+void seibu_crtc_device::layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_scroll_cb.isnull())
 		m_layer_scroll_cb(offset,data,mem_mask);
 }
 
-READ16_MEMBER(seibu_crtc_device::reg_1a_r)
+uint16_t seibu_crtc_device::reg_1a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// SPI needs read/write access to this
 	return m_reg_1a;
 }
 
-WRITE16_MEMBER( seibu_crtc_device::reg_1a_w)
+void seibu_crtc_device::reg_1a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_reg_1a);
 	if (!m_reg_1a_cb.isnull())
 		m_reg_1a_cb(offset,data,mem_mask);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
+void seibu_crtc_device::layer_scroll_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_layer_scroll_base_cb.isnull())
 		m_layer_scroll_base_cb(offset,data,mem_mask);
@@ -355,34 +355,34 @@ inline void seibu_crtc_device::write_word(offs_t address, uint16_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-READ16_MEMBER( seibu_crtc_device::read )
+uint16_t seibu_crtc_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read_word(offset);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::write )
+void seibu_crtc_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	write_word(offset,data);
 }
 
 /* Sky Smasher / Raiden DX swaps registers [0x10] with [0x20] */
-READ16_MEMBER( seibu_crtc_device::read_alt )
+uint16_t seibu_crtc_device::read_alt(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0));
 }
 
-WRITE16_MEMBER( seibu_crtc_device::write_alt )
+void seibu_crtc_device::write_alt(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	write_word(BITSWAP16(offset,15,14,13,12,11,10,9,8,7,6,5,3,4,2,1,0),data);
 }
 
 /* Good E Jang / Seibu Cup Soccer Selection XOR bit 6 of the address bus */
-READ16_MEMBER( seibu_crtc_device::read_xor )
+uint16_t seibu_crtc_device::read_xor(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return read_word(offset ^ 0x20);
 }
 
-WRITE16_MEMBER( seibu_crtc_device::write_xor )
+void seibu_crtc_device::write_xor(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	write_word(offset ^ 0x20,data);
 }

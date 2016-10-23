@@ -237,12 +237,12 @@ void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
 }
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_palette_r )
+uint16_t sega_32x_device::_32x_68k_palette_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_32x_palette[offset];
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_palette_w )
+void sega_32x_device::_32x_68k_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int r,g,b, p;
 
@@ -260,12 +260,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_palette_w )
 
 }
 
-READ16_MEMBER( sega_32x_device::_32x_68k_dram_r )
+uint16_t sega_32x_device::_32x_68k_dram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_32x_access_dram[offset];
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_dram_w )
+void sega_32x_device::_32x_68k_dram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((mem_mask&0xffff) == 0xffff)
 	{
@@ -295,12 +295,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_dram_w )
 	}
 }
 
-READ16_MEMBER( sega_32x_device::_32x_68k_dram_overwrite_r )
+uint16_t sega_32x_device::_32x_68k_dram_overwrite_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_32x_access_dram[offset];
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_dram_overwrite_w )
+void sega_32x_device::_32x_68k_dram_overwrite_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//COMBINE_DATA(&m_32x_access_dram[offset+0x10000]);
 
@@ -345,7 +345,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_dram_overwrite_w )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_a15106_r )
+uint16_t sega_32x_device::_32x_68k_a15106_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retval;
 
@@ -356,7 +356,7 @@ READ16_MEMBER( sega_32x_device::_32x_68k_a15106_r )
 	return retval;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
+void sega_32x_device::_32x_68k_a15106_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -405,7 +405,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
+uint16_t sega_32x_device::_32x_dreq_common_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -476,7 +476,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
+void sega_32x_device::_32x_dreq_common_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -595,12 +595,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_a1511a_r )
+uint16_t sega_32x_device::_32x_68k_a1511a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sega_tv;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_a1511a_w )
+void sega_32x_device::_32x_68k_a1511a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sega_tv = data & 1;
 
@@ -613,18 +613,18 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a1511a_w )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_m_hint_vector_r )
+uint16_t sega_32x_device::_32x_68k_m_hint_vector_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_hint_vector[offset];
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_m_hint_vector_w )
+void sega_32x_device::_32x_68k_m_hint_vector_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_hint_vector[offset] = data;
 }
 
 // returns MARS, the system ID of the 32x
-READ16_MEMBER( sega_32x_device::_32x_68k_MARS_r )
+uint16_t sega_32x_device::_32x_68k_MARS_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -646,12 +646,12 @@ READ16_MEMBER( sega_32x_device::_32x_68k_MARS_r )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_a15100_r )
+uint16_t sega_32x_device::_32x_68k_a15100_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_32x_access_auth<<15) | 0x0080;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
+void sega_32x_device::_32x_68k_a15100_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -706,13 +706,13 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_a15102_r )
+uint16_t sega_32x_device::_32x_68k_a15102_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("_32x_68k_a15102_r\n");
 	return m_32x_68k_a15102_reg;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_a15102_w )
+void sega_32x_device::_32x_68k_a15102_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -738,12 +738,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15102_w )
 /**********************************************************************************************/
 
 
-READ16_MEMBER( sega_32x_device::_32x_68k_a15104_r )
+uint16_t sega_32x_device::_32x_68k_a15104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_32x_68k_a15104_reg;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
+void sega_32x_device::_32x_68k_a15104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -768,14 +768,14 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
 /**********************************************************************************************/
 
 // reads
-READ16_MEMBER( sega_32x_device::_32x_68k_m_commsram_r )
+uint16_t sega_32x_device::_32x_68k_m_commsram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
 	return m_commsram[offset];
 }
 
 // writes
-WRITE16_MEMBER( sega_32x_device::_32x_68k_m_commsram_w )
+void sega_32x_device::_32x_68k_m_commsram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_commsram[offset]);
 	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
@@ -859,7 +859,7 @@ TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 	m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
 }
 
-READ16_MEMBER( sega_32x_device::_32x_pwm_r )
+uint16_t sega_32x_device::_32x_pwm_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -874,7 +874,7 @@ READ16_MEMBER( sega_32x_device::_32x_pwm_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_pwm_w )
+void sega_32x_device::_32x_pwm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -929,7 +929,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_pwm_w )
 	}
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_68k_pwm_w )
+void sega_32x_device::_32x_68k_pwm_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(offset == 0/2)
 		_32x_pwm_w(space,offset,(data & 0x7f) | (m_pwm_ctrl & 0xff80),mem_mask);
@@ -962,7 +962,7 @@ uint16_t sega_32x_device::get_hposition(void)
 	return value4;
 }
 
-READ16_MEMBER( sega_32x_device::_32x_common_vdp_regs_r )
+uint16_t sega_32x_device::_32x_common_vdp_regs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// what happens if the z80 accesses it, what authorization do we use?
 
@@ -1042,7 +1042,7 @@ void sega_32x_device::_32x_check_framebuffer_swap(bool enabled)
 }
 
 
-WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
+void sega_32x_device::_32x_common_vdp_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
@@ -1171,7 +1171,7 @@ P = PWM Interrupt Mask (0 masked, 1 allowed)
 /**********************************************************************************************/
 
 /* MASTER */
-READ16_MEMBER( sega_32x_device::_32x_sh2_master_4000_r )
+uint16_t sega_32x_device::_32x_sh2_master_4000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retvalue = 0x0200;
 	retvalue |= m_32x_access_auth << 15;
@@ -1185,7 +1185,7 @@ READ16_MEMBER( sega_32x_device::_32x_sh2_master_4000_r )
 	return retvalue;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4000_w )
+void sega_32x_device::_32x_sh2_master_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1209,7 +1209,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4000_w )
 
 /* SLAVE */
 
-READ16_MEMBER( sega_32x_device::_32x_sh2_slave_4000_r )
+uint16_t sega_32x_device::_32x_sh2_slave_4000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retvalue = 0x0200;
 	retvalue |= m_32x_access_auth << 15;
@@ -1223,7 +1223,7 @@ READ16_MEMBER( sega_32x_device::_32x_sh2_slave_4000_r )
 }
 
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4000_w )
+void sega_32x_device::_32x_sh2_slave_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -1251,13 +1251,13 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4000_w )
 // Shouldn't be used
 /**********************************************************************************************/
 
-READ16_MEMBER( sega_32x_device::_32x_sh2_common_4002_r )
+uint16_t sega_32x_device::_32x_sh2_common_4002_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	printf("reading 4002!\n");
 	return 0x0000;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4002_w )
+void sega_32x_device::_32x_sh2_common_4002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("write 4002!\n");
 }
@@ -1268,12 +1268,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4002_w )
 // H Count Register (H Interrupt)
 // 0 = every line
 /**********************************************************************************************/
-READ16_MEMBER( sega_32x_device::_32x_sh2_common_4004_r )
+uint16_t sega_32x_device::_32x_sh2_common_4004_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_32x_hcount_reg;
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4004_w )
+void sega_32x_device::_32x_sh2_common_4004_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_32x_hcount_reg = data & 0xff;
 }
@@ -1284,13 +1284,13 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4004_w )
 // DReq Control Register
 /**********************************************************************************************/
 
-READ16_MEMBER( sega_32x_device::_32x_sh2_common_4006_r )
+uint16_t sega_32x_device::_32x_sh2_common_4006_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//printf("DREQ read!\n"); // tempo reads it, shut up for now
 	return _32x_68k_a15106_r(space,offset,mem_mask);
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4006_w )
+void sega_32x_device::_32x_sh2_common_4006_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("DREQ write!\n"); //register is read only on SH-2 side
 }
@@ -1301,24 +1301,24 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_common_4006_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4014_w ){ m_master_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4014_w ) { m_slave_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_master_4014_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ m_master_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_slave_4014_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_slave_cpu->set_input_line(SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4016_w ){ m_sh2_master_vint_pending = 0; _32x_check_irqs(); }
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4016_w ) { m_sh2_slave_vint_pending = 0; _32x_check_irqs(); }
+void sega_32x_device::_32x_sh2_master_4016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ m_sh2_master_vint_pending = 0; _32x_check_irqs(); }
+void sega_32x_device::_32x_sh2_slave_4016_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_sh2_slave_vint_pending = 0; _32x_check_irqs(); }
 
 /**********************************************************************************************/
 // SH2 side 4018
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4018_w ){ m_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4018_w ) { m_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_master_4018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ m_master_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_slave_4018_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_slave_cpu->set_input_line(SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
@@ -1326,28 +1326,28 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_4018_w ) { m_slave_cpu->set_inpu
 // Note: flag cleared here is a guess, according to After Burner behaviour
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401a_w ){ m_32x_68k_a15102_reg &= ~1; m_master_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401a_w ) { m_32x_68k_a15102_reg &= ~2; m_slave_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_master_401a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ m_32x_68k_a15102_reg &= ~1; m_master_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_slave_401a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_32x_68k_a15102_reg &= ~2; m_slave_cpu->set_input_line(SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401c_w ){ m_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401c_w ) { m_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_master_401c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ m_master_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+void sega_32x_device::_32x_sh2_slave_401c_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_slave_cpu->set_input_line(SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
 // ?? unknown / unused
 /**********************************************************************************************/
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_401e_w )
+void sega_32x_device::_32x_sh2_master_401e_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("_32x_sh2_master_401e_w\n");
 }
 
-WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401e_w )
+void sega_32x_device::_32x_sh2_slave_401e_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("_32x_sh2_slave_401e_w\n");
 }
@@ -1422,7 +1422,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401e_w )
    to 2x 16-bit handlers here (TODO: nuke this eventually) */
 
 #define _32X_MAP_READHANDLERS(NAMEA,NAMEB)                                          \
-READ32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_r )                             \
+uint32_t sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_r(address_space &space, offs_t offset, uint32_t mem_mask)                             \
 {                                                                                   \
 	uint32_t retvalue = 0x00000000;                                                   \
 	if (ACCESSING_BITS_16_31)                                                       \
@@ -1439,7 +1439,7 @@ READ32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_r )                
 	return retvalue;                                                                \
 }
 #define _32X_MAP_WRITEHANDLERS(NAMEA,NAMEB)                                             \
-WRITE32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_w)                                 \
+void sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)                                 \
 {                                                                                       \
 	if (ACCESSING_BITS_16_31)                                                           \
 	{                                                                                   \

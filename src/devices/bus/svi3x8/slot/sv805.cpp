@@ -69,7 +69,7 @@ void sv805_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( sv805_device::iorq_r )
+uint8_t sv805_device::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -87,7 +87,7 @@ READ8_MEMBER( sv805_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv805_device::iorq_w )
+void sv805_device::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

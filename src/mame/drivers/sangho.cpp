@@ -86,18 +86,18 @@ public:
 	required_memory_bank m_bank8;
 	uint8_t m_sec_slot[4];
 
-	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
-	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
-	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
-	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
+	void pzlestar_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pzlestar_mem_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pzlestar_mem_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sexyboom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_pzlestar();
 	virtual void machine_start() override;
 	void machine_reset_pzlestar();
 	void machine_reset_sexyboom();
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
-	DECLARE_READ8_MEMBER(sec_slot_r);
-	DECLARE_WRITE8_MEMBER(sec_slot_w);
+	uint8_t sec_slot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sec_slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /*
@@ -201,21 +201,21 @@ void sangho_state::pzlestar_map_banks()
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(sangho_state::sec_slot_r),this), write8_delegate(FUNC(sangho_state::sec_slot_w),this));
 }
 
-WRITE8_MEMBER(sangho_state::pzlestar_bank_w)
+void sangho_state::pzlestar_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("rom bank %02x\n", data);
 	m_pzlestar_rom_bank = data;
 	pzlestar_map_banks();
 }
 
-WRITE8_MEMBER(sangho_state::pzlestar_mem_bank_w)
+void sangho_state::pzlestar_mem_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("mem bank %02x\n", data);
 	m_pzlestar_mem_bank = data;
 	pzlestar_map_banks();
 }
 
-READ8_MEMBER(sangho_state::pzlestar_mem_bank_r)
+uint8_t sangho_state::pzlestar_mem_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pzlestar_mem_bank;
 }
@@ -260,19 +260,19 @@ void sangho_state::sexyboom_map_bank(int bank)
 	}
 }
 
-WRITE8_MEMBER(sangho_state::sexyboom_bank_w)
+void sangho_state::sexyboom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sexyboom_bank[offset] = data;
 	sexyboom_map_bank(offset>>1);
 }
 
 /* secondary slot R/Ws from current primary slot number (see also mess/machine/msx.c) */
-READ8_MEMBER(sangho_state::sec_slot_r)
+uint8_t sangho_state::sec_slot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sec_slot[m_pzlestar_mem_bank >> 6] ^ 0xff;
 }
 
-WRITE8_MEMBER(sangho_state::sec_slot_w)
+void sangho_state::sec_slot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sec_slot[m_pzlestar_mem_bank >> 6] = data;
 }

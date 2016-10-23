@@ -109,7 +109,7 @@ void stfight_state::machine_reset()
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
-WRITE8_MEMBER(stfight_state::stfight_bank_w)
+void stfight_state::stfight_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank_num = 0;
 
@@ -150,19 +150,19 @@ INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
  *      Hardware handlers
  */
 
-WRITE8_MEMBER(stfight_state::stfight_io_w)
+void stfight_state::stfight_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: What is bit 4?
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-READ8_MEMBER(stfight_state::stfight_coin_r)
+uint8_t stfight_state::stfight_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_coin_state;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_coin_w)
+void stfight_state::stfight_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Acknowledge coin signals (active low)
 	if (!BIT(data, 0))
@@ -206,13 +206,13 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
  *      Machine hardware for YM2303 FM sound control
  */
 
-WRITE8_MEMBER(stfight_state::stfight_fm_w)
+void stfight_state::stfight_fm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// The sound cpu ignores any FM data without bit 7 set
 	m_fm_data = 0x80 | data;
 }
 
-READ8_MEMBER(stfight_state::stfight_fm_r)
+uint8_t stfight_state::stfight_fm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_fm_data;
 
@@ -227,49 +227,49 @@ READ8_MEMBER(stfight_state::stfight_fm_r)
  *  MCU communications
  */
 
-WRITE8_MEMBER(stfight_state::stfight_mcu_w)
+void stfight_state::stfight_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cpu_to_mcu_data = data;
 	m_cpu_to_mcu_empty = 0;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_a_w)
+void stfight_state::stfight_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_b_w)
+void stfight_state::stfight_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_ddr_c_w)
+void stfight_state::stfight_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
 
 
-READ8_MEMBER(stfight_state::stfight_68705_port_a_r)
+uint8_t stfight_state::stfight_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portA_in = m_cpu_to_mcu_data;
 
 	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_a_w)
+void stfight_state::stfight_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data_offs = data << 8;
 	m_portA_out = data;
 }
 
-READ8_MEMBER(stfight_state::stfight_68705_port_b_r)
+uint8_t stfight_state::stfight_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portB_in = (ioport("COIN")->read() << 6) | (m_cpu_to_mcu_empty << 4) | m_cpu_to_mcu_data;
 
 	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
+void stfight_state::stfight_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ddrB & 0x20) && (~data & 0x20))
 	{
@@ -280,12 +280,12 @@ WRITE8_MEMBER(stfight_state::stfight_68705_port_b_w)
 	m_portB_out = data;
 }
 
-READ8_MEMBER(stfight_state::stfight_68705_port_c_r)
+uint8_t stfight_state::stfight_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 }
 
-WRITE8_MEMBER(stfight_state::stfight_68705_port_c_w)
+void stfight_state::stfight_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Signal a valid coin on the falling edge
 	if ((m_ddrC & 0x01) && (m_portC_out & 0x01) && !(data & 0x01))

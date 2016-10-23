@@ -190,12 +190,12 @@ public:
 	int m_last_my;
 	int m_frame_count;
 	int m_videoROM_address;
-	DECLARE_READ8_MEMBER(lisa_fdc_io_r);
-	DECLARE_WRITE8_MEMBER(lisa_fdc_io_w);
-	DECLARE_READ16_MEMBER(lisa_r);
-	DECLARE_WRITE16_MEMBER(lisa_w);
-	DECLARE_READ16_MEMBER(lisa_IO_r);
-	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+	uint8_t lisa_fdc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lisa_fdc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t lisa_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lisa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lisa_IO_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lisa_IO_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_lisa210();
 	void init_mac_xl();
@@ -209,9 +209,9 @@ public:
 	TIMER_CALLBACK_MEMBER(handle_mouse);
 	TIMER_CALLBACK_MEMBER(read_COPS_command);
 	TIMER_CALLBACK_MEMBER(set_COPS_ready);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_a);
+	void COPS_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
-	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
+	void COPS_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
 
 	void field_interrupts();

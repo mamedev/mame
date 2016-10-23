@@ -55,13 +55,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
 }
 
 
-READ8_MEMBER( xevious_state::battles_customio0_r )
+uint8_t xevious_state::battles_customio0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU0 %04x: custom I/O Read = %02x\n",space.device().safe_pc(),m_battles_customio_command);
 	return m_battles_customio_command;
 }
 
-READ8_MEMBER( xevious_state::battles_customio3_r )
+uint8_t xevious_state::battles_customio3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int return_data;
 
@@ -81,7 +81,7 @@ READ8_MEMBER( xevious_state::battles_customio3_r )
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_customio0_w )
+void xevious_state::battles_customio0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_device *timer = machine().device<timer_device>("battles_nmi");
 
@@ -100,7 +100,7 @@ WRITE8_MEMBER( xevious_state::battles_customio0_w )
 
 }
 
-WRITE8_MEMBER( xevious_state::battles_customio3_w )
+void xevious_state::battles_customio3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU3 %04x: custom I/O Write = %02x\n",space.device().safe_pc(),data);
 
@@ -109,34 +109,34 @@ WRITE8_MEMBER( xevious_state::battles_customio3_w )
 
 
 
-READ8_MEMBER( xevious_state::battles_customio_data0_r )
+uint8_t xevious_state::battles_customio_data0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU0 %04x: custom I/O parameter %02x Read = %02x\n",space.device().safe_pc(),offset,m_battles_customio_data);
 
 	return m_battles_customio_data;
 }
 
-READ8_MEMBER( xevious_state::battles_customio_data3_r )
+uint8_t xevious_state::battles_customio_data3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("CPU3 %04x: custom I/O parameter %02x Read = %02x\n",space.device().safe_pc(),offset,m_battles_customio_data);
 	return m_battles_customio_data;
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_customio_data0_w )
+void xevious_state::battles_customio_data0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU0 %04x: custom I/O parameter %02x Write = %02x\n",space.device().safe_pc(),offset,data);
 	m_battles_customio_data = data;
 }
 
-WRITE8_MEMBER( xevious_state::battles_customio_data3_w )
+void xevious_state::battles_customio_data3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU3 %04x: custom I/O parameter %02x Write = %02x\n",space.device().safe_pc(),offset,data);
 	m_battles_customio_data = data;
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
+void xevious_state::battles_CPU4_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,data & 0x02); // Start 1
 	output().set_led_value(1,data & 0x01); // Start 2
@@ -147,7 +147,7 @@ WRITE8_MEMBER( xevious_state::battles_CPU4_coin_w )
 }
 
 
-WRITE8_MEMBER( xevious_state::battles_noise_sound_w )
+void xevious_state::battles_noise_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("CPU3 %04x: 50%02x Write = %02x\n",space.device().safe_pc(),offset,data);
 	if( (m_battles_sound_played == 0) && (data == 0xFF) ){
@@ -162,7 +162,7 @@ WRITE8_MEMBER( xevious_state::battles_noise_sound_w )
 }
 
 
-READ8_MEMBER( xevious_state::battles_input_port_r )
+uint8_t xevious_state::battles_input_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ( offset )
 	{

@@ -26,21 +26,21 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_READ16_MEMBER(tricep_terminal_r);
-	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t tricep_terminal_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tricep_terminal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint16_t> m_p_ram;
 	virtual void machine_reset() override;
 };
 
 
 
-READ16_MEMBER( tricep_state::tricep_terminal_r )
+uint16_t tricep_state::tricep_terminal_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER( tricep_state::tricep_terminal_w )
+void tricep_state::tricep_terminal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_terminal->write(space, 0, data >> 8);
 }
@@ -66,7 +66,7 @@ void tricep_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( tricep_state::kbd_put )
+void tricep_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

@@ -67,7 +67,7 @@ void nes_ntb_slot_device::device_start()
 	m_cart = dynamic_cast<ntb_cart_interface *>(get_card_device());
 }
 
-READ8_MEMBER(nes_ntb_slot_device::read)
+uint8_t nes_ntb_slot_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
@@ -211,7 +211,7 @@ void nes_sunsoft_dcs_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_sunsoft_dcs_device::write_h)
+void nes_sunsoft_dcs_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Sunsoft DCS write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -228,7 +228,7 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_h)
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_dcs_device::read_h)
+uint8_t nes_sunsoft_dcs_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Sunsoft DCS read_h, offset: %04x\n", offset));
 
@@ -243,7 +243,7 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_h)
 		return hi_access_rom(offset);
 }
 
-WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
+void nes_sunsoft_dcs_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("Sunsoft DCS write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
 	}
 }
 
-READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
+uint8_t nes_sunsoft_dcs_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Sunsoft DCS read_m, offset: %04x\n", offset));
 

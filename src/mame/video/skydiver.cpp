@@ -66,68 +66,68 @@ void skydiver_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(skydiver_state::videoram_w)
+void skydiver_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-READ8_MEMBER(skydiver_state::wram_r)
+uint8_t skydiver_state::wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset | 0x380];
 }
 
-WRITE8_MEMBER(skydiver_state::wram_w)
+void skydiver_state::wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset | 0x0380] = data;
 }
 
 
-WRITE8_MEMBER(skydiver_state::width_w)
+void skydiver_state::width_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_width = offset;
 }
 
 
-WRITE8_MEMBER(skydiver_state::coin_lockout_w)
+void skydiver_state::coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(!offset);
 }
 
 
-WRITE8_MEMBER(skydiver_state::start_lamp_1_w)
+void skydiver_state::start_lamp_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, offset);
 }
 
-WRITE8_MEMBER(skydiver_state::start_lamp_2_w)
+void skydiver_state::start_lamp_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, offset);
 }
 
 
-WRITE8_MEMBER(skydiver_state::lamp_s_w)
+void skydiver_state::lamp_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("lamps", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_k_w)
+void skydiver_state::lamp_k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("lampk", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_y_w)
+void skydiver_state::lamp_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("lampy", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::lamp_d_w)
+void skydiver_state::lamp_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("lampd", offset);
 }
 
-WRITE8_MEMBER(skydiver_state::_2000_201F_w)
+void skydiver_state::_2000_201F_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = offset & 0x01;
 

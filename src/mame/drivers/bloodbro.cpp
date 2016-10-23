@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( skysmash_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0xc0000, 0xc004f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(bloodbro_state::weststry_soundlatch_w)
+void bloodbro_state::weststry_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_seibu_sound->main_word_w(space, offset, data, mem_mask);
 
@@ -461,17 +461,17 @@ static GFXDECODE_START( weststry )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, weststry_spritelayout,   0x00*16,  0x10 )
 GFXDECODE_END
 
-WRITE16_MEMBER( bloodbro_state::layer_en_w )
+void bloodbro_state::layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( bloodbro_state::layer_scroll_w )
+void bloodbro_state::layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
+void bloodbro_state::weststry_layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

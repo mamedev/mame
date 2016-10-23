@@ -58,9 +58,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(pia1_b_in);
-	DECLARE_READ8_MEMBER(videoram_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia1_b_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
 	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
@@ -113,7 +113,7 @@ void poly_state::machine_reset()
 {
 }
 
-READ8_MEMBER( poly_state::pia1_b_in )
+uint8_t poly_state::pia1_b_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // return ascii key value, bit 7 is the strobe value
 	uint8_t data = m_term_data;
@@ -121,12 +121,12 @@ READ8_MEMBER( poly_state::pia1_b_in )
 	return data;
 }
 
-READ8_MEMBER( poly_state::videoram_r )
+uint8_t poly_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE8_MEMBER( poly_state::kbd_put )
+void poly_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data | 0x80;
 

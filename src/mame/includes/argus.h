@@ -71,30 +71,30 @@ public:
 	tilemap_t *m_bg1_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE8_MEMBER(valtric_mosaic_w);
-	DECLARE_WRITE8_MEMBER(txram_w);
-	DECLARE_WRITE8_MEMBER(bg1ram_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_mosaic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void txram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// argus specific
-	DECLARE_WRITE8_MEMBER(argus_bg_status_w);
-	DECLARE_WRITE8_MEMBER(argus_paletteram_w);
+	void argus_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void argus_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// butasan specific
-	DECLARE_WRITE8_MEMBER(butasan_bg0_status_w);
-	DECLARE_WRITE8_MEMBER(butasan_bg1_status_w);
-	DECLARE_WRITE8_MEMBER(butasan_paletteram_w);
-	DECLARE_WRITE8_MEMBER(butasan_bg1ram_w);
-	DECLARE_WRITE8_MEMBER(butasan_pageselect_w);
-	DECLARE_READ8_MEMBER(butasan_pagedram_r);
-	DECLARE_WRITE8_MEMBER(butasan_pagedram_w);
-	DECLARE_WRITE8_MEMBER(butasan_unknown_w);
+	void butasan_bg0_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_bg1_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_bg1ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_pageselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t butasan_pagedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void butasan_pagedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void butasan_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// valtric specific
-	DECLARE_WRITE8_MEMBER(valtric_bg_status_w);
-	DECLARE_WRITE8_MEMBER(valtric_paletteram_w);
-	DECLARE_WRITE8_MEMBER(valtric_unknown_w);
+	void valtric_bg_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void valtric_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(argus_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);

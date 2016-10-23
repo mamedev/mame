@@ -58,18 +58,18 @@ public:
 	optional_shared_ptr<uint16_t> m_intvkbd_dualport_ram;
 	optional_shared_ptr<uint8_t> m_videoram;
 
-	DECLARE_READ16_MEMBER(intv_stic_r);
-	DECLARE_WRITE16_MEMBER(intv_stic_w);
-	DECLARE_READ16_MEMBER(intv_gram_r);
-	DECLARE_WRITE16_MEMBER(intv_gram_w);
-	DECLARE_READ16_MEMBER(intv_ram8_r);
-	DECLARE_WRITE16_MEMBER(intv_ram8_w);
-	DECLARE_READ16_MEMBER(intv_ram16_r);
-	DECLARE_WRITE16_MEMBER(intv_ram16_w);
-	DECLARE_READ8_MEMBER(intvkb_iocart_r);
+	uint16_t intv_stic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void intv_stic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t intv_gram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void intv_gram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t intv_ram8_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void intv_ram8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t intv_ram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void intv_ram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t intvkb_iocart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(intv_right_control_r);
-	DECLARE_READ8_MEMBER(intv_left_control_r);
+	uint8_t intv_right_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t intv_left_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t m_bus_copy_mode;
 	uint8_t m_backtab_row;
@@ -78,13 +78,13 @@ public:
 	uint8_t m_ram8[256];
 
 	// Keyboard Component
-	DECLARE_READ8_MEMBER(intvkbd_tms9927_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_tms9927_w);
-	DECLARE_WRITE16_MEMBER(intvkbd_dualport16_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_lsb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_lsb_w);
-	DECLARE_READ8_MEMBER(intvkbd_dualport8_msb_r);
-	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_msb_w);
+	uint8_t intvkbd_tms9927_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void intvkbd_tms9927_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void intvkbd_dualport16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t intvkbd_dualport8_lsb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void intvkbd_dualport8_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t intvkbd_dualport8_msb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void intvkbd_dualport8_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_tms9927_num_rows;
 	uint8_t m_tms9927_cursor_col;

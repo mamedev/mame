@@ -17,7 +17,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "softlist.h"
 
-WRITE8_MEMBER(nes_state::nes_vh_sprite_dma_w)
+void nes_state::nes_vh_sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppu->spriteram_dma(space, data);
 }

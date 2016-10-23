@@ -33,8 +33,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_READ8_MEMBER(p1_fdc_r);
-	DECLARE_WRITE8_MEMBER(p1_fdc_w);
+	uint8_t p1_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p1_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( p1_fdc_irq_drq );
 protected:
 	// device-level overrides

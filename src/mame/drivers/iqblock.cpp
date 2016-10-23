@@ -59,14 +59,14 @@ Grndtour:
 #include "sound/ym2413.h"
 
 
-WRITE8_MEMBER(iqblock_state::iqblock_prot_w)
+void iqblock_state::iqblock_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambase[0xe26] = data;
 	m_rambase[0xe27] = data;
 	m_rambase[0xe1c] = data;
 }
 
-WRITE8_MEMBER(iqblock_state::grndtour_prot_w)
+void iqblock_state::grndtour_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambase[0xe39] = data;
 	m_rambase[0xe3a] = data;
@@ -89,13 +89,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
 }
 
 
-WRITE8_MEMBER(iqblock_state::irqack_w)
+void iqblock_state::irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-WRITE8_MEMBER(iqblock_state::port_C_w)
+void iqblock_state::port_C_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 

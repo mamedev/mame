@@ -44,10 +44,10 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(zrt80_10_r);
-	DECLARE_WRITE8_MEMBER(zrt80_30_w);
-	DECLARE_WRITE8_MEMBER(zrt80_38_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t zrt80_10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zrt80_30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zrt80_38_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	const uint8_t *m_p_chargen;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -66,7 +66,7 @@ public:
 };
 
 
-READ8_MEMBER( zrt80_state::zrt80_10_r )
+uint8_t zrt80_state::zrt80_10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -86,13 +86,13 @@ void zrt80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-WRITE8_MEMBER(zrt80_state::zrt80_30_w)
+void zrt80_state::zrt80_30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_set(attotime::from_msec(100), TIMER_BEEP_OFF);
 	m_beep->set_state(1);
 }
 
-WRITE8_MEMBER(zrt80_state::zrt80_38_w)
+void zrt80_state::zrt80_38_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_set(attotime::from_msec(400), TIMER_BEEP_OFF);
 	m_beep->set_state(1);
@@ -249,7 +249,7 @@ MC6845_UPDATE_ROW( zrt80_state::crtc_update_row )
 	}
 }
 
-WRITE8_MEMBER( zrt80_state::kbd_put )
+void zrt80_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

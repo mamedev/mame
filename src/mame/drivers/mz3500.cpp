@@ -78,23 +78,23 @@ public:
 
 	uint8_t m_fdd_sel;
 
-	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
-	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
-	DECLARE_READ8_MEMBER(mz3500_ipl_r);
-	DECLARE_READ8_MEMBER(mz3500_basic_r);
-	DECLARE_READ8_MEMBER(mz3500_work_ram_r);
-	DECLARE_WRITE8_MEMBER(mz3500_work_ram_w);
-	DECLARE_READ8_MEMBER(mz3500_shared_ram_r);
-	DECLARE_WRITE8_MEMBER(mz3500_shared_ram_w);
-	DECLARE_READ8_MEMBER(mz3500_io_r);
-	DECLARE_WRITE8_MEMBER(mz3500_io_w);
-	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
-	DECLARE_READ8_MEMBER(mz3500_fdc_r);
-	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
-	DECLARE_READ8_MEMBER(mz3500_fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(mz3500_pa_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
-	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
+	uint8_t mz3500_master_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_master_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_ipl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_basic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_work_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_work_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz3500_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz3500_fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz3500_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz3500_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz3500_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -242,28 +242,28 @@ uint32_t mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_ipl_r)
+uint8_t mz3500_state::mz3500_ipl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ipl_rom[offset];
 }
 
-READ8_MEMBER(mz3500_state::mz3500_basic_r)
+uint8_t mz3500_state::mz3500_basic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_basic_rom[offset];
 }
 
-READ8_MEMBER(mz3500_state::mz3500_work_ram_r)
+uint8_t mz3500_state::mz3500_work_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_work_ram[offset];
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_work_ram_w)
+void mz3500_state::mz3500_work_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_work_ram[offset] = data;
 }
 
 
-READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
+uint8_t mz3500_state::mz3500_master_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_ms == 0)
 	{
@@ -363,7 +363,7 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 	return 0xff; // shouldn't happen
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
+void mz3500_state::mz3500_master_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_ms == 0) // Initialize State
 	{
@@ -453,17 +453,17 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 	}
 }
 
-READ8_MEMBER(mz3500_state::mz3500_shared_ram_r)
+uint8_t mz3500_state::mz3500_shared_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_shared_ram_w)
+void mz3500_state::mz3500_shared_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared_ram[offset] = data;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_io_r)
+uint8_t mz3500_state::mz3500_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	[2]
@@ -487,7 +487,7 @@ READ8_MEMBER(mz3500_state::mz3500_io_r)
 	return 0;
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_io_w)
+void mz3500_state::mz3500_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	[0]
@@ -525,7 +525,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_io_w)
 	}
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
+void mz3500_state::mz3500_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 8)
 	{
@@ -538,7 +538,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
 		m_crtc[offset] = data;
 }
 
-READ8_MEMBER(mz3500_state::mz3500_fdc_r)
+uint8_t mz3500_state::mz3500_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	---- -x-- Motor
@@ -551,7 +551,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 	return (floppy->mon_r() << 2) | (floppy->idx_r() << 1) | (m_fdc->get_drq() & 1);
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
+void mz3500_state::mz3500_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- FDC int enable
@@ -577,7 +577,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 
 }
 
-READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
+uint8_t mz3500_state::mz3500_fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fdc->dma_r();
 }
@@ -618,12 +618,12 @@ static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
+void mz3500_state::mz3500_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// printer data
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
+void mz3500_state::mz3500_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- CG select (ROM and/or upd7220 clock?)
@@ -636,7 +636,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
 	m_srdy = (data & 0x40) >> 6;
 }
 
-WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
+void mz3500_state::mz3500_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- printer OBF output

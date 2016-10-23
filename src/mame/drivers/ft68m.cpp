@@ -30,10 +30,10 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_READ16_MEMBER(switches_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t keyin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t switches_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -42,19 +42,19 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-READ16_MEMBER( ft68m_state::keyin_r )
+uint16_t ft68m_state::keyin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
 
-READ16_MEMBER( ft68m_state::status_r )
+uint16_t ft68m_state::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_term_data) ? 0x500 : 0x400;
 }
 
-READ16_MEMBER( ft68m_state::switches_r )
+uint16_t ft68m_state::switches_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x7c00; // bypass self test
 }
@@ -88,7 +88,7 @@ void ft68m_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( ft68m_state::kbd_put )
+void ft68m_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

@@ -90,8 +90,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_READ16_MEMBER( rf5c400_r );
-	DECLARE_WRITE16_MEMBER( rf5c400_w );
+	uint16_t rf5c400_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rf5c400_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 private:
 	void rf5c400_init_chip();

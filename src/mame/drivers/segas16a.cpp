@@ -163,7 +163,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 //  misc_control_w - miscellaneous video controls
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::misc_control_w )
+void segas16a_state::misc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  PPI port B
@@ -207,7 +207,7 @@ WRITE8_MEMBER( segas16a_state::misc_control_w )
 //  tilemap_sound_w - tilemap and sound control
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
+void segas16a_state::tilemap_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  PPI port C
@@ -238,7 +238,7 @@ WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
 //  standard_io_r - default I/O handler for reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::standard_io_r )
+uint16_t segas16a_state::standard_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -264,7 +264,7 @@ READ16_MEMBER( segas16a_state::standard_io_r )
 //  standard_io_r - default I/O handler for writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::standard_io_w )
+void segas16a_state::standard_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x3fff/2;
 	switch (offset & (0x3000/2))
@@ -284,7 +284,7 @@ WRITE16_MEMBER( segas16a_state::standard_io_w )
 //  misc_io_r - miscellaneous I/O reads
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::misc_io_r )
+uint16_t segas16a_state::misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// just call custom handler
 	return m_custom_io_r(space, offset, mem_mask);
@@ -295,7 +295,7 @@ READ16_MEMBER( segas16a_state::misc_io_r )
 //  misc_io_w - miscellaneous I/O writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segas16a_state::misc_io_w )
+void segas16a_state::misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// just call custom handler
 	m_custom_io_w(space, offset, data, mem_mask);
@@ -311,7 +311,7 @@ WRITE16_MEMBER( segas16a_state::misc_io_w )
 //  sound_data_r - read data from the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::sound_data_r )
+uint8_t segas16a_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// assert ACK
 	m_i8255->pc6_w(CLEAR_LINE);
@@ -323,7 +323,7 @@ READ8_MEMBER( segas16a_state::sound_data_r )
 //  n7751_command_w - control the N7751
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_command_w )
+void segas16a_state::n7751_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  Z80 7751 control port
@@ -350,7 +350,7 @@ WRITE8_MEMBER( segas16a_state::n7751_command_w )
 //  n7751_control_w - YM2151 output port callback
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_control_w )
+void segas16a_state::n7751_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  YM2151 output port
@@ -368,7 +368,7 @@ WRITE8_MEMBER( segas16a_state::n7751_control_w )
 //  n7751_rom_offset_w - post expander callback
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
+void segas16a_state::n7751_rom_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// P4 - address lines 0-3
 	// P5 - address lines 4-7
@@ -387,7 +387,7 @@ WRITE8_MEMBER( segas16a_state::n7751_rom_offset_w )
 //  n7751_rom_r - MCU reads from BUS
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::n7751_rom_r )
+uint8_t segas16a_state::n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// read from BUS
 	return memregion("n7751data")->base()[m_n7751_rom_address];
@@ -398,7 +398,7 @@ READ8_MEMBER( segas16a_state::n7751_rom_r )
 //  n7751_p2_r - MCU reads from the P2 lines
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::n7751_p2_r )
+uint8_t segas16a_state::n7751_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048)
 	// bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used
@@ -410,7 +410,7 @@ READ8_MEMBER( segas16a_state::n7751_p2_r )
 //  n7751_p2_w - MCU writes to the P2 lines
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::n7751_p2_w )
+void segas16a_state::n7751_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write to P2; low 4 bits go to 8243
 	m_n7751_i8243->i8243_p2_w(space, offset, data & 0x0f);
@@ -424,7 +424,7 @@ WRITE8_MEMBER( segas16a_state::n7751_p2_w )
 //  n7751_t1_r - MCU reads from the T1 line
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::n7751_t1_r )
+uint8_t segas16a_state::n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T1 - labelled as "TEST", connected to ground
 	return 0;
@@ -440,7 +440,7 @@ READ8_MEMBER( segas16a_state::n7751_t1_r )
 //  mcu_control_w - control lines from the MCU
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::mcu_control_w )
+void segas16a_state::mcu_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// if we have a fake i8751 handler, ignore writes by the actual 8751
 	if (!m_i8751_vblank_hook.isnull())
@@ -471,7 +471,7 @@ WRITE8_MEMBER( segas16a_state::mcu_control_w )
 //  to the 68000's address space
 //-------------------------------------------------
 
-WRITE8_MEMBER( segas16a_state::mcu_io_w )
+void segas16a_state::mcu_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 	//  1.00 0... = work RAM (accessed @ $4000+x) or I/O (accessed @ $8000+x)
@@ -526,7 +526,7 @@ WRITE8_MEMBER( segas16a_state::mcu_io_w )
 //  to the 68000's address space
 //-------------------------------------------------
 
-READ8_MEMBER( segas16a_state::mcu_io_r )
+uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch ((m_mcu_control >> 3) & 7)
 	{
@@ -734,7 +734,7 @@ void segas16a_state::quartet_i8751_sim()
 //  for Ace Attacker
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
+uint16_t segas16a_state::aceattaca_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -781,7 +781,7 @@ READ16_MEMBER( segas16a_state::aceattaca_custom_io_r )
 //  for Major League
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
+uint16_t segas16a_state::mjleague_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -861,7 +861,7 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 //  for Passing Shot
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
+uint16_t segas16a_state::passsht16a_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -894,7 +894,7 @@ READ16_MEMBER( segas16a_state::passsht16a_custom_io_r )
 //  for SDI
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sdi_custom_io_r )
+uint16_t segas16a_state::sdi_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{
@@ -915,7 +915,7 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 //  for Sukeban Jansi Ryuko
 //-------------------------------------------------
 
-READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
+uint16_t segas16a_state::sjryuko_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0x3000/2))
 	{

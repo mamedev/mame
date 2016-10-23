@@ -64,7 +64,7 @@ J1100072A
 #include "includes/bigevglf.h"
 
 
-WRITE8_MEMBER(bigevglf_state::beg_banking_w)
+void bigevglf_state::beg_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beg_bank = data;
 
@@ -79,19 +79,19 @@ TIMER_CALLBACK_MEMBER(bigevglf_state::from_sound_latch_callback)
 	m_from_sound = param & 0xff;
 	m_sound_state |= 2;
 }
-WRITE8_MEMBER(bigevglf_state::beg_fromsound_w)/* write to D800 sets bit 1 in status */
+void bigevglf_state::beg_fromsound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* write to D800 sets bit 1 in status */
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::from_sound_latch_callback),this), (space.device().safe_pc() << 16) | data);
 }
 
-READ8_MEMBER(bigevglf_state::beg_fromsound_r)
+uint8_t bigevglf_state::beg_fromsound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
 	return m_from_sound;
 }
 
-READ8_MEMBER(bigevglf_state::beg_soundstate_r)
+uint8_t bigevglf_state::beg_soundstate_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_sound_state;
 	/* set a timer to force synchronization after the read */
@@ -100,7 +100,7 @@ READ8_MEMBER(bigevglf_state::beg_soundstate_r)
 	return ret;
 }
 
-READ8_MEMBER(bigevglf_state::soundstate_r)
+uint8_t bigevglf_state::soundstate_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
@@ -116,24 +116,24 @@ TIMER_CALLBACK_MEMBER(bigevglf_state::nmi_callback)
 	m_sound_state &= ~1;
 }
 
-WRITE8_MEMBER(bigevglf_state::sound_command_w)/* write to port 20 clears bit 0 in status */
+void bigevglf_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* write to port 20 clears bit 0 in status */
 {
 	m_for_sound = data;
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::nmi_callback),this), data);
 }
 
-READ8_MEMBER(bigevglf_state::sound_command_r)/* read from D800 sets bit 0 in status */
+uint8_t bigevglf_state::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)/* read from D800 sets bit 0 in status */
 {
 	m_sound_state |= 1;
 	return m_for_sound;
 }
 
-WRITE8_MEMBER(bigevglf_state::nmi_disable_w)
+void bigevglf_state::nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(bigevglf_state::nmi_enable_w)
+void bigevglf_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -151,27 +151,27 @@ TIMER_CALLBACK_MEMBER(bigevglf_state::deferred_ls74_w)
 }
 
 /* do this on a timer to let the CPUs synchronize */
-WRITE8_MEMBER(bigevglf_state::beg13_a_clr_w)
+void bigevglf_state::beg13_a_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 0);
 }
 
-WRITE8_MEMBER(bigevglf_state::beg13_b_clr_w)
+void bigevglf_state::beg13_b_clr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 0);
 }
 
-WRITE8_MEMBER(bigevglf_state::beg13_a_set_w)
+void bigevglf_state::beg13_a_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (0 << 8) | 1);
 }
 
-WRITE8_MEMBER(bigevglf_state::beg13_b_set_w)
+void bigevglf_state::beg13_b_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(bigevglf_state::deferred_ls74_w),this), (1 << 8) | 1);
 }
 
-READ8_MEMBER(bigevglf_state::beg_status_r)
+uint8_t bigevglf_state::beg_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* d0 = Q of 74ls74 IC13(partA)
    d1 = Q of 74ls74 IC13(partB)
@@ -188,21 +188,21 @@ READ8_MEMBER(bigevglf_state::beg_status_r)
 }
 
 
-READ8_MEMBER(bigevglf_state::beg_trackball_x_r)
+uint8_t bigevglf_state::beg_trackball_x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 
 	return ioport(portx_name[m_port_select])->read();
 }
 
-READ8_MEMBER(bigevglf_state::beg_trackball_y_r)
+uint8_t bigevglf_state::beg_trackball_y_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 
 	return ioport(porty_name[m_port_select])->read();
 }
 
-WRITE8_MEMBER(bigevglf_state::beg_port08_w)
+void bigevglf_state::beg_port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_select = (data & 0x04) >> 2;
 }
@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, bigevglf_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
+uint8_t bigevglf_state::sub_cpu_mcu_coin_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	        bit 0 and bit 1 = coin inputs

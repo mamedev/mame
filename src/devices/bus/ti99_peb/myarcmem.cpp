@@ -95,7 +95,7 @@ READ8Z_MEMBER(myarc_memory_expansion_device::readz)
 /*
     Memory write access. DSRROM does not allow writing.
 */
-WRITE8_MEMBER(myarc_memory_expansion_device::write)
+void myarc_memory_expansion_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int base = get_base(offset);
 
@@ -136,7 +136,7 @@ READ8Z_MEMBER(myarc_memory_expansion_device::crureadz)
         1006 = bit 2 of RAM bank value (512K)
         1008 = bit 3 of RAM bank value (512K)
 */
-WRITE8_MEMBER(myarc_memory_expansion_device::cruwrite)
+void myarc_memory_expansion_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (((offset & 0xff00)==MYARCMEM_CRU_BASE1)||((offset & 0xff00)==MYARCMEM_CRU_BASE2))
 	{

@@ -111,7 +111,7 @@ const char *const gorf_sample_names[] =
 };
 
 
-READ8_MEMBER( astrocde_state::gorf_speech_r )
+uint8_t astrocde_state::gorf_speech_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = offset >> 8;
 #if USE_FAKE_VOTRAX

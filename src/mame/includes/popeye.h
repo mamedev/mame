@@ -37,13 +37,13 @@ public:
 	uint8_t m_lastflip;
 	int   m_field;
 
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
-	DECLARE_WRITE8_MEMBER(popeye_colorram_w);
-	DECLARE_WRITE8_MEMBER(popeye_bitmap_w);
-	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
-	DECLARE_WRITE8_MEMBER(popeye_portB_w);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void popeye_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void popeye_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void popeye_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void skyskipr_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void popeye_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
 	void init_skyskipr();
 	void init_popeye();

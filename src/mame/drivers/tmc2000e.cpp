@@ -35,43 +35,43 @@
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( tmc2000e_state::vismac_r )
+uint8_t tmc2000e_state::vismac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::vismac_w )
+void tmc2000e_state::vismac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( tmc2000e_state::floppy_r )
-{
-	return 0;
-}
-
-WRITE8_MEMBER( tmc2000e_state::floppy_w )
-{
-}
-
-READ8_MEMBER( tmc2000e_state::ascii_keyboard_r )
+uint8_t tmc2000e_state::floppy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER( tmc2000e_state::io_r )
+void tmc2000e_state::floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+}
+
+uint8_t tmc2000e_state::ascii_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_w )
+uint8_t tmc2000e_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
+{
+	return 0;
+}
+
+void tmc2000e_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::io_select_w )
+void tmc2000e_state::io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
+void tmc2000e_state::keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }
@@ -245,7 +245,7 @@ WRITE_LINE_MEMBER( tmc2000e_state::q_w )
 	// floppy control (FDC-6)
 }
 
-WRITE8_MEMBER( tmc2000e_state::dma_w )
+void tmc2000e_state::dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_color = (m_colorram[offset & 0x3ff]) & 0x07; // 0x04 = R, 0x02 = B, 0x01 = G
 

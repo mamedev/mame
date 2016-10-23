@@ -35,16 +35,16 @@ public:
 	{ }
 
 	DECLARE_PALETTE_INIT(gamate);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_READ8_MEMBER(newer_protection_set);
-	DECLARE_WRITE8_MEMBER(protection_reset);
-	DECLARE_READ8_MEMBER(gamate_cart_protection_r);
-	DECLARE_WRITE8_MEMBER(gamate_cart_protection_w);
-	DECLARE_WRITE8_MEMBER(cart_bankswitchmulti_w);
-	DECLARE_WRITE8_MEMBER(cart_bankswitch_w);
-	DECLARE_READ8_MEMBER(gamate_video_r);
-	DECLARE_READ8_MEMBER(gamate_nmi_r);
-	DECLARE_WRITE8_MEMBER(gamate_video_w);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t newer_protection_set(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void protection_reset(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gamate_cart_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gamate_cart_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cart_bankswitchmulti_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cart_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gamate_video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gamate_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gamate_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gamate();
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gamate_interrupt);
@@ -91,7 +91,7 @@ private:
 	uint8_t *m_cart_ptr;
 };
 
-WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
+void gamate_state::gamate_cart_protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%.6f protection write %x %x address:%x data:%x shift:%d\n",machine().time().as_double(), offset, data, card_protection.address, card_protection.cartridge_byte, card_protection.bit_shifter);
 
@@ -109,7 +109,7 @@ WRITE8_MEMBER( gamate_state::gamate_cart_protection_w )
 	}
 }
 
-READ8_MEMBER( gamate_state::gamate_cart_protection_r )
+uint8_t gamate_state::gamate_cart_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret=1;
 	if (card_protection.bit_shifter==7 && card_protection.unprotected)
@@ -136,12 +136,12 @@ READ8_MEMBER( gamate_state::gamate_cart_protection_r )
 	return ret;
 }
 
-READ8_MEMBER( gamate_state::protection_r )
+uint8_t gamate_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return card_protection.set? 3: 1;
 } // bits 0 and 1 checked
 
-WRITE8_MEMBER( gamate_state::protection_reset )
+void gamate_state::protection_reset(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // writes 0x20
 	card_protection.address=0x6005-0x6001;
@@ -151,13 +151,13 @@ WRITE8_MEMBER( gamate_state::protection_reset )
 	card_protection.unprotected=false;
 }
 
-READ8_MEMBER( gamate_state::newer_protection_set )
+uint8_t gamate_state::newer_protection_set(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	card_protection.set=true;
 	return 0;
 }
 
-WRITE8_MEMBER( gamate_state::gamate_video_w )
+void gamate_state::gamate_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	video.reg[offset]=data;
 	switch (offset)
@@ -191,18 +191,18 @@ WRITE8_MEMBER( gamate_state::gamate_video_w )
 	}
 }
 
-WRITE8_MEMBER( gamate_state::cart_bankswitchmulti_w )
+void gamate_state::cart_bankswitchmulti_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bank_multi=data;
 	m_bankmulti->set_base(m_cart_ptr+0x4000*data+1);
 }
 
-WRITE8_MEMBER( gamate_state::cart_bankswitch_w )
+void gamate_state::cart_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank->set_base(m_cart_ptr+0x4000*data);
 }
 
-READ8_MEMBER( gamate_state::gamate_video_r )
+uint8_t gamate_state::gamate_video_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset!=6)
 		return 0;
@@ -217,7 +217,7 @@ READ8_MEMBER( gamate_state::gamate_video_r )
 	return data;
 }
 
-READ8_MEMBER( gamate_state::gamate_nmi_r )
+uint8_t gamate_state::gamate_nmi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	machine().ui().popup_time(2, "nmi/4800 read\n");

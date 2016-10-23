@@ -47,7 +47,7 @@ ioport_constructor a26_rom_cm_device::device_input_ports() const
 
 
 
-READ8_MEMBER(a26_rom_cm_device::read_rom)
+uint8_t a26_rom_cm_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset + (m_base_bank * 0x1000)];
 }

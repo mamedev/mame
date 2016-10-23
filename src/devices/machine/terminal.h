@@ -32,8 +32,8 @@ public:
 
 	template<class _Object> static devcb_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<generic_terminal_device &>(device).m_keyboard_cb.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { term_write(data); }
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual ioport_constructor device_input_ports() const override;

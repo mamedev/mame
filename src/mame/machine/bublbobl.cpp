@@ -14,7 +14,7 @@
 #include "includes/bublbobl.h"
 
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
+void bublbobl_state::bublbobl_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry((data ^ 4) & 7);
@@ -35,7 +35,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
+void bublbobl_state::tokio_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 7);
@@ -43,7 +43,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
 	/* bits 3-7 unknown */
 }
 
-WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
+void bublbobl_state::tokio_videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 flips screen */
 	flip_screen_set(data & 0x80);
@@ -51,7 +51,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 	/* other bits unknown */
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
+void bublbobl_state::bublbobl_nmitrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -74,13 +74,13 @@ static const uint8_t tokio_prot_data[] =
 	0x00,0x00,0x00,0x00,0x02,0x00,0x00,0x01
 };
 
-READ8_MEMBER(bublbobl_state::tokio_mcu_r)
+uint8_t bublbobl_state::tokio_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_tokio_prot_count %= sizeof(tokio_prot_data);
 	return tokio_prot_data[m_tokio_prot_count++];
 }
 
-READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
+uint8_t bublbobl_state::tokiob_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xbf; /* ad-hoc value set to pass initial testing */
 }
@@ -105,18 +105,18 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_sound_command_w)
+void bublbobl_state::bublbobl_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	synchronize(TIMER_NMI, data);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_disable_w)
+void bublbobl_state::bublbobl_sh_nmi_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 0;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
+void bublbobl_state::bublbobl_sh_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
@@ -126,17 +126,17 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
 	}
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
+void bublbobl_state::bublbobl_soundcpu_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_sound_status_r)
+uint8_t bublbobl_state::bublbobl_sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_status;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_sound_status_w)
+void bublbobl_state::bublbobl_sound_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_status = data;
 }
@@ -149,54 +149,54 @@ Bubble Bobble MCU
 
 ***************************************************************************/
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr1_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ddr1;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr1_w)
+void bublbobl_state::bublbobl_mcu_ddr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr1 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr2_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ddr2;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr2_w)
+void bublbobl_state::bublbobl_mcu_ddr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr2 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr3_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ddr3;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr3_w)
+void bublbobl_state::bublbobl_mcu_ddr3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr3 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_r)
+uint8_t bublbobl_state::bublbobl_mcu_ddr4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ddr4;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
+void bublbobl_state::bublbobl_mcu_ddr4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr4 = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
+uint8_t bublbobl_state::bublbobl_mcu_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 1 read\n", space.device().safe_pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
+void bublbobl_state::bublbobl_mcu_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
 
@@ -219,13 +219,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 	m_port1_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
+uint8_t bublbobl_state::bublbobl_mcu_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 2 read\n", space.device().safe_pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
+void bublbobl_state::bublbobl_mcu_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 2 write %02x\n", space.device().safe_pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
@@ -259,25 +259,25 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 	m_port2_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port3_r)
+uint8_t bublbobl_state::bublbobl_mcu_port3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 3 read\n", space.device().safe_pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port3_w)
+void bublbobl_state::bublbobl_mcu_port3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 3 write %02x\n", space.device().safe_pc(), data);
 	m_port3_out = data;
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_mcu_port4_r)
+uint8_t bublbobl_state::bublbobl_mcu_port4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 4 read\n", space.device().safe_pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port4_w)
+void bublbobl_state::bublbobl_mcu_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 6801U4 port 4 write %02x\n", space.device().safe_pc(), data);
 
@@ -295,7 +295,7 @@ in boblbobl, so they don't matter. All checks are patched out in sboblbob.
 
 ***************************************************************************/
 
-READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
+uint8_t bublbobl_state::boblbobl_ic43_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// if (offset >= 2)
 	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", space.device().safe_pc(), offset, res);
@@ -306,7 +306,7 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
 		return machine().rand() & 0xff;
 }
 
-WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_a_w)
+void bublbobl_state::boblbobl_ic43_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int res = 0;
 
@@ -344,7 +344,7 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_a_w)
 	m_ic43_a = res;
 }
 
-WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
+void bublbobl_state::boblbobl_ic43_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
 	m_ic43_b = (data >> 4) ^ xorval[offset];
 }
 
-READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
+uint8_t bublbobl_state::boblbobl_ic43_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  logerror("%04x: ic43_b_r (offs %d)\n", space.device().safe_pc(), offset);
 	if (offset == 0)
@@ -380,19 +380,19 @@ INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
 }
 
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_a_r)
+uint8_t bublbobl_state::bublbobl_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_a_w)
+void bublbobl_state::bublbobl_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
+void bublbobl_state::bublbobl_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
@@ -418,12 +418,12 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
  *  7   W  not used?
  */
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_b_r)
+uint8_t bublbobl_state::bublbobl_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
+void bublbobl_state::bublbobl_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
@@ -489,7 +489,7 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_b_w)
+void bublbobl_state::bublbobl_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }

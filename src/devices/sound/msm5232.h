@@ -51,7 +51,7 @@ public:
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
 	template<class _Object> static devcb_base &set_gate_handler_callback(device_t &device, _Object object) { return downcast<msm5232_device &>(device).m_gate_handler_cb.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void set_clock(int clock);
 
 protected:

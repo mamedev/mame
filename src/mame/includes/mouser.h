@@ -36,12 +36,12 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	DECLARE_WRITE8_MEMBER(mouser_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mouser_sound_interrupt_w);
-	DECLARE_READ8_MEMBER(mouser_sound_byte_r);
-	DECLARE_WRITE8_MEMBER(mouser_sound_nmi_clear_w);
-	DECLARE_WRITE8_MEMBER(mouser_flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(mouser_flip_screen_y_w);
+	void mouser_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mouser_sound_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mouser_sound_byte_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mouser_sound_nmi_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mouser_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mouser_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_mouser();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

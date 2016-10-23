@@ -185,78 +185,78 @@ public:
 	void machine_reset_cmanhat();
 	void machine_reset_cocean1a(); /* 10 */
 	uint32_t screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
-	DECLARE_READ8_MEMBER( decocass_sound_command_main_r );
-	DECLARE_READ8_MEMBER(decocass_sound_data_r);
-	DECLARE_READ8_MEMBER(decocass_sound_ack_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_data_w);
-	DECLARE_READ8_MEMBER(decocass_sound_command_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_nmi_enable_w);
-	DECLARE_READ8_MEMBER(decocass_sound_nmi_enable_r);
-	DECLARE_READ8_MEMBER(decocass_sound_data_ack_reset_r);
-	DECLARE_WRITE8_MEMBER(decocass_sound_data_ack_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_nmi_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_quadrature_decoder_reset_w);
-	DECLARE_WRITE8_MEMBER(decocass_adc_w);
-	DECLARE_READ8_MEMBER(decocass_input_r);
+	void decocass_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_command_main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t decocass_sound_data_ack_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_sound_data_ack_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_nmi_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_quadrature_decoder_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(decocass_reset_w);
+	void decocass_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(decocass_e5xx_r);
-	DECLARE_WRITE8_MEMBER(decocass_e5xx_w);
-	DECLARE_WRITE8_MEMBER(decocass_de0091_w);
-	DECLARE_WRITE8_MEMBER(decocass_e900_w);
+	uint8_t decocass_e5xx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_e5xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_de0091_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_e900_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_WRITE8_MEMBER(i8041_p1_w);
-	DECLARE_READ8_MEMBER(i8041_p1_r);
-	DECLARE_WRITE8_MEMBER(i8041_p2_w);
-	DECLARE_READ8_MEMBER(i8041_p2_r);
+	void i8041_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8041_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8041_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8041_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void decocass_machine_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(decocass_paletteram_w);
-	DECLARE_WRITE8_MEMBER(decocass_charram_w);
-	DECLARE_WRITE8_MEMBER(decocass_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(decocass_colorram_w);
-	DECLARE_WRITE8_MEMBER(decocass_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(decocass_tileram_w);
-	DECLARE_WRITE8_MEMBER(decocass_objectram_w);
+	void decocass_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_objectram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(decocass_watchdog_count_w);
-	DECLARE_WRITE8_MEMBER(decocass_watchdog_flip_w);
-	DECLARE_WRITE8_MEMBER(decocass_color_missiles_w);
-	DECLARE_WRITE8_MEMBER(decocass_mode_set_w);
-	DECLARE_WRITE8_MEMBER(decocass_color_center_bot_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_h_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_vl_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_back_vr_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_part_h_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_part_v_shift_w);
-	DECLARE_WRITE8_MEMBER(decocass_center_h_shift_space_w);
-	DECLARE_WRITE8_MEMBER(decocass_center_v_shift_w);
+	void decocass_watchdog_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_watchdog_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_color_missiles_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_mode_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_color_center_bot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_back_h_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_back_vl_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_back_vr_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_part_h_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_part_v_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_center_h_shift_space_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void decocass_center_v_shift_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void decocass_video_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
-	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
-	DECLARE_READ8_MEMBER(mirrorvideoram_r);
-	DECLARE_READ8_MEMBER(mirrorcolorram_r);
-	DECLARE_READ8_MEMBER(cdsteljn_input_r);
-	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
+	void mirrorvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mirrorcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mirrorvideoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cdsteljn_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cdsteljn_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 private:
-	DECLARE_READ8_MEMBER(decocass_type1_r);
-	DECLARE_READ8_MEMBER(decocass_type2_r);
-	DECLARE_WRITE8_MEMBER(decocass_type2_w);
-	DECLARE_READ8_MEMBER(decocass_type3_r);
-	DECLARE_WRITE8_MEMBER(decocass_type3_w);
-	DECLARE_READ8_MEMBER(decocass_type4_r);
-	DECLARE_WRITE8_MEMBER(decocass_type4_w);
-	DECLARE_READ8_MEMBER(decocass_type5_r);
-	DECLARE_WRITE8_MEMBER(decocass_type5_w);
-	DECLARE_READ8_MEMBER(decocass_nodong_r);
+	uint8_t decocass_type1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t decocass_type2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_type2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_type3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_type3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_type4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_type4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_type5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void decocass_type5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t decocass_nodong_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t* m_type1_map;
 	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);

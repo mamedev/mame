@@ -239,7 +239,7 @@ void sn76496_base_device::device_start()
 	register_for_save_states();
 }
 
-WRITE8_MEMBER( sn76496_base_device::stereo_w )
+void sn76496_base_device::stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound->update();
 	if (m_stereo) m_stereo_mask = data;
@@ -304,7 +304,7 @@ void sn76496_base_device::write(uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( sn76496_base_device::write )
+void sn76496_base_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write(data);
 }

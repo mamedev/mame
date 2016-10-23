@@ -61,21 +61,21 @@ public:
 	required_device_array<dac_word_interface, 16> m_dacs;
 	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 	std::unique_ptr<rgb_t[]> m_colormap;
-	DECLARE_WRITE16_MEMBER(palette_w);
-	DECLARE_READ16_MEMBER(line_r);
-	DECLARE_WRITE16_MEMBER(laserdisc_w);
-	DECLARE_READ16_MEMBER(laserdisc_r);
-	DECLARE_WRITE16_MEMBER(ldaud_w);
-	DECLARE_WRITE16_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(reset_w);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_READ16_MEMBER(chop_r);
-	DECLARE_READ16_MEMBER(read_rotram);
-	DECLARE_WRITE16_MEMBER(write_rotram);
-	DECLARE_READ16_MEMBER(read_sndram);
-	DECLARE_WRITE16_MEMBER(write_sndram);
-	DECLARE_WRITE16_MEMBER(sound_dac_w);
+	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t line_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void laserdisc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t laserdisc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ldaud_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t chop_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t read_rotram(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_rotram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_sndram(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_sndram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -110,7 +110,7 @@ void cubeqst_state::video_start()
 	m_depth_buffer = std::make_unique<uint8_t[]>(512);
 }
 
-WRITE16_MEMBER(cubeqst_state::palette_w)
+void cubeqst_state::palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -194,7 +194,7 @@ uint32_t cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-READ16_MEMBER(cubeqst_state::line_r)
+uint16_t cubeqst_state::line_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* I think this is unusued */
 	return m_screen->vpos();
@@ -217,7 +217,7 @@ INTERRUPT_GEN_MEMBER(cubeqst_state::vblank)
  *
  *************************************/
 
-WRITE16_MEMBER(cubeqst_state::laserdisc_w)
+void cubeqst_state::laserdisc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_laserdisc->data_w(data & 0xff);
 }
@@ -226,7 +226,7 @@ WRITE16_MEMBER(cubeqst_state::laserdisc_w)
     D0: Command acknowledge
     D1: Seek status (0 = searching, 1 = ready)
 */
-READ16_MEMBER(cubeqst_state::laserdisc_r)
+uint16_t cubeqst_state::laserdisc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int ldp_command_flag = (m_laserdisc->ready_r() == ASSERT_LINE) ? 0 : 1;
 	int ldp_seek_status = (m_laserdisc->status_r() == ASSERT_LINE) ? 1 : 0;
@@ -236,7 +236,7 @@ READ16_MEMBER(cubeqst_state::laserdisc_r)
 
 
 /* LDP audio squelch control */
-WRITE16_MEMBER(cubeqst_state::ldaud_w)
+void cubeqst_state::ldaud_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_laserdisc->set_external_audio_squelch(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -251,7 +251,7 @@ WRITE16_MEMBER(cubeqst_state::ldaud_w)
 
     Note: Can only be written during VBLANK (as with palette RAM)
 */
-WRITE16_MEMBER(cubeqst_state::control_w)
+void cubeqst_state::control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_laserdisc->video_enable(data & 1);
 }
@@ -287,7 +287,7 @@ void cubeqst_state::swap_linecpu_banks()
     D1: /Sound
     D2: /Disk
 */
-WRITE16_MEMBER(cubeqst_state::reset_w)
+void cubeqst_state::reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rotatecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	m_linecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
@@ -310,7 +310,7 @@ WRITE16_MEMBER(cubeqst_state::reset_w)
  *
  *************************************/
 
-WRITE16_MEMBER(cubeqst_state::io_w)
+void cubeqst_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	   0: Spare lamp
@@ -336,7 +336,7 @@ WRITE16_MEMBER(cubeqst_state::io_w)
 	m_io_latch = data;
 }
 
-READ16_MEMBER(cubeqst_state::io_r)
+uint16_t cubeqst_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t port_data = ioport("IO")->read();
 
@@ -357,7 +357,7 @@ READ16_MEMBER(cubeqst_state::io_r)
 }
 
 /* Trackball ('CHOP') */
-READ16_MEMBER(cubeqst_state::chop_r)
+uint16_t cubeqst_state::chop_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("TRACK_X")->read() << 8) | ioport("TRACK_Y")->read();
 }
@@ -398,22 +398,22 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ16_MEMBER(cubeqst_state::read_rotram)
+uint16_t cubeqst_state::read_rotram(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rotatecpu->rotram_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(cubeqst_state::write_rotram)
+void cubeqst_state::write_rotram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rotatecpu->rotram_w(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER(cubeqst_state::read_sndram)
+uint16_t cubeqst_state::read_sndram(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundcpu->sndram_r(space, offset, mem_mask);
 }
 
-WRITE16_MEMBER(cubeqst_state::write_sndram)
+void cubeqst_state::write_sndram(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->sndram_w(space, offset, data, mem_mask);
 }
@@ -494,7 +494,7 @@ void cubeqst_state::machine_reset()
  */
 
 /* Called by the sound CPU emulation */
-WRITE16_MEMBER( cubeqst_state::sound_dac_w )
+void cubeqst_state::sound_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/// d0 selects between 4051.1d (right, d0=1) and 4051.3d (left, d0=0)
 	/// d1-d3 select the channel

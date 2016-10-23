@@ -79,13 +79,13 @@ private:
 	DECLARE_ADDRESS_MAP(fpga_map, 32);
 	DECLARE_ADDRESS_MAP(ram_map, 32);
 
-	DECLARE_READ32_MEMBER( fpga_r );
-	DECLARE_WRITE32_MEMBER( fpga_w );
-	DECLARE_READ32_MEMBER( rtc_r );
-	DECLARE_WRITE32_MEMBER( rtc_w );
+	uint32_t fpga_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void fpga_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t rtc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER( ram_r );
-	DECLARE_WRITE32_MEMBER( ram_w );
+	uint32_t ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 };
 
 class iteagle_eeprom_device : public pci_device {
@@ -111,8 +111,8 @@ private:
 	std::array<uint16_t, 0x40> m_iteagle_default_eeprom;
 
 	DECLARE_ADDRESS_MAP(eeprom_map, 32);
-	DECLARE_READ32_MEMBER( eeprom_r );
-	DECLARE_WRITE32_MEMBER( eeprom_w );
+	uint32_t eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 };
 
 class iteagle_periph_device : public pci_device {
@@ -132,8 +132,8 @@ private:
 
 	DECLARE_ADDRESS_MAP(ctrl_map, 32);
 
-	DECLARE_READ32_MEMBER( ctrl_r );
-	DECLARE_WRITE32_MEMBER( ctrl_w );
+	uint32_t ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 };
 

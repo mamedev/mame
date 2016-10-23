@@ -53,7 +53,7 @@
 
 *************************************/
 
-WRITE16_MEMBER(lockon_state::adrst_w)
+void lockon_state::adrst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ctrl_reg = data & 0xff;
 
@@ -63,13 +63,13 @@ WRITE16_MEMBER(lockon_state::adrst_w)
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
-READ16_MEMBER(lockon_state::main_gnd_r)
+uint16_t lockon_state::main_gnd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &gndspace = m_ground->space(AS_PROGRAM);
 	return gndspace.read_word(V30_GND_ADDR | offset * 2);
 }
 
-WRITE16_MEMBER(lockon_state::main_gnd_w)
+void lockon_state::main_gnd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &gndspace = m_ground->space(AS_PROGRAM);
 
@@ -79,13 +79,13 @@ WRITE16_MEMBER(lockon_state::main_gnd_w)
 		gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 }
 
-READ16_MEMBER(lockon_state::main_obj_r)
+uint16_t lockon_state::main_obj_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &objspace = m_object->space(AS_PROGRAM);
 	return objspace.read_word(V30_OBJ_ADDR | offset * 2);
 }
 
-WRITE16_MEMBER(lockon_state::main_obj_w)
+void lockon_state::main_obj_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &objspace =m_object->space(AS_PROGRAM);
 
@@ -95,7 +95,7 @@ WRITE16_MEMBER(lockon_state::main_obj_w)
 		objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 }
 
-WRITE16_MEMBER(lockon_state::tst_w)
+void lockon_state::tst_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x800)
 	{
@@ -114,24 +114,24 @@ WRITE16_MEMBER(lockon_state::tst_w)
 	}
 }
 
-READ16_MEMBER(lockon_state::main_z80_r)
+uint16_t lockon_state::main_z80_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &sndspace = m_audiocpu->space(AS_PROGRAM);
 	return 0xff00 | sndspace.read_byte(offset);
 }
 
-WRITE16_MEMBER(lockon_state::main_z80_w)
+void lockon_state::main_z80_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &sndspace = m_audiocpu->space(AS_PROGRAM);
 	sndspace.write_byte(offset, data);
 }
 
-WRITE16_MEMBER(lockon_state::inten_w)
+void lockon_state::inten_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_main_inten = 1;
 }
 
-WRITE16_MEMBER(lockon_state::emres_w)
+void lockon_state::emres_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_watchdog->watchdog_reset();
 	m_main_inten = 0;
@@ -329,7 +329,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_MEMBER(lockon_state::adc_r)
+uint8_t lockon_state::adc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -369,7 +369,7 @@ GFXDECODE_END
  *
  *************************************/
 
-WRITE8_MEMBER(lockon_state::sound_vol)
+void lockon_state::sound_vol(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #define LO_SHUNT    250.0
 #define LO_R0       5600.0
@@ -421,7 +421,7 @@ WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
-WRITE8_MEMBER(lockon_state::ym2203_out_b)
+void lockon_state::ym2203_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);

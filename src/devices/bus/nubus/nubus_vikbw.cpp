@@ -152,22 +152,22 @@ uint32_t nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_vikbw_device::viking_ack_w )
+void nubus_vikbw_device::viking_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	lower_slot_irq();
 }
 
-READ32_MEMBER( nubus_vikbw_device::viking_ack_r )
+uint32_t nubus_vikbw_device::viking_ack_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_vikbw_device::viking_disable_w )
+void nubus_vikbw_device::viking_disable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_vbl_disable = 1;
 }
 
-READ32_MEMBER( nubus_vikbw_device::viking_enable_r )
+uint32_t nubus_vikbw_device::viking_enable_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_vbl_disable = 0;
 	return 0;

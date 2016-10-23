@@ -33,7 +33,7 @@
     (*) The Coin Counters are handled by the Konami Custom 051550
 */
 
-WRITE8_MEMBER(ajax_state::bankswitch_w)
+void ajax_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = 0;
 
@@ -77,7 +77,7 @@ WRITE8_MEMBER(ajax_state::bankswitch_w)
         LS393       C20         Dual -ve edge trigger 4-bit Binary Ripple Counter with Resets
 */
 
-WRITE8_MEMBER(ajax_state::lamps_w)
+void ajax_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(1, data & 0x02);  /* super weapon lamp */
 	output().set_led_value(2, data & 0x04);  /* power up lamps */
@@ -106,7 +106,7 @@ WRITE8_MEMBER(ajax_state::lamps_w)
     0x01c0  (r) MIO2            Enables DIPSW #3 reading
 */
 
-READ8_MEMBER(ajax_state::ls138_f10_r)
+uint8_t ajax_state::ls138_f10_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = 0, index;
 	static const char *const portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
@@ -134,7 +134,7 @@ READ8_MEMBER(ajax_state::ls138_f10_r)
 	return data;
 }
 
-WRITE8_MEMBER(ajax_state::ls138_f10_w)
+void ajax_state::ls138_f10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((offset & 0x01c0) >> 6)
 	{
@@ -179,7 +179,7 @@ WRITE8_MEMBER(ajax_state::ls138_f10_w)
     0   SRB0    /
 */
 
-WRITE8_MEMBER(ajax_state::bankswitch_2_w)
+void ajax_state::bankswitch_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* enable char ROM reading through the video RAM */
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);

@@ -45,13 +45,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(flkatck_bankswitch_w);
-	DECLARE_READ8_MEMBER(flkatck_ls138_r);
-	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
-	DECLARE_READ8_MEMBER(multiply_r);
-	DECLARE_WRITE8_MEMBER(multiply_w);
-	DECLARE_WRITE8_MEMBER(flkatck_k007121_w);
-	DECLARE_WRITE8_MEMBER(flkatck_k007121_regs_w);
+	void flkatck_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t flkatck_ls138_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flkatck_ls138_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t multiply_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void multiply_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flkatck_k007121_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flkatck_k007121_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info_A);
 	TILE_GET_INFO_MEMBER(get_tile_info_B);
 	virtual void machine_start() override;
@@ -59,5 +59,5 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
-	DECLARE_WRITE8_MEMBER(volume_callback);
+	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

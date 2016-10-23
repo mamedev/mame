@@ -69,7 +69,7 @@ machine_config_constructor coco_orch90_device::device_mconfig_additions() const
     write
 -------------------------------------------------*/
 
-WRITE8_MEMBER(coco_orch90_device::write)
+void coco_orch90_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

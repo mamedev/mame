@@ -22,7 +22,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -39,8 +39,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	required_device<pokey_device> m_pokey;
@@ -61,8 +61,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -81,8 +81,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	required_device<pokey_device> m_pokey;
@@ -99,8 +99,8 @@ public:
 	a78_rom_sg_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -114,8 +114,8 @@ public:
 	a78_rom_sg9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 };
 
 
@@ -132,8 +132,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -153,8 +153,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_40xx) override;
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) override;
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 protected:
 	int m_bank;
@@ -174,8 +174,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
 
 protected:
 	required_device<pokey_device> m_pokey450;
@@ -193,8 +193,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
 
 protected:
 	required_device<pokey_device> m_pokey450;
@@ -212,8 +212,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
 
 protected:
 	required_device<pokey_device> m_pokey450;
@@ -231,8 +231,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) return m_pokey450->read(space, offset & 0x0f); else return 0xff; }
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { if (offset >= 0x50 && offset < 0x60) m_pokey450->write(space, offset & 0x0f, data); }
 
 protected:
 	required_device<pokey_device> m_pokey450;

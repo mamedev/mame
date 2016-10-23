@@ -30,13 +30,13 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(porta_r);
-	DECLARE_WRITE8_MEMBER(porta_w);
-	DECLARE_READ8_MEMBER(portb_r);
-	DECLARE_WRITE8_MEMBER(sol_w) {};
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) {};
-	DECLARE_WRITE8_MEMBER(lamp2_w) {};
+	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
+	void lamp2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
 	void init_jp();
 private:
 	bool m_clock_bit;
@@ -178,7 +178,7 @@ static INPUT_PORTS_START( jp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-WRITE8_MEMBER( jp_state::disp_w )
+void jp_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t i;
 	m_row = data >> 3; // d3..d7 = switch strobes
@@ -216,11 +216,11 @@ WRITE8_MEMBER( jp_state::disp_w )
 	}
 }
 
-WRITE8_MEMBER( jp_state::porta_w )
+void jp_state::porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( jp_state::porta_r )
+uint8_t jp_state::porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_row)
 	{
@@ -234,7 +234,7 @@ READ8_MEMBER( jp_state::porta_r )
 	return 0xff;
 }
 
-READ8_MEMBER( jp_state::portb_r )
+uint8_t jp_state::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_row)
 	{

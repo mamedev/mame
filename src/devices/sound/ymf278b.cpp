@@ -673,7 +673,7 @@ void ymf278b_device::timer_busy_start(int is_pcm)
 	m_timer_busy->adjust(attotime::from_hz(m_clock / (is_pcm ? 88 : 56)));
 }
 
-WRITE8_MEMBER( ymf278b_device::write )
+void ymf278b_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -717,7 +717,7 @@ WRITE8_MEMBER( ymf278b_device::write )
 }
 
 
-READ8_MEMBER( ymf278b_device::read )
+uint8_t ymf278b_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 

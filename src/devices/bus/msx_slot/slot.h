@@ -28,8 +28,8 @@ public:
 	static void set_start_address(device_t &device, uint32_t start_address);
 	static void set_size(device_t &device, uint32_t size);
 
-	virtual DECLARE_READ8_MEMBER(read) { return 0xFF; }
-	virtual DECLARE_WRITE8_MEMBER(write) { }
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xFF; }
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }
 
 protected:
 	uint32_t m_start_address;

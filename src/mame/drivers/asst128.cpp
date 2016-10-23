@@ -40,7 +40,7 @@ public:
 	required_device<pc_fdc_xt_device> m_fdc;
 
 	DECLARE_FLOPPY_FORMATS( asst128_formats );
-	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
+	void asst128_fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void machine_start() override;
 };
@@ -52,7 +52,7 @@ void asst128_state::machine_start()
 	memcpy(font->base()+0x0400, memregion("bios")->base()+0x4000, 0x0400);
 }
 
-WRITE8_MEMBER(asst128_state::asst128_fdc_dor_w)
+void asst128_state::asst128_fdc_dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->tc_w((data & 0x80) == 0x80);
 	m_fdc->dor_w(space, offset, data, mem_mask);

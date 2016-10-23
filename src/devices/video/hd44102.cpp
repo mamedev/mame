@@ -125,7 +125,7 @@ void hd44102_device::device_reset()
 //  read - register read
 //-------------------------------------------------
 
-READ8_MEMBER( hd44102_device::read )
+uint8_t hd44102_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -142,7 +142,7 @@ READ8_MEMBER( hd44102_device::read )
 //  write - register write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd44102_device::write )
+void hd44102_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cs2)
 	{
@@ -155,7 +155,7 @@ WRITE8_MEMBER( hd44102_device::write )
 //  status_r - status read
 //-------------------------------------------------
 
-READ8_MEMBER( hd44102_device::status_r )
+uint8_t hd44102_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
@@ -165,7 +165,7 @@ READ8_MEMBER( hd44102_device::status_r )
 //  control_w - control write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd44102_device::control_w )
+void hd44102_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_status & STATUS_BUSY) return;
 
@@ -226,7 +226,7 @@ WRITE8_MEMBER( hd44102_device::control_w )
 //  data_r - data read
 //-------------------------------------------------
 
-READ8_MEMBER( hd44102_device::data_r )
+uint8_t hd44102_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_output;
 
@@ -242,7 +242,7 @@ READ8_MEMBER( hd44102_device::data_r )
 //  data_w - data write
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd44102_device::data_w )
+void hd44102_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[m_x][m_y] = data;
 

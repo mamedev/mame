@@ -78,18 +78,18 @@ public:
 	uint8_t m_out[3];
 	uint8_t m_igs_magic[2];
 
-	DECLARE_WRITE8_MEMBER(reel1_ram_w);
-	DECLARE_WRITE8_MEMBER(reel2_ram_w);
-	DECLARE_WRITE8_MEMBER(reel3_ram_w);
-	DECLARE_WRITE8_MEMBER(reel4_ram_w);
-	DECLARE_WRITE8_MEMBER(bg_scroll_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(magic_w);
-	DECLARE_READ8_MEMBER(magic_r);
+	void reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t magic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void show_out();
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
@@ -124,7 +124,7 @@ public:
 
 
 
-WRITE8_MEMBER(igs009_state::reel1_ram_w)
+void igs009_state::reel1_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel1_tile_info)
 }
 
 
-WRITE8_MEMBER(igs009_state::reel2_ram_w)
+void igs009_state::reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2_ram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
@@ -180,7 +180,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel2_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel3_ram_w)
+void igs009_state::reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel3_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::reel4_ram_w)
+void igs009_state::reel4_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel4_ram[offset] = data;
 	m_reel4_tilemap->mark_tile_dirty(offset);
@@ -236,7 +236,7 @@ TILE_GET_INFO_MEMBER(igs009_state::get_gp98_reel4_tile_info)
 
 
 
-WRITE8_MEMBER(igs009_state::bg_scroll_w)
+void igs009_state::bg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_scroll[offset] = data;
 //  bg_tilemap->set_scrolly(offset,data);
@@ -249,13 +249,13 @@ TILE_GET_INFO_MEMBER(igs009_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, (4*(code >> 14)+3), 0);
 }
 
-WRITE8_MEMBER(igs009_state::fg_tile_w)
+void igs009_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(igs009_state::fg_color_w)
+void igs009_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -382,7 +382,7 @@ void igs009_state::show_out()
 #endif
 }
 
-WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
+void igs009_state::nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
@@ -403,7 +403,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::video_and_leds_w)
+void igs009_state::video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(4,      data & 0x01); // start?
 	output().set_led_value(5,      data & 0x04); // l_bet?
@@ -415,7 +415,7 @@ WRITE8_MEMBER(igs009_state::video_and_leds_w)
 	show_out();
 }
 
-WRITE8_MEMBER(igs009_state::leds_w)
+void igs009_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x01);  // stop_1
 	output().set_led_value(1, data & 0x02);  // stop_2
@@ -428,7 +428,7 @@ WRITE8_MEMBER(igs009_state::leds_w)
 }
 
 
-WRITE8_MEMBER(igs009_state::magic_w)
+void igs009_state::magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_igs_magic[offset] = data;
 
@@ -446,7 +446,7 @@ WRITE8_MEMBER(igs009_state::magic_w)
 	}
 }
 
-READ8_MEMBER(igs009_state::magic_r)
+uint8_t igs009_state::magic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{

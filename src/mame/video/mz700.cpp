@@ -98,7 +98,7 @@ uint32_t mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitm
     CGRAM
 ***************************************************************************/
 
-WRITE8_MEMBER(mz_state::mz800_cgram_w)
+void mz_state::mz800_cgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cgram[offset] = data;
 }

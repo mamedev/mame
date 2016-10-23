@@ -58,7 +58,7 @@ void atarigx2_state::machine_reset_atarigx2()
  *
  *************************************/
 
-READ32_MEMBER(atarigx2_state::special_port2_r)
+uint32_t atarigx2_state::special_port2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("SERVICE")->read();
 	temp ^= 0x0008;     /* A2D.EOC always high for now */
@@ -66,7 +66,7 @@ READ32_MEMBER(atarigx2_state::special_port2_r)
 }
 
 
-READ32_MEMBER(atarigx2_state::special_port3_r)
+uint32_t atarigx2_state::special_port3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int temp = ioport("SPECIAL")->read();
 	return (temp << 16) | temp;
@@ -74,7 +74,7 @@ READ32_MEMBER(atarigx2_state::special_port3_r)
 
 
 
-READ32_MEMBER(atarigx2_state::a2d_data_r)
+uint32_t atarigx2_state::a2d_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* otherwise, assume it's hydra */
 	switch (offset)
@@ -89,7 +89,7 @@ READ32_MEMBER(atarigx2_state::a2d_data_r)
 }
 
 
-WRITE32_MEMBER(atarigx2_state::latch_w)
+void atarigx2_state::latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	    D13 = 68.DISA
@@ -117,7 +117,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 }
 
 
-WRITE32_MEMBER(atarigx2_state::mo_command_w)
+void atarigx2_state::mo_command_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(m_mo_command);
 	if (ACCESSING_BITS_0_15)
@@ -134,7 +134,7 @@ WRITE32_MEMBER(atarigx2_state::mo_command_w)
 
 /* Note: Will all eventually be handled in machine/atarixga.cpp */
 
-WRITE32_MEMBER(atarigx2_state::atarigx2_protection_w)
+void atarigx2_state::atarigx2_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	{
 		int pc = space.device().safe_pcbase();
@@ -211,7 +211,7 @@ uint32_t ftest4(uint32_t num)
 
 *********************/
 
-READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
+uint32_t atarigx2_state::atarigx2_protection_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	static const uint32_t lookup_table[][2] =
 	{
@@ -1179,7 +1179,7 @@ READ32_MEMBER(atarigx2_state::atarigx2_protection_r)
 }
 
 
-READ32_MEMBER( atarigx2_state::rrreveng_prot_r )
+uint32_t atarigx2_state::rrreveng_prot_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }

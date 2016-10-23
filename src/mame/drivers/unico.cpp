@@ -44,7 +44,7 @@ Year + Game         PCB             Notes
                                 Burglar X
 ***************************************************************************/
 
-WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
+void unico_state::burglarx_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
                                 Zero Point
 ***************************************************************************/
 
-WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
+void unico_state::zeropnt_sound_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -98,7 +98,7 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
+uint16_t unico_state::unico_gunx_0_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int x=ioport("X0")->read();
 
@@ -109,7 +109,7 @@ READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_guny_0_msb_r)
+uint16_t unico_state::unico_guny_0_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int y=ioport("Y0")->read();
 
@@ -118,7 +118,7 @@ READ16_MEMBER(unico_state::unico_guny_0_msb_r)
 	return ((y&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
+uint16_t unico_state::unico_gunx_1_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int x=ioport("X1")->read();
 
@@ -129,7 +129,7 @@ READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 	return ((x&0xff) ^ (m_screen->frame_number()&1))<<8;
 }
 
-READ16_MEMBER(unico_state::unico_guny_1_msb_r)
+uint16_t unico_state::unico_guny_1_msb_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int y=ioport("Y1")->read();
 
@@ -166,12 +166,12 @@ ADDRESS_MAP_END
                                 Zero Point 2
 ***************************************************************************/
 
-READ32_MEMBER(unico_state::zeropnt2_gunx_0_msb_r){ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_guny_0_msb_r){ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_gunx_1_msb_r){ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-READ32_MEMBER(unico_state::zeropnt2_guny_1_msb_r){ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+uint32_t unico_state::zeropnt2_gunx_0_msb_r(address_space &space, offs_t offset, uint32_t mem_mask){ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
+uint32_t unico_state::zeropnt2_guny_0_msb_r(address_space &space, offs_t offset, uint32_t mem_mask){ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
+uint32_t unico_state::zeropnt2_gunx_1_msb_r(address_space &space, offs_t offset, uint32_t mem_mask){ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
+uint32_t unico_state::zeropnt2_guny_1_msb_r(address_space &space, offs_t offset, uint32_t mem_mask){ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
 
-WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
+void unico_state::zeropnt2_sound_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -182,7 +182,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
 	}
 }
 
-WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
+void unico_state::zeropnt2_leds_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -192,7 +192,7 @@ WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 	}
 }
 
-WRITE32_MEMBER(unico_state::zeropnt2_eeprom_w)
+void unico_state::zeropnt2_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (data & ~0xfe00000)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);

@@ -30,18 +30,18 @@ void lpc_pit_device::device_reset()
 {
 }
 
-READ8_MEMBER( lpc_pit_device::status_r)
+uint8_t lpc_pit_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%s: status_r %d\n", tag(), offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER(lpc_pit_device::access_w)
+void lpc_pit_device::access_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: access_w %d, %02x\n", tag(), offset, data);
 }
 
-WRITE8_MEMBER(lpc_pit_device::control_w)
+void lpc_pit_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: control_w %02x\n", tag(), data);
 }

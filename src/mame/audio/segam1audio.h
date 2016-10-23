@@ -36,13 +36,13 @@ public:
 		required_device<multipcm_device> m_multipcm_2;
 		required_device<ym3438_device> m_ym;
 
-		DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
-		DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
-		DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk1_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_mpcm_bnk2_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
-		DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
-		DECLARE_READ16_MEMBER(ready_r);
+		uint16_t m1_snd_68k_latch_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		uint16_t m1_snd_v60_ready_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+		void m1_snd_mpcm_bnk1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		void m1_snd_mpcm_bnk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		void m1_snd_68k_latch1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		void m1_snd_68k_latch2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+		uint16_t ready_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 		void check_fifo_irq();
 		void write_fifo(uint8_t data);

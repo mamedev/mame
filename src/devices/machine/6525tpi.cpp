@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i4_w )
 	}
 }
 
-READ8_MEMBER( tpi6525_device::pa_r )
+uint8_t tpi6525_device::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_in_a;
 
@@ -307,13 +307,13 @@ READ8_MEMBER( tpi6525_device::pa_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pa_w )
+void tpi6525_device::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_in_a = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::pb_r )
+uint8_t tpi6525_device::pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_in_b;
 
@@ -326,13 +326,13 @@ READ8_MEMBER( tpi6525_device::pb_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pb_w )
+void tpi6525_device::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_in_b = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::pc_r )
+uint8_t tpi6525_device::pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_in_c;
 
@@ -345,13 +345,13 @@ READ8_MEMBER( tpi6525_device::pc_r )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::pc_w )
+void tpi6525_device::pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_in_c = data;
 }
 
 
-READ8_MEMBER( tpi6525_device::read )
+uint8_t tpi6525_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -466,7 +466,7 @@ READ8_MEMBER( tpi6525_device::read )
 }
 
 
-WRITE8_MEMBER( tpi6525_device::write )
+void tpi6525_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(machine(), 2, "tpi6525", ("%s write %.2x %.2x\n", tag(), offset, data));
 

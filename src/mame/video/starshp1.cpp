@@ -82,7 +82,7 @@ void starshp1_state::video_start()
 }
 
 
-READ8_MEMBER(starshp1_state::starshp1_rng_r)
+uint8_t starshp1_state::starshp1_rng_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
@@ -100,7 +100,7 @@ READ8_MEMBER(starshp1_state::starshp1_rng_r)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
+void starshp1_state::starshp1_ssadd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 * The range of sprite position values doesn't suffice to
@@ -116,7 +116,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_ssadd_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_sspic_w)
+void starshp1_state::starshp1_sspic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	 * Some mysterious game code at address $2CCE is causing
@@ -129,7 +129,7 @@ WRITE8_MEMBER(starshp1_state::starshp1_sspic_w)
 }
 
 
-WRITE8_MEMBER(starshp1_state::starshp1_playfield_w)
+void starshp1_state::starshp1_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_mux != 0)
 	{

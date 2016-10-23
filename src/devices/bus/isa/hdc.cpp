@@ -1021,7 +1021,7 @@ void isa8_hdc_device::device_reset()
  *      hard disk controller
  *
  *************************************************************************/
-READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
+uint8_t isa8_hdc_device::pc_hdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -1039,7 +1039,7 @@ READ8_MEMBER( isa8_hdc_device::pc_hdc_r )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_hdc_device::pc_hdc_w )
+void isa8_hdc_device::pc_hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_HDC_CALL)
 		logerror("%s pc_hdc_w(): offs=%d data=0x%02x\n", machine().describe_context(), offset, data);

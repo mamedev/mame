@@ -454,7 +454,7 @@
 
 */
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port30_w)
+void ampoker2_state::ampoker2_port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_30 C000H         ;OUTPUT PORT 30H
 ---------------------------------------------------
@@ -468,7 +468,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port30_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
+void ampoker2_state::ampoker2_port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_31 C001H         ;OUTPUT PORT 31H
 ---------------------------------------------------
@@ -486,7 +486,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
+void ampoker2_state::ampoker2_port32_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_32 C002H         ;OUTPUT PORT 32H
 ---------------------------------------------------
@@ -501,7 +501,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port33_w)
+void ampoker2_state::ampoker2_port33_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_33 C003H         ;OUTPUT PORT 33H
 ---------------------------------------------------
@@ -515,7 +515,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port33_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
+void ampoker2_state::ampoker2_port34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_34 C004H         ;OUTPUT PORT 34H
 ---------------------------------------------------
@@ -530,7 +530,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port35_w)
+void ampoker2_state::ampoker2_port35_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_35 C005H         ;OUTPUT PORT 35H
 ---------------------------------------------------
@@ -544,7 +544,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port35_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
+void ampoker2_state::ampoker2_port36_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_36 C006H         ;OUTPUT PORT 36H
 ---------------------------------------------------
@@ -562,7 +562,7 @@ WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
 }
 
 
-WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
+void ampoker2_state::ampoker2_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*-------------------------------------------------
     PORT_37 C007H         ;OUTPUT PORT 37H
 ---------------------------------------------------

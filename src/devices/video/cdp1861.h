@@ -99,7 +99,7 @@ public:
 	template<class _Object> static devcb_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_dma_out.set_callback(object); }
 	template<class _Object> static devcb_base &set_efx_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_efx.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( dma_w );
+	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
 	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
 

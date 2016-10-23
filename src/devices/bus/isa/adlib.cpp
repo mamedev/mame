@@ -18,7 +18,7 @@ static MACHINE_CONFIG_FRAGMENT( adlib_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
 MACHINE_CONFIG_END
 
-READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
+uint8_t isa8_adlib_device::ym3812_16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0xff;
 	switch(offset)
@@ -28,7 +28,7 @@ READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 	return retVal;
 }
 
-WRITE8_MEMBER( isa8_adlib_device::ym3812_16_w )
+void isa8_adlib_device::ym3812_16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

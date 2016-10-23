@@ -82,31 +82,31 @@ void timelimt_state::video_start()
 
 /***************************************************************************/
 
-WRITE8_MEMBER(timelimt_state::videoram_w)
+void timelimt_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::bg_videoram_w)
+void timelimt_state::bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_lsb_w)
+void timelimt_state::scroll_x_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx &= 0x100;
 	m_scrollx |= data & 0xff;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_x_msb_w)
+void timelimt_state::scroll_x_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrollx &= 0xff;
 	m_scrollx |= ( data & 1 ) << 8;
 }
 
-WRITE8_MEMBER(timelimt_state::scroll_y_w)
+void timelimt_state::scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }

@@ -116,7 +116,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
  *************************************/
 
 
-WRITE8_MEMBER(tubep_state::tubep_LS259_w)
+void tubep_state::tubep_LS259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
+void tubep_state::main_cpu_irq_line_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
@@ -163,7 +163,7 @@ WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_soundlatch_w)
+void tubep_state::tubep_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_latch = (data&0x7f) | 0x80;
 }
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
+void tubep_state::second_cpu_irq_line_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_slave->set_input_line(0, CLEAR_LINE);
 	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( tubep_second_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tubep_state::tubep_soundlatch_r)
+uint8_t tubep_state::tubep_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -226,13 +226,13 @@ READ8_MEMBER(tubep_state::tubep_soundlatch_r)
 	return res;
 }
 
-READ8_MEMBER(tubep_state::tubep_sound_irq_ack)
+uint8_t tubep_state::tubep_sound_irq_ack(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
+void tubep_state::tubep_sound_unknown(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*logerror("Sound CPU writes to port 0x07 - unknown function\n");*/
 	return;
@@ -393,7 +393,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
+void tubep_state::rjammer_LS259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -410,7 +410,7 @@ WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
+void tubep_state::rjammer_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_latch = data;
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -538,14 +538,14 @@ void tubep_state::machine_reset_rjammer()
  *
  *************************************/
 
-READ8_MEMBER(tubep_state::rjammer_soundlatch_r)
+uint8_t tubep_state::rjammer_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = m_sound_latch;
 	return res;
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
+void tubep_state::rjammer_voice_startstop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
@@ -555,7 +555,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
+void tubep_state::rjammer_voice_frequency_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
@@ -585,7 +585,7 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
+void tubep_state::rjammer_voice_input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
@@ -602,7 +602,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::rjammer_voice_intensity_control_w)
+void tubep_state::rjammer_voice_intensity_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
 	/* need to buffer the data */
@@ -629,27 +629,27 @@ static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(tubep_state::ay8910_portA_0_w)
+void tubep_state::ay8910_portA_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_0_w)
+void tubep_state::ay8910_portB_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_1_w)
+void tubep_state::ay8910_portA_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_1_w)
+void tubep_state::ay8910_portB_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portA_2_w)
+void tubep_state::ay8910_portA_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }
-WRITE8_MEMBER(tubep_state::ay8910_portB_2_w)
+void tubep_state::ay8910_portB_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 		//analog sound control
 }

@@ -70,11 +70,11 @@ public:
 	  the game has special treatment (Aliens)
 	*/
 
-	DECLARE_READ8_MEMBER( k051960_r );
-	DECLARE_WRITE8_MEMBER( k051960_w );
+	uint8_t k051960_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( k051937_r );
-	DECLARE_WRITE8_MEMBER( k051937_w );
+	uint8_t k051937_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k051937_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 

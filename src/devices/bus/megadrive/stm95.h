@@ -68,9 +68,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_bank[3];

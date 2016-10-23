@@ -156,25 +156,25 @@ public:
 	uint8_t m_palette_data[3];
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_READ16_MEMBER(rtc_r);
-	DECLARE_WRITE16_MEMBER(rtc_w);
-	DECLARE_WRITE16_MEMBER(tmaster_color_w);
-	DECLARE_WRITE16_MEMBER(tmaster_addr_w);
-	DECLARE_WRITE16_MEMBER(tmaster_blitter_w);
-	DECLARE_READ16_MEMBER(tmaster_blitter_r);
+	uint16_t rtc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void rtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tmaster_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tmaster_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_READ_LINE_MEMBER(read_rand);
-	DECLARE_READ16_MEMBER(galgames_eeprom_r);
-	DECLARE_WRITE16_MEMBER(galgames_eeprom_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_offset_w);
-	DECLARE_WRITE16_MEMBER(galgames_palette_data_w);
-	DECLARE_READ16_MEMBER(galgames_okiram_r);
-	DECLARE_WRITE16_MEMBER(galgames_okiram_w);
-	DECLARE_WRITE16_MEMBER(galgames_cart_sel_w);
-	DECLARE_READ16_MEMBER(galgames_cart_clock_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_clock_w);
-	DECLARE_READ16_MEMBER(galgames_cart_data_r);
-	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
-	DECLARE_READ16_MEMBER(dummy_read_01);
+	uint16_t galgames_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_palette_offset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_palette_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_okiram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_okiram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galgames_cart_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_cart_clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_cart_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t galgames_cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void galgames_cart_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dummy_read_01(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
 	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
 	void init_galgames();
@@ -244,7 +244,7 @@ uint8_t tmaster_state::binary_to_BCD(uint8_t data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ16_MEMBER(tmaster_state::rtc_r)
+uint16_t tmaster_state::rtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	system_time systime;
 
@@ -260,7 +260,7 @@ READ16_MEMBER(tmaster_state::rtc_r)
 	return m_rtc_ram[offset];
 }
 
-WRITE16_MEMBER(tmaster_state::rtc_w)
+void tmaster_state::rtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ( offset == 0 )
 	{
@@ -371,12 +371,12 @@ uint32_t tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_color_w)
+void tmaster_state::tmaster_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_color );
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_addr_w)
+void tmaster_state::tmaster_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_addr );
 }
@@ -493,7 +493,7 @@ void tmaster_state::tmaster_draw()
 	}
 }
 
-WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
+void tmaster_state::tmaster_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( m_regs + offset );
 	switch (offset*2)
@@ -505,7 +505,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::tmaster_blitter_r)
+uint16_t tmaster_state::tmaster_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0000;  // bit 7 = 1 -> blitter busy
 }
@@ -581,14 +581,14 @@ ADDRESS_MAP_END
 
 static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
 
-READ16_MEMBER(tmaster_state::galgames_eeprom_r)
+uint16_t tmaster_state::galgames_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(galgames_eeprom_names[m_galgames_cart]);
 
 	return eeprom->do_read() ? 0x80 : 0x00;
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
+void tmaster_state::galgames_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data & ~0x0003)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",space.device().safe_pc(),data);
@@ -607,7 +607,7 @@ WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
 
 // BT481A Palette RAMDAC
 
-WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
+void tmaster_state::galgames_palette_offset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -615,7 +615,7 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
 		m_palette_index = 0;
 	}
 }
-WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
+void tmaster_state::galgames_palette_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -632,11 +632,11 @@ WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 }
 
 // Sound
-READ16_MEMBER(tmaster_state::galgames_okiram_r)
+uint16_t tmaster_state::galgames_okiram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return memregion("oki")->base()[offset] | 0xff00;
 }
-WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
+void tmaster_state::galgames_okiram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		memregion("oki")->base()[offset] = data & 0xff;
@@ -656,7 +656,7 @@ void tmaster_state::galgames_update_rombank(uint32_t cart)
 	membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + m_galgames_cart);  // rom
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
+void tmaster_state::galgames_cart_sel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// cart selection (0 1 2 3 4 7)
 
@@ -689,12 +689,12 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::galgames_cart_clock_r)
+uint16_t tmaster_state::galgames_cart_clock_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0080;
 }
 
-WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
+void tmaster_state::galgames_cart_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -716,16 +716,16 @@ WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 	}
 }
 
-READ16_MEMBER(tmaster_state::galgames_cart_data_r)
+uint16_t tmaster_state::galgames_cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
-WRITE16_MEMBER(tmaster_state::galgames_cart_data_w)
+void tmaster_state::galgames_cart_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-READ16_MEMBER(tmaster_state::dummy_read_01)
+uint16_t tmaster_state::dummy_read_01(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x3; // Pass the check at PC = 0xfae & a later one
 }

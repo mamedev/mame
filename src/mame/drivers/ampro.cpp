@@ -46,9 +46,9 @@ public:
 	void machine_reset_ampro();
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE8_MEMBER(port00_w);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
 private:
@@ -66,7 +66,7 @@ d5     /DDEN
 d6     Banking 0=rom
 d7     FDC master clock 0=8MHz 1=16MHz (for 20cm disks, not emulated)
 */
-WRITE8_MEMBER( ampro_state::port00_w )
+void ampro_state::port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(BIT(data, 6));
 	m_fdc->dden_w(BIT(data, 5));
@@ -77,7 +77,7 @@ WRITE8_MEMBER( ampro_state::port00_w )
 		floppy->ss_w(BIT(data, 4));
 }
 
-READ8_MEMBER( ampro_state::io_r )
+uint8_t ampro_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x40)
 		return m_ctc->read(space, offset>>4);
@@ -85,7 +85,7 @@ READ8_MEMBER( ampro_state::io_r )
 		return m_dart->ba_cd_r(space, offset>>2);
 }
 
-WRITE8_MEMBER( ampro_state::io_w )
+void ampro_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x40)
 		m_ctc->write(space, offset>>4, data);

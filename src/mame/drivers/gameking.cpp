@@ -47,10 +47,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(gameking);
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
-	DECLARE_READ8_MEMBER(lcd_r);
-	DECLARE_WRITE8_MEMBER(lcd_w);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(gameking_frame_int);
 	TIMER_CALLBACK_MEMBER(gameking_timer);
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
@@ -81,7 +81,7 @@ protected:
 };
 
 
-WRITE8_MEMBER(gameking_state::io_w)
+void gameking_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset != offsetof(Gkio, bank8000_cart))
 		logerror("%.6f io w %x %x\n", machine().time().as_double(), offset, data);
@@ -108,7 +108,7 @@ WRITE8_MEMBER(gameking_state::io_w)
 	}
 }
 
-READ8_MEMBER(gameking_state::io_r)
+uint8_t gameking_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	uint8_t data = maincpu_rom->base()[offset];
@@ -129,13 +129,13 @@ READ8_MEMBER(gameking_state::io_r)
 	return data;
 }
 
-WRITE8_MEMBER( gameking_state::lcd_w )
+void gameking_state::lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	maincpu_rom->base()[offset+0x600]=data;
 }
 
-READ8_MEMBER(gameking_state::lcd_r)
+uint8_t gameking_state::lcd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	uint8_t data = maincpu_rom->base()[offset + 0x600];

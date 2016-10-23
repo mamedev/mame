@@ -23,10 +23,10 @@ public:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(io_0x03_r);
-	DECLARE_WRITE8_MEMBER(mrjong_videoram_w);
-	DECLARE_WRITE8_MEMBER(mrjong_colorram_w);
-	DECLARE_WRITE8_MEMBER(mrjong_flipscreen_w);
+	uint8_t io_0x03_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mrjong_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrjong_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mrjong_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mrjong);

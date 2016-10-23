@@ -115,16 +115,16 @@ public:
 	int      m_i8039_status;
 	int      m_last_irq;
 
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_WRITE8_MEMBER(bankselect_w);
-	DECLARE_WRITE8_MEMBER(sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(portA_r);
-	DECLARE_WRITE8_MEMBER(portB_w);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8039_irqen_and_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_junofrst();
 	void machine_start_junofrst();
@@ -152,7 +152,7 @@ public:
           We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
 */
 
-WRITE8_MEMBER(junofrst_state::blitter_w)
+void junofrst_state::blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitterdata[offset] = data;
 
@@ -205,13 +205,13 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::bankselect_w)
+void junofrst_state::bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
-READ8_MEMBER(junofrst_state::portA_r)
+uint8_t junofrst_state::portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int timer;
 
@@ -227,7 +227,7 @@ READ8_MEMBER(junofrst_state::portA_r)
 }
 
 
-WRITE8_MEMBER(junofrst_state::portB_w)
+void junofrst_state::portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_rc_device *filter[3] = { m_filter_0_0, m_filter_0_1, m_filter_0_2 };
 	int i;
@@ -247,7 +247,7 @@ WRITE8_MEMBER(junofrst_state::portB_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
+void junofrst_state::sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_last_irq == 0 && data == 1)
 	{
@@ -259,13 +259,13 @@ WRITE8_MEMBER(junofrst_state::sh_irqtrigger_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irq_w)
+void junofrst_state::i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_i8039->set_input_line(0, ASSERT_LINE);
 }
 
 
-WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
+void junofrst_state::i8039_irqen_and_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x80) == 0)
 		m_i8039->set_input_line(0, CLEAR_LINE);
@@ -273,19 +273,19 @@ WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 }
 
 
-WRITE8_MEMBER(junofrst_state::flip_screen_w)
+void junofrst_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tutankhm_flip_screen_x_w(space, 0, data);
 	tutankhm_flip_screen_y_w(space, 0, data);
 }
 
 
-WRITE8_MEMBER(junofrst_state::coincounter_w)
+void junofrst_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(junofrst_state::irq_enable_w)
+void junofrst_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)

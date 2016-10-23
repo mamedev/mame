@@ -48,13 +48,13 @@
  *
  *************************************/
 
-WRITE8_MEMBER(ambush_state::ambush_coin_counter_w)
+void ambush_state::ambush_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-WRITE8_MEMBER(ambush_state::flip_screen_w)
+void ambush_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }

@@ -38,9 +38,9 @@ public:
 	required_shared_ptr<uint16_t> m_vram;
 	uint8_t m_map_vreg;
 	required_shared_ptr<uint16_t> m_io;
-	DECLARE_READ16_MEMBER(jackpool_ff_r);
-	DECLARE_READ16_MEMBER(jackpool_io_r);
-	DECLARE_WRITE16_MEMBER(jackpool_io_w);
+	uint16_t jackpool_ff_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t jackpool_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void jackpool_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,12 +101,12 @@ uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_in
 }
 
 /*Communication ram*/
-READ16_MEMBER(jackpool_state::jackpool_ff_r)
+uint16_t jackpool_state::jackpool_ff_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(jackpool_state::jackpool_io_r)
+uint16_t jackpool_state::jackpool_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset*2)
 	{
@@ -135,7 +135,7 @@ READ16_MEMBER(jackpool_state::jackpool_io_r)
 	return m_io[offset];
 }
 
-WRITE16_MEMBER(jackpool_state::jackpool_io_w)
+void jackpool_state::jackpool_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_io[offset]);
 

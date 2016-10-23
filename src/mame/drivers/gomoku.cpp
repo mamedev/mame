@@ -29,7 +29,7 @@ todo:
 
 
 /* input ports are rotated 90 degrees */
-READ8_MEMBER(gomoku_state::input_port_r)
+uint8_t gomoku_state::input_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i, res;
 

@@ -57,14 +57,14 @@ public:
 	static void static_set_ref_day(device_t &device, uint8_t m_ref_day);
 
 	/* 1-wire interface reset  */
-	DECLARE_WRITE8_MEMBER(ds2404_1w_reset_w);
+	void ds2404_1w_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* 3-wire interface reset  */
-	DECLARE_WRITE8_MEMBER(ds2404_3w_reset_w);
+	void ds2404_3w_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ds2404_data_r);
-	DECLARE_WRITE8_MEMBER(ds2404_data_w);
-	DECLARE_WRITE8_MEMBER(ds2404_clk_w);
+	uint8_t ds2404_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ds2404_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ds2404_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

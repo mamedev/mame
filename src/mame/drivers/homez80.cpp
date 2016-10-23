@@ -34,7 +34,7 @@ public:
 		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( homez80_keyboard_r );
+	uint8_t homez80_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint8_t* m_p_chargen;
 	bool m_irq;
@@ -45,7 +45,7 @@ public:
 };
 
 
-READ8_MEMBER( homez80_state::homez80_keyboard_r )
+uint8_t homez80_state::homez80_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);

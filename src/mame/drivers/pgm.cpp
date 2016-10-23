@@ -199,7 +199,7 @@ Notes:
 #include "machine/pgmprot_igs027a_type3.h"
 #include "machine/pgmprot_orlegend.h"
 
-READ16_MEMBER(pgm_state::pgm_videoram_r)
+uint16_t pgm_state::pgm_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 0x4000 / 2)
 		return m_bg_videoram[offset&0x7ff];
@@ -209,7 +209,7 @@ READ16_MEMBER(pgm_state::pgm_videoram_r)
 		return m_videoram[offset];
 }
 
-WRITE16_MEMBER(pgm_state::pgm_videoram_w)
+void pgm_state::pgm_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x4000 / 2)
 		pgm_bg_videoram_w(space, offset&0x7ff, data, mem_mask);
@@ -219,7 +219,7 @@ WRITE16_MEMBER(pgm_state::pgm_videoram_w)
 		COMBINE_DATA(&m_videoram[offset]);
 }
 
-WRITE16_MEMBER(pgm_state::pgm_coin_counter_w)
+void pgm_state::pgm_coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 	machine().bookkeeping().coin_counter_w(1, data & 0x0002);
@@ -227,12 +227,12 @@ WRITE16_MEMBER(pgm_state::pgm_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(3, data & 0x0008);
 }
 
-READ16_MEMBER(pgm_state::z80_ram_r)
+uint16_t pgm_state::z80_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_z80_mainram[offset * 2] << 8) | m_z80_mainram[offset * 2 + 1];
 }
 
-WRITE16_MEMBER(pgm_state::z80_ram_w)
+void pgm_state::z80_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -246,7 +246,7 @@ WRITE16_MEMBER(pgm_state::z80_ram_w)
 			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(pgm_state::z80_reset_w)
+void pgm_state::z80_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (PGMLOGERROR)
 		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, space.device().safe_pc());
@@ -265,13 +265,13 @@ WRITE16_MEMBER(pgm_state::z80_reset_w)
 	}
 }
 
-WRITE16_MEMBER(pgm_state::z80_ctrl_w)
+void pgm_state::z80_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (PGMLOGERROR)
 		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, space.device().safe_pc());
 }
 
-WRITE16_MEMBER(pgm_state::m68k_l1_w)
+void pgm_state::m68k_l1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -282,7 +282,7 @@ WRITE16_MEMBER(pgm_state::m68k_l1_w)
 	}
 }
 
-WRITE8_MEMBER(pgm_state::z80_l3_w)
+void pgm_state::z80_l3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (PGMLOGERROR)
 		logerror("SL 3 z80.w %02x (%04x)\n", data, space.device().safe_pc());

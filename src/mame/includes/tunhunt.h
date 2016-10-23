@@ -28,14 +28,14 @@ public:
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_tmpbitmap;
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(button_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(dsw2_0r);
-	DECLARE_READ8_MEMBER(dsw2_1r);
-	DECLARE_READ8_MEMBER(dsw2_2r);
-	DECLARE_READ8_MEMBER(dsw2_3r);
-	DECLARE_READ8_MEMBER(dsw2_4r);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t button_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsw2_0r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsw2_1r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsw2_2r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsw2_3r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dsw2_4r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 

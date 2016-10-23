@@ -47,19 +47,19 @@ public:
 	tilemap_t *m_tilemap_1;
 	uint8_t m_mcu_p3_reg;
 
-	DECLARE_WRITE8_MEMBER(nmi_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(protection_w);
-	DECLARE_READ8_MEMBER(e004_r);
-	DECLARE_READ8_MEMBER(protection_r);
-	DECLARE_WRITE8_MEMBER(e100_w);
-	DECLARE_WRITE8_MEMBER(p1_w);
-	DECLARE_READ8_MEMBER(from_main_r);
-	DECLARE_WRITE8_MEMBER(to_main_w);
-	DECLARE_WRITE8_MEMBER(p3_w);
-	DECLARE_READ8_MEMBER(p0_r);
-	DECLARE_WRITE8_MEMBER(vram_0_w);
-	DECLARE_WRITE8_MEMBER(vram_1_w);
+	void nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t e004_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void e100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t from_main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_back);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);

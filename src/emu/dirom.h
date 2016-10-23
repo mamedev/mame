@@ -44,10 +44,10 @@ private:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void interface_pre_start() override;
 
-	DECLARE_READ8_MEMBER(z8_r);
-	DECLARE_READ16_MEMBER(z16_r);
-	DECLARE_READ32_MEMBER(z32_r);
-	DECLARE_READ64_MEMBER(z64_r);
+	uint8_t z8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t z16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t z32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint64_t z64_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	void reset_bank();
 };

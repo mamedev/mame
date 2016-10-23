@@ -27,18 +27,18 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE8_MEMBER(latch_w);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	required_device<cpu_device> m_ourcpu;
 
-	DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
-	DECLARE_WRITE8_MEMBER(mpeg_start_w);
-	DECLARE_WRITE8_MEMBER(mpeg_end_w);
-	DECLARE_WRITE8_MEMBER(mpeg_volume_w);
-	DECLARE_WRITE8_MEMBER(mpeg_stereo_w);
-	DECLARE_READ8_MEMBER(mpeg_pos_r);
-	DECLARE_READ8_MEMBER(latch_r);
-	DECLARE_READ8_MEMBER(status_r);
+	void mpeg_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpeg_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpeg_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpeg_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mpeg_stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mpeg_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

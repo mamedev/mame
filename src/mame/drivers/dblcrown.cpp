@@ -81,24 +81,24 @@ public:
 	uint8_t m_mux_data;
 	uint8_t m_lamps_data;
 
-	DECLARE_READ8_MEMBER(bank_r);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(irq_source_r);
-	DECLARE_WRITE8_MEMBER(irq_source_w);
-	DECLARE_READ8_MEMBER(palette_r);
-	DECLARE_WRITE8_MEMBER(palette_w);
-	DECLARE_READ8_MEMBER(vram_r);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(vram_bank_r);
-	DECLARE_WRITE8_MEMBER(vram_bank_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(in_mux_r);
-	DECLARE_READ8_MEMBER(in_mux_type_r);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(lamps_r);
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(watchdog_w);
+	uint8_t bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_source_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_source_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t in_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t in_mux_type_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lamps_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
 	DECLARE_PALETTE_INIT(dblcrown);
@@ -159,28 +159,28 @@ uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER( dblcrown_state::bank_r)
+uint8_t dblcrown_state::bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank;
 }
 
-WRITE8_MEMBER( dblcrown_state::bank_w)
+void dblcrown_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank = data;
 	membank("rom_bank")->set_entry(m_bank & 0x1f);
 }
 
-READ8_MEMBER( dblcrown_state::irq_source_r)
+uint8_t dblcrown_state::irq_source_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_irq_src;
 }
 
-WRITE8_MEMBER( dblcrown_state::irq_source_w)
+void dblcrown_state::irq_source_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_src = data; // this effectively acks the irq, by writing 0
 }
 
-READ8_MEMBER( dblcrown_state::palette_r)
+uint8_t dblcrown_state::palette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//if(m_bank & 8) /* TODO: verify this */
 	//  offset+=0x200;
@@ -188,7 +188,7 @@ READ8_MEMBER( dblcrown_state::palette_r)
 	return m_pal_ram[offset];
 }
 
-WRITE8_MEMBER( dblcrown_state::palette_w)
+void dblcrown_state::palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b,datax;
 
@@ -208,7 +208,7 @@ WRITE8_MEMBER( dblcrown_state::palette_w)
 }
 
 
-READ8_MEMBER( dblcrown_state::vram_r)
+uint8_t dblcrown_state::vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
@@ -216,7 +216,7 @@ READ8_MEMBER( dblcrown_state::vram_r)
 	return m_vram[(offset & 0xfff) | hi_offs];
 }
 
-WRITE8_MEMBER( dblcrown_state::vram_w)
+void dblcrown_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t hi_offs;
 	hi_offs = m_vram_bank[(offset & 0x1000) >> 12] << 12;
@@ -233,12 +233,12 @@ WRITE8_MEMBER( dblcrown_state::vram_w)
 	#endif
 }
 
-READ8_MEMBER( dblcrown_state::vram_bank_r)
+uint8_t dblcrown_state::vram_bank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vram_bank[offset];
 }
 
-WRITE8_MEMBER( dblcrown_state::vram_bank_w)
+void dblcrown_state::vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_bank[offset] = data & 0xf;
 
@@ -246,17 +246,17 @@ WRITE8_MEMBER( dblcrown_state::vram_bank_w)
 		printf("vram bank = %02x\n",data);
 }
 
-READ8_MEMBER( dblcrown_state::mux_r)
+uint8_t dblcrown_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_data;
 }
 
-WRITE8_MEMBER( dblcrown_state::mux_w)
+void dblcrown_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = data;
 }
 
-READ8_MEMBER( dblcrown_state::in_mux_r )
+uint8_t dblcrown_state::in_mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
@@ -273,7 +273,7 @@ READ8_MEMBER( dblcrown_state::in_mux_r )
 	return res;
 }
 
-READ8_MEMBER( dblcrown_state::in_mux_type_r )
+uint8_t dblcrown_state::in_mux_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	const char *const muxnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	int i;
@@ -290,7 +290,7 @@ READ8_MEMBER( dblcrown_state::in_mux_type_r )
 	return res;
 }
 
-WRITE8_MEMBER( dblcrown_state::output_w )
+void dblcrown_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  bits
   7654 3210
@@ -307,12 +307,12 @@ WRITE8_MEMBER( dblcrown_state::output_w )
 }
 
 
-READ8_MEMBER( dblcrown_state::lamps_r )
+uint8_t dblcrown_state::lamps_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lamps_data;
 }
 
-WRITE8_MEMBER( dblcrown_state::lamps_w )
+void dblcrown_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  bits
   7654 3210
@@ -337,7 +337,7 @@ WRITE8_MEMBER( dblcrown_state::lamps_w )
 	m_lamps_data = data;
 }
 
-WRITE8_MEMBER(dblcrown_state::watchdog_w)
+void dblcrown_state::watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 /*
   Always 0x01...
 */

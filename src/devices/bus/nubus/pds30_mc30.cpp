@@ -239,7 +239,7 @@ uint32_t nubus_xceedmc30_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
+void nubus_xceedmc30_device::xceedmc30_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -313,7 +313,7 @@ WRITE32_MEMBER( nubus_xceedmc30_device::xceedmc30_w )
 	}
 }
 
-READ32_MEMBER( nubus_xceedmc30_device::xceedmc30_r )
+uint32_t nubus_xceedmc30_device::xceedmc30_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 //    printf("xceedmc30_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
 	if (offset == 0x80008)
@@ -325,12 +325,12 @@ READ32_MEMBER( nubus_xceedmc30_device::xceedmc30_r )
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_xceedmc30_device::vram_w )
+void nubus_xceedmc30_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_xceedmc30_device::vram_r )
+uint32_t nubus_xceedmc30_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

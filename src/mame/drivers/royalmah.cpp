@@ -136,74 +136,74 @@ public:
 	uint8_t m_mjifb_rom_enable;
 	uint8_t m_flip_screen;
 
-	DECLARE_WRITE8_MEMBER(royalmah_palbank_w);
-	DECLARE_WRITE8_MEMBER(royalmah_rom_w);
-	DECLARE_WRITE8_MEMBER(tahjong_bank_w);
-	DECLARE_WRITE8_MEMBER(mjderngr_coin_w);
-	DECLARE_WRITE8_MEMBER(mjderngr_palbank_w);
-	DECLARE_WRITE8_MEMBER(input_port_select_w);
-	DECLARE_READ8_MEMBER(majs101b_dsw_r);
-	DECLARE_READ8_MEMBER(suzume_dsw_r);
-	DECLARE_WRITE8_MEMBER(suzume_bank_w);
-	DECLARE_WRITE8_MEMBER(mjapinky_bank_w);
-	DECLARE_WRITE8_MEMBER(mjapinky_palbank_w);
-	DECLARE_READ8_MEMBER(mjapinky_dsw_r);
-	DECLARE_WRITE8_MEMBER(tontonb_bank_w);
-	DECLARE_WRITE8_MEMBER(dynax_bank_w);
-	DECLARE_READ8_MEMBER(daisyari_dsw_r);
-	DECLARE_WRITE8_MEMBER(daisyari_bank_w);
-	DECLARE_READ8_MEMBER(mjclub_dsw_r);
-	DECLARE_WRITE8_MEMBER(mjclub_bank_w);
-	DECLARE_WRITE8_MEMBER(jansou_dsw_sel_w);
-	DECLARE_READ8_MEMBER(jansou_dsw_r);
-	DECLARE_WRITE8_MEMBER(jansou_colortable_w);
-	DECLARE_WRITE8_MEMBER(jansou_6400_w);
-	DECLARE_WRITE8_MEMBER(jansou_6401_w);
-	DECLARE_WRITE8_MEMBER(jansou_6402_w);
-	DECLARE_READ8_MEMBER(jansou_6403_r);
-	DECLARE_READ8_MEMBER(jansou_6404_r);
-	DECLARE_READ8_MEMBER(jansou_6405_r);
-	DECLARE_WRITE8_MEMBER(jansou_sound_w);
-	DECLARE_WRITE8_MEMBER(janptr96_dswsel_w);
-	DECLARE_READ8_MEMBER(janptr96_dswsel_r);
-	DECLARE_READ8_MEMBER(janptr96_dsw_r);
-	DECLARE_WRITE8_MEMBER(janptr96_rombank_w);
-	DECLARE_WRITE8_MEMBER(janptr96_rambank_w);
-	DECLARE_READ8_MEMBER(janptr96_unknown_r);
-	DECLARE_WRITE8_MEMBER(janptr96_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(mjifb_coin_counter_w);
-	DECLARE_READ8_MEMBER(mjifb_rom_io_r);
-	DECLARE_WRITE8_MEMBER(mjifb_rom_io_w);
-	DECLARE_WRITE8_MEMBER(mjifb_videoram_w);
-	DECLARE_READ8_MEMBER(mjifb_p3_r);
-	DECLARE_READ8_MEMBER(mjifb_p5_r);
-	DECLARE_READ8_MEMBER(mjifb_p6_r);
-	DECLARE_READ8_MEMBER(mjifb_p7_r);
-	DECLARE_READ8_MEMBER(mjifb_p8_r);
-	DECLARE_WRITE8_MEMBER(mjifb_p3_w);
-	DECLARE_WRITE8_MEMBER(mjifb_p4_w);
-	DECLARE_WRITE8_MEMBER(mjifb_p8_w);
-	DECLARE_READ8_MEMBER(mjdejavu_rom_io_r);
-	DECLARE_WRITE8_MEMBER(mjdejavu_rom_io_w);
-	DECLARE_READ8_MEMBER(mjtensin_p3_r);
-	DECLARE_WRITE8_MEMBER(mjtensin_p4_w);
-	DECLARE_WRITE8_MEMBER(mjtensin_6ff3_w);
-	DECLARE_WRITE8_MEMBER(cafetime_p4_w);
-	DECLARE_WRITE8_MEMBER(cafetime_p3_w);
-	DECLARE_WRITE8_MEMBER(cafetime_dsw_w);
-	DECLARE_READ8_MEMBER(cafetime_dsw_r);
-	DECLARE_READ8_MEMBER(cafetime_7fe4_r);
-	DECLARE_WRITE8_MEMBER(cafetime_7fe3_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_p4_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_p3_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_rombank_w);
-	DECLARE_READ8_MEMBER(mjvegasa_rom_io_r);
-	DECLARE_WRITE8_MEMBER(mjvegasa_rom_io_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(mjvegasa_12400_w);
-	DECLARE_READ8_MEMBER(mjvegasa_12500_r);
-	DECLARE_READ8_MEMBER(royalmah_player_1_port_r);
-	DECLARE_READ8_MEMBER(royalmah_player_2_port_r);
+	void royalmah_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void royalmah_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tahjong_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjderngr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjderngr_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_port_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t majs101b_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t suzume_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void suzume_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjapinky_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjapinky_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjapinky_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tontonb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dynax_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t daisyari_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void daisyari_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjclub_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjclub_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jansou_dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jansou_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jansou_colortable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jansou_6400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jansou_6401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jansou_6402_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jansou_6403_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t jansou_6404_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t jansou_6405_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jansou_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void janptr96_dswsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t janptr96_dswsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t janptr96_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void janptr96_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void janptr96_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t janptr96_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void janptr96_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjifb_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjifb_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjifb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_p5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_p6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_p7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mjifb_p8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjifb_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjifb_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjifb_p8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjdejavu_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjdejavu_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjtensin_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjtensin_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjtensin_6ff3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cafetime_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cafetime_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cafetime_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cafetime_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cafetime_7fe4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cafetime_7fe3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjvegasa_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjvegasa_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjvegasa_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjvegasa_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mjvegasa_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjvegasa_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mjvegasa_12400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mjvegasa_12500_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t royalmah_player_1_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t royalmah_player_2_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
 	void init_janptr96();
@@ -275,7 +275,7 @@ PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
 }
 
 
-WRITE8_MEMBER(royalmah_state::royalmah_palbank_w)
+void royalmah_state::royalmah_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 = coin counter */
 	machine().bookkeeping().coin_counter_w(0,data & 2);
@@ -288,7 +288,7 @@ WRITE8_MEMBER(royalmah_state::royalmah_palbank_w)
 }
 
 
-WRITE8_MEMBER(royalmah_state::mjderngr_coin_w)
+void royalmah_state::mjderngr_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 1 = coin counter */
 	machine().bookkeeping().coin_counter_w(0,data & 2);
@@ -298,7 +298,7 @@ WRITE8_MEMBER(royalmah_state::mjderngr_coin_w)
 }
 
 
-WRITE8_MEMBER(royalmah_state::mjderngr_palbank_w)
+void royalmah_state::mjderngr_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palette_base = data;
 }
@@ -339,19 +339,19 @@ uint32_t royalmah_state::screen_update_royalmah(screen_device &screen, bitmap_in
 
 
 
-WRITE8_MEMBER(royalmah_state::royalmah_rom_w)
+void royalmah_state::royalmah_rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* using this handler will avoid all the entries in the error log that are the result of
 	   the RLD and RRD instructions this games uses to print text on the screen */
 }
 
 
-WRITE8_MEMBER(royalmah_state::input_port_select_w)
+void royalmah_state::input_port_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_port_select = data;
 }
 
-READ8_MEMBER(royalmah_state::royalmah_player_1_port_r)
+uint8_t royalmah_state::royalmah_player_1_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = (ioport("KEY0")->read() & 0xc0) | 0x3f;
 
@@ -364,7 +364,7 @@ READ8_MEMBER(royalmah_state::royalmah_player_1_port_r)
 	return ret;
 }
 
-READ8_MEMBER(royalmah_state::royalmah_player_2_port_r)
+uint8_t royalmah_state::royalmah_player_2_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = (ioport("KEY5")->read() & 0xc0) | 0x3f;
 
@@ -379,7 +379,7 @@ READ8_MEMBER(royalmah_state::royalmah_player_2_port_r)
 
 
 
-READ8_MEMBER(royalmah_state::majs101b_dsw_r)
+uint8_t royalmah_state::majs101b_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dsw_select)
 	{
@@ -392,7 +392,7 @@ READ8_MEMBER(royalmah_state::majs101b_dsw_r)
 
 
 
-READ8_MEMBER(royalmah_state::suzume_dsw_r)
+uint8_t royalmah_state::suzume_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_suzume_bank & 0x40)
 	{
@@ -410,7 +410,7 @@ READ8_MEMBER(royalmah_state::suzume_dsw_r)
 	}
 }
 
-WRITE8_MEMBER(royalmah_state::tahjong_bank_w)
+void royalmah_state::tahjong_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -425,7 +425,7 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 }
 
 
-WRITE8_MEMBER(royalmah_state::suzume_bank_w)
+void royalmah_state::suzume_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -441,14 +441,14 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 }
 
 
-WRITE8_MEMBER(royalmah_state::mjapinky_bank_w)
+void royalmah_state::mjapinky_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	m_rombank = data;
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
-WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
+void royalmah_state::mjapinky_palbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = (data & 4) >> 2;
 	m_palette_base = (data >> 3) & 0x01;
@@ -456,13 +456,13 @@ WRITE8_MEMBER(royalmah_state::mjapinky_palbank_w)
 	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
-READ8_MEMBER(royalmah_state::mjapinky_dsw_r)
+uint8_t royalmah_state::mjapinky_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_rombank == 0x0e)  return ioport("DSW3")->read();
 	else                    return *(memregion("maincpu")->base() + 0x10000 + 0x8000 * m_rombank);
 }
 
-WRITE8_MEMBER(royalmah_state::tontonb_bank_w)
+void royalmah_state::tontonb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -480,7 +480,7 @@ logerror("%04x: bank %02x\n",space.device().safe_pc(),data);
 
 
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
-WRITE8_MEMBER(royalmah_state::dynax_bank_w)
+void royalmah_state::dynax_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -496,7 +496,7 @@ WRITE8_MEMBER(royalmah_state::dynax_bank_w)
 	membank("bank1")->set_base(&rom[address]);
 }
 
-READ8_MEMBER(royalmah_state::daisyari_dsw_r)
+uint8_t royalmah_state::daisyari_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dsw_select)
 	{
@@ -509,7 +509,7 @@ READ8_MEMBER(royalmah_state::daisyari_dsw_r)
 	return 0;
 }
 
-WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
+void royalmah_state::daisyari_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -524,7 +524,7 @@ WRITE8_MEMBER(royalmah_state::daisyari_bank_w)
 	/* bit 1 used too but unknown purpose. */
 }
 
-READ8_MEMBER(royalmah_state::mjclub_dsw_r)
+uint8_t royalmah_state::mjclub_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dsw_select)
 	{
@@ -537,7 +537,7 @@ READ8_MEMBER(royalmah_state::mjclub_dsw_r)
 	return 0;
 }
 
-WRITE8_MEMBER(royalmah_state::mjclub_bank_w)
+void royalmah_state::mjclub_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	int address;
@@ -741,12 +741,12 @@ ADDRESS_MAP_END
 
 
 
-WRITE8_MEMBER(royalmah_state::jansou_dsw_sel_w)
+void royalmah_state::jansou_dsw_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_select = data;
 }
 
-READ8_MEMBER(royalmah_state::jansou_dsw_r)
+uint8_t royalmah_state::jansou_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_dsw_select & 7)
 	{
@@ -758,30 +758,30 @@ READ8_MEMBER(royalmah_state::jansou_dsw_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_colortable_w)
+void royalmah_state::jansou_colortable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_jansou_colortable[offset] = data;
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_6400_w)
+void royalmah_state::jansou_6400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_adr_l = data;
 	m_gfx_adr = m_gfx_adr_h*0x10000 + m_gfx_adr_m*0x100 + m_gfx_adr_l;
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_6401_w)
+void royalmah_state::jansou_6401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_adr_m = data;
 	m_gfx_adr = m_gfx_adr_h*0x10000 + m_gfx_adr_m*0x100 + m_gfx_adr_l;
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_6402_w)
+void royalmah_state::jansou_6402_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_adr_h = data & 1;
 	m_gfx_adr = m_gfx_adr_h*0x10000 + m_gfx_adr_m*0x100 + m_gfx_adr_l;
 }
 
-READ8_MEMBER(royalmah_state::jansou_6403_r)
+uint8_t royalmah_state::jansou_6403_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *GFXROM = memregion("gfx1")->base();
 	int d0 = GFXROM[m_gfx_adr];
@@ -801,17 +801,17 @@ READ8_MEMBER(royalmah_state::jansou_6403_r)
 	return 0xff;
 }
 
-READ8_MEMBER(royalmah_state::jansou_6404_r)
+uint8_t royalmah_state::jansou_6404_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfxdata0;
 }
 
-READ8_MEMBER(royalmah_state::jansou_6405_r)
+uint8_t royalmah_state::jansou_6405_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_gfxdata1;
 }
 
-WRITE8_MEMBER(royalmah_state::jansou_sound_w)
+void royalmah_state::jansou_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -858,19 +858,19 @@ static ADDRESS_MAP_START( janptr96_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(royalmah_state::janptr96_dswsel_w)
+void royalmah_state::janptr96_dswsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 0x20 = 0 -> hopper on
 	// 0x40 ?
 	m_dsw_select = data;
 }
 
-READ8_MEMBER(royalmah_state::janptr96_dswsel_r)
+uint8_t royalmah_state::janptr96_dswsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dsw_select;
 }
 
-READ8_MEMBER(royalmah_state::janptr96_dsw_r)
+uint8_t royalmah_state::janptr96_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (~m_dsw_select & 0x01) return ioport("DSW4")->read();
 	if (~m_dsw_select & 0x02) return ioport("DSW3")->read();
@@ -880,24 +880,24 @@ READ8_MEMBER(royalmah_state::janptr96_dsw_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::janptr96_rombank_w)
+void royalmah_state::janptr96_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->set_base(ROM + 0x10000 + 0x8000 * data);
 }
 
-WRITE8_MEMBER(royalmah_state::janptr96_rambank_w)
+void royalmah_state::janptr96_rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_base(m_janptr96_nvram.get() + 0x1000 + 0x1000 * data);
 }
 
-READ8_MEMBER(royalmah_state::janptr96_unknown_r)
+uint8_t royalmah_state::janptr96_unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// 0x08 = 0 makes the game crash (e.g. in the m-ram test: nested interrupts?)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::janptr96_coin_counter_w)
+void royalmah_state::janptr96_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = (data & 4) >> 2;
 	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
@@ -924,14 +924,14 @@ ADDRESS_MAP_END
 ****************************************************************************/
 
 
-WRITE8_MEMBER(royalmah_state::mjifb_coin_counter_w)
+void royalmah_state::mjifb_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = ((data & 4) >> 2) ^ 1;
 	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
 	machine().bookkeeping().coin_counter_w(1,data & 1);  // out
 }
 
-READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
+uint8_t royalmah_state::mjifb_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mjifb_rom_enable)
 		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
@@ -950,7 +950,7 @@ READ8_MEMBER(royalmah_state::mjifb_rom_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
+void royalmah_state::mjifb_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
@@ -978,7 +978,7 @@ WRITE8_MEMBER(royalmah_state::mjifb_rom_io_w)
 	logerror("%04X: unmapped input write at %04X = %02X\n", space.device().safe_pc(), offset,data);
 }
 
-WRITE8_MEMBER(royalmah_state::mjifb_videoram_w)
+void royalmah_state::mjifb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset + 0x4000] = data;
@@ -992,36 +992,36 @@ static ADDRESS_MAP_START( mjifb_map, AS_PROGRAM, 8, royalmah_state )
 //  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
 ADDRESS_MAP_END
 
-READ8_MEMBER(royalmah_state::mjifb_p3_r)
+uint8_t royalmah_state::mjifb_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("PORT3_5")->read() >> 6;
 }
-READ8_MEMBER(royalmah_state::mjifb_p5_r)
+uint8_t royalmah_state::mjifb_p5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("PORT3_5")->read();
 }
-READ8_MEMBER(royalmah_state::mjifb_p6_r)
+uint8_t royalmah_state::mjifb_p6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("PORT6_7")->read();
 }
-READ8_MEMBER(royalmah_state::mjifb_p7_r)
+uint8_t royalmah_state::mjifb_p7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("PORT6_7")->read() >> 4;
 }
-READ8_MEMBER(royalmah_state::mjifb_p8_r)
+uint8_t royalmah_state::mjifb_p8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::mjifb_p3_w)
+void royalmah_state::mjifb_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
 }
-WRITE8_MEMBER(royalmah_state::mjifb_p4_w)
+void royalmah_state::mjifb_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 }
-WRITE8_MEMBER(royalmah_state::mjifb_p8_w)
+void royalmah_state::mjifb_p8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mjifb_rom_enable = (data & 0x08);
 }
@@ -1040,7 +1040,7 @@ ADDRESS_MAP_END
                            Mahjong Shinkirou Deja Vu
 ****************************************************************************/
 
-READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
+uint8_t royalmah_state::mjdejavu_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_mjifb_rom_enable)
 		return ((uint8_t*)(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x4000))[offset];
@@ -1059,7 +1059,7 @@ READ8_MEMBER(royalmah_state::mjdejavu_rom_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::mjdejavu_rom_io_w)
+void royalmah_state::mjdejavu_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	if (m_mjifb_rom_enable)
@@ -1096,7 +1096,7 @@ ADDRESS_MAP_END
                                 Mahjong Tensinhai
 ****************************************************************************/
 
-READ8_MEMBER(royalmah_state::mjtensin_p3_r)
+uint8_t royalmah_state::mjtensin_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -1105,12 +1105,12 @@ void royalmah_state::mjtensin_update_rombank()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
-WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
+void royalmah_state::mjtensin_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 	mjtensin_update_rombank();
 }
-WRITE8_MEMBER(royalmah_state::mjtensin_6ff3_w)
+void royalmah_state::mjtensin_6ff3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (data << 4) | (m_rombank & 0x0f);
 	mjtensin_update_rombank();
@@ -1146,22 +1146,22 @@ void royalmah_state::cafetime_update_rombank()
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
-WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
+void royalmah_state::cafetime_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
 	cafetime_update_rombank();
 }
-WRITE8_MEMBER(royalmah_state::cafetime_p3_w)
+void royalmah_state::cafetime_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
 	cafetime_update_rombank();
 }
 
-WRITE8_MEMBER(royalmah_state::cafetime_dsw_w)
+void royalmah_state::cafetime_dsw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_select = data;
 }
-READ8_MEMBER(royalmah_state::cafetime_dsw_r)
+uint8_t royalmah_state::cafetime_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( m_dsw_select )
 	{
@@ -1175,11 +1175,11 @@ READ8_MEMBER(royalmah_state::cafetime_dsw_r)
 	return 0xff;
 }
 
-READ8_MEMBER(royalmah_state::cafetime_7fe4_r)
+uint8_t royalmah_state::cafetime_7fe4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
-WRITE8_MEMBER(royalmah_state::cafetime_7fe3_w)
+void royalmah_state::cafetime_7fe3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("%02x",data);
 }
@@ -1213,20 +1213,20 @@ ADDRESS_MAP_END
                                Mahjong Vegas
 ****************************************************************************/
 
-WRITE8_MEMBER(royalmah_state::mjvegasa_p4_w)
+void royalmah_state::mjvegasa_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0xf8) | ((data & 0x0e) >> 1);
 }
-WRITE8_MEMBER(royalmah_state::mjvegasa_p3_w)
+void royalmah_state::mjvegasa_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0xf7) | ((data & 0x04) << 1);
 }
-WRITE8_MEMBER(royalmah_state::mjvegasa_rombank_w)
+void royalmah_state::mjvegasa_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0f) << 4);
 }
 
-READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
+uint8_t royalmah_state::mjvegasa_rom_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_rombank & 0x70) != 0x70)
 		return memregion("maincpu")->base()[0x10000 + m_rombank * 0x8000 + offset];
@@ -1242,7 +1242,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
+void royalmah_state::mjvegasa_rom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	if ((m_rombank & 0x70) != 0x70)
@@ -1262,7 +1262,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 	logerror("%04X: unmapped IO write at %04X = %02X\n", space.device().safe_pc(), offset,data);
 }
 
-WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
+void royalmah_state::mjvegasa_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flip_screen = (data & 4) >> 2;
 	machine().bookkeeping().coin_counter_w(0,data & 2);  // in
@@ -1270,12 +1270,12 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_coin_counter_w)
 }
 
 // hopper?
-WRITE8_MEMBER(royalmah_state::mjvegasa_12400_w)
+void royalmah_state::mjvegasa_12400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bits 0 & 1
 //  popmessage("UNK: %02x",data);
 }
-READ8_MEMBER(royalmah_state::mjvegasa_12500_r)
+uint8_t royalmah_state::mjvegasa_12500_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// bits 0 & 2
 	return 0xff;

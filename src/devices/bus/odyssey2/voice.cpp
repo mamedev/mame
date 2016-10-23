@@ -94,7 +94,7 @@ WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
 	m_lrq_state = state;
 }
 
-WRITE8_MEMBER(o2_voice_device::io_write)
+void o2_voice_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x20)
 		m_speech->ald_w(space, 0, offset & 0x7f);

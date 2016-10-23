@@ -70,7 +70,7 @@ void tsamurai_state::machine_start_vsgongf()
 	machine_start();
 }
 
-WRITE8_MEMBER(tsamurai_state::nmi_enable_w)
+void tsamurai_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enabled = data;
 }
@@ -80,55 +80,55 @@ INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
 	if (m_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(tsamurai_state::tsamurai_unknown_d803_r)
+uint8_t tsamurai_state::tsamurai_unknown_d803_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x6b;
 }
 
-READ8_MEMBER(tsamurai_state::m660_unknown_d803_r)
+uint8_t tsamurai_state::m660_unknown_d803_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x53;     // this is what the bootleg patches in.
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d806_r)
+uint8_t tsamurai_state::unknown_d806_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x40;
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d900_r)
+uint8_t tsamurai_state::unknown_d900_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x6a;
 }
 
-READ8_MEMBER(tsamurai_state::unknown_d938_r)
+uint8_t tsamurai_state::unknown_d938_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfb;
 }
 
-WRITE8_MEMBER(tsamurai_state::sound_command1_w)
+void tsamurai_state::sound_command1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_command1 = data;
 	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::sound_command2_w)
+void tsamurai_state::sound_command2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_command2 = data;
 	m_audio2->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::m660_sound_command3_w)
+void tsamurai_state::m660_sound_command3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_command3 = data;
 	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
-WRITE8_MEMBER(tsamurai_state::flip_screen_w)
+void tsamurai_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
 
-WRITE8_MEMBER(tsamurai_state::coincounter_w)
+void tsamurai_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset,data);
 }
@@ -219,17 +219,17 @@ static ADDRESS_MAP_START( vsgongf_audio_io_map, AS_IO, 8, tsamurai_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(tsamurai_state::sound_command1_r)
+uint8_t tsamurai_state::sound_command1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_command1;
 }
 
-READ8_MEMBER(tsamurai_state::sound_command2_r)
+uint8_t tsamurai_state::sound_command2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_command2;
 }
 
-READ8_MEMBER(tsamurai_state::m660_sound_command3_r)
+uint8_t tsamurai_state::m660_sound_command3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_command3;
 }
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_sound_nmi_enable_w)
+void tsamurai_state::vsgongf_sound_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vsgongf_sound_nmi_enabled = data;
 }
@@ -302,7 +302,7 @@ INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
 
 /* what are these, protection of some kind? */
 
-READ8_MEMBER(tsamurai_state::vsgongf_a006_r)
+uint8_t tsamurai_state::vsgongf_a006_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* sound CPU busy? */
 	if (!strcmp(machine().system().name,"vsgongf"))  return 0x80;
@@ -313,7 +313,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a006_r)
 	return 0x00;
 }
 
-READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
+uint8_t tsamurai_state::vsgongf_a100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* protection? */
 	if (!strcmp(machine().system().name,"vsgongf"))  return 0xaa;
@@ -324,7 +324,7 @@ READ8_MEMBER(tsamurai_state::vsgongf_a100_r)
 	return 0x00;
 }
 
-WRITE8_MEMBER(tsamurai_state::vsgongf_sound_command_w)
+void tsamurai_state::vsgongf_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

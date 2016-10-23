@@ -18,7 +18,7 @@
 
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_MEMBER(pce_common_state::pce_joystick_w)
+void pce_common_state::pce_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().device<h6280_device>("maincpu")->io_set_buffer(data);
 	/* bump counter on a low-to-high transition of bit 1 */
@@ -42,7 +42,7 @@ uint8_t pce_common_state::joy_read()
 	return ioport("JOY")->read();
 }
 
-READ8_MEMBER(pce_common_state::pce_joystick_r)
+uint8_t pce_common_state::pce_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 	int data = joy_read();

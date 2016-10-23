@@ -35,7 +35,7 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
-		DECLARE_READ8_MEMBER(input_port_0_r);
+		uint8_t input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -57,7 +57,7 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
-		DECLARE_READ8_MEMBER(input_port_0_r);
+		uint8_t input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -78,7 +78,7 @@ public:
 		virtual machine_config_constructor device_mconfig_additions() const override;
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
-		DECLARE_READ8_MEMBER(input_port_0_r);
+		uint8_t input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 protected:
 		// device-level overrides
 		virtual void device_start() override;

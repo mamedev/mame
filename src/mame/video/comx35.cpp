@@ -8,7 +8,7 @@
 #include "sound/wave.h"
 #include "video/mc6845.h"
 
-WRITE8_MEMBER( comx35_state::cdp1869_w )
+void comx35_state::cdp1869_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t ma = m_maincpu->get_memory_address();
 

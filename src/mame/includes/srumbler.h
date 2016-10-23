@@ -26,11 +26,11 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int m_scroll[4];
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(foreground_w);
-	DECLARE_WRITE8_MEMBER(background_w);
-	DECLARE_WRITE8_MEMBER(_4009_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _4009_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

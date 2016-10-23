@@ -97,10 +97,10 @@ public:
 	int m_ROM_paged;
 	int m_irq_state;
 	int m_KeyRow;
-	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
-	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
-	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
-	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
+	void ti99_2_write_kbd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ti99_2_write_misc_cru(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ti99_2_read_kbd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ti99_2_read_misc_cru(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_ti99_2_24();
 	void init_ti99_2_32();
 	virtual void machine_reset() override;
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 /* current keyboard row */
 
 /* write the current keyboard row */
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
+void ti99_2_state::ti99_2_write_kbd(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7;  /* other address lines are not decoded */
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	}
 }
 
-WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
+void ti99_2_state::ti99_2_write_misc_cru(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7;  /* other address lines are not decoded */
 
@@ -275,14 +275,14 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_misc_cru)
 }
 
 /* read keys in the current row */
-READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
+uint8_t ti99_2_state::ti99_2_read_kbd(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	return ioport(keynames[m_KeyRow])->read();
 }
 
-READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
+uint8_t ti99_2_state::ti99_2_read_misc_cru(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }

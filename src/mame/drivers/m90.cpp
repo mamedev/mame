@@ -38,7 +38,7 @@ void m90_state::machine_start()
 
 /***************************************************************************/
 
-WRITE16_MEMBER(m90_state::m90_coincounter_w)
+void m90_state::m90_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -49,13 +49,13 @@ WRITE16_MEMBER(m90_state::m90_coincounter_w)
 	}
 }
 
-WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
+void m90_state::quizf1_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		membank("bank1")->set_entry(data & 0xf);
 }
 
-WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
+void m90_state::dynablsb_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -65,7 +65,7 @@ WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(m90_state::unknown_w)
+void m90_state::unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	printf("%04x    ",data);
 }

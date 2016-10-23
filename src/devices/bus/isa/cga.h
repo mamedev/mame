@@ -56,8 +56,8 @@ public:
 	void mode_control_w(uint8_t data);
 	void set_palette_luts();
 	void plantronics_w(uint8_t data);
-	virtual DECLARE_READ8_MEMBER( io_read );
-	virtual DECLARE_WRITE8_MEMBER( io_write );
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
 	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -154,10 +154,10 @@ public:
 	static const offs_t vram_offset[4];
 	static const uint8_t mc6845_writeonce_register[31];
 
-	virtual DECLARE_READ8_MEMBER( io_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE8_MEMBER( vram_w );
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // device type definition
@@ -180,8 +180,8 @@ protected:
 	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER( io_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	void change_resolution(uint8_t mode);
 
@@ -208,12 +208,12 @@ protected:
 	virtual void device_reset() override;
 
 public:
-	virtual DECLARE_READ8_MEMBER( io_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	uint8_t   m_p3df;
-	DECLARE_READ8_MEMBER( char_ram_read );
-	DECLARE_WRITE8_MEMBER( char_ram_write );
+	uint8_t char_ram_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void char_ram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // device type definition
@@ -272,8 +272,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	// optional information overrides
 	//virtual const rom_entry *device_rom_region() const;
-	virtual DECLARE_READ8_MEMBER( io_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( io_write ) override;
+	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
 	MC6845_UPDATE_ROW( m24_gfx_1bpp_m24_update_row );
 	MC6845_RECONFIGURE(reconfigure);

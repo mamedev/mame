@@ -31,7 +31,7 @@ INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_MEMBER(drmicro_state::nmi_enable_w)
+void drmicro_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 1;
 	m_flipscreen = (data & 2) ? 1 : 0;
@@ -61,7 +61,7 @@ WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 		m_msm->reset_w(1);
 }
 
-WRITE8_MEMBER(drmicro_state::pcm_set_w)
+void drmicro_state::pcm_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pcm_adr = ((data & 0x3f) << 9);
 	pcm_w(1);

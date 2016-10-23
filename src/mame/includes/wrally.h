@@ -24,13 +24,13 @@ public:
 
 	tilemap_t *m_pant[2];
 
-	DECLARE_READ8_MEMBER(dallas_share_r);
-	DECLARE_WRITE8_MEMBER(dallas_share_w);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(okim6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_counter_w);
-	DECLARE_WRITE16_MEMBER(coin_lockout_w);
+	uint8_t dallas_share_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dallas_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void okim6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_lockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
 	TILE_GET_INFO_MEMBER(get_tile_info_screen1);

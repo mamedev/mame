@@ -78,13 +78,13 @@ PALETTE_INIT_MEMBER(mario_state, mario)
 	palette.palette()->normalize_range(0, 255);
 }
 
-WRITE8_MEMBER(mario_state::mario_videoram_w)
+void mario_state::mario_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mario_state::mario_gfxbank_w)
+void mario_state::mario_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfx_bank != (data & 0x01))
 	{
@@ -93,7 +93,7 @@ WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 	}
 }
 
-WRITE8_MEMBER(mario_state::mario_palettebank_w)
+void mario_state::mario_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank != (data & 0x01))
 	{
@@ -102,17 +102,17 @@ WRITE8_MEMBER(mario_state::mario_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(mario_state::mario_scroll_w)
+void mario_state::mario_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_scroll = data + 17;
 }
 
-WRITE8_MEMBER(mario_state::mariobl_scroll_w)
+void mario_state::mariobl_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_scroll = data;
 }
 
-WRITE8_MEMBER(mario_state::mario_flip_w)
+void mario_state::mario_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flip != (data & 0x01))
 	{

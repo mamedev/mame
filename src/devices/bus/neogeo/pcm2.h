@@ -23,7 +23,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-//  virtual DECLARE_READ16_MEMBER(read_rom) override;
+//  virtual uint16_t read_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 //  virtual void activate_cart(ACTIVATE_CART_PARAMS) override { m_banked_cart->install_banks(machine, maincpu, cpuregion, cpuregion_size); }
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) override {}

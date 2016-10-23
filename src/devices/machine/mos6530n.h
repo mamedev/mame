@@ -268,23 +268,23 @@ protected:
 	void timer_w(offs_t offset, uint8_t data, bool ie);
 	uint8_t timer_r(bool ie);
 
-	DECLARE_READ8_MEMBER( rom_r ) { return m_rom[offset]; }
-	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
-	DECLARE_WRITE8_MEMBER( ram_w ) { m_ram[offset] = data; }
-	DECLARE_READ8_MEMBER( pa_data_r );
-	DECLARE_WRITE8_MEMBER( pa_data_w );
-	DECLARE_READ8_MEMBER( pb_data_r );
-	DECLARE_WRITE8_MEMBER( pb_data_w );
-	DECLARE_READ8_MEMBER( pa_ddr_r ) { return m_pa_ddr; }
-	DECLARE_WRITE8_MEMBER( pa_ddr_w );
-	DECLARE_READ8_MEMBER( pb_ddr_r ) { return m_pb_ddr; }
-	DECLARE_WRITE8_MEMBER( pb_ddr_w );
-	DECLARE_READ8_MEMBER( timer_off_r );
-	DECLARE_READ8_MEMBER( timer_on_r );
-	DECLARE_READ8_MEMBER( irq_r );
-	DECLARE_WRITE8_MEMBER( timer_off_w );
-	DECLARE_WRITE8_MEMBER( timer_on_w );
-	DECLARE_WRITE8_MEMBER( edge_w );
+	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_rom[offset]; }
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_ram[offset]; }
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_ram[offset] = data; }
+	uint8_t pa_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pa_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pb_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pb_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pa_ddr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pa_ddr; }
+	void pa_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pb_ddr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pb_ddr; }
+	void pb_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_off_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t timer_on_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void edge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	optional_shared_ptr<uint8_t> m_ram;
 	optional_region_ptr<uint8_t> m_rom;
@@ -402,8 +402,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
 	// is there a better way to access the memory map when not using AM_DEVICE?
-	DECLARE_READ8_MEMBER(io_r);
-	DECLARE_WRITE8_MEMBER(io_w);
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -45,17 +45,17 @@ public:
 	uint8_t m_master_nmi_mask;
 	uint8_t m_slave_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(gyruss_irq_clear_w);
-	DECLARE_WRITE8_MEMBER(gyruss_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(gyruss_i8039_irq_w);
-	DECLARE_WRITE8_MEMBER(master_nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(slave_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(gyruss_spriteram_w);
-	DECLARE_READ8_MEMBER(gyruss_scanline_r);
-	DECLARE_READ8_MEMBER(gyruss_portA_r);
-	DECLARE_WRITE8_MEMBER(gyruss_dac_w);
-	DECLARE_WRITE8_MEMBER(gyruss_filter0_w);
-	DECLARE_WRITE8_MEMBER(gyruss_filter1_w);
+	void gyruss_irq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gyruss_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gyruss_i8039_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void master_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void slave_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gyruss_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gyruss_scanline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gyruss_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gyruss_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gyruss_filter0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gyruss_filter1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gyruss();
 	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
 	virtual void machine_start() override;

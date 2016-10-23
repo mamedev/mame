@@ -20,7 +20,7 @@ cedar_magnet_sound_device::cedar_magnet_sound_device(const machine_config &mconf
 }
 
 
-READ8_MEMBER(cedar_magnet_sound_device::top_port14_r)
+uint8_t cedar_magnet_sound_device::top_port14_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  uint8_t ret = m_command;
 //  m_command = 0;

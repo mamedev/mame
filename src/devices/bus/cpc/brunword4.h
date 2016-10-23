@@ -19,7 +19,7 @@ public:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void set_mapping(uint8_t type) override;
 
 protected:

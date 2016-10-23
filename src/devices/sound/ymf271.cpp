@@ -1425,7 +1425,7 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( ymf271_device::write )
+void ymf271_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 
@@ -1471,7 +1471,7 @@ WRITE8_MEMBER( ymf271_device::write )
 	}
 }
 
-READ8_MEMBER( ymf271_device::read )
+uint8_t ymf271_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0xf)
 	{

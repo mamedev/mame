@@ -21,15 +21,15 @@ public:
 	/* misc */
 	uint8_t m_lut_gun1[0x100];
 	uint8_t m_lut_gun2[0x100];
-	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
-	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
-	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
-	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
+	void ramtek_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gray5bit_controller0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gray5bit_controller1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m79amb_8002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_m79amb();
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
-	DECLARE_WRITE8_MEMBER(m79amb_8000_w);
-	DECLARE_WRITE8_MEMBER(m79amb_8003_w);
+	void m79amb_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void m79amb_8003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;
 };
 

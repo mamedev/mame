@@ -52,20 +52,20 @@ public:
 	/* memory pointers */
 	required_memory_bank m_rombank;
 
-	DECLARE_READ8_MEMBER(k051316_1_ramrom_r);
-	DECLARE_READ8_MEMBER(k051316_2_ramrom_r);
-	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
-	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
-	DECLARE_READ8_MEMBER(analog_read_r);
-	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(k007232_extvolume_w);
+	uint8_t k051316_1_ramrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t k051316_2_ramrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void chqflag_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void chqflag_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void select_analog_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t analog_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void chqflag_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k007232_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k007232_extvolume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(volume_callback0);
-	DECLARE_WRITE8_MEMBER(volume_callback1);
+	void volume_callback0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void volume_callback1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);

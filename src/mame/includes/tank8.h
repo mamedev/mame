@@ -65,16 +65,16 @@ public:
 	bitmap_ind16 m_helper3;
 	emu_timer *m_collision_timer;
 
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(lockout_w);
-	DECLARE_WRITE8_MEMBER(int_reset_w);
-	DECLARE_WRITE8_MEMBER(video_ram_w);
-	DECLARE_WRITE8_MEMBER(crash_w);
-	DECLARE_WRITE8_MEMBER(explosion_w);
-	DECLARE_WRITE8_MEMBER(bugle_w);
-	DECLARE_WRITE8_MEMBER(bug_w);
-	DECLARE_WRITE8_MEMBER(attract_w);
-	DECLARE_WRITE8_MEMBER(motor_w);
+	uint8_t collision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void int_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void crash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void explosion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bugle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 

@@ -26,8 +26,8 @@ public:
 
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
-	DECLARE_READ8_MEMBER(mz6500_vram_r);
-	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
+	uint8_t mz6500_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz6500_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
 	required_shared_ptr<uint16_t> m_video_ram;
@@ -62,12 +62,12 @@ void mz6500_state::video_start()
 }
 
 
-READ8_MEMBER( mz6500_state::mz6500_vram_r )
+uint8_t mz6500_state::mz6500_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_ram[offset >> 1] >> ((offset & 1) ? 8 : 0);
 }
 
-WRITE8_MEMBER( mz6500_state::mz6500_vram_w )
+void mz6500_state::mz6500_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mask = (offset & 1) ? 8 : 0;
 	offset >>= 1;

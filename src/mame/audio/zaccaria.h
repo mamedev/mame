@@ -47,10 +47,10 @@ public:
 			char const *shortname,
 			char const *source);
 
-	DECLARE_READ8_MEMBER(melodypia_porta_r);
-	DECLARE_WRITE8_MEMBER(melodypia_porta_w);
-	DECLARE_WRITE8_MEMBER(melodypia_portb_w);
-	DECLARE_READ8_MEMBER(melodypsg1_portb_r);
+	uint8_t melodypia_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void melodypia_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void melodypia_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t melodypsg1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;
@@ -71,12 +71,12 @@ public:
 	zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// host interface
-	DECLARE_WRITE8_MEMBER(sound_w);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	// PSG output handlers
-	DECLARE_WRITE8_MEMBER(melodypsg1_porta_w);
-	DECLARE_WRITE8_MEMBER(melodypsg2_porta_w);
+	void melodypsg1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void melodypsg2_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -92,19 +92,19 @@ public:
 	zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
 
 	// host interface
-	DECLARE_WRITE8_MEMBER(hs_w);
+	void hs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(acs_r);
 	DECLARE_WRITE_LINE_MEMBER(ressound_w);
 
 	// melody section handlers
-	DECLARE_WRITE8_MEMBER(ay_4g_porta_w);
-	DECLARE_WRITE8_MEMBER(ay_4h_porta_w);
-	DECLARE_WRITE8_MEMBER(ay_4h_portb_w);
+	void ay_4g_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_4h_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_4h_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// master audio section handlers
-	DECLARE_READ8_MEMBER(host_command_r);
-	DECLARE_WRITE8_MEMBER(melody_command_w);
-	DECLARE_WRITE8_MEMBER(pia_1i_portb_w);
+	uint8_t host_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void melody_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_1i_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// input ports don't push
 	INTERRUPT_GEN_MEMBER(input_poll);

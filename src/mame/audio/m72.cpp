@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER(m72_audio_device::ym2151_irq_handler)
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), state ? YM2151_ASSERT : YM2151_CLEAR);
 }
 
-WRITE16_MEMBER( m72_audio_device::sound_command_w )
+void m72_audio_device::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -143,13 +143,13 @@ WRITE16_MEMBER( m72_audio_device::sound_command_w )
 	}
 }
 
-WRITE8_MEMBER( m72_audio_device::sound_command_byte_w )
+void m72_audio_device::sound_command_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(*m_space, offset, data);
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_ASSERT);
 }
 
-WRITE8_MEMBER( m72_audio_device::sound_irq_ack_w )
+void m72_audio_device::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), Z80_CLEAR);
 }
@@ -161,7 +161,7 @@ void m72_audio_device::set_sample_start(int start)
 	m_sample_addr = start;
 }
 
-WRITE8_MEMBER( m72_audio_device::vigilant_sample_addr_w )
+void m72_audio_device::vigilant_sample_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 		m_sample_addr = (m_sample_addr & 0x00ff) | ((data << 8) & 0xff00);
@@ -169,7 +169,7 @@ WRITE8_MEMBER( m72_audio_device::vigilant_sample_addr_w )
 		m_sample_addr = (m_sample_addr & 0xff00) | ((data << 0) & 0x00ff);
 }
 
-WRITE8_MEMBER( m72_audio_device::shisen_sample_addr_w )
+void m72_audio_device::shisen_sample_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_addr >>= 2;
 
@@ -181,7 +181,7 @@ WRITE8_MEMBER( m72_audio_device::shisen_sample_addr_w )
 	m_sample_addr <<= 2;
 }
 
-WRITE8_MEMBER( m72_audio_device::rtype2_sample_addr_w )
+void m72_audio_device::rtype2_sample_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_addr >>= 5;
 
@@ -193,7 +193,7 @@ WRITE8_MEMBER( m72_audio_device::rtype2_sample_addr_w )
 	m_sample_addr <<= 5;
 }
 
-WRITE8_MEMBER( m72_audio_device::poundfor_sample_addr_w )
+void m72_audio_device::poundfor_sample_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* poundfor writes both sample start and sample END - a first for Irem...
 	   we don't handle the end written here, 00 marks the sample end as usual. */
@@ -209,12 +209,12 @@ WRITE8_MEMBER( m72_audio_device::poundfor_sample_addr_w )
 	m_sample_addr <<= 4;
 }
 
-READ8_MEMBER( m72_audio_device::sample_r )
+uint8_t m72_audio_device::sample_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_samples[m_sample_addr];
 }
 
-WRITE8_MEMBER( m72_audio_device::sample_w )
+void m72_audio_device::sample_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(data);
 	m_sample_addr = (m_sample_addr + 1) & (m_samples_size - 1);

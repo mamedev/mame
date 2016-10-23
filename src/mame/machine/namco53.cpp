@@ -61,12 +61,12 @@
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-READ8_MEMBER( namco_53xx_device::K_r )
+uint8_t namco_53xx_device::K_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_k(0);
 }
 
-READ8_MEMBER( namco_53xx_device::Rx_r )
+uint8_t namco_53xx_device::Rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset) {
 		case 0 : return m_in_0(0);
@@ -78,7 +78,7 @@ READ8_MEMBER( namco_53xx_device::Rx_r )
 
 }
 
-WRITE8_MEMBER( namco_53xx_device::O_w )
+void namco_53xx_device::O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
@@ -87,7 +87,7 @@ WRITE8_MEMBER( namco_53xx_device::O_w )
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-WRITE8_MEMBER( namco_53xx_device::P_w )
+void namco_53xx_device::P_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p(space, 0, data);
 }
@@ -110,7 +110,7 @@ WRITE_LINE_MEMBER(namco_53xx_device::read_request)
 	machine().scheduler().timer_set(attotime::from_usec(21), timer_expired_delegate(FUNC(namco_53xx_device::irq_clear),this), 0);
 }
 
-READ8_MEMBER( namco_53xx_device::read )
+uint8_t namco_53xx_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = m_portO;
 

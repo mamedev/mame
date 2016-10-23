@@ -280,7 +280,7 @@ void dgn_beta_state::dgnbeta_vid_set_gctrl(int data)
 
 
 /* Write handler for colour, pallate ram */
-WRITE8_MEMBER(dgn_beta_state::dgnbeta_colour_ram_w)
+void dgn_beta_state::dgnbeta_colour_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ColourRAM[offset]=data&0x0f;          /* Colour ram 4 bit and write only to CPU */
 }

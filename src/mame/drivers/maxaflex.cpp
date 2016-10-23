@@ -52,24 +52,24 @@ public:
 	uint8_t m_tcr;
 	timer_device *m_mcu_timer;
 	void mmu(uint8_t new_mmu);
-	DECLARE_READ8_MEMBER(mcu_portA_r);
-	DECLARE_WRITE8_MEMBER(mcu_portA_w);
-	DECLARE_READ8_MEMBER(mcu_portB_r);
-	DECLARE_WRITE8_MEMBER(mcu_portB_w);
-	DECLARE_READ8_MEMBER(mcu_portC_r);
-	DECLARE_WRITE8_MEMBER(mcu_portC_w);
-	DECLARE_READ8_MEMBER(mcu_ddr_r);
-	DECLARE_WRITE8_MEMBER(mcu_portA_ddr_w);
-	DECLARE_WRITE8_MEMBER(mcu_portB_ddr_w);
-	DECLARE_WRITE8_MEMBER(mcu_portC_ddr_w);
-	DECLARE_READ8_MEMBER(mcu_tdr_r);
-	DECLARE_WRITE8_MEMBER(mcu_tdr_w);
-	DECLARE_READ8_MEMBER(mcu_tcr_r);
-	DECLARE_WRITE8_MEMBER(mcu_tcr_w);
+	uint8_t mcu_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_portC_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_ddr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_portA_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_portB_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_portC_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_tdr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu_tcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_READ8_MEMBER(pia_pa_r);
-	DECLARE_READ8_MEMBER(pia_pb_r);
-	WRITE8_MEMBER(pia_pb_w) { mmu(data); }
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mmu(data); }
 	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
 	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
@@ -118,13 +118,13 @@ void maxaflex_state::mmu(uint8_t new_mmu)
     7   (out) AUDIO
 */
 
-READ8_MEMBER(maxaflex_state::mcu_portA_r)
+uint8_t maxaflex_state::mcu_portA_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_portA_in = m_dsw->read() | (m_coin->read() << 4) | (m_console->read() << 5);
 	return (m_portA_in & ~m_ddrA) | (m_portA_out & m_ddrA);
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
+void maxaflex_state::mcu_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portA_out = data;
 	m_speaker->level_w(data >> 7);
@@ -141,12 +141,12 @@ WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
     7   (out)   TOFF - enables/disables user controls
 */
 
-READ8_MEMBER(maxaflex_state::mcu_portB_r)
+uint8_t maxaflex_state::mcu_portB_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portB_in & ~m_ddrB) | (m_portB_out & m_ddrB);
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
+void maxaflex_state::mcu_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff = data ^ m_portB_out;
 	m_portB_out = data;
@@ -178,12 +178,12 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
     2   (out)   lamp START
     3   (out)   lamp OVER */
 
-READ8_MEMBER(maxaflex_state::mcu_portC_r)
+uint8_t maxaflex_state::mcu_portC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_portC_in & ~m_ddrC) | (m_portC_out & m_ddrC);
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
+void maxaflex_state::mcu_portC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	static const uint8_t ls48_map[16] =
@@ -201,22 +201,22 @@ WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 	}
 }
 
-READ8_MEMBER(maxaflex_state::mcu_ddr_r)
+uint8_t maxaflex_state::mcu_ddr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portA_ddr_w)
+void maxaflex_state::mcu_portA_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrA = data;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portB_ddr_w)
+void maxaflex_state::mcu_portB_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrB = data;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_portC_ddr_w)
+void maxaflex_state::mcu_portC_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddrC = data;
 }
@@ -234,23 +234,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(maxaflex_state::mcu_timer_proc)
 }
 
 /* Timer Data Reg */
-READ8_MEMBER(maxaflex_state::mcu_tdr_r)
+uint8_t maxaflex_state::mcu_tdr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tdr;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_tdr_w)
+void maxaflex_state::mcu_tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tdr = data;
 }
 
 /* Timer control reg */
-READ8_MEMBER(maxaflex_state::mcu_tcr_r)
+uint8_t maxaflex_state::mcu_tcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_tcr & ~0x08;
 }
 
-WRITE8_MEMBER(maxaflex_state::mcu_tcr_w)
+void maxaflex_state::mcu_tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tcr = data;
 	if ( (m_tcr & 0x40) == 0 )
@@ -387,12 +387,12 @@ static INPUT_PORTS_START( a600xl )
 INPUT_PORTS_END
 
 
-READ8_MEMBER(maxaflex_state::pia_pa_r)
+uint8_t maxaflex_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return atari_input_disabled() ? 0xff : m_joy01.read_safe(0);
 }
 
-READ8_MEMBER(maxaflex_state::pia_pb_r)
+uint8_t maxaflex_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return atari_input_disabled() ? 0xff : m_joy23.read_safe(0);
 }

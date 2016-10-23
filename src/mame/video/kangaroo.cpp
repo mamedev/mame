@@ -57,7 +57,7 @@ void kangaroo_state::videoram_write( uint16_t offset, uint8_t data, uint8_t mask
 }
 
 
-WRITE8_MEMBER(kangaroo_state::kangaroo_videoram_w)
+void kangaroo_state::kangaroo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	videoram_write(offset, data, m_video_control[8]);
 }
@@ -70,7 +70,7 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
+void kangaroo_state::kangaroo_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_control[offset] = data;
 

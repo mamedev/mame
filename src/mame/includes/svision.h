@@ -53,10 +53,10 @@ public:
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
 
-	DECLARE_READ8_MEMBER(svision_r);
-	DECLARE_WRITE8_MEMBER(svision_w);
-	DECLARE_READ8_MEMBER(tvlink_r);
-	DECLARE_WRITE8_MEMBER(tvlink_w);
+	uint8_t svision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void svision_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tvlink_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tvlink_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_svisions();
 	void init_svision();
 	virtual void machine_start() override;

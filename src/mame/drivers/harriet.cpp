@@ -38,13 +38,13 @@ public:
 	uint8_t m_teletype_data;
 	uint8_t m_teletype_status;
 
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_READ8_MEMBER(unk2_r);
-	DECLARE_READ8_MEMBER(unk3_r);
-	DECLARE_READ8_MEMBER(keyboard_status_r);
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unk3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -63,12 +63,12 @@ uint32_t harriet_state::screen_update( screen_device &screen, bitmap_ind16 &bitm
 }
 
 /* tested at POST (PC=0x612), halts the CPU if cmp.b $f1000f.l, d0 for 0x4000 DBRAs */
-READ8_MEMBER(harriet_state::unk_r)
+uint8_t harriet_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(harriet_state::unk_w)
+void harriet_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  if(offset)
         printf("%02x\n",data);
@@ -77,25 +77,25 @@ WRITE8_MEMBER(harriet_state::unk_w)
 }
 
 /* PC=0x676/0x694 */
-READ8_MEMBER(harriet_state::unk2_r)
+uint8_t harriet_state::unk2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
 
-WRITE8_MEMBER(harriet_state::serial_w)
+void harriet_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_terminal->write(space, 0, data);
 }
 
 /* tested before putting data to serial port at PC=0x4c78 */
-READ8_MEMBER(harriet_state::unk3_r)
+uint8_t harriet_state::unk3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;//machine().rand();
 }
 
 /* 0x314c bit 7: keyboard status */
-READ8_MEMBER(harriet_state::keyboard_status_r)
+uint8_t harriet_state::keyboard_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( harriet )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( harriet_state::kbd_put )
+void harriet_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_teletype_data = data;
 	m_teletype_status |= 0x80;

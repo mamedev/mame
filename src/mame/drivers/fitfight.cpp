@@ -89,26 +89,26 @@ Stephh's notes :
 #include "sound/okim6295.h"
 #include "includes/fitfight.h"
 
-READ16_MEMBER( fitfight_state::hotmindff_unk_r )
+uint16_t fitfight_state::hotmindff_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// won't boot unless things in here change, this is p1/p2 inputs in fitfight
 	return space.machine().rand();
 }
 
-READ16_MEMBER(fitfight_state::fitfight_700000_r)
+uint16_t fitfight_state::fitfight_700000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_fof_700000_data;
 	return (data << 2);
 }
 
-READ16_MEMBER(fitfight_state::histryma_700000_r)
+uint16_t fitfight_state::histryma_700000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = (m_fof_700000_data & 0x00AA);
 	data |= ((m_fof_700000_data & 0x0055) >> 2);
 	return (data);
 }
 
-READ16_MEMBER(fitfight_state::bbprot_700000_r)
+uint16_t fitfight_state::bbprot_700000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0;
 	data  =  (m_fof_700000_data & 0x000b);
@@ -118,7 +118,7 @@ READ16_MEMBER(fitfight_state::bbprot_700000_r)
 	return (data);
 }
 
-WRITE16_MEMBER(fitfight_state::fitfight_700000_w)
+void fitfight_state::fitfight_700000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fof_700000[offset]);        // needed for scrolling
 
@@ -220,35 +220,35 @@ static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(fitfight_state::snd_porta_r)
+uint8_t fitfight_state::snd_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//osd_printf_debug("PA R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
-READ8_MEMBER(fitfight_state::snd_portb_r)
+uint8_t fitfight_state::snd_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//osd_printf_debug("PB R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
-READ8_MEMBER(fitfight_state::snd_portc_r)
+uint8_t fitfight_state::snd_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//osd_printf_debug("PC R @%x\n",space.device().safe_pc());
 	return machine().rand();
 }
 
-WRITE8_MEMBER(fitfight_state::snd_porta_w)
+void fitfight_state::snd_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//osd_printf_debug("PA W %x @%x\n",data,space.device().safe_pc());
 }
 
-WRITE8_MEMBER(fitfight_state::snd_portb_w)
+void fitfight_state::snd_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//osd_printf_debug("PB W %x @%x\n",data,space.device().safe_pc());
 }
 
-WRITE8_MEMBER(fitfight_state::snd_portc_w)
+void fitfight_state::snd_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//osd_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
 }

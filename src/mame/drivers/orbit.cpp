@@ -85,7 +85,7 @@ void orbit_state::update_misc_flags(address_space &space, uint8_t val)
 }
 
 
-WRITE8_MEMBER(orbit_state::orbit_misc_w)
+void orbit_state::orbit_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bit = offset >> 1;
 

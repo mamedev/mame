@@ -18,27 +18,27 @@ void h8_port_device::set_info(int _address, uint8_t _default_ddr, uint8_t _mask)
 	mask = _mask;
 }
 
-WRITE8_MEMBER(h8_port_device::ddr_w)
+void h8_port_device::ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  logerror("ddr_w %02x\n", data);
 	ddr = data;
 	update_output();
 }
 
-WRITE8_MEMBER(h8_port_device::dr_w)
+void h8_port_device::dr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//  logerror("dr_w %02x\n", data);
 	dr = data;
 	update_output();
 }
 
-READ8_MEMBER(h8_port_device::dr_r)
+uint8_t h8_port_device::dr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//  logerror("dr_r %02x\n", (dr | mask) & 0xff);
 	return dr | mask;
 }
 
-READ8_MEMBER(h8_port_device::port_r)
+uint8_t h8_port_device::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = mask | (dr & ddr);
 	if((ddr & ~mask) != uint8_t(~mask))
@@ -48,25 +48,25 @@ READ8_MEMBER(h8_port_device::port_r)
 	return res;
 }
 
-WRITE8_MEMBER(h8_port_device::pcr_w)
+void h8_port_device::pcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("pcr_w %02x\n", data);
 	pcr = data;
 }
 
-READ8_MEMBER(h8_port_device::pcr_r)
+uint8_t h8_port_device::pcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("dr_r %02x\n", (pcr | mask) & 0xff);
 	return pcr | mask;
 }
 
-WRITE8_MEMBER(h8_port_device::odr_w)
+void h8_port_device::odr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("odr_w %02x\n", data);
 	odr = data;
 }
 
-READ8_MEMBER(h8_port_device::odr_r)
+uint8_t h8_port_device::odr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("odr_r %02x\n", (odr | mask) & 0xff);
 	return odr | ~mask;

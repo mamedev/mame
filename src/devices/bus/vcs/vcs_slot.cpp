@@ -797,7 +797,7 @@ std::string vcs_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(vcs_cart_slot_device::read_rom)
+uint8_t vcs_cart_slot_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset, mem_mask);
@@ -805,7 +805,7 @@ READ8_MEMBER(vcs_cart_slot_device::read_rom)
 		return 0xff;
 }
 
-READ8_MEMBER(vcs_cart_slot_device::read_bank)
+uint8_t vcs_cart_slot_device::read_bank(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_bank(space, offset, mem_mask);
@@ -818,13 +818,13 @@ READ8_MEMBER(vcs_cart_slot_device::read_bank)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(vcs_cart_slot_device::write_bank)
+void vcs_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_bank(space, offset, data, mem_mask);
 }
 
-WRITE8_MEMBER(vcs_cart_slot_device::write_ram)
+void vcs_cart_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data, mem_mask);
@@ -835,7 +835,7 @@ WRITE8_MEMBER(vcs_cart_slot_device::write_ram)
  direct update
  -------------------------------------------------*/
 
-DIRECT_UPDATE_MEMBER(vcs_cart_slot_device::cart_opbase)
+offs_t vcs_cart_slot_device::cart_opbase(direct_read_data &direct, offs_t address)
 {
 	if (m_cart)
 		return m_cart->cart_opbase(direct, address);

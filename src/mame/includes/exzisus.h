@@ -26,10 +26,10 @@ public:
 	required_shared_ptr<uint8_t> m_objectram0;
 	required_shared_ptr<uint8_t> m_videoram0;
 
-	DECLARE_WRITE8_MEMBER(cpua_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cpub_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(coincounter_w);
-	DECLARE_WRITE8_MEMBER(cpub_reset_w);
+	void cpua_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpub_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void cpub_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 

@@ -41,9 +41,9 @@ public:
 			m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_WRITE8_MEMBER(argo_videoram_w);
-	DECLARE_READ8_MEMBER(argo_io_r);
-	DECLARE_WRITE8_MEMBER(argo_io_w);
+	void argo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t argo_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void argo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	const uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
@@ -61,7 +61,7 @@ protected:
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
-WRITE8_MEMBER(argo_state::argo_videoram_w)
+void argo_state::argo_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM;
 	if (m_ram_ctrl)
@@ -72,7 +72,7 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 	RAM[offset] = data;
 }
 
-READ8_MEMBER(argo_state::argo_io_r)
+uint8_t argo_state::argo_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t low_io = offset;
 
@@ -92,7 +92,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	}
 }
 
-WRITE8_MEMBER(argo_state::argo_io_w)
+void argo_state::argo_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t low_io = offset;
 

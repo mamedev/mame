@@ -167,7 +167,7 @@ void m1comm_device::device_reset()
 	m_commcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-READ8_MEMBER(m1comm_device::dlc_reg_r)
+uint8_t m1comm_device::dlc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// dirty hack to keep Z80 in RESET state
 	if (!m_cn)
@@ -184,7 +184,7 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 	return result;
 }
 
-WRITE8_MEMBER(m1comm_device::dlc_reg_w)
+void m1comm_device::dlc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dlc_reg[offset] = data;
 #ifdef __M1COMM_VERBOSE__
@@ -192,7 +192,7 @@ WRITE8_MEMBER(m1comm_device::dlc_reg_w)
 #endif
 }
 
-READ8_MEMBER(m1comm_device::dma_reg_r)
+uint8_t m1comm_device::dma_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_dma_reg[offset];
 #ifdef __M1COMM_VERBOSE__
@@ -201,7 +201,7 @@ READ8_MEMBER(m1comm_device::dma_reg_r)
 	return result;
 }
 
-WRITE8_MEMBER(m1comm_device::dma_reg_w)
+void m1comm_device::dma_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-dma_reg_w: %02x %02x\n", offset, data);
@@ -209,7 +209,7 @@ WRITE8_MEMBER(m1comm_device::dma_reg_w)
 	m_dma_reg[offset] = data;
 }
 
-READ8_MEMBER(m1comm_device::syn_r)
+uint8_t m1comm_device::syn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_syn | 0xFC;
 #ifdef __M1COMM_VERBOSE__
@@ -218,7 +218,7 @@ READ8_MEMBER(m1comm_device::syn_r)
 	return result;
 }
 
-WRITE8_MEMBER(m1comm_device::syn_w)
+void m1comm_device::syn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_syn = data & 0x03;
 
@@ -240,7 +240,7 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 #endif
 }
 
-READ8_MEMBER(m1comm_device::zfg_r)
+uint8_t m1comm_device::zfg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M1COMM_VERBOSE__
@@ -249,7 +249,7 @@ READ8_MEMBER(m1comm_device::zfg_r)
 	return result;
 }
 
-WRITE8_MEMBER(m1comm_device::zfg_w)
+void m1comm_device::zfg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-zfg_w: %02x\n", data);
@@ -257,22 +257,22 @@ WRITE8_MEMBER(m1comm_device::zfg_w)
 	m_zfg = data & 0x01;
 }
 
-READ8_MEMBER(m1comm_device::share_r)
+uint8_t m1comm_device::share_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared[offset];
 }
 
-WRITE8_MEMBER(m1comm_device::share_w)
+void m1comm_device::share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shared[offset] = data;
 }
 
-READ8_MEMBER(m1comm_device::cn_r)
+uint8_t m1comm_device::cn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_cn | 0xfe;
 }
 
-WRITE8_MEMBER(m1comm_device::cn_w)
+void m1comm_device::cn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cn = data & 0x01;
 
@@ -302,12 +302,12 @@ WRITE8_MEMBER(m1comm_device::cn_w)
 #endif
 }
 
-READ8_MEMBER(m1comm_device::fg_r)
+uint8_t m1comm_device::fg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
-WRITE8_MEMBER(m1comm_device::fg_w)
+void m1comm_device::fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_cn)
 		return;

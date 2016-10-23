@@ -158,13 +158,13 @@ public:
 	required_shared_ptr<uint8_t> m_attr_ram3;
 	tilemap_t *m_bg_tilemap;
 	uint8_t m_question_adr[4];
-	DECLARE_WRITE8_MEMBER(quizmstr_bg_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr1_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr2_w);
-	DECLARE_WRITE8_MEMBER(quizmstr_attr3_w);
-	DECLARE_READ8_MEMBER(question_r);
-	DECLARE_WRITE8_MEMBER(question_w);
-	DECLARE_READ8_MEMBER(ff_r);
+	void quizmstr_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizmstr_attr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizmstr_attr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizmstr_attr3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void question_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_coinmstr();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
@@ -175,7 +175,7 @@ public:
 };
 
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_bg_w)
+void coinmstr_state::quizmstr_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
@@ -218,7 +218,7 @@ static void coinmstr_set_pal(palette_device &palette, uint32_t paldat, int col)
 }
 
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
+void coinmstr_state::quizmstr_attr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_ram1[offset] = data;
 
@@ -233,7 +233,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr1_w)
 	}
 }
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
+void coinmstr_state::quizmstr_attr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_ram2[offset] = data;
 
@@ -248,7 +248,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr2_w)
 	}
 }
 
-WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
+void coinmstr_state::quizmstr_attr3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_attr_ram3[offset] = data;
 
@@ -258,7 +258,7 @@ WRITE8_MEMBER(coinmstr_state::quizmstr_attr3_w)
 }
 
 
-READ8_MEMBER(coinmstr_state::question_r)
+uint8_t coinmstr_state::question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int address;
 	uint8_t *questions = memregion("user1")->base();
@@ -306,7 +306,7 @@ READ8_MEMBER(coinmstr_state::question_r)
 	return questions[address];
 }
 
-WRITE8_MEMBER(coinmstr_state::question_w)
+void coinmstr_state::question_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != m_question_adr[offset])
 	{
@@ -316,7 +316,7 @@ WRITE8_MEMBER(coinmstr_state::question_w)
 	m_question_adr[offset] = data;
 }
 
-READ8_MEMBER(coinmstr_state::ff_r)
+uint8_t coinmstr_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

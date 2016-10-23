@@ -165,14 +165,14 @@ INTERRUPT_GEN_MEMBER(atari_sound_comm_device::sound_irq_gen)
 //  can be used.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::sound_irq_ack_r)
+uint8_t atari_sound_comm_device::sound_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_timed_int = 0;
 	update_sound_irq();
 	return 0;
 }
 
-WRITE8_MEMBER(atari_sound_comm_device::sound_irq_ack_w)
+void atari_sound_comm_device::sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timed_int = 0;
 	update_sound_irq();
@@ -196,7 +196,7 @@ WRITE_LINE_MEMBER(atari_sound_comm_device::ym2151_irq_gen)
 //  sound CPU in response.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_sound_comm_device::sound_reset_w)
+void atari_sound_comm_device::sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	synchronize(TID_SOUND_RESET);
 }
@@ -209,7 +209,7 @@ WRITE16_MEMBER(atari_sound_comm_device::sound_reset_w)
 //  the upper 8 bits.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_sound_comm_device::main_command_w)
+void atari_sound_comm_device::main_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(TID_SOUND_WRITE, data);
 }
@@ -222,7 +222,7 @@ WRITE8_MEMBER(atari_sound_comm_device::main_command_w)
 //  byte in the upper 8 bits.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::main_response_r)
+uint8_t atari_sound_comm_device::main_response_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_to_main_ready = false;
 	m_main_int_cb(CLEAR_LINE);
@@ -235,7 +235,7 @@ READ8_MEMBER(atari_sound_comm_device::main_response_r)
 //  sound CPU to the main CPU.
 //-------------------------------------------------
 
-WRITE8_MEMBER(atari_sound_comm_device::sound_response_w)
+void atari_sound_comm_device::sound_response_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	synchronize(TID_6502_WRITE, data);
 }
@@ -247,7 +247,7 @@ WRITE8_MEMBER(atari_sound_comm_device::sound_response_w)
 //  CPU.
 //-------------------------------------------------
 
-READ8_MEMBER(atari_sound_comm_device::sound_command_r)
+uint8_t atari_sound_comm_device::sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_main_to_sound_ready = false;
 	m_sound_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -376,7 +376,7 @@ atari_vad_device::atari_vad_device(const machine_config &mconfig, const char *ta
 //  write.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::control_write)
+void atari_vad_device::control_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t newword = m_control[offset];
 	COMBINE_DATA(&newword);
@@ -388,7 +388,7 @@ WRITE16_MEMBER(atari_vad_device::control_write)
 //  control_read: Handles an I/O read from the video controller.
 //-------------------------------------------------
 
-READ16_MEMBER(atari_vad_device::control_read)
+uint16_t atari_vad_device::control_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("vc_r(%02X)\n", offset);
 
@@ -412,7 +412,7 @@ READ16_MEMBER(atari_vad_device::control_read)
 //  alpha_w: Generic write handler for alpha RAM.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::alpha_w)
+void atari_vad_device::alpha_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_alpha_tilemap->write(space, offset, data, mem_mask);
 }
@@ -423,7 +423,7 @@ WRITE16_MEMBER(atari_vad_device::alpha_w)
 //  upper word of split playfield RAM.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
+void atari_vad_device::playfield_upper_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write_ext(space, offset, data, mem_mask);
 	if (m_playfield2_tilemap != nullptr)
@@ -437,7 +437,7 @@ WRITE16_MEMBER(atari_vad_device::playfield_upper_w)
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
+void atari_vad_device::playfield_latched_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
@@ -451,7 +451,7 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_lsb_w)
 //  upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
+void atari_vad_device::playfield_latched_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
@@ -465,7 +465,7 @@ WRITE16_MEMBER(atari_vad_device::playfield_latched_msb_w)
 //  of the upper word.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atari_vad_device::playfield2_latched_msb_w)
+void atari_vad_device::playfield2_latched_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_playfield2_tilemap->write(space, offset, data, mem_mask);
 	if ((m_control[0x0a] & 0x80) != 0)
@@ -839,24 +839,24 @@ atari_eeprom_device::atari_eeprom_device(const machine_config &mconfig, device_t
 //  handlers
 //-------------------------------------------------
 
-READ8_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE8_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
-READ16_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE16_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
-READ32_MEMBER(atari_eeprom_device::unlock_read) { m_unlocked = true; return space.unmap(); }
-WRITE32_MEMBER(atari_eeprom_device::unlock_write) { m_unlocked = true; }
+uint8_t atari_eeprom_device::unlock_read(address_space &space, offs_t offset, uint8_t mem_mask) { m_unlocked = true; return space.unmap(); }
+void atari_eeprom_device::unlock_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_unlocked = true; }
+uint16_t atari_eeprom_device::unlock_read(address_space &space, offs_t offset, uint16_t mem_mask) { m_unlocked = true; return space.unmap(); }
+void atari_eeprom_device::unlock_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask) { m_unlocked = true; }
+uint32_t atari_eeprom_device::unlock_read(address_space &space, offs_t offset, uint32_t mem_mask) { m_unlocked = true; return space.unmap(); }
+void atari_eeprom_device::unlock_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask) { m_unlocked = true; }
 
 
 //-------------------------------------------------
 //  read/write - data read/write handlers
 //-------------------------------------------------
 
-READ8_MEMBER(atari_eeprom_device::read)
+uint8_t atari_eeprom_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom->read(space, offset);
 }
 
-WRITE8_MEMBER(atari_eeprom_device::write)
+void atari_eeprom_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_unlocked)
 		m_eeprom->write(space, offset, data, mem_mask);
@@ -1084,7 +1084,7 @@ INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
 //  scanline interrupt.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::scanline_int_ack_w)
+void atarigen_state::scanline_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_scanline_int_state = 0;
 	update_interrupts();
@@ -1120,7 +1120,7 @@ INTERRUPT_GEN_MEMBER(atarigen_state::sound_int_gen)
 //  interrupt.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::sound_int_ack_w)
+void atarigen_state::sound_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_sound_int_state = 0;
 	update_interrupts();
@@ -1144,7 +1144,7 @@ INTERRUPT_GEN_MEMBER(atarigen_state::video_int_gen)
 //  interrupt.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::video_int_ack_w)
+void atarigen_state::video_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_video_int_state = 0;
 	update_interrupts();
@@ -1223,7 +1223,7 @@ void atarigen_state::slapstic_configure(cpu_device &device, offs_t base, offs_t 
 //  address and do nothing more.
 //-------------------------------------------------
 
-WRITE16_MEMBER(atarigen_state::slapstic_w)
+void atarigen_state::slapstic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");
@@ -1237,7 +1237,7 @@ WRITE16_MEMBER(atarigen_state::slapstic_w)
 //  address and then reads a word from the underlying memory.
 //-------------------------------------------------
 
-READ16_MEMBER(atarigen_state::slapstic_r)
+uint16_t atarigen_state::slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_slapstic_device.found())
 		fatalerror("Slapstic device is missing?\n");

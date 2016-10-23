@@ -128,12 +128,12 @@ public:
 	uint32_t m_videoreg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	required_shared_ptr<uint32_t> m_cop_ram;
-	DECLARE_READ32_MEMBER(shared_r);
-	DECLARE_WRITE32_MEMBER(shared_w);
-	DECLARE_WRITE32_MEMBER(videoreg_w);
-	DECLARE_WRITE32_MEMBER(cop_w);
-	DECLARE_READ32_MEMBER(cop_r);
-	DECLARE_READ32_MEMBER(irq_ack_clear);
+	uint32_t shared_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void shared_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void videoreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void cop_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cop_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t irq_ack_clear(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_speglsht();
 	void machine_reset_speglsht();
 	virtual void machine_start() override;
@@ -143,7 +143,7 @@ public:
 	required_device<st0016_cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 
-	DECLARE_WRITE8_MEMBER(st0016_rom_bank_w);
+	void st0016_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 
@@ -166,7 +166,7 @@ void speglsht_state::machine_start()
 }
 
 // common rombank? should go in machine/st0016 with larger address space exposed?
-WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
+void speglsht_state::st0016_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -184,23 +184,23 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
 ADDRESS_MAP_END
 
-READ32_MEMBER(speglsht_state::shared_r)
+uint32_t speglsht_state::shared_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_shared[offset];
 }
 
-WRITE32_MEMBER(speglsht_state::shared_w)
+void speglsht_state::shared_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_shared[offset]=data&0xff;
 }
 
-WRITE32_MEMBER(speglsht_state::videoreg_w)
+void speglsht_state::videoreg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_videoreg);
 }
 
 
-WRITE32_MEMBER(speglsht_state::cop_w)
+void speglsht_state::cop_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_cop_ram[offset]);
 
@@ -211,7 +211,7 @@ WRITE32_MEMBER(speglsht_state::cop_w)
 }
 
 //matrix * vector
-READ32_MEMBER(speglsht_state::cop_r)
+uint32_t speglsht_state::cop_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int32_t *cop=(int32_t*)&m_cop_ram[0];
 
@@ -245,7 +245,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 	return 0;
 }
 
-READ32_MEMBER(speglsht_state::irq_ack_clear)
+uint32_t speglsht_state::irq_ack_clear(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_subcpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
 	return 0;

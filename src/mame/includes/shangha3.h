@@ -37,22 +37,22 @@ public:
 	bitmap_ind16 m_rawbitmap;
 
 	// common
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
-	DECLARE_WRITE16_MEMBER(gfxlist_addr_w);
-	DECLARE_WRITE16_MEMBER(blitter_go_w);
-	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gfxlist_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void blitter_go_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// shangha3 specific
-	DECLARE_READ16_MEMBER(shangha3_prot_r);
-	DECLARE_WRITE16_MEMBER(shangha3_prot_w);
-	DECLARE_WRITE16_MEMBER(shangha3_coinctrl_w);
+	uint16_t shangha3_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void shangha3_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void shangha3_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// heberpop specific
-	DECLARE_WRITE16_MEMBER(heberpop_coinctrl_w);
-	DECLARE_WRITE16_MEMBER(heberpop_sound_command_w); // used by blocken too
+	void heberpop_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void heberpop_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff); // used by blocken too
 
 	// blocken specific
-	DECLARE_WRITE16_MEMBER(blocken_coinctrl_w);
+	void blocken_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_shangha3();
 	void init_heberpop();

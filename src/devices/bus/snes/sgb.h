@@ -27,22 +27,22 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ8_MEMBER(gb_cart_r);
-	virtual DECLARE_WRITE8_MEMBER(gb_bank_w);
-	virtual DECLARE_READ8_MEMBER(gb_ram_r);
-	virtual DECLARE_WRITE8_MEMBER(gb_ram_w);
-	virtual DECLARE_READ8_MEMBER(gb_echo_r);
-	virtual DECLARE_WRITE8_MEMBER(gb_echo_w);
-	virtual DECLARE_READ8_MEMBER(gb_io_r);
-	virtual DECLARE_WRITE8_MEMBER(gb_io_w);
-	virtual DECLARE_READ8_MEMBER(gb_ie_r);
-	virtual DECLARE_WRITE8_MEMBER(gb_ie_w);
-	virtual DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	virtual uint8_t gb_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void gb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t gb_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void gb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t gb_echo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void gb_echo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t gb_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void gb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t gb_ie_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void gb_ie_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void gb_timer_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<lr35902_cpu_device> m_sgb_cpu;

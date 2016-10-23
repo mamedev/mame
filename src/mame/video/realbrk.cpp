@@ -25,7 +25,7 @@
 #include "includes/realbrk.h"
 
 
-WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
+void realbrk_state::realbrk_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -41,7 +41,7 @@ WRITE16_MEMBER(realbrk_state::realbrk_flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(realbrk_state::dai2kaku_flipscreen_w)
+void realbrk_state::dai2kaku_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_disable_video = 0;
 }
@@ -90,13 +90,13 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_1)
 			TILE_FLIPYX( attr >> 14 ));
 }
 
-WRITE16_MEMBER(realbrk_state::vram_0_w)
+void realbrk_state::vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(realbrk_state::vram_1_w)
+void realbrk_state::vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset/2);
@@ -125,7 +125,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
 			0);
 }
 
-WRITE16_MEMBER(realbrk_state::vram_2_w)
+void realbrk_state::vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_2[offset]);
 	m_tilemap_2->mark_tile_dirty(offset);
@@ -469,7 +469,7 @@ void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &
 
 ***************************************************************************/
 
-WRITE16_MEMBER(realbrk_state::vregs_w)
+void realbrk_state::vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t old_data = m_vregs[offset];
 	uint16_t new_data = COMBINE_DATA(&m_vregs[offset]);

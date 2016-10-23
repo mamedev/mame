@@ -61,41 +61,41 @@ void aim65_state::aim65_pia()
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_pia_a_w )
+void aim65_state::aim65_pia_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia_a = data;
 	aim65_pia();
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_pia_b_w )
+void aim65_state::aim65_pia_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia_b = data;
 	aim65_pia();
 }
 
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds1)
+void aim65_state::aim65_update_ds1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(0 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds2)
+void aim65_state::aim65_update_ds2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(4 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds3)
+void aim65_state::aim65_update_ds3(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(8 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds4)
+void aim65_state::aim65_update_ds4(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(12 + (offset ^ 3), data);
 }
 
-WRITE16_MEMBER( aim65_state::aim65_update_ds5)
+void aim65_state::aim65_update_ds5(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	output().set_digit_value(16 + (offset ^ 3), data);
 }
@@ -107,7 +107,7 @@ WRITE16_MEMBER( aim65_state::aim65_update_ds5)
 ******************************************************************************/
 
 
-READ8_MEMBER( aim65_state::aim65_riot_b_r )
+uint8_t aim65_state::aim65_riot_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] =
 	{
@@ -128,7 +128,7 @@ READ8_MEMBER( aim65_state::aim65_riot_b_r )
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
+void aim65_state::aim65_riot_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_riot_port_a = data;
 }
@@ -175,7 +175,7 @@ void aim65_state::machine_start()
  Cassette
 ******************************************************************************/
 
-WRITE8_MEMBER( aim65_state::aim65_pb_w )
+void aim65_state::aim65_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     d7 = cass out (both decks)
@@ -212,7 +212,7 @@ WRITE8_MEMBER( aim65_state::aim65_pb_w )
 }
 
 
-READ8_MEMBER( aim65_state::aim65_pb_r )
+uint8_t aim65_state::aim65_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     d7 = cassette in (deck 1)
@@ -347,7 +347,7 @@ TIMER_CALLBACK_MEMBER(aim65_state::aim65_printer_timer)
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_printer_on )
+void aim65_state::aim65_printer_on(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	if (!data)
@@ -365,7 +365,7 @@ WRITE8_MEMBER( aim65_state::aim65_printer_on )
 }
 
 
-WRITE8_MEMBER( aim65_state::aim65_pa_w )
+void aim65_state::aim65_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // All bits are for printer data (not emulated)
 	if (m_flag_a == 0)

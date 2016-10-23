@@ -201,49 +201,49 @@ public:
 	uint32_t m_old_key1;
 	uint32_t m_old_key2;
 	uint32_t m_old_key3;
-	DECLARE_WRITE8_MEMBER(pc6001_system_latch_w);
-	DECLARE_READ8_MEMBER(nec_ppi8255_r);
-	DECLARE_WRITE8_MEMBER(nec_ppi8255_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_bank_r0_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_bank_r1_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_bank_w0_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_opt_bank_w);
-	DECLARE_WRITE8_MEMBER(work_ram0_w);
-	DECLARE_WRITE8_MEMBER(work_ram1_w);
-	DECLARE_WRITE8_MEMBER(work_ram2_w);
-	DECLARE_WRITE8_MEMBER(work_ram3_w);
-	DECLARE_WRITE8_MEMBER(work_ram4_w);
-	DECLARE_WRITE8_MEMBER(work_ram5_w);
-	DECLARE_WRITE8_MEMBER(work_ram6_w);
-	DECLARE_WRITE8_MEMBER(work_ram7_w);
-	DECLARE_WRITE8_MEMBER(necmk2_ppi8255_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_system_latch_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_vram_bank_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_col_bank_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_0xf3_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_timer_adj_w);
-	DECLARE_WRITE8_MEMBER(pc6001m2_timer_irqv_w);
-	DECLARE_READ8_MEMBER(pc6001m2_bank_r0_r);
-	DECLARE_READ8_MEMBER(pc6001m2_bank_r1_r);
-	DECLARE_READ8_MEMBER(pc6001m2_bank_w0_r);
-	DECLARE_READ8_MEMBER(pc6601_fdc_r);
-	DECLARE_WRITE8_MEMBER(pc6601_fdc_w);
-	DECLARE_READ8_MEMBER(pc6001sr_bank_rn_r);
-	DECLARE_WRITE8_MEMBER(pc6001sr_bank_rn_w);
-	DECLARE_READ8_MEMBER(pc6001sr_bank_wn_r);
-	DECLARE_WRITE8_MEMBER(pc6001sr_bank_wn_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram0_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram1_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram2_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram3_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram4_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram5_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram6_w);
-	DECLARE_WRITE8_MEMBER(sr_work_ram7_w);
-	DECLARE_WRITE8_MEMBER(pc6001sr_mode_w);
-	DECLARE_WRITE8_MEMBER(pc6001sr_vram_bank_w);
-	DECLARE_WRITE8_MEMBER(pc6001sr_system_latch_w);
-	DECLARE_WRITE8_MEMBER(necsr_ppi8255_w);
+	void pc6001_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nec_ppi8255_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nec_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_bank_r0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_bank_r1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_bank_w0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_opt_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void work_ram7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void necmk2_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_col_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_0xf3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_timer_adj_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001m2_timer_irqv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc6001m2_bank_r0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc6001m2_bank_r1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc6001m2_bank_w0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pc6601_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc6601_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc6001sr_bank_rn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc6001sr_bank_rn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc6001sr_bank_wn_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc6001sr_bank_wn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr_work_ram7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001sr_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001sr_vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001sr_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void necsr_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -259,12 +259,12 @@ public:
 	TIMER_CALLBACK_MEMBER(audio_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_READ8_MEMBER(pc6001_8255_porta_r);
-	DECLARE_WRITE8_MEMBER(pc6001_8255_porta_w);
-	DECLARE_READ8_MEMBER(pc6001_8255_portb_r);
-	DECLARE_WRITE8_MEMBER(pc6001_8255_portb_w);
-	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
-	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
+	uint8_t pc6001_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc6001_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc6001_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pc6001_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pc6001_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pc6001_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -811,7 +811,7 @@ uint32_t pc6001_state::screen_update_pc6001sr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001_system_latch_w)
+void pc6001_state::pc6001_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint16_t startaddr[] = {0xC000, 0xE000, 0x8000, 0xA000 };
 
@@ -866,7 +866,7 @@ uint8_t pc6001_state::pc6001_get_char_rom(uint8_t ch, int line)
 #endif
 
 
-READ8_MEMBER(pc6001_state::nec_ppi8255_r)
+uint8_t pc6001_state::nec_ppi8255_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset==2)
 		return m_port_c_8255;
@@ -881,7 +881,7 @@ READ8_MEMBER(pc6001_state::nec_ppi8255_r)
 	return m_ppi->read(space, offset);
 }
 
-WRITE8_MEMBER(pc6001_state::nec_ppi8255_w)
+void pc6001_state::nec_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset==3)
 	{
@@ -1102,7 +1102,7 @@ static const uint32_t banksw_table_r1[0x10*4][4] = {
 	{ INVALID(0),   INVALID(0),     INVALID(0),     INVALID(0)  }   //0x0f: <invalid setting>
 };
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
+void pc6001_state::pc6001m2_bank_r0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	uint8_t *gfx_data = m_region_gfx1->base();
@@ -1122,7 +1122,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r0_w)
 		m_bank4->set_base(&gfx_data[m_cgrom_bank_addr]);
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r1_w)
+void pc6001_state::pc6001m2_bank_r1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 
@@ -1138,12 +1138,12 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_bank_r1_w)
 	m_bank8->set_base(&ROM[banksw_table_r1[((data & 0xf0)>>4)+(m_bank_opt*0x10)][3]]);
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_bank_w0_w)
+void pc6001_state::pc6001m2_bank_w0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_w = data;
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
+void pc6001_state::pc6001m2_opt_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	uint8_t *gfx_data = m_region_gfx1->base();
@@ -1171,56 +1171,56 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_opt_bank_w)
 
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram0_w)
+void pc6001_state::work_ram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(0) : EXWRAM(0))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram1_w)
+void pc6001_state::work_ram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x01) ? WRAM(1) : EXWRAM(1))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram2_w)
+void pc6001_state::work_ram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(2) : EXWRAM(2))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram3_w)
+void pc6001_state::work_ram3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x04) ? WRAM(3) : EXWRAM(3))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram4_w)
+void pc6001_state::work_ram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(4) : EXWRAM(4))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram5_w)
+void pc6001_state::work_ram5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x10) ? WRAM(5) : EXWRAM(5))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram6_w)
+void pc6001_state::work_ram6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(6) : EXWRAM(6))] = data;
 }
 
-WRITE8_MEMBER(pc6001_state::work_ram7_w)
+void pc6001_state::work_ram7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = m_region_maincpu->base();
 	ROM[offset+((m_bank_w & 0x40) ? WRAM(7) : EXWRAM(7))] = data;
 }
 
 
-WRITE8_MEMBER(pc6001_state::necmk2_ppi8255_w)
+void pc6001_state::necmk2_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset==3)
 	{
@@ -1287,7 +1287,7 @@ void pc6001_state::vram_bank_change(uint8_t vram_bank)
 	}
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_system_latch_w)
+void pc6001_state::pc6001m2_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((!(m_sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
@@ -1313,7 +1313,7 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_system_latch_w)
 }
 
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
+void pc6001_state::pc6001m2_vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//static const uint32_t startaddr[] = {WRAM(6), WRAM(6), WRAM(0), WRAM(4) };
 
@@ -1345,13 +1345,13 @@ WRITE8_MEMBER(pc6001_state::pc6001m2_vram_bank_w)
 //  m_video_ram = work_ram + startaddr[(data >> 1) & 0x03];
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_col_bank_w)
+void pc6001_state::pc6001m2_col_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgcol_bank = (data & 7);
 }
 
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_0xf3_w)
+void pc6001_state::pc6001m2_0xf3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	x--- ---- M1 (?) wait setting
@@ -1377,29 +1377,29 @@ TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
 }
 
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_timer_adj_w)
+void pc6001_state::pc6001m2_timer_adj_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_hz_div = data;
 	attotime period = attotime::from_hz((487.5*4)/(m_timer_hz_div+1));
 	m_timer_irq_timer->adjust(period,  0, period);
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001m2_timer_irqv_w)
+void pc6001_state::pc6001m2_timer_irqv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer_irq_vector = data;
 }
 
-READ8_MEMBER(pc6001_state::pc6001m2_bank_r0_r)
+uint8_t pc6001_state::pc6001m2_bank_r0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_r0;
 }
 
-READ8_MEMBER(pc6001_state::pc6001m2_bank_r1_r)
+uint8_t pc6001_state::pc6001m2_bank_r1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_r1;
 }
 
-READ8_MEMBER(pc6001_state::pc6001m2_bank_w0_r)
+uint8_t pc6001_state::pc6001m2_bank_w0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_w;
 }
@@ -1450,12 +1450,12 @@ static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8, pc6001_state )
 ADDRESS_MAP_END
 
 /* disk device placeholder (TODO: identify & hook-up this) */
-READ8_MEMBER(pc6001_state::pc6601_fdc_r)
+uint8_t pc6001_state::pc6601_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(pc6001_state::pc6601_fdc_w)
+void pc6001_state::pc6601_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -1514,12 +1514,12 @@ ADDRESS_MAP_END
 	0x70000+(0x1000*_v_)
 #define SR_NULL(_v_) \
 	0x80000+(0x1000*_v_)
-READ8_MEMBER(pc6001_state::pc6001sr_bank_rn_r)
+uint8_t pc6001_state::pc6001sr_bank_rn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sr_bank_r[offset];
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001sr_bank_rn_w)
+void pc6001_state::pc6001sr_bank_rn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	memory_bank *bank[8] = { m_bank1, m_bank2, m_bank3, m_bank4, m_bank5, m_bank6, m_bank7, m_bank8 };
 	uint8_t *ROM = m_region_maincpu->base();
@@ -1541,12 +1541,12 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_rn_w)
 	}
 }
 
-READ8_MEMBER(pc6001_state::pc6001sr_bank_wn_r)
+uint8_t pc6001_state::pc6001sr_bank_wn_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sr_bank_w[offset];
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001sr_bank_wn_w)
+void pc6001_state::pc6001sr_bank_wn_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sr_bank_w[offset] = data;
 }
@@ -1561,16 +1561,16 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_wn_w)
 	else \
 		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
 }
-WRITE8_MEMBER(pc6001_state::sr_work_ram0_w){ SR_WRAM_BANK_W(0); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram1_w){ SR_WRAM_BANK_W(1); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram2_w){ SR_WRAM_BANK_W(2); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram3_w){ SR_WRAM_BANK_W(3); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram4_w){ SR_WRAM_BANK_W(4); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram5_w){ SR_WRAM_BANK_W(5); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram6_w){ SR_WRAM_BANK_W(6); }
-WRITE8_MEMBER(pc6001_state::sr_work_ram7_w){ SR_WRAM_BANK_W(7); }
+void pc6001_state::sr_work_ram0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(0); }
+void pc6001_state::sr_work_ram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(1); }
+void pc6001_state::sr_work_ram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(2); }
+void pc6001_state::sr_work_ram3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(3); }
+void pc6001_state::sr_work_ram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(4); }
+void pc6001_state::sr_work_ram5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(5); }
+void pc6001_state::sr_work_ram6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(6); }
+void pc6001_state::sr_work_ram7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ SR_WRAM_BANK_W(7); }
 
-WRITE8_MEMBER(pc6001_state::pc6001sr_mode_w)
+void pc6001_state::pc6001sr_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sr_video_mode = data;
 
@@ -1578,14 +1578,14 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_mode_w)
 		assert("PC-6001SR in Mk-2 compatibility mode not yet supported!\n");
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001sr_vram_bank_w)
+void pc6001_state::pc6001sr_vram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *work_ram = m_region_maincpu->base();
 
 	m_video_ram = work_ram + 0x70000 + ((data & 0x0f)*0x1000);
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001sr_system_latch_w)
+void pc6001_state::pc6001sr_system_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((!(m_sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
@@ -1610,7 +1610,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_system_latch_w)
 	//printf("%02x B0\n",data);
 }
 
-WRITE8_MEMBER(pc6001_state::necsr_ppi8255_w)
+void pc6001_state::necsr_ppi8255_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset==3)
 	{
@@ -1866,33 +1866,33 @@ IRQ_CALLBACK_MEMBER(pc6001_state::pc6001_irq_callback)
 	return m_irq_vector;
 }
 
-READ8_MEMBER(pc6001_state::pc6001_8255_porta_r)
+uint8_t pc6001_state::pc6001_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001_8255_porta_w)
+void pc6001_state::pc6001_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if(data != 0x06)
 //      printf("pc6001_8255_porta_w %02x\n",data);
 }
 
-READ8_MEMBER(pc6001_state::pc6001_8255_portb_r)
+uint8_t pc6001_state::pc6001_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001_8255_portb_w)
+void pc6001_state::pc6001_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("pc6001_8255_portb_w %02x\n",data);
 }
 
-WRITE8_MEMBER(pc6001_state::pc6001_8255_portc_w)
+void pc6001_state::pc6001_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("pc6001_8255_portc_w %02x\n",data);
 }
 
-READ8_MEMBER(pc6001_state::pc6001_8255_portc_r)
+uint8_t pc6001_state::pc6001_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x88;
 }

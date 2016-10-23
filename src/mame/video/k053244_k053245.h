@@ -41,16 +41,16 @@ public:
 		dev.m_dy = y_offset;
 	}
 
-	DECLARE_READ16_MEMBER( k053245_word_r );
-	DECLARE_WRITE16_MEMBER( k053245_word_w );
-	DECLARE_READ8_MEMBER( k053245_r );
-	DECLARE_WRITE8_MEMBER( k053245_w );
-	DECLARE_READ8_MEMBER( k053244_r );
-	DECLARE_WRITE8_MEMBER( k053244_w );
-	DECLARE_READ16_MEMBER( k053244_lsb_r );
-	DECLARE_WRITE16_MEMBER( k053244_lsb_w );
-	DECLARE_READ16_MEMBER( k053244_word_r );
-	DECLARE_WRITE16_MEMBER( k053244_word_w );
+	uint16_t k053245_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void k053245_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t k053245_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k053245_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k053244_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k053244_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t k053244_lsb_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void k053244_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t k053244_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void k053244_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bankselect(int bank);    /* used by TMNT2, Asterix and Premier Soccer for ROM testing */
 	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void clear_buffer();

@@ -28,7 +28,7 @@ public:
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 
-	DECLARE_READ8_MEMBER(top_port14_r);
+	uint8_t top_port14_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void write_command(uint8_t data);
 	uint8_t m_command;

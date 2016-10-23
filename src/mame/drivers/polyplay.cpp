@@ -163,7 +163,7 @@ static INPUT_PORTS_START( polyplay )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(polyplay_state::polyplay_sound_channel)
+void polyplay_state::polyplay_sound_channel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset) {
 	case 0x00:
@@ -211,7 +211,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_sound_channel)
 	}
 }
 
-WRITE8_MEMBER(polyplay_state::polyplay_start_timer2)
+void polyplay_state::polyplay_start_timer2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0x03)
 		m_timer->reset();
@@ -220,7 +220,7 @@ WRITE8_MEMBER(polyplay_state::polyplay_start_timer2)
 		m_timer->adjust(attotime::from_hz(40), 0, attotime::from_hz(40));
 }
 
-READ8_MEMBER(polyplay_state::polyplay_random_read)
+uint8_t polyplay_state::polyplay_random_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand() & 0xff;
 }

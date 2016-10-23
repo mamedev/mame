@@ -7,7 +7,7 @@
 
 
 
-READ16_MEMBER( m68340cpu_device::m68340_internal_sim_r )
+uint16_t m68340cpu_device::m68340_internal_sim_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
@@ -57,7 +57,7 @@ READ16_MEMBER( m68340cpu_device::m68340_internal_sim_r )
 	return 0x0000;
 }
 
-READ8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_r )
+uint8_t m68340cpu_device::m68340_internal_sim_ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x10;
 	m68340cpu_device *m68k = this;
@@ -112,7 +112,7 @@ READ8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_r )
 	return 0x00;
 }
 
-READ32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_r )
+uint32_t m68340cpu_device::m68340_internal_sim_cs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset += m68340SIM_AM_CS0>>2;
 
@@ -144,7 +144,7 @@ READ32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_r )
 	return 0x00000000;
 }
 
-WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
+void m68340cpu_device::m68340_internal_sim_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m68340cpu_device *m68k = this;
 	m68340_sim* sim = m68k->m68340SIM;
@@ -202,7 +202,7 @@ WRITE16_MEMBER( m68340cpu_device::m68340_internal_sim_w )
 	}
 }
 
-WRITE8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_w )
+void m68340cpu_device::m68340_internal_sim_ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x10;
 	m68340cpu_device *m68k = this;
@@ -255,7 +255,7 @@ WRITE8_MEMBER( m68340cpu_device::m68340_internal_sim_ports_w )
 	}
 }
 
-WRITE32_MEMBER( m68340cpu_device::m68340_internal_sim_cs_w )
+void m68340cpu_device::m68340_internal_sim_cs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset += m68340SIM_AM_CS0>>2;
 	m68340cpu_device *m68k = this;

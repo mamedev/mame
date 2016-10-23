@@ -100,7 +100,7 @@ TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
 }
 
 
-READ8_MEMBER( namco_06xx_device::data_r )
+uint8_t namco_06xx_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -121,7 +121,7 @@ READ8_MEMBER( namco_06xx_device::data_r )
 }
 
 
-WRITE8_MEMBER( namco_06xx_device::data_w )
+void namco_06xx_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s: 06XX '%s' write offset %d = %02x\n",machine().describe_context(),tag(),offset,data));
 
@@ -137,13 +137,13 @@ WRITE8_MEMBER( namco_06xx_device::data_w )
 }
 
 
-READ8_MEMBER( namco_06xx_device::ctrl_r )
+uint8_t namco_06xx_device::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("%s: 06XX '%s' ctrl_r\n",machine().describe_context(),tag()));
 	return m_control;
 }
 
-WRITE8_MEMBER( namco_06xx_device::ctrl_w )
+void namco_06xx_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("%s: 06XX '%s' control %02x\n",space.machine().describe_context(),tag(),data));
 

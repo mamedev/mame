@@ -79,13 +79,13 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/funkybee.h"
 
 
-READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
+uint8_t funkybee_state::funkybee_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_watchdog->reset_r(space, 0);
 	return ioport("IN0")->read();
 }
 
-WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)
+void funkybee_state::funkybee_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }

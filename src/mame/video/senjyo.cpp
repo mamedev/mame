@@ -131,27 +131,27 @@ PALETTE_INIT_MEMBER( senjyo_state, radar )
 
 ***************************************************************************/
 
-WRITE8_MEMBER(senjyo_state::fgvideoram_w)
+void senjyo_state::fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::fgcolorram_w)
+void senjyo_state::fgcolorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg1videoram_w)
+void senjyo_state::bg1videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg2videoram_w)
+void senjyo_state::bg2videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_MEMBER(senjyo_state::bg3videoram_w)
+void senjyo_state::bg3videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg3videoram[offset] = data;
 	m_bg3_tilemap->mark_tile_dirty(offset);

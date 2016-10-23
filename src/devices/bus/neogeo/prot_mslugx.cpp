@@ -31,7 +31,7 @@ void mslugx_prot_device::device_reset()
   Also found is a QFP144 chip labeled with 0103 - function unknown
 ***************************************************************/
 
-WRITE16_MEMBER( mslugx_prot_device::protection_w )
+void mslugx_prot_device::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -59,7 +59,7 @@ WRITE16_MEMBER( mslugx_prot_device::protection_w )
 }
 
 
-READ16_MEMBER( mslugx_prot_device::protection_r )
+uint16_t mslugx_prot_device::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 

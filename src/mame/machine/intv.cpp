@@ -7,7 +7,7 @@
 
 
 
-WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
+void intv_state::intvkbd_dualport16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	unsigned char *RAM;
 
@@ -18,12 +18,12 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 	RAM[offset] = (uint8_t) (data >> 0);
 }
 
-READ8_MEMBER( intv_state::intvkbd_dualport8_lsb_r )
+uint8_t intv_state::intvkbd_dualport8_lsb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (uint8_t) (m_intvkbd_dualport_ram[offset] >> 0);
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
+void intv_state::intvkbd_dualport8_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	unsigned char *RAM;
 
@@ -37,7 +37,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 
 
 
-READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
+uint8_t intv_state::intvkbd_dualport8_msb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	unsigned char rv;
 
@@ -134,7 +134,7 @@ static const char *const tape_motor_mode_desc[8] =
 	"EJECT", "PLAY/RECORD", "REWIND", "FF"
 };
 
-WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
+void intv_state::intvkbd_dualport8_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	unsigned int mask;
 
@@ -245,7 +245,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 }
 
 
-READ16_MEMBER( intv_state::intv_stic_r )
+uint16_t intv_state::intv_stic_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		return m_stic->read(space, offset, mem_mask);
@@ -253,14 +253,14 @@ READ16_MEMBER( intv_state::intv_stic_r )
 		return offset;
 }
 
-WRITE16_MEMBER( intv_state::intv_stic_w )
+void intv_state::intv_stic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		m_stic->write(space, offset, data, mem_mask);
 }
 
 
-READ16_MEMBER( intv_state::intv_gram_r )
+uint16_t intv_state::intv_gram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("read: %d = GRAM(%d)\n",state->m_gram[offset],offset);
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
@@ -269,38 +269,38 @@ READ16_MEMBER( intv_state::intv_gram_r )
 		return offset;
 }
 
-WRITE16_MEMBER( intv_state::intv_gram_w )
+void intv_state::intv_gram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_bus_copy_mode || !m_stic->read_stic_handshake())
 		m_stic->gram_write(space, offset, data, mem_mask);
 }
 
-READ16_MEMBER( intv_state::intv_ram8_r )
+uint16_t intv_state::intv_ram8_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%x = ram8_r(%x)\n",state->m_ram8[offset],offset);
 	return (int)m_ram8[offset];
 }
 
-WRITE16_MEMBER( intv_state::intv_ram8_w )
+void intv_state::intv_ram8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("ram8_w(%x) = %x\n",offset,data);
 	m_ram8[offset] = data&0xff;
 }
 
-READ16_MEMBER( intv_state::intv_ram16_r )
+uint16_t intv_state::intv_ram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%x = ram16_r(%x)\n",state->m_ram16[offset],offset);
 	return (int)m_ram16[offset];
 }
 
-WRITE16_MEMBER( intv_state::intv_ram16_w )
+void intv_state::intv_ram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%g: WRITING TO GRAM offset = %d\n",machine.time(),offset);
 	//logerror("ram16_w(%x) = %x\n",offset,data);
 	m_ram16[offset] = data & 0xffff;
 }
 
-READ8_MEMBER( intv_state::intvkb_iocart_r )
+uint8_t intv_state::intvkb_iocart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_iocart1->exists())
 		return m_iocart1->read_rom(space, offset, mem_mask);

@@ -55,16 +55,16 @@ public:
 	uint8_t m_status;
 	uint8_t m_common;
 
-	DECLARE_WRITE8_MEMBER(drive_w);
-	DECLARE_WRITE8_MEMBER(video5_flip_w);
-	DECLARE_READ8_MEMBER(video5_flip_r);
-	DECLARE_WRITE8_MEMBER(screen_flip_w);
-	DECLARE_READ8_MEMBER(screen_flip_r);
-	DECLARE_READ8_MEMBER(meyc8088_input_r);
-	DECLARE_READ8_MEMBER(meyc8088_status_r);
-	DECLARE_WRITE8_MEMBER(meyc8088_lights1_w);
-	DECLARE_WRITE8_MEMBER(meyc8088_lights2_w);
-	DECLARE_WRITE8_MEMBER(meyc8088_common_w);
+	void drive_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video5_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t video5_flip_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void screen_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t screen_flip_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meyc8088_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t meyc8088_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void meyc8088_lights1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8088_lights2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void meyc8088_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT(meyc8088);
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -175,7 +175,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(meyc8088_state::heartbeat_callback)
 	m_status |= 0x20;
 }
 
-WRITE8_MEMBER(meyc8088_state::drive_w)
+void meyc8088_state::drive_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// drivers go into high-impedance state ~100ms after write (LS374 /OC)
 	m_status &= ~0x20;
@@ -186,25 +186,25 @@ WRITE8_MEMBER(meyc8088_state::drive_w)
 }
 
 // switch screen on/off on $b4000 access
-READ8_MEMBER(meyc8088_state::screen_flip_r)
+uint8_t meyc8088_state::screen_flip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_status ^= 2;
 	return 0;
 }
 
-WRITE8_MEMBER(meyc8088_state::screen_flip_w)
+void meyc8088_state::screen_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status ^= 2;
 }
 
 // switch video5 (color prom d4) on/off on $b5000 access
-READ8_MEMBER(meyc8088_state::video5_flip_r)
+uint8_t meyc8088_state::video5_flip_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_status ^= 4;
 	return 0;
 }
 
-WRITE8_MEMBER(meyc8088_state::video5_flip_w)
+void meyc8088_state::video5_flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status ^= 4;
 }
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( meyc8088_map, AS_PROGRAM, 8, meyc8088_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(meyc8088_state::meyc8088_input_r)
+uint8_t meyc8088_state::meyc8088_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -239,7 +239,7 @@ READ8_MEMBER(meyc8088_state::meyc8088_input_r)
 	return ret;
 }
 
-READ8_MEMBER(meyc8088_state::meyc8088_status_r)
+uint8_t meyc8088_state::meyc8088_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0: /CR2
 	// d1: screen on
@@ -251,21 +251,21 @@ READ8_MEMBER(meyc8088_state::meyc8088_status_r)
 }
 
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_lights1_w)
+void meyc8088_state::meyc8088_lights1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// lite 1-8
 	for (int i = 0; i < 8; i++)
 		output().set_lamp_value(i, ~data >> i & 1);
 }
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_lights2_w)
+void meyc8088_state::meyc8088_lights2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// lite 9-16
 	for (int i = 0; i < 8; i++)
 		output().set_lamp_value(i + 8, ~data >> i & 1);
 }
 
-WRITE8_MEMBER(meyc8088_state::meyc8088_common_w)
+void meyc8088_state::meyc8088_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: /CR2
 	m_status = (m_status & ~1) | (data & 1);

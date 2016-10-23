@@ -39,16 +39,16 @@ public:
 	tilemap_t *m_pant[2];
 	int m_dual_monitor;
 
-	DECLARE_READ16_MEMBER(dallas_kludge_r);
-	DECLARE_READ16_MEMBER(maniacsqa_prot_r);
+	uint16_t dallas_kludge_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t maniacsqa_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(gaelco2_coin_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_coin2_w);
-	DECLARE_WRITE16_MEMBER(touchgo_coin_w);
-	DECLARE_READ16_MEMBER(snowboar_protection_r);
-	DECLARE_WRITE16_MEMBER(snowboar_protection_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_vram_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_palette_w);
+	void gaelco2_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco2_coin2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void touchgo_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t snowboar_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void snowboar_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco2_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_touchgo();
 	void init_touchgop();
 	void init_snowboar();
@@ -63,9 +63,9 @@ public:
 	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gaelco2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_cs_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_sk_w);
-	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_data_w);
+	void gaelco2_eeprom_cs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco2_eeprom_sk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gaelco2_eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs);
 	uint32_t dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
@@ -90,11 +90,11 @@ public:
 
 	int m_clr_gun_int;
 
-	DECLARE_READ16_MEMBER(p1_gun_x);
-	DECLARE_READ16_MEMBER(p1_gun_y);
-	DECLARE_READ16_MEMBER(p2_gun_x);
-	DECLARE_READ16_MEMBER(p2_gun_y);
-	DECLARE_WRITE16_MEMBER(bang_clr_gun_int_w);
+	uint16_t p1_gun_x(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t p1_gun_y(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t p2_gun_x(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t p2_gun_y(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bang_clr_gun_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
 	void init_bang();
 };
@@ -114,8 +114,8 @@ public:
 
 	uint8_t m_analog_ports[2];
 
-	DECLARE_WRITE16_MEMBER(wrally2_coin_w);
-	DECLARE_WRITE16_MEMBER(wrally2_adc_clk);
-	DECLARE_WRITE16_MEMBER(wrally2_adc_cs);
+	void wrally2_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wrally2_adc_clk(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void wrally2_adc_cs(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
 };

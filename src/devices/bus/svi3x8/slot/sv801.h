@@ -31,8 +31,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
-	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
+	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
@@ -43,7 +43,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_WRITE8_MEMBER( motor_w );
+	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;

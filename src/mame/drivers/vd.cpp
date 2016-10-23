@@ -25,11 +25,11 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(dsw_r) { return 0; }
-	DECLARE_WRITE8_MEMBER(col_w);
-	DECLARE_WRITE8_MEMBER(disp_w);
-	DECLARE_WRITE8_MEMBER(lamp_w) { };
-	DECLARE_WRITE8_MEMBER(sol_w) { };
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0; }
+	void col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
+	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 protected:
 
@@ -117,14 +117,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 		m_t_c++;
 }
 
-WRITE8_MEMBER( vd_state::disp_w )
+void vd_state::disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	segment[offset] = data;
 	if (!offset)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER( vd_state::col_w )
+void vd_state::col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != 0x3f)
 	{

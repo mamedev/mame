@@ -33,13 +33,13 @@ public:
 
 	/* misc */
 	int        m_input_ports_hack;
-	DECLARE_WRITE8_MEMBER(yamyam_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gundealr_bg_videoram_w);
-	DECLARE_WRITE8_MEMBER(gundealr_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(gundealr_paletteram_w);
-	DECLARE_WRITE8_MEMBER(gundealr_fg_scroll_w);
-	DECLARE_WRITE8_MEMBER(yamyam_fg_scroll_w);
-	DECLARE_WRITE8_MEMBER(gundealr_flipscreen_w);
+	void yamyam_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gundealr_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gundealr_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gundealr_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gundealr_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void yamyam_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gundealr_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(gundealr_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

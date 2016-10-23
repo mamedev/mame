@@ -42,7 +42,7 @@ Stephh's notes (based on the game M6502 code and some tests) :
 #include "includes/konamipt.h"
 #include "includes/scotrsht.h"
 
-WRITE8_MEMBER(scotrsht_state::ctrl_w)
+void scotrsht_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 0x02;
 	flip_screen_set(data & 0x08);
@@ -54,7 +54,7 @@ INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-WRITE8_MEMBER(scotrsht_state::soundlatch_w)
+void scotrsht_state::soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

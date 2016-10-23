@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER( c1571_t::via0_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1571_t::via0_pa_r )
+uint8_t c1571_t::via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -204,7 +204,7 @@ READ8_MEMBER( c1571_t::via0_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1571_t::via0_pa_w )
+void c1571_t::via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -249,7 +249,7 @@ WRITE8_MEMBER( c1571_t::via0_pa_w )
 	update_iec();
 }
 
-WRITE8_MEMBER( c1571cr_t::via0_pa_w )
+void c1571cr_t::via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -286,7 +286,7 @@ WRITE8_MEMBER( c1571cr_t::via0_pa_w )
 	}
 }
 
-READ8_MEMBER( c1571_t::via0_pb_r )
+uint8_t c1571_t::via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -320,7 +320,7 @@ READ8_MEMBER( c1571_t::via0_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1571_t::via0_pb_w )
+void c1571_t::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -349,7 +349,7 @@ WRITE8_MEMBER( c1571_t::via0_pb_w )
 	update_iec();
 }
 
-WRITE8_MEMBER( c1571cr_t::via0_pb_w )
+void c1571cr_t::via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -379,7 +379,7 @@ WRITE8_MEMBER( c1571cr_t::via0_pb_w )
 }
 
 
-READ8_MEMBER( c1571_t::via1_r )
+uint8_t c1571_t::via1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_via1->read(space, offset);
 
@@ -389,7 +389,7 @@ READ8_MEMBER( c1571_t::via1_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1571_t::via1_w )
+void c1571_t::via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_via1->write(space, offset, data);
 
@@ -404,7 +404,7 @@ WRITE_LINE_MEMBER( c1571_t::via1_irq_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER( c1571_t::via1_pb_r )
+uint8_t c1571_t::via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -432,7 +432,7 @@ READ8_MEMBER( c1571_t::via1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( c1571_t::via1_pb_w )
+void c1571_t::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -496,12 +496,12 @@ WRITE_LINE_MEMBER( c1571_t::cia_sp_w )
 	update_iec();
 }
 
-READ8_MEMBER( c1571_t::cia_pb_r )
+uint8_t c1571_t::cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_parallel_data;
 }
 
-WRITE8_MEMBER( c1571_t::cia_pb_w )
+void c1571_t::cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_other != nullptr)
 	{
@@ -514,19 +514,19 @@ WRITE8_MEMBER( c1571_t::cia_pb_w )
 //  MOS6526_INTERFACE( mini_chief_cia_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( mini_chief_t::cia_pa_r )
+uint8_t mini_chief_t::cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO read from ISA bus @ 0x320 | A2 A1 A0
 
 	return 0;
 }
 
-WRITE8_MEMBER( mini_chief_t::cia_pa_w )
+void mini_chief_t::cia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO write to ISA bus @ 0x320 | A2 A1 A0
 }
 
-WRITE8_MEMBER( mini_chief_t::cia_pb_w )
+void mini_chief_t::cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

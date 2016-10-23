@@ -80,7 +80,7 @@ void msx_slot_fs4600_device::restore_banks()
 }
 
 
-READ8_MEMBER(msx_slot_fs4600_device::read)
+uint8_t msx_slot_fs4600_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_control & 0x02) && ((offset & 0x3fff) == 0x3ffd))
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(msx_slot_fs4600_device::read)
 }
 
 
-WRITE8_MEMBER(msx_slot_fs4600_device::write)
+void msx_slot_fs4600_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x7ff9)
 	{

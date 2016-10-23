@@ -114,7 +114,7 @@ void lastduel_state::video_start_madgear()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
+void lastduel_state::lastduel_flip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -127,7 +127,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 	}
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
+void lastduel_state::lastduel_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 	switch (offset)
@@ -143,37 +143,37 @@ WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll1_w)
+void lastduel_state::lastduel_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_scroll2_w)
+void lastduel_state::lastduel_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
+void lastduel_state::lastduel_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(lastduel_state::madgear_scroll1_w)
+void lastduel_state::madgear_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(lastduel_state::madgear_scroll2_w)
+void lastduel_state::madgear_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
+void lastduel_state::lastduel_palette_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int red, green, blue, bright;
 	data = COMBINE_DATA(&m_paletteram[offset]);

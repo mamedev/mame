@@ -55,12 +55,12 @@ static ADDRESS_MAP_START( mb_vcu_pal_ram, AS_1, 8, mb_vcu_device )
 	AM_RANGE(0x0600, 0x06ff) AM_READWRITE(mb_vcu_paletteram_r,mb_vcu_paletteram_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER( mb_vcu_device::mb_vcu_paletteram_r )
+uint8_t mb_vcu_device::mb_vcu_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palram[offset];
 }
 
-WRITE8_MEMBER( mb_vcu_device::mb_vcu_paletteram_w )
+void mb_vcu_device::mb_vcu_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b, bit0, bit1, bit2;
 
@@ -232,23 +232,23 @@ void mb_vcu_device::device_reset()
 //**************************************************************************
 //  uint8_t *pcg = memregion("sub2")->base();
 
-READ8_MEMBER( mb_vcu_device::read_ram )
+uint8_t mb_vcu_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( mb_vcu_device::write_ram )
+void mb_vcu_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 }
 
-WRITE8_MEMBER( mb_vcu_device::write_vregs )
+void mb_vcu_device::write_vregs(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vregs[offset] = data;
 }
 
 /* latches RAM offset to send to params */
-READ8_MEMBER( mb_vcu_device::load_params )
+uint8_t mb_vcu_device::load_params(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_param_offset_latch = offset;
 
@@ -276,7 +276,7 @@ READ8_MEMBER( mb_vcu_device::load_params )
 	return 0; // open bus?
 }
 
-READ8_MEMBER( mb_vcu_device::load_gfx )
+uint8_t mb_vcu_device::load_gfx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int xi,yi;
 	int dstx,dsty;
@@ -382,7 +382,7 @@ READ8_MEMBER( mb_vcu_device::load_gfx )
 ---0 -011 (0x03) read to i/o?
 ---1 -011 (0x13) read to vram?
 */
-READ8_MEMBER( mb_vcu_device::load_set_clr )
+uint8_t mb_vcu_device::load_set_clr(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int xi,yi;
 	int dstx,dsty;
@@ -454,7 +454,7 @@ READ8_MEMBER( mb_vcu_device::load_set_clr )
 	return 0; // open bus?
 }
 
-WRITE8_MEMBER( mb_vcu_device::background_color_w )
+void mb_vcu_device::background_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit0,bit1,bit2;
 	int r,g,b;
@@ -480,7 +480,7 @@ WRITE8_MEMBER( mb_vcu_device::background_color_w )
 	m_palette->set_pen_color(0x100, rgb_t(r, g, b));
 }
 
-READ8_MEMBER( mb_vcu_device::status_r )
+uint8_t mb_vcu_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	---- ---x busy or vblank flag
@@ -488,7 +488,7 @@ READ8_MEMBER( mb_vcu_device::status_r )
 	return m_status;
 }
 
-WRITE8_MEMBER( mb_vcu_device::vbank_w )
+void mb_vcu_device::vbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vbank = (data & 0x40) >> 6;
 }

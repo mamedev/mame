@@ -78,11 +78,11 @@ public:
 		m_color(0x00)
 	{}
 
-	DECLARE_READ8_MEMBER(vblank_r);
-	DECLARE_WRITE8_MEMBER(ball_x_w);
-	DECLARE_WRITE8_MEMBER(ball_y_w);
-	DECLARE_WRITE8_MEMBER(color_w);
-	DECLARE_WRITE8_MEMBER(audio_w);
+	uint8_t vblank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ball_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ball_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -167,7 +167,7 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER( mmagic_state::vblank_r )
+uint8_t mmagic_state::vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -180,17 +180,17 @@ READ8_MEMBER( mmagic_state::vblank_r )
 	return data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_x_w )
+void mmagic_state::ball_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ball_x = data;
 }
 
-WRITE8_MEMBER( mmagic_state::ball_y_w )
+void mmagic_state::ball_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ball_y = data;
 }
 
-WRITE8_MEMBER( mmagic_state::color_w )
+void mmagic_state::color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 3 is always set
 	// bit 6 switches the palette (actually there is only a single differently colored tile)
@@ -244,7 +244,7 @@ uint32_t mmagic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  AUDIO EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER( mmagic_state::audio_w )
+void mmagic_state::audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_AUDIO)
 		logerror("audio_w: %02x\n", data);

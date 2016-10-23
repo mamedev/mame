@@ -107,19 +107,19 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER(hack_coin1_r);
-	DECLARE_READ8_MEMBER(hack_coin2_r);
-	DECLARE_READ8_MEMBER(hack_908_r);
-	DECLARE_READ8_MEMBER(mc6845_r);
-	DECLARE_WRITE8_MEMBER(mc6845_w);
-	DECLARE_WRITE8_MEMBER(output_a_w);
-	DECLARE_WRITE8_MEMBER(output_b_w);
-	DECLARE_WRITE8_MEMBER(output_c_w);
-	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(lpt_r);
-	DECLARE_WRITE8_MEMBER(lpt_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
+	uint8_t hack_coin1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hack_coin2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hack_908_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mc6845_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lpt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lpt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 
@@ -177,19 +177,19 @@ void amusco_state::machine_start()
 *  Read / Write Handlers  *
 **************************/
 
-READ8_MEMBER(amusco_state::hack_coin1_r)
+uint8_t amusco_state::hack_coin1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// actually set by IRQ4
 	return BIT(ioport("IN2")->read(), 1) ? 1 : 0;
 }
 
-READ8_MEMBER(amusco_state::hack_coin2_r)
+uint8_t amusco_state::hack_coin2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// actually set by IRQ4
 	return BIT(ioport("IN2")->read(), 2) ? 1 : 0;
 }
 
-READ8_MEMBER(amusco_state::hack_908_r)
+uint8_t amusco_state::hack_908_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// IRQ4 and other routines wait for bits of this to be set by IRQ2
 	return 0xff;
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-READ8_MEMBER( amusco_state::mc6845_r)
+uint8_t amusco_state::mc6845_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset & 1)
 		return m_crtc->register_r(space, 0);
@@ -216,7 +216,7 @@ READ8_MEMBER( amusco_state::mc6845_r)
 	return m_crtc->status_r(space,0); // not a plain 6845, requests update bit here ...
 }
 
-WRITE8_MEMBER( amusco_state::mc6845_w)
+void amusco_state::mc6845_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset & 1)
 	{
@@ -233,29 +233,29 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::output_a_w)
+void amusco_state::output_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("Writing %02Xh to PPI output A\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_b_w)
+void amusco_state::output_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("Writing %02Xh to PPI output B\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::output_c_w)
+void amusco_state::output_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("Writing %02Xh to PPI output C\n", data);
 }
 
-WRITE8_MEMBER(amusco_state::vram_w)
+void amusco_state::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[m_video_update_address * 2 + offset] = data;
 	m_bg_tilemap->mark_tile_dirty(m_video_update_address);
 //  printf("%04x %04x\n",m_video_update_address,data);
 }
 
-READ8_MEMBER(amusco_state::lpt_r)
+uint8_t amusco_state::lpt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -272,12 +272,12 @@ READ8_MEMBER(amusco_state::lpt_r)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::lpt_w)
+void amusco_state::lpt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Writing %02Xh to printer port 28%dh\n", data, offset);
 }
 
-READ8_MEMBER(amusco_state::rtc_r)
+uint8_t amusco_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -290,7 +290,7 @@ READ8_MEMBER(amusco_state::rtc_r)
 	}
 }
 
-WRITE8_MEMBER(amusco_state::rtc_w)
+void amusco_state::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

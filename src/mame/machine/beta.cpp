@@ -68,7 +68,7 @@ void beta_disk_device::disable()
 	m_betadisk_active = 0;
 }
 
-READ8_MEMBER(beta_disk_device::status_r)
+uint8_t beta_disk_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->status_r(space, 0);
@@ -77,7 +77,7 @@ READ8_MEMBER(beta_disk_device::status_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::track_r)
+uint8_t beta_disk_device::track_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->track_r(space, 0);
@@ -86,7 +86,7 @@ READ8_MEMBER(beta_disk_device::track_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::sector_r)
+uint8_t beta_disk_device::sector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->sector_r(space, 0);
@@ -95,7 +95,7 @@ READ8_MEMBER(beta_disk_device::sector_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::data_r)
+uint8_t beta_disk_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		return m_wd179x->data_r(space, 0);
@@ -104,7 +104,7 @@ READ8_MEMBER(beta_disk_device::data_r)
 	}
 }
 
-READ8_MEMBER(beta_disk_device::state_r)
+uint8_t beta_disk_device::state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		uint8_t result = 0x3F;        // actually open bus
@@ -116,7 +116,7 @@ READ8_MEMBER(beta_disk_device::state_r)
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::param_w)
+void beta_disk_device::param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_betadisk_active == 1)
 	{
@@ -142,28 +142,28 @@ WRITE8_MEMBER(beta_disk_device::param_w)
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::command_w)
+void beta_disk_device::command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->cmd_w(space, 0, data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::track_w)
+void beta_disk_device::track_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->track_w(space, 0, data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::sector_w)
+void beta_disk_device::sector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->sector_w(space, 0, data);
 	}
 }
 
-WRITE8_MEMBER(beta_disk_device::data_w)
+void beta_disk_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_betadisk_active==1) {
 		m_wd179x->data_w(space, 0, data);

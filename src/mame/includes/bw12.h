@@ -83,9 +83,9 @@ public:
 	void set_floppy_motor_off_timer();
 	void ls259_w(int address, int data);
 
-	DECLARE_READ8_MEMBER( ls259_r );
-	DECLARE_WRITE8_MEMBER( ls259_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
+	uint8_t ls259_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
 	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );

@@ -141,7 +141,7 @@ public:
 	WRITE_LINE_MEMBER( floppy_ds1_w );
 	WRITE_LINE_MEMBER( floppy_ds2_w );
 	WRITE_LINE_MEMBER( floppy_ds3_w );
-	WRITE8_MEMBER( floppy_ds_w );
+	void floppy_ds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	WRITE_LINE_MEMBER( floppy_mon_w );
 	WRITE_LINE_MEMBER( floppy_drtn_w );
 	WRITE_LINE_MEMBER( floppy_wtd_w );

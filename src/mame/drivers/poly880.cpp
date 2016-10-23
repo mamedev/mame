@@ -53,7 +53,7 @@ void poly880_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( poly880_state::cldig_w )
+void poly880_state::cldig_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data;
 
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 
 /* Z80-PIO Interface */
 
-WRITE8_MEMBER( poly880_state::pio1_pa_w )
+void poly880_state::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER( poly880_state::pio1_pa_w )
 	update_display();
 }
 
-READ8_MEMBER( poly880_state::pio1_pb_r )
+uint8_t poly880_state::pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -197,7 +197,7 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( poly880_state::pio1_pb_w )
+void poly880_state::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

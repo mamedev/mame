@@ -34,10 +34,10 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_videoram2_w);
-	DECLARE_WRITE16_MEMBER(mugsmash_reg_w);
+	void mugsmash_reg2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mugsmash_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mugsmash_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mugsmash_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
 	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
 	virtual void machine_start() override;

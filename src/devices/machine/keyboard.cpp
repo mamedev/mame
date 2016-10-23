@@ -16,7 +16,7 @@ In MACHINE_CONFIG
 
 In the code:
 
-WRITE8_MEMBER( xxx_state::kbd_put )
+void xxx_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     (code to capture the key as it is pressed)
     (if your machine uses function keys, add your conversion code here)

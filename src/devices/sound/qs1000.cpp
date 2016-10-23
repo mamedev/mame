@@ -291,7 +291,7 @@ void qs1000_device::set_irq(int state)
 //  data_to_i8052 - called by the 8052 core to
 //  receive serial data
 //-------------------------------------------------
-READ8_MEMBER(qs1000_device::data_to_i8052)
+uint8_t qs1000_device::data_to_i8052(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_serial_data_in;
 }
@@ -321,7 +321,7 @@ void qs1000_device::device_timer(emu_timer &timer, device_timer_id id, int param
 //-------------------------------------------------
 //  p0_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p0_r )
+uint8_t qs1000_device::p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -330,7 +330,7 @@ READ8_MEMBER( qs1000_device::p0_r )
 //-------------------------------------------------
 //  p1_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p1_r )
+uint8_t qs1000_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_in_p1_cb(0);
 }
@@ -339,7 +339,7 @@ READ8_MEMBER( qs1000_device::p1_r )
 //-------------------------------------------------
 //  p2_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p2_r )
+uint8_t qs1000_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_in_p2_cb(0);
 }
@@ -348,7 +348,7 @@ READ8_MEMBER( qs1000_device::p2_r )
 //-------------------------------------------------
 //  p3_r
 //-------------------------------------------------
-READ8_MEMBER( qs1000_device::p3_r )
+uint8_t qs1000_device::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_in_p3_cb(0);
 }
@@ -357,7 +357,7 @@ READ8_MEMBER( qs1000_device::p3_r )
 //-------------------------------------------------
 //  p0_w
 //-------------------------------------------------
-WRITE8_MEMBER( qs1000_device::p0_w )
+void qs1000_device::p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER( qs1000_device::p0_w )
 //  p1_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p1_w )
+void qs1000_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_p1_cb((offs_t)0, data);
 }
@@ -376,7 +376,7 @@ WRITE8_MEMBER( qs1000_device::p1_w )
 //  p2_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p2_w )
+void qs1000_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_p2_cb((offs_t)0, data);
 }
@@ -386,7 +386,7 @@ WRITE8_MEMBER( qs1000_device::p2_w )
 //  p3_w
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::p3_w )
+void qs1000_device::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_p3_cb((offs_t)0, data);
 }
@@ -396,7 +396,7 @@ WRITE8_MEMBER( qs1000_device::p3_w )
 //  wave_w - process writes to wavetable engine
 //-------------------------------------------------
 
-WRITE8_MEMBER( qs1000_device::wave_w )
+void qs1000_device::wave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 

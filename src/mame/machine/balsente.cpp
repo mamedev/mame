@@ -236,13 +236,13 @@ CEM3394_EXT_INPUT(balsente_state::noise_gen_5) { noise_gen_chip(5, count, buffer
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_random_reset_w)
+void balsente_state::balsente_random_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset random number generator */
 }
 
 
-READ8_MEMBER(balsente_state::balsente_random_num_r)
+uint8_t balsente_state::balsente_random_num_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t cc;
 
@@ -262,7 +262,7 @@ READ8_MEMBER(balsente_state::balsente_random_num_r)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_rombank_select_w)
+void balsente_state::balsente_rombank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the bank number comes from bits 4-6 */
 	membank("bank1")->set_entry((data >> 4) & 7);
@@ -270,7 +270,7 @@ WRITE8_MEMBER(balsente_state::balsente_rombank_select_w)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
+void balsente_state::balsente_rombank2_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Night Stocker and Name that Tune only so far.... */
 	int bank = data & 7;
@@ -301,7 +301,7 @@ WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_misc_output_w)
+void balsente_state::balsente_misc_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = (offset / 4) % 8;
 	data >>= 7;
@@ -418,7 +418,7 @@ void balsente_state::m6850_update_io()
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::balsente_m6850_r)
+uint8_t balsente_state::balsente_m6850_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result;
 
@@ -463,7 +463,7 @@ TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_m6850_w)
+void balsente_state::balsente_m6850_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* control register is at offset 0 */
 	if (offset == 0)
@@ -487,7 +487,7 @@ WRITE8_MEMBER(balsente_state::balsente_m6850_w)
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::balsente_m6850_sound_r)
+uint8_t balsente_state::balsente_m6850_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result;
 
@@ -511,7 +511,7 @@ READ8_MEMBER(balsente_state::balsente_m6850_sound_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_m6850_sound_w)
+void balsente_state::balsente_m6850_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* control register is at offset 0 */
 	if (offset == 0)
@@ -584,14 +584,14 @@ TIMER_CALLBACK_MEMBER(balsente_state::adc_finished)
 }
 
 
-READ8_MEMBER(balsente_state::balsente_adc_data_r)
+uint8_t balsente_state::balsente_adc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* just return the last value read */
 	return m_adc_value;
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_adc_select_w)
+void balsente_state::balsente_adc_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* set a timer to go off and read the value after 50us */
 	/* it's important that we do this for Mini Golf */
@@ -599,13 +599,13 @@ WRITE8_MEMBER(balsente_state::balsente_adc_select_w)
 	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(balsente_state::adc_finished),this), offset & 7);
 }
 
-READ8_MEMBER(balsente_state::teamht_extra_r)
+uint8_t balsente_state::teamht_extra_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_teamht_input;
 }
 
 
-WRITE8_MEMBER(balsente_state::teamht_multiplex_select_w)
+void balsente_state::teamht_multiplex_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("multiplex_select %d\n", offset & 7);
 	switch (offset & 7)
@@ -749,7 +749,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_counter_callback)
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::balsente_counter_8253_r)
+uint8_t balsente_state::balsente_counter_8253_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int which;
 
@@ -782,7 +782,7 @@ READ8_MEMBER(balsente_state::balsente_counter_8253_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_counter_8253_w)
+void balsente_state::balsente_counter_8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int which;
 
@@ -926,7 +926,7 @@ void balsente_state::update_counter_0_timer()
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::balsente_counter_state_r)
+uint8_t balsente_state::balsente_counter_state_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* bit D0 is the inverse of the flip-flop state */
 	int result = !m_counter_0_ff;
@@ -938,7 +938,7 @@ READ8_MEMBER(balsente_state::balsente_counter_state_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
+void balsente_state::balsente_counter_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t diff_counter_control = m_counter_control ^ data;
 
@@ -985,7 +985,7 @@ WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
+void balsente_state::balsente_chip_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t register_map[8] =
 	{
@@ -1048,7 +1048,7 @@ WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 
 
 
-WRITE8_MEMBER(balsente_state::balsente_dac_data_w)
+void balsente_state::balsente_dac_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* LSB or MSB? */
 	if (offset & 1)
@@ -1066,7 +1066,7 @@ WRITE8_MEMBER(balsente_state::balsente_dac_data_w)
 }
 
 
-WRITE8_MEMBER(balsente_state::balsente_register_addr_w)
+void balsente_state::balsente_register_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac_register = data & 7;
 }
@@ -1085,7 +1085,7 @@ CUSTOM_INPUT_MEMBER(balsente_state::nstocker_bits_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::spiker_expand_w)
+void balsente_state::spiker_expand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* offset 0 is the bit pattern */
 	if (offset == 0)
@@ -1100,7 +1100,7 @@ WRITE8_MEMBER(balsente_state::spiker_expand_w)
 		m_spiker_expand_color = data;
 }
 
-READ8_MEMBER(balsente_state::spiker_expand_r)
+uint8_t balsente_state::spiker_expand_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t left, right;
 
@@ -1160,7 +1160,7 @@ void balsente_state::update_grudge_steering()
 }
 
 
-READ8_MEMBER(balsente_state::grudge_steering_r)
+uint8_t balsente_state::grudge_steering_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("%04X:grudge_steering_r(@%d)\n", space.device().safe_pc(), m_screen->vpos());
 	m_grudge_steering_result |= 0x80;
@@ -1175,7 +1175,7 @@ READ8_MEMBER(balsente_state::grudge_steering_r)
  *
  *************************************/
 
-READ8_MEMBER(balsente_state::shrike_shared_6809_r)
+uint8_t balsente_state::shrike_shared_6809_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 
@@ -1189,7 +1189,7 @@ READ8_MEMBER(balsente_state::shrike_shared_6809_r)
 }
 
 
-WRITE8_MEMBER(balsente_state::shrike_shared_6809_w)
+void balsente_state::shrike_shared_6809_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 	m_shrike_shared[offset >> 1] = ( m_shrike_shared[offset >> 1] & mem_mask_int ) | ( data << ( mem_mask_int & 0x8 ) );
@@ -1197,12 +1197,12 @@ WRITE8_MEMBER(balsente_state::shrike_shared_6809_w)
 
 // uses movep, so writes even 8 bit addresses to odd 16 bit addresses, reads as 16 bit from odd addresses
 // i.e. write 0xdeadbeef to 10000, read 0xde from 10001, 0xad from 10003, 0xbe from 10005...
-WRITE16_MEMBER(balsente_state::shrike_io_68k_w)
+void balsente_state::shrike_io_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_shrike_io[offset] );
 }
 
-READ16_MEMBER(balsente_state::shrike_io_68k_r)
+uint16_t balsente_state::shrike_io_68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ( m_shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }

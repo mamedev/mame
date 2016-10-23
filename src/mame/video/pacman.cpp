@@ -183,19 +183,19 @@ void pacman_state::video_start_birdiy()
 	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour
 }
 
-WRITE8_MEMBER(pacman_state::pacman_videoram_w)
+void pacman_state::pacman_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_colorram_w)
+void pacman_state::pacman_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset );
 }
 
-WRITE8_MEMBER(pacman_state::pacman_flipscreen_w)
+void pacman_state::pacman_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data & 1;
 	m_bg_tilemap->set_flip(m_flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
@@ -325,7 +325,7 @@ void pacman_state::video_start_pengo()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(pacman_state::pacman_get_tile_info),this), tilemap_mapper_delegate(FUNC(pacman_state::pacman_scan_rows),this),  8, 8, 36, 28 );
 }
 
-WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
+void pacman_state::pengo_palettebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palettebank != data)
 	{
@@ -334,7 +334,7 @@ WRITE8_MEMBER(pacman_state::pengo_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
+void pacman_state::pengo_colortablebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_colortablebank != data)
 	{
@@ -343,7 +343,7 @@ WRITE8_MEMBER(pacman_state::pengo_colortablebank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::pengo_gfxbank_w)
+void pacman_state::pengo_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 1))
 	{
@@ -439,13 +439,13 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 	return 0;
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_videoram_w)
+void pacman_state::s2650games_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
+void pacman_state::s2650games_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	m_colorram[offset & 0x1f] = data;
@@ -453,12 +453,12 @@ WRITE8_MEMBER(pacman_state::s2650games_colorram_w)
 		m_bg_tilemap->mark_tile_dirty(i);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_scroll_w)
+void pacman_state::s2650games_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-WRITE8_MEMBER(pacman_state::s2650games_tilesbank_w)
+void pacman_state::s2650games_tilesbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s2650games_tileram[offset] = data;
 	m_bg_tilemap->mark_all_dirty();
@@ -559,13 +559,13 @@ void pacman_state::video_start_jrpacman()
 	m_bg_tilemap->set_scroll_cols(36 );
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)
+void pacman_state::jrpacman_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	jrpacman_mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)
+void pacman_state::jrpacman_charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_charbank != (data & 1))
 	{
@@ -574,12 +574,12 @@ WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_spritebank_w)
+void pacman_state::jrpacman_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = (data & 1);
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
+void pacman_state::jrpacman_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 	for( i = 2; i < 34; i++ )
@@ -588,7 +588,7 @@ WRITE8_MEMBER(pacman_state::jrpacman_scroll_w)
 	}
 }
 
-WRITE8_MEMBER(pacman_state::jrpacman_bgpriority_w)
+void pacman_state::jrpacman_bgpriority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgpriority = (data & 1);
 }

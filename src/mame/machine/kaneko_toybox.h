@@ -340,11 +340,11 @@ public:
 	static void set_table(device_t &device, int tabletype);
 	static void set_game_type(device_t &device, int gametype);
 
-	DECLARE_WRITE16_MEMBER(mcu_com0_w);
-	DECLARE_WRITE16_MEMBER(mcu_com1_w);
-	DECLARE_WRITE16_MEMBER(mcu_com2_w);
-	DECLARE_WRITE16_MEMBER(mcu_com3_w);
-	DECLARE_READ16_MEMBER(mcu_status_r);
+	void mcu_com0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_com3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mcu_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	virtual void device_start() override;

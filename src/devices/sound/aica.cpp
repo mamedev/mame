@@ -1439,12 +1439,12 @@ void aica_device::set_ram_base(void *base, int size)
 	m_DSP.AICARAM_LENGTH = size;
 }
 
-READ16_MEMBER( aica_device::read )
+uint16_t aica_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return r16(space,offset*2);
 }
 
-WRITE16_MEMBER( aica_device::write )
+void aica_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t tmp;
 
@@ -1453,13 +1453,13 @@ WRITE16_MEMBER( aica_device::write )
 	w16(space, offset*2, tmp);
 }
 
-WRITE16_MEMBER( aica_device::midi_in )
+void aica_device::midi_in(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_MidiStack[m_MidiW++]=data;
 	m_MidiW &= 15;
 }
 
-READ16_MEMBER( aica_device::midi_out_r )
+uint16_t aica_device::midi_out_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	unsigned char val;
 

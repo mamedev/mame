@@ -15,7 +15,7 @@ Ping Pong (c) 1985 Konami
 
 
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
+void pingpong_state::cashquiz_question_bank_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( data != 0xff )
 	{
@@ -32,7 +32,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
 	}
 }
 
-WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
+void pingpong_state::cashquiz_question_bank_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data >= 0x60 && data <= 0xdf)
 	{
@@ -46,7 +46,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 }
 
 
-WRITE8_MEMBER(pingpong_state::coin_w)
+void pingpong_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 2 = irq enable, bit 3 = nmi enable */
 	m_intenable = data & 0x0c;

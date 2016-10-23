@@ -87,8 +87,8 @@ private:
 	void tape_status_set(uint16_t value);
 
 	// device register I/O
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void check_tape();
 

@@ -52,17 +52,17 @@ CPU/Video Board Parts:
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
+void sbasketb_state::sbasketb_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(sbasketb_state::sbasketb_coin_counter_w)
+void sbasketb_state::sbasketb_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
 
-WRITE8_MEMBER(sbasketb_state::irq_mask_w)
+void sbasketb_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 }

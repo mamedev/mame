@@ -306,7 +306,7 @@ space. This mapper uses 32KB sized banks.
 #define SGB_FRAMES_PER_SECOND   61.17
 
 
-READ8_MEMBER(gb_state::gb_cart_r)
+uint8_t gb_state::gb_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bios_disable && m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -336,7 +336,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 	}
 }
 
-READ8_MEMBER(gb_state::gbc_cart_r)
+uint8_t gb_state::gbc_cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bios_disable && m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -371,13 +371,13 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 	}
 }
 
-WRITE8_MEMBER(gb_state::gb_bank_w)
+void gb_state::gb_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_bank(space, offset, data);
 }
 
-READ8_MEMBER(gb_state::gb_ram_r)
+uint8_t gb_state::gb_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		return m_cartslot->read_ram(space, offset);
@@ -385,23 +385,23 @@ READ8_MEMBER(gb_state::gb_ram_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(gb_state::gb_ram_w)
+void gb_state::gb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_ram(space, offset, data);
 }
 
-READ8_MEMBER(gb_state::gb_echo_r)
+uint8_t gb_state::gb_echo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return space.read_byte(0xc000 + offset);
 }
 
-WRITE8_MEMBER(gb_state::gb_echo_w)
+void gb_state::gb_echo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return space.write_byte(0xc000 + offset, data);
 }
 
-READ8_MEMBER(megaduck_state::cart_r)
+uint8_t megaduck_state::cart_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		return m_cartslot->read_rom(space, offset);
@@ -409,13 +409,13 @@ READ8_MEMBER(megaduck_state::cart_r)
 		return 0xff;
 }
 
-WRITE8_MEMBER(megaduck_state::bank1_w)
+void megaduck_state::bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_bank(space, offset, data);
 }
 
-WRITE8_MEMBER(megaduck_state::bank2_w)
+void megaduck_state::bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cartslot)
 		m_cartslot->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */

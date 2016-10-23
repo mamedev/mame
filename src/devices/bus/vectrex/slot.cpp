@@ -237,7 +237,7 @@ std::string vectrex_cart_slot_device::get_default_card_software()
  read_rom
  -------------------------------------------------*/
 
-READ8_MEMBER(vectrex_cart_slot_device::read_rom)
+uint8_t vectrex_cart_slot_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset);
@@ -249,7 +249,7 @@ READ8_MEMBER(vectrex_cart_slot_device::read_rom)
  write_ram
  -------------------------------------------------*/
 
-WRITE8_MEMBER(vectrex_cart_slot_device::write_ram)
+void vectrex_cart_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);
@@ -259,7 +259,7 @@ WRITE8_MEMBER(vectrex_cart_slot_device::write_ram)
  write_bank
  -------------------------------------------------*/
 
-WRITE8_MEMBER(vectrex_cart_slot_device::write_bank)
+void vectrex_cart_slot_device::write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_bank(space, offset, data);

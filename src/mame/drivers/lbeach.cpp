@@ -68,10 +68,10 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_WRITE8_MEMBER(lbeach_bg_vram_w);
-	DECLARE_WRITE8_MEMBER(lbeach_fg_vram_w);
-	DECLARE_READ8_MEMBER(lbeach_in1_r);
-	DECLARE_READ8_MEMBER(lbeach_in2_r);
+	void lbeach_bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lbeach_fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lbeach_in1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lbeach_in2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -178,13 +178,13 @@ uint32_t lbeach_state::screen_update_lbeach(screen_device &screen, bitmap_ind16 
 }
 
 
-WRITE8_MEMBER(lbeach_state::lbeach_bg_vram_w)
+void lbeach_state::lbeach_bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(lbeach_state::lbeach_fg_vram_w)
+void lbeach_state::lbeach_fg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_vram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -198,13 +198,13 @@ WRITE8_MEMBER(lbeach_state::lbeach_fg_vram_w)
 
 ***************************************************************************/
 
-READ8_MEMBER(lbeach_state::lbeach_in1_r)
+uint8_t lbeach_state::lbeach_in1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d6,7(steering wheel) need to be swapped
 	return BITSWAP8(ioport("IN1")->read(),6,7,5,4,3,2,1,0);
 }
 
-READ8_MEMBER(lbeach_state::lbeach_in2_r)
+uint8_t lbeach_state::lbeach_in2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d6 and d7 are for collision detection
 	uint8_t d6 = m_collision_fg_car ? 0x40 : 0;

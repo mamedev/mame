@@ -71,14 +71,14 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(p8k_port0_r);
-	DECLARE_WRITE8_MEMBER(p8k_port0_w);
-	DECLARE_READ8_MEMBER(p8k_port24_r);
-	DECLARE_WRITE8_MEMBER(p8k_port24_w);
-	DECLARE_READ16_MEMBER(portff82_r);
-	DECLARE_WRITE16_MEMBER(portff82_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(kbd_put_16);
+	uint8_t p8k_port0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p8k_port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p8k_port24_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p8k_port24_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t portff82_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void portff82_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put_16(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -93,10 +93,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( p8k_daisy_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( p8k_dma_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( p8k_16_daisy_interrupt );
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /***************************************************************************
@@ -141,13 +141,13 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER( p8k_state::p8k_port0_r )
+uint8_t p8k_state::p8k_port0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 // see memory explanation above
-WRITE8_MEMBER( p8k_state::p8k_port0_w )
+void p8k_state::p8k_port0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t breg = m_maincpu->state_int(Z80_B) >> 4;
 	if ((data==1) || (data==2) || (data==4))
@@ -171,7 +171,7 @@ WRITE8_MEMBER( p8k_state::p8k_port0_w )
 		printf("Invalid data %X for bank %d\n",data,breg);
 }
 
-READ8_MEMBER( p8k_state::p8k_port24_r )
+uint8_t p8k_state::p8k_port24_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 3)
 		return 0xff;
@@ -181,13 +181,13 @@ READ8_MEMBER( p8k_state::p8k_port24_r )
 	return 0;
 }
 
-WRITE8_MEMBER( p8k_state::p8k_port24_w )
+void p8k_state::p8k_port24_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 2)
 		m_terminal->write(space, 0, data);
 }
 
-WRITE8_MEMBER( p8k_state::kbd_put )
+void p8k_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	m_term_data = data;
@@ -225,25 +225,25 @@ WRITE_LINE_MEMBER( p8k_state::p8k_dma_irq_w )
 	p8k_daisy_interrupt(state);
 }
 
-READ8_MEMBER(p8k_state::memory_read_byte)
+uint8_t p8k_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(p8k_state::memory_write_byte)
+void p8k_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER(p8k_state::io_read_byte)
+uint8_t p8k_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(p8k_state::io_write_byte)
+void p8k_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);
@@ -340,7 +340,7 @@ void p8k_state::init_p8k()
 
 ****************************************************************************/
 
-WRITE8_MEMBER( p8k_state::kbd_put_16 )
+void p8k_state::kbd_put_16(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &mem = m_maincpu->space(AS_DATA);
 	// keyboard int handler is at 0x0700
@@ -356,7 +356,7 @@ void p8k_state::machine_reset_p8k_16()
 {
 }
 
-READ16_MEMBER( p8k_state::portff82_r )
+uint16_t p8k_state::portff82_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 3) // FF87
 		return 0xff;
@@ -366,7 +366,7 @@ READ16_MEMBER( p8k_state::portff82_r )
 	return 0;
 }
 
-WRITE16_MEMBER( p8k_state::portff82_w )
+void p8k_state::portff82_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 1) // FF83
 	{

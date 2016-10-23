@@ -75,8 +75,8 @@ public:
 	template<class _dtrd> void set_dtrd_callback(_dtrd dtrd) { m_write_dtrd.set_callback(dtrd); }
 	template<class _apd> void set_apd_callback(_apd apd) { m_write_apd.set_callback(apd); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( di_w );
 

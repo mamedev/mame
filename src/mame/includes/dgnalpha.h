@@ -62,13 +62,13 @@ public:
 
 
 	/* pia2 */
-	DECLARE_WRITE8_MEMBER( pia2_pa_w );
+	void pia2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
 
 	/* psg */
-	DECLARE_READ8_MEMBER( psg_porta_read );
-	DECLARE_WRITE8_MEMBER( psg_porta_write );
+	uint8_t psg_porta_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void psg_porta_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* fdc */
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
@@ -83,8 +83,8 @@ protected:
 	virtual bool firq_get_line(void) override;
 
 	/* PIA1 */
-	virtual DECLARE_READ8_MEMBER( ff20_read ) override;
-	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
+	virtual uint8_t ff20_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void ff20_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 private:
 	uint8_t m_just_reset;

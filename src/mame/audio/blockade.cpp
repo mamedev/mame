@@ -38,20 +38,20 @@ DISCRETE_SOUND_START(blockade)
 	DISCRETE_OUTPUT(NODE_10, 7500)
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER(blockade_state::blockade_sound_freq_w)
+void blockade_state::blockade_sound_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space,BLOCKADE_NOTE_DATA, data);
 	return;
 }
 
-WRITE8_MEMBER(blockade_state::blockade_env_on_w)
+void blockade_state::blockade_env_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BLOCKADE_LOG) osd_printf_debug("Boom Start\n");
 	m_samples->start(0,0);
 	return;
 }
 
-WRITE8_MEMBER(blockade_state::blockade_env_off_w)
+void blockade_state::blockade_env_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BLOCKADE_LOG) osd_printf_debug("Boom End\n");
 	return;

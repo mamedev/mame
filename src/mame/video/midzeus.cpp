@@ -399,7 +399,7 @@ uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-READ32_MEMBER(midzeus_state::zeus_r)
+uint32_t midzeus_state::zeus_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	bool logit = (offset < 0xb0 || offset > 0xb7);
 	uint32_t result = m_zeusbase[offset & ~1];
@@ -469,7 +469,7 @@ READ32_MEMBER(midzeus_state::zeus_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midzeus_state::zeus_w)
+void midzeus_state::zeus_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	bool logit = zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 

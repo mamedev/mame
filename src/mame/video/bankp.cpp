@@ -80,36 +80,36 @@ PALETTE_INIT_MEMBER(bankp_state, bankp)
 	/* the bottom half of the PROM seems to be not used */
 }
 
-WRITE8_MEMBER(bankp_state::scroll_w)
+void bankp_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_x = data;
 }
 
-WRITE8_MEMBER(bankp_state::videoram_w)
+void bankp_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::colorram_w)
+void bankp_state::colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::videoram2_w)
+void bankp_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::colorram2_w)
+void bankp_state::colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(bankp_state::out_w)
+void bankp_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-1 are playfield priority */
 	/* TODO: understand how this works */

@@ -427,7 +427,7 @@ INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
 }
 
 
-WRITE16_MEMBER(itech32_state::int1_ack_w)
+void itech32_state::int1_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	itech32_update_interrupts(0, -1, -1);
 }
@@ -499,7 +499,7 @@ CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
 	return m_special_result;
 }
 
-READ16_MEMBER(itech32_state::trackball_r)
+uint16_t itech32_state::trackball_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int lower = ioport("TRACKX1")->read();
 	int upper = ioport("TRACKY1")->read();
@@ -507,7 +507,7 @@ READ16_MEMBER(itech32_state::trackball_r)
 	return (lower & 15) | ((upper & 15) << 4);
 }
 
-READ16_MEMBER(itech32_state::trackball_p2_r)
+uint16_t itech32_state::trackball_p2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int lower = ioport("TRACKX2")->read();
 	int upper = ioport("TRACKY2")->read();
@@ -516,7 +516,7 @@ READ16_MEMBER(itech32_state::trackball_p2_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_8bit_r)
+uint32_t itech32_state::trackball32_8bit_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int lower = ioport("TRACKX1")->read();
 	int upper = ioport("TRACKY1")->read();
@@ -525,7 +525,7 @@ READ32_MEMBER(itech32_state::trackball32_8bit_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
+uint32_t itech32_state::trackball32_4bit_p1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	attotime curtime = machine().time();
 
@@ -561,7 +561,7 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
+uint32_t itech32_state::trackball32_4bit_p2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	attotime curtime = machine().time();
 
@@ -597,14 +597,14 @@ READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
 }
 
 
-READ32_MEMBER(itech32_state::trackball32_4bit_combined_r)
+uint32_t itech32_state::trackball32_4bit_combined_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return trackball32_4bit_p1_r(space, offset, mem_mask) |
 			(trackball32_4bit_p2_r(space, offset, mem_mask) << 8);
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_steering_r)
+uint32_t itech32_state::drivedge_steering_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int val = ioport("STEER")->read() * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
@@ -612,7 +612,7 @@ READ32_MEMBER(itech32_state::drivedge_steering_r)
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_gas_r)
+uint32_t itech32_state::drivedge_gas_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int val = ioport("GAS")->read();
 	return val << 16;
@@ -625,13 +625,13 @@ READ32_MEMBER(itech32_state::drivedge_gas_r)
  *
  *************************************/
 
-READ16_MEMBER(itech32_state::wcbowl_prot_result_r)
+uint16_t itech32_state::wcbowl_prot_result_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_main_ram[0x111d/2];
 }
 
 
-READ32_MEMBER(itech32_state::itech020_prot_result_r)
+uint32_t itech32_state::itech020_prot_result_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = ((uint32_t *)m_main_ram.target())[m_itech020_prot_address >> 2];
 	result >>= (~m_itech020_prot_address & 3) * 8;
@@ -639,13 +639,13 @@ READ32_MEMBER(itech32_state::itech020_prot_result_r)
 }
 
 
-READ32_MEMBER(itech32_state::gt2kp_prot_result_r)
+uint32_t itech32_state::gt2kp_prot_result_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00010000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
 }
 
 
-READ32_MEMBER(itech32_state::gtclass_prot_result_r)
+uint32_t itech32_state::gtclass_prot_result_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00008000;  /* 32 bit value at 680000 to 680003 will return the needed value of 0x80 */
 }
@@ -658,7 +658,7 @@ READ32_MEMBER(itech32_state::gtclass_prot_result_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::sound_bank_w)
+void itech32_state::sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("soundbank")->set_entry(data);
 }
@@ -679,27 +679,27 @@ TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
 }
 
 
-WRITE16_MEMBER(itech32_state::sound_data_w)
+void itech32_state::sound_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), data & 0xff);
 }
 
 
-READ32_MEMBER(itech32_state::sound_data32_r)
+uint32_t itech32_state::sound_data32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_sound_return << 16;
 }
 
 
-WRITE32_MEMBER(itech32_state::sound_data32_w)
+void itech32_state::sound_data32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech32_state::delayed_sound_data_w),this), (data >> 16) & 0xff);
 }
 
 
-READ8_MEMBER(itech32_state::sound_data_r)
+uint8_t itech32_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
@@ -707,13 +707,13 @@ READ8_MEMBER(itech32_state::sound_data_r)
 }
 
 
-WRITE8_MEMBER(itech32_state::sound_return_w)
+void itech32_state::sound_return_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_return = data;
 }
 
 
-READ8_MEMBER(itech32_state::sound_data_buffer_r)
+uint8_t itech32_state::sound_data_buffer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -726,7 +726,7 @@ READ8_MEMBER(itech32_state::sound_data_buffer_r)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::drivedge_portb_out)
+void itech32_state::drivedge_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("PIA port B write = %02x\n", data);
 
@@ -750,7 +750,7 @@ WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
 }
 
 
-WRITE8_MEMBER(itech32_state::pia_portb_out)
+void itech32_state::pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("PIA port B write = %02x\n", data);
 
@@ -769,7 +769,7 @@ WRITE8_MEMBER(itech32_state::pia_portb_out)
  *
  *************************************/
 
-WRITE8_MEMBER(itech32_state::firq_clear_w)
+void itech32_state::firq_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -782,14 +782,14 @@ WRITE8_MEMBER(itech32_state::firq_clear_w)
  *
  *************************************/
 
-WRITE32_MEMBER(itech32_state::tms_reset_assert_w)
+void itech32_state::tms_reset_assert_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
-WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
+void itech32_state::tms_reset_clear_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
@@ -805,7 +805,7 @@ WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms1_68k_ram_w)
+void itech32_state::tms1_68k_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(m_tms1_boot);
@@ -815,7 +815,7 @@ WRITE32_MEMBER(itech32_state::tms1_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms2_68k_ram_w)
+void itech32_state::tms2_68k_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
@@ -824,28 +824,28 @@ WRITE32_MEMBER(itech32_state::tms2_68k_ram_w)
 }
 
 
-WRITE32_MEMBER(itech32_state::tms1_trigger_w)
+void itech32_state::tms1_trigger_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms1_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-WRITE32_MEMBER(itech32_state::tms2_trigger_w)
+void itech32_state::tms2_trigger_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms2_ram[offset]);
 	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_tms1_speedup_r)
+uint32_t itech32_state::drivedge_tms1_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_tms1_ram[0x382] == 0 && space.device().safe_pc() == 0xee) START_TMS_SPINNING(0);
 	return m_tms1_ram[0x382];
 }
 
 
-READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
+uint32_t itech32_state::drivedge_tms2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_tms2_ram[0x382] == 0 && space.device().safe_pc() == 0x809808) START_TMS_SPINNING(1);
 	return m_tms2_ram[0x382];
@@ -859,7 +859,7 @@ READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
  *
  *************************************/
 
-WRITE32_MEMBER(itech32_state::int1_ack32_w)
+void itech32_state::int1_ack32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int1_ack_w(space, offset, data, mem_mask);
 }
@@ -933,7 +933,7 @@ ADDRESS_MAP_END
 
 #if LOG_DRIVEDGE_UNINIT_RAM
 
-READ32_MEMBER(itech32_state::test1_r)
+uint32_t itech32_state::test1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31 && !m_written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+0);
 	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0x100 + offset*4+1);
@@ -942,7 +942,7 @@ READ32_MEMBER(itech32_state::test1_r)
 	return ((uint32_t *)m_main_ram)[0x100/4 + offset];
 }
 
-WRITE32_MEMBER(itech32_state::test1_w)
+void itech32_state::test1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31) m_written[0x100 + offset*4+0] = 1;
 	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
@@ -951,7 +951,7 @@ WRITE32_MEMBER(itech32_state::test1_w)
 	COMBINE_DATA(&((uint32_t *)m_main_ram)[0x100/4 + offset]);
 }
 
-READ32_MEMBER(itech32_state::test2_r)
+uint32_t itech32_state::test2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31 && !m_written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+0);
 	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", space.device().safe_pc(), 0xc00 + offset*4+1);
@@ -960,7 +960,7 @@ READ32_MEMBER(itech32_state::test2_r)
 	return ((uint32_t *)m_main_ram)[0xc00/4 + offset];
 }
 
-WRITE32_MEMBER(itech32_state::test2_w)
+void itech32_state::test2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31) m_written[0xc00 + offset*4+0] = 1;
 	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;

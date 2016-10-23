@@ -54,7 +54,7 @@ void exidy_state::adjust_sample(uint8_t freq)
 }
 
 
-WRITE8_MEMBER( exidy_state::targ_audio_1_w )
+void exidy_state::targ_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* CPU music */
 	if (BIT(m_port_1_last ^ data, 0))
@@ -103,7 +103,7 @@ WRITE8_MEMBER( exidy_state::targ_audio_1_w )
 }
 
 
-WRITE8_MEMBER( exidy_state::targ_audio_2_w )
+void exidy_state::targ_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x01) && !(m_port_2_last & 0x01))
 	{
@@ -118,7 +118,7 @@ WRITE8_MEMBER( exidy_state::targ_audio_2_w )
 }
 
 
-WRITE8_MEMBER( exidy_state::spectar_audio_2_w )
+void exidy_state::spectar_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	adjust_sample(data);
 }

@@ -111,7 +111,7 @@ void fcombat_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
+void fcombat_state::fcombat_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = flip screen and joystick input multiplexor */
 	m_cocktail_flip = data & 1;

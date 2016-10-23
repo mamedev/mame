@@ -45,15 +45,15 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
-	DECLARE_WRITE8_MEMBER(z80_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
-	DECLARE_WRITE8_MEMBER(simpsons_eeprom_w);
-	DECLARE_WRITE8_MEMBER(simpsons_coin_counter_w);
-	DECLARE_READ8_MEMBER(simpsons_sound_interrupt_r);
-	DECLARE_READ8_MEMBER(simpsons_k052109_r);
-	DECLARE_WRITE8_MEMBER(simpsons_k052109_w);
-	DECLARE_READ8_MEMBER(simpsons_k053247_r);
-	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
+	void z80_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void simpsons_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void simpsons_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t simpsons_sound_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t simpsons_k052109_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void simpsons_k052109_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t simpsons_k053247_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void simpsons_k053247_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -61,7 +61,7 @@ public:
 	void simpsons_video_banking(int bank);
 	void simpsons_objdma();
 	K052109_CB_MEMBER(tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K053246_CB_MEMBER(sprite_callback);
 
 protected:

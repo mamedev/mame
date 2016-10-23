@@ -135,38 +135,38 @@ void tecmo16_state::video_start_riot()
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::videoram_w)
+void tecmo16_state::videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::colorram_w)
+void tecmo16_state::colorram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::videoram2_w)
+void tecmo16_state::videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::colorram2_w)
+void tecmo16_state::colorram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_colorram2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(tecmo16_state::charram_w)
+void tecmo16_state::charram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_charram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tecmo16_state::flipscreen_w)
+void tecmo16_state::flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_flipscreen = data & 0x01;
 	flip_screen_set(m_flipscreen);
@@ -174,37 +174,37 @@ WRITE16_MEMBER(tecmo16_state::flipscreen_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tecmo16_state::scroll_x_w)
+void tecmo16_state::scroll_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll_x_w);
 	m_fg_tilemap->set_scrollx(0,m_scroll_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::scroll_y_w)
+void tecmo16_state::scroll_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll_y_w);
 	m_fg_tilemap->set_scrolly(0,m_scroll_y_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::scroll2_x_w)
+void tecmo16_state::scroll2_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2_x_w);
 	m_bg_tilemap->set_scrollx(0,m_scroll2_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::scroll2_y_w)
+void tecmo16_state::scroll2_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll2_y_w);
 	m_bg_tilemap->set_scrolly(0,m_scroll2_y_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::scroll_char_x_w)
+void tecmo16_state::scroll_char_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll_char_x_w);
 	m_tx_tilemap->set_scrollx(0,m_scroll_char_x_w);
 }
 
-WRITE16_MEMBER(tecmo16_state::scroll_char_y_w)
+void tecmo16_state::scroll_char_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scroll_char_y_w);
 	m_tx_tilemap->set_scrolly(0,m_scroll_char_y_w-16);

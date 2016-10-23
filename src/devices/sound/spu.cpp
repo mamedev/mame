@@ -1145,7 +1145,7 @@ void spu_device::kill_sound()
 //
 //
 
-READ16_MEMBER( spu_device::read )
+uint16_t spu_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	unsigned short ret, *rp=(unsigned short *)(reg+((offset*2)&0x1ff));
 
@@ -1167,7 +1167,7 @@ READ16_MEMBER( spu_device::read )
 //
 //
 
-WRITE16_MEMBER( spu_device::write )
+void spu_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	#ifdef debug_spu_registers
 		printf("spu: write %08x = %04x [%s]\n",

@@ -94,29 +94,29 @@ public:
 	virtual void machine_reset() override;
 	void update_halt_line();
 
-	DECLARE_WRITE8_MEMBER(leds_w);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE_LINE_MEMBER(dmac_eop);
 	DECLARE_WRITE_LINE_MEMBER(dmac_dack3);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(timint_w);
-	DECLARE_WRITE8_MEMBER(fdd_motor_w);
-	DECLARE_READ8_MEMBER(sys_status_r);
-	DECLARE_WRITE8_MEMBER(tc_set_w);
-	DECLARE_WRITE8_MEMBER(switch16_w);
-	DECLARE_READ8_MEMBER(ramsel_r);
-	DECLARE_READ8_MEMBER(romsel_r);
-	DECLARE_WRITE8_MEMBER(ramsel_w);
-	DECLARE_WRITE8_MEMBER(romsel_w);
-	DECLARE_READ8_MEMBER(kb_mcu_port1_r);
-	DECLARE_WRITE8_MEMBER(kb_mcu_port1_w);
-	DECLARE_WRITE8_MEMBER(kb_mcu_port2_w);
-	DECLARE_WRITE8_MEMBER(rambank_w);
-	DECLARE_READ8_MEMBER(program_r);
-	DECLARE_WRITE8_MEMBER(program_w);
-	DECLARE_READ8_MEMBER(exp_program_r);
-	DECLARE_WRITE8_MEMBER(exp_program_w);
+	void fdd_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sys_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tc_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void switch16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ramsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t romsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kb_mcu_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_mcu_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kb_mcu_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t program_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t exp_program_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void exp_program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(thold7_w);
 
 	void update_busint(int slot, int state);
@@ -146,16 +146,16 @@ public:
 
 	void ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data);
 	void ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data);
-	DECLARE_READ8_MEMBER(ifsel0_r)  { uint8_t data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel1_r)  { uint8_t data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel2_r)  { uint8_t data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel3_r)  { uint8_t data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel4_r)  { uint8_t data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
-	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(space, 0, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(space, 1, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(space, 2, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel3_w) { ifsel_w(space, 3, offset, data); }
-	DECLARE_WRITE8_MEMBER(ifsel4_w) { ifsel_w(space, 4, offset, data); }
+	uint8_t ifsel0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  { uint8_t data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
+	uint8_t ifsel1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  { uint8_t data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
+	uint8_t ifsel2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  { uint8_t data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
+	uint8_t ifsel3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  { uint8_t data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
+	uint8_t ifsel4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  { uint8_t data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
+	void ifsel0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ifsel_w(space, 0, offset, data); }
+	void ifsel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ifsel_w(space, 1, offset, data); }
+	void ifsel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ifsel_w(space, 2, offset, data); }
+	void ifsel3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ifsel_w(space, 3, offset, data); }
+	void ifsel4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { ifsel_w(space, 4, offset, data); }
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
@@ -174,18 +174,18 @@ public:
 	int         m_irqs[8];
 };
 
-WRITE8_MEMBER(dmv_state::tc_set_w)
+void dmv_state::tc_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->tc_w(true);
 }
 
-WRITE8_MEMBER(dmv_state::switch16_w)
+void dmv_state::switch16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_switch16 = !m_switch16;
 	update_halt_line();
 }
 
-WRITE8_MEMBER(dmv_state::leds_w)
+void dmv_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    LEDs    Value       Significance
@@ -205,34 +205,34 @@ WRITE8_MEMBER(dmv_state::leds_w)
 		output().set_led_value(8-i, BIT(data, i));
 }
 
-READ8_MEMBER(dmv_state::ramsel_r)
+uint8_t dmv_state::ramsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ramoutdis = false;
 	return 0;
 }
 
-READ8_MEMBER(dmv_state::romsel_r)
+uint8_t dmv_state::romsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ramoutdis = true;
 	return 0;
 }
 
-WRITE8_MEMBER(dmv_state::ramsel_w)
+void dmv_state::ramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ramoutdis = false;
 }
 
-WRITE8_MEMBER(dmv_state::romsel_w)
+void dmv_state::romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ramoutdis = true;
 }
 
-WRITE8_MEMBER(dmv_state::rambank_w)
+void dmv_state::rambank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram_bank = offset;
 }
 
-WRITE8_MEMBER(dmv_state::fdd_motor_w)
+void dmv_state::fdd_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate0(0);
@@ -242,7 +242,7 @@ WRITE8_MEMBER(dmv_state::fdd_motor_w)
 	m_floppy1->get_device()->mon_w(m_floppy_motor);
 }
 
-READ8_MEMBER(dmv_state::sys_status_r)
+uint8_t dmv_state::sys_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    Main system status
@@ -382,22 +382,22 @@ void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t 
 		slot->io_write(space, ifsel, offset, data);
 }
 
-WRITE8_MEMBER(dmv_state::exp_program_w)
+void dmv_state::exp_program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	program_write(space, (offset >> 16) & 0x07, offset, data);
 }
 
-READ8_MEMBER(dmv_state::exp_program_r)
+uint8_t dmv_state::exp_program_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return program_read(space, (offset >> 16) & 0x07, offset);
 }
 
-WRITE8_MEMBER(dmv_state::program_w)
+void dmv_state::program_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	program_write(space, m_ram_bank, offset, data);
 }
 
-READ8_MEMBER(dmv_state::program_r)
+uint8_t dmv_state::program_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return program_read(space, m_ram_bank, offset);
 }
@@ -532,18 +532,18 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	AM_RANGE(0xc0, 0xcf) AM_READWRITE(ifsel4_r, ifsel4_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(dmv_state::kb_mcu_port1_r)
+uint8_t dmv_state::kb_mcu_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return !(m_keyboard->sd_poll_r() & !m_sd_poll_state);
 }
 
-WRITE8_MEMBER(dmv_state::kb_mcu_port1_w)
+void dmv_state::kb_mcu_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sd_poll_state = BIT(data, 1);
 	m_keyboard->sd_poll_w(!m_sd_poll_state);
 }
 
-WRITE8_MEMBER(dmv_state::kb_mcu_port2_w)
+void dmv_state::kb_mcu_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 0));
 	m_slot7a->keyint_w(BIT(data, 4));

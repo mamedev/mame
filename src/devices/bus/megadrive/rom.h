@@ -23,8 +23,8 @@ public:
 	virtual void device_start() override {};
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override { if (offset < 0x400000/2) return m_rom[MD_ADDR(offset)]; else return 0xffff; };
-	virtual DECLARE_WRITE16_MEMBER(write) override { };
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override { if (offset < 0x400000/2) return m_rom[MD_ADDR(offset)]; else return 0xffff; };
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override { };
 };
 
 // ======================> md_rom_sram_device
@@ -36,9 +36,9 @@ public:
 	md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_fram_device
@@ -50,10 +50,10 @@ public:
 	md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_ssf2_device
@@ -69,8 +69,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_bank[16];
@@ -90,7 +90,7 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 private:
 	int m_base;
@@ -110,8 +110,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_bank;
@@ -127,7 +127,7 @@ public:
 	md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_chinf3_device
@@ -143,8 +143,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	int m_bank;
@@ -159,7 +159,7 @@ public:
 	md_rom_16mj2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_elfwor_device
@@ -171,7 +171,7 @@ public:
 	md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_yasech_device
@@ -183,7 +183,7 @@ public:
 	md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_kof98_device
@@ -195,7 +195,7 @@ public:
 	md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_kof99_device
@@ -207,7 +207,7 @@ public:
 	md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_lion2_device
@@ -223,8 +223,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint16_t m_prot1_data, m_prot2_data;
@@ -243,8 +243,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_reg[3];
@@ -260,7 +260,7 @@ public:
 	md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_cjmjclub_device
@@ -272,7 +272,7 @@ public:
 	md_rom_cjmjclub_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_pokea_device
@@ -284,7 +284,7 @@ public:
 	md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_pokestad_device
@@ -300,8 +300,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_bank;
@@ -320,8 +320,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint16_t m_bank_addr, m_bank_size, m_old_bank_addr;
@@ -336,7 +336,7 @@ public:
 	md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_rx3_device
@@ -348,7 +348,7 @@ public:
 	md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_sbubl_device
@@ -360,7 +360,7 @@ public:
 	md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_smb_device
@@ -372,7 +372,7 @@ public:
 	md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_smb2_device
@@ -384,7 +384,7 @@ public:
 	md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_smw64_device
@@ -400,8 +400,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint32_t m_latch0, m_latch1;
@@ -418,7 +418,7 @@ public:
 	md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 
@@ -431,7 +431,7 @@ public:
 	md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 // ======================> md_rom_squir_device
@@ -447,8 +447,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint16_t m_latch;
@@ -467,8 +467,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint16_t m_reg;
@@ -487,8 +487,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint16_t m_latch;
@@ -508,8 +508,8 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_bank;
@@ -528,9 +528,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_mode, m_lock;
@@ -549,9 +549,9 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_mode;
@@ -570,10 +570,10 @@ public:
 	virtual void device_reset() override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_READ16_MEMBER(read_a13) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a13) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	uint8_t m_mode, m_lock, m_ram_enable, m_base;

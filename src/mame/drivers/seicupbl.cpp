@@ -60,12 +60,12 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE8_MEMBER(okim_rombank_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(vram_sc0_w);
-	DECLARE_WRITE16_MEMBER(vram_sc1_w);
-	DECLARE_WRITE16_MEMBER(vram_sc2_w);
-	DECLARE_WRITE16_MEMBER(vram_sc3_w);
+	void okim_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram_sc0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_sc1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_sc2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vram_sc3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
@@ -292,31 +292,31 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(seicupbl_state::sound_cmd_w)
+void seicupbl_state::sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
+void seicupbl_state::vram_sc0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_data[offset]);
 	m_sc_layer[0]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc1_w)
+void seicupbl_state::vram_sc1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mid_data[offset]);
 	m_sc_layer[1]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc2_w)
+void seicupbl_state::vram_sc2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fore_data[offset]);
 	m_sc_layer[2]->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(seicupbl_state::vram_sc3_w)
+void seicupbl_state::vram_sc3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_sc_layer[3]->mark_tile_dirty(offset);
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(seicupbl_state::okim_rombank_w)
+void seicupbl_state::okim_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("%08x",0x40000 * (data & 0x07));
 	m_oki->set_rom_bank(data & 0x7);

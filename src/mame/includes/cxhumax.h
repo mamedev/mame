@@ -46,77 +46,77 @@ public:
 	required_shared_ptr<uint32_t> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 
-	DECLARE_WRITE32_MEMBER ( flash_w );
-	DECLARE_READ32_MEMBER ( flash_r );
+	void flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t flash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_hsx_w );
-	DECLARE_READ32_MEMBER ( cx_hsx_r );
+	void cx_hsx_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_hsx_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_romdescr_w );
-	DECLARE_READ32_MEMBER ( cx_romdescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_isaromdescr_w );
-	DECLARE_READ32_MEMBER ( cx_isaromdescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_isadescr_w );
-	DECLARE_READ32_MEMBER ( cx_isadescr_r );
-	DECLARE_WRITE32_MEMBER ( cx_rommap_w );
-	DECLARE_READ32_MEMBER ( cx_rommap_r );
-	DECLARE_WRITE32_MEMBER ( cx_rommode_w );
-	DECLARE_READ32_MEMBER ( cx_rommode_r );
-	DECLARE_WRITE32_MEMBER ( cx_xoemask_w );
-	DECLARE_READ32_MEMBER ( cx_xoemask_r );
-	DECLARE_WRITE32_MEMBER ( cx_pci_w );
-	DECLARE_READ32_MEMBER ( cx_pci_r );
-	DECLARE_WRITE32_MEMBER ( cx_extdesc_w );
-	DECLARE_READ32_MEMBER ( cx_extdesc_r );
+	void cx_romdescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_romdescr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_isaromdescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_isaromdescr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_isadescr_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_isadescr_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_rommap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_rommap_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_rommode_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_rommode_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_xoemask_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_xoemask_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_pci_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_pci_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_extdesc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_extdesc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_remap_w );
-	DECLARE_WRITE32_MEMBER ( cx_scratch_w );
-	DECLARE_READ32_MEMBER ( cx_scratch_r );
+	void cx_remap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void cx_scratch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_scratch_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_timers_w );
-	DECLARE_READ32_MEMBER ( cx_timers_r );
+	void cx_timers_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_timers_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_uart2_w );
-	DECLARE_READ32_MEMBER ( cx_uart2_r );
+	void cx_uart2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_uart2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_pll_w );
-	DECLARE_READ32_MEMBER ( cx_pll_r );
-	DECLARE_WRITE32_MEMBER ( cx_clkdiv_w );
-	DECLARE_READ32_MEMBER ( cx_clkdiv_r );
-	DECLARE_WRITE32_MEMBER ( cx_pllprescale_w );
-	DECLARE_READ32_MEMBER ( cx_pllprescale_r );
+	void cx_pll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_pll_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_clkdiv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_clkdiv_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_pllprescale_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_pllprescale_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_chipcontrol_w );
-	DECLARE_READ32_MEMBER ( cx_chipcontrol_r );
+	void cx_chipcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_chipcontrol_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_intctrl_w );
-	DECLARE_READ32_MEMBER ( cx_intctrl_r );
+	void cx_intctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_intctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_ss_w );
-	DECLARE_READ32_MEMBER ( cx_ss_r );
+	void cx_ss_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_ss_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_i2c0_w );
-	DECLARE_READ32_MEMBER ( cx_i2c0_r );
-	DECLARE_WRITE32_MEMBER ( cx_i2c1_w );
-	DECLARE_READ32_MEMBER ( cx_i2c1_r );
-	DECLARE_WRITE32_MEMBER ( cx_i2c2_w );
-	DECLARE_READ32_MEMBER ( cx_i2c2_r );
+	void cx_i2c0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_i2c0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_i2c1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_i2c1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_i2c2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_i2c2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_mc_cfg_w );
-	DECLARE_READ32_MEMBER ( cx_mc_cfg_r );
+	void cx_mc_cfg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_mc_cfg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_drm0_w );
-	DECLARE_READ32_MEMBER ( cx_drm0_r );
-	DECLARE_WRITE32_MEMBER ( cx_drm1_w );
-	DECLARE_READ32_MEMBER ( cx_drm1_r );
+	void cx_drm0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_drm0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cx_drm1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_drm1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_hdmi_w );
-	DECLARE_READ32_MEMBER ( cx_hdmi_r );
+	void cx_hdmi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_hdmi_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE32_MEMBER ( cx_gxa_w );
-	DECLARE_READ32_MEMBER ( cx_gxa_r );
+	void cx_gxa_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cx_gxa_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER ( dummy_flash_r );
+	uint32_t dummy_flash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	uint32_t m_romdescr_reg;
 	uint32_t m_isaromdescr_regs[0x0C/4];

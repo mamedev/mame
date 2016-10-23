@@ -165,19 +165,19 @@ public:
 	virtual ~device_nes_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_ex) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex) { }
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_ex(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_ex(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }
 
-	virtual DECLARE_READ8_MEMBER(chr_r);
-	virtual DECLARE_WRITE8_MEMBER(chr_w);
-	virtual DECLARE_READ8_MEMBER(nt_r);
-	virtual DECLARE_WRITE8_MEMBER(nt_w);
+	virtual uint8_t chr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void chr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual uint8_t nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { }
@@ -373,14 +373,14 @@ public:
 	int nes_get_pcb_id(const char *slot);
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
-	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_READ8_MEMBER(read_ex);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
-	virtual DECLARE_WRITE8_MEMBER(write_ex);
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_ex(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_ex(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }

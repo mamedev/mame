@@ -40,43 +40,43 @@ void lpc_rtc_device::device_reset()
 {
 }
 
-READ8_MEMBER(  lpc_rtc_device::index_r)
+uint8_t lpc_rtc_device::index_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return cur_index;
 }
 
-WRITE8_MEMBER( lpc_rtc_device::index_w)
+void lpc_rtc_device::index_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cur_index = data & 0x7f;
 }
 
-READ8_MEMBER(  lpc_rtc_device::target_r)
+uint8_t lpc_rtc_device::target_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ram[cur_index];
 }
 
-WRITE8_MEMBER( lpc_rtc_device::target_w)
+void lpc_rtc_device::target_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ram[cur_index] = data;
 	logerror("%s: ram[%02x] = %02x\n", tag(), cur_index, data);
 }
 
-READ8_MEMBER(  lpc_rtc_device::extindex_r)
+uint8_t lpc_rtc_device::extindex_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return cur_extindex;
 }
 
-WRITE8_MEMBER( lpc_rtc_device::extindex_w)
+void lpc_rtc_device::extindex_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cur_extindex = data & 0x7f;
 }
 
-READ8_MEMBER(  lpc_rtc_device::exttarget_r)
+uint8_t lpc_rtc_device::exttarget_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ram[cur_extindex|128];
 }
 
-WRITE8_MEMBER( lpc_rtc_device::exttarget_w)
+void lpc_rtc_device::exttarget_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ram[cur_extindex|128] = data;
 	logerror("%s: ram[%02x] = %02x\n", tag(), cur_extindex|128, data);

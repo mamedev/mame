@@ -69,20 +69,20 @@ public:
 	uint32_t m_ttl74123_output;
 	uint8_t m_AY8910_selected;
 
-	DECLARE_READ8_MEMBER(audio_command_r);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_answer_r);
-	DECLARE_WRITE8_MEMBER(audio_answer_w);
+	uint8_t audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t audio_answer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void audio_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE8_MEMBER(AY8910_select_w);
-	DECLARE_READ8_MEMBER(AY8910_port_r);
-	DECLARE_WRITE8_MEMBER(AY8910_port_w);
+	void AY8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t AY8910_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void AY8910_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE8_MEMBER(pia_comp_w);
+	void pia_comp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
-	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
+	void ttl74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -129,7 +129,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
  *
  *************************************/
 
-READ8_MEMBER(r2dtank_state::audio_command_r)
+uint8_t r2dtank_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
@@ -139,7 +139,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 }
 
 
-WRITE8_MEMBER(r2dtank_state::audio_command_w)
+void r2dtank_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, ~data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
@@ -148,7 +148,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.de
 }
 
 
-READ8_MEMBER(r2dtank_state::audio_answer_r)
+uint8_t r2dtank_state::audio_answer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_soundlatch2->read(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
@@ -157,7 +157,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.devic
 }
 
 
-WRITE8_MEMBER(r2dtank_state::audio_answer_w)
+void r2dtank_state::audio_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
 	if (space.device().safe_pc() == 0xfb12)
@@ -170,7 +170,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.devi
 }
 
 
-WRITE8_MEMBER(r2dtank_state::AY8910_select_w)
+void r2dtank_state::AY8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* not sure what all the bits mean:
 	   D0 - ????? definetely used
@@ -185,7 +185,7 @@ if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().desc
 }
 
 
-READ8_MEMBER(r2dtank_state::AY8910_port_r)
+uint8_t r2dtank_state::AY8910_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -199,7 +199,7 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 }
 
 
-WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
+void r2dtank_state::AY8910_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_AY8910_selected & 0x08)
 		machine().device<ay8910_device>("ay1")->data_address_w(space, m_AY8910_selected >> 2, data);
@@ -221,7 +221,7 @@ WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
  *
  *************************************/
 
-WRITE8_MEMBER(r2dtank_state::ttl74123_output_changed)
+void r2dtank_state::ttl74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia_main");
 	pia->ca1_w(data);
@@ -320,7 +320,7 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(r2dtank_state::pia_comp_w)
+void r2dtank_state::pia_comp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_t *device = machine().device("pia_main");
 	downcast<pia6821_device *>(device)->write(machine().driver_data()->generic_space(), offset, ~data);

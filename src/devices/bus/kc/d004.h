@@ -49,9 +49,9 @@ protected:
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 public:
-	DECLARE_READ8_MEMBER(hw_input_gate_r);
-	DECLARE_WRITE8_MEMBER(fdd_select_w);
-	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
+	uint8_t hw_input_gate_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdd_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hw_terminal_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
@@ -97,8 +97,8 @@ protected:
 	virtual void device_reset() override;
 
 public:
-	DECLARE_READ8_MEMBER(gide_r);
-	DECLARE_WRITE8_MEMBER(gide_w);
+	uint8_t gide_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gide_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	required_device<ata_interface_device> m_ata;

@@ -33,8 +33,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(bml3_mp1805_r);
-	DECLARE_WRITE8_MEMBER(bml3_mp1805_w);
+	uint8_t bml3_mp1805_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bml3_mp1805_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( bml3_mc6843_intrq_w );
 

@@ -33,8 +33,8 @@ public:
 
 	optional_device<cassette_image_device> m_cassette;
 
-	DECLARE_READ8_MEMBER(cassette_r);
-	DECLARE_WRITE8_MEMBER(cassette_w);
+	uint8_t cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

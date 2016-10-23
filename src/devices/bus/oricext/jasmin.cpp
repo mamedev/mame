@@ -135,33 +135,33 @@ INPUT_CHANGED_MEMBER(jasmin_device::boot_pressed)
 	}
 }
 
-WRITE8_MEMBER(jasmin_device::side_sel_w)
+void jasmin_device::side_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	side_sel = data & 1;
 	if(cur_floppy)
 		cur_floppy->ss_w(side_sel);
 }
 
-WRITE8_MEMBER(jasmin_device::fdc_reset_w)
+void jasmin_device::fdc_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if((data & 1) != fdc_reset)
 		fdc->soft_reset();
 	fdc_reset = data & 1;
 }
 
-WRITE8_MEMBER(jasmin_device::ram_access_w)
+void jasmin_device::ram_access_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ram_access = data & 1;
 	remap();
 }
 
-WRITE8_MEMBER(jasmin_device::rom_access_w)
+void jasmin_device::rom_access_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	rom_access = data & 1;
 	remap();
 }
 
-WRITE8_MEMBER(jasmin_device::select_w)
+void jasmin_device::select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	select[offset] = data & 1;
 	cur_floppy = nullptr;

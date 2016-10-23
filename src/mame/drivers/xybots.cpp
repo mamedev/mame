@@ -53,7 +53,7 @@ void xybots_state::machine_reset_xybots()
  *
  *************************************/
 
-READ16_MEMBER(xybots_state::special_port1_r)
+uint16_t xybots_state::special_port1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = ioport("FFE200")->read();
 	result ^= m_h256 ^= 0x0400;

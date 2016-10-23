@@ -79,7 +79,7 @@ void taito_en_device::device_reset()
  *
  *************************************/
 
-READ8_MEMBER( taito_en_device::en_68000_share_r )
+uint8_t taito_en_device::en_68000_share_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -92,7 +92,7 @@ READ8_MEMBER( taito_en_device::en_68000_share_r )
 	return 0;
 }
 
-WRITE8_MEMBER( taito_en_device::en_68000_share_w )
+void taito_en_device::en_68000_share_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -103,7 +103,7 @@ WRITE8_MEMBER( taito_en_device::en_68000_share_w )
 	}
 }
 
-WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
+void taito_en_device::en_es5505_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t max_banks_this_game = (memregion(":ensoniq.0")->bytes()/0x200000)-1;
 
@@ -112,7 +112,7 @@ WRITE16_MEMBER( taito_en_device::en_es5505_bank_w )
 	m_ensoniq->voice_bank_w(offset,data<<20);
 }
 
-WRITE8_MEMBER( taito_en_device::en_volume_w )
+void taito_en_device::en_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mb87078->data_w(data, offset ^ 1);
 }
@@ -126,7 +126,7 @@ WRITE8_MEMBER( taito_en_device::en_volume_w )
 
 //todo: hook up cpu/es5510
 
-READ16_MEMBER( taito_en_device::es5510_dsp_r )
+uint16_t taito_en_device::es5510_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -144,7 +144,7 @@ READ16_MEMBER( taito_en_device::es5510_dsp_r )
 	return m_es5510_dsp_ram[offset];
 }
 
-WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
+void taito_en_device::es5510_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint8_t *snd_mem = (uint8_t *)memregion(":ensoniq.0")->base();
 
@@ -239,7 +239,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(taito_en_device::mb87078_gain_changed)
+void taito_en_device::mb87078_gain_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset > 1)
 	{

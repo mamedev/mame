@@ -63,14 +63,14 @@ bootleg todo:
 
 /**********************************************************************************/
 
-WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
+void pktgaldx_state::pktgaldx_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki2->set_rom_bank(data & 3);
 }
 
 /**********************************************************************************/
 
-READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
+uint16_t pktgaldx_state::pktgaldx_protection_region_f_104_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
@@ -78,7 +78,7 @@ READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 	return data;
 }
 
-WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
+void pktgaldx_state::pktgaldx_protection_region_f_104_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int real_address = 0 + (offset *2);
 	uint8_t cs = 0;
@@ -117,12 +117,12 @@ ADDRESS_MAP_END
 
 /* Pocket Gal Deluxe (bootleg!) */
 
-READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
+uint16_t pktgaldx_state::pckgaldx_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
+uint16_t pktgaldx_state::pckgaldx_protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("pckgaldx_protection_r address %06x\n",space.device().safe_pc());
 	return -1;

@@ -10,7 +10,7 @@
 
 const device_type ISA16_SB16 = &device_creator<sb16_lle_device>;
 
-READ8_MEMBER( sb16_lle_device::dsp_data_r )
+uint8_t sb16_lle_device::dsp_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 		m_data_in = false;
@@ -18,18 +18,18 @@ READ8_MEMBER( sb16_lle_device::dsp_data_r )
 	return m_in_byte;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dsp_data_w )
+void sb16_lle_device::dsp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_out = true;
 	m_out_byte = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dac_ctrl_r )
+uint8_t sb16_lle_device::dac_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_ctrl_w )
+void sb16_lle_device::dac_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x05
 	 * bit0 -
@@ -48,18 +48,18 @@ WRITE8_MEMBER( sb16_lle_device::dac_ctrl_w )
 	}
 }
 
-READ8_MEMBER( sb16_lle_device::adc_data_r )
+uint8_t sb16_lle_device::adc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_data_w )
+void sb16_lle_device::dac_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ldac->write(data << 8);
 	m_rdac->write(data << 8);
 }
 
-READ8_MEMBER( sb16_lle_device::p1_r )
+uint8_t sb16_lle_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	ret |= m_data_out << 0;
@@ -67,7 +67,7 @@ READ8_MEMBER( sb16_lle_device::p1_r )
 	return ret;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p1_w )
+void sb16_lle_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port P1
 	 * bit0 - output byte ready
@@ -81,12 +81,12 @@ WRITE8_MEMBER( sb16_lle_device::p1_w )
 	*/
 }
 
-READ8_MEMBER( sb16_lle_device::p2_r )
+uint8_t sb16_lle_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( sb16_lle_device::p2_w )
+void sb16_lle_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port P2
 	 * bit0 -
@@ -111,25 +111,25 @@ void sb16_lle_device::control_timer(bool start)
 		m_timer->adjust(attotime::never);
 }
 
-WRITE8_MEMBER( sb16_lle_device::rate_w )
+void sb16_lle_device::rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_freq = data;
 	if(!(m_ctrl8 & 2) || !(m_ctrl16 & 2))
 		control_timer(true);
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_r )
+uint8_t sb16_lle_device::dma8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dac_fifo[0].b[0];
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_w )
+void sb16_lle_device::dma8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adc_fifo[0].b[0] = data;
 	m_isa->drq1_w(0);
 }
 
-READ8_MEMBER( sb16_lle_device::dma_stat_r )
+uint8_t sb16_lle_device::dma_stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* port 0x06
 	 * bit0 - 8 bit complete
@@ -145,12 +145,12 @@ READ8_MEMBER( sb16_lle_device::dma_stat_r )
 	return ret;
 }
 
-READ8_MEMBER( sb16_lle_device::ctrl8_r )
+uint8_t sb16_lle_device::ctrl8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctrl8;
 }
 
-WRITE8_MEMBER( sb16_lle_device::ctrl8_w )
+void sb16_lle_device::ctrl8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x08
 	 * bit0 - ?
@@ -186,12 +186,12 @@ WRITE8_MEMBER( sb16_lle_device::ctrl8_w )
 	m_ctrl8 = data;
 }
 
-READ8_MEMBER( sb16_lle_device::ctrl16_r )
+uint8_t sb16_lle_device::ctrl16_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctrl16;
 }
 
-WRITE8_MEMBER( sb16_lle_device::ctrl16_w )
+void sb16_lle_device::ctrl16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x10
 	 * bit0 -
@@ -227,12 +227,12 @@ WRITE8_MEMBER( sb16_lle_device::ctrl16_w )
 	m_ctrl16 = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dac_fifo_ctrl_r )
+uint8_t sb16_lle_device::dac_fifo_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dac_fifo_ctrl;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dac_fifo_ctrl_w )
+void sb16_lle_device::dac_fifo_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x0E
 	 * bit0 - reset fifo
@@ -254,12 +254,12 @@ WRITE8_MEMBER( sb16_lle_device::dac_fifo_ctrl_w )
 	m_dac_fifo_ctrl = data;
 }
 
-READ8_MEMBER( sb16_lle_device::adc_fifo_ctrl_r )
+uint8_t sb16_lle_device::adc_fifo_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adc_fifo_ctrl;
 }
 
-WRITE8_MEMBER( sb16_lle_device::adc_fifo_ctrl_w )
+void sb16_lle_device::adc_fifo_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x16
 	 * bit0 - reset fifo
@@ -281,12 +281,12 @@ WRITE8_MEMBER( sb16_lle_device::adc_fifo_ctrl_w )
 	m_adc_fifo_ctrl = data;
 }
 
-READ8_MEMBER( sb16_lle_device::mode_r )
+uint8_t sb16_lle_device::mode_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mode;
 }
 
-WRITE8_MEMBER( sb16_lle_device::mode_w )
+void sb16_lle_device::mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* port 0x04
 	 * bit0 - 1 -- dac 16, adc 8; 0 -- adc 16, dac 8
@@ -301,7 +301,7 @@ WRITE8_MEMBER( sb16_lle_device::mode_w )
 	m_mode = data;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_ready_r )
+uint8_t sb16_lle_device::dma8_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* port 0x0F
 	 * bit0 -
@@ -316,7 +316,7 @@ READ8_MEMBER( sb16_lle_device::dma8_ready_r )
 	return ((m_dac_fifo_tail - m_dac_fifo_head) != 1) << 6;
 }
 
-READ8_MEMBER( sb16_lle_device::adc_data_ready_r )
+uint8_t sb16_lle_device::adc_data_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* port 0x17
 	 * bit0 -
@@ -331,32 +331,32 @@ READ8_MEMBER( sb16_lle_device::adc_data_ready_r )
 	return (m_mode & 1) ? 0x80 : 0;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_cnt_lo_r )
+uint8_t sb16_lle_device::dma8_cnt_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dma8_cnt & 0xff;
 }
 
-READ8_MEMBER( sb16_lle_device::dma8_cnt_hi_r )
+uint8_t sb16_lle_device::dma8_cnt_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dma8_cnt >> 8;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_len_lo_w )
+void sb16_lle_device::dma8_len_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma8_len = (m_dma8_len & 0xff00) | data;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma8_len_hi_w )
+void sb16_lle_device::dma8_len_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma8_len = (m_dma8_len & 0xff) | (data << 8);
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma16_len_lo_w )
+void sb16_lle_device::dma16_len_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma16_len = (m_dma16_len & 0xff00) | data;
 }
 
-WRITE8_MEMBER( sb16_lle_device::dma16_len_hi_w )
+void sb16_lle_device::dma16_len_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dma16_len = (m_dma16_len & 0xff) | (data << 8);
 }
@@ -428,13 +428,13 @@ machine_config_constructor sb16_lle_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( sb16 );
 }
 
-READ8_MEMBER( sb16_lle_device::host_data_r )
+uint8_t sb16_lle_device::host_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_data_out = false;
 	return m_out_byte;
 }
 
-WRITE8_MEMBER( sb16_lle_device::host_cmd_w )
+void sb16_lle_device::host_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_data_in = true;
 	m_in_byte = data;
@@ -594,7 +594,7 @@ void sb16_lle_device::dack16_w(int line, uint16_t data)
 		m_isa->drq5_w(0);
 }
 
-WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
+void sb16_lle_device::dsp_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 1)
 	{
@@ -603,14 +603,14 @@ WRITE8_MEMBER( sb16_lle_device::dsp_reset_w )
 	}
 }
 
-READ8_MEMBER( sb16_lle_device::dsp_wbuf_status_r )
+uint8_t sb16_lle_device::dsp_wbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 		return 0xff;
 	return m_data_in << 7;
 }
 
-READ8_MEMBER( sb16_lle_device::dsp_rbuf_status_r )
+uint8_t sb16_lle_device::dsp_rbuf_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset)
 	{
@@ -623,19 +623,19 @@ READ8_MEMBER( sb16_lle_device::dsp_rbuf_status_r )
 	return m_data_out << 7;
 }
 
-WRITE8_MEMBER( sb16_lle_device::invalid_w )
+void sb16_lle_device::invalid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("sb16: invalid port write\n");
 }
 
-READ8_MEMBER( sb16_lle_device::invalid_r )
+uint8_t sb16_lle_device::invalid_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("sb16: invalid port read\n");
 	return 0xff;
 }
 
 // just using the old dummy mpu401 for now
-READ8_MEMBER( sb16_lle_device::mpu401_r )
+uint8_t sb16_lle_device::mpu401_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res;
 
@@ -654,7 +654,7 @@ READ8_MEMBER( sb16_lle_device::mpu401_r )
 	return res;
 }
 
-WRITE8_MEMBER( sb16_lle_device::mpu401_w )
+void sb16_lle_device::mpu401_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0) // data
 	{

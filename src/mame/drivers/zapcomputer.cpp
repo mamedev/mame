@@ -39,8 +39,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(display_7seg_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t decode7seg(uint8_t data);
@@ -66,7 +66,7 @@ uint8_t zapcomp_state::decode7seg(uint8_t data)
 	return BITSWAP8(patterns[data & 0x0F], 7, 3, 4, 2, 1, 0, 6, 5);
 }
 
-WRITE8_MEMBER( zapcomp_state::display_7seg_w )
+void zapcomp_state::display_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset){
 		case 0: //Port 0x05 : address HI
@@ -86,7 +86,7 @@ WRITE8_MEMBER( zapcomp_state::display_7seg_w )
 	}
 }
 
-READ8_MEMBER( zapcomp_state::keyboard_r )
+uint8_t zapcomp_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retval = 0x00;
 	uint8_t special = ioport("X1")->read();

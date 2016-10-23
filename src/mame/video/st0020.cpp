@@ -85,7 +85,7 @@ void st0020_device::device_reset()
 }
 
 
-READ16_MEMBER(st0020_device::st0020_gfxram_r)
+uint16_t st0020_device::st0020_gfxram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 	ST0020_ST0032_BYTESWAP_MEM_MASK
@@ -96,7 +96,7 @@ READ16_MEMBER(st0020_device::st0020_gfxram_r)
 	return data;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
+void st0020_device::st0020_gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	ST0020_ST0032_BYTESWAP_MEM_MASK
 	ST0020_ST0032_BYTESWAP_DATA
@@ -106,7 +106,7 @@ WRITE16_MEMBER(st0020_device::st0020_gfxram_w)
 	gfx(0)->mark_dirty(offset / (16*8/2));
 }
 
-READ16_MEMBER(st0020_device::st0020_sprram_r)
+uint16_t st0020_device::st0020_sprram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 
@@ -115,12 +115,12 @@ READ16_MEMBER(st0020_device::st0020_sprram_r)
 	return data;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_sprram_w)
+void st0020_device::st0020_sprram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_st0020_spriteram[offset]);
 }
 
-READ16_MEMBER(st0020_device::st0020_blit_r)
+uint16_t st0020_device::st0020_blit_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -133,14 +133,14 @@ READ16_MEMBER(st0020_device::st0020_blit_r)
 	return 0;
 }
 
-READ16_MEMBER(st0020_device::st0020_blitram_r)
+uint16_t st0020_device::st0020_blitram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data;
 	data = st0020_blit_r(space, offset, mem_mask);
 	return data;
 }
 
-WRITE16_MEMBER(st0020_device::st0020_blit_w)
+void st0020_device::st0020_blit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *st0020_blitram = m_st0020_blitram.get();
 
@@ -205,7 +205,7 @@ WRITE16_MEMBER(st0020_device::st0020_blit_w)
 	}
 }
 
-WRITE16_MEMBER(st0020_device::st0020_blitram_w)
+void st0020_device::st0020_blitram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	st0020_blit_w(space, offset, data, mem_mask);
 }

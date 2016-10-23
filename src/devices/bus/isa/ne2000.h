@@ -16,10 +16,10 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	void ne2000_irq_w(int state);
-	DECLARE_READ8_MEMBER(ne2000_mem_read);
-	DECLARE_WRITE8_MEMBER(ne2000_mem_write);
-	DECLARE_READ16_MEMBER(ne2000_port_r);
-	DECLARE_WRITE16_MEMBER(ne2000_port_w);
+	uint8_t ne2000_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ne2000_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t ne2000_port_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ne2000_port_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

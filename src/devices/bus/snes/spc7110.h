@@ -96,13 +96,13 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_READ8_MEMBER(read_ram) override;
-	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+	virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	virtual DECLARE_READ8_MEMBER(chip_read) override;
-	virtual DECLARE_WRITE8_MEMBER(chip_write) override;
+	virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	void spc7110_start();
 	uint32_t spc7110_datarom_addr(uint32_t addr, uint32_t len);
@@ -212,11 +212,11 @@ public:
 	// reading and writing
 
 // we just use the spc7110 ones for the moment, pending the split of regs 0x4840-0x4842 (RTC) from the base add-on
-//  virtual DECLARE_READ8_MEMBER(read_l);
-//  virtual DECLARE_READ8_MEMBER(read_h);
+//  virtual uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-//  virtual DECLARE_READ8_MEMBER(chip_read);
-//  virtual DECLARE_WRITE8_MEMBER(chip_write);
+//  virtual uint8_t chip_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+//  virtual void chip_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // device type definition

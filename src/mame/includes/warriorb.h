@@ -56,11 +56,11 @@ public:
 	/* misc */
 	int        m_pandata[4];
 
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE8_MEMBER(pancontrol);
-	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
+	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pancontrol(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tc0100scn_dual_screen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

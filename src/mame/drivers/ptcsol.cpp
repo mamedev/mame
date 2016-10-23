@@ -151,19 +151,19 @@ public:
 		, m_cassette2(*this, "cassette2")
 	{ }
 
-	DECLARE_READ8_MEMBER( sol20_f8_r );
-	DECLARE_READ8_MEMBER( sol20_f9_r );
-	DECLARE_READ8_MEMBER( sol20_fa_r );
-	DECLARE_READ8_MEMBER( sol20_fb_r );
-	DECLARE_READ8_MEMBER( sol20_fc_r );
-	DECLARE_READ8_MEMBER( sol20_fd_r );
-	DECLARE_WRITE8_MEMBER( sol20_f8_w );
-	DECLARE_WRITE8_MEMBER( sol20_f9_w );
-	DECLARE_WRITE8_MEMBER( sol20_fa_w );
-	DECLARE_WRITE8_MEMBER( sol20_fb_w );
-	DECLARE_WRITE8_MEMBER( sol20_fd_w );
-	DECLARE_WRITE8_MEMBER( sol20_fe_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	uint8_t sol20_f8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sol20_f9_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sol20_fa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sol20_fb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sol20_fc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sol20_fd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sol20_f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol20_f9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol20_fa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol20_fb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol20_fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sol20_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sol20();
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
@@ -316,7 +316,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 	}
 }
 
-READ8_MEMBER( sol20_state::sol20_f8_r )
+uint8_t sol20_state::sol20_f8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // d7 - TMBT; d6 - DAV; d5 - CTS; d4 - OE; d3 - PE; d2 - FE; d1 - DSR; d0 - CD
 	/* set unemulated bits (CTS/DSR/CD) high */
@@ -333,7 +333,7 @@ READ8_MEMBER( sol20_state::sol20_f8_r )
 	return data;
 }
 
-READ8_MEMBER( sol20_state::sol20_f9_r)
+uint8_t sol20_state::sol20_f9_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_uart_s->get_received_data();
 	m_uart_s->set_input_pin(AY31015_RDAV, 0);
@@ -341,7 +341,7 @@ READ8_MEMBER( sol20_state::sol20_f9_r)
 	return data;
 }
 
-READ8_MEMBER( sol20_state::sol20_fa_r )
+uint8_t sol20_state::sol20_fa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set unused bits high */
 	uint8_t data = 0x26;
@@ -359,7 +359,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	return data | (arrowkey & keydown);
 }
 
-READ8_MEMBER( sol20_state::sol20_fb_r)
+uint8_t sol20_state::sol20_fb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_uart->get_received_data();
 	m_uart->set_input_pin(AY31015_RDAV, 0);
@@ -367,7 +367,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 	return data;
 }
 
-READ8_MEMBER( sol20_state::sol20_fc_r )
+uint8_t sol20_state::sol20_fc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_iop_arrows->read();
 	if (BIT(data, 0)) return 0x32;
@@ -379,23 +379,23 @@ READ8_MEMBER( sol20_state::sol20_fc_r )
 	return m_sol20_fc;
 }
 
-READ8_MEMBER( sol20_state::sol20_fd_r )
+uint8_t sol20_state::sol20_fd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // Return a byte from parallel interface
 	return 0;
 }
 
-WRITE8_MEMBER( sol20_state::sol20_f8_w )
+void sol20_state::sol20_f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // The only function seems to be to send RTS from bit 4
 }
 
-WRITE8_MEMBER( sol20_state::sol20_f9_w )
+void sol20_state::sol20_f9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_uart_s->set_transmit_data(data);
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fa_w )
+void sol20_state::sol20_fa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sol20_fa &= 1;
 	m_sol20_fa |= (data & 0xf0);
@@ -418,17 +418,17 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 	m_uart->set_transmitter_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fb_w )
+void sol20_state::sol20_fb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_uart->set_transmit_data(data);
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fd_w )
+void sol20_state::sol20_fd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // Output a byte to parallel interface
 }
 
-WRITE8_MEMBER( sol20_state::sol20_fe_w )
+void sol20_state::sol20_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sol20_fe = data;
 }
@@ -712,7 +712,7 @@ static GFXDECODE_START( sol20 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sol20_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE8_MEMBER( sol20_state::kbd_put )
+void sol20_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{

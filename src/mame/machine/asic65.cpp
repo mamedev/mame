@@ -200,7 +200,7 @@ void asic65_device::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-WRITE16_MEMBER( asic65_device::data_w )
+void asic65_device::data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* logging */
 	if (LOG_ASIC && !m_log) m_log = fopen("m_log", "w");
@@ -237,7 +237,7 @@ WRITE16_MEMBER( asic65_device::data_w )
 }
 
 
-READ16_MEMBER( asic65_device::read )
+uint16_t asic65_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int64_t element, result64 = 0;
 	uint16_t result = 0;
@@ -458,7 +458,7 @@ READ16_MEMBER( asic65_device::read )
 }
 
 
-READ16_MEMBER( asic65_device::io_r )
+uint16_t asic65_device::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_asic65_type == ASIC65_ROMBASED)
 	{
@@ -484,14 +484,14 @@ READ16_MEMBER( asic65_device::io_r )
  *
  *************************************/
 
-WRITE16_MEMBER( asic65_device::m68k_w )
+void asic65_device::m68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_68full = 1;
 	m_68data = data;
 }
 
 
-READ16_MEMBER( asic65_device::m68k_r )
+uint16_t asic65_device::m68k_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_tfull = 0;
 	if (m_asic65_type == ASIC65_ROMBASED)
@@ -500,13 +500,13 @@ READ16_MEMBER( asic65_device::m68k_r )
 }
 
 
-WRITE16_MEMBER( asic65_device::stat_w )
+void asic65_device::stat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_xflg = data & 1;
 }
 
 
-READ16_MEMBER( asic65_device::stat_r )
+uint16_t asic65_device::stat_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* bit 15 = 68FULL */
 	/* bit 14 = TFULL */

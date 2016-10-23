@@ -49,19 +49,19 @@ The driver has been updated accordingly.
  *
  *************************************/
 
-READ8_MEMBER(matmania_state::maniach_68705_port_a_r)
+uint8_t matmania_state::maniach_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_port_a_w)
+void matmania_state::maniach_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_a_w)
+void matmania_state::maniach_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
@@ -76,12 +76,12 @@ WRITE8_MEMBER(matmania_state::maniach_68705_ddr_a_w)
  *  2   W  when 0->1, copies port A to the latch for the main CPU
  */
 
-READ8_MEMBER(matmania_state::maniach_68705_port_b_r)
+uint8_t matmania_state::maniach_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_port_b_w)
+void matmania_state::maniach_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
@@ -101,13 +101,13 @@ WRITE8_MEMBER(matmania_state::maniach_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_b_w)
+void matmania_state::maniach_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
 
-READ8_MEMBER(matmania_state::maniach_68705_port_c_r)
+uint8_t matmania_state::maniach_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_port_c_in = 0;
 
@@ -122,33 +122,33 @@ READ8_MEMBER(matmania_state::maniach_68705_port_c_r)
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_port_c_w)
+void matmania_state::maniach_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port C write %02x\n", space.device().safe_pc(), data);
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(matmania_state::maniach_68705_ddr_c_w)
+void matmania_state::maniach_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_c = data;
 }
 
 
-WRITE8_MEMBER(matmania_state::maniach_mcu_w)
+void matmania_state::maniach_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 3040_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
 	m_main_sent = 1;
 }
 
-READ8_MEMBER(matmania_state::maniach_mcu_r)
+uint8_t matmania_state::maniach_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 3040_r %02x\n", space.device().safe_pc(), m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
-READ8_MEMBER(matmania_state::maniach_mcu_status_r)
+uint8_t matmania_state::maniach_mcu_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res = 0;
 
@@ -170,13 +170,13 @@ READ8_MEMBER(matmania_state::maniach_mcu_status_r)
  *
  *************************************/
 
-WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
+void matmania_state::matmania_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
+void matmania_state::maniach_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);

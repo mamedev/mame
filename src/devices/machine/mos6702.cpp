@@ -53,7 +53,7 @@ void mos6702_device::device_start()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6702_device::read )
+uint8_t mos6702_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -63,6 +63,6 @@ READ8_MEMBER( mos6702_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6702_device::write )
+void mos6702_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }

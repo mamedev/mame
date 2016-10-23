@@ -67,7 +67,7 @@ Verification still needed for the other PCBs.
 #include "sound/3812intf.h"
 #include "includes/aerofgt.h"
 
-WRITE16_MEMBER(aerofgt_state::sound_command_w)
+void aerofgt_state::sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -77,7 +77,7 @@ WRITE16_MEMBER(aerofgt_state::sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
+void aerofgt_state::turbofrc_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -87,7 +87,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
+void aerofgt_state::aerfboot_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -96,29 +96,29 @@ WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 	}
 }
 
-READ16_MEMBER(aerofgt_state::pending_command_r)
+uint16_t aerofgt_state::pending_command_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_pending_command;
 }
 
-WRITE8_MEMBER(aerofgt_state::pending_command_clear_w)
+void aerofgt_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
+void aerofgt_state::aerofgt_sh_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }
 
 
-WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
+void aerofgt_state::pspikesb_oki_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */
-WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
+void aerofgt_state::aerfboo2_okim6295_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  if(ACCESSING_BITS_8_15)
 //  {
@@ -126,21 +126,21 @@ WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
 //  }
 }
 
-WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
+void aerofgt_state::aerfboot_okim6295_banking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*bit 2 (0x4) setted too?*/
 	if (data & 0x4)
 		membank("okibank")->set_entry(data & 0x3);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+void aerofgt_state::karatblzbl_d7759_write_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+void aerofgt_state::karatblzbl_d7759_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 0x80);
 }

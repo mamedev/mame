@@ -162,7 +162,7 @@ void nes_3dblock_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_gs2015_device::write_h)
+void nes_gs2015_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("gs2015 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -170,7 +170,7 @@ WRITE8_MEMBER(nes_gs2015_device::write_h)
 	chr8(offset >> 1, m_chr_source);
 }
 
-READ8_MEMBER(nes_gs2015_device::read_m)
+uint8_t nes_gs2015_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("gs2015 read_m, offset: %04x\n", offset));
 	return 0;   // Videopoker Bonza needs this (sort of protection? or related to inputs?)
@@ -187,7 +187,7 @@ READ8_MEMBER(nes_gs2015_device::read_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_gs2004_device::write_h)
+void nes_gs2004_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("gs2004 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -205,7 +205,7 @@ WRITE8_MEMBER(nes_gs2004_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_gs2013_device::write_h)
+void nes_gs2013_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("gs2013 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -233,7 +233,7 @@ WRITE8_MEMBER(nes_gs2013_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tf9_device::write_h)
+void nes_tf9_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("tetrisfam write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -280,7 +280,7 @@ void nes_3dblock_device::hblank_irq(int scanline, int vblank, int blanked)
 	}
 }
 
-WRITE8_MEMBER(nes_3dblock_device::write_l)
+void nes_3dblock_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("3dblock write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;

@@ -19,17 +19,17 @@ public:
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
 	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
 
-	DECLARE_READ32_MEMBER(sb_mdstar_r);  // 5f6c04
-	DECLARE_WRITE32_MEMBER(sb_mdstar_w);
-	DECLARE_READ32_MEMBER(sb_mdtsel_r);    // 5f6c10
-	DECLARE_WRITE32_MEMBER(sb_mdtsel_w);
-	DECLARE_READ32_MEMBER(sb_mden_r);    // 5f6c14
-	DECLARE_WRITE32_MEMBER(sb_mden_w);
-	DECLARE_READ32_MEMBER(sb_mdst_r);    // 5f6c18
-	DECLARE_WRITE32_MEMBER(sb_mdst_w);
-	DECLARE_READ32_MEMBER(sb_msys_r);    // 5f6c80
-	DECLARE_WRITE32_MEMBER(sb_msys_w);
-	DECLARE_WRITE32_MEMBER(sb_mdapro_w); // 5f6c8c
+	uint32_t sb_mdstar_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);  // 5f6c04
+	void sb_mdstar_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sb_mdtsel_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);    // 5f6c10
+	void sb_mdtsel_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sb_mden_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);    // 5f6c14
+	void sb_mden_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sb_mdst_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);    // 5f6c18
+	void sb_mdst_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t sb_msys_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);    // 5f6c80
+	void sb_msys_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sb_mdapro_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff); // 5f6c8c
 
 	DECLARE_ADDRESS_MAP(amap, 32);
 

@@ -46,11 +46,11 @@ public:
 	uint16_t m_gunx;
 	uint16_t m_guny;
 	uint8_t m_blank_palette;
-	DECLARE_WRITE16_MEMBER(ripribit_control_w);
-	DECLARE_WRITE16_MEMBER(cfarm_control_w);
-	DECLARE_WRITE16_MEMBER(cclownz_control_w);
-	DECLARE_READ16_MEMBER(lethalj_gun_r);
-	DECLARE_WRITE16_MEMBER(lethalj_blitter_w);
+	void ripribit_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cfarm_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cclownz_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t lethalj_gun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void lethalj_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void do_blit();
 	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
 	void init_cfarm();

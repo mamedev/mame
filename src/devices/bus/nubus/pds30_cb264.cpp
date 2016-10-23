@@ -236,7 +236,7 @@ uint32_t nubus_cb264se30_device::screen_update(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
+void nubus_cb264se30_device::cb264se30_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -308,17 +308,17 @@ WRITE32_MEMBER( nubus_cb264se30_device::cb264se30_w )
 	}
 }
 
-READ32_MEMBER( nubus_cb264se30_device::cb264se30_r )
+uint32_t nubus_cb264se30_device::cb264se30_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-WRITE32_MEMBER( nubus_cb264se30_device::vram_w )
+void nubus_cb264se30_device::vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vram32[offset]);
 }
 
-READ32_MEMBER( nubus_cb264se30_device::vram_r )
+uint32_t nubus_cb264se30_device::vram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_vram32[offset];
 }

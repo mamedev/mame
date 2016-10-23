@@ -69,8 +69,8 @@ public:
 	// read/write handlers overloads
 	uint8_t read(offs_t offset)               { return read((uint8_t) offset); }
 	void write(offs_t offset, uint8_t data)   { write((uint8_t) offset, data); }
-	DECLARE_READ8_MEMBER( read )            { return read((uint8_t) offset); }
-	DECLARE_WRITE8_MEMBER( write )          { write((uint8_t) offset, data); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)            { return read((uint8_t) offset); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)          { write((uint8_t) offset, data); }
 
 	// accessor
 	uint8_t get_lines();

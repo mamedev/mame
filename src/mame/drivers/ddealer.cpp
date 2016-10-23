@@ -152,11 +152,11 @@ public:
 	/* misc */
 	uint8_t    m_input_pressed;
 	uint16_t   m_coin_input;
-	DECLARE_WRITE16_MEMBER(ddealer_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(back_vram_w);
-	DECLARE_WRITE16_MEMBER(ddealer_vregs_w);
-	DECLARE_WRITE16_MEMBER(ddealer_mcu_shared_w);
-	DECLARE_READ16_MEMBER(ddealer_mcu_r);
+	void ddealer_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void back_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddealer_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ddealer_mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t ddealer_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_ddealer();
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	virtual void machine_start() override;
@@ -173,7 +173,7 @@ public:
 
 
 
-WRITE16_MEMBER(ddealer_state::ddealer_flipscreen_w)
+void ddealer_state::ddealer_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_flipscreen = data & 0x01;
 }
@@ -382,14 +382,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
 
 
 
-WRITE16_MEMBER(ddealer_state::back_vram_w)
+void ddealer_state::back_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_back_vram[offset]);
 	m_back_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(ddealer_state::ddealer_vregs_w)
+void ddealer_state::ddealer_vregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 }
@@ -415,7 +415,7 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 		m_mcu_shared_ram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
-WRITE16_MEMBER(ddealer_state::ddealer_mcu_shared_w)
+void ddealer_state::ddealer_mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mcu_shared_ram[offset]);
 
@@ -651,7 +651,7 @@ MACHINE_CONFIG_END
 
 
 
-READ16_MEMBER(ddealer_state::ddealer_mcu_r)
+uint16_t ddealer_state::ddealer_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int resp[] =
 	{

@@ -93,12 +93,12 @@ public:
 	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
-	DECLARE_WRITE8_MEMBER(main_command_w);
-	DECLARE_READ8_MEMBER(main_response_r);
-	DECLARE_WRITE16_MEMBER(sound_reset_w);
+	void main_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t main_response_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// read/write handlers
-	DECLARE_WRITE8_MEMBER(ym2151_port_w);
+	void ym2151_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER(main_test_read_line);
 
 	// I/O lines
@@ -144,11 +144,11 @@ protected:
 
 public:
 	// read/write handlers
-	DECLARE_READ8_MEMBER( oki_r );
-	DECLARE_WRITE8_MEMBER( oki_w );
-	DECLARE_WRITE8_MEMBER( wrio_w );
-	DECLARE_WRITE8_MEMBER( mix_w );
-	DECLARE_WRITE8_MEMBER( overall_volume_w );
+	uint8_t oki_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wrio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void overall_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device level overrides
@@ -187,12 +187,12 @@ public:
 	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
-	DECLARE_WRITE8_MEMBER( wrio_w );
-	DECLARE_WRITE8_MEMBER( mix_w );
-	DECLARE_WRITE8_MEMBER( tms5220_voice );
-	DECLARE_READ8_MEMBER( pokey_r );
-	DECLARE_WRITE8_MEMBER( pokey_w );
+	uint8_t rdio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void wrio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tms5220_voice(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pokey_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pokey_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device level overrides
@@ -224,7 +224,7 @@ public:
 	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
+	uint8_t rdio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device level overrides
@@ -249,7 +249,7 @@ protected:
 
 public:
 	// read/write handlers
-	DECLARE_READ8_MEMBER( rdio_r );
+	uint8_t rdio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device level overrides

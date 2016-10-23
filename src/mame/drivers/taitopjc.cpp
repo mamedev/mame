@@ -119,22 +119,22 @@ public:
 	required_memory_region m_polyrom;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_READ64_MEMBER(video_r);
-	DECLARE_WRITE64_MEMBER(video_w);
-	DECLARE_READ64_MEMBER(ppc_common_r);
-	DECLARE_WRITE64_MEMBER(ppc_common_w);
-	DECLARE_READ64_MEMBER(dsp_r);
-	DECLARE_WRITE64_MEMBER(dsp_w);
-	DECLARE_READ8_MEMBER(tlcs_common_r);
-	DECLARE_WRITE8_MEMBER(tlcs_common_w);
-	DECLARE_READ8_MEMBER(tlcs_sound_r);
-	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
-	DECLARE_WRITE16_MEMBER(tlcs_unk_w);
-	DECLARE_READ16_MEMBER(tms_dspshare_r);
-	DECLARE_WRITE16_MEMBER(tms_dspshare_w);
-	DECLARE_READ16_MEMBER(dsp_rom_r);
-	DECLARE_WRITE16_MEMBER(dsp_roml_w);
-	DECLARE_WRITE16_MEMBER(dsp_romh_w);
+	uint64_t video_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void video_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t ppc_common_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void ppc_common_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint64_t dsp_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
+	void dsp_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
+	uint8_t tlcs_common_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tlcs_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tlcs_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tlcs_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tlcs_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t tms_dspshare_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tms_dspshare_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dsp_rom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dsp_roml_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dsp_romh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -298,7 +298,7 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 	}
 }
 
-READ64_MEMBER(taitopjc_state::video_r)
+uint64_t taitopjc_state::video_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -313,7 +313,7 @@ READ64_MEMBER(taitopjc_state::video_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitopjc_state::video_w)
+void taitopjc_state::video_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -332,7 +332,7 @@ WRITE64_MEMBER(taitopjc_state::video_w)
 	}
 }
 
-READ64_MEMBER(taitopjc_state::ppc_common_r)
+uint64_t taitopjc_state::ppc_common_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 	uint32_t address;
@@ -353,7 +353,7 @@ READ64_MEMBER(taitopjc_state::ppc_common_r)
 	return r;
 }
 
-WRITE64_MEMBER(taitopjc_state::ppc_common_w)
+void taitopjc_state::ppc_common_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	uint32_t address = offset * 2;
 
@@ -382,7 +382,7 @@ WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 	}
 }
 
-READ64_MEMBER(taitopjc_state::dsp_r)
+uint64_t taitopjc_state::dsp_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
 
@@ -473,7 +473,7 @@ void taitopjc_state::print_display_list()
 	}
 }
 
-WRITE64_MEMBER(taitopjc_state::dsp_w)
+void taitopjc_state::dsp_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), space.device().safe_pc());
 
@@ -531,7 +531,7 @@ ADDRESS_MAP_END
 
 
 
-READ8_MEMBER(taitopjc_state::tlcs_common_r)
+uint8_t taitopjc_state::tlcs_common_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -543,7 +543,7 @@ READ8_MEMBER(taitopjc_state::tlcs_common_r)
 	}
 }
 
-WRITE8_MEMBER(taitopjc_state::tlcs_common_w)
+void taitopjc_state::tlcs_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1)
 	{
@@ -577,7 +577,7 @@ WRITE8_MEMBER(taitopjc_state::tlcs_common_w)
 	}
 }
 
-READ8_MEMBER(taitopjc_state::tlcs_sound_r)
+uint8_t taitopjc_state::tlcs_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x17)
 	{
@@ -587,12 +587,12 @@ READ8_MEMBER(taitopjc_state::tlcs_sound_r)
 	return 0;
 }
 
-WRITE8_MEMBER(taitopjc_state::tlcs_sound_w)
+void taitopjc_state::tlcs_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("tlcs_sound_w: %08X, %02X\n", offset, data);
 }
 
-WRITE16_MEMBER(taitopjc_state::tlcs_unk_w)
+void taitopjc_state::tlcs_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0xc/2)
 	{
@@ -633,12 +633,12 @@ ADDRESS_MAP_END
 
 
 
-READ16_MEMBER(taitopjc_state::tms_dspshare_r)
+uint16_t taitopjc_state::tms_dspshare_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dsp_ram[offset];
 }
 
-WRITE16_MEMBER(taitopjc_state::tms_dspshare_w)
+void taitopjc_state::tms_dspshare_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0xffc)
 	{
@@ -647,7 +647,7 @@ WRITE16_MEMBER(taitopjc_state::tms_dspshare_w)
 	m_dsp_ram[offset] = data;
 }
 
-READ16_MEMBER(taitopjc_state::dsp_rom_r)
+uint16_t taitopjc_state::dsp_rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	assert(m_dsp_rom_address < 0x800000);
 
@@ -656,13 +656,13 @@ READ16_MEMBER(taitopjc_state::dsp_rom_r)
 	return data;
 }
 
-WRITE16_MEMBER(taitopjc_state::dsp_roml_w)
+void taitopjc_state::dsp_roml_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_rom_address &= 0xffff0000;
 	m_dsp_rom_address |= data;
 }
 
-WRITE16_MEMBER(taitopjc_state::dsp_romh_w)
+void taitopjc_state::dsp_romh_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_dsp_rom_address &= 0xffff;
 	m_dsp_rom_address |= (uint32_t)(data) << 16;

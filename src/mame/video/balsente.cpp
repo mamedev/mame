@@ -42,7 +42,7 @@ void balsente_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_videoram_w)
+void balsente_state::balsente_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* expand the two pixel values into two bytes */
 	m_videoram[offset] = data;
@@ -59,7 +59,7 @@ WRITE8_MEMBER(balsente_state::balsente_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
+void balsente_state::balsente_palette_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only update if changed */
 	if (m_palettebank_vis != (data & 3))
@@ -80,7 +80,7 @@ WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_paletteram_w)
+void balsente_state::balsente_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(balsente_state::balsente_paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
+void balsente_state::shrike_sprite_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if( m_sprite_data != m_sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{

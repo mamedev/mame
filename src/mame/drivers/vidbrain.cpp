@@ -59,7 +59,7 @@
 //  keyboard_w - keyboard column write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::keyboard_w )
+void vidbrain_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER( vidbrain_state::keyboard_w )
 //  keyboard_r - keyboard row read
 //-------------------------------------------------
 
-READ8_MEMBER( vidbrain_state::keyboard_r )
+uint8_t vidbrain_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -120,7 +120,7 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 //  sound_w - sound clock write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::sound_w )
+void vidbrain_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -181,7 +181,7 @@ void vidbrain_state::interrupt_check()
 //  f3853_w - F3853 SMI write
 //-------------------------------------------------
 
-WRITE8_MEMBER( vidbrain_state::f3853_w )
+void vidbrain_state::f3853_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -408,7 +408,7 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-READ8_MEMBER(vidbrain_state::memory_read_byte)
+uint8_t vidbrain_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);

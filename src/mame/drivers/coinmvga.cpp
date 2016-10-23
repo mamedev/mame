@@ -293,13 +293,13 @@ uint32_t coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_in
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(coinmvga_state::debug_w)
+//void coinmvga_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
 
 /*
-READ16_MEMBER(coinmvga_state::test_r)
+uint16_t coinmvga_state::test_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
     return machine().rand();
 }*/

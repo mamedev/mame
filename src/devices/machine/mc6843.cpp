@@ -478,7 +478,7 @@ void mc6843_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 
 
-READ8_MEMBER( mc6843_device::read )
+uint8_t mc6843_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -617,7 +617,7 @@ READ8_MEMBER( mc6843_device::read )
 	return data;
 }
 
-WRITE8_MEMBER( mc6843_device::write )
+void mc6843_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset ) {
 	case 0: /* Data Output Register (DOR) */

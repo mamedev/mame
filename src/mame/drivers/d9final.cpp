@@ -46,11 +46,11 @@ public:
 
 	tilemap_t *m_sc0_tilemap;
 
-	DECLARE_WRITE8_MEMBER(sc0_lovram);
-	DECLARE_WRITE8_MEMBER(sc0_hivram);
-	DECLARE_WRITE8_MEMBER(sc0_cram);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(prot_latch_r);
+	void sc0_lovram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc0_hivram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sc0_cram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prot_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 
@@ -84,31 +84,31 @@ uint32_t d9final_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-WRITE8_MEMBER(d9final_state::sc0_lovram)
+void d9final_state::sc0_lovram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lo_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::sc0_hivram)
+void d9final_state::sc0_hivram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hi_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::sc0_cram)
+void d9final_state::sc0_cram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(d9final_state::bank_w)
+void d9final_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x7);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
-READ8_MEMBER(d9final_state::prot_latch_r)
+uint8_t d9final_state::prot_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  printf("PC=%06x\n",space.device().safe_pc());
 

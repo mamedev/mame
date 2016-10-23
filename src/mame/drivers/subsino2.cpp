@@ -107,59 +107,59 @@ public:
 	optional_shared_ptr<uint8_t> m_outputs;
 	uint16_t m_bishjan_sound;
 	uint16_t m_bishjan_input;
-	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_lo2_w);
-	DECLARE_READ8_MEMBER(ss9601_videoram_0_hi_r);
-	DECLARE_READ8_MEMBER(ss9601_videoram_0_lo_r);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_lo2_w);
-	DECLARE_READ8_MEMBER(ss9601_videoram_1_hi_r);
-	DECLARE_READ8_MEMBER(ss9601_videoram_1_lo_r);
-	DECLARE_WRITE8_MEMBER(ss9601_reelram_hi_lo_w);
-	DECLARE_READ8_MEMBER(ss9601_reelram_hi_r);
-	DECLARE_READ8_MEMBER(ss9601_reelram_lo_r);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollctrl_w);
-	DECLARE_WRITE8_MEMBER(ss9601_tilesize_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scroll_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_hi_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_hi_lo_w);
-	DECLARE_READ8_MEMBER(ss9601_scrollram_0_hi_r);
-	DECLARE_READ8_MEMBER(ss9601_scrollram_0_lo_r);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_hi_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_lo_w);
-	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_hi_lo_w);
-	DECLARE_READ8_MEMBER(ss9601_scrollram_1_hi_r);
-	DECLARE_READ8_MEMBER(ss9601_scrollram_1_lo_r);
-	DECLARE_WRITE8_MEMBER(ss9601_disable_w);
-	DECLARE_WRITE8_MEMBER(hm86171_colorram_w);
-	DECLARE_WRITE8_MEMBER(dsw_mask_w);
-	DECLARE_READ8_MEMBER(dsw_r);
-	DECLARE_READ8_MEMBER(vblank_bit2_r);
-	DECLARE_READ8_MEMBER(vblank_bit6_r);
-	DECLARE_WRITE16_MEMBER(bishjan_sound_w);
-	DECLARE_READ16_MEMBER(bishjan_serial_r);
-	DECLARE_WRITE16_MEMBER(bishjan_input_w);
-	DECLARE_READ16_MEMBER(bishjan_input_r);
-	DECLARE_WRITE16_MEMBER(bishjan_outputs_w);
-	DECLARE_WRITE16_MEMBER(new2001_outputs_w);
-	DECLARE_WRITE16_MEMBER(humlan_outputs_w);
-	DECLARE_WRITE8_MEMBER(expcard_outputs_w);
-	DECLARE_WRITE8_MEMBER(mtrain_outputs_w);
-	DECLARE_WRITE8_MEMBER(mtrain_videoram_w);
-	DECLARE_WRITE8_MEMBER(mtrain_tilesize_w);
-	DECLARE_READ8_MEMBER(mtrain_prot_r);
-	DECLARE_WRITE8_MEMBER(saklove_outputs_w);
-	DECLARE_WRITE8_MEMBER(xplan_outputs_w);
-	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_bit0_w);
-	DECLARE_WRITE8_MEMBER(oki_bank_bit4_w);
+	void ss9601_byte_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_byte_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_0_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_0_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_0_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_0_hi_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_videoram_0_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_videoram_0_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_1_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_videoram_1_hi_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_videoram_1_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_videoram_1_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ss9601_reelram_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_reelram_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_reelram_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ss9601_scrollctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_tilesize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_0_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_0_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_0_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_scrollram_0_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_scrollram_0_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ss9601_scrollram_1_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_scrollram_1_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ss9601_scrollram_1_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ss9601_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void hm86171_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dsw_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vblank_bit2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vblank_bit6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bishjan_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bishjan_serial_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bishjan_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t bishjan_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void bishjan_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void new2001_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void humlan_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void expcard_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mtrain_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mtrain_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mtrain_tilesize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mtrain_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void saklove_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xplan_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void xtrain_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void oki_bank_bit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void oki_bank_bit4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_bishjan();
 	void init_new2001();
 	void init_humlan();
@@ -218,11 +218,11 @@ TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_1)
 }
 
 
-WRITE8_MEMBER(subsino2_state::ss9601_byte_lo_w)
+void subsino2_state::ss9601_byte_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_byte_lo = data;
 }
-WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
+void subsino2_state::ss9601_byte_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_byte_lo2 = data;
 }
@@ -255,83 +255,83 @@ static inline void ss9601_videoram_w(layer_t *l, vram_t vram, address_space &spa
 }
 
 // Layer 0
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_w)
+void subsino2_state::ss9601_videoram_0_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_lo_w)
+void subsino2_state::ss9601_videoram_0_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, data);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo_w)
+void subsino2_state::ss9601_videoram_0_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
 	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, m_ss9601_byte_lo);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo2_w)
+void subsino2_state::ss9601_videoram_0_hi_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[0], VRAM_HI, space, offset, data);
 	ss9601_videoram_w(&m_layers[0], VRAM_LO, space, offset, m_ss9601_byte_lo2);
 }
 
-READ8_MEMBER(subsino2_state::ss9601_videoram_0_hi_r)
+uint8_t subsino2_state::ss9601_videoram_0_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[0].videorams[VRAM_HI][offset];
 }
 
-READ8_MEMBER(subsino2_state::ss9601_videoram_0_lo_r)
+uint8_t subsino2_state::ss9601_videoram_0_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[0].videorams[VRAM_LO][offset];
 }
 
 // Layer 1
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_w)
+void subsino2_state::ss9601_videoram_1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_lo_w)
+void subsino2_state::ss9601_videoram_1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, data);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo_w)
+void subsino2_state::ss9601_videoram_1_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
 	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, m_ss9601_byte_lo);
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo2_w)
+void subsino2_state::ss9601_videoram_1_hi_lo2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ss9601_videoram_w(&m_layers[1], VRAM_HI, space, offset, data);
 	ss9601_videoram_w(&m_layers[1], VRAM_LO, space, offset, m_ss9601_byte_lo2);
 }
 
-READ8_MEMBER(subsino2_state::ss9601_videoram_1_hi_r)
+uint8_t subsino2_state::ss9601_videoram_1_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[1].videorams[VRAM_HI][offset];
 }
 
-READ8_MEMBER(subsino2_state::ss9601_videoram_1_lo_r)
+uint8_t subsino2_state::ss9601_videoram_1_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[1].videorams[VRAM_LO][offset];
 }
 
 // Layer 0 Reels
 
-WRITE8_MEMBER(subsino2_state::ss9601_reelram_hi_lo_w)
+void subsino2_state::ss9601_reelram_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_reelrams[VRAM_HI][offset] = data;
 	m_ss9601_reelrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
-READ8_MEMBER(subsino2_state::ss9601_reelram_hi_r)
+uint8_t subsino2_state::ss9601_reelram_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ss9601_reelrams[VRAM_HI][offset];
 }
-READ8_MEMBER(subsino2_state::ss9601_reelram_lo_r)
+uint8_t subsino2_state::ss9601_reelram_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ss9601_reelrams[VRAM_LO][offset];
 }
@@ -442,12 +442,12 @@ wtrnymph                xplan
 
 // These are written in sequence
 
-WRITE8_MEMBER(subsino2_state::ss9601_scrollctrl_w)
+void subsino2_state::ss9601_scrollctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_scrollctrl = data;
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_tilesize_w)
+void subsino2_state::ss9601_tilesize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_tilesize = data;
 
@@ -513,7 +513,7 @@ WRITE8_MEMBER(subsino2_state::ss9601_tilesize_w)
                               Tilemaps Scroll
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::ss9601_scroll_w)
+void subsino2_state::ss9601_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	layer_t *layers = m_layers;
 	switch ( offset )
@@ -533,55 +533,55 @@ WRITE8_MEMBER(subsino2_state::ss9601_scroll_w)
 }
 
 // Layer 0
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_w)
+void subsino2_state::ss9601_scrollram_0_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[0].scrollrams[VRAM_HI][offset] = data;
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_w)
+void subsino2_state::ss9601_scrollram_0_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[0].scrollrams[VRAM_LO][offset] = data;
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_lo_w)
+void subsino2_state::ss9601_scrollram_0_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[0].scrollrams[VRAM_HI][offset] = data;
 	m_layers[0].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
 
-READ8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_r)
+uint8_t subsino2_state::ss9601_scrollram_0_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[0].scrollrams[VRAM_HI][offset];
 }
 
-READ8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_r)
+uint8_t subsino2_state::ss9601_scrollram_0_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[0].scrollrams[VRAM_LO][offset];
 }
 
 // Layer 1
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_w)
+void subsino2_state::ss9601_scrollram_1_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[1].scrollrams[VRAM_HI][offset] = data;
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_w)
+void subsino2_state::ss9601_scrollram_1_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[1].scrollrams[VRAM_LO][offset] = data;
 }
 
-WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_lo_w)
+void subsino2_state::ss9601_scrollram_1_hi_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layers[1].scrollrams[VRAM_HI][offset] = data;
 	m_layers[1].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
 
-READ8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_r)
+uint8_t subsino2_state::ss9601_scrollram_1_hi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[1].scrollrams[VRAM_HI][offset];
 }
 
-READ8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_r)
+uint8_t subsino2_state::ss9601_scrollram_1_lo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_layers[1].scrollrams[VRAM_LO][offset];
 }
@@ -591,7 +591,7 @@ READ8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_r)
                               Tilemaps Disable
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
+void subsino2_state::ss9601_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_disable = data;
 }
@@ -788,7 +788,7 @@ uint32_t subsino2_state::screen_update_subsino2(screen_device &screen, bitmap_in
 ***************************************************************************/
 
 
-WRITE8_MEMBER(subsino2_state::hm86171_colorram_w)
+void subsino2_state::hm86171_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -820,12 +820,12 @@ WRITE8_MEMBER(subsino2_state::hm86171_colorram_w)
                                 Input / Output
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::dsw_mask_w)
+void subsino2_state::dsw_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dsw_mask = data;
 }
 
-READ8_MEMBER(subsino2_state::dsw_r)
+uint8_t subsino2_state::dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return  ( (ioport("DSW1")->read() & m_dsw_mask) ? 0x01 : 0 ) |
 			( (ioport("DSW2")->read() & m_dsw_mask) ? 0x02 : 0 ) |
@@ -834,22 +834,22 @@ READ8_MEMBER(subsino2_state::dsw_r)
 }
 
 
-READ8_MEMBER(subsino2_state::vblank_bit2_r)
+uint8_t subsino2_state::vblank_bit2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vblank() ? 0x04 : 0x00;
 }
-READ8_MEMBER(subsino2_state::vblank_bit6_r)
+uint8_t subsino2_state::vblank_bit6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vblank() ? 0x40 : 0x00;
 }
 
-WRITE8_MEMBER(subsino2_state::oki_bank_bit0_w)
+void subsino2_state::oki_bank_bit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// it writes 0x32 or 0x33
 	m_oki->set_rom_bank(data & 1);
 }
 
-WRITE8_MEMBER(subsino2_state::oki_bank_bit4_w)
+void subsino2_state::oki_bank_bit4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// it writes 0x23 or 0x33
 	m_oki->set_rom_bank((data >> 4) & 1);
@@ -869,7 +869,7 @@ INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
                                 Bishou Jan
 ***************************************************************************/
 
-WRITE16_MEMBER(subsino2_state::bishjan_sound_w)
+void subsino2_state::bishjan_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	    sound writes in service mode:
@@ -880,7 +880,7 @@ WRITE16_MEMBER(subsino2_state::bishjan_sound_w)
 		m_bishjan_sound = data >> 8;
 }
 
-READ16_MEMBER(subsino2_state::bishjan_serial_r)
+uint16_t subsino2_state::bishjan_serial_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return
 		(machine().rand() & 0x9800) |                     // bit 7 - serial communication
@@ -890,13 +890,13 @@ READ16_MEMBER(subsino2_state::bishjan_serial_r)
 		0x18;
 }
 
-WRITE16_MEMBER(subsino2_state::bishjan_input_w)
+void subsino2_state::bishjan_input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_bishjan_input = data >> 8;
 }
 
-READ16_MEMBER(subsino2_state::bishjan_input_r)
+uint16_t subsino2_state::bishjan_input_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int i;
 	uint16_t res = 0xff;
@@ -912,7 +912,7 @@ READ16_MEMBER(subsino2_state::bishjan_input_r)
 	;
 }
 
-WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
+void subsino2_state::bishjan_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_outputs16[offset] );
 
@@ -983,7 +983,7 @@ ADDRESS_MAP_END
                                   New 2001
 ***************************************************************************/
 
-WRITE16_MEMBER(subsino2_state::new2001_outputs_w)
+void subsino2_state::new2001_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_outputs16[offset] );
 
@@ -1074,7 +1074,7 @@ ADDRESS_MAP_END
                              Humlan's Lyckohjul
 ***************************************************************************/
 
-WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
+void subsino2_state::humlan_outputs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_outputs16[offset] );
 
@@ -1110,7 +1110,7 @@ ADDRESS_MAP_END
                        Express Card / Top Card
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
+void subsino2_state::expcard_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outputs[offset] = data;
 
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
                                 Magic Train
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
+void subsino2_state::mtrain_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outputs[offset] = data;
 
@@ -1177,7 +1177,7 @@ WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
+void subsino2_state::mtrain_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	vram_t vram = (m_ss9601_byte_lo & 0x08) ? VRAM_HI : VRAM_LO;
 	switch (m_ss9601_byte_lo & (~0x08))
@@ -1192,7 +1192,7 @@ WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
 	}
 }
 
-WRITE8_MEMBER(subsino2_state::mtrain_tilesize_w)
+void subsino2_state::mtrain_tilesize_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ss9601_tilesize = data;
 
@@ -1230,7 +1230,7 @@ WRITE8_MEMBER(subsino2_state::mtrain_tilesize_w)
 	}
 }
 
-READ8_MEMBER(subsino2_state::mtrain_prot_r)
+uint8_t subsino2_state::mtrain_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return "SUBSION"[offset];
 }
@@ -1276,7 +1276,7 @@ ADDRESS_MAP_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
+void subsino2_state::saklove_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outputs[offset] = data;
 
@@ -1356,7 +1356,7 @@ ADDRESS_MAP_END
                                 X-Plan
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
+void subsino2_state::xplan_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outputs[offset] = data;
 
@@ -1455,7 +1455,7 @@ ADDRESS_MAP_END
                                 X-Train
 ***************************************************************************/
 
-WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
+void subsino2_state::xtrain_outputs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outputs[offset] = data;
 

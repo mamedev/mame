@@ -211,24 +211,24 @@ TIMER_DEVICE_CALLBACK_MEMBER(xain_state::scanline)
 	}
 }
 
-WRITE8_MEMBER(xain_state::cpuA_bankswitch_w)
+void xain_state::cpuA_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pri = data & 0x7;
 	membank("bank1")->set_entry((data >> 3) & 1);
 }
 
-WRITE8_MEMBER(xain_state::cpuB_bankswitch_w)
+void xain_state::cpuB_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data & 1);
 }
 
-WRITE8_MEMBER(xain_state::sound_command_w)
+void xain_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-WRITE8_MEMBER(xain_state::main_irq_w)
+void xain_state::main_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -247,23 +247,23 @@ WRITE8_MEMBER(xain_state::main_irq_w)
 	}
 }
 
-WRITE8_MEMBER(xain_state::irqA_assert_w)
+void xain_state::irqA_assert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(xain_state::irqB_clear_w)
+void xain_state::irqB_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(xain_state::m68705_r)
+uint8_t xain_state::m68705_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mcu_ready = 1;
 	return m_from_mcu;
 }
 
-WRITE8_MEMBER(xain_state::m68705_w)
+void xain_state::m68705_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_from_main = data;
 	m_mcu_accept = 0;
@@ -284,27 +284,27 @@ CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
 
 ***************************************************************************/
 
-READ8_MEMBER(xain_state::m68705_port_a_r)
+uint8_t xain_state::m68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(xain_state::m68705_port_a_w)
+void xain_state::m68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(xain_state::m68705_ddr_a_w)
+void xain_state::m68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(xain_state::m68705_port_b_r)
+uint8_t xain_state::m68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(xain_state::m68705_port_b_w)
+void xain_state::m68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ddr_b & 0x02) && (~data & 0x02))
 	{
@@ -327,12 +327,12 @@ WRITE8_MEMBER(xain_state::m68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(xain_state::m68705_ddr_b_w)
+void xain_state::m68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
-READ8_MEMBER(xain_state::m68705_port_c_r)
+uint8_t xain_state::m68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_port_c_in = 0;
 
@@ -344,12 +344,12 @@ READ8_MEMBER(xain_state::m68705_port_c_r)
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(xain_state::m68705_port_c_w)
+void xain_state::m68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(xain_state::m68705_ddr_c_w)
+void xain_state::m68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_c = data;
 }
@@ -373,7 +373,7 @@ CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 	return res;
 }
 
-READ8_MEMBER(xain_state::mcu_comm_reset_r)
+uint8_t xain_state::mcu_comm_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mcu_ready = 1;
 	m_mcu_accept = 1;

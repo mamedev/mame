@@ -60,13 +60,13 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
-	DECLARE_READ8_MEMBER(mcu63701_r);
-	DECLARE_WRITE8_MEMBER(mcu63701_w);
-	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spd_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mcu63701_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu63701_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
 

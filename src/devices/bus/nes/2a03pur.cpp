@@ -93,7 +93,7 @@ void nes_2a03pur_device::pcb_reset()
  officially reserved yet.
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_2a03pur_device::write_l)
+void nes_2a03pur_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("2a03 puritans write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -101,7 +101,7 @@ WRITE8_MEMBER(nes_2a03pur_device::write_l)
 		m_reg[offset & 7] = data;
 }
 
-READ8_MEMBER(nes_2a03pur_device::read_h)
+uint8_t nes_2a03pur_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("2a03 puritans read_h, offset: %04x\n", offset));
 

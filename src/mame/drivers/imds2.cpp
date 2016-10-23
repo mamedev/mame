@@ -199,7 +199,7 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 {
 }
 
-READ8_MEMBER(imds2_state::ipc_mem_read)
+uint8_t imds2_state::ipc_mem_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (imds2_in_ipc_rom(offset)) {
 		return m_ipc_rom[ (offset & 0x07ff) | ((offset & 0x1000) >> 1) ];
@@ -208,14 +208,14 @@ READ8_MEMBER(imds2_state::ipc_mem_read)
 	}
 }
 
-WRITE8_MEMBER(imds2_state::ipc_mem_write)
+void imds2_state::ipc_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!imds2_in_ipc_rom(offset)) {
 		m_ipc_ram[ offset ] = data;
 	}
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ipc_control_w)
+void imds2_state::imds2_ipc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
@@ -234,22 +234,22 @@ WRITE_LINE_MEMBER(imds2_state::imds2_ipc_intr)
 	m_ipccpu->set_input_line(I8085_INTR_LINE , (state != 0) && BIT(m_ipc_control , 2));
 }
 
-READ8_MEMBER(imds2_state::imds2_ipcsyspic_r)
+uint8_t imds2_state::imds2_ipcsyspic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ipcsyspic->read(space , offset == 0);
 }
 
-READ8_MEMBER(imds2_state::imds2_ipclocpic_r)
+uint8_t imds2_state::imds2_ipclocpic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ipclocpic->read(space , offset == 0);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ipcsyspic_w)
+void imds2_state::imds2_ipcsyspic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ipcsyspic->write(space , offset == 0 , data);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ipclocpic_w)
+void imds2_state::imds2_ipclocpic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ipclocpic->write(space , offset == 0 , data);
 }
@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_1_w)
 		m_ipcusart1->write_rxc(state);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_miscout_w)
+void imds2_state::imds2_miscout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_miscout = data;
 	imds2_update_beeper();
@@ -274,7 +274,7 @@ WRITE8_MEMBER(imds2_state::imds2_miscout_w)
 	m_ipclocpic->ir6_w(BIT(m_miscout , 1));
 }
 
-READ8_MEMBER(imds2_state::imds2_miscin_r)
+uint8_t imds2_state::imds2_miscin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = m_ioc_options->read();
 	return res | ((m_beeper_timer == 0) << 2);
@@ -286,19 +286,19 @@ WRITE_LINE_MEMBER(imds2_state::imds2_beep_timer_w)
 	imds2_update_beeper();
 }
 
-WRITE8_MEMBER(imds2_state::imds2_start_timer_w)
+void imds2_state::imds2_start_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Trigger timer 2 of ioctimer
 	m_ioctimer->write_gate2(0);
 	m_ioctimer->write_gate2(1);
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_read)
+uint8_t imds2_state::imds2_kb_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_kbcpu->upi41_master_r(space , (offset & 2) >> 1);
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_p2_r)
+uint8_t imds2_state::imds2_kb_port_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_kb_p1 & 3) == 0) {
 		// Row selected
@@ -358,75 +358,75 @@ READ8_MEMBER(imds2_state::imds2_kb_port_p2_r)
 	}
 }
 
-WRITE8_MEMBER(imds2_state::imds2_kb_port_p1_w)
+void imds2_state::imds2_kb_port_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kb_p1 = data;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t0_r)
+uint8_t imds2_state::imds2_kb_port_t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t1_r)
+uint8_t imds2_state::imds2_kb_port_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ioc_dbbout_w)
+void imds2_state::imds2_ioc_dbbout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ioc_obf = ~data;
 	// Set/reset OBF flag (b0)
 	m_ipc_ioc_status = ((offset & 1) == 0) | (m_ipc_ioc_status & ~0x01);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ioc_f0_w)
+void imds2_state::imds2_ioc_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Set/reset F0 flag (b2)
 	m_ipc_ioc_status = ((offset & 1) << 2) | (m_ipc_ioc_status & ~0x04);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ioc_set_f1_w)
+void imds2_state::imds2_ioc_set_f1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Set F1 flag (b3)
 	m_ipc_ioc_status |= 0x08;
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ioc_reset_f1_w)
+void imds2_state::imds2_ioc_reset_f1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Reset F1 flag (b3)
 	m_ipc_ioc_status &= ~0x08;
 }
 
-READ8_MEMBER(imds2_state::imds2_ioc_status_r)
+uint8_t imds2_state::imds2_ioc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ~m_ipc_ioc_status;
 }
 
-READ8_MEMBER(imds2_state::imds2_ioc_dbbin_r)
+uint8_t imds2_state::imds2_ioc_dbbin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Reset IBF flag (b1)
 	m_ipc_ioc_status &= ~0x02;
 	return ~m_ioc_ibf;
 }
 
-READ8_MEMBER(imds2_state::imds2_ipc_dbbout_r)
+uint8_t imds2_state::imds2_ipc_dbbout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Reset OBF flag (b0)
 	m_ipc_ioc_status &= ~0x01;
 	return m_ioc_obf;
 }
 
-READ8_MEMBER(imds2_state::imds2_ipc_status_r)
+uint8_t imds2_state::imds2_ipc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ipc_ioc_status;
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ipc_dbbin_data_w)
+void imds2_state::imds2_ipc_dbbin_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Set IBF flag (b1)
 	m_ipc_ioc_status |= 0x02;
@@ -435,7 +435,7 @@ WRITE8_MEMBER(imds2_state::imds2_ipc_dbbin_data_w)
 	m_ioc_ibf = data;
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ipc_dbbin_cmd_w)
+void imds2_state::imds2_ipc_dbbin_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Set IBF flag (b1)
 	m_ipc_ioc_status |= 0x02;
@@ -450,19 +450,19 @@ WRITE_LINE_MEMBER(imds2_state::imds2_hrq_w)
 	m_iocdma->hlda_w(state);
 }
 
-READ8_MEMBER(imds2_state::imds2_ioc_mem_r)
+uint8_t imds2_state::imds2_ioc_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_ioccpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(imds2_state::imds2_ioc_mem_w)
+void imds2_state::imds2_ioc_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_ioccpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset , data);
 }
 
-READ8_MEMBER(imds2_state::imds2_pio_port_p1_r)
+uint8_t imds2_state::imds2_pio_port_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// If STATUS ENABLE/ == 0 return inverted device status byte, else return 0xff
 	// STATUS ENABLE/ == 0 when P23-P20 == 12 & P24 == 0 & P25 = 1 & P26 = 1
@@ -473,18 +473,18 @@ READ8_MEMBER(imds2_state::imds2_pio_port_p1_r)
 }
 }
 
-WRITE8_MEMBER(imds2_state::imds2_pio_port_p1_w)
+void imds2_state::imds2_pio_port_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio_port1 = data;
 	imds2_update_printer();
 }
 
-READ8_MEMBER(imds2_state::imds2_pio_port_p2_r)
+uint8_t imds2_state::imds2_pio_port_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pio_port2;
 }
 
-WRITE8_MEMBER(imds2_state::imds2_pio_port_p2_w)
+void imds2_state::imds2_pio_port_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pio_port2 = data;
 	imds2_update_printer();

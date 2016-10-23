@@ -229,18 +229,18 @@ public:
 	uint8_t m_p3;
 	int m_d68681_val;
 	i82716_t m_i82716;
-	DECLARE_WRITE16_MEMBER(i82716_w);
-	DECLARE_READ16_MEMBER(i82716_r);
-	DECLARE_WRITE16_MEMBER(write_odd);
-	DECLARE_READ16_MEMBER(read_odd);
-	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
-	DECLARE_READ8_MEMBER(mcu_r);
-	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(b_read);
-	DECLARE_WRITE8_MEMBER(b_writ);
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_WRITE8_MEMBER(lamp_data_w);
-	DECLARE_READ8_MEMBER(kbd_r);
+	void i82716_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t i82716_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write_odd(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read_odd(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vsync_int_ctrl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t b_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void b_writ(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_screenpl();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -248,8 +248,8 @@ public:
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_maygayv1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
-	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);
+	void data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 };
@@ -257,7 +257,7 @@ public:
 
 
 
-WRITE16_MEMBER(maygayv1_state::i82716_w)
+void maygayv1_state::i82716_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
@@ -276,7 +276,7 @@ WRITE16_MEMBER(maygayv1_state::i82716_w)
 	}
 }
 
-READ16_MEMBER(maygayv1_state::i82716_r)
+uint16_t maygayv1_state::i82716_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
@@ -490,12 +490,12 @@ void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
 
 
 
-WRITE16_MEMBER(maygayv1_state::write_odd)
+void maygayv1_state::write_odd(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 //;860008 is a latch of some sort
-READ16_MEMBER(maygayv1_state::read_odd)
+uint16_t maygayv1_state::read_odd(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
@@ -506,12 +506,12 @@ READ16_MEMBER(maygayv1_state::read_odd)
  *
  *************************************/
 
-WRITE8_MEMBER( maygayv1_state::strobe_w )
+void maygayv1_state::strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lamp_strobe = data;
 }
 
-WRITE8_MEMBER( maygayv1_state::lamp_data_w )
+void maygayv1_state::lamp_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//The two A/B ports are merged back into one, to make one row of 8 lamps.
 
@@ -530,14 +530,14 @@ WRITE8_MEMBER( maygayv1_state::lamp_data_w )
 
 }
 
-READ8_MEMBER( maygayv1_state::kbd_r )
+uint8_t maygayv1_state::kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 
 	return ioport(portnames[m_lamp_strobe&0x07])->read();
 }
 
-WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
+void maygayv1_state::vsync_int_ctrl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vsync_latch_preset = data & 0x0100;
 
@@ -597,7 +597,7 @@ ADDRESS_MAP_END
 
 */
 
-READ8_MEMBER(maygayv1_state::mcu_r)
+uint8_t maygayv1_state::mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -614,7 +614,7 @@ READ8_MEMBER(maygayv1_state::mcu_r)
 	return 0;
 }
 
-WRITE8_MEMBER(maygayv1_state::mcu_w)
+void maygayv1_state::mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 			logerror("O %x D %x",offset,data);
 
@@ -813,23 +813,23 @@ WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
 }
 
-READ8_MEMBER(maygayv1_state::data_to_i8031)
+uint8_t maygayv1_state::data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_d68681_val;
 }
 
-WRITE8_MEMBER(maygayv1_state::data_from_i8031)
+void maygayv1_state::data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_duart68681->rx_a_w(data);
 }
 
-READ8_MEMBER(maygayv1_state::b_read)
+uint8_t maygayv1_state::b_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Meters - upper nibble?
 	return 0xff;
 }
 
-WRITE8_MEMBER(maygayv1_state::b_writ)
+void maygayv1_state::b_writ(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("B WRITE %x\n",data);
 }

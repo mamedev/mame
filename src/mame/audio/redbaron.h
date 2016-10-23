@@ -12,7 +12,7 @@ class redbaron_sound_device : public device_t,
 public:
 	redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( sounds_w );
+	void sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

@@ -84,12 +84,12 @@ image_init_result ng_memcard_device::call_create(int format_type, util::option_r
 }
 
 
-READ8_MEMBER(ng_memcard_device::read)
+uint8_t ng_memcard_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memcard_data[offset];
 }
 
-WRITE8_MEMBER(ng_memcard_device::write)
+void ng_memcard_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_memcard_data[offset] = data;
 }

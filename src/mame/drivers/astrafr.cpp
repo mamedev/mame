@@ -41,11 +41,11 @@ public:
 
 
 
-	DECLARE_READ32_MEMBER(astrafr_mem_r);
-	DECLARE_WRITE32_MEMBER(astrafr_mem_w);
+	uint32_t astrafr_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void astrafr_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(astrafr_slave_mem_r);
-	DECLARE_WRITE32_MEMBER(astrafr_slave_mem_w);
+	uint32_t astrafr_slave_mem_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void astrafr_slave_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 
 	// ports move above from game to game..
@@ -53,7 +53,7 @@ public:
 	uint16_t fgpa_first_read_addr;
 	uint16_t fgpa_after_rom_write_addr;
 
-	DECLARE_READ8_MEMBER( astra_fgpa_r )
+	uint8_t astra_fgpa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int pc = space.device().safe_pc();
 
@@ -68,7 +68,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER( astra_fgpa_w )
+	void astra_fgpa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		int pc = space.device().safe_pc();
 
@@ -84,7 +84,7 @@ public:
 	}
 
 	/* 2nd copy for the 2nd board (assume same addresses for now */
-	DECLARE_READ8_MEMBER( astra_fgpa_slave_r )
+	uint8_t astra_fgpa_slave_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int pc = space.device().safe_pc();
 
@@ -99,7 +99,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER( astra_fgpa_slave_w )
+	void astra_fgpa_slave_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		int pc = space.device().safe_pc();
 
@@ -130,7 +130,7 @@ public:
 
 
 
-READ32_MEMBER(astrafr_state::astrafr_mem_r)
+uint32_t astrafr_state::astrafr_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_maincpu->get_cs(offset * 4);
@@ -157,7 +157,7 @@ READ32_MEMBER(astrafr_state::astrafr_mem_r)
 
 
 
-WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
+void astrafr_state::astrafr_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int address = offset * 4;
@@ -187,7 +187,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 	}
 }
 
-READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
+uint32_t astrafr_state::astrafr_slave_mem_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int cs = m_slavecpu->get_cs(offset * 4);
@@ -212,7 +212,7 @@ READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 	return 0x0000;
 }
 
-WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
+void astrafr_state::astrafr_slave_mem_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	int address = offset * 4;

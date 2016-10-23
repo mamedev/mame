@@ -33,14 +33,14 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
-	DECLARE_WRITE8_MEMBER(ymz1_address_w);
-	DECLARE_WRITE8_MEMBER(ymz2_address_w);
-	DECLARE_WRITE8_MEMBER(ymz1_data_w);
-	DECLARE_WRITE8_MEMBER(ymz2_data_w);
-	DECLARE_READ8_MEMBER(ymz1_data_r);
-	DECLARE_READ8_MEMBER(ymz2_data_r);
+	uint8_t ctc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ymz1_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ymz2_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ymz1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ymz2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ymz1_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ymz2_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_zc1_cb) { if(state) { m_slot->nmi_w(1); m_slot->nmi_w(0); } }
 	DECLARE_WRITE_LINE_MEMBER(ctc_intr_cb) { m_slot->irq_w(state); }
 

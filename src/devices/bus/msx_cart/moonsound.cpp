@@ -90,28 +90,28 @@ WRITE_LINE_MEMBER(msx_cart_moonsound::irq_w)
 }
 
 
-WRITE8_MEMBER(msx_cart_moonsound::write_ymf278b_fm)
+void msx_cart_moonsound::write_ymf278b_fm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("moonsound: write 0x%02x, data 0x%02x\n", 0xc4 + offset, data));
 	m_ymf278b->write(space, offset, data);
 }
 
 
-READ8_MEMBER(msx_cart_moonsound::read_ymf278b_fm)
+uint8_t msx_cart_moonsound::read_ymf278b_fm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("moonsound: read 0x%02x\n", 0xc4 + offset));
 	return m_ymf278b->read(space, offset);
 }
 
 
-WRITE8_MEMBER(msx_cart_moonsound::write_ymf278b_pcm)
+void msx_cart_moonsound::write_ymf278b_pcm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("moonsound: write 0x%02x, data 0x%02x\n", 0x7e + offset, data));
 	m_ymf278b->write(space, 4 + offset, data);
 }
 
 
-READ8_MEMBER(msx_cart_moonsound::read_ymf278b_pcm)
+uint8_t msx_cart_moonsound::read_ymf278b_pcm(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("moonsound: read 0x%02x\n", 0x7e + offset));
 	return m_ymf278b->read(space, 4 + offset);
@@ -119,7 +119,7 @@ READ8_MEMBER(msx_cart_moonsound::read_ymf278b_pcm)
 
 
 // For detecting presence of moonsound cartridge
-READ8_MEMBER(msx_cart_moonsound::read_c0)
+uint8_t msx_cart_moonsound::read_c0(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG(("moonsound: read 0xc0\n"));
 	return 0x00;

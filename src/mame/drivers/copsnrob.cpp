@@ -68,12 +68,12 @@ Added Dip locations according to manual.
  *
  *************************************/
 
-READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
+uint8_t copsnrob_state::copsnrob_misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_screen->vblank() ? 0x00 : 0x80;
 }
 
-WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
+void copsnrob_state::copsnrob_misc2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_misc = data & 0x7f;
 	/* Multi Player Start */

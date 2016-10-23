@@ -61,34 +61,34 @@ f80b      ????
 #include "includes/tecmo.h"
 
 
-WRITE8_MEMBER(tecmo_state::bankswitch_w)
+void tecmo_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data >> 3);
 }
 
-WRITE8_MEMBER(tecmo_state::sound_command_w)
+void tecmo_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
-WRITE8_MEMBER(tecmo_state::nmi_ack_w)
+void tecmo_state::nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_start_w)
+void tecmo_state::adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_pos = data << 8;
 	m_msm->reset_w(0);
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_end_w)
+void tecmo_state::adpcm_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_end = (data + 1) << 8;
 }
 
-WRITE8_MEMBER(tecmo_state::adpcm_vol_w)
+void tecmo_state::adpcm_vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->set_volume((data & 0x0f) * 100 / 15);
 }
@@ -113,28 +113,28 @@ WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
 }
 
 /* the 8-bit dipswitches are split across addresses */
-READ8_MEMBER(tecmo_state::dswa_l_r)
+uint8_t tecmo_state::dswa_l_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port = ioport("DSWA")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::dswa_h_r)
+uint8_t tecmo_state::dswa_h_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port = ioport("DSWA")->read();
 	port &= 0xf0;
 	return port>>4;
 }
 
-READ8_MEMBER(tecmo_state::dswb_l_r)
+uint8_t tecmo_state::dswb_l_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port = ioport("DSWB")->read();
 	port &= 0x0f;
 	return port;
 }
 
-READ8_MEMBER(tecmo_state::dswb_h_r)
+uint8_t tecmo_state::dswb_h_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t port = ioport("DSWB")->read();
 	port &= 0xf0;

@@ -37,51 +37,51 @@ public:
 	a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// cpu
-	WRITE8_MEMBER( int2_w );
-	WRITE8_MEMBER( irq_ack_w );
+	void int2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	// zorro slot
-	DECLARE_READ16_MEMBER( shared_ram_r );
-	DECLARE_WRITE16_MEMBER( shared_ram_w );
-	DECLARE_READ16_MEMBER( irq_ack_r );
-	DECLARE_WRITE16_MEMBER( irq_ack_w );
-	DECLARE_READ16_MEMBER( reset_low_r );
-	DECLARE_WRITE16_MEMBER( reset_low_w );
-	DECLARE_READ16_MEMBER( irq_r );
-	DECLARE_WRITE16_MEMBER( irq_w );
-	DECLARE_READ16_MEMBER( reset_high_r );
-	DECLARE_WRITE16_MEMBER( reset_high_w );
+	uint16_t shared_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void shared_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t irq_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t reset_low_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reset_low_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t reset_high_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void reset_high_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// acia
-	DECLARE_READ8_MEMBER( acia_0_r );
-	DECLARE_WRITE8_MEMBER( acia_0_w );
+	uint8_t acia_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
-	DECLARE_READ8_MEMBER( acia_1_r );
-	DECLARE_WRITE8_MEMBER( acia_1_w );
+	uint8_t acia_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
-	DECLARE_READ8_MEMBER( acia_2_r );
-	DECLARE_WRITE8_MEMBER( acia_2_w );
+	uint8_t acia_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_2_irq_w );
-	DECLARE_READ8_MEMBER( acia_3_r );
-	DECLARE_WRITE8_MEMBER( acia_3_w );
+	uint8_t acia_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_3_irq_w );
-	DECLARE_READ8_MEMBER( acia_4_r );
-	DECLARE_WRITE8_MEMBER( acia_4_w );
+	uint8_t acia_4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
-	DECLARE_READ8_MEMBER( acia_5_r );
-	DECLARE_WRITE8_MEMBER( acia_5_w );
+	uint8_t acia_5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
-	DECLARE_READ8_MEMBER( acia_6_r );
-	DECLARE_WRITE8_MEMBER( acia_6_w );
+	uint8_t acia_6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void acia_6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
 
 	// cia
-	DECLARE_READ8_MEMBER( cia_r );
-	DECLARE_WRITE8_MEMBER( cia_w );
+	uint8_t cia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_READ8_MEMBER( cia_port_a_r );
-	DECLARE_READ8_MEMBER( cia_port_b_r );
-	DECLARE_WRITE8_MEMBER( cia_port_b_w );
+	uint8_t cia_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cia_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// rs232
 	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );

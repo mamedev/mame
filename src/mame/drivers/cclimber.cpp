@@ -254,35 +254,35 @@ void cclimber_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 }
 
-WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
+void cclimber_state::swimmer_sh_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,offset,data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
-WRITE8_MEMBER(cclimber_state::yamato_p0_w)
+void cclimber_state::yamato_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yamato_p0 = data;
 }
 
-WRITE8_MEMBER(cclimber_state::yamato_p1_w)
+void cclimber_state::yamato_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_yamato_p1 = data;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p0_r)
+uint8_t cclimber_state::yamato_p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_yamato_p0;
 }
 
-READ8_MEMBER(cclimber_state::yamato_p1_r)
+uint8_t cclimber_state::yamato_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_yamato_p1;
 }
 
 
-WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
+void cclimber_state::toprollr_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_toprollr_rombank &= ~(1 << offset);
 	m_toprollr_rombank |= (data & 1) << offset;
@@ -302,7 +302,7 @@ void cclimber_state::machine_reset_cclimber()
 }
 
 
-WRITE8_MEMBER(cclimber_state::nmi_mask_w)
+void cclimber_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

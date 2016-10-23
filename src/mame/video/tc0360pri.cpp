@@ -74,7 +74,7 @@ void tc0360pri_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( tc0360pri_device::write )
+void tc0360pri_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_regs[offset] = data;
 
@@ -89,7 +89,7 @@ if (offset >= 0x0a)
 #endif
 }
 
-READ8_MEMBER( tc0360pri_device::read )
+uint8_t tc0360pri_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_regs[offset];
 }

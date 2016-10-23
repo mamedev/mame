@@ -58,19 +58,19 @@ void news_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(news_state::news_fgram_w)
+void news_state::news_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(news_state::news_bgram_w)
+void news_state::news_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(news_state::news_bgpic_w)
+void news_state::news_bgpic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bgpic != data)
 	{

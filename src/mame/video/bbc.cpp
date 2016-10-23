@@ -146,7 +146,7 @@ void bbc_state::set_pixel_lookup()
 }
 
 
-WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
+void bbc_state::bbc_videoULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Make sure vpos is never <0 2008-10-11 PHS.
 	int vpos=machine().first_screen()->vpos();

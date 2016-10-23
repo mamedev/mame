@@ -21,8 +21,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 private:
 	required_device<md_cart_slot_device> m_exp;

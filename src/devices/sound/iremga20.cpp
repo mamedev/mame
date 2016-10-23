@@ -176,7 +176,7 @@ void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	}
 }
 
-WRITE8_MEMBER( iremga20_device::irem_ga20_w )
+void iremga20_device::irem_ga20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int channel;
 
@@ -222,7 +222,7 @@ WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 	}
 }
 
-READ8_MEMBER( iremga20_device::irem_ga20_r )
+uint8_t iremga20_device::irem_ga20_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int channel;
 

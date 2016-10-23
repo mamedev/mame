@@ -103,12 +103,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_state::interrupt)
 	}
 }
 
-WRITE8_MEMBER(spdodgeb_state::scrollx_lo_w)
+void spdodgeb_state::scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lastscroll = (m_lastscroll & 0x100) | data;
 }
 
-WRITE8_MEMBER(spdodgeb_state::ctrl_w)
+void spdodgeb_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = flip screen */
 	flip_screen_set(data & 0x01);
@@ -130,7 +130,7 @@ WRITE8_MEMBER(spdodgeb_state::ctrl_w)
 	m_sprite_palbank = (data & 0xc0) >> 6;
 }
 
-WRITE8_MEMBER(spdodgeb_state::videoram_w)
+void spdodgeb_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);

@@ -43,16 +43,16 @@ public:
 	{ }
 
 	uint8_t m_keyboard_line;
-	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
-	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
+	uint8_t pk8000_joy_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_joy_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
-	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
-	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
-	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
+	void pk8000_80_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pk8000_80_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pk8000_80_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
 
@@ -138,12 +138,12 @@ void pk8000_state::pk8000_set_bank(uint8_t data)
 				break;
 	}
 }
-WRITE8_MEMBER(pk8000_state::pk8000_80_porta_w)
+void pk8000_state::pk8000_80_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pk8000_set_bank(data);
 }
 
-READ8_MEMBER(pk8000_state::pk8000_80_portb_r)
+uint8_t pk8000_state::pk8000_80_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_keyboard_line>9) {
 		return 0xff;
@@ -151,7 +151,7 @@ READ8_MEMBER(pk8000_state::pk8000_80_portb_r)
 	return m_io_port[m_keyboard_line]->read();
 }
 
-WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
+void pk8000_state::pk8000_80_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_line = data & 0x0f;
 
@@ -161,13 +161,13 @@ WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
 	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
-READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
+uint8_t pk8000_state::pk8000_joy_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
-READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
+uint8_t pk8000_state::pk8000_joy_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy2->read() & 0x7f;

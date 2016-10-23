@@ -70,7 +70,7 @@ DEVICE_ADDRESS_MAP_START( io_map, 8, mos6532_t )
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0x8) AM_WRITE(edge_w)
 ADDRESS_MAP_END
 
-READ8_MEMBER(mos6532_t::io_r)
+uint8_t mos6532_t::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x1f;
 	uint8_t ret = 0;
@@ -89,7 +89,7 @@ READ8_MEMBER(mos6532_t::io_r)
 	return ret;
 }
 
-WRITE8_MEMBER(mos6532_t::io_w)
+void mos6532_t::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x1f;
 
@@ -503,7 +503,7 @@ void mos6530_base_t::pb_w(int bit, int state)
 //  pa_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_base_t::pa_data_r )
+uint8_t mos6530_base_t::pa_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t in = 0;
 
@@ -538,7 +538,7 @@ READ8_MEMBER( mos6530_base_t::pa_data_r )
 //  pa_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::pa_data_w )
+void mos6530_base_t::pa_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pa_out = data;
 
@@ -553,7 +553,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_data_w )
 //  pa_ddr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
+void mos6530_base_t::pa_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pa_ddr = data;
 
@@ -568,7 +568,7 @@ WRITE8_MEMBER( mos6530_base_t::pa_ddr_w )
 //  pb_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_base_t::pb_data_r )
+uint8_t mos6530_base_t::pb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t in = 0;
 
@@ -603,7 +603,7 @@ READ8_MEMBER( mos6530_base_t::pb_data_r )
 //  pb_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::pb_data_w )
+void mos6530_base_t::pb_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pb_out = data;
 
@@ -617,7 +617,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_data_w )
 //  pb_ddr_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
+void mos6530_base_t::pb_ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pb_ddr = data;
 
@@ -631,7 +631,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 //  timer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_base_t::timer_off_r )
+uint8_t mos6530_base_t::timer_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -639,7 +639,7 @@ READ8_MEMBER( mos6530_base_t::timer_off_r )
 	return timer_r(false);
 }
 
-READ8_MEMBER( mos6530_base_t::timer_on_r )
+uint8_t mos6530_base_t::timer_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (space.debugger_access())
 		return 0;
@@ -674,7 +674,7 @@ uint8_t mos6530_base_t::timer_r(bool ie)
 //  irq_r -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6530_base_t::irq_r )
+uint8_t mos6530_base_t::irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = get_irq_flags();
 
@@ -693,12 +693,12 @@ READ8_MEMBER( mos6530_base_t::irq_r )
 //  timer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::timer_off_w )
+void mos6530_base_t::timer_off_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_w(offset, data, false);
 }
 
-WRITE8_MEMBER( mos6530_base_t::timer_on_w )
+void mos6530_base_t::timer_on_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	timer_w(offset, data, true);
 }
@@ -739,7 +739,7 @@ void mos6530_base_t::timer_w(offs_t offset, uint8_t data, bool ie)
 //  edge_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6530_base_t::edge_w )
+void mos6530_base_t::edge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pa7_dir = BIT(data, 0);
 	m_ie_edge = BIT(data, 1) ? false : true;

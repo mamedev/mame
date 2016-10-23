@@ -21,7 +21,7 @@ Namco System II
 void (*namcos2_kickstart)(running_machine &machine, int internal);
 
 
-READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
+uint16_t namcos2_state::namcos2_finallap_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const uint16_t table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
 	static const uint16_t table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
@@ -137,12 +137,12 @@ void namcos2_shared_state::machine_reset_namcos2()
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_w )
+void namcos2_shared_state::namcos2_68k_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eeprom[offset] = data;
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
+uint8_t namcos2_shared_state::namcos2_68k_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_eeprom[offset];
 }
@@ -153,15 +153,15 @@ READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
 /* 68000 Shared serial communications processor (CPU5?)       */
 /**************************************************************/
 
-READ16_MEMBER( namcos2_state::serial_comms_ram_r ){
+uint16_t namcos2_state::serial_comms_ram_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	return m_serial_comms_ram[offset];
 }
 
-WRITE16_MEMBER( namcos2_state::serial_comms_ram_w ){
+void namcos2_state::serial_comms_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	COMBINE_DATA( &m_serial_comms_ram[offset] );
 }
 
-READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
+uint16_t namcos2_state::serial_comms_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retval = m_serial_comms_ctrl[offset];
 
@@ -176,7 +176,7 @@ READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
 	return retval;
 }
 
-WRITE16_MEMBER( namcos2_state::serial_comms_ctrl_w )
+void namcos2_state::serial_comms_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA( &m_serial_comms_ctrl[offset] );
 }
@@ -216,7 +216,7 @@ suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
 
-READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
+uint16_t namcos2_state::namcos2_68k_key_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (m_gametype)
 	{
@@ -389,7 +389,7 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 	return space.machine().rand()&0xffff;
 }
 
-WRITE16_MEMBER( namcos2_state::namcos2_68k_key_w )
+void namcos2_state::namcos2_68k_key_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int gametype = m_gametype;
 	if( gametype == NAMCOS2_MARVEL_LAND && offset == 5 )
@@ -600,32 +600,32 @@ uint16_t namcos2_shared_state::readwrite_c148( address_space &space, offs_t offs
 	return result;
 }
 
-WRITE16_MEMBER( namcos2_shared_state::namcos2_68k_master_C148_w )
+void namcos2_shared_state::namcos2_68k_master_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	(void)readwrite_c148(space, offset, data, 1);
 }
 
-READ16_MEMBER( namcos2_shared_state::namcos2_68k_master_C148_r )
+uint16_t namcos2_shared_state::namcos2_68k_master_C148_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return readwrite_c148(space, offset, 0, 0);
 }
 
-WRITE16_MEMBER( namcos2_shared_state::namcos2_68k_slave_C148_w )
+void namcos2_shared_state::namcos2_68k_slave_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	(void)readwrite_c148(space, offset, data, 1);
 }
 
-READ16_MEMBER( namcos2_shared_state::namcos2_68k_slave_C148_r )
+uint16_t namcos2_shared_state::namcos2_68k_slave_C148_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return readwrite_c148(space, offset, 0, 0);
 }
 
-WRITE16_MEMBER( namcos2_shared_state::namcos21_68k_gpu_C148_w )
+void namcos2_shared_state::namcos21_68k_gpu_C148_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	(void)readwrite_c148(space, offset, data, 1);
 }
 
-READ16_MEMBER( namcos2_shared_state::namcos21_68k_gpu_C148_r )
+uint16_t namcos2_shared_state::namcos21_68k_gpu_C148_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return readwrite_c148(space, offset, 0, 0);
 }
@@ -686,7 +686,7 @@ INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
+void namcos2_shared_state::namcos2_sound_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM= memregion("audiocpu")->base();
 	uint32_t max = (memregion("audiocpu")->bytes() - 0x10000) / 0x4000;
@@ -700,7 +700,7 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_sound_bankselect_w )
 /*                                                            */
 /**************************************************************/
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
+void namcos2_shared_state::namcos2_mcu_analog_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_analog_ctrl = data & 0xff;
 
@@ -758,7 +758,7 @@ WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_w )
 	}
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_r )
+uint8_t namcos2_shared_state::namcos2_mcu_analog_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data=0;
 
@@ -772,22 +772,22 @@ READ8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_ctrl_r )
 	return data;
 }
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_port_w )
+void namcos2_shared_state::namcos2_mcu_analog_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_analog_port_r )
+uint8_t namcos2_shared_state::namcos2_mcu_analog_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(m_mcu_analog_complete==1) m_mcu_analog_complete=0;
 	return m_mcu_analog_data;
 }
 
-WRITE8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_w )
+void namcos2_shared_state::namcos2_mcu_port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Undefined operation on write */
 }
 
-READ8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_r )
+uint8_t namcos2_shared_state::namcos2_mcu_port_d_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Provides a digital version of the analog ports */
 	int threshold = 0x7f;

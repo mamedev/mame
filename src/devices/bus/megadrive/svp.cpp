@@ -172,7 +172,7 @@ uint32_t md_rom_svp_device::pm_io(int reg, int write, uint32_t d)
 	return (uint32_t)-1;
 }
 
-READ16_MEMBER( md_rom_svp_device::read_pm0 )
+uint16_t md_rom_svp_device::read_pm0(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t d = pm_io(0, 0, 0);
 	if (d != (uint32_t)-1)
@@ -182,7 +182,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm0 )
 	return d;
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
+void md_rom_svp_device::write_pm0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(0, 1, data);
 	if (r != (uint32_t)-1)
@@ -190,7 +190,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
 	m_xst2 = data; // ?
 }
 
-READ16_MEMBER( md_rom_svp_device::read_pm1 )
+uint16_t md_rom_svp_device::read_pm1(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(1, 0, 0);
 	if (r != (uint32_t)-1)
@@ -199,7 +199,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm1 )
 	return 0;
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
+void md_rom_svp_device::write_pm1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(1, 1, data);
 	if (r != (uint32_t)-1)
@@ -207,7 +207,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
 
-READ16_MEMBER( md_rom_svp_device::read_pm2 )
+uint16_t md_rom_svp_device::read_pm2(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(2, 0, 0);
 	if (r != (uint32_t)-1)
@@ -216,7 +216,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm2 )
 	return 0;
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
+void md_rom_svp_device::write_pm2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(2, 1, data);
 	if (r != (uint32_t)-1)
@@ -224,7 +224,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
 
-READ16_MEMBER( md_rom_svp_device::read_xst )
+uint16_t md_rom_svp_device::read_xst(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t d = pm_io(3, 0, 0);
 	if (d != (uint32_t)-1)
@@ -232,7 +232,7 @@ READ16_MEMBER( md_rom_svp_device::read_xst )
 	return m_xst;
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_xst )
+void md_rom_svp_device::write_xst(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t r = pm_io(3, 1, data);
 	if (r != (uint32_t)-1)
@@ -241,17 +241,17 @@ WRITE16_MEMBER( md_rom_svp_device::write_xst )
 	m_xst = data;
 }
 
-READ16_MEMBER( md_rom_svp_device::read_pm4 )
+uint16_t md_rom_svp_device::read_pm4(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return pm_io(4, 0, 0);
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_pm4 )
+void md_rom_svp_device::write_pm4(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	pm_io(4, 1, data);
 }
 
-READ16_MEMBER( md_rom_svp_device::read_pmc )
+uint16_t md_rom_svp_device::read_pmc(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 	{
@@ -266,7 +266,7 @@ READ16_MEMBER( md_rom_svp_device::read_pmc )
 	}
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_pmc )
+void md_rom_svp_device::write_pmc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 	{
@@ -281,24 +281,24 @@ WRITE16_MEMBER( md_rom_svp_device::write_pmc )
 	}
 }
 
-READ16_MEMBER( md_rom_svp_device::read_al )
+uint16_t md_rom_svp_device::read_al(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_emu_status &= ~(SSP_PMC_SET | SSP_PMC_HAVE_ADDR);
 	return 0;
 }
 
-WRITE16_MEMBER( md_rom_svp_device::write_al )
+void md_rom_svp_device::write_al(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
 
-READ16_MEMBER( md_rom_svp_device::rom_read1 )
+uint16_t md_rom_svp_device::rom_read1(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *IRAM = (uint16_t *)m_iram;
 	return IRAM[offset];
 }
 
-READ16_MEMBER( md_rom_svp_device::rom_read2 )
+uint16_t md_rom_svp_device::rom_read2(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rom[offset + 0x800/2];
 }
@@ -402,7 +402,7 @@ void md_rom_svp_device::device_start()
 	save_item(NAME(m_iram));
 }
 
-READ16_MEMBER(md_rom_svp_device::read)
+uint16_t md_rom_svp_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *DRAM = (uint16_t *)m_dram;
 
@@ -433,7 +433,7 @@ READ16_MEMBER(md_rom_svp_device::read)
 	}
 }
 
-WRITE16_MEMBER(md_rom_svp_device::write)
+void md_rom_svp_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset >= 0x300000/2 && offset < 0x320000/2)
 	{
@@ -443,7 +443,7 @@ WRITE16_MEMBER(md_rom_svp_device::write)
 	}
 }
 
-READ16_MEMBER(md_rom_svp_device::read_a15)
+uint16_t md_rom_svp_device::read_a15(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t d;
 	switch (offset)
@@ -458,7 +458,7 @@ READ16_MEMBER(md_rom_svp_device::read_a15)
 	return 0;
 }
 
-WRITE16_MEMBER(md_rom_svp_device::write_a15)
+void md_rom_svp_device::write_a15(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{

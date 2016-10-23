@@ -146,7 +146,7 @@ void riot6532_device::timer_end()
     riot6532_w - master I/O write access
 -------------------------------------------------*/
 
-WRITE8_MEMBER( riot6532_device::write )
+void riot6532_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	reg_w(offset, data);
 }
@@ -231,7 +231,7 @@ void riot6532_device::reg_w(uint8_t offset, uint8_t data)
     riot6532_r - master I/O read access
 -------------------------------------------------*/
 
-READ8_MEMBER( riot6532_device::read )
+uint8_t riot6532_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return reg_r(offset, space.debugger_access());
 }

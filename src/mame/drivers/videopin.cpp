@@ -104,7 +104,7 @@ double videopin_state::calc_plunger_pos()
 }
 
 
-READ8_MEMBER(videopin_state::misc_r)
+uint8_t videopin_state::misc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	double plunger = calc_plunger_pos();
 
@@ -132,7 +132,7 @@ READ8_MEMBER(videopin_state::misc_r)
 }
 
 
-WRITE8_MEMBER(videopin_state::led_w)
+void videopin_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i = (m_screen->vpos() >> 5) & 7;
 	static const char *const matrix[8][4] =
@@ -159,7 +159,7 @@ WRITE8_MEMBER(videopin_state::led_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::out1_w)
+void videopin_state::out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0 => OCTAVE0  */
 	/* D1 => OCTACE1  */
@@ -182,7 +182,7 @@ WRITE8_MEMBER(videopin_state::out1_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::out2_w)
+void videopin_state::out2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0 => VOL0      */
 	/* D1 => VOL1      */
@@ -202,7 +202,7 @@ WRITE8_MEMBER(videopin_state::out2_w)
 }
 
 
-WRITE8_MEMBER(videopin_state::note_dvsr_w)
+void videopin_state::note_dvsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* note data */
 	m_discrete->write(space, VIDEOPIN_NOTE_DATA, ~data &0xff);

@@ -29,13 +29,13 @@ public:
 	{ }
 
 	void init_gts80b();
-	DECLARE_READ8_MEMBER(port1a_r);
-	DECLARE_READ8_MEMBER(port2a_r);
-	DECLARE_WRITE8_MEMBER(port1b_w);
-	DECLARE_WRITE8_MEMBER(port2a_w);
-	DECLARE_WRITE8_MEMBER(port2b_w);
-	DECLARE_WRITE8_MEMBER(port3a_w);
-	DECLARE_WRITE8_MEMBER(port3b_w);
+	uint8_t port1a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port2a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port3a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port3b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_dispcmd;
 	uint8_t m_port2a;
@@ -270,7 +270,7 @@ static const uint16_t patterns[] = {
 	/* 0x78-0x7f */ 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff,
 };
 
-READ8_MEMBER( gts80b_state::port1a_r )
+uint8_t gts80b_state::port1a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	uint8_t data = 0;
@@ -288,18 +288,18 @@ READ8_MEMBER( gts80b_state::port1a_r )
 	return data;
 }
 
-READ8_MEMBER( gts80b_state::port2a_r )
+uint8_t gts80b_state::port2a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port2a | 0x80; // slam tilt off
 }
 
 // sw strobes
-WRITE8_MEMBER( gts80b_state::port1b_w )
+void gts80b_state::port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_swrow = data;
 }
 
-WRITE8_MEMBER( gts80b_state::port2a_w )
+void gts80b_state::port2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port2a = data;
 	if (BIT(data, 4))
@@ -309,7 +309,7 @@ WRITE8_MEMBER( gts80b_state::port2a_w )
 }
 
 //d0-3 data; d4-5 = which display enabled; d6 = display reset; d7 = dipsw enable
-WRITE8_MEMBER( gts80b_state::port2b_w )
+void gts80b_state::port2b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port2b = data & 15;
 	uint16_t segment;
@@ -343,12 +343,12 @@ WRITE8_MEMBER( gts80b_state::port2b_w )
 }
 
 // solenoids
-WRITE8_MEMBER( gts80b_state::port3a_w )
+void gts80b_state::port3a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 //pb0-3 = sound; pb4-7 = lamprow
-WRITE8_MEMBER( gts80b_state::port3b_w )
+void gts80b_state::port3b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;

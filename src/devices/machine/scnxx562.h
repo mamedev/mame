@@ -636,11 +636,11 @@ public:
 #endif
 	}
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// interrupt acknowledge
-	DECLARE_READ8_MEMBER( iack );
+	uint8_t iack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// device_z80daisy_interface overrides
 	virtual int z80daisy_irq_state() override;

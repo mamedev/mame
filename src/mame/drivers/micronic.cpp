@@ -117,7 +117,7 @@
 #include "includes/micronic.h"
 #include "rendlay.h"
 
-READ8_MEMBER( micronic_state::keypad_r )
+uint8_t micronic_state::keypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -136,22 +136,22 @@ READ8_MEMBER( micronic_state::keypad_r )
 	return data;
 }
 
-READ8_MEMBER( micronic_state::status_flag_r )
+uint8_t micronic_state::status_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status_flag;
 }
 
-WRITE8_MEMBER( micronic_state::status_flag_w )
+void micronic_state::status_flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status_flag = data;
 }
 
-WRITE8_MEMBER( micronic_state::kp_matrix_w )
+void micronic_state::kp_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kp_matrix = data;
 }
 
-WRITE8_MEMBER( micronic_state::beep_w )
+void micronic_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint16_t frequency[16] =
 	{
@@ -163,12 +163,12 @@ WRITE8_MEMBER( micronic_state::beep_w )
 	m_beep->set_state((data & 0x0f) ? 1 : 0);
 }
 
-READ8_MEMBER( micronic_state::irq_flag_r )
+uint8_t micronic_state::irq_flag_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_backbattery->read()<<4) | (m_mainbattery->read()<<3) | (keypad_r(space, offset) ? 0 : 1);
 }
 
-WRITE8_MEMBER( micronic_state::bank_select_w )
+void micronic_state::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data < 2)
 	{
@@ -182,12 +182,12 @@ WRITE8_MEMBER( micronic_state::bank_select_w )
 	}
 }
 
-WRITE8_MEMBER( micronic_state::lcd_contrast_w )
+void micronic_state::lcd_contrast_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcd_contrast = data;
 }
 
-WRITE8_MEMBER( micronic_state::port_2c_w )
+void micronic_state::port_2c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lcd_backlight = BIT(data, 4);
 }
@@ -197,17 +197,17 @@ WRITE8_MEMBER( micronic_state::port_2c_w )
     RTC-146818
 ***************************************************************************/
 
-WRITE8_MEMBER( micronic_state::rtc_address_w )
+void micronic_state::rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, 0, data);
 }
 
-READ8_MEMBER( micronic_state::rtc_data_r )
+uint8_t micronic_state::rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rtc->read(space, 1);
 }
 
-WRITE8_MEMBER( micronic_state::rtc_data_w )
+void micronic_state::rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, 1, data);
 }

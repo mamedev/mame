@@ -153,7 +153,7 @@ void a1bus_cassette_device::cassette_toggle_output()
 	m_cassette->output(m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
-READ8_MEMBER(a1bus_cassette_device::cassette_r)
+uint8_t a1bus_cassette_device::cassette_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	cassette_toggle_output();
 
@@ -188,7 +188,7 @@ READ8_MEMBER(a1bus_cassette_device::cassette_r)
 	}
 }
 
-WRITE8_MEMBER(a1bus_cassette_device::cassette_w)
+void a1bus_cassette_device::cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Writes toggle the output flip-flop in the same way that reads
 	   do; other than that they have no effect.  Any repeated accesses

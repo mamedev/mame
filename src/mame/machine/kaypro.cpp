@@ -20,7 +20,7 @@ WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( kaypro_state::pio_system_r )
+uint8_t kaypro_state::pio_system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -33,7 +33,7 @@ READ8_MEMBER( kaypro_state::pio_system_r )
 	return data;
 }
 
-WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
+void kaypro_state::kayproii_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -71,7 +71,7 @@ WRITE8_MEMBER( kaypro_state::kayproii_pio_system_w )
 	m_system_port = data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
+void kaypro_state::kaypro4_pio_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	kayproii_pio_system_w(space, offset, data);
 
@@ -87,13 +87,13 @@ WRITE8_MEMBER( kaypro_state::kaypro4_pio_system_w )
 
 ************************************************************/
 
-READ8_MEMBER( kaypro_state::kaypro2x_system_port_r )
+uint8_t kaypro_state::kaypro2x_system_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_centronics_busy << 6;
 	return (m_system_port & 0xbf) | data;
 }
 
-WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
+void kaypro_state::kaypro2x_system_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  d7 bank select
     d6 alternate character set (write only)
@@ -162,7 +162,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     FFh    19200 */
 
 
-READ8_MEMBER(kaypro_state::kaypro_sio_r)
+uint8_t kaypro_state::kaypro_sio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 1)
 		return kay_kbd_d_r();
@@ -173,7 +173,7 @@ READ8_MEMBER(kaypro_state::kaypro_sio_r)
 		return m_sio->cd_ba_r(space, offset);
 }
 
-WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
+void kaypro_state::kaypro_sio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 		kay_kbd_d_w(data);

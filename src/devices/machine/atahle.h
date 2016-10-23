@@ -23,12 +23,12 @@ public:
 	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
 
 	virtual uint16_t read_dma() override;
-	virtual DECLARE_READ16_MEMBER(read_cs0) override;
-	virtual DECLARE_READ16_MEMBER(read_cs1) override;
+	virtual uint16_t read_cs0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_cs1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 	virtual void write_dma(uint16_t data) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs0) override;
-	virtual DECLARE_WRITE16_MEMBER(write_cs1) override;
+	virtual void write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual void write_cs1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;

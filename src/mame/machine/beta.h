@@ -23,17 +23,17 @@ public:
 	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~beta_disk_device() {}
 
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_READ8_MEMBER(track_r);
-	DECLARE_READ8_MEMBER(sector_r);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_READ8_MEMBER(state_r);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t state_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(param_w);
-	DECLARE_WRITE8_MEMBER(command_w);
-	DECLARE_WRITE8_MEMBER(track_w);
-	DECLARE_WRITE8_MEMBER(sector_w);
-	DECLARE_WRITE8_MEMBER(data_w);
+	void param_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void track_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	int is_active();

@@ -61,58 +61,58 @@ void naomi_g1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	irq_cb(DMA_GDROM_IRQ);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gdstar_r)
+uint32_t naomi_g1_device::sb_gdstar_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gdstar;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gdstar_w)
+void naomi_g1_device::sb_gdstar_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gdstar);
 	logerror("G1: gdstar_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gdlen_r)
+uint32_t naomi_g1_device::sb_gdlen_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gdlen;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gdlen_w)
+void naomi_g1_device::sb_gdlen_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gdlen);
 	logerror("G1: gdlen_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gddir_r)
+uint32_t naomi_g1_device::sb_gddir_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gddir;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gddir_w)
+void naomi_g1_device::sb_gddir_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gddir);
 	gddir &= 1;
 	logerror("G1: gddir_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gden_r)
+uint32_t naomi_g1_device::sb_gden_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gden;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gden_w)
+void naomi_g1_device::sb_gden_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&gden);
 	gden &= 1;
 	logerror("G1: gden_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gdst_r)
+uint32_t naomi_g1_device::sb_gdst_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return gdst;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gdst_w)
+void naomi_g1_device::sb_gdst_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old = gdst;
 	COMBINE_DATA(&gdst);
@@ -161,69 +161,69 @@ WRITE32_MEMBER(naomi_g1_device::sb_gdst_w)
 	}
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1rrc_w)
+void naomi_g1_device::sb_g1rrc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1rrc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1rwc_w)
+void naomi_g1_device::sb_g1rwc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1rwc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1crc_w)
+void naomi_g1_device::sb_g1crc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1crc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1cwc_w)
+void naomi_g1_device::sb_g1cwc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1cwc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1frc_w)
+void naomi_g1_device::sb_g1frc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1frc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1fwc_w)
+void naomi_g1_device::sb_g1fwc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1fwc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1gdrc_w)
+void naomi_g1_device::sb_g1gdrc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1gdrc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1gdwc_w)
+void naomi_g1_device::sb_g1gdwc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1gdwc_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_g1sysm_r)
+uint32_t naomi_g1_device::sb_g1sysm_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("G1: g1sysm_r @ %08x\n", mem_mask);
 	return 0;
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_g1crdyc_w)
+void naomi_g1_device::sb_g1crdyc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: g1crdyc_w %08x @ %08x\n", data, mem_mask);
 }
 
-WRITE32_MEMBER(naomi_g1_device::sb_gdapro_w)
+void naomi_g1_device::sb_gdapro_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("G1: gdapro_w %08x @ %08x\n", data, mem_mask);
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gdstard_r)
+uint32_t naomi_g1_device::sb_gdstard_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("G1: gdstard_r @ %08x\n", mem_mask);
 	return 0;
 }
 
-READ32_MEMBER(naomi_g1_device::sb_gdlend_r)
+uint32_t naomi_g1_device::sb_gdlend_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("G1: gdlend_r @ %08x\n", mem_mask);
 	return 0;

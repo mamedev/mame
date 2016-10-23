@@ -40,7 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wr_w ); /* write enable */
 	DECLARE_WRITE_LINE_MEMBER( ce_w ); /* chip enable */
 	DECLARE_WRITE_LINE_MEMBER( cu_w ); /* cursor enable */
-	DECLARE_WRITE8_MEMBER( data_w );
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

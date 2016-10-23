@@ -95,7 +95,7 @@ void midvunit_state::machine_reset_midvplus()
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::port0_r)
+uint32_t midvunit_state::port0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t val = ioport("IN0")->read();
 	uint16_t diff = val ^ m_last_port0;
@@ -123,7 +123,7 @@ READ32_MEMBER(midvunit_state::port0_r)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::midvunit_adc_r)
+uint32_t midvunit_state::midvunit_adc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (!(m_control_data & 0x40))
 	{
@@ -136,7 +136,7 @@ READ32_MEMBER(midvunit_state::midvunit_adc_r)
 }
 
 
-WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
+void midvunit_state::midvunit_adc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!(m_control_data & 0x20))
 	{
@@ -159,20 +159,20 @@ WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_cmos_protect_w)
+void midvunit_state::midvunit_cmos_protect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_cmos_protected = ((data & 0xc00) != 0xc00);
 }
 
 
-WRITE32_MEMBER(midvunit_state::midvunit_cmos_w)
+void midvunit_state::midvunit_cmos_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (!m_cmos_protected)
 		COMBINE_DATA(m_nvram + offset);
 }
 
 
-READ32_MEMBER(midvunit_state::midvunit_cmos_r)
+uint32_t midvunit_state::midvunit_cmos_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_nvram[offset];
 }
@@ -185,7 +185,7 @@ READ32_MEMBER(midvunit_state::midvunit_cmos_r)
  *
  *************************************/
 
-WRITE32_MEMBER(midvunit_state::midvunit_control_w)
+void midvunit_state::midvunit_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
@@ -205,7 +205,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 }
 
 
-WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
+void midvunit_state::crusnwld_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t olddata = m_control_data;
 	COMBINE_DATA(&m_control_data);
@@ -225,7 +225,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 }
 
 
-WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
+void midvunit_state::midvunit_sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("Sound W = %02X\n", data);
 	m_dcs->data_w(data & 0xff);
@@ -239,7 +239,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_sound_w)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::tms32031_control_r)
+uint32_t midvunit_state::tms32031_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
@@ -259,7 +259,7 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 }
 
 
-WRITE32_MEMBER(midvunit_state::tms32031_control_w)
+void midvunit_state::tms32031_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_tms32031_control[offset]);
 
@@ -293,20 +293,20 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
+uint32_t midvunit_state::crusnwld_serial_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int status = m_midway_serial_pic->status_r(space,0);
 	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
-READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
+uint32_t midvunit_state::crusnwld_serial_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_midway_serial_pic->read(space,0) << 16;
 }
 
 
-WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
+void midvunit_state::crusnwld_serial_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((data & 0xf0000) == 0x10000)
 	{
@@ -334,7 +334,7 @@ static const uint32_t bit_data[0x10] =
 };
 
 
-READ32_MEMBER(midvunit_state::bit_data_r)
+uint32_t midvunit_state::bit_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int bit = (bit_data[m_bit_index / 32] >> (31 - (m_bit_index % 32))) & 1;
 	m_bit_index = (m_bit_index + 1) % 512;
@@ -342,7 +342,7 @@ READ32_MEMBER(midvunit_state::bit_data_r)
 }
 
 
-WRITE32_MEMBER(midvunit_state::bit_reset_w)
+void midvunit_state::bit_reset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_bit_index = 0;
 }
@@ -355,25 +355,25 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
+uint32_t midvunit_state::offroadc_serial_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int status = m_midway_serial_pic2->status_r(space,0);
 	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
-READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
+uint32_t midvunit_state::offroadc_serial_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_midway_serial_pic2->read(space, 0) << 16;
 }
 
 
-WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
+void midvunit_state::offroadc_serial_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
-READ32_MEMBER(midvunit_state::midvunit_output_r)
+uint32_t midvunit_state::midvunit_output_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_output;
 }
@@ -385,7 +385,7 @@ void midvunit_state::set_input(const char *s)
 	m_galil_input_length = strlen(s);
 }
 
-WRITE32_MEMBER(midvunit_state::midvunit_output_w)
+void midvunit_state::midvunit_output_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t op = (data >> 8) & 0xF;
 	uint8_t arg = data & 0xFF;
@@ -492,7 +492,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::midvplus_misc_r)
+uint32_t midvunit_state::midvplus_misc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = m_midvplus_misc[offset];
 
@@ -517,7 +517,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 }
 
 
-WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
+void midvunit_state::midvplus_misc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t olddata = m_midvplus_misc[offset];
 	bool logit = true;
@@ -552,7 +552,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
  *
  *************************************/
 
-WRITE8_MEMBER(midvunit_state::midvplus_xf1_w)
+void midvunit_state::midvplus_xf1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  osd_printf_debug("xf1_w = %d\n", data);
 
@@ -1838,7 +1838,7 @@ ROM_END
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::generic_speedup_r)
+uint32_t midvunit_state::generic_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	space.device().execute().eat_cycles(100);
 	return m_generic_speedup[offset];

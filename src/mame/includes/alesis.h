@@ -34,7 +34,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device interface
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -83,17 +83,17 @@ public:
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);
 	void init_hr16();
-	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_WRITE8_MEMBER( mmt8_led_w );
-	DECLARE_READ8_MEMBER( mmt8_led_r );
-	DECLARE_WRITE8_MEMBER( track_led_w );
-	DECLARE_WRITE8_MEMBER( kb_matrix_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
-	DECLARE_READ8_MEMBER( mmt8_p3_r );
-	DECLARE_WRITE8_MEMBER( mmt8_p3_w );
-	DECLARE_WRITE8_MEMBER( sr16_lcd_w );
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmt8_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmt8_led_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void track_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kb_matrix_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmt8_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mmt8_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sr16_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	HD44780_PIXEL_UPDATE(sr16_pixel_update);
 
 private:

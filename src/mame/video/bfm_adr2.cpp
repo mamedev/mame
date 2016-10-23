@@ -276,14 +276,14 @@ INTERRUPT_GEN_MEMBER( bfm_adder2_device::adder2_vbl )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::screen_ram_r )
+uint8_t bfm_adder2_device::screen_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adder2_screen_page_reg & SL_ACCESS ? m_adder_screen_ram[1][offset]:m_adder_screen_ram[0][offset];
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
+void bfm_adder2_device::screen_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int dirty_off = (offset>>7)*50 + ((offset & 0x7F)>>1);
 
@@ -315,28 +315,28 @@ WRITE8_MEMBER( bfm_adder2_device::screen_ram_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::normal_ram_r )
+uint8_t bfm_adder2_device::normal_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_adder_ram[offset];
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::normal_ram_w )
+void bfm_adder2_device::normal_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder_ram[offset] = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_rom_page_w )
+void bfm_adder2_device::adder2_rom_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank2")->set_entry(data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_c001_w )
+void bfm_adder2_device::adder2_c001_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("c101 = %02X\n",data);
 
@@ -345,14 +345,14 @@ WRITE8_MEMBER( bfm_adder2_device::adder2_c001_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_screen_page_w )
+void bfm_adder2_device::adder2_screen_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder2_screen_page_reg = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::adder2_vbl_ctrl_r )
+uint8_t bfm_adder2_device::adder2_vbl_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_adder_vbl_triggered = 0;    // clear VBL start IRQ
 
@@ -361,14 +361,14 @@ READ8_MEMBER( bfm_adder2_device::adder2_vbl_ctrl_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_vbl_ctrl_w )
+void bfm_adder2_device::adder2_vbl_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder2_c101 = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_r )
+uint8_t bfm_adder2_device::adder2_uart_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int status = 0;
 
@@ -380,7 +380,7 @@ READ8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_w )
+void bfm_adder2_device::adder2_uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder2_data_from_sc2 = 0;   // data available for adder from sc2
 	m_adder2_sc2data       = 0;   // data
@@ -392,7 +392,7 @@ WRITE8_MEMBER( bfm_adder2_device::adder2_uart_ctrl_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::adder2_uart_rx_r )
+uint8_t bfm_adder2_device::adder2_uart_rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_adder2_sc2data;
 	m_adder2_data_from_sc2 = 0;       // clr flag, data from scorpion2 board available
@@ -404,7 +404,7 @@ READ8_MEMBER( bfm_adder2_device::adder2_uart_rx_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfm_adder2_device::adder2_uart_tx_w )
+void bfm_adder2_device::adder2_uart_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder2_data_to_sc2 = 1;     // set flag, data from adder available
 	m_adder2_data       = data;   // store data
@@ -414,7 +414,7 @@ WRITE8_MEMBER( bfm_adder2_device::adder2_uart_tx_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfm_adder2_device::adder2_irq_r )
+uint8_t bfm_adder2_device::adder2_irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int status = 0;
 
@@ -427,7 +427,7 @@ READ8_MEMBER( bfm_adder2_device::adder2_irq_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_adder2_device::vid_uart_tx_w)
+void bfm_adder2_device::vid_uart_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adder2_data_from_sc2 = 1;       // set flag, data from scorpion2 board available
 	m_adder2_sc2data       = data;    // store data
@@ -441,13 +441,13 @@ WRITE8_MEMBER(bfm_adder2_device::vid_uart_tx_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfm_adder2_device::vid_uart_ctrl_w)
+void bfm_adder2_device::vid_uart_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_adder2_device::vid_uart_rx_r)
+uint8_t bfm_adder2_device::vid_uart_rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_adder2_data;
 	m_adder2_data_to_sc2 = 0;   // clr flag, data from adder available
@@ -459,7 +459,7 @@ READ8_MEMBER(bfm_adder2_device::vid_uart_rx_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfm_adder2_device::vid_uart_ctrl_r)
+uint8_t bfm_adder2_device::vid_uart_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int status = 0;
 

@@ -43,12 +43,12 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	uint8_t   m_nmi_mask;
-	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
-	DECLARE_WRITE8_MEMBER(darwin_0803_w);
-	DECLARE_WRITE8_MEMBER(brkthru_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(brkthru_bgram_w);
-	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
-	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
+	void brkthru_1803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void darwin_0803_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brkthru_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brkthru_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brkthru_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brkthru_1800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_brkthru();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

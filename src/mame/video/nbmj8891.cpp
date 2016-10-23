@@ -16,12 +16,12 @@
 
 
 ******************************************************************************/
-READ8_MEMBER(nbmj8891_state::palette_type1_r)
+uint8_t nbmj8891_state::palette_type1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8891_state::palette_type1_w)
+void nbmj8891_state::palette_type1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -38,12 +38,12 @@ WRITE8_MEMBER(nbmj8891_state::palette_type1_w)
 	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_MEMBER(nbmj8891_state::palette_type2_r)
+uint8_t nbmj8891_state::palette_type2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8891_state::palette_type2_w)
+void nbmj8891_state::palette_type2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -60,12 +60,12 @@ WRITE8_MEMBER(nbmj8891_state::palette_type2_w)
 	m_palette->set_pen_color((offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-READ8_MEMBER(nbmj8891_state::palette_type3_r)
+uint8_t nbmj8891_state::palette_type3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_palette_ptr[offset];
 }
 
-WRITE8_MEMBER(nbmj8891_state::palette_type3_w)
+void nbmj8891_state::palette_type3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r, g, b;
 
@@ -82,17 +82,17 @@ WRITE8_MEMBER(nbmj8891_state::palette_type3_w)
 	m_palette->set_pen_color((offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_MEMBER(nbmj8891_state::clutsel_w)
+void nbmj8891_state::clutsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clutsel = data;
 }
 
-READ8_MEMBER(nbmj8891_state::clut_r)
+uint8_t nbmj8891_state::clut_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_clut[offset];
 }
 
-WRITE8_MEMBER(nbmj8891_state::clut_w)
+void nbmj8891_state::clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_clut[((m_clutsel & 0x7f) * 0x10) + (offset & 0x0f)] = data;
 }
@@ -101,7 +101,7 @@ WRITE8_MEMBER(nbmj8891_state::clut_w)
 
 
 ******************************************************************************/
-WRITE8_MEMBER(nbmj8891_state::blitter_w)
+void nbmj8891_state::blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -125,7 +125,7 @@ WRITE8_MEMBER(nbmj8891_state::blitter_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8891_state::taiwanmb_blitter_w)
+void nbmj8891_state::taiwanmb_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -138,19 +138,19 @@ WRITE8_MEMBER(nbmj8891_state::taiwanmb_blitter_w)
 	}
 }
 
-WRITE8_MEMBER(nbmj8891_state::taiwanmb_gfxdraw_w)
+void nbmj8891_state::taiwanmb_gfxdraw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  gfxdraw();
 }
 
-WRITE8_MEMBER(nbmj8891_state::taiwanmb_gfxflag_w)
+void nbmj8891_state::taiwanmb_gfxflag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = (data & 0x04) ? 1 : 0;
 
 	vramflip(0);
 }
 
-WRITE8_MEMBER(nbmj8891_state::taiwanmb_mcu_w)
+void nbmj8891_state::taiwanmb_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_param_old[m_param_cnt & 0x0f] = data;
 
@@ -233,12 +233,12 @@ WRITE8_MEMBER(nbmj8891_state::taiwanmb_mcu_w)
 	m_param_cnt++;
 }
 
-WRITE8_MEMBER(nbmj8891_state::scrolly_w)
+void nbmj8891_state::scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(nbmj8891_state::vramsel_w)
+void nbmj8891_state::vramsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* protection - not sure about this */
 	m_nb1413m3->m_sndromrgntag = (data & 0x20) ? "protection" : "voice";
@@ -246,7 +246,7 @@ WRITE8_MEMBER(nbmj8891_state::vramsel_w)
 	m_vram = data;
 }
 
-WRITE8_MEMBER(nbmj8891_state::romsel_w)
+void nbmj8891_state::romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int gfxlen = memregion("gfx1")->bytes();
 	m_gfxrom = (data & 0x0f);

@@ -24,10 +24,10 @@ public:
 	std::unique_ptr<int[]> m_sprite_table[5];
 	tilemap_t *m_pant[2];
 
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(coin_w);
-	DECLARE_READ16_MEMBER(DS5002FP_R);
-	DECLARE_WRITE16_MEMBER(vram_w);
+	void OKIM6295_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t DS5002FP_R(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

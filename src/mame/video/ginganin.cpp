@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
+void ginganin_state::ginganin_fgram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_fgram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -124,7 +124,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 			0);
 }
 
-WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
+void ginganin_state::ginganin_txtram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txtram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -142,7 +142,7 @@ void ginganin_state::video_start()
 }
 
 
-WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
+void ginganin_state::ginganin_vregs16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 	data = m_vregs[offset];

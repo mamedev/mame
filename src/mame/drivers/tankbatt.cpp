@@ -70,12 +70,12 @@ void tankbatt_state::machine_start()
 	save_item(NAME(m_sound_enable));
 }
 
-WRITE8_MEMBER(tankbatt_state::led_w)
+void tankbatt_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(offset,data & 1);
 }
 
-READ8_MEMBER(tankbatt_state::in0_r)
+uint8_t tankbatt_state::in0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val;
 
@@ -83,7 +83,7 @@ READ8_MEMBER(tankbatt_state::in0_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::in1_r)
+uint8_t tankbatt_state::in1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val;
 
@@ -91,7 +91,7 @@ READ8_MEMBER(tankbatt_state::in1_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-READ8_MEMBER(tankbatt_state::dsw_r)
+uint8_t tankbatt_state::dsw_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val;
 
@@ -99,7 +99,7 @@ READ8_MEMBER(tankbatt_state::dsw_r)
 	return ((val << (7 - offset)) & 0x80);
 }
 
-WRITE8_MEMBER(tankbatt_state::interrupt_enable_w)
+void tankbatt_state::interrupt_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = !data;
 	m_sound_enable = !data;
@@ -108,12 +108,12 @@ WRITE8_MEMBER(tankbatt_state::interrupt_enable_w)
 	if (data) m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::demo_interrupt_enable_w)
+void tankbatt_state::demo_interrupt_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_expl_w)
+void tankbatt_state::sh_expl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sound_enable)
 	{
@@ -121,7 +121,7 @@ WRITE8_MEMBER(tankbatt_state::sh_expl_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_engine_w)
+void tankbatt_state::sh_engine_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sound_enable)
 	{
@@ -133,7 +133,7 @@ WRITE8_MEMBER(tankbatt_state::sh_engine_w)
 	else m_samples->stop(2);
 }
 
-WRITE8_MEMBER(tankbatt_state::sh_fire_w)
+void tankbatt_state::sh_fire_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_sound_enable)
 	{
@@ -141,19 +141,19 @@ WRITE8_MEMBER(tankbatt_state::sh_fire_w)
 	}
 }
 
-WRITE8_MEMBER(tankbatt_state::irq_ack_w)
+void tankbatt_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(tankbatt_state::coincounter_w)
+void tankbatt_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 1);
 	machine().bookkeeping().coin_counter_w(1,data & 1);
 }
 
-WRITE8_MEMBER(tankbatt_state::coinlockout_w)
+void tankbatt_state::coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_w(0,data & 1);
 	machine().bookkeeping().coin_lockout_w(1,data & 1);

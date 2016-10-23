@@ -21,15 +21,15 @@ public:
 	virtual ~device_sat_cart_interface();
 
 	// reading from ROM
-	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
+	virtual uint32_t read_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
 	// reading and writing to Extended DRAM chips
-	virtual DECLARE_READ32_MEMBER(read_ext_dram0) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0) {}
-	virtual DECLARE_READ32_MEMBER(read_ext_dram1) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1) {}
+	virtual uint32_t read_ext_dram0(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual void write_ext_dram0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {}
+	virtual uint32_t read_ext_dram1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual void write_ext_dram1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {}
 	// reading and writing to Extended BRAM chip
-	virtual DECLARE_READ32_MEMBER(read_ext_bram) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) {}
+	virtual uint32_t read_ext_bram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff) { return 0xffffffff; }
+	virtual void write_ext_bram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff) {}
 
 	virtual int get_cart_type() { return m_cart_type; };
 
@@ -94,13 +94,13 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ32_MEMBER(read_rom);
-	virtual DECLARE_READ32_MEMBER(read_ext_dram0);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0);
-	virtual DECLARE_READ32_MEMBER(read_ext_dram1);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1);
-	virtual DECLARE_READ32_MEMBER(read_ext_bram);
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
+	virtual uint32_t read_rom(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_ext_dram0(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual void write_ext_dram0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_ext_dram1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual void write_ext_dram1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	virtual uint32_t read_ext_bram(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	virtual void write_ext_bram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 private:
 	device_sat_cart_interface*       m_cart;

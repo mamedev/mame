@@ -71,186 +71,186 @@ void i82371sb_isa_device::reset_all_mappings()
 	pci_device::reset_all_mappings();
 }
 
-WRITE8_MEMBER (i82371sb_isa_device::boot_state_w)
+void i82371sb_isa_device::boot_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_boot_state_hook((offs_t)0, data);
 }
 
-WRITE8_MEMBER (i82371sb_isa_device::nop_w)
+void i82371sb_isa_device::nop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER (i82371sb_isa_device::iort_r)
+uint8_t i82371sb_isa_device::iort_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return iort;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::iort_w)
+void i82371sb_isa_device::iort_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	iort = data;
 	logerror("iort = %02x\n", iort);
 }
 
-READ16_MEMBER (i82371sb_isa_device::xbcs_r)
+uint16_t i82371sb_isa_device::xbcs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return xbcs;
 }
 
-WRITE16_MEMBER(i82371sb_isa_device::xbcs_w)
+void i82371sb_isa_device::xbcs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&xbcs);
 	logerror("xbcs = %04x\n", xbcs);
 }
 
-READ8_MEMBER (i82371sb_isa_device::pirqrc_r)
+uint8_t i82371sb_isa_device::pirqrc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pirqrc[offset];
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::pirqrc_w)
+void i82371sb_isa_device::pirqrc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pirqrc[offset] = data;
 	logerror("pirqrc[%d] = %02x\n", offset, pirqrc[offset]);
 }
 
-READ8_MEMBER (i82371sb_isa_device::tom_r)
+uint8_t i82371sb_isa_device::tom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return tom;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::tom_w)
+void i82371sb_isa_device::tom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	tom = data;
 	logerror("tom = %02x\n", tom);
 }
 
-READ16_MEMBER (i82371sb_isa_device::mstat_r)
+uint16_t i82371sb_isa_device::mstat_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return mstat;
 }
 
-WRITE16_MEMBER(i82371sb_isa_device::mstat_w)
+void i82371sb_isa_device::mstat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&mstat);
 	logerror("mstat = %04x\n", mstat);
 }
 
-READ8_MEMBER (i82371sb_isa_device::mbirq0_r)
+uint8_t i82371sb_isa_device::mbirq0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return mbirq0;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::mbirq0_w)
+void i82371sb_isa_device::mbirq0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mbirq0 = data;
 	logerror("mbirq0 = %02x\n", mbirq0);
 }
 
-READ8_MEMBER (i82371sb_isa_device::mbdma_r)
+uint8_t i82371sb_isa_device::mbdma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return mbdma[offset];
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::mbdma_w)
+void i82371sb_isa_device::mbdma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mbdma[offset] = data;
 	logerror("mbdma[%d] = %02x\n", offset, mbdma);
 }
 
-READ8_MEMBER (i82371sb_isa_device::apicbase_r)
+uint8_t i82371sb_isa_device::apicbase_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return apicbase;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::apicbase_w)
+void i82371sb_isa_device::apicbase_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apicbase = data;
 	logerror("apicbase = %02x\n", apicbase);
 }
 
-READ8_MEMBER (i82371sb_isa_device::dlc_r)
+uint8_t i82371sb_isa_device::dlc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dlc;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::dlc_w)
+void i82371sb_isa_device::dlc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dlc = data;
 	logerror("dlc = %02x\n", dlc);
 }
 
-READ8_MEMBER (i82371sb_isa_device::smicntl_r)
+uint8_t i82371sb_isa_device::smicntl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return smicntl;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::smicntl_w)
+void i82371sb_isa_device::smicntl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	smicntl = data;
 	logerror("smicntl = %02x\n", smicntl);
 }
 
-READ16_MEMBER (i82371sb_isa_device::smien_r)
+uint16_t i82371sb_isa_device::smien_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return smien;
 }
 
-WRITE16_MEMBER(i82371sb_isa_device::smien_w)
+void i82371sb_isa_device::smien_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&smien);
 	logerror("smien = %04x\n", smien);
 }
 
-READ32_MEMBER (i82371sb_isa_device::see_r)
+uint32_t i82371sb_isa_device::see_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return see;
 }
 
-WRITE32_MEMBER(i82371sb_isa_device::see_w)
+void i82371sb_isa_device::see_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&see);
 	logerror("see = %08x\n", see);
 }
 
-READ8_MEMBER (i82371sb_isa_device::ftmr_r)
+uint8_t i82371sb_isa_device::ftmr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ftmr;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::ftmr_w)
+void i82371sb_isa_device::ftmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ftmr = data;
 	logerror("ftmr = %02x\n", ftmr);
 }
 
-READ16_MEMBER (i82371sb_isa_device::smireq_r)
+uint16_t i82371sb_isa_device::smireq_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return smireq;
 }
 
-WRITE16_MEMBER(i82371sb_isa_device::smireq_w)
+void i82371sb_isa_device::smireq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&smireq);
 	logerror("smireq = %04x\n", smireq);
 }
 
-READ8_MEMBER (i82371sb_isa_device::ctltmr_r)
+uint8_t i82371sb_isa_device::ctltmr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ctlmtr;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::ctltmr_w)
+void i82371sb_isa_device::ctltmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ctlmtr = data;
 	logerror("ctlmtr = %02x\n", ctlmtr);
 }
 
-READ8_MEMBER (i82371sb_isa_device::cthtmr_r)
+uint8_t i82371sb_isa_device::cthtmr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return cthmtr;
 }
 
-WRITE8_MEMBER(i82371sb_isa_device::cthtmr_w)
+void i82371sb_isa_device::cthtmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	cthmtr = data;
 	logerror("cthmtr = %02x\n", cthmtr);

@@ -108,8 +108,8 @@ public:
 	static void static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6);
 
 	// API
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
 
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }

@@ -476,12 +476,12 @@ static ADDRESS_MAP_START(nc_map, AS_PROGRAM, 8, nc_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(nc_state::nc_memory_management_r)
+uint8_t nc_state::nc_memory_management_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_memory_config[offset];
 }
 
-WRITE8_MEMBER(nc_state::nc_memory_management_w)
+void nc_state::nc_memory_management_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("Memory management W: %02x %02x\n",offset,data));
 		m_memory_config[offset] = data;
@@ -489,7 +489,7 @@ WRITE8_MEMBER(nc_state::nc_memory_management_w)
 		nc_refresh_memory_config();
 }
 
-WRITE8_MEMBER(nc_state::nc_irq_mask_w)
+void nc_state::nc_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("irq mask w: %02x\n", data));
 	LOG_DEBUG(("irq mask nc200 w: %02x\n",data & ((1<<4) | (1<<5) | (1<<6) | (1<<7))));
@@ -500,7 +500,7 @@ WRITE8_MEMBER(nc_state::nc_irq_mask_w)
 	nc_update_interrupts();
 }
 
-WRITE8_MEMBER(nc_state::nc_irq_status_w)
+void nc_state::nc_irq_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("irq status w: %02x\n", data));
 	data = data^0x0ff;
@@ -537,13 +537,13 @@ WRITE8_MEMBER(nc_state::nc_irq_status_w)
 		nc_update_interrupts();
 }
 
-READ8_MEMBER(nc_state::nc_irq_status_r)
+uint8_t nc_state::nc_irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 		return ~((m_irq_status & (~m_irq_latch_mask)) | m_irq_latch);
 }
 
 
-READ8_MEMBER(nc_state::nc_key_data_in_r)
+uint8_t nc_state::nc_key_data_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = {
 		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
@@ -596,7 +596,7 @@ void nc_state::nc_sound_update(int channel)
 	beeper_device->set_clock(frequency);
 }
 
-WRITE8_MEMBER(nc_state::nc_sound_w)
+void nc_state::nc_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("sound w: %04x %02x\n", offset, data));
 
@@ -663,7 +663,7 @@ WRITE_LINE_MEMBER(nc_state::write_uart_clock)
 	m_uart->write_rxc(state);
 }
 
-WRITE8_MEMBER(nc_state::nc_uart_control_w)
+void nc_state::nc_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* same for nc100 and nc200 */
 	m_centronics->write_strobe(BIT(data, 6));
@@ -694,7 +694,7 @@ WRITE8_MEMBER(nc_state::nc_uart_control_w)
 
 
 
-WRITE8_MEMBER(nc_state::nc100_display_memory_start_w)
+void nc_state::nc100_display_memory_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
@@ -707,7 +707,7 @@ WRITE8_MEMBER(nc_state::nc100_display_memory_start_w)
 }
 
 
-WRITE8_MEMBER(nc_state::nc100_uart_control_w)
+void nc_state::nc100_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	nc_uart_control_w(space, offset,data);
 
@@ -811,7 +811,7 @@ void nc_state::machine_start()
 }
 
 
-WRITE8_MEMBER(nc_state::nc100_poweroff_control_w)
+void nc_state::nc100_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 7-1: not used */
 	/* bit 0: 1 = no effect, 0 = power off */
@@ -821,7 +821,7 @@ WRITE8_MEMBER(nc_state::nc100_poweroff_control_w)
 
 
 /* nc100 version of card/battery status */
-READ8_MEMBER(nc_state::nc100_card_battery_status_r)
+uint8_t nc_state::nc100_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int nc_card_battery_status = 0x0fc;
 
@@ -849,7 +849,7 @@ READ8_MEMBER(nc_state::nc100_card_battery_status_r)
 	return nc_card_battery_status;
 }
 
-WRITE8_MEMBER(nc_state::nc100_memory_card_wait_state_w)
+void nc_state::nc100_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG(("nc100 memory card wait state: %02x\n",data));
 }
@@ -1021,7 +1021,7 @@ void nc_state::nc150_init_machine()
 /* NC200 hardware */
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(nc_state::nc200_display_memory_start_w)
+void nc_state::nc200_display_memory_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7: A15 */
 	/* bit 6: A14 */
@@ -1169,7 +1169,7 @@ NC200:
 
 
 /* nc200 version of card/battery status */
-READ8_MEMBER(nc_state::nc200_card_battery_status_r)
+uint8_t nc_state::nc200_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int nc_card_battery_status = 0x0ff;
 
@@ -1202,7 +1202,7 @@ READ8_MEMBER(nc_state::nc200_card_battery_status_r)
   bit 0: Parallel interface BUSY
  */
 
-READ8_MEMBER(nc_state::nc200_printer_status_r)
+uint8_t nc_state::nc200_printer_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -1212,7 +1212,7 @@ READ8_MEMBER(nc_state::nc200_printer_status_r)
 }
 
 
-WRITE8_MEMBER(nc_state::nc200_uart_control_w)
+void nc_state::nc200_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* int reset_fdc = (m_uart_control^data) & (1<<5); */
 
@@ -1242,7 +1242,7 @@ WRITE8_MEMBER(nc_state::nc200_uart_control_w)
 /* bit 1: disk motor??  */
 /* bit 0: UPD765 Terminal Count input */
 
-WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
+void nc_state::nc200_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data));
@@ -1256,7 +1256,7 @@ WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
 /* bit 2: backlight: 1=off, 0=on */
 /* bit 1 cleared to zero in disk code */
 /* bit 0 seems to be the same as nc100 */
-WRITE8_MEMBER(nc_state::nc200_poweroff_control_w)
+void nc_state::nc200_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", m_maincpu->pc(), data));
 

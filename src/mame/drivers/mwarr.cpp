@@ -90,13 +90,13 @@ public:
 	int m_which;
 
 	uint16_t m_sprites_buffer[0x800];
-	DECLARE_WRITE16_MEMBER(bg_videoram_w);
-	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
-	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
-	DECLARE_WRITE16_MEMBER(tx_videoram_w);
-	DECLARE_WRITE16_MEMBER(sprites_commands_w);
-	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
-	DECLARE_WRITE16_MEMBER(oki1_bank_w);
+	void bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mlow_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mhigh_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprites_commands_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mwarr_brightness_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
 	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
@@ -119,36 +119,36 @@ public:
  *
  *************************************/
 
-WRITE16_MEMBER(mwarr_state::bg_videoram_w)
+void mwarr_state::bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
+void mwarr_state::mlow_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mlow_videoram[offset]);
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
+void mwarr_state::mhigh_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_mhigh_videoram[offset]);
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mwarr_state::tx_videoram_w)
+void mwarr_state::tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(mwarr_state::oki1_bank_w)
+void mwarr_state::oki1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_oki2->set_rom_bank(data & 3);
 }
 
-WRITE16_MEMBER(mwarr_state::sprites_commands_w)
+void mwarr_state::sprites_commands_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_which)
 	{
@@ -184,7 +184,7 @@ WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 	m_which ^= 1;
 }
 
-WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
+void mwarr_state::mwarr_brightness_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 	double brightness;

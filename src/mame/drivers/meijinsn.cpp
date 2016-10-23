@@ -95,8 +95,8 @@ public:
 	uint8_t m_coinvalue;
 	int m_mcu_latch;
 
-	DECLARE_WRITE16_MEMBER(sound_w);
-	DECLARE_READ16_MEMBER(alpha_mcu_r);
+	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t alpha_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -107,13 +107,13 @@ public:
 
 
 
-WRITE16_MEMBER(meijinsn_state::sound_w)
+void meijinsn_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_soundlatch->write(space, 0, data & 0xff);
 }
 
-READ16_MEMBER(meijinsn_state::alpha_mcu_r)
+uint16_t meijinsn_state::alpha_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const uint8_t coinage1[2][2] = {{1,1}, {1,2}};
 	static const uint8_t coinage2[2][2] = {{1,5}, {2,1}};

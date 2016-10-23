@@ -77,7 +77,7 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 }
 
 /* Dummy catcher for any unknown r/w */
-READ8_MEMBER( next_state::io_r )
+uint8_t next_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
@@ -88,21 +88,21 @@ READ8_MEMBER( next_state::io_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( next_state::io_w )
+void next_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
 }
 
 /* map ROM at 0x01000000-0x0101ffff? */
-READ32_MEMBER( next_state::rom_map_r )
+uint32_t next_state::rom_map_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(0 && !space.debugger_access())
 		printf("%08x ROM MAP?\n",space.device().safe_pc());
 	return 0x01000000;
 }
 
-READ32_MEMBER( next_state::scr2_r )
+uint32_t next_state::scr2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(0 && !space.debugger_access())
 		printf("%08x\n",space.device().safe_pc());
@@ -139,7 +139,7 @@ READ32_MEMBER( next_state::scr2_r )
 	return data;
 }
 
-WRITE32_MEMBER( next_state::scr2_w )
+void next_state::scr2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(0 && !space.debugger_access())
 		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
@@ -152,7 +152,7 @@ WRITE32_MEMBER( next_state::scr2_w )
 	irq_set(1, scr2 & 0x02000000);
 }
 
-READ32_MEMBER( next_state::scr1_r )
+uint32_t next_state::scr1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*
 	    xxxx ---- ---- ---- ---- ---- ---- ---- slot ID
@@ -230,17 +230,17 @@ void next_state::irq_set(int id, bool raise)
 }
 
 
-READ32_MEMBER( next_state::irq_status_r )
+uint32_t next_state::irq_status_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return irq_status;
 }
 
-READ32_MEMBER( next_state::irq_mask_r )
+uint32_t next_state::irq_mask_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return irq_mask;
 }
 
-WRITE32_MEMBER( next_state::irq_mask_w )
+void next_state::irq_mask_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&irq_mask);
 	irq_check();
@@ -447,7 +447,7 @@ void next_state::dma_check_end(int slot, bool eof)
 		dma_end(slot);
 }
 
-READ32_MEMBER( next_state::dma_regs_r)
+uint32_t next_state::dma_regs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -475,7 +475,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	return res;
 }
 
-WRITE32_MEMBER( next_state::dma_regs_w)
+void next_state::dma_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -500,7 +500,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 	}
 }
 
-READ32_MEMBER( next_state::dma_ctrl_r)
+uint32_t next_state::dma_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -513,7 +513,7 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
 
-WRITE32_MEMBER( next_state::dma_ctrl_w)
+void next_state::dma_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
@@ -572,14 +572,14 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 
 const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
 
-READ32_MEMBER( next_state::scsictrl_r )
+uint32_t next_state::scsictrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t res = (scsictrl << 24) | (scsistat << 16);
 	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, space.device().safe_pc());
 	return res;
 }
 
-WRITE32_MEMBER( next_state::scsictrl_w )
+void next_state::scsictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(ACCESSING_BITS_24_31) {
 		scsictrl = data >> 24;
@@ -603,7 +603,7 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 	}
 }
 
-READ32_MEMBER( next_state::event_counter_r)
+uint32_t next_state::event_counter_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// Event counters, around that time, are usually fixed-frequency counters.
 	// This one being 1MHz seems to make sense
@@ -615,17 +615,17 @@ READ32_MEMBER( next_state::event_counter_r)
 	return eventc_latch;
 }
 
-READ32_MEMBER( next_state::dsp_r)
+uint32_t next_state::dsp_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x7fffffff;
 }
 
-WRITE32_MEMBER( next_state::fdc_control_w )
+void next_state::fdc_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
 }
 
-READ32_MEMBER( next_state::fdc_control_r )
+uint32_t next_state::fdc_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	// Type of floppy present
 	// 0 = no floppy in drive
@@ -659,13 +659,13 @@ READ32_MEMBER( next_state::fdc_control_r )
 	return 0 << 24;
 }
 
-READ32_MEMBER( next_state::phy_r )
+uint32_t next_state::phy_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
 	return phy[offset] | (0 << 24);
 }
 
-WRITE32_MEMBER( next_state::phy_w )
+void next_state::phy_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(phy+offset);
 	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
@@ -681,14 +681,14 @@ void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_ctrl &= 0x7fffffff;
 }
 
-READ32_MEMBER( next_state::timer_data_r )
+uint32_t next_state::timer_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(timer_ctrl & 0x80000000)
 		timer_update();
 	return timer_data;
 }
 
-WRITE32_MEMBER( next_state::timer_data_w )
+void next_state::timer_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(timer_ctrl & 0x80000000) {
 		COMBINE_DATA(&timer_next_data);
@@ -699,13 +699,13 @@ WRITE32_MEMBER( next_state::timer_data_w )
 	}
 }
 
-READ32_MEMBER( next_state::timer_ctrl_r )
+uint32_t next_state::timer_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	irq_set(29, false);
 	return timer_ctrl;
 }
 
-WRITE32_MEMBER( next_state::timer_ctrl_w )
+void next_state::timer_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	bool oldact = timer_ctrl & 0x80000000;
 	COMBINE_DATA(&timer_ctrl);
@@ -806,7 +806,7 @@ WRITE_LINE_MEMBER(next_state::scsi_drq)
 	dma_drq_w(1, state);
 }
 
-WRITE8_MEMBER(next_state::ramdac_w)
+void next_state::ramdac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset) {
 	case 0:

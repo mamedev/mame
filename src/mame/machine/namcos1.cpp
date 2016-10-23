@@ -10,20 +10,20 @@
 *                                                                              *
 *******************************************************************************/
 
-WRITE8_MEMBER( namcos1_state::_3dcs_w )
+void namcos1_state::_3dcs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset & 1) popmessage("LEFT");
 	else            popmessage("RIGHT");
 }
 
 
-READ8_MEMBER( namcos1_state::no_key_r )
+uint8_t namcos1_state::no_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	popmessage("CPU %s PC %08x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 	return 0;
 }
 
-WRITE8_MEMBER( namcos1_state::no_key_w )
+void namcos1_state::no_key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	popmessage("CPU %s PC %08x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 }
@@ -128,7 +128,7 @@ puzlclub:
 CPU #0 PC e017: keychip write 0003=35 [they probably used RAM instead of a key chip for this prototype]
 CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
-READ8_MEMBER( namcos1_state::key_type1_r )
+uint8_t namcos1_state::key_type1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -159,7 +159,7 @@ READ8_MEMBER( namcos1_state::key_type1_r )
 	return 0;
 }
 
-WRITE8_MEMBER( namcos1_state::key_type1_w )
+void namcos1_state::key_type1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
@@ -311,7 +311,7 @@ CPU #0 PC e574: keychip read 0001
 
 */
 
-READ8_MEMBER( namcos1_state::key_type2_r )
+uint8_t namcos1_state::key_type2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -330,7 +330,7 @@ READ8_MEMBER( namcos1_state::key_type2_r )
 	return 0;
 }
 
-WRITE8_MEMBER( namcos1_state::key_type2_w )
+void namcos1_state::key_type2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
@@ -437,7 +437,7 @@ CPU #0 PC ca96: keychip read 0043     [0x30 | (ARG & 0x0f)]
 CPU #0 PC e45a: keychip read 0030     [discarded]
 */
 
-READ8_MEMBER( namcos1_state::key_type3_r )
+uint8_t namcos1_state::key_type3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip read %04x\n", space.device().tag(), space.device().safe_pc(), offset);
 
@@ -460,7 +460,7 @@ READ8_MEMBER( namcos1_state::key_type3_r )
 	return 0;
 }
 
-WRITE8_MEMBER( namcos1_state::key_type3_w )
+void namcos1_state::key_type3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("CPU %s PC %04x: keychip write %04x=%02x\n", space.device().tag(), space.device().safe_pc(), offset, data);
 
@@ -475,7 +475,7 @@ WRITE8_MEMBER( namcos1_state::key_type3_w )
 *                                                                              *
 *******************************************************************************/
 
-WRITE8_MEMBER(namcos1_state::sound_bankswitch_w)
+void namcos1_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundbank->set_entry((data & 0x70) >> 4);
 }
@@ -544,7 +544,7 @@ void namcos1_state::machine_reset()
 *******************************************************************************/
 
 /* mcu banked rom area select */
-WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
+void namcos1_state::mcu_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 
@@ -580,7 +580,7 @@ WRITE8_MEMBER(namcos1_state::mcu_bankswitch_w)
 /* I found set $A6 only initialize in MCU                       */
 /* This patch kill write this data by MCU case $A6 to xx(clear) */
 
-WRITE8_MEMBER(namcos1_state::mcu_patch_w)
+void namcos1_state::mcu_patch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("mcu C000 write pc=%04x data=%02x\n",space.device().safe_pc(),data);
 	if (m_mcu_patch_data == 0xa6) return;
@@ -934,7 +934,7 @@ void namcos1_state::init_soukobdx()
 /*******************************************************************************
 *   Quester specific                                                           *
 *******************************************************************************/
-READ8_MEMBER( namcos1_state::quester_paddle_r )
+uint8_t namcos1_state::quester_paddle_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -978,7 +978,7 @@ void namcos1_state::init_quester()
 *   Beraboh Man specific                                                       *
 *******************************************************************************/
 
-READ8_MEMBER( namcos1_state::berabohm_buttons_r )
+uint8_t namcos1_state::berabohm_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 
@@ -1073,7 +1073,7 @@ void namcos1_state::init_berabohm()
 
 // used by faceoff and tankforce 4 player (input multiplex)
 
-READ8_MEMBER( namcos1_state::faceoff_inputs_r )
+uint8_t namcos1_state::faceoff_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int res;
 

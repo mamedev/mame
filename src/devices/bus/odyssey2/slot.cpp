@@ -226,7 +226,7 @@ std::string o2_cart_slot_device::get_default_card_software()
  read_rom**
  -------------------------------------------------*/
 
-READ8_MEMBER(o2_cart_slot_device::read_rom04)
+uint8_t o2_cart_slot_device::read_rom04(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom04(space, offset);
@@ -234,7 +234,7 @@ READ8_MEMBER(o2_cart_slot_device::read_rom04)
 		return 0xff;
 }
 
-READ8_MEMBER(o2_cart_slot_device::read_rom0c)
+uint8_t o2_cart_slot_device::read_rom0c(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom0c(space, offset);
@@ -246,7 +246,7 @@ READ8_MEMBER(o2_cart_slot_device::read_rom0c)
  io_write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(o2_cart_slot_device::io_write)
+void o2_cart_slot_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->io_write(space, offset, data);

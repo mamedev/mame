@@ -56,13 +56,13 @@ public:
 	required_device<address_map_bank_device> m_videobank0;
 	required_device<address_map_bank_device> m_videobank1;
 
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(K052109_r);
-	DECLARE_WRITE8_MEMBER(K052109_w);
-	DECLARE_WRITE8_MEMBER(_5fe0_w);
-	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
-	DECLARE_WRITE8_MEMBER(z80_irq_w);
-	DECLARE_READ8_MEMBER(z80_irq_r);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t K052109_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void K052109_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _5fe0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -73,7 +73,7 @@ public:
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);
-	DECLARE_WRITE8_MEMBER(banking_callback);
+	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K053246_CB_MEMBER(sprite_callback);
 
 protected:

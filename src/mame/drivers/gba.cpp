@@ -543,7 +543,7 @@ static const char *reg_names[] = {
 	"FIFO_B_L",    "FIFO_B_H"
 };
 
-READ32_MEMBER(gba_state::gba_io_r)
+uint32_t gba_state::gba_io_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t retval = 0;
 
@@ -739,7 +739,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 	return retval;
 }
 
-WRITE32_MEMBER(gba_state::gba_io_w)
+void gba_state::gba_io_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
@@ -1130,7 +1130,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 	}
 }
 
-READ32_MEMBER(gba_state::gba_bios_r)
+uint32_t gba_state::gba_bios_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t *rom = m_region_maincpu;
 	if (m_bios_hack->read())
@@ -1147,7 +1147,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 	return rom[offset & 0x3fff];
 }
 
-READ32_MEMBER(gba_state::gba_10000000_r)
+uint32_t gba_state::gba_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
@@ -1435,7 +1435,7 @@ ROM_END
 
 // this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,
 // and some games verify that as a protection check (notably Metroid Fusion)
-DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
+offs_t gba_state::gba_direct(direct_read_data &direct, offs_t address)
 {
 	if (address > 0x4000)
 	{

@@ -13,29 +13,29 @@
 
 const device_type DECODMD2 = &device_creator<decodmd_type2_device>;
 
-WRITE8_MEMBER( decodmd_type2_device::bank_w )
+void decodmd_type2_device::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rombank1->set_entry(data & 0x1f);
 }
 
-WRITE8_MEMBER( decodmd_type2_device::crtc_address_w )
+void decodmd_type2_device::crtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mc6845->address_w(space,offset,data);
 	m_crtc_index = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::crtc_status_r )
+uint8_t decodmd_type2_device::crtc_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mc6845->register_r(space,offset);
 }
 
-WRITE8_MEMBER( decodmd_type2_device::crtc_register_w )
+void decodmd_type2_device::crtc_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mc6845->register_w(space,offset,data);
 	m_crtc_reg[m_crtc_index] = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::latch_r )
+uint8_t decodmd_type2_device::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// clear IRQ?
 	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
@@ -43,13 +43,13 @@ READ8_MEMBER( decodmd_type2_device::latch_r )
 	return m_command;
 }
 
-WRITE8_MEMBER( decodmd_type2_device::data_w )
+void decodmd_type2_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// set IRQ?
 	m_latch = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::busy_r )
+uint8_t decodmd_type2_device::busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 
@@ -62,7 +62,7 @@ READ8_MEMBER( decodmd_type2_device::busy_r )
 }
 
 
-WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
+void decodmd_type2_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(m_ctrl & 0x01) && (data & 0x01))
 	{
@@ -79,17 +79,17 @@ WRITE8_MEMBER( decodmd_type2_device::ctrl_w )
 	m_ctrl = data;
 }
 
-READ8_MEMBER( decodmd_type2_device::ctrl_r )
+uint8_t decodmd_type2_device::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ctrl;
 }
 
-READ8_MEMBER( decodmd_type2_device::status_r )
+uint8_t decodmd_type2_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_status;
 }
 
-WRITE8_MEMBER( decodmd_type2_device::status_w )
+void decodmd_type2_device::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_status = data & 0x0f;
 }

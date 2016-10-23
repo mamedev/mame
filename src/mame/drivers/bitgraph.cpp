@@ -109,33 +109,33 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	DECLARE_READ8_MEMBER( pia_r );
-	DECLARE_WRITE8_MEMBER( pia_w );
-	DECLARE_READ8_MEMBER( pia_pa_r );
-	DECLARE_READ8_MEMBER( pia_pb_r );
-	DECLARE_WRITE8_MEMBER( pia_pa_w );
-	DECLARE_WRITE8_MEMBER( pia_pb_w );
+	uint8_t pia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
-	DECLARE_WRITE16_MEMBER( baud_write );
+	void baud_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
 	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
 	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
 
-	DECLARE_READ8_MEMBER( adlc_r );
-	DECLARE_WRITE8_MEMBER( adlc_w );
+	uint8_t adlc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adlc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( earom_write );
-	DECLARE_WRITE8_MEMBER( misccr_write );
+	void earom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misccr_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( system_clock_write );
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( ppu_read );
-	DECLARE_WRITE8_MEMBER( ppu_write );
-	DECLARE_WRITE8_MEMBER( ppu_i8243_w );
+	uint8_t ppu_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppu_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppu_i8243_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	virtual void machine_start() override;
@@ -200,13 +200,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(bitgraph)
 INPUT_PORTS_END
 
-READ8_MEMBER(bitgraph_state::pia_r)
+uint8_t bitgraph_state::pia_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	DBG_LOG(3,"PIA", ("R %d\n", offset));
 	return m_pia->read(space, 3-offset);
 }
 
-WRITE8_MEMBER(bitgraph_state::pia_w)
+void bitgraph_state::pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(3,"PIA", ("W %d < %02X\n", offset, data));
 	return m_pia->write(space, 3-offset, data);
@@ -222,14 +222,14 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 	// XXX shut up verbose log
 }
 
-READ8_MEMBER(bitgraph_state::pia_pa_r)
+uint8_t bitgraph_state::pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
 	DBG_LOG(2,"PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
 	return data;
 }
 
-WRITE8_MEMBER(bitgraph_state::pia_pa_w)
+void bitgraph_state::pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2,"PIA", ("A <- %02X\n", data));
 	m_pia_a = data;
@@ -245,13 +245,13 @@ WRITE8_MEMBER(bitgraph_state::pia_pa_w)
         B6          O: Clear Clock interrupt.  Must write a 0 [clear interrupt], then a 1.
         B7          I: EVEN field ??
 */
-READ8_MEMBER(bitgraph_state::pia_pb_r)
+uint8_t bitgraph_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	DBG_LOG(2,"PIA", ("B == %02X\n", m_pia_b));
 	return m_pia_b;
 }
 
-WRITE8_MEMBER(bitgraph_state::pia_pb_w)
+void bitgraph_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2,"PIA", ("B <- %02X\n", data));
 	m_pia_b = data;
@@ -273,14 +273,14 @@ WRITE8_MEMBER(bitgraph_state::pia_pb_w)
 	}
 }
 
-WRITE8_MEMBER(bitgraph_state::earom_write)
+void bitgraph_state::earom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2,"EAROM", ("addr <- %02X (%02X)\n", data & 0x3f, data));
 	m_earom->set_address(data & 0x3f);
 }
 
 // written once and never changed
-WRITE8_MEMBER(bitgraph_state::misccr_write)
+void bitgraph_state::misccr_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"MISCCR", ("<- %02X (DTR %d MAP %d)\n", data, BIT(data, 3), (data & 3)));
 	m_misccr = data;
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
 	}
 }
 
-WRITE16_MEMBER(bitgraph_state::baud_write)
+void bitgraph_state::baud_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(1,"Baud", ("%04X\n", data));
 	m_dbrgb->str_w(data & 15);      // 2 DBG
@@ -334,13 +334,13 @@ WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
 	}
 }
 
-READ8_MEMBER(bitgraph_state::adlc_r)
+uint8_t bitgraph_state::adlc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	DBG_LOG(1,"ADLC", ("R %d\n", offset));
 	return m_adlc ? m_adlc->read(space, 3-offset) : 0xff;
 }
 
-WRITE8_MEMBER(bitgraph_state::adlc_w)
+void bitgraph_state::adlc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"ADLC", ("W %d < %02X\n", offset, data));
 	if (m_adlc) return m_adlc->write(space, 3-offset, data);
@@ -383,14 +383,14 @@ uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(bitgraph_state::ppu_read)
+uint8_t bitgraph_state::ppu_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_ppu[offset];
 	DBG_LOG(1,"PPU", ("%d == %02X\n", offset, data));
 	return data;
 }
 
-WRITE8_MEMBER(bitgraph_state::ppu_write)
+void bitgraph_state::ppu_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"PPU", ("%d <- %02X\n", offset, data));
 	m_ppu[offset] = data;
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
     p6  O: Centronics control
     p7  I: Centronics status
 */
-WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
+void bitgraph_state::ppu_i8243_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(1,"PPU", ("8243 %d <- %02X\n", offset + 4, data));
 	switch (offset) {

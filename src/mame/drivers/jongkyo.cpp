@@ -50,13 +50,13 @@ public:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
 	uint8_t    m_videoram2[0x4000];
-	DECLARE_WRITE8_MEMBER(bank_select_w);
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(videoram2_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
-	DECLARE_READ8_MEMBER(input_1p_r);
-	DECLARE_READ8_MEMBER(input_2p_r);
+	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jongkyo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_1p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t input_2p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_jongkyo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -129,7 +129,7 @@ uint32_t jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-WRITE8_MEMBER(jongkyo_state::bank_select_w)
+void jongkyo_state::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mask = 1 << (offset >> 1);
 
@@ -142,13 +142,13 @@ WRITE8_MEMBER(jongkyo_state::bank_select_w)
 	membank("bank1d")->set_entry(m_rom_bank);
 }
 
-WRITE8_MEMBER(jongkyo_state::mux_w)
+void jongkyo_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux_data = ~data;
 	//  printf("%02x\n", m_mux_data);
 }
 
-WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
+void jongkyo_state::jongkyo_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = hopper out? */
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 	m_flip_screen = (data & 4) >> 2;
 }
 
-READ8_MEMBER(jongkyo_state::input_1p_r)
+uint8_t jongkyo_state::input_1p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t cr_clear = ioport("CR_CLEAR")->read();
 
@@ -178,7 +178,7 @@ READ8_MEMBER(jongkyo_state::input_1p_r)
 			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
 }
 
-READ8_MEMBER(jongkyo_state::input_2p_r)
+uint8_t jongkyo_state::input_2p_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t coin_port = ioport("COINS")->read();
 
@@ -197,12 +197,12 @@ READ8_MEMBER(jongkyo_state::input_2p_r)
 			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
 }
 
-WRITE8_MEMBER(jongkyo_state::videoram2_w)
+void jongkyo_state::videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 }
 
-WRITE8_MEMBER(jongkyo_state::unknown_w)
+void jongkyo_state::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

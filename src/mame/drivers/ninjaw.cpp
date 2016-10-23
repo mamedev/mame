@@ -333,7 +333,7 @@ void ninjaw_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 
 }
 
-WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
+void ninjaw_state::cpua_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;
@@ -349,12 +349,12 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
             SOUND
 *****************************************/
 
-WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
+void ninjaw_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 7);
 }
 
-WRITE16_MEMBER(ninjaw_state::sound_w)
+void ninjaw_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_tc0140syt->master_port_w(space, 0, data & 0xff);
@@ -367,7 +367,7 @@ WRITE16_MEMBER(ninjaw_state::sound_w)
 #endif
 }
 
-READ16_MEMBER(ninjaw_state::sound_r)
+uint16_t ninjaw_state::sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 1)
 		return ((m_tc0140syt->master_comm_r(space, 0) & 0xff));
@@ -378,7 +378,7 @@ READ16_MEMBER(ninjaw_state::sound_r)
 
 /**** sound pan control ****/
 
-WRITE8_MEMBER(ninjaw_state::pancontrol_w)
+void ninjaw_state::pancontrol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	filter_volume_device *flt = nullptr;
 	offset &= 3;
@@ -397,7 +397,7 @@ WRITE8_MEMBER(ninjaw_state::pancontrol_w)
 }
 
 
-WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
+void ninjaw_state::tc0100scn_triple_screen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_tc0100scn_1->word_w(space, offset, data, mem_mask);
 	m_tc0100scn_2->word_w(space, offset, data, mem_mask);

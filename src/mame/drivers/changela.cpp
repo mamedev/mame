@@ -20,14 +20,14 @@ Tomasz Slanina
 #include "changela.lh"
 
 
-READ8_MEMBER(changela_state::mcu_r)
+uint8_t changela_state::mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//osd_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
 	return m_mcu_out;
 }
 
 /* latch LS374 at U39 */
-WRITE8_MEMBER(changela_state::mcu_w)
+void changela_state::mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu_in = data;
 }
@@ -37,42 +37,42 @@ WRITE8_MEMBER(changela_state::mcu_w)
         MCU
 *********************************/
 
-READ8_MEMBER(changela_state::changela_68705_port_a_r)
+uint8_t changela_state::changela_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_port_a_w)
+void changela_state::changela_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_ddr_a_w)
+void changela_state::changela_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
 
-READ8_MEMBER(changela_state::changela_68705_port_b_r)
+uint8_t changela_state::changela_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (ioport("MCU")->read() & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_port_b_w)
+void changela_state::changela_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_ddr_b_w)
+void changela_state::changela_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }
 
-READ8_MEMBER(changela_state::changela_68705_port_c_r)
+uint8_t changela_state::changela_68705_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
+void changela_state::changela_68705_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* PC3 is connected to the CLOCK input of the LS374,
 	    so we latch the data on positive going edge of the clock */
@@ -88,7 +88,7 @@ WRITE8_MEMBER(changela_state::changela_68705_port_c_w)
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER(changela_state::changela_68705_ddr_c_w)
+void changela_state::changela_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_c = data;
 }
@@ -111,23 +111,23 @@ ADDRESS_MAP_END
 
 
 /* U30 */
-READ8_MEMBER(changela_state::changela_24_r)
+uint8_t changela_state::changela_24_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_port_c_out & 2) << 2) | 7;   /* bits 2,1,0-N/C inputs */
 }
 
-READ8_MEMBER(changela_state::changela_25_r)
+uint8_t changela_state::changela_25_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//collisions on bits 3,2, bits 1,0-N/C inputs
 	return (m_tree1_col << 3) | (m_tree0_col << 2) | 0x03;
 }
 
-READ8_MEMBER(changela_state::changela_30_r)
+uint8_t changela_state::changela_30_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("WHEEL")->read() & 0x0f;  //wheel control (clocked input) signal on bits 3,2,1,0
 }
 
-READ8_MEMBER(changela_state::changela_31_r)
+uint8_t changela_state::changela_31_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
@@ -147,7 +147,7 @@ READ8_MEMBER(changela_state::changela_31_r)
 	return (m_dir_31 << 3) | (m_left_bank_col << 2) | (m_right_bank_col << 1) | m_boat_shore_col;
 }
 
-READ8_MEMBER(changela_state::changela_2c_r)
+uint8_t changela_state::changela_2c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int val = ioport("IN0")->read();
 
@@ -156,7 +156,7 @@ READ8_MEMBER(changela_state::changela_2c_r)
 	return val;
 }
 
-READ8_MEMBER(changela_state::changela_2d_r)
+uint8_t changela_state::changela_2d_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* the schems are unreadable - i'm not sure it is V8 (page 74, SOUND I/O BOARD SCHEMATIC 1 OF 2, FIGURE 24 - in the middle on the right side) */
 	int v8 = 0;
@@ -182,22 +182,22 @@ READ8_MEMBER(changela_state::changela_2d_r)
 	return (ioport("IN1")->read() & 0x20) | gas | (v8 << 4);
 }
 
-WRITE8_MEMBER(changela_state::mcu_pc_0_w)
+void changela_state::mcu_pc_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_c_in = (m_port_c_in & 0xfe) | (data & 1);
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_0)
+void changela_state::changela_collision_reset_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision_reset = data & 0x01;
 }
 
-WRITE8_MEMBER(changela_state::changela_collision_reset_1)
+void changela_state::changela_collision_reset_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tree_collision_reset = data & 0x01;
 }
 
-WRITE8_MEMBER(changela_state::changela_coin_counter_w)
+void changela_state::changela_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }

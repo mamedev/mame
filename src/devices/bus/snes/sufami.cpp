@@ -73,12 +73,12 @@ machine_config_constructor sns_rom_sufami_device::device_mconfig_additions() con
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(sns_rom_sufami_device::read_l)
+uint8_t sns_rom_sufami_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read_h(space, offset);
 }
 
-READ8_MEMBER(sns_rom_sufami_device::read_h)
+uint8_t sns_rom_sufami_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank;
 
@@ -117,12 +117,12 @@ READ8_MEMBER(sns_rom_sufami_device::read_h)
 	return 0xff;
 }
 
-WRITE8_MEMBER(sns_rom_sufami_device::write_l)
+void sns_rom_sufami_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write_h(space, offset, data);
 }
 
-WRITE8_MEMBER(sns_rom_sufami_device::write_h)
+void sns_rom_sufami_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
@@ -151,7 +151,7 @@ WRITE8_MEMBER(sns_rom_sufami_device::write_h)
  Sufami Turbo 'minicart' emulation
  -------------------------------------------------*/
 
-READ8_MEMBER(sns_rom_strom_device::read_l)
+uint8_t sns_rom_strom_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x200000)
 	{

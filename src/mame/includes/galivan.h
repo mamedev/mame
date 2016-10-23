@@ -39,20 +39,20 @@ public:
 
 	uint8_t       m_shift_scroll; //youmab
 	uint32_t      m_shift_val;
-	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
-	DECLARE_READ8_MEMBER(soundlatch_clear_r);
-	DECLARE_READ8_MEMBER(IO_port_c0_r);
-	DECLARE_WRITE8_MEMBER(blit_trigger_w);
-	DECLARE_WRITE8_MEMBER(youmab_extra_bank_w);
-	DECLARE_READ8_MEMBER(youmab_8a_r);
-	DECLARE_WRITE8_MEMBER(youmab_81_w);
-	DECLARE_WRITE8_MEMBER(youmab_84_w);
-	DECLARE_WRITE8_MEMBER(youmab_86_w);
-	DECLARE_WRITE8_MEMBER(galivan_videoram_w);
-	DECLARE_WRITE8_MEMBER(galivan_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(ninjemak_gfxbank_w);
-	DECLARE_WRITE8_MEMBER(galivan_scrollx_w);
-	DECLARE_WRITE8_MEMBER(galivan_scrolly_w);
+	void galivan_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t soundlatch_clear_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t IO_port_c0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blit_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void youmab_extra_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t youmab_8a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void youmab_81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void youmab_84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void youmab_86_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galivan_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galivan_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ninjemak_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galivan_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void galivan_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_youmab();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

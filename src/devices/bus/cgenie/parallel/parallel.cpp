@@ -63,7 +63,7 @@ void parallel_slot_device::device_reset()
 //  I/O PORTS
 //**************************************************************************
 
-READ8_MEMBER( parallel_slot_device::pa_r )
+uint8_t parallel_slot_device::pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->pa_r();
@@ -71,13 +71,13 @@ READ8_MEMBER( parallel_slot_device::pa_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( parallel_slot_device::pa_w )
+void parallel_slot_device::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->pa_w(data);
 }
 
-READ8_MEMBER( parallel_slot_device::pb_r )
+uint8_t parallel_slot_device::pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->pb_r();
@@ -85,7 +85,7 @@ READ8_MEMBER( parallel_slot_device::pb_r )
 		return 0xff;
 }
 
-WRITE8_MEMBER( parallel_slot_device::pb_w )
+void parallel_slot_device::pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->pb_w(data);

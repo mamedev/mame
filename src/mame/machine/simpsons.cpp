@@ -12,7 +12,7 @@
 
 ***************************************************************************/
 
-WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
+void simpsons_state::simpsons_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0xff)
 		return;
@@ -30,7 +30,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
+void simpsons_state::simpsons_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0,1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -43,7 +43,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 	m_k053246->k053246_set_objcha_line((~data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
+uint8_t simpsons_state::simpsons_sound_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff );
 	return 0x00;
@@ -56,7 +56,7 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 
 ***************************************************************************/
 
-WRITE8_MEMBER( simpsons_state::banking_callback )
+void simpsons_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x3f);
 }

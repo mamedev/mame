@@ -89,19 +89,19 @@ PALETTE_INIT_MEMBER(trackfld_state,trackfld)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_videoram_w)
+void trackfld_state::trackfld_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
+void trackfld_state::trackfld_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
+void trackfld_state::trackfld_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != data)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
 	}
 }
 
-WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
+void trackfld_state::atlantol_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 1)
 	{

@@ -27,14 +27,14 @@
  *************************************/
 
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
-WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
+void rocnrope_state::rocnrope_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	RAM[0xfff2 + offset] = data;
 }
 
-WRITE8_MEMBER(rocnrope_state::irq_mask_w)
+void rocnrope_state::irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 	if (!m_irq_mask)

@@ -80,19 +80,19 @@ PALETTE_INIT_MEMBER(exedexes_state, exedexes)
 	}
 }
 
-WRITE8_MEMBER(exedexes_state::exedexes_videoram_w)
+void exedexes_state::exedexes_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exedexes_state::exedexes_colorram_w)
+void exedexes_state::exedexes_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(exedexes_state::exedexes_c804_w)
+void exedexes_state::exedexes_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -107,7 +107,7 @@ WRITE8_MEMBER(exedexes_state::exedexes_c804_w)
 	/* other bits seem to be unused */
 }
 
-WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
+void exedexes_state::exedexes_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 4 is bg enable */
 	m_sc2on = data & 0x10;

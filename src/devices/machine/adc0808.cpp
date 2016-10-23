@@ -147,7 +147,7 @@ void adc0808_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  data_r - data read
 //-------------------------------------------------
 
-READ8_MEMBER( adc0808_device::data_r )
+uint8_t adc0808_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sar;
 }
@@ -157,7 +157,7 @@ READ8_MEMBER( adc0808_device::data_r )
 //  ale_w - address write
 //-------------------------------------------------
 
-WRITE8_MEMBER( adc0808_device::ale_w )
+void adc0808_device::ale_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_address = data;
 }

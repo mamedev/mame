@@ -37,7 +37,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
  *
  *************************************/
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_nmi_enable_w)
+void munchmo_state::mnchmobl_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data;
 }
@@ -56,26 +56,26 @@ INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
+void munchmo_state::mnchmobl_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
 
-WRITE8_MEMBER(munchmo_state::sound_nmi_ack_w)
+void munchmo_state::sound_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-READ8_MEMBER(munchmo_state::munchmo_ay1reset_r)
+uint8_t munchmo_state::munchmo_ay1reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	ay8910->reset_w(space,0,0);
 	return 0;
 }
 
-READ8_MEMBER(munchmo_state::munchmo_ay2reset_r)
+uint8_t munchmo_state::munchmo_ay2reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	ay8910->reset_w(space,0,0);

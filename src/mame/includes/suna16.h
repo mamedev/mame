@@ -39,28 +39,28 @@ public:
 	uint8_t m_prot;
 
 	// common
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(paletteram_r);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(flipscreen_w);
+	void soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// bestbest specific
-	DECLARE_WRITE16_MEMBER(bestbest_flipscreen_w);
-	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
-	DECLARE_READ8_MEMBER(bestbest_prot_r);
-	DECLARE_WRITE8_MEMBER(bestbest_prot_w);
-	DECLARE_WRITE8_MEMBER(bestbest_ay8910_port_a_w);
+	void bestbest_flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bestbest_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t bestbest_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bestbest_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bestbest_ay8910_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// bssoccer specific
-	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
+	void bssoccer_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bssoccer_pcm_1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bssoccer_pcm_2_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// uballoon specific
-	DECLARE_WRITE16_MEMBER(uballoon_leds_w);
-	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
-	DECLARE_READ8_MEMBER(uballoon_prot_r);
-	DECLARE_WRITE8_MEMBER(uballoon_prot_w);
+	void uballoon_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void uballoon_pcm_1_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t uballoon_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void uballoon_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
 

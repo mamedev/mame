@@ -57,31 +57,31 @@ public:
 
 
 
-	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
-	DECLARE_READ16_MEMBER ( cop_tile_bank_2_r );
-	DECLARE_WRITE16_MEMBER ( cop_tile_bank_2_w );
-	DECLARE_WRITE16_MEMBER ( raidendx_cop_bank_2_w );
-	DECLARE_WRITE16_MEMBER ( tilemap_enable_w );
-	DECLARE_WRITE16_MEMBER ( tile_scroll_w );
-	DECLARE_WRITE16_MEMBER ( tile_bank_01_w );
-	DECLARE_WRITE16_MEMBER ( raiden2_background_w );
-	DECLARE_WRITE16_MEMBER ( raiden2_foreground_w );
-	DECLARE_WRITE16_MEMBER ( raiden2_midground_w );
-	DECLARE_WRITE16_MEMBER ( raiden2_text_w );
-	DECLARE_WRITE16_MEMBER(m_videoram_private_w);
+	void raiden2_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t cop_tile_bank_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cop_tile_bank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raidendx_cop_bank_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tilemap_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tile_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tile_bank_01_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden2_background_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden2_foreground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden2_midground_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void raiden2_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void m_videoram_private_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( sprcpt_val_1_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_val_2_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_data_1_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_data_2_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_data_3_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_data_4_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_adr_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_flags_1_w );
-	DECLARE_WRITE16_MEMBER( sprcpt_flags_2_w );
+	void sprcpt_val_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_val_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_data_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_data_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_data_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_data_4_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_adr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_flags_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprcpt_flags_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
-	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
+	uint16_t raiden2_sound_comms_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void raiden2_sound_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void common_reset();
 
@@ -104,17 +104,17 @@ public:
 
 
 
-	DECLARE_WRITE16_MEMBER( sprite_prot_x_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_y_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_src_seg_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_src_w );
-	DECLARE_READ16_MEMBER( sprite_prot_src_seg_r );
-	DECLARE_READ16_MEMBER( sprite_prot_dst1_r );
-	DECLARE_READ16_MEMBER( sprite_prot_maxx_r );
-	DECLARE_READ16_MEMBER( sprite_prot_off_r );
-	DECLARE_WRITE16_MEMBER( sprite_prot_dst1_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_maxx_w );
-	DECLARE_WRITE16_MEMBER( sprite_prot_off_w );
+	void sprite_prot_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_prot_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_prot_src_seg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_prot_src_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sprite_prot_src_seg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sprite_prot_dst1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sprite_prot_maxx_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t sprite_prot_off_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sprite_prot_dst1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_prot_maxx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sprite_prot_off_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint16_t sprite_prot_x,sprite_prot_y,dst1,cop_spr_maxx,cop_spr_off;
 	uint16_t sprite_prot_src_addr[2];

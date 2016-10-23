@@ -167,13 +167,13 @@ public:
 	pen_t m_pens[NUM_PENS];
 
 	uint8_t m_atamanot_prot_state;
-	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
-	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_READ8_MEMBER(c001_r);
-	DECLARE_WRITE8_MEMBER(c001_w);
-	DECLARE_READ8_MEMBER(atamanot_prot_r);
-	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
+	void ssingles_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ssingles_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t c001_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c001_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t atamanot_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void atamanot_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	void init_ssingles();
 	virtual void video_start() override;
@@ -269,14 +269,14 @@ MC6845_UPDATE_ROW( ssingles_state::atamanot_update_row )
 }
 
 
-WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
+void ssingles_state::ssingles_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *vram = memregion("vram")->base();
 	vram[offset] = data;
 	m_videoram[offset]=data;
 }
 
-WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
+void ssingles_state::ssingles_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *cram = memregion("cram")->base();
 	cram[offset] = data;
@@ -296,18 +296,18 @@ void ssingles_state::video_start()
 }
 
 
-READ8_MEMBER(ssingles_state::c000_r)
+uint8_t ssingles_state::c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prot_data;
 }
 
-READ8_MEMBER(ssingles_state::c001_r)
+uint8_t ssingles_state::c001_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_prot_data=0xc4;
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::c001_w)
+void ssingles_state::c001_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_data^=data^0x11;
 }
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(ssingles_state::atamanot_prot_r)
+uint8_t ssingles_state::atamanot_prot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
@@ -361,7 +361,7 @@ READ8_MEMBER(ssingles_state::atamanot_prot_r)
 	return 0;
 }
 
-WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
+void ssingles_state::atamanot_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_atamanot_prot_state = data;
 }

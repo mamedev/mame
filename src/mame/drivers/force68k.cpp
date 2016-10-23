@@ -142,11 +142,11 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ16_MEMBER (vme_a24_r);
-	DECLARE_WRITE16_MEMBER (vme_a24_w);
-	DECLARE_READ16_MEMBER (vme_a16_r);
-	DECLARE_WRITE16_MEMBER (vme_a16_w);
+	uint16_t bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start () override;
 	// clocks
 	DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
@@ -160,7 +160,7 @@ public:
 	// User EPROM/SRAM slot(s)
 	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
-	DECLARE_READ16_MEMBER (read16_rom);
+	uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -306,13 +306,13 @@ void force68k_state::machine_start ()
 }
 
 /* A very ineffecient User cart emulation of two 8 bit sockets (odd and even) */
-READ16_MEMBER (force68k_state::read16_rom){
+uint16_t force68k_state::read16_rom(address_space &space, offs_t offset, uint16_t mem_mask){
 	offset = offset % m_cart->common_get_size("rom"); // Don't read outside buffer...
 	return ((m_usrrom [offset] << 8) & 0xff00) | ((m_usrrom [offset] >> 8) & 0x00ff);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (force68k_state::bootvect_r){
+uint16_t force68k_state::bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		return m_sysrom [offset];
 }
 
@@ -335,21 +335,21 @@ READ16_MEMBER (force68k_state::bootvect_r){
  */
 
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (force68k_state::vme_a24_r){
+uint16_t force68k_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a24_w){
+void force68k_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a24_w\n"));
 }
 
-READ16_MEMBER (force68k_state::vme_a16_r){
+uint16_t force68k_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 		LOG (logerror ("vme_16_r\n"));
 		return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (force68k_state::vme_a16_w){
+void force68k_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 		LOG (logerror ("vme_a16_w\n"));
 }
 

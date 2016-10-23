@@ -132,22 +132,22 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_device<generic_latch_8_device> m_soundlatch3;
 
-	DECLARE_WRITE8_MEMBER(audio_1_command_w);
-	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
-	DECLARE_WRITE8_MEMBER(audio_2_command_w);
-	DECLARE_READ8_MEMBER(nyny_pia_1_2_r);
-	DECLARE_WRITE8_MEMBER(nyny_pia_1_2_w);
+	void audio_1_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_1_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void audio_2_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nyny_pia_1_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nyny_pia_1_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
-	DECLARE_WRITE8_MEMBER(pia_2_port_a_w);
-	DECLARE_WRITE8_MEMBER(pia_2_port_b_w);
+	void pia_2_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia_2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE8_MEMBER(nyny_ay8910_37_port_a_w);
+	void nyny_ay8910_37_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
+	void ic48_1_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	inline void shift_star_generator(  );
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -205,13 +205,13 @@ INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::pia_2_port_a_w)
+void nyny_state::pia_2_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_star_delay_counter = (m_star_delay_counter & 0x0f00) | data;
 }
 
 
-WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
+void nyny_state::pia_2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
 	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
@@ -236,7 +236,7 @@ WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::ic48_1_74123_output_changed)
+void nyny_state::ic48_1_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pia2->ca1_w(data);
 }
@@ -361,21 +361,21 @@ WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::audio_1_command_w)
+void nyny_state::audio_1_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
-WRITE8_MEMBER(nyny_state::audio_1_answer_w)
+void nyny_state::audio_1_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch3->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
-WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
+void nyny_state::nyny_ay8910_37_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* not sure what this does */
 
@@ -388,7 +388,7 @@ WRITE8_MEMBER(nyny_state::nyny_ay8910_37_port_a_w)
  *
  *************************************/
 
-WRITE8_MEMBER(nyny_state::audio_2_command_w)
+void nyny_state::audio_2_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch2->write(space, 0, (data & 0x60) >> 5);
 	m_audiocpu2->set_input_line(M6802_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -402,7 +402,7 @@ WRITE8_MEMBER(nyny_state::audio_2_command_w)
  *
  *************************************/
 
-READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
+uint8_t nyny_state::nyny_pia_1_2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -414,7 +414,7 @@ READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 }
 
 
-WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
+void nyny_state::nyny_pia_1_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the address bits are directly connected to the chip selects */
 	if (BIT(offset, 2))  m_pia1->write(space, offset & 0x03, data);

@@ -146,7 +146,7 @@ IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
 }
 
 
-READ8_MEMBER( pic8259_device::read )
+uint8_t pic8259_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* NPW 18-May-2003 - Changing 0xFF to 0x00 as per Ruslan */
 	uint8_t data = 0x00;
@@ -196,7 +196,7 @@ READ8_MEMBER( pic8259_device::read )
 }
 
 
-WRITE8_MEMBER( pic8259_device::write )
+void pic8259_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

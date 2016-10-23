@@ -79,7 +79,7 @@ void flkatck_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
+void flkatck_state::flkatck_k007121_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007121_ram[offset] = data;
 	if (offset < 0x1000)    /* tiles */
@@ -91,7 +91,7 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
 	}
 }
 
-WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
+void flkatck_state::flkatck_k007121_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

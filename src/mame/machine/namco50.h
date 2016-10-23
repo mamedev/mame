@@ -15,14 +15,14 @@ class namco_50xx_device : public device_t
 public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	WRITE_LINE_MEMBER(read_request);
-	READ8_MEMBER( read );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask);
 
-	READ8_MEMBER( K_r );
-	READ8_MEMBER( R0_r );
-	READ8_MEMBER( R2_r );
-	WRITE8_MEMBER( O_w );
+	uint8_t K_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t R0_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	uint8_t R2_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	// device-level overrides

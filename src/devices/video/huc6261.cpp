@@ -198,7 +198,7 @@ void huc6261_device::video_update( bitmap_rgb32 &bitmap, const rectangle &clipre
 }
 
 
-READ16_MEMBER( huc6261_device::read )
+uint16_t huc6261_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = 0xFFFF;
 
@@ -253,7 +253,7 @@ READ16_MEMBER( huc6261_device::read )
 }
 
 
-WRITE16_MEMBER( huc6261_device::write )
+void huc6261_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch ( offset & 1 )
 	{

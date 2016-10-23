@@ -48,16 +48,16 @@ public:
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
 
-	DECLARE_WRITE16_MEMBER(lastduel_sound_w);
-	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(lastduel_flip_w);
-	DECLARE_WRITE16_MEMBER(lastduel_scroll_w);
-	DECLARE_WRITE16_MEMBER(lastduel_scroll1_w);
-	DECLARE_WRITE16_MEMBER(lastduel_scroll2_w);
-	DECLARE_WRITE16_MEMBER(lastduel_vram_w);
-	DECLARE_WRITE16_MEMBER(madgear_scroll1_w);
-	DECLARE_WRITE16_MEMBER(madgear_scroll2_w);
-	DECLARE_WRITE16_MEMBER(lastduel_palette_word_w);
+	void lastduel_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mg_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lastduel_flip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastduel_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastduel_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastduel_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastduel_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void madgear_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void madgear_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void lastduel_palette_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

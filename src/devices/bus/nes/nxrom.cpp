@@ -293,7 +293,7 @@ void nes_un1rom_device::pcb_reset()
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_nrom368_device::read_l)
+uint8_t nes_nrom368_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("nrom368 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -303,13 +303,13 @@ READ8_MEMBER(nes_nrom368_device::read_l)
 		return m_open_bus;
 }
 
-READ8_MEMBER(nes_nrom368_device::read_m)
+uint8_t nes_nrom368_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("nrom368 read_m, offset: %04x\n", offset));
 	return m_prg[0x1800 + (offset & 0x1fff)];
 }
 
-READ8_MEMBER(nes_nrom368_device::read_h)
+uint8_t nes_nrom368_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("nrom368 read_h, offset: %04x\n", offset));
 	return m_prg[0x3800 + (offset & 0x7fff)];
@@ -336,7 +336,7 @@ READ8_MEMBER(nes_nrom368_device::read_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_axrom_device::write_h)
+void nes_axrom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("axrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -357,7 +357,7 @@ WRITE8_MEMBER(nes_axrom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_bxrom_device::write_h)
+void nes_bxrom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
@@ -393,7 +393,7 @@ WRITE8_MEMBER(nes_bxrom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cnrom_device::write_h)
+void nes_cnrom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("cxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -414,7 +414,7 @@ WRITE8_MEMBER(nes_cnrom_device::write_h)
 		chr8(data, CHRROM);
 }
 
-READ8_MEMBER(nes_cnrom_device::chr_r)
+uint8_t nes_cnrom_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 
@@ -443,7 +443,7 @@ READ8_MEMBER(nes_cnrom_device::chr_r)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_cprom_device::write_h)
+void nes_cprom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("cprom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -464,7 +464,7 @@ WRITE8_MEMBER(nes_cprom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_gxrom_device::write_h)
+void nes_gxrom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("gxrom write_h, offset %04x, data: %02x\n", offset, data));
 
@@ -490,7 +490,7 @@ WRITE8_MEMBER(nes_gxrom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_uxrom_device::write_h)
+void nes_uxrom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("uxrom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -516,7 +516,7 @@ WRITE8_MEMBER(nes_uxrom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_uxrom_cc_device::write_h)
+void nes_uxrom_cc_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("uxrom_cc write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -537,7 +537,7 @@ WRITE8_MEMBER(nes_uxrom_cc_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_un1rom_device::write_h)
+void nes_un1rom_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("un1rom write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -560,7 +560,7 @@ WRITE8_MEMBER(nes_un1rom_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_nochr_device::chr_w)
+void nes_nochr_device::chr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)
@@ -571,7 +571,7 @@ WRITE8_MEMBER(nes_nochr_device::chr_w)
 		m_ciram[offset & 0x7ff] = data; // not sure here, since there is no software to test...
 }
 
-READ8_MEMBER(nes_nochr_device::chr_r)
+uint8_t nes_nochr_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int mirr = get_mirroring();
 	if (mirr == PPU_MIRROR_HIGH)

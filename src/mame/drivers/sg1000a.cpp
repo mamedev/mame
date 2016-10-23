@@ -129,7 +129,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
-	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
+	void sg1000a_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sg1000a();
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -247,7 +247,7 @@ static INPUT_PORTS_START( dokidoki )
 INPUT_PORTS_END
 
 
-WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
+void sg1000a_state::sg1000a_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }

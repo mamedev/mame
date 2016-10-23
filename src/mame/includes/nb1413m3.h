@@ -137,25 +137,25 @@ public:
 		TIMER_CB
 	};
 
-	DECLARE_WRITE8_MEMBER( nmi_clock_w );
-	DECLARE_READ8_MEMBER( sndrom_r );
-	DECLARE_WRITE8_MEMBER( sndrombank1_w );
-	DECLARE_WRITE8_MEMBER( sndrombank2_w );
-	DECLARE_READ8_MEMBER( gfxrom_r );
-	DECLARE_WRITE8_MEMBER( gfxrombank_w );
-	DECLARE_WRITE8_MEMBER( gfxradr_l_w );
-	DECLARE_WRITE8_MEMBER( gfxradr_h_w );
-	DECLARE_WRITE8_MEMBER( inputportsel_w );
-	DECLARE_READ8_MEMBER( inputport0_r );
-	DECLARE_READ8_MEMBER( inputport1_r );
-	DECLARE_READ8_MEMBER( inputport2_r );
-	DECLARE_READ8_MEMBER( inputport3_r );
-	DECLARE_READ8_MEMBER( dipsw1_r );
-	DECLARE_READ8_MEMBER( dipsw2_r );
-	DECLARE_READ8_MEMBER( dipsw3_l_r );
-	DECLARE_READ8_MEMBER( dipsw3_h_r );
-	DECLARE_WRITE8_MEMBER( outcoin_w );
-	DECLARE_WRITE8_MEMBER( vcrctrl_w );
+	void nmi_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sndrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sndrombank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sndrombank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gfxrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gfxrombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxradr_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxradr_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t inputport0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t inputport1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t inputport2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t inputport3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipsw3_l_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dipsw3_h_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void outcoin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vcrctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	const char * m_sndromrgntag;
 	int m_sndrombank1;

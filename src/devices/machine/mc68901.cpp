@@ -537,7 +537,7 @@ void mc68901_device::rcv_complete()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mc68901_device::read )
+uint8_t mc68901_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1075,7 +1075,7 @@ void mc68901_device::register_w(offs_t offset, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( mc68901_device::write )
+void mc68901_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	register_w(offset, data);
 }

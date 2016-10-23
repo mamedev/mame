@@ -35,12 +35,12 @@ public:
 	required_device<i8255_device> m_ppi;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
-	DECLARE_READ8_MEMBER(mz80k_strobe_r);
-	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);
-	DECLARE_READ8_MEMBER(mz80k_8255_portb_r);
-	DECLARE_READ8_MEMBER(mz80k_8255_portc_r);
-	DECLARE_WRITE8_MEMBER(mz80k_8255_porta_w);
-	DECLARE_WRITE8_MEMBER(mz80k_8255_portc_w);
+	uint8_t mz80k_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz80k_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mz80k_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t mz80k_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mz80k_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mz80k_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 	bool m_mz80k_vertical;

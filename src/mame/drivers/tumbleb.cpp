@@ -316,7 +316,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
+void tumbleb_state::tumblepb_oki_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -331,14 +331,14 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 	/* STUFF IN OTHER BYTE TOO..*/
 }
 
-READ16_MEMBER(tumbleb_state::tumblepb_prot_r)
+uint16_t tumbleb_state::tumblepb_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ~0;
 }
 
 /******************************************************************************/
 
-READ16_MEMBER(tumbleb_state::tumblepopb_controls_r)
+uint16_t tumbleb_state::tumblepopb_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -606,7 +606,7 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 }
 
 
-WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
+void tumbleb_state::tumbleb2_soundmcu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int sound = tumbleb_sound_lookup[data & 0xff];
 
@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(tumbleb_state::semibase_unknown_r)
+uint16_t tumbleb_state::semibase_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
@@ -698,7 +698,7 @@ ADDRESS_MAP_END
 
 
 
-WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
+void tumbleb_state::jumpkids_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -734,7 +734,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
+void tumbleb_state::semicom_soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -746,7 +746,7 @@ WRITE16_MEMBER(tumbleb_state::semicom_soundcmd_w)
 	}
 }
 
-WRITE8_MEMBER(tumbleb_state::oki_sound_bank_w)
+void tumbleb_state::oki_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *oki = memregion("oki")->base();
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
@@ -792,7 +792,7 @@ static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(tumbleb_state::jumpkids_oki_bank_w)
+void tumbleb_state::jumpkids_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t* sound1 = memregion("oki")->base();
 	uint8_t* sound2 = memregion("oki2")->base();
@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( jumpkids_sound_map, AS_PROGRAM, 8, tumbleb_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tumbleb_state::prot_io_r)
+uint8_t tumbleb_state::prot_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// never read?
 	return 0x00;
@@ -818,7 +818,7 @@ READ8_MEMBER(tumbleb_state::prot_io_r)
 
 
 // probably not endian safe
-WRITE8_MEMBER(tumbleb_state::prot_io_w)
+void tumbleb_state::prot_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -3506,7 +3506,7 @@ void tumbleb_state::init_fncywld()
 }
 
 
-READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
+uint16_t tumbleb_state::bcstory_1a0_read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//osd_printf_debug("bcstory_io %06x\n",space.device().safe_pc());
 

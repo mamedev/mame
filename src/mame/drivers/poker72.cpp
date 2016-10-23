@@ -37,9 +37,9 @@ public:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_pal;
 	uint8_t m_tile_bank;
-	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_WRITE8_MEMBER(tile_bank_w);
+	void poker72_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tile_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_poker72();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -81,7 +81,7 @@ uint32_t poker72_state::screen_update_poker72(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
+void poker72_state::poker72_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b;
 	m_pal[offset] = data;
@@ -93,7 +93,7 @@ WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 	m_palette->set_pen_color( offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
-WRITE8_MEMBER(poker72_state::output_w)
+void poker72_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	printf("%02x\n",data);
 
@@ -106,7 +106,7 @@ WRITE8_MEMBER(poker72_state::output_w)
 		membank("bank1")->set_entry(0);
 }
 
-WRITE8_MEMBER(poker72_state::tile_bank_w)
+void poker72_state::tile_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tile_bank = (data & 4) >> 2;
 }

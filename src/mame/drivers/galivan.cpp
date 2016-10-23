@@ -41,18 +41,18 @@ TODO
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
+void galivan_state::galivan_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space,0,((data & 0x7f) << 1) | 1);
 }
 
-READ8_MEMBER(galivan_state::soundlatch_clear_r)
+uint8_t galivan_state::soundlatch_clear_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch->clear_w(space, 0, 0);
 	return 0;
 }
 
-READ8_MEMBER(galivan_state::IO_port_c0_r)
+uint8_t galivan_state::IO_port_c0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (0x58); /* To Avoid Reset on Ufo Robot dangar */
 }
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(galivan_state::blit_trigger_w)
+void galivan_state::blit_trigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nb1414m4->exec((m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
@@ -1109,7 +1109,7 @@ ROM_START( youmab2 )
 ROM_END
 
 
-WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
+void galivan_state::youmab_extra_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data == 0xff)
 		membank("bank2")->set_entry(1);
@@ -1119,18 +1119,18 @@ WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
 		printf("data %03x\n", data);
 }
 
-READ8_MEMBER(galivan_state::youmab_8a_r)
+uint8_t galivan_state::youmab_8a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(galivan_state::youmab_81_w)
+void galivan_state::youmab_81_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ??
 }
 
 /* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
-WRITE8_MEMBER(galivan_state::youmab_84_w)
+void galivan_state::youmab_84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_shift_val &= ~((0x80 >> 7) << m_shift_scroll);
 	m_shift_val |= (((data & 0x80) >> 7) << m_shift_scroll);
@@ -1142,7 +1142,7 @@ WRITE8_MEMBER(galivan_state::youmab_84_w)
 	//if(m_shift_scroll == 25)
 }
 
-WRITE8_MEMBER(galivan_state::youmab_86_w)
+void galivan_state::youmab_86_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* latch values */
 	{

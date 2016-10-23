@@ -16,7 +16,7 @@ WRITE_LINE_MEMBER( cidelsa_state::q_w )
 
 /* Sound Interface */
 
-WRITE8_MEMBER( draco_state::sound_bankswitch_w )
+void draco_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -34,7 +34,7 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 	membank("bank1")->set_entry(bank);
 }
 
-WRITE8_MEMBER( draco_state::sound_g_w )
+void draco_state::sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -63,24 +63,24 @@ WRITE8_MEMBER( draco_state::sound_g_w )
 	}
 }
 
-READ8_MEMBER( draco_state::sound_in_r )
+uint8_t draco_state::sound_in_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ~(m_sound) & 0x07;
 }
 
-READ8_MEMBER( draco_state::psg_r )
+uint8_t draco_state::psg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_psg_latch;
 }
 
-WRITE8_MEMBER( draco_state::psg_w )
+void draco_state::psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_psg_latch = data;
 }
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
+void cidelsa_state::destryer_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  bit   description
@@ -98,7 +98,7 @@ WRITE8_MEMBER( cidelsa_state::destryer_out1_w )
 
 /* CDP1852 Interfaces */
 
-WRITE8_MEMBER( cidelsa_state::altair_out1_w )
+void cidelsa_state::altair_out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  bit   description
@@ -118,7 +118,7 @@ WRITE8_MEMBER( cidelsa_state::altair_out1_w )
 	output().set_led_value(2, data & 0x20); // FIRE
 }
 
-WRITE8_MEMBER( draco_state::out1_w )
+void draco_state::out1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	  bit   description

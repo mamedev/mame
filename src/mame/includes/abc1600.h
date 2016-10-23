@@ -101,25 +101,25 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( bus_r );
-	DECLARE_WRITE8_MEMBER( bus_w );
-	DECLARE_READ8_MEMBER( dart_r );
-	DECLARE_WRITE8_MEMBER( dart_w );
-	DECLARE_READ8_MEMBER( scc_r );
-	DECLARE_WRITE8_MEMBER( scc_w );
-	DECLARE_READ8_MEMBER( cio_r );
-	DECLARE_WRITE8_MEMBER( cio_w );
-	DECLARE_WRITE8_MEMBER( fw0_w );
-	DECLARE_WRITE8_MEMBER( fw1_w );
-	DECLARE_WRITE8_MEMBER( spec_contr_reg_w );
+	uint8_t bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t scc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fw0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fw1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spec_contr_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
 
-	DECLARE_READ8_MEMBER( cio_pa_r );
-	DECLARE_READ8_MEMBER( cio_pb_r );
-	DECLARE_WRITE8_MEMBER( cio_pb_w );
-	DECLARE_READ8_MEMBER( cio_pc_r );
-	DECLARE_WRITE8_MEMBER( cio_pc_w );
+	uint8_t cio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t cio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cio_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cio_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 

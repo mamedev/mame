@@ -105,7 +105,7 @@ public:
 
 	// reads for both host and peripherals
 	uint8_t dio_r() { return get_data(); }
-	DECLARE_READ8_MEMBER( dio_r ) { return get_data(); }
+	uint8_t dio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return get_data(); }
 	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
 	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
 	DECLARE_READ_LINE_MEMBER( nrfd_r ) { return get_signal(NRFD); }
@@ -117,7 +117,7 @@ public:
 
 	// writes for host (driver_device)
 	void dio_w(uint8_t data) { return set_data(this, data); }
-	DECLARE_WRITE8_MEMBER( dio_w ) { set_data(this, data); }
+	void dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { set_data(this, data); }
 	DECLARE_WRITE_LINE_MEMBER( eoi_w ) { set_signal(this, EOI, state); }
 	DECLARE_WRITE_LINE_MEMBER( dav_w ) { set_signal(this, DAV, state); }
 	DECLARE_WRITE_LINE_MEMBER( nrfd_w ) { set_signal(this, NRFD, state); }

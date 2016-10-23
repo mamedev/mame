@@ -23,8 +23,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_huc6260(*this, "huc6260") { }
 
-	DECLARE_WRITE8_MEMBER(pce_joystick_w);
-	DECLARE_READ8_MEMBER(pce_joystick_r);
+	void pce_joystick_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pce_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_pce_common();
 

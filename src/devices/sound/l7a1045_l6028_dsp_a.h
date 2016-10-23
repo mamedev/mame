@@ -34,8 +34,8 @@ public:
 
 //  void set_base(int8_t* base) { m_base = base; }
 
-	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
-	DECLARE_READ16_MEMBER( l7a1045_sound_r );
+	void l7a1045_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t l7a1045_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -59,10 +59,10 @@ private:
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];
 
-	DECLARE_WRITE16_MEMBER(sound_select_w);
-	DECLARE_WRITE16_MEMBER(sound_data_w);
-	DECLARE_READ16_MEMBER(sound_data_r);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
+	void sound_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t sound_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void sound_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 extern const device_type L7A1045;

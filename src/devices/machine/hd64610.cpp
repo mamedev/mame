@@ -284,7 +284,7 @@ WRITE_LINE_MEMBER( hd64610_device::h_w )
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( hd64610_device::read )
+uint8_t hd64610_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data =  m_regs[offset & 0x0f];
 
@@ -298,7 +298,7 @@ READ8_MEMBER( hd64610_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( hd64610_device::write )
+void hd64610_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x0f)
 	{

@@ -118,19 +118,19 @@ WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)
 	m_cpu->set_input_line(M6809_FIRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER( wpcsnd_device::bg_speech_clock_w )
+void wpcsnd_device::bg_speech_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// pulses clock input?
 	m_hc55516->clock_w(1);
 	m_hc55516->clock_w(0);
 }
 
-WRITE8_MEMBER( wpcsnd_device::bg_speech_digit_w )
+void wpcsnd_device::bg_speech_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hc55516->digit_w(data);
 }
 
-WRITE8_MEMBER( wpcsnd_device::rombank_w )
+void wpcsnd_device::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bank = data & 0x0f;
 
@@ -151,19 +151,19 @@ WRITE8_MEMBER( wpcsnd_device::rombank_w )
 	if(LOG_WPCSND) logerror("WPCSND: Bank set to %02x\n",bank);
 }
 
-READ8_MEMBER(wpcsnd_device::latch_r)
+uint8_t wpcsnd_device::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_cpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return m_latch;
 }
 
-WRITE8_MEMBER(wpcsnd_device::latch_w)
+void wpcsnd_device::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reply_available = true;
 	m_reply = data;
 	m_reply_cb(space,1);
 }
 
-WRITE8_MEMBER(wpcsnd_device::volume_w)
+void wpcsnd_device::volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }

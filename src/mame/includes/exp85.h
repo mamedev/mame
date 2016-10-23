@@ -33,8 +33,8 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_READ8_MEMBER( i8355_a_r );
-	DECLARE_WRITE8_MEMBER( i8355_a_w );
+	uint8_t i8355_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8355_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( sid_r );
 	DECLARE_WRITE_LINE_MEMBER( sod_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );

@@ -204,7 +204,7 @@ ADDRESS_MAP_END
  as used by the above memory map
 *******************************************************************************/
 
-WRITE16_MEMBER(wwfsstar_state::scroll_w)
+void wwfsstar_state::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -217,18 +217,18 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 	}
 }
 
-WRITE16_MEMBER(wwfsstar_state::sound_w)
+void wwfsstar_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 1, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
+void wwfsstar_state::flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }
 
-WRITE16_MEMBER(wwfsstar_state::irqack_w)
+void wwfsstar_state::irqack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 		m_maincpu->set_input_line(6, CLEAR_LINE);

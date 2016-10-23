@@ -47,18 +47,18 @@ public:
 		, m_bank3(*this, "bank3")
 	{ }
 
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_READ8_MEMBER(serial_dsr_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(serial_rx_r);
-	DECLARE_WRITE8_MEMBER(display_ctrl_w);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(serial_tx_w);
-	DECLARE_WRITE8_MEMBER(serial_dtr_w);
-	DECLARE_WRITE8_MEMBER(serial_rts_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(irqctrl_w);
-	DECLARE_WRITE8_MEMBER(memmap_w);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_dsr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void display_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_dtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irqctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(hunter2);
 	void init_hunter2();
 	DECLARE_WRITE_LINE_MEMBER(timer0_out);
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( hunter2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 INPUT_PORTS_END
 
-READ8_MEMBER( hunter2_state::keyboard_r )
+uint8_t hunter2_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t i,data = 0xff;
 	for (i = 0; i < 7; i++)
@@ -202,7 +202,7 @@ READ8_MEMBER( hunter2_state::keyboard_r )
 	return data;
 }
 
-READ8_MEMBER( hunter2_state::serial_dsr_r )
+uint8_t hunter2_state::serial_dsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0x00;
 
@@ -212,13 +212,13 @@ READ8_MEMBER( hunter2_state::serial_dsr_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::keyboard_w )
+void hunter2_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keydata = data;
 	//logerror("Key row select %02x\n",data);
 }
 
-READ8_MEMBER( hunter2_state::serial_rx_r )
+uint8_t hunter2_state::serial_rx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res = 0x28;
 
@@ -230,7 +230,7 @@ READ8_MEMBER( hunter2_state::serial_rx_r )
 	return res;
 }
 
-WRITE8_MEMBER( hunter2_state::display_ctrl_w )
+void hunter2_state::display_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* according to the website,
 Bit 2: Backlight toggle
@@ -239,29 +239,29 @@ Bits 1,0,7,6: Contrast level.
 */
 }
 
-WRITE8_MEMBER( hunter2_state::port80_w )
+void hunter2_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( hunter2_state::serial_tx_w )
+void hunter2_state::serial_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_txd(data & 0x01);
 //  logerror("TXD write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::serial_dtr_w )
+void hunter2_state::serial_dtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_dtr(data & 0x01);
 //  logerror("DTR write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::serial_rts_w )
+void hunter2_state::serial_rts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rs232->write_rts(data & 0x01);
 //  logerror("RTS write %02x\n",data);
 }
 
-WRITE8_MEMBER( hunter2_state::speaker_w )
+void hunter2_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 0));
 }
@@ -272,7 +272,7 @@ Bit 1 = Enable RSTC interrupts
 Bit 2 = Enable RSTB interrupts
 Bit 3 = Enable RSTA interrupts
 */
-WRITE8_MEMBER( hunter2_state::irqctrl_w )
+void hunter2_state::irqctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data;
 	if(!(data & 0x08))
@@ -294,7 +294,7 @@ data   bank0    bank1    bank2
 ....
 8F     61       62       63
 */
-WRITE8_MEMBER( hunter2_state::memmap_w )
+void hunter2_state::memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data < 0x0a)
 	{

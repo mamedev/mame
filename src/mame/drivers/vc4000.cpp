@@ -134,7 +134,7 @@ Q-0900^76203F0161063005080E492DCD4890597877103F020E75105A0A0C1E89F4101879
 #include "includes/vc4000.h"
 #include "softlist.h"
 
-READ8_MEMBER( vc4000_state::vc4000_key_r )
+uint8_t vc4000_state::vc4000_key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	switch(offset & 0x0f)
@@ -164,19 +164,19 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	return data;
 }
 
-WRITE8_MEMBER( vc4000_state::vc4000_sound_ctl )
+void vc4000_state::vc4000_sound_ctl(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("Write to sound control register offset= %d value= %d\n", offset, data);
 }
 
 // Write cassette - Address 0x1DFF
-WRITE8_MEMBER( vc4000_state::elektor_cass_w )
+void vc4000_state::elektor_cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->output(BIT(data, 7) ? -1.0 : +1.0);
 }
 
 // Read cassette - Address 0x1DBF
-READ8_MEMBER( vc4000_state::elektor_cass_r )
+uint8_t vc4000_state::elektor_cass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_cassette->input() > 0.03) ? 0xff : 0x7f;
 }

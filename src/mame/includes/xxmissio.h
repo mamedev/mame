@@ -29,14 +29,14 @@ public:
 	uint8_t m_yscroll;
 	uint8_t m_flipscreen;
 
-	DECLARE_WRITE8_MEMBER(bank_sel_w);
-	DECLARE_WRITE8_MEMBER(status_m_w);
-	DECLARE_WRITE8_MEMBER(status_s_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(bgram_w);
-	DECLARE_READ8_MEMBER(bgram_r);
-	DECLARE_WRITE8_MEMBER(scroll_x_w);
-	DECLARE_WRITE8_MEMBER(scroll_y_w);
+	void bank_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void status_m_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void status_s_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bgram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
 

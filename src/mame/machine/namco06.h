@@ -83,10 +83,10 @@ public:
 	template<class _Object> static devcb_base &set_write_2_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_write_2.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_3_callback(device_t &device, _Object object) { return downcast<namco_06xx_device &>(device).m_write_3.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_READ8_MEMBER( ctrl_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

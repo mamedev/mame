@@ -164,12 +164,12 @@ public:
 	required_shared_ptr<uint32_t> m_rombase;
 	uint32_t *m_video_base;
 	const uint8_t *m_control_map;
-	DECLARE_READ32_MEMBER(kinst_control_r);
-	DECLARE_WRITE32_MEMBER(kinst_control_w);
-	DECLARE_READ32_MEMBER(kinst_ide_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_w);
-	DECLARE_READ32_MEMBER(kinst_ide_extra_r);
-	DECLARE_WRITE32_MEMBER(kinst_ide_extra_w);
+	uint32_t kinst_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t kinst_ide_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t kinst_ide_extra_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void kinst_ide_extra_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_kinst();
 	void init_kinst2();
 	virtual void machine_start() override;
@@ -310,25 +310,25 @@ INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_ide_r)
+uint32_t kinst_state::kinst_ide_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ata->read_cs0(space, offset / 2, mem_mask);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_w)
+void kinst_state::kinst_ide_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ata->write_cs0(space, offset / 2, data, mem_mask);
 }
 
 
-READ32_MEMBER(kinst_state::kinst_ide_extra_r)
+uint32_t kinst_state::kinst_ide_extra_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_ata->read_cs1(space, 6, 0xff);
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
+void kinst_state::kinst_ide_extra_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_ata->write_cs1(space, 6, data, 0xff);
 }
@@ -341,7 +341,7 @@ WRITE32_MEMBER(kinst_state::kinst_ide_extra_w)
  *
  *************************************/
 
-READ32_MEMBER(kinst_state::kinst_control_r)
+uint32_t kinst_state::kinst_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
@@ -376,7 +376,7 @@ READ32_MEMBER(kinst_state::kinst_control_r)
 }
 
 
-WRITE32_MEMBER(kinst_state::kinst_control_w)
+void kinst_state::kinst_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t olddata;
 

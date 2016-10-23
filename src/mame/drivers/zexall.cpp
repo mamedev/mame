@@ -37,12 +37,12 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER( zexall_output_ack_r );
-	DECLARE_READ8_MEMBER( zexall_output_req_r );
-	DECLARE_READ8_MEMBER( zexall_output_data_r );
-	DECLARE_WRITE8_MEMBER( zexall_output_ack_w );
-	DECLARE_WRITE8_MEMBER( zexall_output_req_w );
-	DECLARE_WRITE8_MEMBER( zexall_output_data_w );
+	uint8_t zexall_output_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zexall_output_req_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t zexall_output_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zexall_output_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zexall_output_req_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zexall_output_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_zexall();
 private:
 	required_device<cpu_device> m_maincpu;
@@ -72,7 +72,7 @@ void zexall_state::machine_reset()
 	memcpy(ram, rom, 0x228a);
 }
 
-READ8_MEMBER( zexall_state::zexall_output_ack_r )
+uint8_t zexall_state::zexall_output_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (m_out_req != m_out_req_last)
@@ -85,28 +85,28 @@ READ8_MEMBER( zexall_state::zexall_output_ack_r )
 	return m_out_ack;
 }
 
-WRITE8_MEMBER( zexall_state::zexall_output_ack_w )
+void zexall_state::zexall_output_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_ack = data;
 }
 
-READ8_MEMBER( zexall_state::zexall_output_req_r )
+uint8_t zexall_state::zexall_output_req_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_out_req;
 }
 
-WRITE8_MEMBER( zexall_state::zexall_output_req_w )
+void zexall_state::zexall_output_req_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_req_last = m_out_req;
 	m_out_req = data;
 }
 
-READ8_MEMBER( zexall_state::zexall_output_data_r )
+uint8_t zexall_state::zexall_output_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_out_data;
 }
 
-WRITE8_MEMBER( zexall_state::zexall_output_data_w )
+void zexall_state::zexall_output_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_out_data = data;
 }

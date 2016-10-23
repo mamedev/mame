@@ -49,8 +49,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE8_MEMBER(orbit_misc_w);
-	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
+	void orbit_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orbit_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -59,10 +59,10 @@ public:
 	INTERRUPT_GEN_MEMBER(orbit_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
-	DECLARE_WRITE8_MEMBER(orbit_note_w);
-	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
+	void orbit_note_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orbit_note_amp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orbit_noise_amp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void orbit_noise_rst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void update_misc_flags(address_space &space, uint8_t val);
 };

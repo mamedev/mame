@@ -74,10 +74,10 @@ public:
 	bool m_comms_ack;
 
 	virtual void machine_start() override;
-	DECLARE_READ16_MEMBER(comms_r);
-	DECLARE_WRITE16_MEMBER(comms_w);
-	DECLARE_WRITE16_MEMBER(data_bank_w);
-	DECLARE_WRITE16_MEMBER(upd_w);
+	uint16_t comms_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void data_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void upd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };
 
 void gambl186_state::machine_start()
@@ -87,7 +87,7 @@ void gambl186_state::machine_start()
 
 static const uint8_t password[] = {5, 2, 0, 3, 0, 0, 2, 4, 5, 6, 0x16};
 
-READ16_MEMBER(gambl186_state::comms_r)
+uint16_t gambl186_state::comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t retval = 0;
 
@@ -273,7 +273,7 @@ READ16_MEMBER(gambl186_state::comms_r)
 	return retval;
 }
 
-WRITE16_MEMBER(gambl186_state::comms_w)
+void gambl186_state::comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -318,7 +318,7 @@ WRITE16_MEMBER(gambl186_state::comms_w)
 	}
 }
 
-WRITE16_MEMBER( gambl186_state::data_bank_w)
+void gambl186_state::data_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	membank("data_bank")->set_entry(data & 3);
 	if(data & 0xfffc)
@@ -341,7 +341,7 @@ WRITE16_MEMBER( gambl186_state::data_bank_w)
    504h: e000
    504h: 2000
 */
-WRITE16_MEMBER(gambl186_state::upd_w)
+void gambl186_state::upd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //// FIXME
 //  m_upd7759->reset_w(0);

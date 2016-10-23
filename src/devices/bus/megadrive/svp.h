@@ -31,30 +31,30 @@ public:
 	required_ioport m_test_ipt;
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) override;
-	virtual DECLARE_WRITE16_MEMBER(write) override;
-	virtual DECLARE_READ16_MEMBER(read_a15) override;
-	virtual DECLARE_WRITE16_MEMBER(write_a15) override;
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t read_a15(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
+	virtual void write_a15(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 
 	virtual int read_test() override;
 
-	virtual DECLARE_READ16_MEMBER(rom_read1);
-	virtual DECLARE_READ16_MEMBER(rom_read2);
+	virtual uint16_t rom_read1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t rom_read2(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	virtual DECLARE_READ16_MEMBER(read_pm0);
-	virtual DECLARE_READ16_MEMBER(read_pm1);
-	virtual DECLARE_READ16_MEMBER(read_pm2);
-	virtual DECLARE_READ16_MEMBER(read_pm4);
-	virtual DECLARE_READ16_MEMBER(read_xst);
-	virtual DECLARE_READ16_MEMBER(read_pmc);
-	virtual DECLARE_READ16_MEMBER(read_al);
-	virtual DECLARE_WRITE16_MEMBER(write_pm0);
-	virtual DECLARE_WRITE16_MEMBER(write_pm1);
-	virtual DECLARE_WRITE16_MEMBER(write_pm2);
-	virtual DECLARE_WRITE16_MEMBER(write_pm4);
-	virtual DECLARE_WRITE16_MEMBER(write_xst);
-	virtual DECLARE_WRITE16_MEMBER(write_pmc);
-	virtual DECLARE_WRITE16_MEMBER(write_al);
+	virtual uint16_t read_pm0(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_pm1(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_pm2(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_pm4(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_xst(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_pmc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_al(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual void write_pm0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_pm1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_pm2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_pm4(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_xst(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_pmc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_al(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint32_t pm_io(int reg, int write, uint32_t d);
 

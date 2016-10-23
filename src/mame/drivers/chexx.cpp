@@ -53,21 +53,21 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(update);
 
 	// handlers
-	DECLARE_READ8_MEMBER(via_a_in);
-	DECLARE_READ8_MEMBER(via_b_in);
+	uint8_t via_a_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t via_b_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(via_a_out);
-	DECLARE_WRITE8_MEMBER(via_b_out);
+	void via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_out);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_out);
 	DECLARE_WRITE_LINE_MEMBER(via_irq_out);
 
-	DECLARE_READ8_MEMBER(input_r);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(ay_w);
-	DECLARE_WRITE8_MEMBER(lamp_w);
+	void ay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// digitalker
 	void digitalker_set_bank(uint8_t bank);
@@ -80,20 +80,20 @@ public:
 
 // VIA
 
-READ8_MEMBER(chexx_state::via_a_in)
+uint8_t chexx_state::via_a_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read A: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
-READ8_MEMBER(chexx_state::via_b_in)
+uint8_t chexx_state::via_b_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	logerror("%s: VIA read B: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 
-WRITE8_MEMBER(chexx_state::via_a_out)
+void chexx_state::via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_a = data;    // multiplexer
 
@@ -101,7 +101,7 @@ WRITE8_MEMBER(chexx_state::via_a_out)
 
 //  logerror("%s: VIA write A = %02X\n", machine().describe_context(), data);
 }
-WRITE8_MEMBER(chexx_state::via_b_out)
+void chexx_state::via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port_b = data;
 
@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(chexx_state::via_irq_out)
 //  logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
 }
 
-READ8_MEMBER(chexx_state::input_r)
+uint8_t chexx_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = ioport("DSW")->read();          // bits 0-3
 	uint8_t inp = ioport("INPUT")->read();        // bit 7 (multiplexed)
@@ -175,14 +175,14 @@ ADDRESS_MAP_END
 
 // Face-Off Memory Map
 
-WRITE8_MEMBER(chexx_state::lamp_w)
+void chexx_state::lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_lamp = data;
 	output().set_lamp_value(0, BIT(m_lamp,0));
 	output().set_lamp_value(1, BIT(m_lamp,1));
 }
 
-WRITE8_MEMBER(chexx_state::ay_w)
+void chexx_state::ay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset)
 	{

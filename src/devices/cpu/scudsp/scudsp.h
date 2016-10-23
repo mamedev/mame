@@ -69,15 +69,15 @@ public:
 	template<class _Object> static devcb_base &set_out_dma_callback(device_t &device, _Object object) { return downcast<scudsp_cpu_device &>(device).m_out_dma_cb.set_callback(object); }
 
 	/* port 0 */
-	DECLARE_READ32_MEMBER( program_control_r );
-	DECLARE_WRITE32_MEMBER( program_control_w );
+	uint32_t program_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void program_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	/* port 1 */
-	DECLARE_WRITE32_MEMBER( program_w );
+	void program_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	/* port 2 */
-	DECLARE_WRITE32_MEMBER( ram_address_control_w );
+	void ram_address_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	/* port 3 */
-	DECLARE_READ32_MEMBER( ram_address_r );
-	DECLARE_WRITE32_MEMBER( ram_address_w );
+	uint32_t ram_address_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ram_address_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 //  virtual DECLARE_ADDRESS_MAP(map, 32) = 0;
 
 protected:

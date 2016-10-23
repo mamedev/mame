@@ -479,11 +479,11 @@ public:
 	stic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~stic_device();
 
-	DECLARE_READ16_MEMBER(read);
-	DECLARE_READ16_MEMBER(gram_read);
-	DECLARE_READ16_MEMBER(grom_read) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
-	DECLARE_WRITE16_MEMBER(write);
-	DECLARE_WRITE16_MEMBER(gram_write);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t gram_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t grom_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { if (offset > 0x800) printf("help! %X\n", offset); return (0xff00 | m_grom[offset]); }
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gram_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void write_to_btb(int h, int w, uint16_t data) { m_backtab_buffer[h][w] = data; }
 	int read_row_delay() { return m_row_delay; }

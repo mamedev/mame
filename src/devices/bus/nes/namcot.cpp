@@ -248,7 +248,7 @@ void nes_namcot163_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3433_device::dxrom_write)
+void nes_namcot3433_device::dxrom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("dxrom_write, offset: %04x, data: %02x\n", offset, data));
 
@@ -292,7 +292,7 @@ WRITE8_MEMBER(nes_namcot3433_device::dxrom_write)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3446_device::write_h)
+void nes_namcot3446_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("namcot3446 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -336,7 +336,7 @@ WRITE8_MEMBER(nes_namcot3446_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot3425_device::write_h)
+void nes_namcot3425_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mode;
 	LOG_MMC(("namcot3425 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -409,7 +409,7 @@ void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
+void nes_namcot340_device::n340_lowrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("n340_lowrite, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -428,7 +428,7 @@ WRITE8_MEMBER(nes_namcot340_device::n340_lowrite)
 	}
 }
 
-READ8_MEMBER(nes_namcot340_device::n340_loread)
+uint8_t nes_namcot340_device::n340_loread(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("n340_loread, offset: %04x\n", offset));
 	offset += 0x100;
@@ -446,7 +446,7 @@ READ8_MEMBER(nes_namcot340_device::n340_loread)
 	}
 }
 
-WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
+void nes_namcot340_device::n340_hiwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("n340_hiwrite, offset: %04x, data: %02x\n", offset, data));
 
@@ -507,7 +507,7 @@ WRITE8_MEMBER(nes_namcot340_device::n340_hiwrite)
 
  -------------------------------------------------*/
 
-READ8_MEMBER(nes_namcot175_device::read_m)
+uint8_t nes_namcot175_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
@@ -517,7 +517,7 @@ READ8_MEMBER(nes_namcot175_device::read_m)
 	return m_open_bus;   // open bus
 }
 
-WRITE8_MEMBER(nes_namcot175_device::write_m)
+void nes_namcot175_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// the only game supporting this is Family Circuit '91, and it has 2KB of battery
 	// but it's mirrored up to 8KB (see Sprint Race -> Back Up menu breakage if not)
@@ -525,7 +525,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_m)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_namcot175_device::write_h)
+void nes_namcot175_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("namcot175 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -562,7 +562,7 @@ WRITE8_MEMBER(nes_namcot175_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_namcot163_device::chr_w)
+void nes_namcot163_device::chr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 
@@ -578,7 +578,7 @@ WRITE8_MEMBER(nes_namcot163_device::chr_w)
 	// or ROM, so no write
 }
 
-READ8_MEMBER(nes_namcot163_device::chr_r)
+uint8_t nes_namcot163_device::chr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int bank = offset >> 10;
 	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
@@ -592,7 +592,7 @@ READ8_MEMBER(nes_namcot163_device::chr_r)
 }
 
 
-READ8_MEMBER(nes_namcot163_device::read_m)
+uint8_t nes_namcot163_device::read_m(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!m_battery.empty() && offset < m_battery.size())
 		return m_battery[offset & (m_battery.size() - 1)];
@@ -600,7 +600,7 @@ READ8_MEMBER(nes_namcot163_device::read_m)
 	return m_open_bus;   // open bus
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_m)
+void nes_namcot163_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// the pcb can separately protect each 2KB chunk of the external wram from writes
 	int bank = (offset & 0x1800) >> 11;
@@ -608,7 +608,7 @@ WRITE8_MEMBER(nes_namcot163_device::write_m)
 		m_battery[offset & (m_battery.size() - 1)] = data;
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_l)
+void nes_namcot163_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("namcot163 write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -624,7 +624,7 @@ WRITE8_MEMBER(nes_namcot163_device::write_l)
 	}
 }
 
-READ8_MEMBER(nes_namcot163_device::read_l)
+uint8_t nes_namcot163_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("namcot163 read_l, offset: %04x\n", offset));
 	offset += 0x100;
@@ -647,7 +647,7 @@ void nes_namcot163_device::set_mirror(uint8_t page, uint8_t data)
 		set_nt_page(page, CIRAM, data & 0x01, 1);
 }
 
-WRITE8_MEMBER(nes_namcot163_device::write_h)
+void nes_namcot163_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page;
 	LOG_MMC(("namcot163 write_h, offset: %04x, data: %02x\n", offset, data));

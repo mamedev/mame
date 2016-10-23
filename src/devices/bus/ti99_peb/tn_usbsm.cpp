@@ -112,7 +112,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::crureadz)
 /*
     CRU write
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::cruwrite)
+void nouspikel_usb_smartmedia_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -228,7 +228,7 @@ READ8Z_MEMBER(nouspikel_usb_smartmedia_device::readz)
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-WRITE8_MEMBER(nouspikel_usb_smartmedia_device::write)
+void nouspikel_usb_smartmedia_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (space.debugger_access()) return;
 

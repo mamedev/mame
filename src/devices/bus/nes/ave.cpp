@@ -122,7 +122,7 @@ void nes_maxi15_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_nina001_device::write_m)
+void nes_nina001_device::write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("nina-001 write_m, offset: %04x, data: %02x\n", offset, data));
 
@@ -155,7 +155,7 @@ WRITE8_MEMBER(nes_nina001_device::write_m)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_nina006_device::write_l)
+void nes_nina006_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("nina-006 write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -192,7 +192,7 @@ void nes_maxi15_device::update_banks()
 	}
 }
 
-READ8_MEMBER(nes_maxi15_device::read_h)
+uint8_t nes_maxi15_device::read_h(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	LOG_MMC(("Maxi 15 read_h, offset: %04x\n", offset));
 

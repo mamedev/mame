@@ -24,14 +24,14 @@ public:
 
 	void set_info(int address, uint8_t default_ddr, uint8_t mask);
 
-	DECLARE_WRITE8_MEMBER(ddr_w);
-	DECLARE_WRITE8_MEMBER(dr_w);
-	DECLARE_READ8_MEMBER(dr_r);
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(pcr_w);
-	DECLARE_READ8_MEMBER(pcr_r);
-	DECLARE_WRITE8_MEMBER(odr_w);
-	DECLARE_READ8_MEMBER(odr_r);
+	void ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void odr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t odr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<h8_device> cpu;

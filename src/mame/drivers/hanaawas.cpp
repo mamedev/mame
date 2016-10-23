@@ -32,7 +32,7 @@
 #include "sound/ay8910.h"
 #include "includes/hanaawas.h"
 
-READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
+uint8_t hanaawas_state::hanaawas_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i, ordinal = 0;
 	uint16_t buttons = 0;
@@ -65,12 +65,12 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 	return (ioport("IN0")->read() & 0xf0) | ordinal;
 }
 
-WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
+void hanaawas_state::hanaawas_inputs_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mux = data;
 }
 
-WRITE8_MEMBER(hanaawas_state::irq_ack_w)
+void hanaawas_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 }

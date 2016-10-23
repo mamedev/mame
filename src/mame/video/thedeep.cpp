@@ -65,13 +65,13 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
 			0);
 }
 
-WRITE8_MEMBER(thedeep_state::vram_0_w)
+void thedeep_state::vram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_0[offset] = data;
 	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(thedeep_state::vram_1_w)
+void thedeep_state::vram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vram_1[offset] = data;
 	m_tilemap_1->mark_tile_dirty(offset / 2);

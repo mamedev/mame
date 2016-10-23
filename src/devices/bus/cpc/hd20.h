@@ -29,8 +29,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_READ8_MEMBER(hdc_r);
-	DECLARE_WRITE8_MEMBER(hdc_w);
+	uint8_t hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 protected:

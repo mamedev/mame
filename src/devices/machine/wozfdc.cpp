@@ -184,7 +184,7 @@ void wozfdc_device::device_timer(emu_timer &timer, device_timer_id id, int param
     read - called to read the FDC's registers
 -------------------------------------------------*/
 
-READ8_MEMBER(wozfdc_device::read)
+uint8_t wozfdc_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	lss_sync();
 	control(offset);
@@ -200,7 +200,7 @@ READ8_MEMBER(wozfdc_device::read)
     write - called to write the FDC's registers
 -------------------------------------------------*/
 
-WRITE8_MEMBER(wozfdc_device::write)
+void wozfdc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	lss_sync();
 	control(offset);
@@ -444,14 +444,14 @@ void appleiii_fdc::set_floppies_4(floppy_connector *f0, floppy_connector *f1, fl
 	}
 }
 
-READ8_MEMBER(appleiii_fdc::read_c0dx)
+uint8_t appleiii_fdc::read_c0dx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	control_dx(offset);
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(appleiii_fdc::write_c0dx)
+void appleiii_fdc::write_c0dx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	control_dx(offset);
 }

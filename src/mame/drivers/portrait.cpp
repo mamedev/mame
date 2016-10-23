@@ -92,7 +92,7 @@ DM81LS95 = TriState buffer
 #include "machine/nvram.h"
 #include "includes/portrait.h"
 
-WRITE8_MEMBER(portrait_state::ctrl_w)
+void portrait_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 4 and 5 are unknown */
 
@@ -108,12 +108,12 @@ WRITE8_MEMBER(portrait_state::ctrl_w)
 	output().set_value("photo", (data >> 7) & 1);
 }
 
-WRITE8_MEMBER(portrait_state::positive_scroll_w)
+void portrait_state::positive_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = data;
 }
 
-WRITE8_MEMBER(portrait_state::negative_scroll_w)
+void portrait_state::negative_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll = - (data ^ 0xff);
 }

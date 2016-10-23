@@ -155,32 +155,32 @@
 
 /***************************************************************************/
 
-READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r)
+uint16_t tatsumi_state::cyclwarr_sprite_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_sprite_w)
+void tatsumi_state::cyclwarr_sprite_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-WRITE16_MEMBER(tatsumi_state::bigfight_a20000_w)
+void tatsumi_state::bigfight_a20000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bigfight_a20000[offset]);
 }
 
-WRITE16_MEMBER(tatsumi_state::bigfight_a40000_w)
+void tatsumi_state::bigfight_a40000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bigfight_a40000[offset]);
 }
 
-WRITE16_MEMBER(tatsumi_state::bigfight_a60000_w)
+void tatsumi_state::bigfight_a60000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bigfight_a60000[offset]);
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
+void tatsumi_state::cyclwarr_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data >> 8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

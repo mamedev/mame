@@ -54,18 +54,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kdat_w );
 
 	// 6500/1 internal
-	DECLARE_READ8_MEMBER( port_a_r );
-	DECLARE_WRITE8_MEMBER( port_a_w );
-	DECLARE_WRITE8_MEMBER( port_b_w );
-	DECLARE_WRITE8_MEMBER( port_c_w );
-	DECLARE_WRITE8_MEMBER( port_d_w );
-	DECLARE_WRITE8_MEMBER( latch_w );
-	DECLARE_READ8_MEMBER( counter_r );
-	DECLARE_WRITE8_MEMBER( transfer_latch_w );
-	DECLARE_WRITE8_MEMBER( clear_pa0_detect );
-	DECLARE_WRITE8_MEMBER( clear_pa1_detect );
-	DECLARE_READ8_MEMBER( control_r );
-	DECLARE_WRITE8_MEMBER( control_w );
+	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void transfer_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clear_pa0_detect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void clear_pa1_detect(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_INPUT_CHANGED_MEMBER( check_reset );
 

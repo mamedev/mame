@@ -140,13 +140,13 @@ void x1_010_device::enable_w(int data)
 /* Use these for 8 bit CPUs */
 
 
-READ8_MEMBER( x1_010_device::read )
+uint8_t x1_010_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset ^= m_adr;
 	return m_reg[offset];
 }
 
-WRITE8_MEMBER( x1_010_device::write )
+void x1_010_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int channel, reg;
 	offset ^= m_adr;
@@ -166,7 +166,7 @@ WRITE8_MEMBER( x1_010_device::write )
 
 /* Use these for 16 bit CPUs */
 
-READ16_MEMBER( x1_010_device::word_r )
+uint16_t x1_010_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t  ret;
 
@@ -176,7 +176,7 @@ READ16_MEMBER( x1_010_device::word_r )
 	return ret;
 }
 
-WRITE16_MEMBER( x1_010_device::word_w )
+void x1_010_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_HI_WORD_BUF[offset] = (data>>8)&0xff;
 	write( space, offset, data&0xff );

@@ -124,12 +124,12 @@ void k007342_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k007342_device::read )
+uint8_t k007342_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER( k007342_device::write )
+void k007342_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram[offset] = data;
 
@@ -139,17 +139,17 @@ WRITE8_MEMBER( k007342_device::write )
 		m_tilemap[1]->mark_tile_dirty(offset & 0x7ff);
 }
 
-READ8_MEMBER( k007342_device::scroll_r )
+uint8_t k007342_device::scroll_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_scroll_ram[offset];
 }
 
-WRITE8_MEMBER( k007342_device::scroll_w )
+void k007342_device::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll_ram[offset] = data;
 }
 
-WRITE8_MEMBER( k007342_device::vreg_w )
+void k007342_device::vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

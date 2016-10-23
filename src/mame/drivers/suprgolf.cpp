@@ -61,22 +61,22 @@ public:
 	uint8_t m_bg_vreg_test;
 	uint8_t m_toggle;
 
-	DECLARE_READ8_MEMBER(videoram_r);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_READ8_MEMBER(bg_vram_r);
-	DECLARE_WRITE8_MEMBER(bg_vram_w);
-	DECLARE_WRITE8_MEMBER(pen_w);
-	DECLARE_WRITE8_MEMBER(adpcm_data_w);
-	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
-	DECLARE_READ8_MEMBER(vregs_r);
-	DECLARE_WRITE8_MEMBER(vregs_w);
-	DECLARE_READ8_MEMBER(rom_bank_select_r);
-	DECLARE_WRITE8_MEMBER(rom_bank_select_w);
-	DECLARE_READ8_MEMBER(pedal_extra_bits_r);
-	DECLARE_READ8_MEMBER(p1_r);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_WRITE8_MEMBER(writeA);
-	DECLARE_WRITE8_MEMBER(writeB);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bg_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rom2_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vregs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rom_bank_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pedal_extra_bits_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void writeA(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void writeB(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -165,7 +165,7 @@ uint32_t suprgolf_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-READ8_MEMBER(suprgolf_state::videoram_r)
+uint8_t suprgolf_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_palette_switch)
 		return m_paletteram[offset];
@@ -173,7 +173,7 @@ READ8_MEMBER(suprgolf_state::videoram_r)
 		return m_videoram[offset];
 }
 
-WRITE8_MEMBER(suprgolf_state::videoram_w)
+void suprgolf_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(m_palette_switch)
 	{
@@ -195,12 +195,12 @@ WRITE8_MEMBER(suprgolf_state::videoram_w)
 	}
 }
 
-READ8_MEMBER(suprgolf_state::vregs_r)
+uint8_t suprgolf_state::vregs_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vreg_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::vregs_w)
+void suprgolf_state::vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%02x\n",data);
 
@@ -215,12 +215,12 @@ WRITE8_MEMBER(suprgolf_state::vregs_w)
 	//  printf("Video regs with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::bg_vram_r)
+uint8_t suprgolf_state::bg_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bg_vram[offset+m_bg_bank*0x2000];
 }
 
-WRITE8_MEMBER(suprgolf_state::bg_vram_w)
+void suprgolf_state::bg_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t hi_nibble,lo_nibble;
 	uint8_t hi_dirty_dot,lo_dirty_dot; // helpers
@@ -276,22 +276,22 @@ void suprgolf_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-WRITE8_MEMBER(suprgolf_state::pen_w)
+void suprgolf_state::pen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vreg_pen = data;
 }
 
-WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
+void suprgolf_state::adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm5205next = data;
 }
 
-READ8_MEMBER(suprgolf_state::rom_bank_select_r)
+uint8_t suprgolf_state::rom_bank_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom_bank;
 }
 
-WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
+void suprgolf_state::rom_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = data;
 
@@ -303,7 +303,7 @@ WRITE8_MEMBER(suprgolf_state::rom_bank_select_w)
 	flip_screen_set(data & 0x80);
 }
 
-WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
+void suprgolf_state::rom2_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,space.device().safe_pcbase());
 	membank("bank1")->set_entry(data & 0x0f);
@@ -312,7 +312,7 @@ WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 		printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
-READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
+uint8_t suprgolf_state::pedal_extra_bits_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t p1_sht_sw,p2_sht_sw;
 
@@ -322,12 +322,12 @@ READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 	return p1_sht_sw | p2_sht_sw;
 }
 
-READ8_MEMBER(suprgolf_state::p1_r)
+uint8_t suprgolf_state::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("P1")->read() & 0xf0) | ((ioport("P1_ANALOG")->read() & 0xf));
 }
 
-READ8_MEMBER(suprgolf_state::p2_r)
+uint8_t suprgolf_state::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
@@ -436,12 +436,12 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:8" )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(suprgolf_state::writeA)
+void suprgolf_state::writeA(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	osd_printf_debug("ymwA\n");
 }
 
-WRITE8_MEMBER(suprgolf_state::writeB)
+void suprgolf_state::writeB(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	osd_printf_debug("ymwA\n");
 }

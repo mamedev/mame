@@ -24,7 +24,7 @@ void special_state::init_special()
 	m_bank1->configure_entries(0, 2, RAM, 0xc000);
 }
 
-READ8_MEMBER( special_state::specialist_8255_porta_r )
+uint8_t special_state::specialist_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_io_line0->read()!=0xff) return 0xfe;
 	if (m_io_line1->read()!=0xff) return 0xfd;
@@ -37,7 +37,7 @@ READ8_MEMBER( special_state::specialist_8255_porta_r )
 	return 0xff;
 }
 
-READ8_MEMBER( special_state::specialist_8255_portb_r )
+uint8_t special_state::specialist_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dat = 0xff;
 
@@ -68,7 +68,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	return dat;
 }
 
-READ8_MEMBER( special_state::specimx_8255_portb_r )
+uint8_t special_state::specimx_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t dat = 0xff;
 
@@ -96,7 +96,7 @@ READ8_MEMBER( special_state::specimx_8255_portb_r )
 	return dat;
 }
 
-READ8_MEMBER( special_state::specialist_8255_portc_r )
+uint8_t special_state::specialist_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_io_line8->read()!=0xff) return 0x0e;
 	if (m_io_line9->read()!=0xff) return 0x0d;
@@ -105,17 +105,17 @@ READ8_MEMBER( special_state::specialist_8255_portc_r )
 	return 0x0f;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_porta_w )
+void special_state::specialist_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_specialist_8255_porta = data;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_portb_w )
+void special_state::specialist_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_specialist_8255_portb = data;
 }
 
-WRITE8_MEMBER( special_state::specialist_8255_portc_w )
+void special_state::specialist_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_specialist_8255_portc = data;
 
@@ -154,18 +154,18 @@ void special_state::machine_reset_special()
 /*
      Specialist MX
 */
-WRITE8_MEMBER( special_state::video_memory_w )
+void special_state::video_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ram->pointer()[0x9000 + offset] = data;
 	m_specimx_colorram[offset] = m_specimx_color;
 }
 
-WRITE8_MEMBER( special_state::specimx_video_color_w )
+void special_state::specimx_video_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_specimx_color = data;
 }
 
-READ8_MEMBER( special_state::specimx_video_color_r )
+uint8_t special_state::specimx_video_color_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_specimx_color;
 }
@@ -212,7 +212,7 @@ void special_state::specimx_set_bank(offs_t i, uint8_t data)
 	}
 }
 
-WRITE8_MEMBER( special_state::specimx_select_bank )
+void special_state::specimx_select_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	specimx_set_bank(offset, data);
 }
@@ -228,7 +228,7 @@ void special_state::machine_reset_specimx()
 	timer_set(attotime::zero, TIMER_PIT8253_GATES);
 }
 
-READ8_MEMBER( special_state::specimx_disk_ctrl_r )
+uint8_t special_state::specimx_disk_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
@@ -241,7 +241,7 @@ WRITE_LINE_MEMBER( special_state::fdc_drq )
 	}
 }
 
-WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
+void special_state::specimx_disk_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const char *names[] = { "fd0", "fd1"};
 	floppy_image_device *floppy = nullptr;
@@ -356,23 +356,23 @@ void special_state::machine_reset_erik()
 	erik_set_bank();
 }
 
-READ8_MEMBER( special_state::erik_rr_reg_r )
+uint8_t special_state::erik_rr_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_RR_register;
 }
 
-WRITE8_MEMBER( special_state::erik_rr_reg_w )
+void special_state::erik_rr_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_RR_register = data;
 	erik_set_bank();
 }
 
-READ8_MEMBER( special_state::erik_rc_reg_r )
+uint8_t special_state::erik_rc_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_RC_register;
 }
 
-WRITE8_MEMBER( special_state::erik_rc_reg_w )
+void special_state::erik_rc_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_RC_register = data;
 	m_erik_color_1 = m_RC_register & 7;
@@ -380,12 +380,12 @@ WRITE8_MEMBER( special_state::erik_rc_reg_w )
 	m_erik_background = BIT(m_RC_register, 6) + BIT(m_RC_register, 7) * 4;
 }
 
-READ8_MEMBER( special_state::erik_disk_reg_r )
+uint8_t special_state::erik_disk_reg_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( special_state::erik_disk_reg_w )
+void special_state::erik_disk_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     wd17xx_set_side (m_fdc,data & 1);

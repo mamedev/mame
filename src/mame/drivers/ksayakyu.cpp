@@ -75,7 +75,7 @@ SRAM:
 #define MAIN_CLOCK XTAL_18_432MHz
 
 
-WRITE8_MEMBER(ksayakyu_state::bank_select_w)
+void ksayakyu_state::bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	    bits:
@@ -87,18 +87,18 @@ WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 	membank("bank1")->set_entry(data & 0x01);
 }
 
-WRITE8_MEMBER(ksayakyu_state::latch_w)
+void ksayakyu_state::latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_status &= ~0x80;
 	m_soundlatch->write(space, 0, data | 0x80);
 }
 
-READ8_MEMBER(ksayakyu_state::sound_status_r)
+uint8_t ksayakyu_state::sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_status | 4;
 }
 
-WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
+void ksayakyu_state::tomaincpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_status |= 0x80;
 	m_soundlatch->write(space, 0, data);
@@ -171,17 +171,17 @@ static INPUT_PORTS_START( ksayakyu )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(ksayakyu_state::dummy1_w)
+void ksayakyu_state::dummy1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x 1\n", data);
 }
 
-WRITE8_MEMBER(ksayakyu_state::dummy2_w)
+void ksayakyu_state::dummy2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x 2\n", data);
 }
 
-WRITE8_MEMBER(ksayakyu_state::dummy3_w)
+void ksayakyu_state::dummy3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("%02x 3\n", data);
 }

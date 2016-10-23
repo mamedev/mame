@@ -7,7 +7,7 @@
 #include "68307.h"
 
 
-READ8_MEMBER( m68307cpu_device::m68307_internal_mbus_r )
+uint8_t m68307cpu_device::m68307_internal_mbus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;
@@ -55,7 +55,7 @@ READ8_MEMBER( m68307cpu_device::m68307_internal_mbus_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( m68307cpu_device::m68307_internal_mbus_w )
+void m68307cpu_device::m68307_internal_mbus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_mbus* mbus = m68k->m68307MBUS;

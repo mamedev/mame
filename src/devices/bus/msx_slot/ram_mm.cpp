@@ -56,22 +56,22 @@ void msx_slot_ram_mm_device::restore_banks()
 	}
 }
 
-READ8_MEMBER(msx_slot_ram_mm_device::read)
+uint8_t msx_slot_ram_mm_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_base[offset >> 14][offset & 0x3fff];
 }
 
-WRITE8_MEMBER(msx_slot_ram_mm_device::write)
+void msx_slot_ram_mm_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bank_base[offset >> 14][offset & 0x3fff] = data;
 }
 
-READ8_MEMBER(msx_slot_ram_mm_device::read_mapper_bank)
+uint8_t msx_slot_ram_mm_device::read_mapper_bank(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bank_selected[offset & 3] | m_ramio_set_bits;
 }
 
-WRITE8_MEMBER(msx_slot_ram_mm_device::write_mapper_bank)
+void msx_slot_ram_mm_device::write_mapper_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 3;
 

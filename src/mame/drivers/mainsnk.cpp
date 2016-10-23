@@ -120,14 +120,14 @@ void mainsnk_state::machine_start()
 	save_item(NAME(m_sound_cpu_busy));
 }
 
-WRITE8_MEMBER(mainsnk_state::sound_command_w)
+void mainsnk_state::sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_cpu_busy = 1;
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(mainsnk_state::sound_ack_r)
+uint8_t mainsnk_state::sound_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_cpu_busy = 0;
 	return 0xff;

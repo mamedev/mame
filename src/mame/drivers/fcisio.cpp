@@ -84,12 +84,12 @@ fcisio1_state(const machine_config &mconfig, device_type type, const char *tag) 
 		,m_pit (*this, "pit")
 {
 }
-	DECLARE_READ16_MEMBER (bootvect_r);
-	DECLARE_READ8_MEMBER (config_rd);
+	uint16_t bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t config_rd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* Dummy driver routines */
-	DECLARE_READ8_MEMBER (not_implemented_r);
-	DECLARE_WRITE8_MEMBER (not_implemented_w);
+	uint8_t not_implemented_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void not_implemented_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start () override;
 
@@ -131,11 +131,11 @@ void fcisio1_state::machine_start ()
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
-READ16_MEMBER (fcisio1_state::bootvect_r){
+uint16_t fcisio1_state::bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	return m_sysrom [offset];
 }
 
-READ8_MEMBER (fcisio1_state::not_implemented_r){
+uint8_t fcisio1_state::not_implemented_r(address_space &space, offs_t offset, uint8_t mem_mask){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -144,7 +144,7 @@ READ8_MEMBER (fcisio1_state::not_implemented_r){
 	return (uint8_t) 0;
 }
 
-WRITE8_MEMBER (fcisio1_state::not_implemented_w){
+void fcisio1_state::not_implemented_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){
 	static int been_here = 0;
 	if (!been_here++){
 		logerror(TODO);
@@ -154,7 +154,7 @@ WRITE8_MEMBER (fcisio1_state::not_implemented_w){
 }
 
 // TODO: Get a manual to understand the config options for real
-READ8_MEMBER (fcisio1_state::config_rd){
+uint8_t fcisio1_state::config_rd(address_space &space, offs_t offset, uint8_t mem_mask){
 	uint8_t ret = 0;
 	LOG(("%s\n", FUNCNAME));
 

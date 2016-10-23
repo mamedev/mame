@@ -23,7 +23,7 @@ void ssozumo_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-WRITE8_MEMBER(ssozumo_state::sh_command_w)
+void ssozumo_state::sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
+void ssozumo_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }

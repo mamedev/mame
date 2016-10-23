@@ -62,23 +62,23 @@
  *************************************/
 
 /* Main CPU and Z80 synchronisation */
-WRITE16_MEMBER(tx1_state::z80_busreq_w)
+void tx1_state::z80_busreq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tx1_state::resume_math_w)
+void tx1_state::resume_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 }
 
-WRITE16_MEMBER(tx1_state::halt_math_w)
+void tx1_state::halt_math_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mathcpu->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
-WRITE8_MEMBER(tx1_state::z80_intreq_w)
+void tx1_state::z80_intreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
@@ -89,13 +89,13 @@ INTERRUPT_GEN_MEMBER(tx1_state::z80_irq)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(tx1_state::z80_shared_r)
+uint16_t tx1_state::z80_shared_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
 	return cpu2space.read_byte(offset);
 }
 
-WRITE16_MEMBER(tx1_state::z80_shared_w)
+void tx1_state::z80_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
 	cpu2space.write_byte(offset, data & 0xff);
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( buggybjr )
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0x1f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
-READ16_MEMBER(tx1_state::dipswitches_r)
+uint16_t tx1_state::dipswitches_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("DSW")->read() & 0xfffe) | m_ts;
 }
@@ -399,45 +399,45 @@ READ16_MEMBER(tx1_state::dipswitches_r)
     (TODO) TS: Connected in place of dipswitch A bit 0
     Accessed on startup as some sort of acknowledgement
 */
-WRITE8_MEMBER(tx1_state::ts_w)
+void tx1_state::ts_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  TS = 1;
 	m_z80_ram[offset] = data;
 }
 
-READ8_MEMBER(tx1_state::ts_r)
+uint8_t tx1_state::ts_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  TS = 1;
 	return m_z80_ram[offset];
 }
 
 
-WRITE8_MEMBER(tx1_state::tx1_coin_cnt_w)
+void tx1_state::tx1_coin_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x40);
 }
 
-WRITE8_MEMBER(tx1_state::bb_coin_cnt_w)
+void tx1_state::bb_coin_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 //  machine().bookkeeping().coin_counter_w(2, data & 0x04);
 }
 
-WRITE8_MEMBER(tx1_state::tx1_ppi_latch_w)
+void tx1_state::tx1_ppi_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_latch_a = ((ioport("AN_BRAKE")->read() & 0xf) << 4) | (ioport("AN_ACCELERATOR")->read() & 0xf);
 	m_ppi_latch_b = ioport("AN_STEERING")->read();
 }
 
-READ8_MEMBER(tx1_state::tx1_ppi_porta_r)
+uint8_t tx1_state::tx1_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi_latch_a;
 }
 
-READ8_MEMBER(tx1_state::tx1_ppi_portb_r)
+uint8_t tx1_state::tx1_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("PPI_PORTD")->read() | m_ppi_latch_b;
 }
@@ -452,7 +452,7 @@ static uint8_t bit_reverse8(uint8_t val)
 	return val;
 }
 
-READ8_MEMBER(tx1_state::bb_analog_r)
+uint8_t tx1_state::bb_analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return bit_reverse8(((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read());
@@ -460,7 +460,7 @@ READ8_MEMBER(tx1_state::bb_analog_r)
 		return bit_reverse8((ioport("AN_BRAKE")->read() & 0xf) << 4);
 }
 
-READ8_MEMBER(tx1_state::bbjr_analog_r)
+uint8_t tx1_state::bbjr_analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return ((ioport("AN_ACCELERATOR")->read() & 0xf) << 4) | ioport("AN_STEERING")->read();

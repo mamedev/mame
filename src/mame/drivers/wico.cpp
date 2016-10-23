@@ -52,17 +52,17 @@ public:
 		, m_shared_ram(*this, "sharedram")
 	{ }
 
-	DECLARE_READ8_MEMBER(lampst_r);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(muxen_w);
-	DECLARE_WRITE8_MEMBER(muxld_w);
-	DECLARE_WRITE8_MEMBER(csols_w);
-	DECLARE_WRITE8_MEMBER(msols_w);
-	DECLARE_WRITE8_MEMBER(dled0_w);
-	DECLARE_WRITE8_MEMBER(dled1_w);
-	DECLARE_WRITE8_MEMBER(zcres_w);
-	DECLARE_WRITE8_MEMBER(wdogcl_w);
-	DECLARE_READ8_MEMBER(gentmrcl_r);
+	uint8_t lampst_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void muxen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void muxld_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void csols_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msols_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dled0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dled1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void zcres_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wdogcl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gentmrcl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
 private:
@@ -298,29 +298,29 @@ static INPUT_PORTS_START( wico )
 INPUT_PORTS_END
 
 // diagnostic display off
-WRITE8_MEMBER( wico_state::dled0_w )
+void wico_state::dled0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_diag_on = 0;
 	output().set_digit_value(9, 0);
 }
 
 // diagnostic display on
-WRITE8_MEMBER( wico_state::dled1_w )
+void wico_state::dled1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_diag_on = 1;
 	output().set_digit_value(9, m_diag_segments);
 }
 
-WRITE8_MEMBER( wico_state::csols_w )
+void wico_state::csols_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( wico_state::msols_w )
+void wico_state::msols_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // write to diagnostic display
-WRITE8_MEMBER( wico_state::muxen_w )
+void wico_state::muxen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 }; // MC14495
 
@@ -335,25 +335,25 @@ WRITE8_MEMBER( wico_state::muxen_w )
 }
 
 // reset digit/scan counter
-WRITE8_MEMBER( wico_state::muxld_w )
+void wico_state::muxld_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // enable zero-crossing interrupt
-WRITE8_MEMBER( wico_state::zcres_w )
+void wico_state::zcres_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zcen = 1;
 }
 
 // enable firq
-READ8_MEMBER( wico_state::gentmrcl_r )
+uint8_t wico_state::gentmrcl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_gten = 1;
 	return 0xff;
 }
 
 // read a switch row
-READ8_MEMBER( wico_state::switch_r )
+uint8_t wico_state::switch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[8];
 	offset = m_shared_ram[0x95];
@@ -371,7 +371,7 @@ READ8_MEMBER( wico_state::switch_r )
 }
 
 // write digits in main display
-READ8_MEMBER( wico_state::lampst_r )
+uint8_t wico_state::lampst_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i, j;
 	for (i = 0; i < 5; i++)
@@ -386,7 +386,7 @@ READ8_MEMBER( wico_state::lampst_r )
 }
 
 // reset watchdog and enable housekeeping cpu
-WRITE8_MEMBER( wico_state::wdogcl_w )
+void wico_state::wdogcl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_hcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }

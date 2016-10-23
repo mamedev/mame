@@ -52,16 +52,16 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(sound_msm_w);
-	DECLARE_READ8_MEMBER(sound_reset_r);
-	DECLARE_WRITE8_MEMBER(kc_sound_control_w);
-	DECLARE_WRITE8_MEMBER(kchamp_videoram_w);
-	DECLARE_WRITE8_MEMBER(kchamp_colorram_w);
-	DECLARE_WRITE8_MEMBER(kchamp_flipscreen_w);
-	DECLARE_WRITE8_MEMBER(sound_control_w);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_msm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kc_sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kchamp_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kchamp_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kchamp_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_kchampvs();
 	void init_kchampvs2();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

@@ -6,7 +6,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
+void tatsumi_state::tatsumi_sprite_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprite_control_ram[offset]);
 
@@ -17,24 +17,24 @@ WRITE16_MEMBER(tatsumi_state::tatsumi_sprite_control_w)
 
 /******************************************************************************/
 
-WRITE16_MEMBER(tatsumi_state::apache3_road_z_w)
+void tatsumi_state::apache3_road_z_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_apache3_road_z = data & 0xff;
 }
 
-WRITE8_MEMBER(tatsumi_state::apache3_road_x_w)
+void tatsumi_state::apache3_road_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Note: Double buffered. Yes, this is correct :)
 	m_apache3_road_x_ram[data] = offset;
 }
 
-READ16_MEMBER(tatsumi_state::roundup5_vram_r)
+uint16_t tatsumi_state::roundup5_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
 	return m_roundup5_vram[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
+void tatsumi_state::roundup5_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset+=((m_control_word&0x0c00)>>10) * 0xc000;
 
@@ -48,24 +48,24 @@ WRITE16_MEMBER(tatsumi_state::roundup5_vram_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset/0x10);
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_text_w)
+void tatsumi_state::roundup5_text_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_videoram0_r)
+uint16_t tatsumi_state::cyclwarr_videoram0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_cyclwarr_videoram0[offset];
 }
 
-READ16_MEMBER(tatsumi_state::cyclwarr_videoram1_r)
+uint16_t tatsumi_state::cyclwarr_videoram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 		return m_cyclwarr_videoram1[offset];
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
+void tatsumi_state::cyclwarr_videoram0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram0[offset]);
 	if (offset>=0x400)
@@ -75,7 +75,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram0_w)
 	}
 }
 
-WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram1_w)
+void tatsumi_state::cyclwarr_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_cyclwarr_videoram1[offset]);
 	if (offset>=0x400)
@@ -85,7 +85,7 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_videoram1_w)
 	}
 }
 
-WRITE16_MEMBER(tatsumi_state::roundup5_crt_w)
+void tatsumi_state::roundup5_crt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset==0 && ACCESSING_BITS_0_7)
 		m_roundupt_crt_selected_reg=data&0x3f;

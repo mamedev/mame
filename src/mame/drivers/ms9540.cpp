@@ -40,7 +40,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint8_t m_term_data;
@@ -72,7 +72,7 @@ void ms9540_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( ms9540_state::kbd_put )
+void ms9540_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

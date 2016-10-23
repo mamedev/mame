@@ -54,11 +54,11 @@ public:
 	sega_16bit_common_base(const machine_config &mconfig, device_type type, const char *tag);
 
 	// open bus read helpers
-	DECLARE_READ16_MEMBER( open_bus_r );
+	uint16_t open_bus_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// palette helpers
-	DECLARE_WRITE16_MEMBER( paletteram_w );
-	DECLARE_WRITE16_MEMBER( philko_paletteram_w );
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void philko_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// internal helpers
@@ -98,8 +98,8 @@ public:
 	static void static_set_sound_readwrite(device_t &device, sound_read_delegate read, sound_write_delegate write);
 
 	// public interface
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// mapping helpers
 	void map_as_rom(uint32_t offset, uint32_t length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
@@ -186,8 +186,8 @@ public:
 	sega_315_5248_multiplier_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -209,8 +209,8 @@ public:
 	sega_315_5249_divider_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -243,8 +243,8 @@ public:
 
 	// public interface
 	bool clock();
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

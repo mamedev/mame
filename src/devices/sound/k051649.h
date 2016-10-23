@@ -58,16 +58,16 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE8_MEMBER( k051649_waveform_w );
-	DECLARE_READ8_MEMBER ( k051649_waveform_r );
-	DECLARE_WRITE8_MEMBER( k051649_volume_w );
-	DECLARE_WRITE8_MEMBER( k051649_frequency_w );
-	DECLARE_WRITE8_MEMBER( k051649_keyonoff_w );
-	DECLARE_WRITE8_MEMBER( k051649_test_w );
-	DECLARE_READ8_MEMBER ( k051649_test_r );
+	void k051649_waveform_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k051649_waveform_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k051649_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k051649_frequency_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k051649_keyonoff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void k051649_test_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k051649_test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( k052539_waveform_w );
-	DECLARE_READ8_MEMBER ( k052539_waveform_r );
+	void k052539_waveform_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t k052539_waveform_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	void make_mixer_table(int voices);

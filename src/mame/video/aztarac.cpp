@@ -23,7 +23,7 @@ inline void aztarac_state::read_vectorram(uint16_t *vectorram, int addr, int *x,
 	if (*y & 0x200) *y |= 0xfffffc00;
 }
 
-WRITE16_MEMBER(aztarac_state::ubr_w)
+void aztarac_state::ubr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int x, y, c, intensity, xoffset, yoffset, color;
 	int defaddr, objaddr=0, ndefs;

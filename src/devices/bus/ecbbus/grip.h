@@ -43,22 +43,22 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE8_MEMBER( vol0_w );
-	DECLARE_WRITE8_MEMBER( vol1_w );
-	DECLARE_WRITE8_MEMBER( flash_w );
-	DECLARE_WRITE8_MEMBER( page_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_READ8_MEMBER( lrs_r );
-	DECLARE_WRITE8_MEMBER( lrs_w );
-	DECLARE_READ8_MEMBER( cxstb_r );
-	DECLARE_WRITE8_MEMBER( cxstb_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( sti_gpio_r );
+	void vol0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t lrs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lrs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cxstb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cxstb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sti_gpio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
-	DECLARE_WRITE8_MEMBER( kb_w );
+	void kb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
@@ -116,8 +116,8 @@ private:
 
 	/*
 	required_device<hd6345_device> m_crtc;
-	DECLARE_WRITE8_MEMBER( eprom_w );
-	DECLARE_WRITE8_MEMBER( dpage_w );
+	void eprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dpage_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// video state
 	int m_dpage;            // displayed video page

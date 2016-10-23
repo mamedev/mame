@@ -30,33 +30,33 @@ void taxidriv_state::machine_start()
 	save_item(NAME(m_spritectrl));
 }
 
-WRITE8_MEMBER(taxidriv_state::p2a_w){ spritectrl_w(space,0,data); }
-WRITE8_MEMBER(taxidriv_state::p2b_w){ spritectrl_w(space,1,data); }
-WRITE8_MEMBER(taxidriv_state::p2c_w){ spritectrl_w(space,2,data); }
-WRITE8_MEMBER(taxidriv_state::p3a_w){ spritectrl_w(space,3,data); }
-WRITE8_MEMBER(taxidriv_state::p3b_w){ spritectrl_w(space,4,data); }
-WRITE8_MEMBER(taxidriv_state::p3c_w){ spritectrl_w(space,5,data); }
-WRITE8_MEMBER(taxidriv_state::p4a_w){ spritectrl_w(space,6,data); }
-WRITE8_MEMBER(taxidriv_state::p4b_w){ spritectrl_w(space,7,data); }
-WRITE8_MEMBER(taxidriv_state::p4c_w){ spritectrl_w(space,8,data); }
+void taxidriv_state::p2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,0,data); }
+void taxidriv_state::p2b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,1,data); }
+void taxidriv_state::p2c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,2,data); }
+void taxidriv_state::p3a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,3,data); }
+void taxidriv_state::p3b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,4,data); }
+void taxidriv_state::p3c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,5,data); }
+void taxidriv_state::p4a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,6,data); }
+void taxidriv_state::p4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,7,data); }
+void taxidriv_state::p4c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ spritectrl_w(space,8,data); }
 
 
-READ8_MEMBER(taxidriv_state::p0a_r)
+uint8_t taxidriv_state::p0a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latchA;
 }
 
-READ8_MEMBER(taxidriv_state::p0c_r)
+uint8_t taxidriv_state::p0c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_s1 << 7);
 }
 
-WRITE8_MEMBER(taxidriv_state::p0b_w)
+void taxidriv_state::p0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latchB = data;
 }
 
-WRITE8_MEMBER(taxidriv_state::p0c_w)
+void taxidriv_state::p0c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s2 = data & 1;
 
@@ -69,40 +69,40 @@ WRITE8_MEMBER(taxidriv_state::p0c_w)
 //  popmessage("%02x",data&0x0f);
 }
 
-READ8_MEMBER(taxidriv_state::p1b_r)
+uint8_t taxidriv_state::p1b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latchB;
 }
 
-READ8_MEMBER(taxidriv_state::p1c_r)
+uint8_t taxidriv_state::p1c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_s2 << 7) | (m_s4 << 6) | ((ioport("SERVCOIN")->read() & 1) << 4);
 }
 
-WRITE8_MEMBER(taxidriv_state::p1a_w)
+void taxidriv_state::p1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latchA = data;
 }
 
-WRITE8_MEMBER(taxidriv_state::p1c_w)
+void taxidriv_state::p1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s1 = data & 1;
 	m_s3 = (data & 2) >> 1;
 }
 
-READ8_MEMBER(taxidriv_state::p8910_0a_r)
+uint8_t taxidriv_state::p8910_0a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_latchA;
 }
 
-READ8_MEMBER(taxidriv_state::p8910_1a_r)
+uint8_t taxidriv_state::p8910_1a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
    original, since it works anyway even if the communication is flawed. */
-WRITE8_MEMBER(taxidriv_state::p8910_0b_w)
+void taxidriv_state::p8910_0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_s4 = data & 1;
 }

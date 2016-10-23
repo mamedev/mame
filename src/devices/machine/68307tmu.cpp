@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "68307.h"
 
-READ16_MEMBER( m68307cpu_device::m68307_internal_timer_r )
+uint16_t m68307cpu_device::m68307_internal_timer_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;
@@ -32,7 +32,7 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_timer_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( m68307cpu_device::m68307_internal_timer_w )
+void m68307cpu_device::m68307_internal_timer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 	m68307_timer* timer = m68k->m68307TIMER;

@@ -639,7 +639,7 @@ void lisa_state::init_COPS()
     CA1 (I) : COPS sending valid data
     CA2 (O) : VIA -> COPS handshake
 */
-WRITE8_MEMBER(lisa_state::COPS_via_out_a)
+void lisa_state::COPS_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("VIA A = %02x\n", data);
 	m_COPS_command = data;
@@ -670,7 +670,7 @@ WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
     CB2 (O) : sound output
 */
 
-WRITE8_MEMBER(lisa_state::COPS_via_out_b)
+void lisa_state::COPS_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* pull-up */
 	data |= (~ m_via0->read(space, via6522_device::VIA_DDRA)) & 0x01;
@@ -1166,7 +1166,7 @@ void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 	}
 }
 
-READ8_MEMBER(lisa_state::lisa_fdc_io_r)
+uint8_t lisa_state::lisa_fdc_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int answer=0;
 
@@ -1193,7 +1193,7 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 	return answer;
 }
 
-WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
+void lisa_state::lisa_fdc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1221,7 +1221,7 @@ WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 	}
 }
 
-READ16_MEMBER(lisa_state::lisa_r)
+uint16_t lisa_state::lisa_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1394,7 +1394,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_w)
+void lisa_state::lisa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* segment register set */
 	int the_seg = m_seg;
@@ -1661,7 +1661,7 @@ void lisa_state::cpu_board_control_access(offs_t offset)
 	}
 }
 
-READ16_MEMBER(lisa_state::lisa_IO_r)
+uint16_t lisa_state::lisa_IO_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int answer=0;
 
@@ -1786,7 +1786,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 	return answer;
 }
 
-WRITE16_MEMBER(lisa_state::lisa_IO_w)
+void lisa_state::lisa_IO_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch ((offset & 0x7000) >> 12)
 	{

@@ -63,7 +63,7 @@ void wpc_device::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-READ8_MEMBER(wpc_device::read)
+uint8_t wpc_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x00;
 	char kbdrow[8];
@@ -134,7 +134,7 @@ READ8_MEMBER(wpc_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(wpc_device::write)
+void wpc_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

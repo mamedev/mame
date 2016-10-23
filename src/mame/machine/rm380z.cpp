@@ -26,7 +26,7 @@ bit7: 1=map ROM at 0000-0fff/0=RAM
 
 */
 
-WRITE8_MEMBER( rm380z_state::port_write )
+void rm380z_state::port_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( offset )
 	{
@@ -72,7 +72,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	}
 }
 
-READ8_MEMBER( rm380z_state::port_read )
+uint8_t rm380z_state::port_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xFF;
 
@@ -107,44 +107,44 @@ READ8_MEMBER( rm380z_state::port_read )
 	return data;
 }
 
-WRITE8_MEMBER( rm380z_state::port_write_1b00 )
+void rm380z_state::port_write_1b00(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	port_write(program,offset+0xfc,data);
 }
 
-READ8_MEMBER( rm380z_state::port_read_1b00 )
+uint8_t rm380z_state::port_read_1b00(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	return port_read(program,offset+0xfc);
 }
 
-READ8_MEMBER( rm380z_state::hiram_read )
+uint8_t rm380z_state::hiram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return hiram[offset];
 }
 
-WRITE8_MEMBER( rm380z_state::hiram_write )
+void rm380z_state::hiram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	hiram[offset]=data;
 }
 
-READ8_MEMBER( rm380z_state::rm380z_portlow_r )
+uint8_t rm380z_state::rm380z_portlow_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( rm380z_state::rm380z_portlow_w )
+void rm380z_state::rm380z_portlow_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("port write [%x] [%x] at PC [%x]\n",offset,data,m_maincpu->safe_pc());
 }
 
-READ8_MEMBER( rm380z_state::rm380z_porthi_r )
+uint8_t rm380z_state::rm380z_porthi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER( rm380z_state::rm380z_porthi_w )
+void rm380z_state::rm380z_porthi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("port write [%x] [%x]\n",offset+0xc5,data);
 }
@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
 	}
 }
 
-WRITE8_MEMBER( rm380z_state::keyboard_put )
+void rm380z_state::keyboard_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -208,7 +208,7 @@ WRITE8_MEMBER( rm380z_state::keyboard_put )
 // at 0x0080 to 0x00FF, then jumps to it if there is no error."
 //
 
-WRITE8_MEMBER( rm380z_state::disk_0_control )
+void rm380z_state::disk_0_control(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *floppy = nullptr;
 

@@ -54,12 +54,12 @@ void epos_state::get_pens( pen_t *pens )
 	}
 }
 
-WRITE8_MEMBER(epos_state::flip_screen_w)
+void epos_state::flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(BIT(data, 7));
 }
 
-WRITE8_MEMBER(epos_state::port_1_w)
+void epos_state::port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* D0 - start light #1
 	   D1 - start light #2

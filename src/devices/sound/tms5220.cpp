@@ -1938,7 +1938,7 @@ WRITE_LINE_MEMBER( tms5220_device::wsq_w )
  * /RS is bit 1, /WS is bit 0
  * Note this is a hack and probably can be removed later, once the 'real' line handlers above defer by at least 4 clock cycles before taking effect
  */
-WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
+void tms5220_device::combined_rsq_wsq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t new_val;
 	uint8_t falling_edges;
@@ -2013,7 +2013,7 @@ WRITE8_MEMBER( tms5220_device::combined_rsq_wsq_w )
 
 ***********************************************************************************************/
 
-WRITE8_MEMBER( tms5220_device::data_w )
+void tms5220_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// prevent debugger from changing the internal state
 	if (space.debugger_access()) return;
@@ -2046,7 +2046,7 @@ WRITE8_MEMBER( tms5220_device::data_w )
 
 ***********************************************************************************************/
 
-READ8_MEMBER( tms5220_device::status_r )
+uint8_t tms5220_device::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// prevent debugger from changing the internal state
 	if (space.debugger_access()) return 0;

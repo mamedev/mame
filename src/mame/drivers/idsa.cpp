@@ -41,13 +41,13 @@ public:
 		{ }
 
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_READ8_MEMBER(portb0_r);
-	DECLARE_WRITE8_MEMBER(port80_w);
-	DECLARE_WRITE8_MEMBER(port90_w);
-	DECLARE_WRITE8_MEMBER(ay1_a_w);
-	DECLARE_WRITE8_MEMBER(ay1_b_w);
-	DECLARE_WRITE8_MEMBER(ay2_a_w);
-	DECLARE_WRITE8_MEMBER(ay2_b_w);
+	uint8_t portb0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	uint16_t m_irqcnt;
@@ -206,35 +206,35 @@ static INPUT_PORTS_START( idsa )
 INPUT_PORTS_END
 
 // This came from pinmame, even though there's no spb640 chip
-READ8_MEMBER( idsa_state::portb0_r )
+uint8_t idsa_state::portb0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t data = m_speech->spb640_r(space, offset / 2);
 	return offset % 2 ? (uint8_t)(data >> 8) : (uint8_t)(data & 0xff);
 }
 
 // ports 80 & 90 for the display
-WRITE8_MEMBER( idsa_state::port80_w )
+void idsa_state::port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( idsa_state::port90_w )
+void idsa_state::port90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // AY ports are for lamps and solenoids
-WRITE8_MEMBER( idsa_state::ay1_a_w )
+void idsa_state::ay1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( idsa_state::ay1_b_w )
+void idsa_state::ay1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( idsa_state::ay2_a_w )
+void idsa_state::ay2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( idsa_state::ay2_b_w )
+void idsa_state::ay2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

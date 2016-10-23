@@ -8,7 +8,7 @@ class smsbootleg_state : public sms_state
 			{}
 
 	void init_sms_supergame();
-	DECLARE_WRITE8_MEMBER(port08_w);
-	DECLARE_WRITE8_MEMBER(port18_w);
+	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 };

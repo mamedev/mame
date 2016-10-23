@@ -28,12 +28,12 @@ public:
 	uint8_t m_scroll_lsb;
 	uint8_t m_scroll_msb;
 	uint8_t m_starfield_enabled;
-	DECLARE_WRITE8_MEMBER(battlex_palette_w);
-	DECLARE_WRITE8_MEMBER(battlex_scroll_x_lsb_w);
-	DECLARE_WRITE8_MEMBER(battlex_scroll_x_msb_w);
-	DECLARE_WRITE8_MEMBER(battlex_scroll_starfield_w);
-	DECLARE_WRITE8_MEMBER(battlex_videoram_w);
-	DECLARE_WRITE8_MEMBER(battlex_flipscreen_w);
+	void battlex_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlex_scroll_x_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlex_scroll_x_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlex_scroll_starfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlex_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void battlex_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
 	void init_battlex();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

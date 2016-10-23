@@ -13,22 +13,22 @@
 
 const device_type N2A03 = &device_creator<n2a03_device>;
 
-READ8_MEMBER(n2a03_device::psg1_4014_r)
+uint8_t n2a03_device::psg1_4014_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_apu->read(space, 0x14);
 }
 
-READ8_MEMBER(n2a03_device::psg1_4015_r)
+uint8_t n2a03_device::psg1_4015_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_apu->read(space, 0x15);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4015_w)
+void n2a03_device::psg1_4015_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_apu->write(space, 0x15, data);
 }
 
-WRITE8_MEMBER(n2a03_device::psg1_4017_w)
+void n2a03_device::psg1_4017_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_apu->write(space, 0x17, data);
 }

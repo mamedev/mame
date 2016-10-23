@@ -151,7 +151,7 @@ void serflash_device::flash_hard_reset()
 	m_flash_page_index = 0;
 }
 
-WRITE8_MEMBER( serflash_device::flash_enab_w )
+void serflash_device::flash_enab_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%08x FLASH: enab = %02X\n", m_maincpu->pc(), data);
 	m_flash_enab = data;
@@ -170,7 +170,7 @@ void serflash_device::flash_change_state(flash_state_t state)
 	//logerror("flash_change_state - FLASH: state = %s\n", m_flash_state_name[state]);
 }
 
-WRITE8_MEMBER( serflash_device::flash_cmd_w )
+void serflash_device::flash_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_flash_enab)
 		return;
@@ -269,7 +269,7 @@ WRITE8_MEMBER( serflash_device::flash_cmd_w )
 	}
 }
 
-WRITE8_MEMBER( serflash_device::flash_data_w )
+void serflash_device::flash_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_flash_enab)
 		return;
@@ -279,7 +279,7 @@ WRITE8_MEMBER( serflash_device::flash_data_w )
 	m_flash_page_addr++;
 }
 
-WRITE8_MEMBER( serflash_device::flash_addr_w )
+void serflash_device::flash_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_flash_enab)
 		return;
@@ -304,7 +304,7 @@ WRITE8_MEMBER( serflash_device::flash_addr_w )
 	}
 }
 
-READ8_MEMBER( serflash_device::flash_io_r )
+uint8_t serflash_device::flash_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x00;
 //  uint32_t old;
@@ -363,14 +363,14 @@ READ8_MEMBER( serflash_device::flash_io_r )
 	return data;
 }
 
-READ8_MEMBER( serflash_device::flash_ready_r )
+uint8_t serflash_device::flash_ready_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 1;
 }
 
 
 
-READ8_MEMBER(serflash_device::n3d_flash_r)
+uint8_t serflash_device::n3d_flash_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_last_flash_cmd==0x70) return 0xe0;
 
@@ -391,7 +391,7 @@ READ8_MEMBER(serflash_device::n3d_flash_r)
 }
 
 
-WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
+void serflash_device::n3d_flash_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("n3d_flash_cmd_w %02x %02x\n", offset, data);
 	m_last_flash_cmd = data;
@@ -404,7 +404,7 @@ WRITE8_MEMBER(serflash_device::n3d_flash_cmd_w)
 
 }
 
-WRITE8_MEMBER(serflash_device::n3d_flash_addr_w)
+void serflash_device::n3d_flash_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 

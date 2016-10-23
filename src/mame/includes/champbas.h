@@ -47,20 +47,20 @@ public:
 	uint8_t m_palette_bank;
 
 	// handlers
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(mcu_switch_w);
-	DECLARE_WRITE8_MEMBER(mcu_start_w);
-	DECLARE_READ8_MEMBER(champbja_protection_r);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcu_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t champbja_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
 
-	DECLARE_WRITE8_MEMBER(tilemap_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	void tilemap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_exctsccr();
 	void init_champbas();

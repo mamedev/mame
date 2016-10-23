@@ -73,12 +73,12 @@ public:
 	required_shared_ptr<uint8_t> m_sprite_ram;
 	required_shared_ptr<uint8_t> m_palette_ram;
 	required_shared_ptr<uint8_t> m_tile_ram;
-	DECLARE_READ8_MEMBER(ldp_read);
-	DECLARE_READ8_MEMBER(pedal_in);
-	DECLARE_WRITE8_MEMBER(ldp_write);
-	DECLARE_WRITE8_MEMBER(misc_io_write);
-	DECLARE_WRITE8_MEMBER(brake_gas_write);
-	DECLARE_WRITE8_MEMBER(palette_write);
+	uint8_t ldp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pedal_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brake_gas_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void palette_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gpworld();
 	virtual void machine_start() override;
 	uint32_t screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -260,12 +260,12 @@ void gpworld_state::machine_start()
 
 /* MEMORY HANDLERS */
 /* READS */
-READ8_MEMBER(gpworld_state::ldp_read)
+uint8_t gpworld_state::ldp_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ldp_read_latch;
 }
 
-READ8_MEMBER(gpworld_state::pedal_in)
+uint8_t gpworld_state::pedal_in(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_brake_gas)
 		return  ioport("INACCEL")->read();
@@ -275,12 +275,12 @@ READ8_MEMBER(gpworld_state::pedal_in)
 }
 
 /* WRITES */
-WRITE8_MEMBER(gpworld_state::ldp_write)
+void gpworld_state::ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ldp_write_latch = data;
 }
 
-WRITE8_MEMBER(gpworld_state::misc_io_write)
+void gpworld_state::misc_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_start_lamp = (data & 0x04) >> 1;
 	m_nmi_enable = (data & 0x40) >> 6;
@@ -289,12 +289,12 @@ WRITE8_MEMBER(gpworld_state::misc_io_write)
 	logerror("NMI : %x (0x%x)\n", m_nmi_enable, data);
 }
 
-WRITE8_MEMBER(gpworld_state::brake_gas_write)
+void gpworld_state::brake_gas_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_brake_gas = data & 0x01;
 }
 
-WRITE8_MEMBER(gpworld_state::palette_write)
+void gpworld_state::palette_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;

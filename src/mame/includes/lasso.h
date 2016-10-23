@@ -55,15 +55,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_READ8_MEMBER(sound_status_r);
-	DECLARE_WRITE8_MEMBER(sound_select_w);
-	DECLARE_WRITE8_MEMBER(lasso_videoram_w);
-	DECLARE_WRITE8_MEMBER(lasso_colorram_w);
-	DECLARE_WRITE8_MEMBER(lasso_flip_screen_w);
-	DECLARE_WRITE8_MEMBER(lasso_video_control_w);
-	DECLARE_WRITE8_MEMBER(wwjgtin_video_control_w);
-	DECLARE_WRITE8_MEMBER(pinbo_video_control_w);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lasso_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lasso_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lasso_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lasso_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void wwjgtin_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pinbo_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);

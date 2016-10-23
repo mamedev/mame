@@ -38,8 +38,8 @@ public:
 	at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
 	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
 

@@ -67,7 +67,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER( kbd_put );
+	void kbd_put(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
 	virtual void rcv_complete() override;
@@ -75,28 +75,28 @@ public:
 	virtual void tra_complete() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	DECLARE_WRITE8_MEMBER( mem_w );
-	DECLARE_READ8_MEMBER( mem_r );
-	DECLARE_WRITE8_MEMBER( mem_addr_lo_w );
-	DECLARE_WRITE8_MEMBER( mem_addr_hi_w );
-	DECLARE_WRITE8_MEMBER( mem_addr_inc_w );
-	DECLARE_WRITE8_MEMBER( mem_addr_dec_w );
-	DECLARE_READ8_MEMBER( flag_r );
-	DECLARE_WRITE8_MEMBER( flag_w );
-	DECLARE_WRITE8_MEMBER( beep_w );
-	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_READ8_MEMBER( kb_ready_r );
-	DECLARE_READ8_MEMBER( kb_s_red_r );
-	DECLARE_READ8_MEMBER( kb_s_sdv_r );
-	DECLARE_READ8_MEMBER( kb_s_dk_r );
-	DECLARE_READ8_MEMBER( kb_s_dupl_r );
-	DECLARE_READ8_MEMBER( kb_s_lin_r );
-	DECLARE_WRITE8_MEMBER( kb_ready_w );
-	DECLARE_READ8_MEMBER( serial_tx_ready_r );
-	DECLARE_WRITE8_MEMBER( serial_w );
-	DECLARE_READ8_MEMBER( serial_rx_ready_r );
-	DECLARE_READ8_MEMBER( serial_r );
-	DECLARE_WRITE8_MEMBER( serial_speed_w );
+	void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mem_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mem_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mem_addr_inc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mem_addr_dec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t flag_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_s_red_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_s_sdv_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_s_dk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_s_dupl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t kb_s_lin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kb_ready_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_tx_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_rx_ready_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_speed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT( ie15 );
 
@@ -144,7 +144,7 @@ protected:
 	required_ioport m_io_keyboard;
 };
 
-READ8_MEMBER( ie15_state::mem_r ) {
+uint8_t ie15_state::mem_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	uint8_t ret;
 
 	ret = m_p_videoram[m_video.ptr1];
@@ -158,7 +158,7 @@ READ8_MEMBER( ie15_state::mem_r ) {
 	return ret;
 }
 
-WRITE8_MEMBER( ie15_state::mem_w ) {
+void ie15_state::mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	if ((m_latch ^= 1) == 0) {
 		if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && m_video.ptr1 >= SCREEN_PAGE)
 		{
@@ -169,7 +169,7 @@ WRITE8_MEMBER( ie15_state::mem_w ) {
 	}
 }
 
-WRITE8_MEMBER( ie15_state::mem_addr_inc_w ) {
+void ie15_state::mem_addr_inc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		DBG_LOG(2,"memory",("++ %03x\n", m_video.ptr1));
@@ -180,7 +180,7 @@ WRITE8_MEMBER( ie15_state::mem_addr_inc_w ) {
 		m_video.ptr2 = m_video.ptr1;
 }
 
-WRITE8_MEMBER( ie15_state::mem_addr_dec_w ) {
+void ie15_state::mem_addr_dec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		DBG_LOG(2,"memory",("-- %03x\n", m_video.ptr1));
@@ -191,7 +191,7 @@ WRITE8_MEMBER( ie15_state::mem_addr_dec_w ) {
 		m_video.ptr2 = m_video.ptr1;
 }
 
-WRITE8_MEMBER( ie15_state::mem_addr_lo_w ) {
+void ie15_state::mem_addr_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	uint16_t tmp = m_video.ptr1;
 
 	tmp &= 0xff0;
@@ -205,7 +205,7 @@ WRITE8_MEMBER( ie15_state::mem_addr_lo_w ) {
 		m_video.ptr2 = tmp;
 }
 
-WRITE8_MEMBER( ie15_state::mem_addr_hi_w ) {
+void ie15_state::mem_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	uint16_t tmp = m_video.ptr1;
 
 	tmp &= 0xf;
@@ -224,7 +224,7 @@ TIMER_CALLBACK_MEMBER(ie15_state::ie15_beepoff)
 	m_beeper->set_state(0);
 }
 
-WRITE8_MEMBER( ie15_state::beep_w ) {
+void ie15_state::beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	uint16_t length = (m_long_beep & IE_TRUE) ? 150 : 400;
 
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
@@ -238,13 +238,13 @@ WRITE8_MEMBER( ie15_state::beep_w ) {
 /* keyboard */
 
 // active high
-READ8_MEMBER( ie15_state::kb_r ) {
+uint8_t ie15_state::kb_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	DBG_LOG(2,"keyboard",("R %02X '%c'\n", m_kb_data, m_kb_data < 0x20 ? ' ' : m_kb_data));
 	return m_kb_data;
 }
 
 // active low
-READ8_MEMBER( ie15_state::kb_ready_r ) {
+uint8_t ie15_state::kb_ready_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	m_kb_flag &= IE_TRUE;
 	if (m_kb_flag != m_kb_flag0) {
 		DBG_LOG(2,"keyboard",("? %c\n", m_kb_flag ? 'n' : 'y'));
@@ -254,34 +254,34 @@ READ8_MEMBER( ie15_state::kb_ready_r ) {
 }
 
 // active low
-WRITE8_MEMBER( ie15_state::kb_ready_w ) {
+void ie15_state::kb_ready_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	DBG_LOG(2,"keyboard",("clear ready\n"));
 	m_kb_flag = IE_TRUE | IE_KB_ACK;
 }
 
 
 // active high; active = interpret controls, inactive = display controls
-READ8_MEMBER( ie15_state::kb_s_red_r ) {
+uint8_t ie15_state::kb_s_red_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_io_keyboard->read() & IE_KB_RED ? IE_TRUE : 0;
 }
 
 // active high; active = setup mode
-READ8_MEMBER( ie15_state::kb_s_sdv_r ) {
+uint8_t ie15_state::kb_s_sdv_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_kb_control & IE_KB_SDV ? IE_TRUE : 0;
 }
 
 // active high; active = keypress detected on aux keypad
-READ8_MEMBER( ie15_state::kb_s_dk_r ) {
+uint8_t ie15_state::kb_s_dk_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_kb_control & IE_KB_DK ? IE_TRUE : 0;
 }
 
 // active low; active = full duplex, inactive = half duplex
-READ8_MEMBER( ie15_state::kb_s_dupl_r ) {
+uint8_t ie15_state::kb_s_dupl_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_io_keyboard->read() & IE_KB_DUP ? IE_TRUE : 0;
 }
 
 // active high; active = on-line, inactive = local editing
-READ8_MEMBER( ie15_state::kb_s_lin_r ) {
+uint8_t ie15_state::kb_s_lin_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_io_keyboard->read() & IE_KB_LIN ? IE_TRUE : 0;
 }
 
@@ -332,17 +332,17 @@ void ie15_state::tra_complete()
 }
 
 // active low
-READ8_MEMBER( ie15_state::serial_rx_ready_r ) {
+uint8_t ie15_state::serial_rx_ready_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_serial_rx_ready;
 }
 
 // active high
-READ8_MEMBER( ie15_state::serial_tx_ready_r ) {
+uint8_t ie15_state::serial_tx_ready_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_serial_tx_ready;
 }
 
 // not called unless data are ready
-READ8_MEMBER( ie15_state::serial_r ) {
+uint8_t ie15_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	uint8_t data;
 
 	data = get_received_char();
@@ -351,18 +351,18 @@ READ8_MEMBER( ie15_state::serial_r ) {
 	return data;
 }
 
-WRITE8_MEMBER( ie15_state::serial_w ) {
+void ie15_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	DBG_LOG(1,"serial",("W %02X '%c'\n", data, data < 0x20?' ':data));
 
 	m_serial_tx_ready = IE_FALSE;
 	transmit_register_setup(data);
 }
 
-WRITE8_MEMBER( ie15_state::serial_speed_w ) {
+void ie15_state::serial_speed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	return;
 }
 
-READ8_MEMBER( ie15_state::flag_r ) {
+uint8_t ie15_state::flag_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	uint8_t ret = 0;
 
 	switch (offset)
@@ -389,7 +389,7 @@ READ8_MEMBER( ie15_state::flag_r ) {
 	return ret;
 }
 
-WRITE8_MEMBER( ie15_state::flag_w ) {
+void ie15_state::flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	switch (offset)
 	{
 		case 0:
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( ie15 )
 	PORT_DIPSETTING(IE_KB_LIN, "On")
 INPUT_PORTS_END
 
-WRITE16_MEMBER( ie15_state::kbd_put )
+void ie15_state::kbd_put(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	DBG_LOG(2,"keyboard",("W %02X<-%02X '%c' %02X (%c)\n", m_kb_data, data, 'x' /* data < 0x20 ? ' ' : (data & 255) */,
 		m_kb_flag, m_kb_flag ? 'n' : 'y'));

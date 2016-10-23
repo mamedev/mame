@@ -60,7 +60,7 @@
 #define ENV_PRIMARYROM  (0x02)
 #define ENV_ROMENABLE   (0x01)
 
-READ8_MEMBER(apple3_state::apple3_c0xx_r)
+uint8_t apple3_state::apple3_c0xx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xFF;
 	device_a2bus_card_interface *slotdevice;
@@ -308,7 +308,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 
 
-WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
+void apple3_state::apple3_c0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -599,23 +599,23 @@ void apple3_state::apple3_via_out(uint8_t *var, uint8_t data)
 }
 
 
-WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
+void apple3_state::apple3_via_0_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apple3_via_out(&m_via_0_a, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
+void apple3_state::apple3_via_0_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("ZP to %02x\n", data);
 	apple3_via_out(&m_via_0_b, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
+void apple3_state::apple3_via_1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apple3_via_out(&m_via_1_a, data);
 }
 
-WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
+void apple3_state::apple3_via_1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac->write(data);
 	apple3_via_out(&m_via_1_b, data);
@@ -782,7 +782,7 @@ void apple3_state::apple3_postload()
 	apple3_update_memory();
 }
 
-READ8_MEMBER(apple3_state::apple3_memory_r)
+uint8_t apple3_state::apple3_memory_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t rv = 0xff;
 
@@ -918,7 +918,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 	return rv;
 }
 
-WRITE8_MEMBER(apple3_state::apple3_memory_w)
+void apple3_state::apple3_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_indir_bank & 0x80) && (offset >= 0x100))
 	{

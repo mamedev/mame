@@ -128,12 +128,12 @@ Bucky:
 #define MOO_DMADELAY (100)
 
 
-READ16_MEMBER(moo_state::control2_r)
+uint16_t moo_state::control2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cur_control2;
 }
 
-WRITE16_MEMBER(moo_state::control2_w)
+void moo_state::control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -219,7 +219,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(moo_state::sound_cmd1_w)
+void moo_state::sound_cmd1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data & 0x00ff0000) == 0)
 	{
@@ -228,23 +228,23 @@ WRITE16_MEMBER(moo_state::sound_cmd1_w)
 	}
 }
 
-WRITE16_MEMBER(moo_state::sound_cmd2_w)
+void moo_state::sound_cmd2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if ((data & 0x00ff0000) == 0)
 		m_soundlatch2->write(space, 0, data & 0xff);
 }
 
-WRITE16_MEMBER(moo_state::sound_irq_w)
+void moo_state::sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
-READ16_MEMBER(moo_state::sound_status_r)
+uint16_t moo_state::sound_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_soundlatch3->read(space, 0);
 }
 
-WRITE8_MEMBER(moo_state::sound_bankswitch_w)
+void moo_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
 }
@@ -254,7 +254,7 @@ WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-READ16_MEMBER(moo_state::k053247_scattered_word_r)
+uint16_t moo_state::k053247_scattered_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		return m_spriteram[offset];
@@ -265,7 +265,7 @@ READ16_MEMBER(moo_state::k053247_scattered_word_r)
 	}
 }
 
-WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
+void moo_state::k053247_scattered_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset & 0x0078)
 		COMBINE_DATA(m_spriteram + offset);
@@ -280,7 +280,7 @@ WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
 #endif
 
 
-WRITE16_MEMBER(moo_state::moo_prot_w)
+void moo_state::moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src1, src2, dst, length, a, b, res;
 
@@ -310,7 +310,7 @@ WRITE16_MEMBER(moo_state::moo_prot_w)
 }
 
 
-WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
+void moo_state::moobl_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("%x to OKI bank\n", data);
 

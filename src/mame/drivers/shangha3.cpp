@@ -54,7 +54,7 @@ write    read
 20    -> 8
 40    -> 0
 */
-READ16_MEMBER(shangha3_state::shangha3_prot_r)
+uint16_t shangha3_state::shangha3_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
@@ -63,12 +63,12 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 	return result[m_prot_count++ % 9];
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
+void shangha3_state::shangha3_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("PC %04x: write %02x to 20004e\n",space.device().safe_pc(),data);
 }
 
-WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
+void shangha3_state::shangha3_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -79,7 +79,7 @@ WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
+void shangha3_state::heberpop_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -93,7 +93,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
+void shangha3_state::blocken_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -108,7 +108,7 @@ WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
 }
 
 
-WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
+void shangha3_state::heberpop_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -117,7 +117,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::irq_ack_w)
+void shangha3_state::irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->set_input_line(4, CLEAR_LINE);
 }

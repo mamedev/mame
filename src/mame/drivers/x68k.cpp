@@ -257,7 +257,7 @@ int x68k_state::x68k_read_mouse()
     0xe98005 - Z8530 command port A
     0xe98007 - Z8530 data port A  (RS232)
 */
-READ16_MEMBER(x68k_state::x68k_scc_r )
+uint16_t x68k_state::x68k_scc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset %= 4;
 	switch(offset)
@@ -275,7 +275,7 @@ READ16_MEMBER(x68k_state::x68k_scc_r )
 	}
 }
 
-WRITE16_MEMBER(x68k_state::x68k_scc_w )
+void x68k_state::x68k_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset %= 4;
 
@@ -529,7 +529,7 @@ uint8_t x68k_state::xpd1lr_r(int port)
 }
 
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
-READ8_MEMBER(x68k_state::ppi_port_a_r)
+uint8_t x68k_state::ppi_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ctrl = m_ctrltype->read() & 0x0f;
 
@@ -551,7 +551,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_b_r)
+uint8_t x68k_state::ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ctrl = m_ctrltype->read() & 0xf0;
 
@@ -573,7 +573,7 @@ READ8_MEMBER(x68k_state::ppi_port_b_r)
 	return 0xff;
 }
 
-READ8_MEMBER(x68k_state::ppi_port_c_r)
+uint8_t x68k_state::ppi_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi_port[2];
 }
@@ -586,7 +586,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
    bits 3,2 - ADPCM Sample rate
    bits 1,0 - ADPCM Pan
 */
-WRITE8_MEMBER(x68k_state::ppi_port_c_w)
+void x68k_state::ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ADPCM / Joystick control
 	m_ppi_port[2] = data;
@@ -622,7 +622,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 
 
 // NEC uPD72065 at 0xe94000
-WRITE16_MEMBER(x68k_state::x68k_fdc_w)
+void x68k_state::x68k_fdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	unsigned int drive, x;
 	switch(offset)
@@ -666,7 +666,7 @@ WRITE16_MEMBER(x68k_state::x68k_fdc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_fdc_r)
+uint16_t x68k_state::x68k_fdc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	unsigned int ret;
 	int x;
@@ -711,7 +711,7 @@ WRITE_LINE_MEMBER( x68k_state::fdc_irq )
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(x68k_state::x68k_ct_w)
+void x68k_state::x68k_ct_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -745,7 +745,7 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
                 - bits 7-2 = vector
                 - bits 1,0 = device (00 = FDC, 01 = FDD, 10 = HDD, 11 = Printer)
 */
-WRITE16_MEMBER(x68k_state::x68k_ioc_w)
+void x68k_state::x68k_ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -777,7 +777,7 @@ WRITE16_MEMBER(x68k_state::x68k_ioc_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_ioc_r)
+uint16_t x68k_state::x68k_ioc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -809,7 +809,7 @@ READ16_MEMBER(x68k_state::x68k_ioc_r)
                                          Any other value, then SRAM is read only.
  Port 8 (0xe8e00f) - Power off control - write 0x00, 0x0f, 0x0f sequentially to switch power off.
 */
-WRITE16_MEMBER(x68k_state::x68k_sysport_w)
+void x68k_state::x68k_sysport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -832,7 +832,7 @@ WRITE16_MEMBER(x68k_state::x68k_sysport_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_sysport_r)
+uint16_t x68k_state::x68k_sysport_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int ret = 0;
 	switch(offset)
@@ -852,18 +852,18 @@ READ16_MEMBER(x68k_state::x68k_sysport_r)
 	}
 }
 
-WRITE16_MEMBER(x68k_state::x68k_ppi_w)
+void x68k_state::x68k_ppi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_ppi->write(space,offset & 0x03,data);
 }
 
-READ16_MEMBER(x68k_state::x68k_ppi_r)
+uint16_t x68k_state::x68k_ppi_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ppi->read(space,offset & 0x03);
 }
 
 
-WRITE16_MEMBER(x68k_state::x68k_sram_w)
+void x68k_state::x68k_sram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(m_sysport.sram_writeprotect == 0x31)
 	{
@@ -871,7 +871,7 @@ WRITE16_MEMBER(x68k_state::x68k_sram_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_sram_r)
+uint16_t x68k_state::x68k_sram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// HACKS!
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
@@ -881,7 +881,7 @@ READ16_MEMBER(x68k_state::x68k_sram_r)
 	return m_nvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::x68k_vid_w)
+void x68k_state::x68k_vid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -918,7 +918,7 @@ WRITE16_MEMBER(x68k_state::x68k_vid_w)
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_vid_r)
+uint16_t x68k_state::x68k_vid_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -935,19 +935,19 @@ READ16_MEMBER(x68k_state::x68k_vid_r)
 	return 0xff;
 }
 
-READ16_MEMBER(x68k_state::x68k_areaset_r)
+uint16_t x68k_state::x68k_areaset_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// register is write-only
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_state::x68k_areaset_w)
+void x68k_state::x68k_areaset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// TODO
 	logerror("SYS: Supervisor area set: 0x%02x\n",data & 0xff);
 }
 
-WRITE16_MEMBER(x68k_state::x68k_enh_areaset_w )
+void x68k_state::x68k_enh_areaset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// TODO
 	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
@@ -973,7 +973,7 @@ void x68k_state::set_bus_error(uint32_t address, bool write, uint16_t mem_mask)
 	logerror("%s: Bus error: Unused RAM access [%08x]\n", machine().describe_context(), address);
 }
 
-READ16_MEMBER(x68k_state::x68k_rom0_r)
+uint16_t x68k_state::x68k_rom0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -982,7 +982,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::x68k_rom0_w)
+void x68k_state::x68k_rom0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location contains the address of some expansion device ROM, if no ROM exists,
 	   then access causes a bus error */
@@ -990,7 +990,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 		set_bus_error((offset << 1) + 0xbffffc, 1, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::x68k_emptyram_r)
+uint16_t x68k_state::x68k_emptyram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -999,7 +999,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
+void x68k_state::x68k_emptyram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* this location is unused RAM, access here causes a bus error
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
@@ -1007,7 +1007,7 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 		set_bus_error((offset << 1), 1, mem_mask);
 }
 
-READ16_MEMBER(x68k_state::x68k_exp_r)
+uint16_t x68k_state::x68k_exp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !space.debugger_access())
@@ -1015,7 +1015,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(x68k_state::x68k_exp_w)
+void x68k_state::x68k_exp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* These are expansion devices, if not present, they cause a bus error */
 	if((m_options->read() & 0x02) && !space.debugger_access())
@@ -1030,7 +1030,7 @@ void x68k_state::dma_irq(int channel)
 	m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,m_current_vector[3]);
 }
 
-WRITE8_MEMBER(x68k_state::dma_end)
+void x68k_state::dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != 0)
 	{
@@ -1042,7 +1042,7 @@ WRITE8_MEMBER(x68k_state::dma_end)
 	}
 }
 
-WRITE8_MEMBER(x68k_state::dma_error)
+void x68k_state::dma_error(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data != 0)
 	{
@@ -1065,7 +1065,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_fm_irq)
 	}
 }
 
-WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
+void x68k_state::x68030_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

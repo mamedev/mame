@@ -41,6 +41,6 @@ public:
 	virtual void machine_start() override;
 	uint32_t screen_update_funkyjet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER( funkyjet_protection_region_0_146_r );
-	DECLARE_WRITE16_MEMBER( funkyjet_protection_region_0_146_w );
+	uint16_t funkyjet_protection_region_0_146_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void funkyjet_protection_region_0_146_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 };

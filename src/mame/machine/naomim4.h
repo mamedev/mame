@@ -18,7 +18,7 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(submap, 16) override;
 
-	DECLARE_READ16_MEMBER(m4_id_r);
+	uint16_t m4_id_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

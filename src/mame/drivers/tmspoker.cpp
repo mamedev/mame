@@ -227,9 +227,9 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
-	//DECLARE_WRITE8_MEMBER(debug_w);
-	DECLARE_READ8_MEMBER(unk_r);
+	void tmspoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	//void debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_bus();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
@@ -247,7 +247,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
+void tmspoker_state::tmspoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -287,7 +287,7 @@ PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
 *  Read / Write Handlers  *
 **************************/
 
-//WRITE8_MEMBER(tmspoker_state::debug_w)
+//void tmspoker_state::debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 //{
 //  popmessage("written : %02X", data);
 //}
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(tmspoker_state::unk_r)
+uint8_t tmspoker_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	printf("%x\n",offset);
 	return 0;//0xff;//mame_rand(machine);

@@ -12,13 +12,13 @@
 #include "includes/arkanoid.h"
 
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_videoram_w)
+void arkanoid_state::arkanoid_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
+void arkanoid_state::arkanoid_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 
@@ -64,7 +64,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 }
 
 
-WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
+void arkanoid_state::brixian_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 
@@ -104,7 +104,7 @@ WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
 
 
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
-WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
+void arkanoid_state::tetrsark_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 }
 
 
-WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
+void arkanoid_state::hexa_d008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 = flipx (or y?) */
 	flip_screen_x_set(data & 0x01);

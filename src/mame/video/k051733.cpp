@@ -109,7 +109,7 @@ void k051733_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( k051733_device::write )
+void k051733_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: write %02x to 051733 address %02x\n", space.device().safe_pc(), data, offset);
 
@@ -135,7 +135,7 @@ static int k051733_int_sqrt( uint32_t op )
 	return i;
 }
 
-READ8_MEMBER( k051733_device::read )
+uint8_t k051733_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int op1 = (m_ram[0x00] << 8) | m_ram[0x01];
 	int op2 = (m_ram[0x02] << 8) | m_ram[0x03];

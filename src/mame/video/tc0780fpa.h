@@ -50,11 +50,11 @@ public:
 
 	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ16_MEMBER(tex_addr_r);
-	DECLARE_WRITE16_MEMBER(tex_addr_w);
-	DECLARE_WRITE16_MEMBER(tex_w);
-	DECLARE_WRITE16_MEMBER(poly_fifo_w);
-	DECLARE_WRITE16_MEMBER(render_w);
+	uint16_t tex_addr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void tex_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void tex_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void poly_fifo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void render_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

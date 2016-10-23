@@ -112,13 +112,13 @@ void suprloco_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(suprloco_state::videoram_w)
+void suprloco_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_MEMBER(suprloco_state::scrollram_w)
+void suprloco_state::scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int adj = flip_screen() ? -8 : 8;
 
@@ -126,7 +126,7 @@ WRITE8_MEMBER(suprloco_state::scrollram_w)
 	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_MEMBER(suprloco_state::control_w)
+void suprloco_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* There is probably a palette select in here */
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(suprloco_state::control_w)
 }
 
 
-READ8_MEMBER(suprloco_state::control_r)
+uint8_t suprloco_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_control;
 }

@@ -17,8 +17,8 @@ public:
 
 	DECLARE_PALETTE_INIT(asr733);
 
-	DECLARE_READ8_MEMBER(cru_r);
-	DECLARE_WRITE8_MEMBER(cru_w);
+	uint8_t cru_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
 	{

@@ -264,7 +264,7 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
+void zac2650_state::tinvader_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* sounds are NOT the same as space invaders */
 

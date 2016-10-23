@@ -44,23 +44,23 @@
 
 /*******************************************************************************/
 
-WRITE8_MEMBER(shootout_state::bankswitch_w)
+void shootout_state::bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
+void shootout_state::sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write( space, offset, data );
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
-WRITE8_MEMBER(shootout_state::flipscreen_w)
+void shootout_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 }
 
-WRITE8_MEMBER(shootout_state::coincounter_w)
+void shootout_state::coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data);
 }

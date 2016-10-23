@@ -28,8 +28,8 @@ public:
 		m_maincpu(*this, "maincpu")
 	{}
 
-	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
+	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -94,12 +94,12 @@ INPUT_PORTS_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER(attckufo_state::vic_videoram_r)
+uint8_t attckufo_state::vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-READ8_MEMBER(attckufo_state::vic_colorram_r)
+uint8_t attckufo_state::vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x400);
 }

@@ -38,7 +38,7 @@ store new data and increment the address.
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( vcs80_state::pio_r )
+uint8_t vcs80_state::pio_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -51,7 +51,7 @@ READ8_MEMBER( vcs80_state::pio_r )
 	return 0;
 }
 
-WRITE8_MEMBER( vcs80_state::pio_w )
+void vcs80_state::pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -123,7 +123,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vcs80_state::vcs80_keyboard_tick)
 	m_keyclk = !m_keyclk;
 }
 
-READ8_MEMBER( vcs80_state::pio_pa_r )
+uint8_t vcs80_state::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -156,7 +156,7 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( vcs80_state::pio_pb_w )
+void vcs80_state::pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -237,7 +237,7 @@ ROM_END
 
 /* Driver Initialization */
 
-DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
+offs_t vcs80_state::vcs80_direct_update_handler(direct_read_data &direct, offs_t address)
 {
 	/* _A0 is connected to PIO PB7 */
 	m_pio->port_b_write((!BIT(address, 0)) << 7);

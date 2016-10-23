@@ -11,7 +11,7 @@ todo - convert to tilemap
 #include "includes/funybubl.h"
 
 
-WRITE8_MEMBER(funybubl_state::funybubl_paldatawrite)
+void funybubl_state::funybubl_paldatawrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int colchanged ;
 	uint32_t coldat;

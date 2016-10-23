@@ -133,28 +133,28 @@ public:
 
 	int m_tilemap_offset_x, m_tilemap_offset_y, m_tilemap_flags, m_tilemap_top;
 
-	DECLARE_READ8_MEMBER( extern_r );
-	DECLARE_WRITE8_MEMBER(extern_w);
-	DECLARE_WRITE8_MEMBER(p2_w);
-	DECLARE_READ8_MEMBER(p2_r);
-	DECLARE_READ8_MEMBER(t1_r);
-	DECLARE_WRITE8_MEMBER(rombank_w);
+	uint8_t extern_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void extern_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(txtram_r);
-	DECLARE_READ8_MEMBER(randomizer);
-	DECLARE_WRITE8_MEMBER(txtram_w);
-	DECLARE_WRITE8_MEMBER(ppi_pb_w);
-	DECLARE_WRITE8_MEMBER(ppi_pc_w);
+	uint8_t txtram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t randomizer(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void txtram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ins8154_pa_r);
-	DECLARE_WRITE8_MEMBER(ins8154_pa_w);
-	DECLARE_READ8_MEMBER(ins8154_pb_r);
-	DECLARE_WRITE8_MEMBER(ins8154_pb_w);
+	uint8_t ins8154_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ins8154_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ins8154_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ins8154_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(ay8910_pa_r);
-	DECLARE_WRITE8_MEMBER(ay8910_pa_w);
-	DECLARE_READ8_MEMBER(ay8910_pb_r);
-	DECLARE_WRITE8_MEMBER(ay8910_pb_w);
+	uint8_t ay8910_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay8910_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ay8910_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ay8910_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_vega();
 
@@ -166,7 +166,7 @@ public:
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-WRITE8_MEMBER(vega_state::extern_w)
+void vega_state::extern_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ext_offset_w=offset;
 
@@ -296,7 +296,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 
 	}
 }
-READ8_MEMBER(vega_state::extern_r)
+uint8_t vega_state::extern_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_ext_offset_r=offset;
 
@@ -360,22 +360,22 @@ READ8_MEMBER(vega_state::extern_r)
 	return 0;
 }
 
-READ8_MEMBER(vega_state::p2_r)
+uint8_t vega_state::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2_data;
 }
 
-WRITE8_MEMBER(vega_state::p2_w)
+void vega_state::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2_data=data;
 }
 
-READ8_MEMBER(vega_state::t1_r)
+uint8_t vega_state::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE8_MEMBER(vega_state::rombank_w)
+void vega_state::rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7 used to select ROM bank (other bits = DSW ) */
 	membank("bank1")->set_entry(data >>7);
@@ -713,82 +713,82 @@ void vega_state::machine_reset()
 	membank("bank1")->set_entry(1);
 }
 
-WRITE8_MEMBER(vega_state::txtram_w)
+void vega_state::txtram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_txt_ram[m_ext_offset_w+((m_p2_data&3)<<8)]=data;
 }
 
-READ8_MEMBER(vega_state::txtram_r)
+uint8_t vega_state::txtram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_txt_ram[m_ext_offset_r+((m_p2_data&3)<<8)];
 }
 
 
-WRITE8_MEMBER( vega_state::ay8910_pa_w )
+void vega_state::ay8910_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tmp=0;
 	logerror("AY PA W %x\n",data);
 }
 
-WRITE8_MEMBER( vega_state::ay8910_pb_w )
+void vega_state::ay8910_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_t1=(data&4)?1:0;
 	logerror("AY PB W %x\n",data);
 }
 
-READ8_MEMBER( vega_state::ay8910_pa_r )
+uint8_t vega_state::ay8910_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//m_tmp=0;
 	logerror("AY PA R\n");
 	return 0;
 }
 
-READ8_MEMBER( vega_state::ay8910_pb_r )
+uint8_t vega_state::ay8910_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_tmp=0;
 	logerror("AY PB R\n");
 	return 0;
 }
 
-WRITE8_MEMBER(vega_state::ppi_pb_w )
+void vega_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tmp=0;
 }
 
-WRITE8_MEMBER(vega_state::ppi_pc_w )
+void vega_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tmp=0;
 	logerror("ppi pc w %x\n",data);
 }
 
 
-WRITE8_MEMBER( vega_state::ins8154_pa_w )
+void vega_state::ins8154_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_obj[OBJ_PLAYER].m_x=data;
 }
 
-WRITE8_MEMBER( vega_state::ins8154_pb_w )
+void vega_state::ins8154_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_obj[OBJ_PLAYER].m_type=data;
 	m_obj[OBJ_PLAYER].m_enable=data&0x20;
 	//logerror("INS PB W %x\n",data);
 }
 
-READ8_MEMBER( vega_state::ins8154_pa_r )
+uint8_t vega_state::ins8154_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_tmp=0;
 	logerror("INS PA R\n");
 	return 0;
 }
 
-READ8_MEMBER( vega_state::ins8154_pb_r )
+uint8_t vega_state::ins8154_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("INS PB R\n");
 	return 0;
 }
 
 
-READ8_MEMBER(vega_state::randomizer )
+uint8_t vega_state::randomizer(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("IN1")->read()&7)|(machine().rand()&(~7));
 }

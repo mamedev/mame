@@ -51,8 +51,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa){ write_a_tx(state); }
 	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb){ write_b_tx(state);  }
-	DECLARE_READ8_MEMBER(m68307_duart_input_r){ return read_inport();  }
-	DECLARE_WRITE8_MEMBER(m68307_duart_output_w){ write_outport(data);  }
+	uint8_t m68307_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff){ return read_inport();  }
+	void m68307_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){ write_outport(data);  }
 	devcb_write_line write_irq, write_a_tx, write_b_tx;
 	devcb_read8 read_inport;
 	devcb_write8 write_outport;
@@ -81,16 +81,16 @@ public:
 	int m68307_currentcs;
 
 
-	DECLARE_READ16_MEMBER( m68307_internal_base_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_base_w );
-	DECLARE_READ16_MEMBER( m68307_internal_timer_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_timer_w );
-	DECLARE_READ16_MEMBER( m68307_internal_sim_r );
-	DECLARE_WRITE16_MEMBER( m68307_internal_sim_w );
-	DECLARE_READ8_MEMBER( m68307_internal_serial_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_serial_w );
-	DECLARE_READ8_MEMBER( m68307_internal_mbus_r );
-	DECLARE_WRITE8_MEMBER( m68307_internal_mbus_w );
+	uint16_t m68307_internal_base_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m68307_internal_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t m68307_internal_timer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m68307_internal_timer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t m68307_internal_sim_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m68307_internal_sim_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t m68307_internal_serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m68307_internal_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t m68307_internal_mbus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m68307_internal_mbus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
 	/* callbacks for internal ports */

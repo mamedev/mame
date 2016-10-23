@@ -6,7 +6,7 @@
 
 
 
-WRITE8_MEMBER(playch10_state::playch10_videoram_w)
+void playch10_state::playch10_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	if (m_pc10_sdcs)

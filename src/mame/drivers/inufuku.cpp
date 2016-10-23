@@ -87,7 +87,7 @@ TODO:
 
 ******************************************************************************/
 
-WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
+void inufuku_state::inufuku_soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -101,12 +101,12 @@ WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
 	}
 }
 
-WRITE8_MEMBER(inufuku_state::pending_command_clear_w)
+void inufuku_state::pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pending_command = 0;
 }
 
-WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
+void inufuku_state::inufuku_soundrombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x03);
 }

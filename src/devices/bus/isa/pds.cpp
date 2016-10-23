@@ -28,14 +28,14 @@ isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag,
 }
 
 
-READ8_MEMBER(isa8_pds_device::ppi_r)
+uint8_t isa8_pds_device::ppi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!(offset & 0x01))
 		return m_ppi->read(space,offset/2);
 	return 0xff;
 }
 
-WRITE8_MEMBER(isa8_pds_device::ppi_w)
+void isa8_pds_device::ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!(offset & 0x01))
 		m_ppi->write(space,offset/2,data);

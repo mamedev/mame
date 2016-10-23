@@ -79,8 +79,8 @@ public:
 	void write(address_space &space, int col, int row, int func, uint8_t data);
 
 	/* latch settings */
-	DECLARE_READ8_MEMBER( latch_r );
-	DECLARE_WRITE8_MEMBER( latch_w );
+	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* video update handling */
 	void get_display_state();

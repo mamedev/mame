@@ -85,7 +85,7 @@ Notes:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( tmc600_state::keyboard_latch_w )
+void tmc600_state::keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data;
 }

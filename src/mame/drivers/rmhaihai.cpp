@@ -58,14 +58,14 @@ public:
 	int m_keyboard_cmd;
 	int m_gfxbank;
 
-	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
-	DECLARE_WRITE8_MEMBER(rmhaihai_colorram_w);
-	DECLARE_READ8_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_w);
-	DECLARE_READ8_MEMBER(samples_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(themj_rombank_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void rmhaihai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rmhaihai_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t samples_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void themj_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_rmhaihai();
 	virtual void video_start() override;
@@ -79,13 +79,13 @@ public:
 
 
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_videoram_w)
+void rmhaihai_state::rmhaihai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
+void rmhaihai_state::rmhaihai_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -118,7 +118,7 @@ uint32_t rmhaihai_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-READ8_MEMBER(rmhaihai_state::keyboard_r)
+uint8_t rmhaihai_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
@@ -168,25 +168,25 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 	return 0;
 }
 
-WRITE8_MEMBER(rmhaihai_state::keyboard_w)
+void rmhaihai_state::keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 logerror("%04x: keyboard_w %02x\n",space.device().safe_pc(),data);
 	m_keyboard_cmd = data;
 }
 
-READ8_MEMBER(rmhaihai_state::samples_r)
+uint8_t rmhaihai_state::samples_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("adpcm")->base()[offset];
 }
 
-WRITE8_MEMBER(rmhaihai_state::adpcm_w)
+void rmhaihai_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm->data_w(data);         /* bit0..3  */
 	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
 	m_msm->vclk_w(BIT(data, 4)); /* bit4     */
 }
 
-WRITE8_MEMBER(rmhaihai_state::ctrl_w)
+void rmhaihai_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 0x01);
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 	m_gfxbank = (data & 0x40) >> 6; /* rmhaisei only */
 }
 
-WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
+void rmhaihai_state::themj_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("banksw %d\n", data & 0x03);
 	membank("bank1")->set_entry(data & 0x03);

@@ -20,8 +20,8 @@ public:
 		: device_slot_card_interface(mconfig, device)
 	{ };
 
-	virtual DECLARE_READ8_MEMBER(read) { return 0xff; };
-	virtual DECLARE_WRITE8_MEMBER(write) { };
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
+	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 };
 
 
@@ -36,8 +36,8 @@ public:
 	virtual void device_start() override;
 
 	// Physical connection simply consists of 8 input and 8 output lines split across 2 connectors
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	msx_audio_kb_port_interface *m_keyboard;
 };

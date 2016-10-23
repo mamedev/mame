@@ -61,21 +61,21 @@ public:
 	//FILE* audio_dump;
 	uint32_t m_words[0x800];
 	int16_t m_samples[0x1000];
-	DECLARE_READ32_MEMBER(pxa255_i2s_r);
-	DECLARE_WRITE32_MEMBER(pxa255_i2s_w);
-	DECLARE_READ32_MEMBER(pxa255_dma_r);
-	DECLARE_WRITE32_MEMBER(pxa255_dma_w);
-	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
-	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
-	DECLARE_READ32_MEMBER(pxa255_intc_r);
-	DECLARE_WRITE32_MEMBER(pxa255_intc_w);
-	DECLARE_READ32_MEMBER(pxa255_gpio_r);
-	DECLARE_WRITE32_MEMBER(pxa255_gpio_w);
-	DECLARE_READ32_MEMBER(pxa255_lcd_r);
-	DECLARE_WRITE32_MEMBER(pxa255_lcd_w);
-	DECLARE_READ32_MEMBER(cpld_r);
-	DECLARE_WRITE32_MEMBER(cpld_w);
-	DECLARE_READ32_MEMBER(prot_cheater_r);
+	uint32_t pxa255_i2s_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_i2s_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_dma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_ostimer_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_ostimer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_intc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_gpio_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_gpio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t pxa255_lcd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pxa255_lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t cpld_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void cpld_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t prot_cheater_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_39in1();
 	void machine_start_60in1();
 	virtual void machine_start() override;
@@ -123,7 +123,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 */
 
-READ32_MEMBER(_39in1_state::pxa255_i2s_r)
+uint32_t _39in1_state::pxa255_i2s_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_I2S_Regs *i2s_regs = &m_i2s_regs;
 
@@ -157,7 +157,7 @@ READ32_MEMBER(_39in1_state::pxa255_i2s_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_i2s_w)
+void _39in1_state::pxa255_i2s_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_I2S_Regs *i2s_regs = &m_i2s_regs;
 
@@ -409,7 +409,7 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
 	pxa255_dma_irq_check();
 }
 
-READ32_MEMBER(_39in1_state::pxa255_dma_r)
+uint32_t _39in1_state::pxa255_dma_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_DMA_Regs *dma_regs = &m_dma_regs;
 
@@ -467,7 +467,7 @@ READ32_MEMBER(_39in1_state::pxa255_dma_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_dma_w)
+void _39in1_state::pxa255_dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_DMA_Regs *dma_regs = &m_dma_regs;
 
@@ -578,7 +578,7 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_ostimer_match)
 	pxa255_ostimer_irq_check();
 }
 
-READ32_MEMBER(_39in1_state::pxa255_ostimer_r)
+uint32_t _39in1_state::pxa255_ostimer_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
@@ -617,7 +617,7 @@ READ32_MEMBER(_39in1_state::pxa255_ostimer_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_ostimer_w)
+void _39in1_state::pxa255_ostimer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
@@ -728,7 +728,7 @@ void _39in1_state::pxa255_set_irq_line(uint32_t line, int irq_state)
 	pxa255_update_interrupts();
 }
 
-READ32_MEMBER(_39in1_state::pxa255_intc_r)
+uint32_t _39in1_state::pxa255_intc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -759,7 +759,7 @@ READ32_MEMBER(_39in1_state::pxa255_intc_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_intc_w)
+void _39in1_state::pxa255_intc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 
@@ -800,7 +800,7 @@ WRITE32_MEMBER(_39in1_state::pxa255_intc_w)
 
 */
 
-READ32_MEMBER(_39in1_state::pxa255_gpio_r)
+uint32_t _39in1_state::pxa255_gpio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_GPIO_Regs *gpio_regs = &m_gpio_regs;
 
@@ -897,7 +897,7 @@ READ32_MEMBER(_39in1_state::pxa255_gpio_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_gpio_w)
+void _39in1_state::pxa255_gpio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_GPIO_Regs *gpio_regs = &m_gpio_regs;
 
@@ -1162,7 +1162,7 @@ TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_lcd_dma_eof)
 	pxa255_lcd_irq_check();
 }
 
-READ32_MEMBER(_39in1_state::pxa255_lcd_r)
+uint32_t _39in1_state::pxa255_lcd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
@@ -1229,7 +1229,7 @@ READ32_MEMBER(_39in1_state::pxa255_lcd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::pxa255_lcd_w)
+void _39in1_state::pxa255_lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
@@ -1340,18 +1340,18 @@ INTERRUPT_GEN_MEMBER(_39in1_state::pxa255_vblank_start)
 }
 
 #ifdef UNUSED_FUNCTION
-READ32_MEMBER(_39in1_state::return_zero)
+uint32_t _39in1_state::return_zero(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0;
 }
 
-READ32_MEMBER(_39in1_state::unknown_r)
+uint32_t _39in1_state::unknown_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00008000;
 }
 #endif
 
-READ32_MEMBER(_39in1_state::cpld_r)
+uint32_t _39in1_state::cpld_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
 
@@ -1406,7 +1406,7 @@ READ32_MEMBER(_39in1_state::cpld_r)
 	return 0;
 }
 
-WRITE32_MEMBER(_39in1_state::cpld_w)
+void _39in1_state::cpld_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffff)
 	{
@@ -1433,7 +1433,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #endif
 }
 
-READ32_MEMBER(_39in1_state::prot_cheater_r)
+uint32_t _39in1_state::prot_cheater_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x37;
 }

@@ -46,7 +46,7 @@ enum
 
 /* Read/Write Handlers */
 
-READ8_MEMBER( cosmicos_state::read )
+uint8_t cosmicos_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_boot) offset |= 0xc0c0;
 
@@ -68,7 +68,7 @@ READ8_MEMBER( cosmicos_state::read )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::write )
+void cosmicos_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_boot) offset |= 0xc0c0;
 
@@ -82,7 +82,7 @@ WRITE8_MEMBER( cosmicos_state::write )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::video_off_r )
+uint8_t cosmicos_state::video_off_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -94,7 +94,7 @@ READ8_MEMBER( cosmicos_state::video_off_r )
 	return data;
 }
 
-READ8_MEMBER( cosmicos_state::video_on_r )
+uint8_t cosmicos_state::video_on_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -106,7 +106,7 @@ READ8_MEMBER( cosmicos_state::video_on_r )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::audio_latch_w )
+void cosmicos_state::audio_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_q)
 	{
@@ -114,7 +114,7 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::hex_keyboard_r )
+uint8_t cosmicos_state::hex_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	int i;
@@ -135,19 +135,19 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	return data;
 }
 
-WRITE8_MEMBER( cosmicos_state::hex_keylatch_w )
+void cosmicos_state::hex_keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keylatch = data & 0x0f;
 }
 
-READ8_MEMBER( cosmicos_state::reset_counter_r )
+uint8_t cosmicos_state::reset_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_counter = 0;
 
 	return 0;
 }
 
-WRITE8_MEMBER( cosmicos_state::segment_w )
+void cosmicos_state::segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_counter++;
 
@@ -162,12 +162,12 @@ WRITE8_MEMBER( cosmicos_state::segment_w )
 	}
 }
 
-READ8_MEMBER( cosmicos_state::data_r )
+uint8_t cosmicos_state::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::display_w )
+void cosmicos_state::display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_segment = data;
 }
@@ -426,12 +426,12 @@ WRITE_LINE_MEMBER( cosmicos_state::q_w )
 	m_q = state;
 }
 
-READ8_MEMBER( cosmicos_state::dma_r )
+uint8_t cosmicos_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_data;
 }
 
-WRITE8_MEMBER( cosmicos_state::sc_w )
+void cosmicos_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sc1 = BIT(data, 1);
 

@@ -44,26 +44,26 @@ public:
 
 
 	// access
-	DECLARE_READ16_MEMBER( kaneko_tmap_vram_r );
-	DECLARE_WRITE16_MEMBER( kaneko_tmap_vram_w );
+	uint16_t kaneko_tmap_vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko_tmap_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( kaneko_tmap_regs_r );
-	DECLARE_WRITE16_MEMBER( kaneko_tmap_regs_w );
+	uint16_t kaneko_tmap_regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kaneko_tmap_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_0_w);
-	DECLARE_WRITE16_MEMBER(kaneko16_vram_1_w);
+	void kaneko16_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kaneko16_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(kaneko16_vram_0_r);
-	DECLARE_READ16_MEMBER(kaneko16_vram_1_r);
+	uint16_t kaneko16_vram_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t kaneko16_vram_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(kaneko16_scroll_0_r);
-	DECLARE_READ16_MEMBER(kaneko16_scroll_1_r);
+	uint16_t kaneko16_scroll_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t kaneko16_scroll_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER( kaneko16_scroll_0_w );
-	DECLARE_WRITE16_MEMBER( kaneko16_scroll_1_w );
+	void kaneko16_scroll_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void kaneko16_scroll_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(galsnew_vram_0_tilebank_w);
-	DECLARE_WRITE16_MEMBER(galsnew_vram_1_tilebank_w);
+	void galsnew_vram_0_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void galsnew_vram_1_tilebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 
 

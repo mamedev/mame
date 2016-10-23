@@ -975,7 +975,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	}
 }
 
-WRITE8_MEMBER(pce_cd_device::bram_w)
+void pce_cd_device::bram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!m_bram_locked)
 	{
@@ -983,7 +983,7 @@ WRITE8_MEMBER(pce_cd_device::bram_w)
 	}
 }
 
-READ8_MEMBER(pce_cd_device::bram_r)
+uint8_t pce_cd_device::bram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bram[(offset & (PCE_BRAM_SIZE - 1)) + m_bram_locked * PCE_BRAM_SIZE];
 }
@@ -1071,7 +1071,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 }
 
 
-WRITE8_MEMBER(pce_cd_device::intf_w)
+void pce_cd_device::intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%04X: write to CD interface offset %02X, data %02X\n", space.device().safe_pc(), offset, data);
 
@@ -1304,7 +1304,7 @@ uint8_t pce_cd_device::get_adpcm_ram_byte()
 	}
 }
 
-READ8_MEMBER(pce_cd_device::intf_r)
+uint8_t pce_cd_device::intf_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_regs[offset & 0x0F];
 
@@ -1375,7 +1375,7 @@ PC Engine Arcade Card emulation
 
 */
 
-READ8_MEMBER(pce_cd_device::acard_r)
+uint8_t pce_cd_device::acard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r_num;
 
@@ -1436,7 +1436,7 @@ READ8_MEMBER(pce_cd_device::acard_r)
 	}
 }
 
-WRITE8_MEMBER(pce_cd_device::acard_w)
+void pce_cd_device::acard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t w_num;
 

@@ -514,7 +514,7 @@ void mc146818_device::update_irq()
 //  read - I/O handler for reading
 //-------------------------------------------------
 
-READ8_MEMBER( mc146818_device::read )
+uint8_t mc146818_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	switch (offset)
@@ -566,7 +566,7 @@ READ8_MEMBER( mc146818_device::read )
 //  write - I/O handler for writing
 //-------------------------------------------------
 
-WRITE8_MEMBER( mc146818_device::write )
+void mc146818_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_MC146818)
 		logerror("mc146818_port_w(): index=0x%02x data=0x%02x\n", m_index, data);

@@ -94,33 +94,33 @@ PALETTE_INIT_MEMBER(suprridr_state, suprridr)
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::flipx_w)
+void suprridr_state::flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipx = data & 1;
 	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(suprridr_state::flipy_w)
+void suprridr_state::flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipy = data & 1;
 	machine().tilemap().set_flip_all((m_flipx ? TILEMAP_FLIPX : 0) | (m_flipy ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgdisable_w)
+void suprridr_state::fgdisable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tilemap->enable(~data & 1);
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgscrolly_w)
+void suprridr_state::fgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tilemap->set_scrolly(0, data);
 }
 
 
-WRITE8_MEMBER(suprridr_state::bgscrolly_w)
+void suprridr_state::bgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
@@ -139,7 +139,7 @@ int suprridr_state::is_screen_flipped()
  *
  *************************************/
 
-WRITE8_MEMBER(suprridr_state::bgram_w)
+void suprridr_state::bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -147,7 +147,7 @@ WRITE8_MEMBER(suprridr_state::bgram_w)
 }
 
 
-WRITE8_MEMBER(suprridr_state::fgram_w)
+void suprridr_state::fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);

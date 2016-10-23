@@ -338,26 +338,26 @@ public:
 	uint8_t m_sbp2;
 	uint8_t m_sbp3;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_READ8_MEMBER(videopkr_io_r);
-	DECLARE_WRITE8_MEMBER(videopkr_io_w);
-	DECLARE_READ8_MEMBER(videopkr_p1_data_r);
-	DECLARE_READ8_MEMBER(videopkr_p2_data_r);
-	DECLARE_WRITE8_MEMBER(videopkr_p1_data_w);
-	DECLARE_WRITE8_MEMBER(videopkr_p2_data_w);
-	DECLARE_READ8_MEMBER(videopkr_t0_latch);
-	DECLARE_WRITE8_MEMBER(prog_w);
-	DECLARE_READ8_MEMBER(sound_io_r);
-	DECLARE_WRITE8_MEMBER(sound_io_w);
-	DECLARE_READ8_MEMBER(sound_p2_r);
-	DECLARE_WRITE8_MEMBER(sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p0_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p0_w);
-	DECLARE_READ8_MEMBER(baby_sound_p1_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p1_w);
-	DECLARE_READ8_MEMBER(baby_sound_p2_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p2_w);
-	DECLARE_READ8_MEMBER(baby_sound_p3_r);
-	DECLARE_WRITE8_MEMBER(baby_sound_p3_w);
+	uint8_t videopkr_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videopkr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videopkr_p1_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t videopkr_p2_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videopkr_p1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videopkr_p2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videopkr_t0_latch(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sound_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t baby_sound_p0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void baby_sound_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t baby_sound_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void baby_sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t baby_sound_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void baby_sound_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t baby_sound_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void baby_sound_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -540,7 +540,7 @@ uint32_t videopkr_state::screen_update_videopkr(screen_device &screen, bitmap_in
 *      R/W Handlers      *
 *************************/
 
-READ8_MEMBER(videopkr_state::videopkr_io_r)
+uint8_t videopkr_state::videopkr_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t valor = 0, hf, co;
 
@@ -620,7 +620,7 @@ READ8_MEMBER(videopkr_state::videopkr_io_r)
 	return valor;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_io_w)
+void videopkr_state::videopkr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (m_p2)
 	{
@@ -689,17 +689,17 @@ WRITE8_MEMBER(videopkr_state::videopkr_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p1_data_r)
+uint8_t videopkr_state::videopkr_p1_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_p2_data_r)
+uint8_t videopkr_state::videopkr_p2_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
+void videopkr_state::videopkr_p1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p1 = data;
 
@@ -741,17 +741,17 @@ WRITE8_MEMBER(videopkr_state::videopkr_p1_data_w)
 	m_ant_jckp = m_jckp;
 }
 
-WRITE8_MEMBER(videopkr_state::videopkr_p2_data_w)
+void videopkr_state::videopkr_p2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p2 = data;
 }
 
-READ8_MEMBER(videopkr_state::videopkr_t0_latch)
+uint8_t videopkr_state::videopkr_t0_latch(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_t0_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::prog_w)
+void videopkr_state::prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!data)
 		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
@@ -793,7 +793,7 @@ WRITE8_MEMBER(videopkr_state::prog_w)
 
 */
 
-READ8_MEMBER(videopkr_state::sound_io_r)
+uint8_t videopkr_state::sound_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_vp_sound_p2)
 	{
@@ -815,7 +815,7 @@ READ8_MEMBER(videopkr_state::sound_io_r)
 	return m_sound_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_io_w)
+void videopkr_state::sound_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_vp_sound_p2 == 0x5f || m_vp_sound_p2 == 0xdf)
 	{
@@ -824,12 +824,12 @@ WRITE8_MEMBER(videopkr_state::sound_io_w)
 	}
 }
 
-READ8_MEMBER(videopkr_state::sound_p2_r)
+uint8_t videopkr_state::sound_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_vp_sound_p2;
 }
 
-WRITE8_MEMBER(videopkr_state::sound_p2_w)
+void videopkr_state::sound_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vp_sound_p2 = data;
 
@@ -861,17 +861,17 @@ WRITE8_MEMBER(videopkr_state::sound_p2_w)
 
 /* Baby Sound Handlers */
 
-READ8_MEMBER(videopkr_state::baby_sound_p0_r)
+uint8_t videopkr_state::baby_sound_p0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sbp0;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p0_w)
+void videopkr_state::baby_sound_p0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sbp0 = data;
 }
 
-READ8_MEMBER(videopkr_state::baby_sound_p1_r)
+uint8_t videopkr_state::baby_sound_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_c_io = (m_p1 >> 5) & 1;
 	m_hp_1 = (~m_p24_data >> 6) & 1;
@@ -882,28 +882,28 @@ READ8_MEMBER(videopkr_state::baby_sound_p1_r)
 	return m_baby_latch;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p1_w)
+void videopkr_state::baby_sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_baby_latch = m_baby_latch | data;
 }
 
-READ8_MEMBER(videopkr_state::baby_sound_p2_r)
+uint8_t videopkr_state::baby_sound_p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sbp2;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p2_w)
+void videopkr_state::baby_sound_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sbp2 = data;
 	m_dac->write(data);
 }
 
-READ8_MEMBER(videopkr_state::baby_sound_p3_r)
+uint8_t videopkr_state::baby_sound_p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sbp3;
 }
 
-WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
+void videopkr_state::baby_sound_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	uint8_t lmp_ports, ay_intf;

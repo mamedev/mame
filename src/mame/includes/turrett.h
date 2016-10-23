@@ -35,11 +35,11 @@ public:
 	required_device<screen_device> m_screen;
 
 	// handlers
-	DECLARE_WRITE32_MEMBER(dma_w);
-	DECLARE_READ32_MEMBER(video_r);
-	DECLARE_WRITE32_MEMBER(video_w);
-	DECLARE_READ32_MEMBER(int_r);
-	DECLARE_WRITE32_MEMBER(int_w);
+	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t int_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	INPUT_CHANGED_MEMBER(ipt_change);
 	DECLARE_READ_LINE_MEMBER(sbrc2_r);
 	DECLARE_READ_LINE_MEMBER(sbrc3_r);
@@ -96,8 +96,8 @@ public:
 	// construction/destruction
 	turrett_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 protected:
 	// device-level overrides

@@ -111,13 +111,13 @@ void ddragon_state::video_start_ddragon()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(ddragon_state::ddragon_bgvideoram_w)
+void ddragon_state::ddragon_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(ddragon_state::ddragon_fgvideoram_w)
+void ddragon_state::ddragon_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);

@@ -162,41 +162,41 @@ public:
 	void store_post_load();
 	void store_select_cart(uint8_t data);
 
-	DECLARE_READ8_MEMBER(read_0000);
-	DECLARE_READ8_MEMBER(read_4000);
-	DECLARE_READ8_MEMBER(read_8000);
-	DECLARE_READ8_MEMBER(read_ram);
-	DECLARE_WRITE8_MEMBER(write_ram);
-	DECLARE_WRITE8_MEMBER(write_cart);
+	uint8_t read_0000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_4000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_8000(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(sms_mapper_r);
-	DECLARE_WRITE8_MEMBER(sms_mapper_w);
-	DECLARE_WRITE8_MEMBER(sms_mem_control_w);
-	DECLARE_WRITE8_MEMBER(sms_io_control_w);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dc_r);
-	DECLARE_READ8_MEMBER(sms_input_port_dd_r);
-	DECLARE_READ8_MEMBER(gg_input_port_00_r);
-	DECLARE_READ8_MEMBER(sg1000m3_peripheral_r);
-	DECLARE_WRITE8_MEMBER(sg1000m3_peripheral_w);
-	DECLARE_READ8_MEMBER(gg_sio_r);
-	DECLARE_WRITE8_MEMBER(gg_sio_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_stereo_w);
-	DECLARE_WRITE8_MEMBER(gg_psg_w);
-	DECLARE_WRITE8_MEMBER(sms_psg_w);
-	DECLARE_READ8_MEMBER(smsj_audio_control_r);
-	DECLARE_WRITE8_MEMBER(smsj_audio_control_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_register_port_w);
-	DECLARE_WRITE8_MEMBER(smsj_ym2413_data_port_w);
-	DECLARE_READ8_MEMBER(sms_sscope_r);
-	DECLARE_WRITE8_MEMBER(sms_sscope_w);
+	uint8_t sms_mapper_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sms_mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sms_mem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sms_io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sms_count_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sms_input_port_dc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sms_input_port_dd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gg_input_port_00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sg1000m3_peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sg1000m3_peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gg_sio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gg_sio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gg_psg_stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gg_psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sms_psg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t smsj_audio_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void smsj_audio_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void smsj_ym2413_register_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void smsj_ym2413_data_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sms_sscope_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sms_sscope_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
 	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
 	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
-	DECLARE_READ32_MEMBER(sms_pixel_color);
+	uint32_t sms_pixel_color(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	void init_sg1000m3();
 	void init_gamegear();
@@ -239,12 +239,12 @@ public:
 
 	required_device<cpu_device> m_control_cpu;
 
-	DECLARE_READ8_MEMBER(sms_store_cart_select_r);
-	DECLARE_WRITE8_MEMBER(sms_store_cart_select_w);
-	DECLARE_WRITE8_MEMBER(sms_store_control_w);
+	uint8_t sms_store_cart_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sms_store_cart_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sms_store_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_smssdisp();
 
-	DECLARE_READ8_MEMBER(store_cart_peek);
+	uint8_t store_cart_peek(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 };

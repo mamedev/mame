@@ -45,27 +45,27 @@ public:
 	m_req_hack(nullptr)
 	{ }
 
-	DECLARE_READ8_MEMBER( irq_callback );
+	uint8_t irq_callback(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER( timer0_tick );
 	DECLARE_WRITE_LINE_MEMBER( i186_timer1_w );
 
-	DECLARE_READ8_MEMBER( nmi_io_r );
-	DECLARE_WRITE8_MEMBER( nmi_io_w );
-	DECLARE_READ8_MEMBER( rtc_r );
-	DECLARE_WRITE8_MEMBER( rtc_w );
-	DECLARE_READ8_MEMBER( stat_r );
-	DECLARE_WRITE8_MEMBER( stat_w );
-	DECLARE_READ8_MEMBER( led_r );
-	DECLARE_WRITE8_MEMBER( led_w );
-	DECLARE_READ16_MEMBER( dskctl_r );
-	DECLARE_WRITE16_MEMBER( dskctl_w );
+	uint8_t nmi_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nmi_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t led_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t dskctl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dskctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER( scsi_r );
-	DECLARE_WRITE8_MEMBER( scsi_w );
-	DECLARE_READ16_MEMBER( mmu_r );
-	DECLARE_WRITE16_MEMBER( mmu_w );
-	DECLARE_READ16_MEMBER( mem_r );
-	DECLARE_WRITE16_MEMBER( mem_w );
+	uint8_t scsi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t mmu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
@@ -138,7 +138,7 @@ void pcd_state::machine_reset()
 		m_mmu.type = 0;
 }
 
-READ8_MEMBER( pcd_state::irq_callback )
+uint8_t pcd_state::irq_callback(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (offset ? m_pic2 : m_pic1)->acknowledge();
 }
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( pcd_state::i186_timer1_w )
 		m_speaker->level_w(state);
 }
 
-READ8_MEMBER( pcd_state::nmi_io_r )
+uint8_t pcd_state::nmi_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(space.debugger_access())
 		return 0;
@@ -165,7 +165,7 @@ READ8_MEMBER( pcd_state::nmi_io_r )
 	return 0;
 }
 
-WRITE8_MEMBER( pcd_state::nmi_io_w )
+void pcd_state::nmi_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(space.debugger_access())
 		return;
@@ -174,34 +174,34 @@ WRITE8_MEMBER( pcd_state::nmi_io_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER( pcd_state::rtc_r )
+uint8_t pcd_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_rtc->write(space, 0, offset);
 	return m_rtc->read(space, 1);
 }
 
-WRITE8_MEMBER( pcd_state::rtc_w )
+void pcd_state::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rtc->write(space, 0, offset);
 	m_rtc->write(space, 1, data);
 }
 
-READ8_MEMBER( pcd_state::stat_r )
+uint8_t pcd_state::stat_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_stat;
 }
 
-WRITE8_MEMBER( pcd_state::stat_w )
+void pcd_state::stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stat &= ~data;
 }
 
-READ16_MEMBER( pcd_state::dskctl_r )
+uint16_t pcd_state::dskctl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dskctl;
 }
 
-WRITE16_MEMBER( pcd_state::dskctl_w )
+void pcd_state::dskctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -226,7 +226,7 @@ WRITE16_MEMBER( pcd_state::dskctl_w )
 	m_fdc->dden_w((m_dskctl & 0x10) ? 1 : 0);
 }
 
-READ8_MEMBER( pcd_state::led_r )
+uint8_t pcd_state::led_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// DIPs?
 	// 0x01 no mmu
@@ -235,7 +235,7 @@ READ8_MEMBER( pcd_state::led_r )
 	return 0x01;
 }
 
-WRITE8_MEMBER( pcd_state::led_w )
+void pcd_state::led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	for(int i = 0; i < 6; i++)
 		logerror("%c", (data & (1 << i)) ? '-' : '*');
@@ -243,7 +243,7 @@ WRITE8_MEMBER( pcd_state::led_w )
 	m_led = data;
 }
 
-READ16_MEMBER( pcd_state::mmu_r )
+uint16_t pcd_state::mmu_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t data = m_mmu.regs[((m_mmu.ctl & 0x1f) << 5) | ((offset >> 2) & 0x1f)];
 	//logerror("%s: mmu read %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
@@ -259,7 +259,7 @@ READ16_MEMBER( pcd_state::mmu_r )
 	return 0;
 }
 
-WRITE16_MEMBER( pcd_state::mmu_w )
+void pcd_state::mmu_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%s: mmu write %04x %04x\n", machine().describe_context(), (offset << 1) + 0x8000, data);
 	if(!offset)
@@ -273,7 +273,7 @@ WRITE16_MEMBER( pcd_state::mmu_w )
 	}
 }
 
-READ8_MEMBER(pcd_state::scsi_r)
+uint8_t pcd_state::scsi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 
@@ -295,7 +295,7 @@ READ8_MEMBER(pcd_state::scsi_r)
 	return ret;
 }
 
-WRITE8_MEMBER(pcd_state::scsi_w)
+void pcd_state::scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER(pcd_state::write_scsi_req)
 	check_scsi_irq();
 }
 
-WRITE16_MEMBER(pcd_state::mem_w)
+void pcd_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)
@@ -401,7 +401,7 @@ WRITE16_MEMBER(pcd_state::mem_w)
 	COMBINE_DATA(&ram[offset]);
 }
 
-READ16_MEMBER(pcd_state::mem_r)
+uint16_t pcd_state::mem_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t *ram = (uint16_t *)m_ram->pointer();
 	if((m_mmu.ctl & 0x20) && m_mmu.type)

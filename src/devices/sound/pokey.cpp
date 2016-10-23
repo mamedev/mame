@@ -800,7 +800,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 //  read - memory interface for reading the active status
 //-------------------------------------------------
 
-READ8_MEMBER( pokey_device::read )
+uint8_t pokey_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return read(offset);
 }
@@ -907,7 +907,7 @@ void pokey_device::write(offs_t offset, uint8_t data)
 	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
 
-WRITE8_MEMBER( pokey_device::write )
+void pokey_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write(offset, data);
 }

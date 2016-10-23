@@ -26,12 +26,12 @@ public:
 	template<class _Object> static devcb_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_3_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0220ioc_device &>(device).m_read_7_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( port_r );
-	DECLARE_WRITE8_MEMBER( port_w );
-	DECLARE_READ8_MEMBER( portreg_r );
-	DECLARE_WRITE8_MEMBER( portreg_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void portreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -67,12 +67,12 @@ public:
 	template<class _Object> static devcb_base &set_read_3_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_3_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0510nio_device &>(device).m_read_7_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( halfword_r );
-	DECLARE_WRITE16_MEMBER( halfword_w );
-	DECLARE_READ16_MEMBER( halfword_wordswap_r );
-	DECLARE_WRITE16_MEMBER( halfword_wordswap_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t halfword_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t halfword_wordswap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void halfword_wordswap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides
@@ -108,12 +108,12 @@ public:
 	template<class _Object> static devcb_base &set_read_7_callback(device_t &device, _Object object) { return downcast<tc0640fio_device &>(device).m_read_7_cb.set_callback(object); }
 
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ16_MEMBER( halfword_r );
-	DECLARE_WRITE16_MEMBER( halfword_w );
-	DECLARE_READ16_MEMBER( halfword_byteswap_r );
-	DECLARE_WRITE16_MEMBER( halfword_byteswap_w );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t halfword_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void halfword_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t halfword_byteswap_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void halfword_byteswap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	// device-level overrides

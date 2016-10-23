@@ -48,13 +48,13 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(mnchmobl_flipscreen_w);
-	DECLARE_READ8_MEMBER(munchmo_ay1reset_r);
-	DECLARE_READ8_MEMBER(munchmo_ay2reset_r);
+	void mnchmobl_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mnchmobl_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mnchmobl_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mnchmobl_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t munchmo_ay1reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t munchmo_ay2reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

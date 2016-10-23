@@ -198,12 +198,12 @@ hk68v10_state(const machine_config &mconfig, device_type type, const char *tag) 
 {
 }
 
-DECLARE_READ16_MEMBER (bootvect_r);
-DECLARE_WRITE16_MEMBER (bootvect_w);
-//DECLARE_READ16_MEMBER (vme_a24_r);
-//DECLARE_WRITE16_MEMBER (vme_a24_w);
-//DECLARE_READ16_MEMBER (vme_a16_r);
-//DECLARE_WRITE16_MEMBER (vme_a16_w);
+uint16_t bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+void bootvect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+//uint16_t vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+//void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+//uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+//void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 virtual void machine_start () override;
 virtual void machine_reset () override;
 
@@ -269,12 +269,12 @@ void hk68v10_state::machine_reset ()
   FC0024: move.l  #$0, $0.l # <- zeroing the reset vector
   FC002E: move.l  #$0, $4.l # There is for sure some hardware mapping going in here
 */
-READ16_MEMBER (hk68v10_state::bootvect_r){
+uint16_t hk68v10_state::bootvect_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG(("%s %s\n", FUNCNAME, m_sysrom != &m_sysram[0] ? "as reset" : "as swapped"));
 	return m_sysrom[offset];
 }
 
-WRITE16_MEMBER (hk68v10_state::bootvect_w){
+void hk68v10_state::bootvect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
@@ -283,21 +283,21 @@ WRITE16_MEMBER (hk68v10_state::bootvect_w){
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (hk68v10_state::vme_a24_r){
+uint16_t hk68v10_state::vme_a24_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (hk68v10_state::vme_a24_w){
+void hk68v10_state::vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 }
 
-READ16_MEMBER (hk68v10_state::vme_a16_r){
+uint16_t hk68v10_state::vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 	return (uint16_t) 0;
 }
 
-WRITE16_MEMBER (hk68v10_state::vme_a16_w){
+void hk68v10_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG(("%s\n", FUNCNAME));
 }
 #endif

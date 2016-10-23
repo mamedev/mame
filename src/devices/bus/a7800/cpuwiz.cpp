@@ -79,7 +79,7 @@ void a78_versaboard_device::device_reset()
 
 // VersaBoard
 
-READ8_MEMBER(a78_versaboard_device::read_40xx)
+uint8_t a78_versaboard_device::read_40xx(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < 0x4000)
 		return m_ram[offset + (m_ram_bank * 0x4000)];
@@ -89,7 +89,7 @@ READ8_MEMBER(a78_versaboard_device::read_40xx)
 		return m_rom[(offset & 0x3fff) + (m_bank_mask * 0x4000)];   // last bank
 }
 
-WRITE8_MEMBER(a78_versaboard_device::write_40xx)
+void a78_versaboard_device::write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x4000)
 		m_ram[offset + (m_ram_bank * 0x4000)] = data;
@@ -104,7 +104,7 @@ WRITE8_MEMBER(a78_versaboard_device::write_40xx)
 
 // MegaCart+
 
-WRITE8_MEMBER(a78_megacart_device::write_40xx)
+void a78_megacart_device::write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < 0x4000)
 		m_ram[offset + (m_ram_bank * 0x4000)] = data;

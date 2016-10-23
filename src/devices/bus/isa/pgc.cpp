@@ -286,7 +286,7 @@ IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
 
 // memory handlers
 
-READ8_MEMBER( isa8_pgc_device::stateparam_r ) {
+uint8_t isa8_pgc_device::stateparam_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	uint8_t ret;
 
 	ret = m_stateparam[offset >> 1];
@@ -297,7 +297,7 @@ READ8_MEMBER( isa8_pgc_device::stateparam_r ) {
 	return ret;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::stateparam_w ) {
+void isa8_pgc_device::stateparam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
 		DBG_LOG(1,"stateparam",("W @ %02x <- %02x\n", offset, data));
@@ -305,7 +305,7 @@ WRITE8_MEMBER( isa8_pgc_device::stateparam_w ) {
 	m_stateparam[offset >> 1] = data;
 }
 
-WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
+void isa8_pgc_device::lut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	uint8_t o = (offset >> 1) * 3;
 
 	if (offset & 1) {
@@ -319,7 +319,7 @@ WRITE8_MEMBER( isa8_pgc_device::lut_w ) {
 	}
 }
 
-READ8_MEMBER( isa8_pgc_device::init_r ) {
+uint8_t isa8_pgc_device::init_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	DBG_LOG(1,"INIT",("unmapping ROM\n"));
 	space.unmap_read(0xf8000, 0xfffff);
 

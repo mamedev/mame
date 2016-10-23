@@ -944,7 +944,7 @@ std::string base_md_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ16_MEMBER(base_md_cart_slot_device::read)
+uint16_t base_md_cart_slot_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read(space, offset, mem_mask);
@@ -952,7 +952,7 @@ READ16_MEMBER(base_md_cart_slot_device::read)
 		return 0xffff;
 }
 
-READ16_MEMBER(base_md_cart_slot_device::read_a13)
+uint16_t base_md_cart_slot_device::read_a13(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_a13(space, offset, mem_mask);
@@ -960,7 +960,7 @@ READ16_MEMBER(base_md_cart_slot_device::read_a13)
 		return 0xffff;
 }
 
-READ16_MEMBER(base_md_cart_slot_device::read_a15)
+uint16_t base_md_cart_slot_device::read_a15(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_a15(space, offset, mem_mask);
@@ -973,19 +973,19 @@ READ16_MEMBER(base_md_cart_slot_device::read_a15)
  write
  -------------------------------------------------*/
 
-WRITE16_MEMBER(base_md_cart_slot_device::write)
+void base_md_cart_slot_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(base_md_cart_slot_device::write_a13)
+void base_md_cart_slot_device::write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_a13(space, offset, data, mem_mask);
 }
 
-WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
+void base_md_cart_slot_device::write_a15(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_a15(space, offset, data, mem_mask);

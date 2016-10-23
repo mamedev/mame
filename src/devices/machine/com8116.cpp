@@ -175,7 +175,7 @@ void com8116_device::str_w(uint8_t data)
 	m_fr_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(fr_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::str_w )
+void com8116_device::str_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	str_w(data);
 }
@@ -195,7 +195,7 @@ void com8116_device::stt_w(uint8_t data)
 	m_ft_timer->adjust(attotime::from_nsec(3500), 0, attotime::from_hz(ft_clock * 2));
 }
 
-WRITE8_MEMBER( com8116_device::stt_w )
+void com8116_device::stt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	stt_w(data);
 }

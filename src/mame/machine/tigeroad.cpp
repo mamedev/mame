@@ -117,14 +117,14 @@ void tigeroad_state::f1dream_protection_w(address_space &space)
 	}
 }
 
-WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
+void tigeroad_state::f1dream_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",space.device().safe_pc(), m_ram16[0x3fe0/2]);
 	f1dream_protection_w(space);
 }
 
 
-READ16_MEMBER(tigeroad_state::pushman_68705_r)
+uint16_t tigeroad_state::pushman_68705_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)
 		return m_latch;
@@ -140,7 +140,7 @@ READ16_MEMBER(tigeroad_state::pushman_68705_r)
 	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
 }
 
-WRITE16_MEMBER(tigeroad_state::pushman_68705_w)
+void tigeroad_state::pushman_68705_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_shared_ram[2 * offset] = data >> 8;
@@ -156,7 +156,7 @@ WRITE16_MEMBER(tigeroad_state::pushman_68705_w)
 }
 
 /* ElSemi - Bouncing balls protection. */
-READ16_MEMBER(tigeroad_state::bballs_68705_r)
+uint16_t tigeroad_state::bballs_68705_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0)
 		return m_latch;
@@ -171,7 +171,7 @@ READ16_MEMBER(tigeroad_state::bballs_68705_r)
 	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
 }
 
-WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
+void tigeroad_state::bballs_68705_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		m_shared_ram[2 * offset] = data >> 8;
@@ -198,12 +198,12 @@ WRITE16_MEMBER(tigeroad_state::bballs_68705_w)
 }
 
 
-READ8_MEMBER(tigeroad_state::pushman_68000_r)
+uint8_t tigeroad_state::pushman_68000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_shared_ram[offset];
 }
 
-WRITE8_MEMBER(tigeroad_state::pushman_68000_w)
+void tigeroad_state::pushman_68000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
 	{

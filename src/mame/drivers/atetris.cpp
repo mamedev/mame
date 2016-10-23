@@ -84,7 +84,7 @@ TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
 }
 
 
-WRITE8_MEMBER(atetris_state::irq_ack_w)
+void atetris_state::irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -134,7 +134,7 @@ void atetris_state::machine_reset()
  *
  *************************************/
 
-READ8_MEMBER(atetris_state::slapstic_r)
+uint8_t atetris_state::slapstic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = m_slapstic_base[0x2000 + offset];
 	int new_bank = m_slapstic_device->slapstic_tweak(space, offset) & 1;
@@ -156,7 +156,7 @@ READ8_MEMBER(atetris_state::slapstic_r)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::coincount_w)
+void atetris_state::coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, (data >> 5) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 4) & 1);
@@ -170,7 +170,7 @@ WRITE8_MEMBER(atetris_state::coincount_w)
  *
  *************************************/
 
-WRITE8_MEMBER(atetris_state::nvram_w)
+void atetris_state::nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_nvram_write_enable)
 		m_nvram[offset] = data;
@@ -178,7 +178,7 @@ WRITE8_MEMBER(atetris_state::nvram_w)
 }
 
 
-WRITE8_MEMBER(atetris_state::nvram_enable_w)
+void atetris_state::nvram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_write_enable = 1;
 }

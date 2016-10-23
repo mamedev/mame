@@ -96,14 +96,14 @@ public:
 	emu_timer*  m_gameplay_timer;
 	uint8_t       m_money_reg;
 
-	DECLARE_WRITE8_MEMBER(famibox_nt_w);
-	DECLARE_READ8_MEMBER(famibox_nt_r);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_READ8_MEMBER(famibox_IN0_r);
-	DECLARE_WRITE8_MEMBER(famibox_IN0_w);
-	DECLARE_READ8_MEMBER(famibox_IN1_r);
-	DECLARE_READ8_MEMBER(famibox_system_r);
-	DECLARE_WRITE8_MEMBER(famibox_system_w);
+	void famibox_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void famibox_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t famibox_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t famibox_system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void famibox_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
 	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -159,14 +159,14 @@ void famibox_state::set_mirroring(int mirroring)
 }
 #endif
 
-WRITE8_MEMBER(famibox_state::famibox_nt_w)
+void famibox_state::famibox_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
-READ8_MEMBER(famibox_state::famibox_nt_r)
+uint8_t famibox_state::famibox_nt_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int page = ((offset & 0xc00) >> 10);
 	return m_nt_page[page][offset & 0x3ff];
@@ -178,7 +178,7 @@ READ8_MEMBER(famibox_state::famibox_nt_r)
 
 *******************************************************/
 
-WRITE8_MEMBER(famibox_state::sprite_dma_w)
+void famibox_state::sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int source = (data & 7);
 	m_ppu->spriteram_dma(space, source);
@@ -193,12 +193,12 @@ WRITE8_MEMBER(famibox_state::sprite_dma_w)
 *******************************************************/
 
 
-READ8_MEMBER(famibox_state::famibox_IN0_r)
+uint8_t famibox_state::famibox_IN0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-WRITE8_MEMBER(famibox_state::famibox_IN0_w)
+void famibox_state::famibox_IN0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x01)
 	{
@@ -212,7 +212,7 @@ WRITE8_MEMBER(famibox_state::famibox_IN0_w)
 	m_in_1 = ioport("P2")->read();
 }
 
-READ8_MEMBER(famibox_state::famibox_IN1_r)
+uint8_t famibox_state::famibox_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
@@ -297,7 +297,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 	}
 }
 
-READ8_MEMBER(famibox_state::famibox_system_r)
+uint8_t famibox_state::famibox_system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( offset & 0x07 )
 	{
@@ -319,7 +319,7 @@ READ8_MEMBER(famibox_state::famibox_system_r)
 	}
 }
 
-WRITE8_MEMBER(famibox_state::famibox_system_w)
+void famibox_state::famibox_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch( offset & 0x07 )
 	{

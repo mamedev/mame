@@ -274,7 +274,7 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
  *
  *************************************/
 
-WRITE8_MEMBER(spiders_state::ic60_74123_output_changed)
+void spiders_state::ic60_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
 	pia2->ca1_w(data);
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
  *
  *************************************/
 
-WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
+void spiders_state::gfx_rom_intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
 	m_gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
@@ -387,7 +387,7 @@ WRITE8_MEMBER(spiders_state::gfx_rom_intf_w)
 }
 
 
-READ8_MEMBER(spiders_state::gfx_rom_r)
+uint8_t spiders_state::gfx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret;
 

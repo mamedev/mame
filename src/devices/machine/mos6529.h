@@ -78,8 +78,8 @@ public:
 	template<class _Object> static devcb_base &set_p6_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p6_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_p7_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p7_handler.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( write_p0 ) { if (state) m_input |= 1; else m_input &= ~1; }
 	DECLARE_WRITE_LINE_MEMBER( write_p1 ) { if (state) m_input |= 2; else m_input &= ~2; }

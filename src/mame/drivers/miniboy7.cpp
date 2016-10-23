@@ -175,9 +175,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	DECLARE_WRITE8_MEMBER(ay_pa_w);
-	DECLARE_WRITE8_MEMBER(ay_pb_w);
-	DECLARE_READ8_MEMBER(pia_pb_r);
+	void ay_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
 
 	void machine_reset() override;
@@ -294,7 +294,7 @@ void miniboy7_state::machine_reset()
 	m_gpri = 0;
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pa_w)
+void miniboy7_state::ay_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ---x xxxx    lamps
 	// --x- ----    coins lockout
@@ -316,7 +316,7 @@ WRITE8_MEMBER(miniboy7_state::ay_pa_w)
 
 }
 
-WRITE8_MEMBER(miniboy7_state::ay_pb_w)
+void miniboy7_state::ay_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// ---- xxxx    unused
 	// -xxx ----    HCD
@@ -325,7 +325,7 @@ WRITE8_MEMBER(miniboy7_state::ay_pb_w)
 	m_ay_pb = data;
 }
 
-READ8_MEMBER(miniboy7_state::pia_pb_r)
+uint8_t miniboy7_state::pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }

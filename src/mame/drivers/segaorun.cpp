@@ -298,19 +298,19 @@ const uint32_t MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
 //  unknown ports
 //-------------------------------------------------
 
-READ8_MEMBER( segaorun_state::unknown_porta_r )
+uint8_t segaorun_state::unknown_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%06X:read from 8255 port A\n", m_maincpu->pc());
 	return 0;
 }
 
-READ8_MEMBER( segaorun_state::unknown_portb_r )
+uint8_t segaorun_state::unknown_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%06X:read from 8255 port B\n", m_maincpu->pc());
 	return 0;
 }
 
-READ8_MEMBER( segaorun_state::unknown_portc_r )
+uint8_t segaorun_state::unknown_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%06X:read from 8255 port C\n", m_maincpu->pc());
 	return 0;
@@ -322,12 +322,12 @@ READ8_MEMBER( segaorun_state::unknown_portc_r )
 //  unknown ports
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::unknown_porta_w )
+void segaorun_state::unknown_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%06X:write %02X to 8255 port A\n", m_maincpu->pc(), data);
 }
 
-WRITE8_MEMBER( segaorun_state::unknown_portb_w )
+void segaorun_state::unknown_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%06X:write %02X to 8255 port B\n", m_maincpu->pc(), data);
 }
@@ -338,7 +338,7 @@ WRITE8_MEMBER( segaorun_state::unknown_portb_w )
 //  sound interrupt control
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::video_control_w )
+void segaorun_state::video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PPI Output port C:
 	//  D7: SG1 -- connects to sprite chip
@@ -359,7 +359,7 @@ WRITE8_MEMBER( segaorun_state::video_control_w )
 //  for deluxe cabs
 //-------------------------------------------------
 
-READ8_MEMBER( segaorun_state::bankmotor_limit_r )
+uint8_t segaorun_state::bankmotor_limit_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0xff;
 
@@ -392,7 +392,7 @@ READ8_MEMBER( segaorun_state::bankmotor_limit_r )
 //  for deluxe cabs
 //-------------------------------------------------
 
-WRITE8_MEMBER( segaorun_state::bankmotor_control_w )
+void segaorun_state::bankmotor_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// PPI Output port B
 	data &= 0x0f;
@@ -501,7 +501,7 @@ void segaorun_state::mapper_sound_w(uint8_t data)
 //  misc_io_r - miscellaneous I/O reads
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::misc_io_r )
+uint16_t segaorun_state::misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
@@ -515,7 +515,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 //  misc_io_w - miscellaneous I/O writes
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::misc_io_w )
+void segaorun_state::misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (!m_custom_io_w.isnull())
 	{
@@ -531,7 +531,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 //  nop_w - no-op write when mapping ROMs as RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::nop_w )
+void segaorun_state::nop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -546,7 +546,7 @@ WRITE16_MEMBER( segaorun_state::nop_w )
 //  the sound latch
 //-------------------------------------------------
 
-READ8_MEMBER( segaorun_state::sound_data_r )
+uint8_t segaorun_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
@@ -678,7 +678,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
 //  for Out Run
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::outrun_custom_io_r )
+uint16_t segaorun_state::outrun_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x7f/2;
 	switch (offset & 0x70/2)
@@ -713,7 +713,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 //  for Out Run
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
+void segaorun_state::outrun_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x7f/2;
 	switch (offset & 0x70/2)
@@ -764,7 +764,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 //  for Super Hang-On
 //-------------------------------------------------
 
-READ16_MEMBER( segaorun_state::shangon_custom_io_r )
+uint16_t segaorun_state::shangon_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	offset &= 0x303f/2;
 	switch (offset)
@@ -796,7 +796,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 //  for Super Hang-On
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
+void segaorun_state::shangon_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= 0x303f/2;
 	switch (offset)

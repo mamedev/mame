@@ -33,12 +33,12 @@ public:
 
 	virtual void update_interrupts() override;
 
-	DECLARE_WRITE16_MEMBER(interrupt_scan_w);
-	DECLARE_WRITE16_MEMBER(paletteram_w);
-	DECLARE_WRITE16_MEMBER(intensity_w);
-	DECLARE_WRITE16_MEMBER(xscroll_w);
-	DECLARE_WRITE16_MEMBER(yscroll_w);
-	DECLARE_WRITE16_MEMBER(slip_w);
+	void interrupt_scan_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void intensity_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void slip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);

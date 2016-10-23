@@ -105,12 +105,12 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(portc0_w );
-	DECLARE_WRITE8_MEMBER(portc8_w );
-	DECLARE_WRITE8_MEMBER(portcc_w );
-	DECLARE_READ8_MEMBER(portc4_r);
-	DECLARE_READ8_MEMBER(portd0_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portc4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t portd0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
@@ -118,10 +118,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	void init_bigbord2();
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_device<palette_device> m_palette;
 
@@ -157,7 +157,7 @@ private:
 };
 
 // Eprom programming port
-WRITE8_MEMBER( bigbord2_state::portc0_w )
+void bigbord2_state::portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -171,7 +171,7 @@ WRITE8_MEMBER( bigbord2_state::portc0_w )
     6 = DIPSW 3
     7 = DIPSW 4 */
 
-READ8_MEMBER( bigbord2_state::portc4_r )
+uint8_t bigbord2_state::portc4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_status | 3 | (m_c8[6]<<2) | m_dsw->read();
 	m_term_status = 0;
@@ -180,14 +180,14 @@ READ8_MEMBER( bigbord2_state::portc4_r )
 
 // KBD port - read ascii value of key pressed
 
-READ8_MEMBER( bigbord2_state::portd0_r )
+uint8_t bigbord2_state::portd0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-WRITE8_MEMBER( bigbord2_state::kbd_put )
+void bigbord2_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data)
 	{
@@ -224,22 +224,22 @@ WRITE_LINE_MEMBER( bigbord2_state::busreq_w )
 	m_dma->bai_w(state); // tell dma that bus has been granted
 }
 
-READ8_MEMBER( bigbord2_state::memory_read_byte )
+uint8_t bigbord2_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mem->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::memory_write_byte )
+void bigbord2_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mem->write_byte(offset, data);
 }
 
-READ8_MEMBER( bigbord2_state::io_read_byte )
+uint8_t bigbord2_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_io->read_byte(offset);
 }
 
-WRITE8_MEMBER( bigbord2_state::io_write_byte )
+void bigbord2_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io->write_byte(offset, data);
 }
@@ -248,7 +248,7 @@ WRITE8_MEMBER( bigbord2_state::io_write_byte )
 /* Read/Write Handlers */
 
 
-WRITE8_MEMBER( bigbord2_state::portc8_w )
+void bigbord2_state::portc8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -313,7 +313,7 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 	}
 }
 
-WRITE8_MEMBER( bigbord2_state::portcc_w )
+void bigbord2_state::portcc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

@@ -35,15 +35,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
-	DECLARE_READ8_MEMBER(key_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(ff_r);
-	DECLARE_READ8_MEMBER(unk_r);
-	DECLARE_READ8_MEMBER(tape_r);
-	DECLARE_WRITE8_MEMBER(tape_w);
-	DECLARE_READ8_MEMBER(tape_stop_r);
-	DECLARE_READ8_MEMBER(tape_start_r);
-	DECLARE_WRITE8_MEMBER(xor_display_w);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tape_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tape_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tape_stop_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t tape_start_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void xor_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	bool m_tape_switch;
 	required_shared_ptr<uint8_t> m_p_wram;
 	uint8_t *m_p_chargen;
@@ -97,14 +97,14 @@ uint32_t bmjr_state::screen_update_bmjr(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER( bmjr_state::key_r )
+uint8_t bmjr_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"KEY%X", m_key_mux);
 	return (ioport(kbdrow)->read() & 15) | (ioport("KEYMOD")->read() << 4);
 }
 
-WRITE8_MEMBER( bmjr_state::key_w )
+void bmjr_state::key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_key_mux = data & 0xf;
 
@@ -113,24 +113,24 @@ WRITE8_MEMBER( bmjr_state::key_w )
 }
 
 
-READ8_MEMBER( bmjr_state::ff_r )
+uint8_t bmjr_state::ff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( bmjr_state::unk_r )
+uint8_t bmjr_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x30;
 }
 
-READ8_MEMBER( bmjr_state::tape_r )
+uint8_t bmjr_state::tape_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 
 	return ((m_cass->input()) > 0.03) ? 0xff : 0x00;
 }
 
-WRITE8_MEMBER( bmjr_state::tape_w )
+void bmjr_state::tape_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(!m_tape_switch)
 	{
@@ -143,7 +143,7 @@ WRITE8_MEMBER( bmjr_state::tape_w )
 	}
 }
 
-READ8_MEMBER( bmjr_state::tape_stop_r )
+uint8_t bmjr_state::tape_stop_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_tape_switch = 0;
 	//m_cass->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
@@ -151,14 +151,14 @@ READ8_MEMBER( bmjr_state::tape_stop_r )
 	return 0x01;
 }
 
-READ8_MEMBER( bmjr_state::tape_start_r )
+uint8_t bmjr_state::tape_start_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_tape_switch = 1;
 	m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	return 0x01;
 }
 
-WRITE8_MEMBER( bmjr_state::xor_display_w )
+void bmjr_state::xor_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_xor_display = data;
 }

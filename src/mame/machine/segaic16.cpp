@@ -59,7 +59,7 @@ sega_16bit_common_base::sega_16bit_common_base(const machine_config &mconfig, de
 //  unmapped address
 //-------------------------------------------------
 
-READ16_MEMBER( sega_16bit_common_base::open_bus_r )
+uint16_t sega_16bit_common_base::open_bus_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// Unmapped memory returns the last word on the data bus, which is almost always the opcode
 	// of the next instruction due to prefetch; however, since we may be encrypted, we actually
@@ -140,7 +140,7 @@ void sega_16bit_common_base::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
+void sega_16bit_common_base::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -164,7 +164,7 @@ WRITE16_MEMBER( sega_16bit_common_base::paletteram_w )
 	m_palette->set_pen_color(offset + 2 * m_palette_entries, m_palette_hilight[r], m_palette_hilight[g], m_palette_hilight[b]);
 }
 
-WRITE16_MEMBER( sega_16bit_common_base::philko_paletteram_w )
+void sega_16bit_common_base::philko_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)
@@ -251,7 +251,7 @@ void sega_315_5195_mapper_device::static_set_sound_readwrite(device_t &device, s
 //  write - handle a write to the memory mapper
 //-------------------------------------------------
 
-WRITE8_MEMBER( sega_315_5195_mapper_device::write )
+void sega_315_5195_mapper_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// wraps every 32 bytes
 	offset &= 0x1f;
@@ -338,7 +338,7 @@ if (LOG_MEMORY_MAP) osd_printf_debug("(Write %02X = %02X)\n", offset, data);
 //  read - handle a read from the memory mapper
 //-------------------------------------------------
 
-READ8_MEMBER( sega_315_5195_mapper_device::read )
+uint8_t sega_315_5195_mapper_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// wraps every 32 bytes
 	offset &= 0x1f;
@@ -748,7 +748,7 @@ sega_315_5248_multiplier_device::sega_315_5248_multiplier_device(const machine_c
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5248_multiplier_device::read )
+uint16_t sega_315_5248_multiplier_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 3)
 	{
@@ -770,7 +770,7 @@ READ16_MEMBER( sega_315_5248_multiplier_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5248_multiplier_device::write )
+void sega_315_5248_multiplier_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// only low bit matters
 	COMBINE_DATA(&m_regs[offset & 1]);
@@ -816,7 +816,7 @@ sega_315_5249_divider_device::sega_315_5249_divider_device(const machine_config 
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5249_divider_device::read )
+uint16_t sega_315_5249_divider_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// 8 effective read registers
 	switch (offset & 7)
@@ -836,7 +836,7 @@ READ16_MEMBER( sega_315_5249_divider_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5249_divider_device::write )
+void sega_315_5249_divider_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_DIVIDE) logerror("divide_w(%X) = %04X\n", offset, data);
 
@@ -1007,7 +1007,7 @@ bool sega_315_5250_compare_timer_device::clock()
 //  read - read the registers
 //-------------------------------------------------
 
-READ16_MEMBER( sega_315_5250_compare_timer_device::read )
+uint16_t sega_315_5250_compare_timer_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (LOG_COMPARE) logerror("compare_r(%X) = %04X\n", offset, m_regs[offset]);
 	switch (offset & 15)
@@ -1031,7 +1031,7 @@ READ16_MEMBER( sega_315_5250_compare_timer_device::read )
 //  write - write to the registers
 //-------------------------------------------------
 
-WRITE16_MEMBER( sega_315_5250_compare_timer_device::write )
+void sega_315_5250_compare_timer_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (LOG_COMPARE) logerror("compare_w(%X) = %04X\n", offset, data);
 	switch (offset & 15)

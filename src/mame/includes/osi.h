@@ -54,9 +54,9 @@ public:
 	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ8_MEMBER( keyboard_r );
-	DECLARE_WRITE8_MEMBER( keyboard_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
 	DECLARE_WRITE_LINE_MEMBER( write_cassette_clock );
 
@@ -118,8 +118,8 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
-	DECLARE_WRITE8_MEMBER( osi630_sound_w );
+	void osi630_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void osi630_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_c1p();
 };
 
@@ -132,9 +132,9 @@ public:
 		m_floppy1(*this, "floppy1")
 	{ }
 
-	DECLARE_READ8_MEMBER( osi470_pia_pa_r );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pa_w );
-	DECLARE_WRITE8_MEMBER( osi470_pia_pb_w );
+	uint8_t osi470_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void osi470_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void osi470_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
 
 protected:
@@ -155,7 +155,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( keyboard_w );
+	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 /* ---------- defined in video/osi.c ---------- */

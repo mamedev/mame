@@ -475,19 +475,19 @@ public:
 	int m_m5205_sambit0;
 	int m_m5205_sambit1;
 
-	DECLARE_READ8_MEMBER(banked_ram_r);
-	DECLARE_WRITE8_MEMBER(banked_ram_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_READ8_MEMBER(backupram_r);
-	DECLARE_WRITE8_MEMBER(backupram_w);
-	DECLARE_WRITE8_MEMBER(backupram_enable_w);
-	DECLARE_WRITE8_MEMBER(msm5205_sambit0_w);
-	DECLARE_WRITE8_MEMBER(msm5205_sambit1_w);
-	DECLARE_WRITE8_MEMBER(msm5205_data_w);
-	DECLARE_WRITE8_MEMBER(irq0_ack_w);
-	DECLARE_READ8_MEMBER(port_38_read);
-	DECLARE_READ8_MEMBER(nmi_read);
-	DECLARE_WRITE8_MEMBER(msm5205_reset_w);
+	uint8_t banked_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void banked_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t backupram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void backupram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void backupram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_sambit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_sambit1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void msm5205_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq0_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_38_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nmi_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void msm5205_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	virtual void machine_start() override;
@@ -555,7 +555,7 @@ uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Access to Banked RAM */
 
-READ8_MEMBER(mastboy_state::banked_ram_r)
+uint8_t mastboy_state::banked_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ((m_bank&0x80) == 0x00)
 	{
@@ -586,7 +586,7 @@ READ8_MEMBER(mastboy_state::banked_ram_r)
 	}
 }
 
-WRITE8_MEMBER(mastboy_state::banked_ram_w)
+void mastboy_state::banked_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_bank&0x80) == 0x00)
 	{
@@ -619,7 +619,7 @@ WRITE8_MEMBER(mastboy_state::banked_ram_w)
 	}
 }
 
-WRITE8_MEMBER(mastboy_state::bank_w)
+void mastboy_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// controls access to banked ram / rom
 	m_bank = data;
@@ -627,12 +627,12 @@ WRITE8_MEMBER(mastboy_state::bank_w)
 
 /* Backup RAM access */
 
-READ8_MEMBER(mastboy_state::backupram_r)
+uint8_t mastboy_state::backupram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[offset];
 }
 
-WRITE8_MEMBER(mastboy_state::backupram_w)
+void mastboy_state::backupram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  if (m_backupram_enabled)
 //  {
@@ -644,7 +644,7 @@ WRITE8_MEMBER(mastboy_state::backupram_w)
 //  }
 }
 
-WRITE8_MEMBER(mastboy_state::backupram_enable_w)
+void mastboy_state::backupram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This is some kind of enable / disable control for backup ram (see Charles's notes) but I'm not
 	   sure how it works in practice, if we use it then it writes a lot of data with it disabled */
@@ -653,7 +653,7 @@ WRITE8_MEMBER(mastboy_state::backupram_enable_w)
 
 /* MSM5205 Related */
 
-WRITE8_MEMBER(mastboy_state::msm5205_sambit0_w)
+void mastboy_state::msm5205_sambit0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m5205_sambit0 = data & 1;
 	m_msm->playmode_w((1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
@@ -661,7 +661,7 @@ WRITE8_MEMBER(mastboy_state::msm5205_sambit0_w)
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_MEMBER(mastboy_state::msm5205_sambit1_w)
+void mastboy_state::msm5205_sambit1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m5205_sambit1 = data & 1;
 
@@ -670,13 +670,13 @@ WRITE8_MEMBER(mastboy_state::msm5205_sambit1_w)
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
-WRITE8_MEMBER(mastboy_state::msm5205_reset_w)
+void mastboy_state::msm5205_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m5205_part = 0;
 	m_msm->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(mastboy_state::msm5205_data_w)
+void mastboy_state::msm5205_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_m5205_next = data;
 }
@@ -694,7 +694,7 @@ WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
 
 /* Interrupt Handling */
 
-WRITE8_MEMBER(mastboy_state::irq0_ack_w)
+void mastboy_state::irq0_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)
@@ -743,12 +743,12 @@ ADDRESS_MAP_END
 
 /* Ports */
 
-READ8_MEMBER(mastboy_state::port_38_read)
+uint8_t mastboy_state::port_38_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x00;
 }
 
-READ8_MEMBER(mastboy_state::nmi_read)
+uint8_t mastboy_state::nmi_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// this is read in the NMI, it's related to the Z180 MMU I think, must return right value or game jumps to 0000
 	return 0x00;

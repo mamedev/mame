@@ -52,16 +52,16 @@ public:
 	virtual ~device_vcs_cart_interface();
 
 	// reading from ROM
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
+	virtual uint8_t read_rom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
 	// writing to RAM chips (sometimes it is in a different range than write_bank!)
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	// read/write to bankswitch address
-	virtual DECLARE_READ8_MEMBER(read_bank) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_bank) {}
+	virtual uint8_t read_bank(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	// direct update handler
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase) { return address; }
+	virtual offs_t cart_opbase(direct_read_data &direct, offs_t address) { return address; }
 
 	virtual void setup_addon_ptr(uint8_t *ptr) {}
 
@@ -116,11 +116,11 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ8_MEMBER(read_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	virtual DECLARE_DIRECT_UPDATE_MEMBER(cart_opbase);
+	virtual uint8_t read_rom(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_bank(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_bank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual offs_t cart_opbase(direct_read_data &direct, offs_t address);
 
 private:
 	device_vcs_cart_interface*       m_cart;

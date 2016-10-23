@@ -283,7 +283,7 @@ offs_t i8244_device::fix_register_mirrors( offs_t offset )
 }
 
 
-READ8_MEMBER(i8244_device::read)
+uint8_t i8244_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -333,7 +333,7 @@ READ8_MEMBER(i8244_device::read)
 }
 
 
-WRITE8_MEMBER(i8244_device::write)
+void i8244_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = fix_register_mirrors( offset );
 

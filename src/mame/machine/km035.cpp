@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER( km035_device::write_rxd )
 //  p1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( km035_device::p1_w )
+void km035_device::p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sense = 0;
 
@@ -338,19 +338,19 @@ WRITE8_MEMBER( km035_device::p1_w )
 	m_tx_handler(!BIT(data, 3));
 }
 
-WRITE8_MEMBER( km035_device::p2_w )
+void km035_device::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2,0,( "p2_w %02x\n", data ));
 
 	m_p2 = data;
 }
 
-READ8_MEMBER( km035_device::p1_r )
+uint8_t km035_device::p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p1;
 }
 
-READ8_MEMBER( km035_device::p2_r )
+uint8_t km035_device::p2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
@@ -359,7 +359,7 @@ READ8_MEMBER( km035_device::p2_r )
 //  bus_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( km035_device::bus_w )
+void km035_device::bus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	DBG_LOG(2,0,( "bus_w %02x\n", data));
 }
@@ -368,7 +368,7 @@ WRITE8_MEMBER( km035_device::bus_w )
 //  t0_r -
 //-------------------------------------------------
 
-READ8_MEMBER( km035_device::t0_r )
+uint8_t km035_device::t0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keylatch;
 }
@@ -377,7 +377,7 @@ READ8_MEMBER( km035_device::t0_r )
 //  t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( km035_device::t1_r )
+uint8_t km035_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rx;
 }

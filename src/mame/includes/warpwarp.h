@@ -52,18 +52,18 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	// warpwarp and bombbee
-	DECLARE_READ8_MEMBER(warpwarp_sw_r);
-	DECLARE_WRITE8_MEMBER(warpwarp_out0_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
-	DECLARE_WRITE8_MEMBER(warpwarp_videoram_w);
-	DECLARE_READ8_MEMBER(warpwarp_dsw1_r);
-	DECLARE_READ8_MEMBER(warpwarp_vol_r);
+	uint8_t warpwarp_sw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void warpwarp_out0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void warpwarp_out3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void warpwarp_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t warpwarp_dsw1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t warpwarp_vol_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	//geebee and navarone
-	DECLARE_READ8_MEMBER(geebee_in_r);
-	DECLARE_WRITE8_MEMBER(geebee_out6_w);
-	DECLARE_WRITE8_MEMBER(geebee_out7_w);
-	DECLARE_WRITE8_MEMBER(geebee_videoram_w);
+	uint8_t geebee_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void geebee_out6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void geebee_out7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void geebee_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	void init_navarone();

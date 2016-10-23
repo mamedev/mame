@@ -67,7 +67,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "includes/gotcha.h"
 
-WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
+void gotcha_state::gotcha_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #if 0
 	popmessage("%c%c%c%c %c%c%c%c %c%c%c%c",
@@ -87,7 +87,7 @@ WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 #endif
 }
 
-WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
+void gotcha_state::gotcha_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{

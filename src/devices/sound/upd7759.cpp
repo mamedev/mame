@@ -798,7 +798,7 @@ WRITE_LINE_MEMBER( upd7756_device::start_w )
 }
 
 
-WRITE8_MEMBER( upd775x_device::port_w )
+void upd775x_device::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* update the FIFO value */
 	m_fifo_in = data;

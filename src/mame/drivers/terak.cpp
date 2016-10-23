@@ -18,10 +18,10 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	DECLARE_READ16_MEMBER(terak_fdc_status_r);
-	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
-	DECLARE_READ16_MEMBER(terak_fdc_data_r);
-	DECLARE_WRITE16_MEMBER(terak_fdc_data_w);
+	uint16_t terak_fdc_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void terak_fdc_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t terak_fdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void terak_fdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t m_unit;
 	uint8_t m_cmd;
 	uint16_t m_data;
@@ -31,7 +31,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 };
 
-READ16_MEMBER( terak_state::terak_fdc_status_r )
+uint16_t terak_state::terak_fdc_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("terak_fdc_status_r\n");
 	if (m_cmd==3) {
@@ -41,20 +41,20 @@ READ16_MEMBER( terak_state::terak_fdc_status_r )
 	return 0;
 }
 
-WRITE16_MEMBER( terak_state::terak_fdc_command_w )
+void terak_state::terak_fdc_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_unit = (data >> 8) & 0x03;
 	m_cmd  = (data >> 1) & 0x07;
 	logerror("terak_fdc_command_w %04x [%d %d]\n",data,m_unit,m_cmd);
 }
 
-READ16_MEMBER( terak_state::terak_fdc_data_r )
+uint16_t terak_state::terak_fdc_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("terak_fdc_data_r\n");
 	return 0;
 }
 
-WRITE16_MEMBER( terak_state::terak_fdc_data_w )
+void terak_state::terak_fdc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("terak_fdc_data_w %04x\n",data);
 }

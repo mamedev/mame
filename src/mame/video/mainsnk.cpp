@@ -83,7 +83,7 @@ void mainsnk_state::video_start()
 }
 
 
-WRITE8_MEMBER(mainsnk_state::c600_w)
+void mainsnk_state::c600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank;
 	int total_elements = m_gfxdecode->gfx(0)->elements();
@@ -106,13 +106,13 @@ WRITE8_MEMBER(mainsnk_state::c600_w)
 	}
 }
 
-WRITE8_MEMBER(mainsnk_state::fgram_w)
+void mainsnk_state::fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(mainsnk_state::bgram_w)
+void mainsnk_state::bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

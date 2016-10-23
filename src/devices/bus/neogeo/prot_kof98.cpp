@@ -80,7 +80,7 @@ void kof98_prot_device::decrypt_68k(uint8_t* cpurom, uint32_t cpurom_size)
   The boards have an ALTERA chip (EPM7128SQC100-15) which is tied to 242-P1
 ***************************************************************/
 
-READ16_MEMBER(kof98_prot_device::protection_r)
+uint16_t kof98_prot_device::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_prot_state == 1)
 	{
@@ -105,7 +105,7 @@ READ16_MEMBER(kof98_prot_device::protection_r)
 
 
 /* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd worked out using real hw */
-WRITE16_MEMBER( kof98_prot_device::protection_w )
+void kof98_prot_device::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* info from razoola */
 	switch (data)

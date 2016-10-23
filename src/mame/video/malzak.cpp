@@ -80,7 +80,7 @@ uint32_t malzak_state::screen_update_malzak(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-WRITE8_MEMBER(malzak_state::malzak_playfield_w)
+void malzak_state::malzak_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int tile = ((m_malzak_x / 16) * 16) + (offset / 16);
 

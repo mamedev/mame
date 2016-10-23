@@ -47,22 +47,22 @@ public:
 	int m_adpcm_data;
 	int m_video_type;
 
-	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(nmi_ack_w);
-	DECLARE_WRITE8_MEMBER(adpcm_end_w);
-	DECLARE_READ8_MEMBER(dswa_l_r);
-	DECLARE_READ8_MEMBER(dswa_h_r);
-	DECLARE_READ8_MEMBER(dswb_l_r);
-	DECLARE_READ8_MEMBER(dswb_h_r);
-	DECLARE_WRITE8_MEMBER(txvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgscroll_w);
-	DECLARE_WRITE8_MEMBER(bgscroll_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(adpcm_start_w);
-	DECLARE_WRITE8_MEMBER(adpcm_vol_w);
+	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_end_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dswa_l_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dswa_h_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dswb_l_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t dswb_h_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void txvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void init_silkworm();

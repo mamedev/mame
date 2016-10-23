@@ -379,14 +379,14 @@ public:
 
 	required_device<segaxbd_state> m_subpcb;
 
-	DECLARE_READ16_MEMBER(shareram1_r) {
+	uint16_t shareram1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram1_w) {
+	void shareram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage1 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -394,14 +394,14 @@ public:
 			rampage1 = data & 0x00FF;
 		}
 	}
-	DECLARE_READ16_MEMBER(shareram2_r) {
+	uint16_t shareram2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			return shareram[address];
 		}
 		return 0xffff;
 	}
-	DECLARE_WRITE16_MEMBER(shareram2_w) {
+	void shareram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {
 		if (offset < 0x10) {
 			int address = (rampage2 << 4) + offset;
 			COMBINE_DATA(&shareram[address]);
@@ -462,7 +462,7 @@ void segaxbd_state::sound_data_w(uint8_t data)
 //  adc_w - handle reads from the ADC
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::adc_r )
+uint16_t segaxbd_state::adc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// on the write, latch the selected input port and stash the value
 	int which = (m_iochip_regs[0][2] >> 2) & 7;
@@ -481,7 +481,7 @@ READ16_MEMBER( segaxbd_state::adc_r )
 //  adc_w - handle writes to the ADC
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::adc_w )
+void segaxbd_state::adc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 }
 
@@ -529,7 +529,7 @@ inline uint16_t segaxbd_state::iochip_r(int which, int port, int inputval)
 //  chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::iochip_0_r )
+uint16_t segaxbd_state::iochip_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -567,7 +567,7 @@ READ16_MEMBER( segaxbd_state::iochip_0_r )
 //  chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iochip_0_w )
+void segaxbd_state::iochip_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// access is via the low 8 bits
 	if (!ACCESSING_BITS_0_7)
@@ -624,7 +624,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_0_w )
 //  chip
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::iochip_1_r )
+uint16_t segaxbd_state::iochip_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -659,7 +659,7 @@ READ16_MEMBER( segaxbd_state::iochip_1_r )
 //  chip
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iochip_1_w )
+void segaxbd_state::iochip_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// access is via the low 8 bits
 	if (!ACCESSING_BITS_0_7)
@@ -681,7 +681,7 @@ WRITE16_MEMBER( segaxbd_state::iochip_1_w )
 //  port
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::iocontrol_w )
+void segaxbd_state::iocontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -702,7 +702,7 @@ WRITE16_MEMBER( segaxbd_state::iocontrol_w )
 //  writes to this address for Line of Fire
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
+void segaxbd_state::loffire_sync0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -713,7 +713,7 @@ WRITE16_MEMBER( segaxbd_state::loffire_sync0_w )
 //  rascot_excs_r - /EXCS region reads for Rascot
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::rascot_excs_r )
+uint16_t segaxbd_state::rascot_excs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%06X:rascot_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 
@@ -728,7 +728,7 @@ READ16_MEMBER( segaxbd_state::rascot_excs_r )
 //  rascot_excs_w - /EXCS region writes for Rascot
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
+void segaxbd_state::rascot_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:rascot_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -739,7 +739,7 @@ WRITE16_MEMBER( segaxbd_state::rascot_excs_w )
 //  Super Monaco GP
 //-------------------------------------------------
 
-READ16_MEMBER( segaxbd_state::smgp_excs_r )
+uint16_t segaxbd_state::smgp_excs_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
 	return 0xffff;
@@ -751,7 +751,7 @@ READ16_MEMBER( segaxbd_state::smgp_excs_r )
 //  Super Monaco GP
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
+void segaxbd_state::smgp_excs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
 }
@@ -766,7 +766,7 @@ WRITE16_MEMBER( segaxbd_state::smgp_excs_w )
 //  sound_data_r - read latched sound data
 //-------------------------------------------------
 
-READ8_MEMBER( segaxbd_state::sound_data_r )
+uint8_t segaxbd_state::sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
@@ -1051,7 +1051,7 @@ void segaxbd_state::palette_init()
 //  paletteram_w - handle writes to palette RAM
 //-------------------------------------------------
 
-WRITE16_MEMBER( segaxbd_state::paletteram_w )
+void segaxbd_state::paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// compute the number of entries
 	if (m_palette_entries == 0)

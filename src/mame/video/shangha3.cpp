@@ -89,7 +89,7 @@ void shangha3_state::video_start()
 
 
 
-WRITE16_MEMBER(shangha3_state::flipscreen_w)
+void shangha3_state::flipscreen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -100,13 +100,13 @@ WRITE16_MEMBER(shangha3_state::flipscreen_w)
 	}
 }
 
-WRITE16_MEMBER(shangha3_state::gfxlist_addr_w)
+void shangha3_state::gfxlist_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_gfxlist_addr);
 }
 
 
-WRITE16_MEMBER(shangha3_state::blitter_go_w)
+void shangha3_state::blitter_go_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t *shangha3_ram = m_ram;
 	bitmap_ind16 &rawbitmap = m_rawbitmap;

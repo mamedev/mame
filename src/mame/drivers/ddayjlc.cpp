@@ -99,18 +99,18 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE8_MEMBER(prot_w);
-	DECLARE_WRITE8_MEMBER(char_bank_w);
-	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
-	DECLARE_WRITE8_MEMBER(ddayjlc_videoram_w);
-	DECLARE_WRITE8_MEMBER(sound_nmi_w);
-	DECLARE_WRITE8_MEMBER(main_nmi_w);
-	DECLARE_WRITE8_MEMBER(bg0_w);
-	DECLARE_WRITE8_MEMBER(bg1_w);
-	DECLARE_WRITE8_MEMBER(bg2_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
-	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
+	void prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddayjlc_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ddayjlc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void main_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8257_CH0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	void init_ddayjlc();
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
@@ -172,17 +172,17 @@ CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
 	return prot_data[m_prot_addr];
 }
 
-WRITE8_MEMBER(ddayjlc_state::prot_w)
+void ddayjlc_state::prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-WRITE8_MEMBER(ddayjlc_state::char_bank_w)
+void ddayjlc_state::char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_char_bank = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
+void ddayjlc_state::ddayjlc_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
@@ -191,33 +191,33 @@ WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(ddayjlc_state::ddayjlc_videoram_w)
+void ddayjlc_state::ddayjlc_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 }
 
 
-WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
+void ddayjlc_state::sound_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_enable = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
+void ddayjlc_state::main_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_nmi_enable = data;
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg0_w)
+void ddayjlc_state::bg0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg1_w)
+void ddayjlc_state::bg1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-WRITE8_MEMBER(ddayjlc_state::bg2_w)
+void ddayjlc_state::bg2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
@@ -226,19 +226,19 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 	membank("bank1")->set_entry(m_bgadr);
 }
 
-WRITE8_MEMBER(ddayjlc_state::sound_w)
+void ddayjlc_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
+void ddayjlc_state::i8257_CH0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_e00x_d[offset][m_e00x_l[offset]] = data;
 	m_e00x_l[offset] ^= 1;
 }
 
-WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
+void ddayjlc_state::i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!data)
 	{

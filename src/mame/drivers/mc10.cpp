@@ -64,15 +64,15 @@ public:
 	uint8_t m_pr_counter;
 	uint8_t m_pr_state;
 
-	DECLARE_READ8_MEMBER( mc10_bfff_r );
-	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
-	DECLARE_READ8_MEMBER( alice90_bfff_r );
-	DECLARE_WRITE8_MEMBER( alice32_bfff_w );
-	DECLARE_READ8_MEMBER( mc10_port1_r );
-	DECLARE_WRITE8_MEMBER( mc10_port1_w );
-	DECLARE_READ8_MEMBER( mc10_port2_r );
-	DECLARE_WRITE8_MEMBER( mc10_port2_w );
-	DECLARE_READ8_MEMBER( mc6847_videoram_r );
+	uint8_t mc10_bfff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc10_bfff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t alice90_bfff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void alice32_bfff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mc10_port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc10_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mc10_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mc10_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_mc10();
 	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
 };
@@ -82,7 +82,7 @@ public:
     MEMORY MAPPED I/O
 ***************************************************************************/
 
-READ8_MEMBER( mc10_state::mc10_bfff_r )
+uint8_t mc10_state::mc10_bfff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -98,7 +98,7 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 	return result;
 }
 
-READ8_MEMBER( mc10_state::alice90_bfff_r )
+uint8_t mc10_state::alice90_bfff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -121,7 +121,7 @@ READ8_MEMBER( mc10_state::alice90_bfff_r )
 	return result;
 }
 
-WRITE8_MEMBER( mc10_state::mc10_bfff_w )
+void mc10_state::mc10_bfff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 2 to 6, mc6847 mode lines */
 	m_mc6847->gm2_w(BIT(data, 2));
@@ -135,7 +135,7 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_dac->write(BIT(data, 7));
 }
 
-WRITE8_MEMBER( mc10_state::alice32_bfff_w )
+void mc10_state::alice32_bfff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 7, dac output */
 	m_dac->write(BIT(data, 7));
@@ -147,18 +147,18 @@ WRITE8_MEMBER( mc10_state::alice32_bfff_w )
 ***************************************************************************/
 
 /* keyboard strobe */
-READ8_MEMBER( mc10_state::mc10_port1_r )
+uint8_t mc10_state::mc10_port1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_keyboard_strobe;
 }
 
 /* keyboard strobe */
-WRITE8_MEMBER( mc10_state::mc10_port1_w )
+void mc10_state::mc10_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_strobe = data;
 }
 
-READ8_MEMBER( mc10_state::mc10_port2_r )
+uint8_t mc10_state::mc10_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xeb;
 
@@ -178,7 +178,7 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	return result;
 }
 
-WRITE8_MEMBER( mc10_state::mc10_port2_w )
+void mc10_state::mc10_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0, cassette & printer output */
 	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
@@ -214,7 +214,7 @@ WRITE8_MEMBER( mc10_state::mc10_port2_w )
     VIDEO EMULATION
 ***************************************************************************/
 
-READ8_MEMBER( mc10_state::mc6847_videoram_r )
+uint8_t mc10_state::mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == ~0) return 0xff;
 	m_mc6847->inv_w(BIT(m_ram_base[offset], 6));

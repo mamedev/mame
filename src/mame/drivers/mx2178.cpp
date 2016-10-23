@@ -40,8 +40,8 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -81,7 +81,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mx2178 )
 INPUT_PORTS_END
 
-READ8_MEMBER( mx2178_state::keyin_r )
+uint8_t mx2178_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset)
 	{
@@ -93,7 +93,7 @@ READ8_MEMBER( mx2178_state::keyin_r )
 		return (m_term_data) ? 0x83 : 0x82;
 }
 
-WRITE8_MEMBER( mx2178_state::kbd_put )
+void mx2178_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 	m_maincpu->set_input_line(0, HOLD_LINE);

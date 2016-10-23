@@ -205,7 +205,7 @@ void msx_slot_disk1_device::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_slot_disk1_device::read)
+uint8_t msx_slot_disk1_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -242,7 +242,7 @@ READ8_MEMBER(msx_slot_disk1_device::read)
 }
 
 
-WRITE8_MEMBER(msx_slot_disk1_device::write)
+void msx_slot_disk1_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -354,7 +354,7 @@ void msx_slot_disk2_device::set_control(uint8_t data)
 }
 
 
-READ8_MEMBER(msx_slot_disk2_device::read)
+uint8_t msx_slot_disk2_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -383,7 +383,7 @@ READ8_MEMBER(msx_slot_disk2_device::read)
 }
 
 
-WRITE8_MEMBER(msx_slot_disk2_device::write)
+void msx_slot_disk2_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -429,7 +429,7 @@ msx_slot_disk3_device::msx_slot_disk3_device(const machine_config &mconfig, cons
 }
 
 
-WRITE8_MEMBER(msx_slot_disk3_device::write)
+void msx_slot_disk3_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -452,7 +452,7 @@ WRITE8_MEMBER(msx_slot_disk3_device::write)
 }
 
 
-READ8_MEMBER(msx_slot_disk3_device::read)
+uint8_t msx_slot_disk3_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -475,7 +475,7 @@ msx_slot_disk4_device::msx_slot_disk4_device(const machine_config &mconfig, cons
 }
 
 
-WRITE8_MEMBER(msx_slot_disk4_device::write)
+void msx_slot_disk4_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -501,7 +501,7 @@ WRITE8_MEMBER(msx_slot_disk4_device::write)
 }
 
 
-READ8_MEMBER(msx_slot_disk4_device::read)
+uint8_t msx_slot_disk4_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -592,7 +592,7 @@ void msx_slot_disk5_device::set_control(uint8_t control)
 }
 
 
-READ8_MEMBER(msx_slot_disk5_device::io_read)
+uint8_t msx_slot_disk5_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -616,7 +616,7 @@ READ8_MEMBER(msx_slot_disk5_device::io_read)
 }
 
 
-WRITE8_MEMBER(msx_slot_disk5_device::io_write)
+void msx_slot_disk5_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -713,7 +713,7 @@ void msx_slot_disk6_device::set_side_motor()
 }
 
 
-READ8_MEMBER(msx_slot_disk6_device::read)
+uint8_t msx_slot_disk6_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -759,7 +759,7 @@ READ8_MEMBER(msx_slot_disk6_device::read)
 }
 
 
-WRITE8_MEMBER(msx_slot_disk6_device::write)
+void msx_slot_disk6_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

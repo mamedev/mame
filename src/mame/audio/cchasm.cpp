@@ -13,7 +13,7 @@
 #include "sound/ay8910.h"
 
 
-WRITE8_MEMBER(cchasm_state::reset_coin_flag_w)
+void cchasm_state::reset_coin_flag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_coin_flag)
 	{
@@ -31,27 +31,27 @@ INPUT_CHANGED_MEMBER(cchasm_state::set_coin_flag )
 	}
 }
 
-READ8_MEMBER(cchasm_state::coin_sound_r)
+uint8_t cchasm_state::coin_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t coin = (ioport("IN3")->read() >> 4) & 0x7;
 	return m_sound_flags | (m_coin_flag << 3) | coin;
 }
 
-READ8_MEMBER(cchasm_state::soundlatch2_r)
+uint8_t cchasm_state::soundlatch2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_sound_flags &= ~0x80;
 	m_ctc->trg2(0);
 	return m_soundlatch2->read(space, offset);
 }
 
-WRITE8_MEMBER(cchasm_state::soundlatch4_w)
+void cchasm_state::soundlatch4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_flags |= 0x40;
 	m_soundlatch4->write(space, offset, data);
 	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-WRITE16_MEMBER(cchasm_state::io_w)
+void cchasm_state::io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//static int led;
 
@@ -76,7 +76,7 @@ WRITE16_MEMBER(cchasm_state::io_w)
 	}
 }
 
-READ16_MEMBER(cchasm_state::io_r)
+uint16_t cchasm_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & 0xf)
 	{

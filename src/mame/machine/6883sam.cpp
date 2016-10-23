@@ -353,7 +353,7 @@ void sam6883_device::set_bank_offset(int bank, offs_t offset)
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER( sam6883_device::read )
+uint8_t sam6883_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
@@ -364,7 +364,7 @@ READ8_MEMBER( sam6883_device::read )
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER( sam6883_device::write )
+void sam6883_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* alter the SAM state */
 	uint16_t xorval = alter_sam_state(offset);

@@ -56,12 +56,12 @@ void k054338_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE16_MEMBER( k054338_device::word_w )
+void k054338_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_regs + offset);
 }
 
-WRITE32_MEMBER( k054338_device::long_w )
+void k054338_device::long_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offset <<= 1;
 	word_w(space, offset, data >> 16, mem_mask >> 16);
@@ -211,7 +211,7 @@ void k054338_device::export_config( int **shd_rgb )
 
 // debug handler
 
-READ16_MEMBER( k054338_device::word_r )
+uint16_t k054338_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return(m_regs[offset]);
 }       // CLTC

@@ -69,20 +69,20 @@ public:
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
 
-	DECLARE_READ8_MEMBER( ddr_r );
-	DECLARE_WRITE8_MEMBER( ddr_w );
-	DECLARE_READ8_MEMBER( ports_r );
-	DECLARE_WRITE8_MEMBER( ports_w );
-	DECLARE_READ8_MEMBER( pll_r );
-	DECLARE_WRITE8_MEMBER( pll_w );
-	DECLARE_READ8_MEMBER( timer_ctrl_r );
-	DECLARE_WRITE8_MEMBER( timer_ctrl_w );
-	DECLARE_READ8_MEMBER( timer_counter_r );
-	DECLARE_WRITE8_MEMBER( timer_counter_w );
-	DECLARE_READ8_MEMBER( onesec_r );
-	DECLARE_WRITE8_MEMBER( onesec_w );
-	DECLARE_READ8_MEMBER( pram_r );
-	DECLARE_WRITE8_MEMBER( pram_w );
+	uint8_t ddr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ports_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pll_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void timer_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t onesec_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void onesec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// interface routines
 	uint8_t get_xcvr_session() { return xcvr_session; }

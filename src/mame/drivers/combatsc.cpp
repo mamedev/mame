@@ -135,7 +135,7 @@ Dip location and recommended settings verified with the US manual
  *
  *************************************/
 
-WRITE8_MEMBER(combatsc_state::combatsc_vreg_w)
+void combatsc_state::combatsc_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data != m_vreg)
 	{
@@ -148,20 +148,20 @@ WRITE8_MEMBER(combatsc_state::combatsc_vreg_w)
 	}
 }
 
-WRITE8_MEMBER(combatsc_state::combatscb_sh_irqtrigger_w)
+void combatsc_state::combatscb_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ8_MEMBER(combatsc_state::combatscb_io_r)
+uint8_t combatsc_state::combatscb_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
 
 	return ioport(portnames[offset])->read();
 }
 
-WRITE8_MEMBER(combatsc_state::combatscb_priority_w)
+void combatsc_state::combatscb_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x40)
 	{
@@ -179,7 +179,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_priority_w)
 	m_priority = data & 0x20;
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
+void combatsc_state::combatsc_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_priority = data & 0x20;
 
@@ -202,7 +202,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
 		membank("bank1")->set_entry(8 + (data & 1));
 }
 
-WRITE8_MEMBER(combatsc_state::combatscb_io_w)
+void combatsc_state::combatscb_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -213,7 +213,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_io_w)
 	}
 }
 
-WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
+void combatsc_state::combatscb_bankselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data & 0x40)
 	{
@@ -253,7 +253,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
 
 /****************************************************************************/
 
-WRITE8_MEMBER(combatsc_state::combatsc_coin_counter_w)
+void combatsc_state::combatsc_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* b7-b3: unused? */
 	/* b1: coin counter 2 */
@@ -263,7 +263,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-READ8_MEMBER(combatsc_state::trackball_r)
+uint8_t combatsc_state::trackball_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -298,15 +298,15 @@ READ8_MEMBER(combatsc_state::trackball_r)
 
 
 /* the protection is a simple multiply */
-WRITE8_MEMBER(combatsc_state::protection_w)
+void combatsc_state::protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_prot[offset] = data;
 }
-READ8_MEMBER(combatsc_state::protection_r)
+uint8_t combatsc_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ((m_prot[0] * m_prot[1]) >> (offset * 8)) & 0xff;
 }
-WRITE8_MEMBER(combatsc_state::protection_clock_w)
+void combatsc_state::protection_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x3f is written here every time before accessing the other registers */
 }
@@ -314,33 +314,33 @@ WRITE8_MEMBER(combatsc_state::protection_clock_w)
 
 /****************************************************************************/
 
-WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
+void combatsc_state::combatsc_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-READ8_MEMBER(combatsc_state::combatsc_busy_r)
+uint8_t combatsc_state::combatsc_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_play_w)
+void combatsc_state::combatsc_play_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->start_w(data & 2);
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_voice_reset_w)
+void combatsc_state::combatsc_voice_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 1);
 }
 
-WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
+void combatsc_state::combatsc_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* unknown. always write 0 */
 }
 
 // causes scores to disappear during fire ranges, either sprite busy flag or screen frame number related
-READ8_MEMBER(combatsc_state::unk_r)
+uint8_t combatsc_state::unk_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; //m_screen->frame_number() & 1;
 }
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 intercepted */
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(combatsc_state::combatscb_dac_w)
+void combatsc_state::combatscb_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(data & 0x60)
 		printf("%02x\n",data);

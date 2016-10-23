@@ -95,16 +95,16 @@ public:
 	uint16_t m_layer_en;
 	uint16_t m_scrollram[6];
 
-	DECLARE_READ16_MEMBER(mahjong_panel_r);
-	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
-	DECLARE_WRITE16_MEMBER(out_w);
-	DECLARE_READ16_MEMBER(system_r);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc0vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc1vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc2vram_w);
-	DECLARE_WRITE16_MEMBER(seibucrtc_sc3vram_w);
-	DECLARE_WRITE16_MEMBER(layer_en_w);
-	DECLARE_WRITE16_MEMBER(layer_scroll_w);
+	uint16_t mahjong_panel_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mahjong_panel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t system_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void seibucrtc_sc0vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void seibucrtc_sc1vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void seibucrtc_sc2vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void seibucrtc_sc3vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
@@ -193,25 +193,25 @@ public:
 *
 *******************************/
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc0vram_w )
+void sengokmj_state::seibucrtc_sc0vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc0_vram[offset]);
 	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc2vram_w )
+void sengokmj_state::seibucrtc_sc2vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc2_vram[offset]);
 	m_sc2_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc1vram_w )
+void sengokmj_state::seibucrtc_sc1vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc1_vram[offset]);
 	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER( sengokmj_state::seibucrtc_sc3vram_w )
+void sengokmj_state::seibucrtc_sc3vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sc3_vram[offset]);
 	m_sc3_tilemap->mark_tile_dirty(offset);
@@ -342,7 +342,7 @@ void sengokmj_state::machine_start()
 
 
 /* Multiplexer device for the mahjong panel */
-READ16_MEMBER(sengokmj_state::mahjong_panel_r)
+uint16_t sengokmj_state::mahjong_panel_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	const char *const mpnames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int i;
@@ -357,7 +357,7 @@ READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 	return res;
 }
 
-WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
+void sengokmj_state::mahjong_panel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_mux_data = (data & 0x3f00) >> 8;
 
@@ -365,7 +365,7 @@ WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
 		logerror("Write to mux %04x\n",data);
 }
 
-WRITE16_MEMBER(sengokmj_state::out_w)
+void sengokmj_state::out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
 	/* ---- ---- ---- -x-- Coin counter (done AFTER you press start)*/
@@ -378,7 +378,7 @@ WRITE16_MEMBER(sengokmj_state::out_w)
 //  popmessage("%02x",m_hopper_io);
 }
 
-READ16_MEMBER(sengokmj_state::system_r)
+uint16_t sengokmj_state::system_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
@@ -551,12 +551,12 @@ INTERRUPT_GEN_MEMBER(sengokmj_state::interrupt)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_en_w )
+void sengokmj_state::layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_layer_en = data;
 }
 
-WRITE16_MEMBER( sengokmj_state::layer_scroll_w )
+void sengokmj_state::layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }

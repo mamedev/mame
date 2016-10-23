@@ -51,14 +51,14 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pce_common_state(mconfig, type, tag) { }
 
-	DECLARE_WRITE8_MEMBER(i8085_d000_w);
-	DECLARE_READ8_MEMBER(z80_io_01_r);
-	DECLARE_READ8_MEMBER(z80_io_02_r);
-	DECLARE_WRITE8_MEMBER(z80_io_17_w);
-	DECLARE_WRITE8_MEMBER(z80_io_37_w);
-	DECLARE_WRITE8_MEMBER(i8155_a_w);
-	DECLARE_WRITE8_MEMBER(i8155_b_w);
-	DECLARE_WRITE8_MEMBER(i8155_c_w);
+	void i8085_d000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t z80_io_01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t z80_io_02_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void z80_io_17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void z80_io_37_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
 };
 
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(paranoia_state::i8085_d000_w)
+void paranoia_state::i8085_d000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -112,21 +112,21 @@ static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x7000, 0x73ff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_MEMBER(paranoia_state::z80_io_01_r)
+uint8_t paranoia_state::z80_io_01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(paranoia_state::z80_io_02_r)
+uint8_t paranoia_state::z80_io_02_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(paranoia_state::z80_io_17_w)
+void paranoia_state::z80_io_17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(paranoia_state::z80_io_37_w)
+void paranoia_state::z80_io_37_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -138,17 +138,17 @@ static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE(z80_io_37_w )
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(paranoia_state::i8155_a_w)
+void paranoia_state::i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8155 Port A: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_b_w)
+void paranoia_state::i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8155 Port B: %02X\n", data);
 }
 
-WRITE8_MEMBER(paranoia_state::i8155_c_w)
+void paranoia_state::i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("i8155 Port C: %02X\n", data);
 }

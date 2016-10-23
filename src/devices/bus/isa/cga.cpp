@@ -1132,7 +1132,7 @@ void isa8_cga_device::plantronics_w(uint8_t data)
  *************************************************************************/
 
 
-READ8_MEMBER( isa8_cga_device::io_read )
+uint8_t isa8_cga_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
 	uint8_t data = 0xff;
@@ -1154,7 +1154,7 @@ READ8_MEMBER( isa8_cga_device::io_read )
 
 
 
-WRITE8_MEMBER( isa8_cga_device::io_write )
+void isa8_cga_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
 
@@ -1396,7 +1396,7 @@ MC6845_UPDATE_ROW( isa8_cga_pc1512_device::pc1512_gfx_4bpp_update_row )
 }
 
 
-WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
+void isa8_cga_pc1512_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
 
@@ -1496,7 +1496,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 }
 
 
-READ8_MEMBER( isa8_cga_pc1512_device::io_read )
+uint8_t isa8_cga_pc1512_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -1518,7 +1518,7 @@ READ8_MEMBER( isa8_cga_pc1512_device::io_read )
 }
 
 
-WRITE8_MEMBER( isa8_cga_pc1512_device::vram_w )
+void isa8_cga_pc1512_device::vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ( ( m_mode_control & 0x12 ) == 0x12 )
 	{
@@ -1625,7 +1625,7 @@ void isa8_wyse700_device::change_resolution(uint8_t mode)
 
 }
 
-WRITE8_MEMBER( isa8_wyse700_device::io_write )
+void isa8_wyse700_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1648,7 +1648,7 @@ WRITE8_MEMBER( isa8_wyse700_device::io_write )
 }
 
 
-READ8_MEMBER( isa8_wyse700_device::io_read )
+uint8_t isa8_wyse700_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -1790,7 +1790,7 @@ void isa8_ec1841_0002_device::device_reset()
 	m_p3df = 0;
 }
 
-WRITE8_MEMBER( isa8_ec1841_0002_device::char_ram_write )
+void isa8_ec1841_0002_device::char_ram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset ^= BIT(offset, 12);
 //  logerror("write char ram %04x %02x\n",offset,data);
@@ -1800,13 +1800,13 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::char_ram_write )
 	m_chr_gen_base[offset + 0x1800] = data;
 }
 
-READ8_MEMBER( isa8_ec1841_0002_device::char_ram_read )
+uint8_t isa8_ec1841_0002_device::char_ram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset ^= BIT(offset, 12);
 	return m_chr_gen_base[offset];
 }
 
-WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
+void isa8_ec1841_0002_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1832,7 +1832,7 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 	}
 }
 
-READ8_MEMBER( isa8_ec1841_0002_device::io_read )
+uint8_t isa8_ec1841_0002_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -1958,7 +1958,7 @@ MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
 	m_screen->configure(width, height, visarea, frame_period);
 }
 
-WRITE8_MEMBER( isa8_cga_m24_device::io_write )
+void isa8_cga_m24_device::io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mc6845_device *mc6845 = subdevice<mc6845_device>(CGA_MC6845_NAME);
 	switch(offset)
@@ -1999,7 +1999,7 @@ WRITE8_MEMBER( isa8_cga_m24_device::io_write )
 	}
 }
 
-READ8_MEMBER( isa8_cga_m24_device::io_read )
+uint8_t isa8_cga_m24_device::io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

@@ -288,7 +288,7 @@ void williams_state::create_palette_lookup()
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
+void williams2_state::williams2_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t ztable[16] =
 	{
@@ -313,7 +313,7 @@ WRITE8_MEMBER(williams2_state::williams2_paletteram_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_fg_select_w)
+void williams2_state::williams2_fg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_williams2_fg_color = data & 0x3f;
 }
@@ -326,7 +326,7 @@ WRITE8_MEMBER(williams2_state::williams2_fg_select_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::williams_video_counter_r)
+uint8_t williams_state::williams_video_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_screen->vpos() < 0x100)
 		return m_screen->vpos() & 0xfc;
@@ -376,7 +376,7 @@ TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_bg_select_w)
+void williams2_state::williams2_bg_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* based on the tilemap config, only certain bits are used */
 	/* the rest are determined by other factors */
@@ -401,21 +401,21 @@ WRITE8_MEMBER(williams2_state::williams2_bg_select_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_tileram_w)
+void williams2_state::williams2_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_williams2_tileram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_xscroll_low_w)
+void williams2_state::williams2_xscroll_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
+void williams2_state::williams2_xscroll_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tilemap_xscroll = (m_tilemap_xscroll & 0x00f) | (data << 4);
 	m_bg_tilemap->set_scrollx(0, (m_tilemap_xscroll & 7) + ((m_tilemap_xscroll >> 3) * 6));
@@ -429,14 +429,14 @@ WRITE8_MEMBER(williams2_state::williams2_xscroll_high_w)
  *
  *************************************/
 
-WRITE8_MEMBER(blaster_state::blaster_remap_select_w)
+void blaster_state::blaster_remap_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter_remap_index = data;
 	m_blitter_remap = m_blitter_remap_lookup.get() + data * 256;
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_video_control_w)
+void blaster_state::blaster_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blaster_video_control = data;
 }
@@ -473,7 +473,7 @@ void williams_state::blitter_init(int blitter_config, const uint8_t *remap_prom)
 }
 
 
-WRITE8_MEMBER(williams_state::williams_blitter_w)
+void williams_state::williams_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sstart, dstart, w, h, accesses;
 	int estimated_clocks_at_4MHz;
@@ -523,7 +523,7 @@ WRITE8_MEMBER(williams_state::williams_blitter_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_blit_window_enable_w)
+void williams2_state::williams2_blit_window_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_blitter_window_enable = data & 0x01;
 }

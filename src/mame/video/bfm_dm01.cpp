@@ -134,14 +134,14 @@ int bfmdm01_device::read_data(void)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfmdm01_device::control_r )
+uint8_t bfmdm01_device::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfmdm01_device::control_w )
+void bfmdm01_device::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int changed = m_control ^ data;
 
@@ -168,14 +168,14 @@ WRITE8_MEMBER( bfmdm01_device::control_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfmdm01_device::mux_r )
+uint8_t bfmdm01_device::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfmdm01_device::mux_w )
+void bfmdm01_device::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	g_profiler.start(PROFILER_USER2);
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( bfmdm01_device::mux_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfmdm01_device::comm_r )
+uint8_t bfmdm01_device::comm_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 
@@ -245,19 +245,19 @@ READ8_MEMBER( bfmdm01_device::comm_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfmdm01_device::comm_w )
+void bfmdm01_device::comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER( bfmdm01_device::unknown_r )
+uint8_t bfmdm01_device::unknown_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER( bfmdm01_device::unknown_w )
+void bfmdm01_device::unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_matrixcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE ); //?
 }

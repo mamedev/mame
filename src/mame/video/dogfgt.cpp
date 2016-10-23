@@ -84,12 +84,12 @@ void dogfgt_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_plane_select_w)
+void dogfgt_state::dogfgt_plane_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bm_plane = data;
 }
 
-READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
+uint8_t dogfgt_state::dogfgt_bitmapram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bm_plane > 2)
 	{
@@ -100,7 +100,7 @@ READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
 	return m_bitmapram[offset + BITMAPRAM_SIZE / 3 * m_bm_plane];
 }
 
-WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
+void dogfgt_state::internal_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x, y, subx;
 
@@ -124,7 +124,7 @@ WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 	}
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
+void dogfgt_state::dogfgt_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_bm_plane > 2)
 	{
@@ -135,20 +135,20 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
 	internal_bitmapram_w(space, offset + BITMAPRAM_SIZE / 3 * m_bm_plane, data);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_bgvideoram_w)
+void dogfgt_state::dogfgt_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_scroll_w)
+void dogfgt_state::dogfgt_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] + 256 * m_scroll[1] + 256);
 	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
 }
 
-WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
+void dogfgt_state::dogfgt_1800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);

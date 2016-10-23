@@ -116,7 +116,7 @@ votrax_sc01_device::votrax_sc01_device(const machine_config &mconfig, const char
 //  write - handle a write to the control register
 //-------------------------------------------------
 
-WRITE8_MEMBER( votrax_sc01_device::write )
+void votrax_sc01_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// flush out anything currently processing
 	m_stream->update();
@@ -146,7 +146,7 @@ osd_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%
 //  inflection bits
 //-------------------------------------------------
 
-WRITE8_MEMBER( votrax_sc01_device::inflection_w )
+void votrax_sc01_device::inflection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// only 2 bits matter
 	data &= 3;

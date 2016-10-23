@@ -104,24 +104,24 @@ write:
  *
  *************************************/
 
-READ8_MEMBER(mario_state::memory_read_byte)
+uint8_t mario_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER(mario_state::memory_write_byte)
+void mario_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.write_byte(offset, data);
 }
 
-WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
+void mario_state::mario_z80dma_rdy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80dma->rdy_w(data & 0x01);
 }
 
-WRITE8_MEMBER(mario_state::nmi_mask_w)
+void mario_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }

@@ -31,7 +31,7 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 
 /******************************************************************************/
 
-READ16_MEMBER(supbtime_state::supbtime_controls_r)
+uint16_t supbtime_state::supbtime_controls_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -50,7 +50,7 @@ READ16_MEMBER(supbtime_state::supbtime_controls_r)
 	return ~0;
 }
 
-WRITE16_MEMBER(supbtime_state::sound_w)
+void supbtime_state::sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);

@@ -132,31 +132,31 @@ PALETTE_INIT_MEMBER(kingofb_state,ringking)
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram_w)
+void kingofb_state::kingofb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram_w)
+void kingofb_state::kingofb_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_videoram2_w)
+void kingofb_state::kingofb_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_colorram2_w)
+void kingofb_state::kingofb_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(kingofb_state::kingofb_f800_w)
+void kingofb_state::kingofb_f800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data & 0x20;
 

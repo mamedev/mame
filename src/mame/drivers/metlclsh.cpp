@@ -46,12 +46,12 @@ metlclsh:
 
 ***************************************************************************/
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_cause_irq)
+void metlclsh_state::metlclsh_cause_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi)
+void metlclsh_state::metlclsh_ack_nmi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -83,22 +83,22 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_cause_nmi2)
+void metlclsh_state::metlclsh_cause_nmi2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_ack_irq2)
+void metlclsh_state::metlclsh_ack_irq2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi2)
+void metlclsh_state::metlclsh_ack_nmi2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
+void metlclsh_state::metlclsh_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

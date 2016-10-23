@@ -82,7 +82,7 @@ void badlands_state::video_start_badlands()
  *
  *************************************/
 
-WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
+void badlands_state::badlands_pf_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		if (m_playfield_tile_bank != (data & 1))

@@ -25,8 +25,8 @@ public:
 	// static configuration helpers
 	static void set_initial_value(device_t &device, uint8_t initial_value) { dynamic_cast<msx_systemflags_device &>(device).m_initial_value = initial_value; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	virtual void device_start() override;

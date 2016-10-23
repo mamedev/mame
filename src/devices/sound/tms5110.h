@@ -55,15 +55,15 @@ public:
 	template<class _Object> static devcb_base &set_data_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_data_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_romclk_callback(device_t &device, _Object object) { return downcast<tms5110_device &>(device).m_romclk_cb.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( ctl_w );
-	DECLARE_READ8_MEMBER( ctl_r );
+	void ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( pdc_w );
 
 	/* this is only used by cvs.c
 	 * it is not related at all to the speech generation
 	 * and conflicts with the new rom controller interface.
 	 */
-	DECLARE_READ8_MEMBER( romclk_hack_r );
+	uint8_t romclk_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_frequency(int frequency);
 protected:
@@ -280,7 +280,7 @@ class m58817_device : public tms5110_device
 public:
 	m58817_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( status_r );
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides
@@ -314,8 +314,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( data_r );
 
 	/* offset is rom # */
-	DECLARE_WRITE8_MEMBER( rom_csq_w );
-	DECLARE_WRITE8_MEMBER( bit_w );
+	void rom_csq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( enable_w );
 
 protected:

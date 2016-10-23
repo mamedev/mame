@@ -88,18 +88,18 @@ uint32_t neogeo_kof10th_cart::get_special_bank()
 	return m_special_bank;
 }
 
-READ16_MEMBER(neogeo_kof10th_cart::protection_r)
+uint16_t neogeo_kof10th_cart::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_cart_ram[offset];
 }
 
-READ16_MEMBER(neogeo_kof10th_cart::addon_r)
+uint16_t neogeo_kof10th_cart::addon_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	//  printf("kof10th_RAM2_r\n");
 	return m_cart_ram2[offset];
 }
 
-WRITE16_MEMBER(neogeo_kof10th_cart::protection_w)
+void neogeo_kof10th_cart::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x40000/2)
 	{

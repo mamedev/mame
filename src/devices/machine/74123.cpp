@@ -190,7 +190,7 @@ void ttl74123_device::start_pulse()
 //  a_w - write register a data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::a_w )
+void ttl74123_device::a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
 	if (!data && m_a && m_b && m_clear)
@@ -206,7 +206,7 @@ WRITE8_MEMBER( ttl74123_device::a_w )
 //  b_w - write register b data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::b_w)
+void ttl74123_device::b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
 	if (data && !m_b && !m_a && m_clear)
@@ -222,7 +222,7 @@ WRITE8_MEMBER( ttl74123_device::b_w)
 //  clear_w - write register clear data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::clear_w)
+void ttl74123_device::clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* start/regtrigger pulse if B=HI and A=LO and rising edge on clear */
 	if (data && !m_a && m_b && !m_clear)
@@ -243,7 +243,7 @@ WRITE8_MEMBER( ttl74123_device::clear_w)
 //  reset_w - reset device
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::reset_w)
+void ttl74123_device::reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_output();
 }

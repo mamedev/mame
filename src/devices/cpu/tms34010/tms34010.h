@@ -253,11 +253,11 @@ public:
 	uint32_t tms340x0_ind16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t tms340x0_rgb32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual DECLARE_WRITE16_MEMBER(io_register_w) = 0;
-	virtual DECLARE_READ16_MEMBER(io_register_r) = 0;
+	virtual void io_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) = 0;
+	virtual uint16_t io_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) = 0;
 
-	DECLARE_WRITE16_MEMBER(host_w);
-	DECLARE_READ16_MEMBER(host_r);
+	void host_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t host_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	TIMER_CALLBACK_MEMBER(internal_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
@@ -1023,8 +1023,8 @@ public:
 	tms34010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
-	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
+	virtual void io_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t io_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 8 - 1) / 8; }
@@ -1040,8 +1040,8 @@ public:
 	tms34020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */
-	virtual DECLARE_WRITE16_MEMBER( io_register_w ) override;
-	virtual DECLARE_READ16_MEMBER( io_register_r ) override;
+	virtual void io_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
+	virtual uint16_t io_register_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 
 protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }

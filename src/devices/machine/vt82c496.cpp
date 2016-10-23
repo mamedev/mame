@@ -64,14 +64,14 @@ void vt82c496_device::device_reset()
 	machine().root_device().membank("bios_f0_r")->set_base(m_rom+0x30000);
 }
 
-READ8_MEMBER(vt82c496_device::read)
+uint8_t vt82c496_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 1)
 		return m_reg[m_reg_select];
 	return 0x00;
 }
 
-WRITE8_MEMBER(vt82c496_device::write)
+void vt82c496_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 		m_reg_select = data;

@@ -11,9 +11,9 @@ public:
 	timeplt_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~timeplt_audio_device() {}
 
-	DECLARE_WRITE8_MEMBER( sh_irqtrigger_w );
-	DECLARE_WRITE8_MEMBER( filter_w );
-	DECLARE_READ8_MEMBER( portB_r );
+	void sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void filter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

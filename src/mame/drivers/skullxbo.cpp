@@ -63,7 +63,7 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 }
 
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_halt_until_hblank_0_w)
+void skullxbo_state::skullxbo_halt_until_hblank_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	halt_until_hblank_0(space.device(), *m_screen);
 }
@@ -83,7 +83,7 @@ void skullxbo_state::machine_reset_skullxbo()
  *
  *************************************/
 
-WRITE16_MEMBER(skullxbo_state::skullxbo_mobwr_w)
+void skullxbo_state::skullxbo_mobwr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("MOBWR[%02X] = %04X\n", offset, data);
 }

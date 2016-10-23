@@ -35,10 +35,10 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
-	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
-	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
-	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
+	void myb3k_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void myb3k_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void myb3k_video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void myb3k_fdc_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<palette_device> m_palette;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
@@ -105,19 +105,19 @@ uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-WRITE8_MEMBER( myb3k_state::myb3k_6845_address_w )
+void myb3k_state::myb3k_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER( myb3k_state::myb3k_6845_data_w )
+void myb3k_state::myb3k_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);
 }
 
-WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
+void myb3k_state::myb3k_video_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ---- -x-- interlace mode */
 	/* ---- --xx horizontal step count (number of offsets of vram RAM data to skip, 64 >> n) */
@@ -125,7 +125,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	m_vmode = data;
 
 }
-WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
+void myb3k_state::myb3k_fdc_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
 	floppy_image_device *floppy = nullptr;

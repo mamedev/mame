@@ -39,12 +39,12 @@ void midxunit_state::register_state_saving()
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_cmos_r)
+uint16_t midxunit_state::midxunit_cmos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_nvram[offset];
 }
 
-WRITE16_MEMBER(midxunit_state::midxunit_cmos_w)
+void midxunit_state::midxunit_cmos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_nvram+offset);
 }
@@ -56,7 +56,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_cmos_w)
  *
  *************************************/
 
-WRITE16_MEMBER(midxunit_state::midxunit_io_w)
+void midxunit_state::midxunit_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int oldword, newword;
 
@@ -91,7 +91,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_io_w)
 }
 
 
-WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
+void midxunit_state::midxunit_unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int offs = offset / 0x40000;
 
@@ -110,7 +110,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_unknown_w)
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_io_r)
+uint16_t midxunit_state::midxunit_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
@@ -132,7 +132,7 @@ READ16_MEMBER(midxunit_state::midxunit_io_r)
 }
 
 
-READ16_MEMBER(midxunit_state::midxunit_analog_r)
+uint16_t midxunit_state::midxunit_analog_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
@@ -140,14 +140,14 @@ READ16_MEMBER(midxunit_state::midxunit_analog_r)
 }
 
 
-WRITE16_MEMBER(midxunit_state::midxunit_analog_select_w)
+void midxunit_state::midxunit_analog_select_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
 		m_analog_port = data - 8;
 }
 
 
-READ16_MEMBER(midxunit_state::midxunit_status_r)
+uint16_t midxunit_state::midxunit_status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* low bit indicates whether the ADC is done reading the current input */
 	return (m_midway_serial_pic->status_r(space,0) << 1) | 1;
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(midxunit_state::midxunit_dcs_output_full)
 }
 
 
-READ16_MEMBER(midxunit_state::midxunit_uart_r)
+uint16_t midxunit_state::midxunit_uart_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int result = 0;
 
@@ -238,7 +238,7 @@ READ16_MEMBER(midxunit_state::midxunit_uart_r)
 }
 
 
-WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
+void midxunit_state::midxunit_uart_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* convert to a byte offset, ignoring MSB writes */
 	if ((offset & 1) || !ACCESSING_BITS_0_7)
@@ -319,19 +319,19 @@ void midxunit_state::machine_reset_midxunit()
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_security_r)
+uint16_t midxunit_state::midxunit_security_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_midway_serial_pic->read(space,0);
 }
 
-WRITE16_MEMBER(midxunit_state::midxunit_security_w)
+void midxunit_state::midxunit_security_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_security_bits = data & 0x0f;
 }
 
 
-WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
+void midxunit_state::midxunit_security_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
 		m_midway_serial_pic->write(space, 0, ((~data & 2) << 3) | m_security_bits);
@@ -345,7 +345,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_security_clock_w)
  *
  *************************************/
 
-READ16_MEMBER(midxunit_state::midxunit_sound_r)
+uint16_t midxunit_state::midxunit_sound_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("%08X:Sound read\n", space.device().safe_pc());
 
@@ -353,13 +353,13 @@ READ16_MEMBER(midxunit_state::midxunit_sound_r)
 }
 
 
-READ16_MEMBER(midxunit_state::midxunit_sound_state_r)
+uint16_t midxunit_state::midxunit_sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dcs->control_r();
 }
 
 
-WRITE16_MEMBER(midxunit_state::midxunit_sound_w)
+void midxunit_state::midxunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* check for out-of-bounds accesses */
 	if (offset)

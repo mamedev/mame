@@ -461,11 +461,11 @@ public:
 	void machine_start_saturn();
 	void machine_reset_saturn();
 
-	DECLARE_READ8_MEMBER(saturn_cart_type_r);
-	DECLARE_READ32_MEMBER(abus_dummy_r);
+	uint8_t saturn_cart_type_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t abus_dummy_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_READ32_MEMBER(saturn_null_ram_r);
-	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
+	uint32_t saturn_null_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void saturn_null_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void saturn_init_driver(int rgn);
 	void init_saturnus();
@@ -480,7 +480,7 @@ public:
 };
 
 
-READ8_MEMBER(sat_console_state::saturn_cart_type_r)
+uint8_t sat_console_state::saturn_cart_type_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_exp)
 		return m_exp->get_cart_type();
@@ -489,7 +489,7 @@ READ8_MEMBER(sat_console_state::saturn_cart_type_r)
 }
 
 /* TODO: Bug! accesses this one, if returning 0 the SH-2 hard-crashes. Might be an actual bug with the CD block. */
-READ32_MEMBER( sat_console_state::abus_dummy_r )
+uint32_t sat_console_state::abus_dummy_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("A-Bus Dummy access %08x\n",offset*4);
 	return -1;
@@ -743,12 +743,12 @@ void sat_console_state::machine_start_saturn()
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
-READ32_MEMBER(sat_console_state::saturn_null_ram_r)
+uint32_t sat_console_state::saturn_null_ram_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(sat_console_state::saturn_null_ram_w)
+void sat_console_state::saturn_null_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 }
 

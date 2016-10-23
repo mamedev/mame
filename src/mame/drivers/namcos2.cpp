@@ -526,12 +526,12 @@ void namcos2_state::GollyGhostUpdateDiorama_c0( int data )
 	}
 }
 
-READ16_MEMBER(namcos2_state::dpram_word_r)
+uint16_t namcos2_state::dpram_word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dpram[offset];
 }
 
-WRITE16_MEMBER(namcos2_state::dpram_word_w)
+void namcos2_state::dpram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -560,17 +560,17 @@ WRITE16_MEMBER(namcos2_state::dpram_word_w)
 }
 
 
-READ8_MEMBER(namcos2_state::dpram_byte_r)
+uint8_t namcos2_state::dpram_byte_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_dpram[offset];
 }
 
-WRITE8_MEMBER(namcos2_state::dpram_byte_w)
+void namcos2_state::dpram_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dpram[offset] = data;
 }
 
-READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
+uint8_t namcos2_state::ack_mcu_vbl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_c68->set_input_line(m37450_device::M3745X_INT1_LINE, CLEAR_LINE);
 	return 0;
@@ -784,12 +784,12 @@ ADDRESS_MAP_END
 /*************************************************************/
 /* 37450 (C68) IO CPU Memory declarations                    */
 /*************************************************************/
-READ8_MEMBER(namcos2_state::c68_p5_r)
+uint8_t namcos2_state::c68_p5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_player_mux) ? ioport("MCUB2")->read() : ioport("MCUB")->read();
 }
 
-WRITE8_MEMBER(namcos2_state::c68_p3_w)
+void namcos2_state::c68_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_player_mux = (data & 0x80) ? 1 : 0;
 }

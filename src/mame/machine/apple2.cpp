@@ -36,7 +36,7 @@
  * New Apple II memory manager
  * ----------------------------------------------------------------------- */
 
-READ8_MEMBER(apple2_state::read_floatingbus)
+uint8_t apple2_state::read_floatingbus(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return apple2_getfloatingbusvalue();
 }
@@ -286,7 +286,7 @@ void apple2_state::apple2_update_memory_postload()
  * Apple II memory map
  * ----------------------------------------------------------------------- */
 
-READ8_MEMBER(apple2_state::apple2_c0xx_r)
+uint8_t apple2_state::apple2_c0xx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -316,7 +316,7 @@ READ8_MEMBER(apple2_state::apple2_c0xx_r)
 
 
 
-WRITE8_MEMBER(apple2_state::apple2_c0xx_w)
+void apple2_state::apple2_c0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	write8_delegate handlers[] =
 	{
@@ -339,7 +339,7 @@ WRITE8_MEMBER(apple2_state::apple2_c0xx_w)
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_c080_r)
+uint8_t apple2_state::apple2_c080_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -412,7 +412,7 @@ READ8_MEMBER(apple2_state::apple2_c080_r)
 }
 
 
-WRITE8_MEMBER(apple2_state::apple2_c080_w)
+void apple2_state::apple2_c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 	int slot;
@@ -531,7 +531,7 @@ int8_t apple2_state::apple2_slotram_r(address_space &space, int slotnum, int off
 	return apple2_getfloatingbusvalue();
 }
 
-READ8_MEMBER(apple2_state::apple2_c1xx_r )
+uint8_t apple2_state::apple2_c1xx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -560,7 +560,7 @@ READ8_MEMBER(apple2_state::apple2_c1xx_r )
 	//return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_c1xx_w )
+void apple2_state::apple2_c1xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -580,7 +580,7 @@ WRITE8_MEMBER(apple2_state::apple2_c1xx_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_c3xx_r )
+uint8_t apple2_state::apple2_c3xx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -609,7 +609,7 @@ READ8_MEMBER(apple2_state::apple2_c3xx_r )
 	//return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
+void apple2_state::apple2_c3xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -634,7 +634,7 @@ WRITE8_MEMBER(apple2_state::apple2_c3xx_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_c4xx_r )
+uint8_t apple2_state::apple2_c4xx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -662,7 +662,7 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	//return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
+void apple2_state::apple2_c4xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slotnum;
 	device_a2bus_card_interface *slotdevice;
@@ -687,7 +687,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c4xx_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_cfff_r)
+uint8_t apple2_state::apple2_cfff_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// debugger guard
 	if (!space.debugger_access())
@@ -700,7 +700,7 @@ READ8_MEMBER(apple2_state::apple2_cfff_r)
 	return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_cfff_w)
+void apple2_state::apple2_cfff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 	{
@@ -710,7 +710,7 @@ WRITE8_MEMBER(apple2_state::apple2_cfff_w)
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_c800_r )
+uint8_t apple2_state::apple2_c800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -724,7 +724,7 @@ READ8_MEMBER(apple2_state::apple2_c800_r )
 	return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_c800_w )
+void apple2_state::apple2_c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -736,7 +736,7 @@ WRITE8_MEMBER(apple2_state::apple2_c800_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_ce00_r )
+uint8_t apple2_state::apple2_ce00_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -750,7 +750,7 @@ READ8_MEMBER(apple2_state::apple2_ce00_r )
 	return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_ce00_w )
+void apple2_state::apple2_ce00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -762,7 +762,7 @@ WRITE8_MEMBER(apple2_state::apple2_ce00_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_inh_d000_r )
+uint8_t apple2_state::apple2_inh_d000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -776,7 +776,7 @@ READ8_MEMBER(apple2_state::apple2_inh_d000_r )
 	return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_inh_d000_w )
+void apple2_state::apple2_inh_d000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -788,7 +788,7 @@ WRITE8_MEMBER(apple2_state::apple2_inh_d000_w )
 	}
 }
 
-READ8_MEMBER(apple2_state::apple2_inh_e000_r )
+uint8_t apple2_state::apple2_inh_e000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -802,7 +802,7 @@ READ8_MEMBER(apple2_state::apple2_inh_e000_r )
 	return apple2_getfloatingbusvalue();
 }
 
-WRITE8_MEMBER(apple2_state::apple2_inh_e000_w )
+void apple2_state::apple2_inh_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	device_a2bus_card_interface *slotdevice;
 
@@ -1351,60 +1351,60 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
     apple2_auxramxx00_w
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_mainram0000_r )
+uint8_t apple2_state::apple2_mainram0000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainram0200_r )
+uint8_t apple2_state::apple2_mainram0200_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x200;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainram0400_r )
+uint8_t apple2_state::apple2_mainram0400_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x400;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainram0800_r )
+uint8_t apple2_state::apple2_mainram0800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x800;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainram2000_r )
+uint8_t apple2_state::apple2_mainram2000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x2000;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainram4000_r )
+uint8_t apple2_state::apple2_mainram4000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0x4000;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainramc000_r )
+uint8_t apple2_state::apple2_mainramc000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0xc000;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainramd000_r )
+uint8_t apple2_state::apple2_mainramd000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0xd000;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_mainrame000_r )
+uint8_t apple2_state::apple2_mainrame000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset += 0xe000;
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram0000_r )
+uint8_t apple2_state::apple2_auxram0000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1419,7 +1419,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0000_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram0200_r )
+uint8_t apple2_state::apple2_auxram0200_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1434,7 +1434,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0200_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram0400_r )
+uint8_t apple2_state::apple2_auxram0400_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1449,7 +1449,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0400_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram0800_r )
+uint8_t apple2_state::apple2_auxram0800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1464,7 +1464,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram0800_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram2000_r )
+uint8_t apple2_state::apple2_auxram2000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1479,7 +1479,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram2000_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxram4000_r )
+uint8_t apple2_state::apple2_auxram4000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1494,7 +1494,7 @@ READ8_MEMBER ( apple2_state::apple2_auxram4000_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxramc000_r )
+uint8_t apple2_state::apple2_auxramc000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1509,7 +1509,7 @@ READ8_MEMBER ( apple2_state::apple2_auxramc000_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxramd000_r )
+uint8_t apple2_state::apple2_auxramd000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1524,7 +1524,7 @@ READ8_MEMBER ( apple2_state::apple2_auxramd000_r )
 	return m_rambase[offset];
 }
 
-READ8_MEMBER ( apple2_state::apple2_auxrame000_r )
+uint8_t apple2_state::apple2_auxrame000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1540,60 +1540,60 @@ READ8_MEMBER ( apple2_state::apple2_auxrame000_r )
 }
 
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram0000_w )
+void apple2_state::apple2_mainram0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram0200_w )
+void apple2_state::apple2_mainram0200_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x200;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram0400_w )
+void apple2_state::apple2_mainram0400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x400;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram0800_w )
+void apple2_state::apple2_mainram0800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x800;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram2000_w )
+void apple2_state::apple2_mainram2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x2000;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainram4000_w )
+void apple2_state::apple2_mainram4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0x4000;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainramc000_w )
+void apple2_state::apple2_mainramc000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0xc000;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainramd000_w )
+void apple2_state::apple2_mainramd000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0xd000;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_mainrame000_w )
+void apple2_state::apple2_mainrame000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset += 0xe000;
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram0000_w )
+void apple2_state::apple2_auxram0000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1609,7 +1609,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0000_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram0200_w )
+void apple2_state::apple2_auxram0200_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1625,7 +1625,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0200_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram0400_w )
+void apple2_state::apple2_auxram0400_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1641,7 +1641,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0400_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram0800_w )
+void apple2_state::apple2_auxram0800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1657,7 +1657,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram0800_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram2000_w )
+void apple2_state::apple2_auxram2000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1673,7 +1673,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram2000_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxram4000_w )
+void apple2_state::apple2_auxram4000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1689,7 +1689,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxram4000_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxramc000_w )
+void apple2_state::apple2_auxramc000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1705,7 +1705,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxramc000_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxramd000_w )
+void apple2_state::apple2_auxramd000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1721,7 +1721,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxramd000_w )
 	m_rambase[offset] = data;
 }
 
-WRITE8_MEMBER ( apple2_state::apple2_auxrame000_w )
+void apple2_state::apple2_auxrame000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_auxslotdevice)
 	{
@@ -1741,7 +1741,7 @@ WRITE8_MEMBER ( apple2_state::apple2_auxrame000_w )
   apple2_c00x_r
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_c00x_r )
+uint8_t apple2_state::apple2_c00x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0;
 
@@ -1781,7 +1781,7 @@ READ8_MEMBER ( apple2_state::apple2_c00x_r )
   C00F  ALTCHARSETON - use alt character set
 ***************************************************************************/
 
-WRITE8_MEMBER ( apple2_state::apple2_c00x_w )
+void apple2_state::apple2_c00x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t mask;
 
@@ -1795,7 +1795,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c00x_w )
   apple2_c01x_r
 ***************************************************************************/
 
-READ8_MEMBER( apple2_state::apple2_c01x_r )
+uint8_t apple2_state::apple2_c01x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = apple2_getfloatingbusvalue() & 0x7F;
 
@@ -1836,7 +1836,7 @@ READ8_MEMBER( apple2_state::apple2_c01x_r )
   apple2_c01x_w
 ***************************************************************************/
 
-WRITE8_MEMBER( apple2_state::apple2_c01x_w )
+void apple2_state::apple2_c01x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Clear the keyboard strobe */
 	g_profiler.start(PROFILER_C01X);
@@ -1850,7 +1850,7 @@ WRITE8_MEMBER( apple2_state::apple2_c01x_w )
   apple2_c02x_r
 ***************************************************************************/
 
-READ8_MEMBER( apple2_state::apple2_c02x_r )
+uint8_t apple2_state::apple2_c02x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -1865,7 +1865,7 @@ READ8_MEMBER( apple2_state::apple2_c02x_r )
   apple2_c02x_w
 ***************************************************************************/
 
-WRITE8_MEMBER( apple2_state::apple2_c02x_w )
+void apple2_state::apple2_c02x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -1881,7 +1881,7 @@ WRITE8_MEMBER( apple2_state::apple2_c02x_w )
   apple2_c03x_r
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_c03x_r )
+uint8_t apple2_state::apple2_c03x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -1902,7 +1902,7 @@ READ8_MEMBER ( apple2_state::apple2_c03x_r )
   apple2_c03x_w
 ***************************************************************************/
 
-WRITE8_MEMBER ( apple2_state::apple2_c03x_w )
+void apple2_state::apple2_c03x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apple2_c03x_r(space, offset, 0);
 }
@@ -1913,7 +1913,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c03x_w )
   apple2_c05x_r
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_c05x_r )
+uint8_t apple2_state::apple2_c05x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -1949,7 +1949,7 @@ READ8_MEMBER ( apple2_state::apple2_c05x_r )
   apple2_c05x_w
 ***************************************************************************/
 
-WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
+void apple2_state::apple2_c05x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	apple2_c05x_r(space, offset, 0);
 }
@@ -1960,7 +1960,7 @@ WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
   apple2_c06x_r
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_c06x_r )
+uint8_t apple2_state::apple2_c06x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = 0;
 	if(!space.debugger_access())
@@ -2024,7 +2024,7 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
   apple2_c07x_r
 ***************************************************************************/
 
-READ8_MEMBER ( apple2_state::apple2_c07x_r )
+uint8_t apple2_state::apple2_c07x_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -2048,7 +2048,7 @@ READ8_MEMBER ( apple2_state::apple2_c07x_r )
   apple2_c07x_w
 ***************************************************************************/
 
-WRITE8_MEMBER ( apple2_state::apple2_c07x_w )
+void apple2_state::apple2_c07x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// this a machine with an aux slot?
 	if (m_auxslotdevice)

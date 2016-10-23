@@ -114,7 +114,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 	}
 }
 
-READ8_MEMBER( sv806_device::mreq_r )
+uint8_t sv806_device::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -125,7 +125,7 @@ READ8_MEMBER( sv806_device::mreq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv806_device::mreq_w )
+void sv806_device::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0xf000 && m_ram_enabled)
 	{
@@ -134,7 +134,7 @@ WRITE8_MEMBER( sv806_device::mreq_w )
 	}
 }
 
-READ8_MEMBER( sv806_device::iorq_r )
+uint8_t sv806_device::iorq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x51)
 		return m_crtc->register_r(space, 0);
@@ -142,7 +142,7 @@ READ8_MEMBER( sv806_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv806_device::iorq_w )
+void sv806_device::iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

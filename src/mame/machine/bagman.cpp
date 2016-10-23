@@ -201,7 +201,7 @@ uint8_t row, column, val;
 }
 
 
-WRITE8_MEMBER(bagman_state::pal16r6_w)
+void bagman_state::pal16r6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 uint8_t line;
 
@@ -224,7 +224,7 @@ void bagman_state::machine_reset()
 	update_pal();
 }
 
-READ8_MEMBER(bagman_state::pal16r6_r)
+uint8_t bagman_state::pal16r6_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	update_pal();
 	return  (m_outvalue[6]) + (m_outvalue[5] << 1) + (m_outvalue[4] << 2) +

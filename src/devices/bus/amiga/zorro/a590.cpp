@@ -314,7 +314,7 @@ WRITE_LINE_MEMBER( a2091_device::cfgin_w )
 	m_dmac->configin_w(state);
 }
 
-READ8_MEMBER( dmac_hdc_device::dmac_scsi_r )
+uint8_t dmac_hdc_device::dmac_scsi_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -325,7 +325,7 @@ READ8_MEMBER( dmac_hdc_device::dmac_scsi_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( dmac_hdc_device::dmac_scsi_w )
+void dmac_hdc_device::dmac_scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

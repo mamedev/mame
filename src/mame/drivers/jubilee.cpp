@@ -219,10 +219,10 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
-	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
-	DECLARE_WRITE8_MEMBER(unk_w);
-	DECLARE_READ8_MEMBER(mux_port_r);
+	void jubileep_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jubileep_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -236,13 +236,13 @@ public:
 *     Video Hardware     *
 *************************/
 
-WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
+void jubilee_state::jubileep_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jubilee_state::jubileep_colorram_w)
+void jubilee_state::jubileep_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(jubilee_state::unk_w)
+void jubilee_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  In particular, the interrupt from above must be cleared. We assume that
     this is done by one of the output lines, and from the 32 lines that are
@@ -551,7 +551,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
 	logerror("CRU write to address %04x: %d\n", offset<<1, data & 1);
 }
 
-READ8_MEMBER(jubilee_state::mux_port_r)
+uint8_t jubilee_state::mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch( mux_sel )
 	{

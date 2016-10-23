@@ -12,7 +12,7 @@ void intv_state::video_start()
 /* very rudimentary support for the tms9927 character generator IC */
 
 
-READ8_MEMBER( intv_state::intvkbd_tms9927_r )
+uint8_t intv_state::intvkbd_tms9927_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t rv;
 	switch (offset)
@@ -34,7 +34,7 @@ READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 	return rv;
 }
 
-WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
+void intv_state::intvkbd_tms9927_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

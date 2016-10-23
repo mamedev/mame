@@ -43,7 +43,7 @@ Notes:
 #include "includes/gameplan.h"
 #include "machine/nvram.h"
 
-READ8_MEMBER(gameplan_state::trvquest_question_r)
+uint8_t gameplan_state::trvquest_question_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
 }

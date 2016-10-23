@@ -17,7 +17,7 @@
   I/O devices
 ***************************************************************************/
 
-READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
+uint8_t galaxy_state::galaxy_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 	{
@@ -30,7 +30,7 @@ READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 	}
 }
 
-WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
+void galaxy_state::galaxy_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	m_latch_value = data;

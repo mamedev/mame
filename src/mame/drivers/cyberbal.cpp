@@ -96,7 +96,7 @@ void cyberbal_state::machine_reset_cyberbal2p()
  *
  *************************************/
 
-READ16_MEMBER(cyberbal_state::sound_state_r)
+uint16_t cyberbal_state::sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int temp = 0xffff;
 	if (m_jsa->main_to_sound_ready()) temp ^= 0xffff;
@@ -111,7 +111,7 @@ READ16_MEMBER(cyberbal_state::sound_state_r)
  *
  *************************************/
 
-WRITE16_MEMBER(cyberbal_state::p2_reset_w)
+void cyberbal_state::p2_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_extracpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }

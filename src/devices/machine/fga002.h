@@ -49,8 +49,8 @@ class fga002_device :  public device_t
 	fga002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	fga002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER (write);
-	DECLARE_READ8_MEMBER (read);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void lirq_w(int status, int vector, int control, int state);
 	DECLARE_WRITE_LINE_MEMBER( lirq0_w );

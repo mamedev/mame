@@ -208,7 +208,7 @@ READ8Z_MEMBER(horizon_ramdisk_device::readz)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::write)
+void horizon_ramdisk_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 32K expansion
 	// According to the manual, "this memory is not affected by the HIDE switch"
@@ -292,7 +292,7 @@ void horizon_ramdisk_device::setbit(int& page, int pattern, bool set)
 	}
 }
 
-WRITE8_MEMBER(horizon_ramdisk_device::cruwrite)
+void horizon_ramdisk_device::cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int size = ioport("HORIZONSIZE")->read();
 	int split_bit = size + 10;

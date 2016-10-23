@@ -57,7 +57,7 @@ void saturn_dram_device::device_reset()
 
 // RAM: two DRAM chips are present in the cart, thus accesses only go up to m_size/2!
 
-READ32_MEMBER(saturn_dram_device::read_ext_dram0)
+uint32_t saturn_dram_device::read_ext_dram0(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset < (0x400000/2)/4)
 		return m_ext_dram0[offset % m_ext_dram0.size()];
@@ -68,7 +68,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram0)
 	}
 }
 
-READ32_MEMBER(saturn_dram_device::read_ext_dram1)
+uint32_t saturn_dram_device::read_ext_dram1(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset < (0x400000/2)/4)
 		return m_ext_dram1[offset % m_ext_dram1.size()];
@@ -79,7 +79,7 @@ READ32_MEMBER(saturn_dram_device::read_ext_dram1)
 	}
 }
 
-WRITE32_MEMBER(saturn_dram_device::write_ext_dram0)
+void saturn_dram_device::write_ext_dram0(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset < (0x400000/2)/4)
 		COMBINE_DATA(&m_ext_dram0[offset % m_ext_dram0.size()]);
@@ -87,7 +87,7 @@ WRITE32_MEMBER(saturn_dram_device::write_ext_dram0)
 		popmessage("DRAM0 write beyond its boundary! offs: %X data: %X\n", offset, data);
 }
 
-WRITE32_MEMBER(saturn_dram_device::write_ext_dram1)
+void saturn_dram_device::write_ext_dram1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset < (0x400000/2)/4)
 		COMBINE_DATA(&m_ext_dram1[offset % m_ext_dram1.size()]);

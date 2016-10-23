@@ -101,12 +101,12 @@ void cr511b_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER( cr511b_device::read )
+uint8_t cr511b_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER ( cr511b_device::write )
+void cr511b_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

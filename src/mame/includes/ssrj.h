@@ -30,10 +30,10 @@ public:
 	tilemap_t *m_tilemap4;
 	std::unique_ptr<uint8_t[]> m_buffer_spriteram;
 
-	DECLARE_READ8_MEMBER(wheel_r);
-	DECLARE_WRITE8_MEMBER(vram1_w);
-	DECLARE_WRITE8_MEMBER(vram2_w);
-	DECLARE_WRITE8_MEMBER(vram4_w);
+	uint8_t wheel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vram1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vram4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);

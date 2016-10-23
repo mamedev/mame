@@ -19,24 +19,24 @@ public:
 
 	DECLARE_ADDRESS_MAP(map, 32);
 
-	DECLARE_READ8_MEMBER(r4_r);
-	DECLARE_WRITE8_MEMBER(r4_w);
-	DECLARE_READ8_MEMBER(r5_r);
-	DECLARE_WRITE8_MEMBER(r5_w);
-	DECLARE_READ8_MEMBER(r6_r);
-	DECLARE_WRITE8_MEMBER(r6_w);
-	DECLARE_READ8_MEMBER(r7_r);
-	DECLARE_WRITE8_MEMBER(r7_w);
-	DECLARE_READ8_MEMBER(r8_r);
-	DECLARE_WRITE8_MEMBER(r8_w);
-	DECLARE_READ8_MEMBER(r9_r);
-	DECLARE_WRITE8_MEMBER(r9_w);
-	DECLARE_READ8_MEMBER(ra_r);
-	DECLARE_WRITE8_MEMBER(ra_w);
-	DECLARE_READ8_MEMBER(rb_r);
-	DECLARE_WRITE8_MEMBER(rb_w);
-	DECLARE_READ8_MEMBER(r10_r);
-	DECLARE_WRITE8_MEMBER(r10_w);
+	uint8_t r4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r9_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ra_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ra_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t r10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void r10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t dma_r();
 	void dma_w(uint8_t data);

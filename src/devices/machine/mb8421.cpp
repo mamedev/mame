@@ -55,7 +55,7 @@ void mb8421_device::device_reset()
 
 
 
-WRITE8_MEMBER(mb8421_device::left_w)
+void mb8421_device::left_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
@@ -64,7 +64,7 @@ WRITE8_MEMBER(mb8421_device::left_w)
 		m_intr_handler(1);
 }
 
-READ8_MEMBER(mb8421_device::left_r)
+uint8_t mb8421_device::left_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x7ff;
 
@@ -74,7 +74,7 @@ READ8_MEMBER(mb8421_device::left_r)
 	return m_ram[offset];
 }
 
-WRITE8_MEMBER(mb8421_device::right_w)
+void mb8421_device::right_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x7ff;
 	m_ram[offset] = data;
@@ -83,7 +83,7 @@ WRITE8_MEMBER(mb8421_device::right_w)
 		m_intl_handler(1);
 }
 
-READ8_MEMBER(mb8421_device::right_r)
+uint8_t mb8421_device::right_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset &= 0x7ff;
 

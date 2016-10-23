@@ -23,7 +23,7 @@ public:
 	virtual ~ntb_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read) { return m_rom[offset]; }
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_rom[offset]; }
 
 	uint8_t *get_cart_base() { return m_rom; }
 
@@ -63,7 +63,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
 
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	ntb_cart_interface*      m_cart;
 };
@@ -126,10 +126,10 @@ public:
 	virtual void device_start() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual uint8_t read_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void write_m(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
+	virtual void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
 	virtual void pcb_reset() override;
 

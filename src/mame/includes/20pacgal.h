@@ -48,14 +48,14 @@ public:
 	uint8_t m_sprite_pal_base;
 
 	uint8_t m_irq_mask;
-	DECLARE_WRITE8_MEMBER(irqack_w);
-	DECLARE_WRITE8_MEMBER(timer_pulse_w);
-	DECLARE_WRITE8_MEMBER(_20pacgal_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(ram_bank_select_w);
-	DECLARE_WRITE8_MEMBER(ram_48000_w);
-	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
-	DECLARE_WRITE8_MEMBER(sprite_ram_w);
-	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
+	void irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void timer_pulse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _20pacgal_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ram_48000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_gfx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_lookup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_25pacman();
 	void init_20pacgal();
 	virtual void machine_start() override;
@@ -80,7 +80,7 @@ public:
 		: _20pacgal_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
+	uint8_t _25pacman_io_87_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 };
 

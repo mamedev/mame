@@ -69,7 +69,7 @@ void psxrcnt_device::device_start()
 	}
 }
 
-WRITE32_MEMBER( psxrcnt_device::write )
+void psxrcnt_device::write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int n_counter = offset / 4;
 	psx_root *root = &root_counter[ n_counter ];
@@ -114,7 +114,7 @@ WRITE32_MEMBER( psxrcnt_device::write )
 	root_timer_adjust( n_counter );
 }
 
-READ32_MEMBER( psxrcnt_device::read )
+uint32_t psxrcnt_device::read(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int n_counter = offset / 4;
 	psx_root *root = &root_counter[ n_counter ];

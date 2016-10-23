@@ -403,7 +403,7 @@ TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
 	m_msm->set_output_gain(10, m_hihatvol + m_cymvol * (m_ay_port_b & 3) * 0.33f);   /* NO from msm5232 */
 }
 
-WRITE8_MEMBER(equites_state::equites_c0f8_w)
+void equites_state::equites_c0f8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -450,7 +450,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 }
 
 
-WRITE8_MEMBER(equites_state::equites_8910porta_w)
+void equites_state::equites_8910porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bongo 1
 	m_samples->set_volume(0, ((data & 0x30) >> 4) * 0.33);
@@ -465,7 +465,7 @@ WRITE8_MEMBER(equites_state::equites_8910porta_w)
 	m_ay_port_a = data;
 }
 
-WRITE8_MEMBER(equites_state::equites_8910portb_w)
+void equites_state::equites_8910portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bongo 3
 	m_samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
@@ -491,7 +491,7 @@ WRITE8_MEMBER(equites_state::equites_8910portb_w)
 	m_ay_port_b = data;
 }
 
-WRITE8_MEMBER(equites_state::equites_cymbal_ctrl_w)
+void equites_state::equites_cymbal_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eq_cymbal_ctrl++;
 }
@@ -512,13 +512,13 @@ void equites_state::equites_update_dac(  )
 		m_dac_2->write(m_dac_latch);
 }
 
-WRITE8_MEMBER(equites_state::equites_dac_latch_w)
+void equites_state::equites_dac_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac_latch = data;
 	equites_update_dac();
 }
 
-WRITE8_MEMBER(equites_state::equites_8155_portb_w)
+void equites_state::equites_8155_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_eq8155_port_b = data;
 	equites_update_dac();
@@ -555,7 +555,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE8_MEMBER(equites_state::equites_8155_w)
+void equites_state::equites_8155_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
@@ -606,14 +606,14 @@ CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
 	return m_gekisou_unknown_bit;
 }
 
-WRITE16_MEMBER(equites_state::gekisou_unknown_bit_w)
+void equites_state::gekisou_unknown_bit_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// data bit is A16 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
 
-READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
+uint16_t equites_state::equites_spriteram_kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_spriteram[0] == 0x5555)
 		return 0;
@@ -621,7 +621,7 @@ READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 		return m_spriteram[0];
 }
 
-READ8_MEMBER(equites_state::mcu_ram_r)
+uint8_t equites_state::mcu_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_fakemcu == nullptr)
 		return m_alpha_8201->ext_ram_r(space, offset);
@@ -629,7 +629,7 @@ READ8_MEMBER(equites_state::mcu_ram_r)
 		return m_mcuram[offset];
 }
 
-WRITE8_MEMBER(equites_state::mcu_ram_w)
+void equites_state::mcu_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_fakemcu == nullptr)
 		m_alpha_8201->ext_ram_w(space, offset, data);
@@ -637,7 +637,7 @@ WRITE8_MEMBER(equites_state::mcu_ram_w)
 		m_mcuram[offset] = data;
 }
 
-WRITE16_MEMBER(equites_state::mcu_start_w)
+void equites_state::mcu_start_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)
@@ -646,7 +646,7 @@ WRITE16_MEMBER(equites_state::mcu_start_w)
 		m_fakemcu->set_input_line(INPUT_LINE_HALT, (offset != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(equites_state::mcu_switch_w)
+void equites_state::mcu_switch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)

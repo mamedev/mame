@@ -28,8 +28,8 @@ public:
 	required_device<pic8259_device> m_pic;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
-	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
+	void multi16_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void multi16_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_shared_ptr<uint16_t> m_p_vram;
 	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void machine_start() override;
@@ -96,13 +96,13 @@ static ADDRESS_MAP_START(multi16_map, AS_PROGRAM, 16, multi16_state)
 	AM_RANGE(0xf0000,0xf3fff) AM_MIRROR(0xc000) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( multi16_state::multi16_6845_address_w )
+void multi16_state::multi16_6845_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_index = data;
 	m_crtc->address_w(space, offset, data);
 }
 
-WRITE8_MEMBER( multi16_state::multi16_6845_data_w )
+void multi16_state::multi16_6845_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_crtc_vreg[m_crtc_index] = data;
 	m_crtc->register_w(space, offset, data);

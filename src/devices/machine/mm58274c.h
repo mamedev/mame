@@ -16,8 +16,8 @@ public:
 	static void set_mode24(device_t &device, int mode) { downcast<mm58274c_device &>(device).m_mode24 = mode; }
 	static void set_day1(device_t &device, int day) { downcast<mm58274c_device &>(device).m_day1 = day; }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_CALLBACK_MEMBER(rtc_increment_cb);
 	TIMER_CALLBACK_MEMBER(rtc_interrupt_cb);

@@ -112,17 +112,17 @@ public:
 	int m_nmi_main;
 	int m_nmi_sub;
 
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(nmi_main_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_sub_enable_w);
-	DECLARE_WRITE8_MEMBER(bgcolor_w);
-	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
-	DECLARE_WRITE8_MEMBER(fgpalette_w);
-	DECLARE_WRITE8_MEMBER(bg_scrolly_w);
-	DECLARE_WRITE8_MEMBER(fgbank_w);
-	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE8_MEMBER(flip_w);
-	DECLARE_READ8_MEMBER(custom_r);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_main_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_sub_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgpalette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t custom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -224,76 +224,76 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_MEMBER(pturn_state::protection_r)
+uint8_t pturn_state::protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x66;
 }
 
-READ8_MEMBER(pturn_state::protection2_r)
+uint8_t pturn_state::protection2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xfe;
 }
 #endif
 
-WRITE8_MEMBER(pturn_state::videoram_w)
+void pturn_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset]=data;
 	m_fgmap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(pturn_state::nmi_main_enable_w)
+void pturn_state::nmi_main_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_main = data;
 }
 
-WRITE8_MEMBER(pturn_state::nmi_sub_enable_w)
+void pturn_state::nmi_sub_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_sub = data;
 }
 
-WRITE8_MEMBER(pturn_state::bgcolor_w)
+void pturn_state::bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgcolor=data;
 }
 
-WRITE8_MEMBER(pturn_state::bg_scrollx_w)
+void pturn_state::bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgmap->set_scrolly(0, (data>>5)*32*8);
 	m_bgpalette=data&0x1f;
 	m_bgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::fgpalette_w)
+void pturn_state::fgpalette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgpalette=data&0x1f;
 	m_fgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::bg_scrolly_w)
+void pturn_state::bg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgmap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(pturn_state::fgbank_w)
+void pturn_state::fgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgbank=data&1;
 	m_fgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::bgbank_w)
+void pturn_state::bgbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgbank=data&1;
 	m_bgmap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(pturn_state::flip_w)
+void pturn_state::flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data);
 }
 
 
-READ8_MEMBER(pturn_state::custom_r)
+uint8_t pturn_state::custom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int addr = (int)offset + 0xc800;
 

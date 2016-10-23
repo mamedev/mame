@@ -131,27 +131,27 @@ DIP locations verified for:
 
 // Z80 (main)
 
-WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
+void punchout_state::punchout_speech_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm->rst( data & 0x01 );
 }
 
-WRITE8_MEMBER(punchout_state::punchout_speech_st_w)
+void punchout_state::punchout_speech_st_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm->st( data & 0x01 );
 }
 
-WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
+void punchout_state::punchout_speech_vcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_vlm->vcu( data & 0x01 );
 }
 
-WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
+void punchout_state::punchout_2a03_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(punchout_state::nmi_mask_w)
+void punchout_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 // e.g. relying on the masking done by the internal registers.
 // The RP5H01 one-time PROM (OTP) is confirmed to be unprogrammed.
 
-READ8_MEMBER(punchout_state::spunchout_exp_r)
+uint8_t punchout_state::spunchout_exp_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// d0-d3: D0-D3 from RP5C01
 	// d4: N/C
@@ -234,13 +234,13 @@ READ8_MEMBER(punchout_state::spunchout_exp_r)
 	return ret;
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_exp_w)
+void punchout_state::spunchout_exp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: D0-D3 to RP5C01
 	m_rtc->write(space, offset >> 4 & 0xf, data & 0xf);
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_rp5h01_reset_w)
+void punchout_state::spunchout_rp5h01_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: 74LS74 2D
 	// 74LS74 2Q -> RP5H01 RESET
@@ -250,7 +250,7 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_reset_w)
 		spunchout_rp5h01_clock_w(space, 0, 0);
 }
 
-WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
+void punchout_state::spunchout_rp5h01_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: 74LS74 1D
 	// 74LS74 1Q -> RP5H01 DATA CLOCK + TEST

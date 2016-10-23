@@ -55,15 +55,15 @@ public:
 	uint8_t m_speaker_data;
 	uint16_t m_t1latch;
 	uint8_t m_beep_en;
-	DECLARE_WRITE8_MEMBER(jr100_via_w);
+	void jr100_via_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_tick);
-	DECLARE_READ8_MEMBER(jr100_via_read_b);
-	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
-	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
+	uint8_t jr100_via_read_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jr100_via_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jr100_via_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
 	uint32_t readByLittleEndian(uint8_t *buf,int pos);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
@@ -90,7 +90,7 @@ protected:
 
 
 
-WRITE8_MEMBER(jr100_state::jr100_via_w)
+void jr100_state::jr100_via_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* ACR: beeper masking */
 	if(offset == 0x0b)
@@ -260,7 +260,7 @@ static GFXDECODE_START( jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-READ8_MEMBER(jr100_state::jr100_via_read_b)
+uint8_t jr100_state::jr100_via_read_b(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0x1f;
 	switch ( m_keyboard_line )
@@ -278,12 +278,12 @@ READ8_MEMBER(jr100_state::jr100_via_read_b)
 	return val;
 }
 
-WRITE8_MEMBER(jr100_state::jr100_via_write_a)
+void jr100_state::jr100_via_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keyboard_line = data & 0x0f;
 }
 
-WRITE8_MEMBER(jr100_state::jr100_via_write_b)
+void jr100_state::jr100_via_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_use_pcg = (data & 0x20) ? true : false;
 	m_speaker_data = data>>7;

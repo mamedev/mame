@@ -11,13 +11,13 @@ public:
 	galaxian_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~galaxian_sound_device() {}
 
-	DECLARE_WRITE8_MEMBER( sound_w );
-	DECLARE_WRITE8_MEMBER( pitch_w );
-	DECLARE_WRITE8_MEMBER( vol_w );
-	DECLARE_WRITE8_MEMBER( noise_enable_w );
-	DECLARE_WRITE8_MEMBER( background_enable_w );
-	DECLARE_WRITE8_MEMBER( fire_enable_w );
-	DECLARE_WRITE8_MEMBER( lfo_freq_w );
+	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void vol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void noise_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void background_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fire_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lfo_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

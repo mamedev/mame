@@ -718,12 +718,12 @@ void taito_f3_state::video_start_f3()
 
 /******************************************************************************/
 
-READ16_MEMBER(taito_f3_state::f3_pf_data_r)
+uint16_t taito_f3_state::f3_pf_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_pf_data[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_pf_data_w)
+void taito_f3_state::f3_pf_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_pf_data[offset]);
 
@@ -744,32 +744,32 @@ WRITE16_MEMBER(taito_f3_state::f3_pf_data_w)
 	}
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_control_0_w)
+void taito_f3_state::f3_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_control_0[offset]);
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_control_1_w)
+void taito_f3_state::f3_control_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_control_1[offset]);
 }
 
-READ16_MEMBER(taito_f3_state::f3_spriteram_r)
+uint16_t taito_f3_state::f3_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_spriteram_w)
+void taito_f3_state::f3_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spriteram[offset]);
 }
 
-READ16_MEMBER(taito_f3_state::f3_videoram_r)
+uint16_t taito_f3_state::f3_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_videoram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
+void taito_f3_state::f3_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int tile,col_off;
 	COMBINE_DATA(&m_videoram[offset]);
@@ -787,34 +787,34 @@ WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
 }
 
 
-READ16_MEMBER(taito_f3_state::f3_vram_r)
+uint16_t taito_f3_state::f3_vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_vram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_vram_w)
+void taito_f3_state::f3_vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_vram[offset]);
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-READ16_MEMBER(taito_f3_state::f3_pivot_r)
+uint16_t taito_f3_state::f3_pivot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_pivot_ram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_pivot_w)
+void taito_f3_state::f3_pivot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f3_pivot_ram[offset]);
 	m_gfxdecode->gfx(3)->mark_dirty(offset/16);
 }
 
-READ16_MEMBER(taito_f3_state::f3_lineram_r)
+uint16_t taito_f3_state::f3_lineram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f3_line_ram[offset];
 }
 
-WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
+void taito_f3_state::f3_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
@@ -834,7 +834,7 @@ WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 	COMBINE_DATA(&m_f3_line_ram[offset]);
 }
 
-WRITE32_MEMBER(taito_f3_state::f3_palette_24bit_w)
+void taito_f3_state::f3_palette_24bit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
 

@@ -2314,7 +2314,7 @@ FFED    BX      R/W     Reset   Description
 
 *************************************************************************************************************/
 
-READ8_MEMBER( tlcs90_device::t90_internal_registers_r )
+uint8_t tlcs90_device::t90_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	#define RIO     m_io->read_byte( T90_IOBASE+offset )
 
@@ -2508,7 +2508,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
 	}
 }
 
-WRITE8_MEMBER( tlcs90_device::t90_internal_registers_w )
+void tlcs90_device::t90_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#define WIO     m_io->write_byte( T90_IOBASE+offset, data )
 

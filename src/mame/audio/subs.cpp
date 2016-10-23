@@ -14,27 +14,27 @@
 sub sound functions
 ***************************************************************************/
 
-WRITE8_MEMBER(subs_state::sonar1_w)
+void subs_state::sonar1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SUBS_SONAR1_EN, offset & 0x01);
 }
 
-WRITE8_MEMBER(subs_state::sonar2_w)
+void subs_state::sonar2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SUBS_SONAR2_EN, offset & 0x01);
 }
 
-WRITE8_MEMBER(subs_state::crash_w)
+void subs_state::crash_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SUBS_CRASH_EN, offset & 0x01);
 }
 
-WRITE8_MEMBER(subs_state::explode_w)
+void subs_state::explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SUBS_EXPLODE_EN, offset & 0x01);
 }
 
-WRITE8_MEMBER(subs_state::noise_reset_w)
+void subs_state::noise_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Pulse noise reset */
 	m_discrete->write(space, SUBS_NOISE_RESET, 0);

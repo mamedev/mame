@@ -56,11 +56,11 @@ public:
 		m_dsw(*this, "DSW")
 		{ }
 
-	DECLARE_READ8_MEMBER(port_r);
-	DECLARE_WRITE8_MEMBER(port_w);
-	DECLARE_WRITE8_MEMBER(port1_w);
-	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_READ8_MEMBER(port2_r);
+	uint8_t port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
 	DECLARE_PALETTE_INIT(monzagp);
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( monzagp_map, AS_PROGRAM, 8, monzagp_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(monzagp_state::port_r)
+uint8_t monzagp_state::port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 	if (!(m_p1 & 0x01))             // 8350 videoram
@@ -309,7 +309,7 @@ READ8_MEMBER(monzagp_state::port_r)
 	return data;
 }
 
-WRITE8_MEMBER(monzagp_state::port_w)
+void monzagp_state::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(m_p1 & 0x01))     // 8350 videoram
 	{
@@ -382,18 +382,18 @@ WRITE8_MEMBER(monzagp_state::port_w)
 	}
 }
 
-WRITE8_MEMBER(monzagp_state::port1_w)
+void monzagp_state::port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("P1 %x = %x\n",space.device().safe_pc(),data);
 	m_p1 = data;
 }
 
-READ8_MEMBER(monzagp_state::port2_r)
+uint8_t monzagp_state::port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_p2;
 }
 
-WRITE8_MEMBER(monzagp_state::port2_w)
+void monzagp_state::port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("P2 %x = %x\n",space.device().safe_pc(),data);
 	m_p2 = data;

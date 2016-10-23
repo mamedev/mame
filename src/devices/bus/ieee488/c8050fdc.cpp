@@ -496,7 +496,7 @@ void c8050_fdc_t::live_run(const attotime &limit)
 	}
 }
 
-READ8_MEMBER( c8050_fdc_t::read )
+uint8_t c8050_fdc_t::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t e = checkpoint_live.e;
 	offs_t i = checkpoint_live.i;
@@ -504,7 +504,7 @@ READ8_MEMBER( c8050_fdc_t::read )
 	return GCR_DECODE(e, i);
 }
 
-WRITE8_MEMBER( c8050_fdc_t::write )
+void c8050_fdc_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("%s %s PI %02x\n", machine().time().as_string(), machine().describe_context(), data);
 

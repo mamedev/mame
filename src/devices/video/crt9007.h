@@ -115,8 +115,8 @@ public:
 	template<class _Object> static devcb_base &set_slg_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_slg.set_callback(object); }
 	template<class _Object> static devcb_base &set_sld_wr_callback(device_t &device, _Object object) { return downcast<crt9007_t &>(device).m_write_sld.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
 

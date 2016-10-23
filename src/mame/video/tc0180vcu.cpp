@@ -138,17 +138,17 @@ void tc0180vcu_device::device_reset()
 *
 */
 
-READ8_MEMBER( tc0180vcu_device::get_fb_page )
+uint8_t tc0180vcu_device::get_fb_page(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_framebuffer_page;
 }
 
-WRITE8_MEMBER( tc0180vcu_device::set_fb_page )
+void tc0180vcu_device::set_fb_page(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_framebuffer_page = data;
 }
 
-READ8_MEMBER( tc0180vcu_device::get_videoctrl )
+uint8_t tc0180vcu_device::get_videoctrl(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_video_control;
 }
@@ -168,12 +168,12 @@ void tc0180vcu_device::video_control( uint8_t data )
 	machine().tilemap().set_flip_all((m_video_control & 0x10) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0 );
 }
 
-READ16_MEMBER( tc0180vcu_device::ctrl_r )
+uint16_t tc0180vcu_device::ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ctrl[offset];
 }
 
-WRITE16_MEMBER( tc0180vcu_device::ctrl_w )
+void tc0180vcu_device::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t oldword = m_ctrl[offset];
 
@@ -243,22 +243,22 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
 		0);
 }
 
-READ16_MEMBER( tc0180vcu_device::scroll_r )
+uint16_t tc0180vcu_device::scroll_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_scrollram[offset];
 }
 
-WRITE16_MEMBER( tc0180vcu_device::scroll_w )
+void tc0180vcu_device::scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-READ16_MEMBER( tc0180vcu_device::word_r )
+uint16_t tc0180vcu_device::word_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ram[offset];
 }
 
-WRITE16_MEMBER( tc0180vcu_device::word_w )
+void tc0180vcu_device::word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_ram[offset]);
 

@@ -46,14 +46,14 @@ public:
 	virtual ~device_a78_cart_interface();
 
 	// memory accessor
-	virtual DECLARE_READ8_MEMBER(read_04xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_10xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_30xx) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_40xx) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_04xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_10xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
-	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_10xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_30xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; }
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual void write_10xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual void write_30xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {}
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -117,14 +117,14 @@ public:
 	virtual std::string get_default_card_software() override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_04xx);
-	virtual DECLARE_READ8_MEMBER(read_10xx);
-	virtual DECLARE_READ8_MEMBER(read_30xx);
-	virtual DECLARE_READ8_MEMBER(read_40xx);
-	virtual DECLARE_WRITE8_MEMBER(write_04xx);
-	virtual DECLARE_WRITE8_MEMBER(write_10xx);
-	virtual DECLARE_WRITE8_MEMBER(write_30xx);
-	virtual DECLARE_WRITE8_MEMBER(write_40xx);
+	virtual uint8_t read_04xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_10xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_30xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual uint8_t read_40xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	virtual void write_04xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_10xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_30xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	virtual void write_40xx(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 private:
 	device_a78_cart_interface*       m_cart;

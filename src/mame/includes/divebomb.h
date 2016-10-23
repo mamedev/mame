@@ -69,23 +69,23 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	DECLARE_READ8_MEMBER(fgcpu_roz_comm_r);
-	DECLARE_WRITE8_MEMBER(fgcpu_roz_comm_w);
-	DECLARE_READ8_MEMBER(fgcpu_spr_comm_r);
-	DECLARE_WRITE8_MEMBER(fgcpu_spr_comm_w);
-	DECLARE_READ8_MEMBER(fgcpu_comm_flags_r);
-	DECLARE_WRITE8_MEMBER(fgram_w);
+	uint8_t fgcpu_roz_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fgcpu_roz_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fgcpu_spr_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fgcpu_spr_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fgcpu_comm_flags_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(spritecpu_port00_w);
-	DECLARE_READ8_MEMBER(spritecpu_comm_r);
-	DECLARE_WRITE8_MEMBER(spritecpu_comm_w);
+	void spritecpu_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spritecpu_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void spritecpu_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(rozcpu_bank_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_wrap1_enable_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_enable1_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_enable2_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_wrap2_enable_w);
-	DECLARE_READ8_MEMBER(rozcpu_comm_r);
-	DECLARE_WRITE8_MEMBER(rozcpu_comm_w);
-	DECLARE_WRITE8_MEMBER(rozcpu_pal_w);
+	void rozcpu_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rozcpu_wrap1_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rozcpu_enable1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rozcpu_enable2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rozcpu_wrap2_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rozcpu_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rozcpu_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void rozcpu_pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

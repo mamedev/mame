@@ -29,10 +29,10 @@ public:
 	nascom_avc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	READ8_MEMBER(vram_r);
-	WRITE8_MEMBER(vram_w);
+	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

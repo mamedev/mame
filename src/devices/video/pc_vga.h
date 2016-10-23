@@ -45,16 +45,16 @@ public:
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual READ8_MEMBER(port_03b0_r);
-	virtual WRITE8_MEMBER(port_03b0_w);
-	virtual READ8_MEMBER(port_03c0_r);
-	virtual WRITE8_MEMBER(port_03c0_w);
-	virtual READ8_MEMBER(port_03d0_r);
-	virtual WRITE8_MEMBER(port_03d0_w);
-	virtual READ8_MEMBER(mem_r);
-	virtual WRITE8_MEMBER(mem_w);
-	virtual READ8_MEMBER(mem_linear_r);
-	virtual WRITE8_MEMBER(mem_linear_w);
+	virtual uint8_t port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	virtual void port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
+	virtual uint8_t mem_linear_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	virtual void mem_linear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 protected:
 	// device-level overrides
@@ -73,8 +73,8 @@ protected:
 	void crtc_reg_write(uint8_t index, uint8_t data);
 	void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();
-	READ8_MEMBER(vga_crtc_r);
-	WRITE8_MEMBER(vga_crtc_w);
+	uint8_t vga_crtc_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void vga_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint8_t gc_reg_read(uint8_t index);
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
@@ -280,50 +280,50 @@ public:
 
 	void enabled();
 
-	READ16_MEMBER(ibm8514_gpstatus_r);
-	WRITE16_MEMBER(ibm8514_cmd_w);
-	READ16_MEMBER(ibm8514_line_error_r);
-	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ16_MEMBER(ibm8514_status_r);
-	WRITE16_MEMBER(ibm8514_htotal_w);
-	READ16_MEMBER(ibm8514_substatus_r);
-	WRITE16_MEMBER(ibm8514_subcontrol_w);
-	READ16_MEMBER(ibm8514_subcontrol_r);
-	READ16_MEMBER(ibm8514_htotal_r);
-	READ16_MEMBER(ibm8514_vtotal_r);
-	WRITE16_MEMBER(ibm8514_vtotal_w);
-	READ16_MEMBER(ibm8514_vdisp_r);
-	WRITE16_MEMBER(ibm8514_vdisp_w);
-	READ16_MEMBER(ibm8514_vsync_r);
-	WRITE16_MEMBER(ibm8514_vsync_w);
-	READ16_MEMBER(ibm8514_desty_r);
-	WRITE16_MEMBER(ibm8514_desty_w);
-	READ16_MEMBER(ibm8514_destx_r);
-	WRITE16_MEMBER(ibm8514_destx_w);
-	READ16_MEMBER(ibm8514_ssv_r);
-	WRITE16_MEMBER(ibm8514_ssv_w);
-	READ16_MEMBER(ibm8514_currentx_r);
-	WRITE16_MEMBER(ibm8514_currentx_w);
-	READ16_MEMBER(ibm8514_currenty_r);
-	WRITE16_MEMBER(ibm8514_currenty_w);
-	READ16_MEMBER(ibm8514_width_r);
-	WRITE16_MEMBER(ibm8514_width_w);
-	READ16_MEMBER(ibm8514_fgcolour_r);
-	WRITE16_MEMBER(ibm8514_fgcolour_w);
-	READ16_MEMBER(ibm8514_bgcolour_r);
-	WRITE16_MEMBER(ibm8514_bgcolour_w);
-	READ16_MEMBER(ibm8514_multifunc_r);
-	WRITE16_MEMBER(ibm8514_multifunc_w);
-	READ16_MEMBER(ibm8514_backmix_r);
-	WRITE16_MEMBER(ibm8514_backmix_w);
-	READ16_MEMBER(ibm8514_foremix_r);
-	WRITE16_MEMBER(ibm8514_foremix_w);
-	READ16_MEMBER(ibm8514_pixel_xfer_r);
-	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
-	READ16_MEMBER(ibm8514_read_mask_r);
-	WRITE16_MEMBER(ibm8514_read_mask_w);
-	READ16_MEMBER(ibm8514_write_mask_r);
-	WRITE16_MEMBER(ibm8514_write_mask_w);
+	uint16_t ibm8514_gpstatus_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_line_error_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_line_error_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_status_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_htotal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_substatus_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_subcontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_subcontrol_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t ibm8514_htotal_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t ibm8514_vtotal_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_vtotal_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_vdisp_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_vdisp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_vsync_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_vsync_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_desty_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_desty_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_destx_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_destx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_ssv_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_ssv_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_currentx_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_currentx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_currenty_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_currenty_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_width_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_width_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_fgcolour_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_fgcolour_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_bgcolour_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_bgcolour_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_multifunc_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_multifunc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_backmix_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_backmix_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_foremix_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_foremix_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_pixel_xfer_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_pixel_xfer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_read_mask_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_read_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t ibm8514_write_mask_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void ibm8514_write_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 	void ibm8514_wait_draw();
 	struct
 	{
@@ -414,31 +414,31 @@ public:
 	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	READ16_MEMBER(mach8_ec0_r);
-	WRITE16_MEMBER(mach8_ec0_w);
-	READ16_MEMBER(mach8_ec1_r);
-	WRITE16_MEMBER(mach8_ec1_w);
-	READ16_MEMBER(mach8_ec2_r);
-	WRITE16_MEMBER(mach8_ec2_w);
-	READ16_MEMBER(mach8_ec3_r);
-	WRITE16_MEMBER(mach8_ec3_w);
-	READ16_MEMBER(mach8_ext_fifo_r);
-	WRITE16_MEMBER(mach8_linedraw_index_w);
-	READ16_MEMBER(mach8_bresenham_count_r);
-	WRITE16_MEMBER(mach8_bresenham_count_w);
-	WRITE16_MEMBER(mach8_linedraw_w);
-	READ16_MEMBER(mach8_linedraw_r);
-	READ16_MEMBER(mach8_scratch0_r);
-	WRITE16_MEMBER(mach8_scratch0_w);
-	READ16_MEMBER(mach8_scratch1_r);
-	WRITE16_MEMBER(mach8_scratch1_w);
-	READ16_MEMBER(mach8_config1_r);
-	READ16_MEMBER(mach8_config2_r);
-	READ16_MEMBER(mach8_sourcex_r);
-	READ16_MEMBER(mach8_sourcey_r);
-	WRITE16_MEMBER(mach8_ext_leftscissor_w);
-	WRITE16_MEMBER(mach8_ext_topscissor_w);
-	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
+	uint16_t mach8_ec0_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_ec0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_ec1_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_ec1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_ec2_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_ec2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_ec3_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_ec3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_ext_fifo_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_linedraw_index_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_bresenham_count_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_bresenham_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	void mach8_linedraw_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_linedraw_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t mach8_scratch0_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_scratch0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_scratch1_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_scratch1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_config1_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t mach8_config2_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t mach8_sourcex_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	uint16_t mach8_sourcey_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void mach8_ext_leftscissor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	void mach8_ext_topscissor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t mach8_clksel_r(address_space &space, offs_t offset, uint16_t mem_mask) { return mach8.clksel; }
 
 protected:
 	virtual void device_start() override;
@@ -470,14 +470,14 @@ public:
 	// construction/destruction
 	tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 
 protected:
 	virtual void device_start() override;
@@ -518,13 +518,13 @@ public:
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 
 	// VGA registers
-	virtual READ8_MEMBER(port_03c0_r) override;
-	READ8_MEMBER(ati_port_ext_r);
-	WRITE8_MEMBER(ati_port_ext_w);
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	uint8_t ati_port_ext_r(address_space &space, offs_t offset, uint8_t mem_mask);
+	void ati_port_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual uint16_t offset() override;
@@ -556,14 +556,14 @@ public:
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
@@ -644,14 +644,14 @@ public:
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
-	virtual READ8_MEMBER(port_03b0_r) override;
-	virtual WRITE8_MEMBER(port_03b0_w) override;
-	virtual READ8_MEMBER(port_03c0_r) override;
-	virtual WRITE8_MEMBER(port_03c0_w) override;
-	virtual READ8_MEMBER(port_03d0_r) override;
-	virtual WRITE8_MEMBER(port_03d0_w) override;
-	virtual READ8_MEMBER(mem_r) override;
-	virtual WRITE8_MEMBER(mem_w) override;
+	virtual uint8_t port_03b0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03c0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t port_03d0_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void port_03d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
+	virtual uint8_t mem_r(address_space &space, offs_t offset, uint8_t mem_mask) override;
+	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override;
 };
 
 

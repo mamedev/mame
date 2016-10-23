@@ -64,18 +64,18 @@ public:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
-	DECLARE_WRITE8_MEMBER(i8089_ca1_w);
-	DECLARE_WRITE8_MEMBER(i8089_ca2_w);
-	DECLARE_WRITE8_MEMBER(i8255_portb_w);
-	DECLARE_READ8_MEMBER(i8255_portc_r);
-	DECLARE_WRITE8_MEMBER(i8255_portc_w);
+	void i8089_ca1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8089_ca2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void i8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t i8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(timer_out1);
 	DECLARE_WRITE_LINE_MEMBER(timer_out2);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_READ8_MEMBER(sio_da_r);
-	DECLARE_READ8_MEMBER(sio_ca_r);
-	DECLARE_READ8_MEMBER(sio_db_r);
-	DECLARE_READ8_MEMBER(sio_cb_r);
+	uint8_t sio_da_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sio_ca_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sio_db_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sio_cb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
@@ -127,14 +127,14 @@ private:
 //  I/O
 //**************************************************************************
 
-WRITE8_MEMBER( apricot_state::i8089_ca1_w )
+void apricot_state::i8089_ca1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_iop->sel_w(0);
 	m_iop->ca_w(1);
 	m_iop->ca_w(0);
 }
 
-WRITE8_MEMBER( apricot_state::i8089_ca2_w )
+void apricot_state::i8089_ca2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_iop->sel_w(1);
 	m_iop->ca_w(1);
@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
 	m_centronics_perror = state;
 }
 
-READ8_MEMBER( apricot_state::i8255_portc_r )
+uint8_t apricot_state::i8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -165,7 +165,7 @@ READ8_MEMBER( apricot_state::i8255_portc_r )
 	return data;
 }
 
-WRITE8_MEMBER( apricot_state::i8255_portb_w )
+void apricot_state::i8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0, crt reset
 	// bit 1, not connected
@@ -194,7 +194,7 @@ WRITE8_MEMBER( apricot_state::i8255_portb_w )
 	// PB7 Centronics transceiver direction. 0 = output, 1 = input
 }
 
-WRITE8_MEMBER( apricot_state::i8255_portc_w )
+void apricot_state::i8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
 	m_centronics->write_strobe(BIT(data, 5));
@@ -222,7 +222,7 @@ WRITE_LINE_MEMBER( apricot_state::timer_out2 )
 	}
 }
 
-READ8_MEMBER( apricot_state::sio_da_r )
+uint8_t apricot_state::sio_da_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -230,7 +230,7 @@ READ8_MEMBER( apricot_state::sio_da_r )
 	return m_sio->da_r(space, offset);
 }
 
-READ8_MEMBER( apricot_state::sio_ca_r )
+uint8_t apricot_state::sio_ca_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -238,7 +238,7 @@ READ8_MEMBER( apricot_state::sio_ca_r )
 	return m_sio->ca_r(space, offset);
 }
 
-READ8_MEMBER( apricot_state::sio_cb_r )
+uint8_t apricot_state::sio_cb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();
@@ -246,7 +246,7 @@ READ8_MEMBER( apricot_state::sio_cb_r )
 	return m_sio->cb_r(space, offset);
 }
 
-READ8_MEMBER( apricot_state::sio_db_r )
+uint8_t apricot_state::sio_db_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_bus_locked)
 		return m_sio->m1_r();

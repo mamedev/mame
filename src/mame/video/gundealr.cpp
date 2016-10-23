@@ -66,19 +66,19 @@ void gundealr_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(gundealr_state::gundealr_bg_videoram_w)
+void gundealr_state::gundealr_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::gundealr_fg_videoram_w)
+void gundealr_state::gundealr_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(gundealr_state::gundealr_paletteram_w)
+void gundealr_state::gundealr_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b,val;
 
@@ -95,21 +95,21 @@ WRITE8_MEMBER(gundealr_state::gundealr_paletteram_w)
 	m_palette->set_pen_color(offset / 2, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-WRITE8_MEMBER(gundealr_state::gundealr_fg_scroll_w)
+void gundealr_state::gundealr_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll[offset] = data;
 	m_fg_tilemap->set_scrollx(0, m_scroll[1] | ((m_scroll[0] & 0x03) << 8));
 	m_fg_tilemap->set_scrolly(0, m_scroll[3] | ((m_scroll[2] & 0x03) << 8));
 }
 
-WRITE8_MEMBER(gundealr_state::yamyam_fg_scroll_w)
+void gundealr_state::yamyam_fg_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scroll[offset] = data;
 	m_fg_tilemap->set_scrollx(0, m_scroll[0] | ((m_scroll[1] & 0x03) << 8));
 	m_fg_tilemap->set_scrolly(0, m_scroll[2] | ((m_scroll[3] & 0x03) << 8));
 }
 
-WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
+void gundealr_state::gundealr_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

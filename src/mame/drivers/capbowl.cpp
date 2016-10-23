@@ -150,7 +150,7 @@ TIMER_CALLBACK_MEMBER(capbowl_state::update)
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::capbowl_rom_select_w)
+void capbowl_state::capbowl_rom_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 2009-11 FP: shall we add a check to be sure that bank < 6?
 	membank("bank1")->set_entry(((data & 0x0c) >> 1) + (data & 0x01));
@@ -164,19 +164,19 @@ WRITE8_MEMBER(capbowl_state::capbowl_rom_select_w)
  *
  *************************************/
 
-READ8_MEMBER(capbowl_state::track_0_r)
+uint8_t capbowl_state::track_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("IN0")->read() & 0xf0) | ((ioport("TRACKY")->read() - m_last_trackball_val[0]) & 0x0f);
 }
 
 
-READ8_MEMBER(capbowl_state::track_1_r)
+uint8_t capbowl_state::track_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("IN1")->read() & 0xf0) | ((ioport("TRACKX")->read() - m_last_trackball_val[1]) & 0x0f);
 }
 
 
-WRITE8_MEMBER(capbowl_state::track_reset_w)
+void capbowl_state::track_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* reset the trackball counters */
 	m_last_trackball_val[0] = ioport("TRACKY")->read();
@@ -193,7 +193,7 @@ WRITE8_MEMBER(capbowl_state::track_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(capbowl_state::sndcmd_w)
+void capbowl_state::sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	m_soundlatch->write(space, offset, data);

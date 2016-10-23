@@ -238,27 +238,27 @@ public:
 	uint32_t    m_DMActrl[2];
 	uint8_t     m_OldPort4;
 
-	DECLARE_READ32_MEMBER(FlipCount_r);
-	DECLARE_WRITE32_MEMBER(FlipCount_w);
-	DECLARE_READ32_MEMBER(Input_r);
-	DECLARE_WRITE32_MEMBER(IntAck_w);
-	DECLARE_WRITE32_MEMBER(Banksw_w);
-	DECLARE_WRITE32_MEMBER(Timer0_w);
-	DECLARE_READ32_MEMBER(Timer0_r);
-	DECLARE_WRITE32_MEMBER(Timer1_w);
-	DECLARE_READ32_MEMBER(Timer1_r);
-	DECLARE_WRITE32_MEMBER(Timer2_w);
-	DECLARE_READ32_MEMBER(Timer2_r);
-	DECLARE_WRITE32_MEMBER(Timer3_w);
-	DECLARE_READ32_MEMBER(Timer3_r);
-	DECLARE_READ32_MEMBER(FlashCmd_r);
-	DECLARE_WRITE32_MEMBER(FlashCmd_w);
-	DECLARE_READ32_MEMBER(PIO_r);
-	DECLARE_WRITE32_MEMBER(PIO_w);
-	DECLARE_READ32_MEMBER(DMA0_r);
-	DECLARE_WRITE32_MEMBER(DMA0_w);
-	DECLARE_READ32_MEMBER(DMA1_r);
-	DECLARE_WRITE32_MEMBER(DMA1_w);
+	uint32_t FlipCount_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void FlipCount_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void IntAck_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void Banksw_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void Timer0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Timer0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void Timer1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Timer1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void Timer2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Timer2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void Timer3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t Timer3_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t FlashCmd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void FlashCmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t PIO_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void PIO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t DMA0_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void DMA0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t DMA1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void DMA1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_topbladv();
 	void init_officeye();
 	void init_crysking();
@@ -266,11 +266,11 @@ public:
 	void init_donghaer();
 	void init_psattack();
 
-	DECLARE_READ32_MEMBER(trivrus_input_r);
-	DECLARE_WRITE32_MEMBER(trivrus_input_w);
+	uint32_t trivrus_input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void trivrus_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint8_t m_trivrus_input;
 
-	DECLARE_READ32_MEMBER(crzyddz2_4_r);
+	uint32_t crzyddz2_4_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -305,7 +305,7 @@ void crystal_state::IntReq( int num )
 #endif
 }
 
-READ32_MEMBER(crystal_state::FlipCount_r)
+uint32_t crystal_state::FlipCount_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 #ifdef IDLE_LOOP_SPEEDUP
 	uint32_t IntPend = space.read_dword(0x01800c0c);
@@ -316,7 +316,7 @@ READ32_MEMBER(crystal_state::FlipCount_r)
 	return ((uint32_t) m_FlipCount) << 16;
 }
 
-WRITE32_MEMBER(crystal_state::FlipCount_w)
+void crystal_state::FlipCount_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_16_23)
 	{
@@ -328,7 +328,7 @@ WRITE32_MEMBER(crystal_state::FlipCount_w)
 	}
 }
 
-READ32_MEMBER(crystal_state::Input_r)
+uint32_t crystal_state::Input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset == 0)
 		return ioport("P1_P2")->read();
@@ -347,7 +347,7 @@ READ32_MEMBER(crystal_state::Input_r)
 	return 0;
 }
 
-WRITE32_MEMBER(crystal_state::IntAck_w)
+void crystal_state::IntAck_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t IntPend = space.read_dword(0x01800c0c);
 
@@ -378,7 +378,7 @@ IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 	return 0;       //This should never happen
 }
 
-WRITE32_MEMBER(crystal_state::Banksw_w)
+void crystal_state::Banksw_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_Bank = (data >> 1) & 7;
 	if (m_Bank <= 2)
@@ -414,47 +414,47 @@ void crystal_state::Timer_w( address_space &space, int which, uint32_t data, uin
 	COMBINE_DATA(&m_Timerctrl[which]);
 }
 
-WRITE32_MEMBER(crystal_state::Timer0_w)
+void crystal_state::Timer0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	Timer_w(space, 0, data, mem_mask);
 }
 
-READ32_MEMBER(crystal_state::Timer0_r)
+uint32_t crystal_state::Timer0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_Timerctrl[0];
 }
 
-WRITE32_MEMBER(crystal_state::Timer1_w)
+void crystal_state::Timer1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	Timer_w(space, 1, data, mem_mask);
 }
 
-READ32_MEMBER(crystal_state::Timer1_r)
+uint32_t crystal_state::Timer1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_Timerctrl[1];
 }
 
-WRITE32_MEMBER(crystal_state::Timer2_w)
+void crystal_state::Timer2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	Timer_w(space, 2, data, mem_mask);
 }
 
-READ32_MEMBER(crystal_state::Timer2_r)
+uint32_t crystal_state::Timer2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_Timerctrl[2];
 }
 
-WRITE32_MEMBER(crystal_state::Timer3_w)
+void crystal_state::Timer3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	Timer_w(space, 3, data, mem_mask);
 }
 
-READ32_MEMBER(crystal_state::Timer3_r)
+uint32_t crystal_state::Timer3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_Timerctrl[3];
 }
 
-READ32_MEMBER(crystal_state::FlashCmd_r)
+uint32_t crystal_state::FlashCmd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if ((m_FlashCmd & 0xff) == 0xff)
 	{
@@ -476,17 +476,17 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	return 0;
 }
 
-WRITE32_MEMBER(crystal_state::FlashCmd_w)
+void crystal_state::FlashCmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_FlashCmd = data;
 }
 
-READ32_MEMBER(crystal_state::PIO_r)
+uint32_t crystal_state::PIO_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_PIO;
 }
 
-WRITE32_MEMBER(crystal_state::PIO_w)
+void crystal_state::PIO_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t RST = data & 0x01000000;
 	uint32_t CLK = data & 0x02000000;
@@ -545,22 +545,22 @@ void crystal_state::DMA_w( address_space &space, int which, uint32_t data, uint3
 	COMBINE_DATA(&m_DMActrl[which]);
 }
 
-READ32_MEMBER(crystal_state::DMA0_r)
+uint32_t crystal_state::DMA0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_DMActrl[0];
 }
 
-WRITE32_MEMBER(crystal_state::DMA0_w)
+void crystal_state::DMA0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	DMA_w(space, 0, data, mem_mask);
 }
 
-READ32_MEMBER(crystal_state::DMA1_r)
+uint32_t crystal_state::DMA1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_DMActrl[1];
 }
 
-WRITE32_MEMBER(crystal_state::DMA1_w)
+void crystal_state::DMA1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	DMA_w(space, 1, data, mem_mask);
 }
@@ -603,7 +603,7 @@ ADDRESS_MAP_END
 // Trivia R Us
 // To do: touch panel, RTC
 
-READ32_MEMBER(crystal_state::trivrus_input_r)
+uint32_t crystal_state::trivrus_input_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (m_trivrus_input)
 	{
@@ -618,7 +618,7 @@ READ32_MEMBER(crystal_state::trivrus_input_r)
 	return 0xffffffff;
 }
 
-WRITE32_MEMBER(crystal_state::trivrus_input_w)
+void crystal_state::trivrus_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_trivrus_input = data & 0xff;
@@ -667,7 +667,7 @@ ADDRESS_MAP_END
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection
 
-READ32_MEMBER(crystal_state::crzyddz2_4_r)
+uint32_t crystal_state::crzyddz2_4_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffff3f | (machine().rand() & 0xc0);
 }

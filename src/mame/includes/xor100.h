@@ -67,15 +67,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE8_MEMBER( mmu_w );
-	DECLARE_WRITE8_MEMBER( prom_toggle_w );
-	DECLARE_READ8_MEMBER( prom_disable_r );
-	DECLARE_WRITE8_MEMBER( baud_w );
-	DECLARE_READ8_MEMBER( fdc_r );
-	DECLARE_WRITE8_MEMBER( fdc_w );
-	DECLARE_READ8_MEMBER( fdc_wait_r );
-	DECLARE_WRITE8_MEMBER( fdc_dcont_w );
-	DECLARE_WRITE8_MEMBER( fdc_dsel_w );
+	void mmu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void prom_toggle_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t prom_disable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fdc_wait_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fdc_dcont_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fdc_dsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 
@@ -92,7 +92,7 @@ public:
 	int m_fdc_dden;
 	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
 	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
-	DECLARE_READ8_MEMBER(i8255_pc_r);
+	uint8_t i8255_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);

@@ -39,7 +39,7 @@ public:
 	required_device<deco_mxc06_device> m_spritegen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(madmotor_sound_w);
+	void madmotor_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_madmotor();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

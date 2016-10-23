@@ -29,21 +29,21 @@ public:
 
 	DECLARE_ADDRESS_MAP(m3_map, 32);
 
-	DECLARE_READ16_MEMBER(ctrl_r);
-	DECLARE_WRITE16_MEMBER(ctrl_w);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(ioregs_r);
-	DECLARE_WRITE16_MEMBER(ioregs_w);
+	uint16_t ioregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ioregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(m3_m68k_ram_r);
-	DECLARE_WRITE16_MEMBER(m3_m68k_ram_w);
-	DECLARE_READ8_MEMBER(m3_comm_ram_r);
-	DECLARE_WRITE8_MEMBER(m3_comm_ram_w);
-	DECLARE_READ16_MEMBER(m3_ioregs_r);
-	DECLARE_WRITE16_MEMBER(m3_ioregs_w);
+	uint16_t m3_m68k_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m3_m68k_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t m3_comm_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void m3_comm_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t m3_ioregs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void m3_ioregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(naomi_r);
-	DECLARE_WRITE16_MEMBER(naomi_w);
+	uint16_t naomi_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void naomi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 protected:
 	enum { TIMER_IRQ5 = 1 };

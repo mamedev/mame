@@ -70,7 +70,7 @@ void dragon_state::pia1_pa_changed(uint8_t data)
 //  ff00_read
 //-------------------------------------------------
 
-READ8_MEMBER( dragon64_state::ff00_read )
+uint8_t dragon64_state::ff00_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0x00;
 
@@ -93,7 +93,7 @@ READ8_MEMBER( dragon64_state::ff00_read )
 //  ff00_write
 //-------------------------------------------------
 
-WRITE8_MEMBER( dragon64_state::ff00_write )
+void dragon64_state::ff00_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset & 0x07)
 	{

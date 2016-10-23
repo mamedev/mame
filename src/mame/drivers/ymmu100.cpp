@@ -170,26 +170,26 @@ public:
 	uint8_t cur_ic32;
 	float contrast;
 
-	DECLARE_READ16_MEMBER(adc0_r);
-	DECLARE_READ16_MEMBER(adc2_r);
-	DECLARE_READ16_MEMBER(adc4_r);
-	DECLARE_READ16_MEMBER(adc6_r);
-	virtual DECLARE_READ16_MEMBER(adc7_r);
+	uint16_t adc0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc4_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t adc6_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint16_t adc7_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(p1_w);
-	DECLARE_READ16_MEMBER(p1_r);
-	DECLARE_WRITE16_MEMBER(p2_w);
-	DECLARE_WRITE16_MEMBER(p3_w);
-	DECLARE_WRITE16_MEMBER(p5_w);
-	DECLARE_WRITE16_MEMBER(p6_w);
-	DECLARE_READ16_MEMBER(p6_r);
-	DECLARE_WRITE16_MEMBER(pa_w);
-	DECLARE_READ16_MEMBER(pa_r);
-	DECLARE_WRITE16_MEMBER(pf_w);
-	DECLARE_WRITE16_MEMBER(pg_w);
+	void p1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t p1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void p2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void p3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void p5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void p6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t p6_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pa_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pf_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER(snd_r);
-	DECLARE_WRITE16_MEMBER(snd_w);
+	uint16_t snd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	float lightlevel(const uint8_t *src, const uint8_t *render);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -202,7 +202,7 @@ public:
 		: mu100_state(mconfig, type, tag)
 	{ }
 
-	virtual DECLARE_READ16_MEMBER(adc7_r) override;
+	virtual uint16_t adc7_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) override;
 };
 
 #include "../drivers/ymmu100.hxx"
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( mu100_map, AS_PROGRAM, 16, mu100_state )
 	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(snd_r, snd_w)
 ADDRESS_MAP_END
 
-READ16_MEMBER(mu100_state::snd_r)
+uint16_t mu100_state::snd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int chan = (offset >> 6) & 0x3f;
 	int slot = offset & 0x3f;
@@ -274,55 +274,55 @@ READ16_MEMBER(mu100_state::snd_r)
 	return 0x0000;
 }
 
-WRITE16_MEMBER(mu100_state::snd_w)
+void mu100_state::snd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int chan = (offset >> 6) & 0x3f;
 	int slot = offset & 0x3f;
 	logerror("snd_w %02x.%02x, %04x (%06x)\n", chan, slot, data, m_maincpu->pc());
 }
 
-READ16_MEMBER(mu100_state::adc0_r)
+uint16_t mu100_state::adc0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("adc0_r\n");
 	return 0;
 }
 
-READ16_MEMBER(mu100_state::adc2_r)
+uint16_t mu100_state::adc2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("adc2_r\n");
 	return 0;
 }
 
 // Put the host switch to pure midi
-READ16_MEMBER(mu100_state::adc4_r)
+uint16_t mu100_state::adc4_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
 // Battery level
-READ16_MEMBER(mu100_state::adc6_r)
+uint16_t mu100_state::adc6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("adc6_r\n");
 	return 0x3ff;
 }
 
 // model detect.  pulled to GND (0) on MU100, to 0.5Vcc on the card version, to Vcc on MU100R
-READ16_MEMBER(mu100_state::adc7_r)
+uint16_t mu100_state::adc7_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0;
 }
 
-READ16_MEMBER(mu100r_state::adc7_r)
+uint16_t mu100r_state::adc7_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x3ff;
 }
 
-WRITE16_MEMBER(mu100_state::p1_w)
+void mu100_state::p1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_p1 = data;
 }
 
-READ16_MEMBER(mu100_state::p1_r)
+uint16_t mu100_state::p1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if((cur_p2 & P2_LCD_ENABLE)) {
 		if(cur_p2 & P2_LCD_RW) {
@@ -346,7 +346,7 @@ READ16_MEMBER(mu100_state::p1_r)
 	return 0xff;
 }
 
-WRITE16_MEMBER(mu100_state::p2_w)
+void mu100_state::p2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// LCB enable edge
 	if(!(cur_p2 & P2_LCD_ENABLE) && (data & P2_LCD_ENABLE)) {
@@ -361,50 +361,50 @@ WRITE16_MEMBER(mu100_state::p2_w)
 	cur_p2 = data;
 }
 
-WRITE16_MEMBER(mu100_state::p3_w)
+void mu100_state::p3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_p3 = data;
 	logerror("A/D gain control %d\n", (data >> 4) & 3);
 }
 
-WRITE16_MEMBER(mu100_state::p5_w)
+void mu100_state::p5_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_p5 = data;
 	logerror("Rotary reset %d\n", (data >> 3) & 1);
 }
 
-WRITE16_MEMBER(mu100_state::p6_w)
+void mu100_state::p6_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_p6 = data;
 	logerror("pbsel %d pbreset %d soundreset %d\n", (data >> 2) & 3, (data >> 4) & 1, (data >> 5) & 1);
 }
 
-READ16_MEMBER(mu100_state::p6_r)
+uint16_t mu100_state::p6_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("plug in detect read\n");
 	return 0x00;
 }
 
-WRITE16_MEMBER(mu100_state::pa_w)
+void mu100_state::pa_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_pa = data;
 	logerror("rotary encoder %d\n", (data >> 6) & 3);
 }
 
-READ16_MEMBER(mu100_state::pa_r)
+uint16_t mu100_state::pa_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	logerror("offline detect read\n");
 	return 0x00;
 }
 
-WRITE16_MEMBER(mu100_state::pf_w)
+void mu100_state::pf_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(cur_pf & 0x01) && (data & 0x01))
 		cur_ic32 = cur_p1;
 	cur_pf = data;
 }
 
-WRITE16_MEMBER(mu100_state::pg_w)
+void mu100_state::pg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	cur_pg = data;
 	logerror("pbsel3 %d\n", data & 1);

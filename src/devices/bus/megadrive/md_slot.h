@@ -95,17 +95,17 @@ public:
 	virtual ~device_md_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write) {}
-	virtual DECLARE_READ16_MEMBER(read_a13) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_a13) {}
-	virtual DECLARE_READ16_MEMBER(read_a15) { return 0xffff; }
-	virtual DECLARE_WRITE16_MEMBER(write_a15) {}
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0xffff; }
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {}
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0xffff; }
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {}
+	virtual uint16_t read_a15(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0xffff; }
+	virtual void write_a15(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) {}
 
 	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
+	virtual void write_tmss_bank(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_device.logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
@@ -181,13 +181,13 @@ public:
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
-	virtual DECLARE_READ16_MEMBER(read_a13);
-	virtual DECLARE_WRITE16_MEMBER(write_a13);
-	virtual DECLARE_READ16_MEMBER(read_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data, mem_mask); };
+	virtual uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_a13(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual void write_a13(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual uint16_t read_a15(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual void write_a15(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	virtual void write_tmss_bank(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { if (m_cart) m_cart->write_tmss_bank(space, offset, data, mem_mask); };
 
 	virtual int read_test() { if (m_cart) return m_cart->read_test(); else return 0; }  // used by Virtua Racing test
 

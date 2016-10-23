@@ -30,31 +30,31 @@ void h8_adc_device::set_info(const char *_intc_tag, int _intc_vector)
 	intc_vector = _intc_vector;
 }
 
-READ8_MEMBER(h8_adc_device::addr8_r)
+uint8_t h8_adc_device::addr8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(V>=1) logerror("addr8_r %d %03x\n", offset, addr[offset >> 1]);
 	return offset & 1 ? addr[offset >> 1] << 6 : addr[offset >> 1] >> 2;
 }
 
-READ16_MEMBER(h8_adc_device::addr16_r)
+uint16_t h8_adc_device::addr16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(V>=1) logerror("addr16_r %d %03x\n", offset, addr[offset]);
 	return addr[offset];
 }
 
-READ8_MEMBER(h8_adc_device::adcsr_r)
+uint8_t h8_adc_device::adcsr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(V>=1) logerror("adcsr_r %02x\n", adcsr);
 	return adcsr;
 }
 
-READ8_MEMBER(h8_adc_device::adcr_r)
+uint8_t h8_adc_device::adcr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(V>=1) logerror("adcr_r %02x\n", adcr);
 	return adcr;
 }
 
-WRITE8_MEMBER(h8_adc_device::adcsr_w)
+void h8_adc_device::adcsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("adcsr_w %02x\n", data);
 	uint8_t prev = adcsr;
@@ -75,7 +75,7 @@ WRITE8_MEMBER(h8_adc_device::adcsr_w)
 		start_conversion();
 }
 
-WRITE8_MEMBER(h8_adc_device::adcr_w)
+void h8_adc_device::adcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(V>=1) logerror("adcr_w %02x\n", data);
 	adcr = data;

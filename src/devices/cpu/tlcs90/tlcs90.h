@@ -27,8 +27,8 @@ public:
 	// construction/destruction
 	tlcs90_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, address_map_constructor program_map);
 
-	DECLARE_READ8_MEMBER( t90_internal_registers_r );
-	DECLARE_WRITE8_MEMBER( t90_internal_registers_w );
+	uint8_t t90_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void t90_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_CALLBACK_MEMBER( t90_timer_callback );
 	TIMER_CALLBACK_MEMBER( t90_timer4_callback );

@@ -100,7 +100,7 @@ CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }
 
-WRITE8_MEMBER(champbas_state::irq_enable_w)
+void champbas_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_mask = data & 1;
 
@@ -121,19 +121,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
  *
  *************************************/
 
-WRITE8_MEMBER(champbas_state::mcu_switch_w)
+void champbas_state::mcu_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// switch shared RAM between CPU and MCU bus
 	m_alpha_8201->bus_dir_w(data & 1);
 }
 
-WRITE8_MEMBER(champbas_state::mcu_start_w)
+void champbas_state::mcu_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_alpha_8201->mcu_start_w(data & 1);
 }
 
 /* champbja another protection */
-READ8_MEMBER(champbas_state::champbja_protection_r)
+uint8_t champbas_state::champbja_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	/*

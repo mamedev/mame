@@ -31,11 +31,11 @@ public:
 	/* misc */
 	int m_adpcm_bank_shift;
 	int m_sndbank;
-	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_videoram_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_spritebank_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrollx_w);
-	DECLARE_WRITE16_MEMBER(ohmygod_scrolly_w);
+	void ohmygod_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_spritebank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ohmygod_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_ohmygod();
 	void init_naname();
 	TILE_GET_INFO_MEMBER(get_tile_info);

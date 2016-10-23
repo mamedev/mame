@@ -192,11 +192,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(duart39_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart40_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(nevada_rtc_irq);
-	DECLARE_READ16_MEMBER(io_board_r);
-	DECLARE_WRITE16_MEMBER(io_board_w);
-	DECLARE_WRITE16_MEMBER (io_board_x);
-	DECLARE_READ16_MEMBER( nevada_sec_r );
-	DECLARE_WRITE16_MEMBER( nevada_sec_w );
+	uint16_t io_board_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void io_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void io_board_x(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t nevada_sec_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void nevada_sec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void machine_start_nevada();
 	void init_nevada();
@@ -253,7 +253,7 @@ static const gfx_layout charlayout =
 
 /***************************************************************************/
 /*
-WRITE16_MEMBER( nevada_state:nevada_videoram_w )
+void nevada_state:nevada_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 // Todo, Just for sample
 
@@ -389,24 +389,24 @@ static const ay8910_interface ay8910_config =
 #endif
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::io_board_r)
+uint16_t nevada_state::io_board_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA00000
 	return 1;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_w)
+void nevada_state::io_board_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA00000 on bit0
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::io_board_x)
+void nevada_state::io_board_x(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// IO board Serial communication 0xA80000  on bit15
 }
 
 /***************************************************************************/
-READ16_MEMBER(nevada_state::nevada_sec_r )
+uint16_t nevada_state::nevada_sec_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 //  D3..D0 = DOOR OPEN or Track STATE of PAL35
 	uint16_t res;
@@ -419,7 +419,7 @@ READ16_MEMBER(nevada_state::nevada_sec_r )
 	return res;
 }
 /***************************************************************************/
-WRITE16_MEMBER(nevada_state::nevada_sec_w )
+void nevada_state::nevada_sec_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// 74LS173 $bits Register used LOWER bits D3..D0 for DOOR LOGIC SWITCH
 	m_datA40000 = data | 0x00f0;     // since D7..D4 are not used and are connected to PULLUP

@@ -109,27 +109,27 @@ class v53_base_device : public nec_common_device
 public:
 	v53_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
 
-	DECLARE_WRITE8_MEMBER(BSEL_w);
-	DECLARE_WRITE8_MEMBER(BADR_w);
-	DECLARE_WRITE8_MEMBER(BRC_w);
-	DECLARE_WRITE8_MEMBER(WMB0_w);
-	DECLARE_WRITE8_MEMBER(WCY1_w);
-	DECLARE_WRITE8_MEMBER(WCY0_w);
-	DECLARE_WRITE8_MEMBER(WAC_w);
-	DECLARE_WRITE8_MEMBER(TCKS_w);
-	DECLARE_WRITE8_MEMBER(SBCR_w);
-	DECLARE_WRITE8_MEMBER(REFC_w);
-	DECLARE_WRITE8_MEMBER(WMB1_w);
-	DECLARE_WRITE8_MEMBER(WCY2_w);
-	DECLARE_WRITE8_MEMBER(WCY3_w);
-	DECLARE_WRITE8_MEMBER(WCY4_w);
-	DECLARE_WRITE8_MEMBER(SULA_w);
-	DECLARE_WRITE8_MEMBER(TULA_w);
-	DECLARE_WRITE8_MEMBER(IULA_w);
-	DECLARE_WRITE8_MEMBER(DULA_w);
-	DECLARE_WRITE8_MEMBER(OPHA_w);
-	DECLARE_WRITE8_MEMBER(OPSEL_w);
-	DECLARE_WRITE8_MEMBER(SCTL_w);
+	void BSEL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void BADR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void BRC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WMB0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WCY1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WCY0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WAC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void TCKS_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void SBCR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void REFC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WMB1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WCY2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WCY3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void WCY4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void SULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void TULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void IULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void DULA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void OPHA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void OPSEL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void SCTL_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_SCTL;
 	uint8_t m_OPSEL;
@@ -141,8 +141,8 @@ public:
 	uint8_t m_OPHA;
 
 	// SCU
-	DECLARE_READ8_MEMBER(scu_simk_r);
-	DECLARE_WRITE8_MEMBER(scu_simk_w);
+	uint8_t scu_simk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void scu_simk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_simk;
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txd_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_dtr_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_dtr_handler.set_callback(object); }
@@ -160,13 +160,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scu_syndet_trampoline_cb) { m_syndet_handler(state); }
 
 	// TCU
-	DECLARE_READ8_MEMBER(tmu_tst0_r);
-	DECLARE_WRITE8_MEMBER(tmu_tct0_w);
-	DECLARE_READ8_MEMBER(tmu_tst1_r);
-	DECLARE_WRITE8_MEMBER(tmu_tct1_w);
-	DECLARE_READ8_MEMBER(tmu_tst2_r);
-	DECLARE_WRITE8_MEMBER(tmu_tct2_w);
-	DECLARE_WRITE8_MEMBER(tmu_tmd_w);
+	uint8_t tmu_tst0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmu_tct0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tmu_tst1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmu_tct1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tmu_tst2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tmu_tct2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tmu_tmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 //  static void set_clk0(device_t &device, double clk0) { downcast<v53_base_device &>(device).m_clk0 = clk0; }
 //  static void set_clk1(device_t &device, double clk1) { downcast<v53_base_device &>(device).m_clk1 = clk1; }
 //  static void set_clk2(device_t &device, double clk2) { downcast<v53_base_device &>(device).m_clk2 = clk2; }
@@ -196,16 +196,16 @@ public:
 	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_3_cb.set_callback(object); }
 	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
-	DECLARE_READ8_MEMBER(dma_memr_trampoline_r) { return m_in_memr_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_memw_trampoline_w) {  m_out_memw_cb(space, offset, data); }
-	DECLARE_READ8_MEMBER(dma_io_0_trampoline_r) { return m_in_ior_0_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_1_trampoline_r) { return m_in_ior_1_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_2_trampoline_r) { return m_in_ior_2_cb(space, offset); }
-	DECLARE_READ8_MEMBER(dma_io_3_trampoline_r) { return m_in_ior_3_cb(space, offset); }
-	DECLARE_WRITE8_MEMBER(dma_io_0_trampoline_w) { m_out_iow_0_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_1_trampoline_w) { m_out_iow_1_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_2_trampoline_w) { m_out_iow_2_cb(space, offset, data); }
-	DECLARE_WRITE8_MEMBER(dma_io_3_trampoline_w) { m_out_iow_3_cb(space, offset, data); }
+	uint8_t dma_memr_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_memr_cb(space, offset); }
+	void dma_memw_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {  m_out_memw_cb(space, offset, data); }
+	uint8_t dma_io_0_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_ior_0_cb(space, offset); }
+	uint8_t dma_io_1_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_ior_1_cb(space, offset); }
+	uint8_t dma_io_2_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_ior_2_cb(space, offset); }
+	uint8_t dma_io_3_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_ior_3_cb(space, offset); }
+	void dma_io_0_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_0_cb(space, offset, data); }
+	void dma_io_1_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_1_cb(space, offset, data); }
+	void dma_io_2_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_2_cb(space, offset, data); }
+	void dma_io_3_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_3_cb(space, offset, data); }
 	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
@@ -236,7 +236,7 @@ public:
 
 
 
-	DECLARE_READ8_MEMBER(get_pic_ack);
+	uint8_t get_pic_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
 
 

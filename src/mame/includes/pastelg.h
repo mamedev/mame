@@ -37,16 +37,16 @@ public:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	int m_flipscreen_old;
 
-	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
-	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
-	DECLARE_READ8_MEMBER(threeds_inputport1_r);
-	DECLARE_READ8_MEMBER(threeds_inputport2_r);
-	DECLARE_WRITE8_MEMBER(threeds_inputportsel_w);
-	DECLARE_WRITE8_MEMBER(pastelg_blitter_w);
-	DECLARE_WRITE8_MEMBER(threeds_romsel_w);
-	DECLARE_WRITE8_MEMBER(threeds_output_w);
-	DECLARE_READ8_MEMBER(threeds_rom_readback_r);
-	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
+	uint8_t pastelg_sndrom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pastelg_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t threeds_inputport1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t threeds_inputport2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void threeds_inputportsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pastelg_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void threeds_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void threeds_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t threeds_rom_readback_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pastelg_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);

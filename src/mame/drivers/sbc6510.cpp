@@ -70,12 +70,12 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(a2_r);
-	DECLARE_WRITE8_MEMBER(a2_w);
-	DECLARE_READ8_MEMBER(psg_a_r);
-	DECLARE_READ8_MEMBER(psg_b_r);
-	DECLARE_WRITE8_MEMBER(key_w);
-	DECLARE_READ8_MEMBER(key_r);
+	uint8_t a2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t psg_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t psg_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t m_term_data;
 	uint8_t m_key_row;
 	uint8_t m_2;
@@ -205,12 +205,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::a2_r )
+uint8_t sbc6510_state::a2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_2;
 }
 
-WRITE8_MEMBER( sbc6510_state::a2_w )
+void sbc6510_state::a2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_2 = data;
 	m_terminal->write(space, 0, data);
@@ -231,17 +231,17 @@ void sbc6510_state::machine_reset()
 {
 }
 
-READ8_MEMBER( sbc6510_state::psg_a_r )
+uint8_t sbc6510_state::psg_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER( sbc6510_state::psg_b_r )
+uint8_t sbc6510_state::psg_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x7f;
 }
 
-READ8_MEMBER( sbc6510_state::key_r )
+uint8_t sbc6510_state::key_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 
@@ -255,7 +255,7 @@ READ8_MEMBER( sbc6510_state::key_r )
 	return ~data;
 }
 
-WRITE8_MEMBER( sbc6510_state::key_w )
+void sbc6510_state::key_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_key_row = data;
 }

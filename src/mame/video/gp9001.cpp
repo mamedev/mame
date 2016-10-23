@@ -153,19 +153,19 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #define GP9001_PRIMASK (0x000f)
 #define GP9001_PRIMASK_TMAPS (0x000e)
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_bg_tmap_w )
+void gp9001vdp_device::gp9001_bg_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_bg[offset]);
 	bg.tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_fg_tmap_w )
+void gp9001vdp_device::gp9001_fg_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_fg[offset]);
 	fg.tmap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_top_tmap_w )
+void gp9001vdp_device::gp9001_top_tmap_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram_top[offset]);
 	top.tmap->mark_tile_dirty(offset/2);
@@ -540,7 +540,7 @@ void gp9001vdp_device::init_scroll_regs()
 
 
 
-READ16_MEMBER( gp9001vdp_device::gp9001_vdp_r )
+uint16_t gp9001vdp_device::gp9001_vdp_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
@@ -557,7 +557,7 @@ READ16_MEMBER( gp9001vdp_device::gp9001_vdp_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_w )
+void gp9001vdp_device::gp9001_vdp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
@@ -580,7 +580,7 @@ WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_w )
 }
 
 /* batrider and bbakraid invert the register select lines */
-READ16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_r )
+uint16_t gp9001vdp_device::gp9001_vdp_alt_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
@@ -597,7 +597,7 @@ READ16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_w )
+void gp9001vdp_device::gp9001_vdp_alt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset & (0xc/2))
 	{
@@ -624,7 +624,7 @@ WRITE16_MEMBER( gp9001vdp_device::gp9001_vdp_alt_w )
 /***************************************************************************/
 /**************** PIPIBIBI bootleg interface into this video driver ********/
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_scroll_w )
+void gp9001vdp_device::pipibibi_bootleg_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 	{
@@ -646,25 +646,25 @@ WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_scroll_w )
 	}
 }
 
-READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_r )
+uint16_t gp9001vdp_device::pipibibi_bootleg_videoram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	gp9001_voffs_w(offset, 0xffff);
 	return gp9001_videoram16_r();
 }
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_videoram16_w )
+void gp9001vdp_device::pipibibi_bootleg_videoram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	gp9001_voffs_w(offset, 0xffff);
 	gp9001_videoram16_w(data, mem_mask);
 }
 
-READ16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_r )
+uint16_t gp9001vdp_device::pipibibi_bootleg_spriteram16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	gp9001_voffs_w((0x1800 + offset), 0);
 	return gp9001_videoram16_r();
 }
 
-WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
+void gp9001vdp_device::pipibibi_bootleg_spriteram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	gp9001_voffs_w((0x1800 + offset), mem_mask);
 	gp9001_videoram16_w(data, mem_mask);

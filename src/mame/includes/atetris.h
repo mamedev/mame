@@ -36,12 +36,12 @@ public:
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(irq_ack_w);
-	DECLARE_READ8_MEMBER(slapstic_r);
-	DECLARE_WRITE8_MEMBER(coincount_w);
-	DECLARE_WRITE8_MEMBER(nvram_w);
-	DECLARE_WRITE8_MEMBER(nvram_enable_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
+	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t slapstic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coincount_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nvram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_atetris();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;

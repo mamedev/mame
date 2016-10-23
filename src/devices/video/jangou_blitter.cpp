@@ -96,7 +96,7 @@ void jangou_blitter_device::plot_gfx_pixel( uint8_t pix, int x, int y )
 		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
-WRITE8_MEMBER( jangou_blitter_device::process_w )
+void jangou_blitter_device::process_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int src, x, y, h, w, flipx;
 	m_blit_data[offset] = data;
@@ -168,20 +168,20 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 }
 
 // Sexy Gal swaps around upper src address
-WRITE8_MEMBER( jangou_blitter_device::alt_process_w )
+void jangou_blitter_device::alt_process_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	const uint8_t translate_addr[7] = { 0, 1, 6, 2, 3, 4, 5 };
 
 	process_w(space,translate_addr[offset],data);
 }
 
-WRITE8_MEMBER( jangou_blitter_device::vregs_w )
+void jangou_blitter_device::vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 5 set by Jangou, left-over?
 	m_pen_data[offset] = data & 0x0f;
 }
 
-WRITE8_MEMBER( jangou_blitter_device::bltflip_w )
+void jangou_blitter_device::bltflip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO: unsure about how this works, Charles says it swaps the nibble but afaik it's used for CPU tiles in Night Gal Summer/Sexy Gal and they seems fine?
 	//       Maybe flipx is actually bltflip for later HW?

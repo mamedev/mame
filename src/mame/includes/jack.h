@@ -49,15 +49,15 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
-	DECLARE_WRITE8_MEMBER(joinem_control_w);
-	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
-	DECLARE_READ8_MEMBER(striv_question_r);
-	DECLARE_WRITE8_MEMBER(jack_videoram_w);
-	DECLARE_WRITE8_MEMBER(jack_colorram_w);
-	DECLARE_READ8_MEMBER(jack_flipscreen_r);
-	DECLARE_WRITE8_MEMBER(jack_flipscreen_w);
-	DECLARE_READ8_MEMBER(timer_r);
+	void jack_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void joinem_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void joinem_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t striv_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jack_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jack_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jack_flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jack_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_zzyzzyxx();
 	void init_striv();

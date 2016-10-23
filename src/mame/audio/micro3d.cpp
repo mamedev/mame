@@ -325,17 +325,17 @@ void micro3d_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 ***************************************************************************/
 
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_a)
+void micro3d_state::micro3d_snd_dac_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dac_data = data;
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_snd_dac_b)
+void micro3d_state::micro3d_snd_dac_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* TODO: This controls upd7759 volume */
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
+void micro3d_state::micro3d_sound_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_port_latch[offset] = data;
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER(micro3d_state::micro3d_sound_io_w)
 	}
 }
 
-READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
+uint8_t micro3d_state::micro3d_sound_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -366,7 +366,7 @@ READ8_MEMBER(micro3d_state::micro3d_sound_io_r)
 	}
 }
 
-WRITE8_MEMBER(micro3d_state::micro3d_upd7759_w)
+void micro3d_state::micro3d_upd7759_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);

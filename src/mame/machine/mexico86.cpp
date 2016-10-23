@@ -14,7 +14,7 @@ bit 2 = sound cpu reset line
 bit 1 = microcontroller reset line
 bit 0 = ? (unused?)
 */
-WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
+void mexico86_state::mexico86_f008_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -250,19 +250,19 @@ INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 }
 
 
-READ8_MEMBER(mexico86_state::mexico86_68705_port_a_r)
+uint8_t mexico86_state::mexico86_68705_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
+void mexico86_state::mexico86_68705_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_a_w)
+void mexico86_state::mexico86_68705_ddr_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_a = data;
 }
@@ -285,12 +285,12 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_a_w)
  *  7   W  not used?
  */
 
-READ8_MEMBER(mexico86_state::mexico86_68705_port_b_r)
+uint8_t mexico86_state::mexico86_68705_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
+void mexico86_state::mexico86_68705_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER(mexico86_state::mexico86_68705_ddr_b_w)
+void mexico86_state::mexico86_68705_ddr_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ddr_b = data;
 }

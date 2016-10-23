@@ -30,9 +30,9 @@ public:
 	tilemap_t *m_tilemap2;
 	tilemap_t *m_tilemap3;
 
-	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(videoram2_w);
-	DECLARE_WRITE16_MEMBER(videoram3_w);
+	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void videoram3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	TILEMAP_MAPPER_MEMBER(bg_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);

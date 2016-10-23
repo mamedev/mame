@@ -50,12 +50,12 @@ uint8_t channelf_state::port_read_with_latch(uint8_t ext, uint8_t latch_state)
 	return (~ext | latch_state);
 }
 
-READ8_MEMBER( channelf_state::port_0_r )
+uint8_t channelf_state::port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return port_read_with_latch(ioport("PANEL")->read(), m_latch[0]);
 }
 
-READ8_MEMBER( channelf_state::port_1_r )
+uint8_t channelf_state::port_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ext_value;
 
@@ -67,7 +67,7 @@ READ8_MEMBER( channelf_state::port_1_r )
 	return port_read_with_latch(ext_value,m_latch[1]);
 }
 
-READ8_MEMBER( channelf_state::port_4_r )
+uint8_t channelf_state::port_4_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ext_value;
 
@@ -79,12 +79,12 @@ READ8_MEMBER( channelf_state::port_4_r )
 	return port_read_with_latch(ext_value,m_latch[2]);
 }
 
-READ8_MEMBER( channelf_state::port_5_r )
+uint8_t channelf_state::port_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return port_read_with_latch(0xff, m_latch[3]);
 }
 
-WRITE8_MEMBER( channelf_state::port_0_w )
+void channelf_state::port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int offs;
 
@@ -97,19 +97,19 @@ WRITE8_MEMBER( channelf_state::port_0_w )
 	}
 }
 
-WRITE8_MEMBER( channelf_state::port_1_w )
+void channelf_state::port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[1] = data;
 	m_val_reg = ((data ^ 0xff) >> 6) & 0x03;
 }
 
-WRITE8_MEMBER( channelf_state::port_4_w )
+void channelf_state::port_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[2] = data;
 	m_col_reg = (data | 0x80) ^ 0xff;
 }
 
-WRITE8_MEMBER( channelf_state::port_5_w )
+void channelf_state::port_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_latch[3] = data;
 	m_custom->sound_w((data>>6)&3);

@@ -622,7 +622,7 @@ void neogeo_state::audio_cpu_check_nmi()
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_cpu_nmi_enabled && m_audio_cpu_nmi_pending) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
+void neogeo_state::audio_cpu_enable_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// out ($08) enables the nmi, out ($18) disables it
 	m_audio_cpu_nmi_enabled = !(offset & 0x10);
@@ -637,12 +637,12 @@ WRITE8_MEMBER(neogeo_state::audio_cpu_enable_nmi_w)
  *
  *************************************/
 
-READ16_MEMBER(neogeo_state::in0_r)
+uint16_t neogeo_state::in0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_edge->in0_r(space, offset) & m_ctrl1->ctrl_r(space, offset)) << 8) | m_dsw->read();
 }
 
-READ16_MEMBER(neogeo_state::in1_r)
+uint16_t neogeo_state::in1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
 }
@@ -652,7 +652,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_start_r)
 	return (m_edge->read_start_sel() & 0x05) | ~0x05;
 }
 
-WRITE8_MEMBER(neogeo_state::io_control_w)
+void neogeo_state::io_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -704,7 +704,7 @@ WRITE8_MEMBER(neogeo_state::io_control_w)
  *
  *************************************/
 
-READ16_MEMBER(neogeo_state::unmapped_r)
+uint16_t neogeo_state::unmapped_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret;
 
@@ -737,7 +737,7 @@ void neogeo_state::set_save_ram_unlock( uint8_t data )
 }
 
 
-WRITE16_MEMBER(neogeo_state::save_ram_w)
+void neogeo_state::save_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_save_ram_unlocked)
 		COMBINE_DATA(&m_save_ram[offset]);
@@ -759,7 +759,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
 }
 
 
-READ16_MEMBER(neogeo_state::memcard_r)
+uint16_t neogeo_state::memcard_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
@@ -774,7 +774,7 @@ READ16_MEMBER(neogeo_state::memcard_r)
 }
 
 
-WRITE16_MEMBER(neogeo_state::memcard_w)
+void neogeo_state::memcard_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_maincpu->eat_cycles(2); // insert waitstate
 
@@ -791,7 +791,7 @@ WRITE16_MEMBER(neogeo_state::memcard_w)
  *
  *************************************/
 
-WRITE8_MEMBER(neogeo_state::audio_command_w)
+void neogeo_state::audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 
@@ -803,7 +803,7 @@ WRITE8_MEMBER(neogeo_state::audio_command_w)
 }
 
 
-READ8_MEMBER(neogeo_state::audio_command_r)
+uint8_t neogeo_state::audio_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
@@ -828,7 +828,7 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
  *
  *************************************/
 
-READ8_MEMBER(neogeo_state::audio_cpu_bank_select_r)
+uint8_t neogeo_state::audio_cpu_bank_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_bank_audio_cart[offset & 3]->set_entry(offset >> 8);
 
@@ -842,7 +842,7 @@ READ8_MEMBER(neogeo_state::audio_cpu_bank_select_r)
  *
  *************************************/
 
-WRITE8_MEMBER(neogeo_state::system_control_w)
+void neogeo_state::system_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t bit = (offset >> 3) & 0x01;
 
@@ -889,7 +889,7 @@ WRITE8_MEMBER(neogeo_state::system_control_w)
 }
 
 
-WRITE16_MEMBER(neogeo_state::write_banksel)
+void neogeo_state::write_banksel(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t len = (!m_slots[m_curr_slot] || m_slots[m_curr_slot]->get_rom_size() == 0) ? m_region_maincpu->bytes() : m_slots[m_curr_slot]->get_rom_size();
 
@@ -976,13 +976,13 @@ void neogeo_state::set_output_data( uint8_t data )
 // FIXME: These are a temporary workaround for slot-driven bankswitch with protected carts.
 // A cleaner implementation is in progress.
 
-WRITE16_MEMBER(neogeo_state::write_bankprot)
+void neogeo_state::write_bankprot(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bank_base = m_slots[m_curr_slot]->get_bank_base(data);
 	m_bank_cartridge->set_base((uint8_t *)m_slots[m_curr_slot]->get_rom_base() + m_bank_base);
 }
 
-WRITE16_MEMBER(neogeo_state::write_bankprot_pvc)
+void neogeo_state::write_bankprot_pvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
@@ -995,7 +995,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_pvc)
 	}
 }
 
-WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
+void neogeo_state::write_bankprot_kf2k3bl(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// write to cart ram
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
@@ -1008,7 +1008,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kf2k3bl)
 	}
 }
 
-WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
+void neogeo_state::write_bankprot_ms5p(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("ms5plus bankswitch - offset: %06x PC %06x: set banking %04x\n", offset, space.device().safe_pc(), data);
 
@@ -1024,7 +1024,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_ms5p)
 	}
 }
 
-WRITE16_MEMBER(neogeo_state::write_bankprot_kof10th)
+void neogeo_state::write_bankprot_kof10th(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slots[m_curr_slot]->protection_w(space, offset, data, mem_mask);
 
@@ -1036,7 +1036,7 @@ WRITE16_MEMBER(neogeo_state::write_bankprot_kof10th)
 	}
 }
 
-READ16_MEMBER(neogeo_state::read_lorom_kof10th)
+uint16_t neogeo_state::read_lorom_kof10th(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t* rom = (m_slots[m_curr_slot] && m_slots[m_curr_slot]->get_rom_size() > 0) ? m_slots[m_curr_slot]->get_rom_base() : (uint16_t*)m_region_maincpu->base();
 	if (offset + 0x80/2 >= 0x10000/2)
@@ -1422,7 +1422,7 @@ void neogeo_state::machine_reset()
  *************************************/
 
 
-READ16_MEMBER(neogeo_state::banked_vectors_r)
+uint16_t neogeo_state::banked_vectors_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_use_cart_vectors)
 	{
@@ -1471,7 +1471,7 @@ ADDRESS_MAP_END
 
 
 
-READ16_MEMBER(aes_state::aes_in2_r)
+uint16_t aes_state::aes_in2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint32_t ret = m_io_in2->read();
 	ret = (ret & 0xfcff) | (m_ctrl1->read_start_sel() << 8);

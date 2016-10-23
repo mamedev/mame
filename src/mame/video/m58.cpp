@@ -102,14 +102,14 @@ PALETTE_INIT_MEMBER(m58_state, m58)
  *
  *************************************/
 
-WRITE8_MEMBER(m58_state::videoram_w)
+void m58_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE8_MEMBER(m58_state::scroll_panel_w)
+void m58_state::scroll_panel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int sx = ( offset % 16 );
 	int sy = ( offset / 16 );
@@ -189,7 +189,7 @@ void m58_state::video_start()
  *
  *************************************/
 
-WRITE8_MEMBER(m58_state::flipscreen_w)
+void m58_state::flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* screen flip is handled both by software and hardware */
 	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));

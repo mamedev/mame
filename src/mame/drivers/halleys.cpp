@@ -251,20 +251,20 @@ public:
 	int m_latch_delay;
 	std::vector<uint8_t> m_paletteram;
 
-	DECLARE_WRITE8_MEMBER(bgtile_w);
-	DECLARE_READ8_MEMBER(blitter_status_r);
-	DECLARE_READ8_MEMBER(blitter_r);
-	DECLARE_WRITE8_MEMBER(blitter_w);
-	DECLARE_READ8_MEMBER(collision_id_r);
-	DECLARE_READ8_MEMBER(paletteram_r);
-	DECLARE_WRITE8_MEMBER(paletteram_w);
-	DECLARE_READ8_MEMBER(vector_r);
-	DECLARE_WRITE8_MEMBER(firq_ack_w);
-	DECLARE_WRITE8_MEMBER(soundcommand_w);
-	DECLARE_READ8_MEMBER(coin_lockout_r);
-	DECLARE_READ8_MEMBER(io_mirror_r);
+	void bgtile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t collision_id_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vector_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t coin_lockout_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t io_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void blit(int offset);
-	DECLARE_WRITE8_MEMBER(sndnmi_msk_w);
+	void sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_halley87();
 	void init_benberob();
 	void init_halleys();
@@ -1007,7 +1007,7 @@ if (0) {
 
 
 // draws Ben Bero Beh's color backdrop(verification required)
-WRITE8_MEMBER(halleys_state::bgtile_w)
+void halleys_state::bgtile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int yskip, xskip, ecx;
 	uint16_t *edi;
@@ -1032,7 +1032,7 @@ WRITE8_MEMBER(halleys_state::bgtile_w)
 }
 
 
-READ8_MEMBER(halleys_state::blitter_status_r)
+uint8_t halleys_state::blitter_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
@@ -1040,7 +1040,7 @@ READ8_MEMBER(halleys_state::blitter_status_r)
 }
 
 
-READ8_MEMBER(halleys_state::blitter_r)
+uint8_t halleys_state::blitter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int i = offset & 0xf;
 
@@ -1056,7 +1056,7 @@ TIMER_CALLBACK_MEMBER(halleys_state::blitter_reset)
 }
 
 
-WRITE8_MEMBER(halleys_state::blitter_w)
+void halleys_state::blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i = offset & 0xf;
 
@@ -1080,7 +1080,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 }
 
 
-READ8_MEMBER(halleys_state::collision_id_r)
+uint8_t halleys_state::collision_id_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /*
     Collision detection abstract:
@@ -1213,12 +1213,12 @@ void halleys_state::halleys_decode_rgb(uint32_t *r, uint32_t *g, uint32_t *b, in
 	*b = prom_6330[0x40 + (bit0|bit1|bit2|bit3|bit4)];
 }
 
-READ8_MEMBER(halleys_state::paletteram_r)
+uint8_t halleys_state::paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_paletteram[offset];
 }
 
-WRITE8_MEMBER(halleys_state::paletteram_w)
+void halleys_state::paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint32_t d, r, g, b, i, j;
 	uint32_t *pal_ptr = m_internal_palette.get();
@@ -1501,9 +1501,9 @@ uint32_t halleys_state::screen_update_benberob(screen_device &screen, bitmap_ind
 
 #if HALLEYS_DEBUG
 
-READ8_MEMBER(halleys_state::zero_r){ return(0); }
+uint8_t halleys_state::zero_r(address_space &space, offs_t offset, uint8_t mem_mask){ return(0); }
 
-READ8_MEMBER(halleys_state::debug_r)
+uint8_t halleys_state::debug_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return(m_io_ram[offset]);
 }
@@ -1567,13 +1567,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 }
 
 
-READ8_MEMBER(halleys_state::vector_r)
+uint8_t halleys_state::vector_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return(m_cpu1_base[0xffe0 + (offset^(m_mVectorType<<4))]);
 }
 
 
-WRITE8_MEMBER(halleys_state::firq_ack_w)
+void halleys_state::firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[0x9c] = data;
 
@@ -1582,13 +1582,13 @@ WRITE8_MEMBER(halleys_state::firq_ack_w)
 }
 
 
-WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
+void halleys_state::sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sndnmi_mask = data & 1;
 }
 
 
-WRITE8_MEMBER(halleys_state::soundcommand_w)
+void halleys_state::soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_io_ram[0x8a] = data;
 	m_soundlatch->write(space,offset,data);
@@ -1596,7 +1596,7 @@ WRITE8_MEMBER(halleys_state::soundcommand_w)
 }
 
 
-READ8_MEMBER(halleys_state::coin_lockout_r)
+uint8_t halleys_state::coin_lockout_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// This is a hack, but it lets you coin up when COIN1 or COIN2 are signaled.
 	// See NMI for the twisted logic that is involved in handling coin input :
@@ -1613,7 +1613,7 @@ READ8_MEMBER(halleys_state::coin_lockout_r)
 }
 
 
-READ8_MEMBER(halleys_state::io_mirror_r)
+uint8_t halleys_state::io_mirror_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 

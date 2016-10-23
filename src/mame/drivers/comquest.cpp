@@ -46,14 +46,14 @@ icq3250a-d
 #include "includes/comquest.h"
 
 #ifdef UNUSED_FUNCTION
-READ8_MEMBER(comquest_state::comquest_read)
+uint8_t comquest_state::comquest_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_MEMBER(comquest_state::comquest_write)
+void comquest_state::comquest_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("comquest read %.4x %.2x\n",offset,data);
 }

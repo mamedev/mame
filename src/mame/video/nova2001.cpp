@@ -60,7 +60,7 @@ PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
 	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_paletteram_w)
+void nova2001_state::ninjakun_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i;
 
@@ -202,19 +202,19 @@ void nova2001_state::video_start_raiders5()
  *
  *************************************/
 
-WRITE8_MEMBER(nova2001_state::nova2001_fg_videoram_w)
+void nova2001_state::nova2001_fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_bg_videoram_w)
+void nova2001_state::nova2001_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
+void nova2001_state::ninjakun_bg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int x = m_bg_tilemap->scrollx(0) >> 3;
 	int y = m_bg_tilemap->scrolly(0) >> 3;
@@ -226,7 +226,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_bg_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
+uint8_t nova2001_state::ninjakun_bg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int x = m_bg_tilemap->scrollx(0) >> 3;
 	int y = m_bg_tilemap->scrolly(0) >> 3;
@@ -237,23 +237,23 @@ READ8_MEMBER(nova2001_state::ninjakun_bg_videoram_r)
 	return m_bg_videoram[offset];
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_scroll_x_w)
+void nova2001_state::nova2001_scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_scroll_y_w)
+void nova2001_state::nova2001_scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(nova2001_state::nova2001_flipscreen_w)
+void nova2001_state::nova2001_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// inverted
 	flip_screen_set(~data & 1);
 }
 
-WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
+void nova2001_state::pkunwar_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(data & 1);
 }

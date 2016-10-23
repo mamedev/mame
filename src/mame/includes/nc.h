@@ -53,24 +53,24 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(nc_memory_management_r);
-	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(nc_irq_status_w);
-	DECLARE_READ8_MEMBER(nc_irq_status_r);
-	DECLARE_READ8_MEMBER(nc_key_data_in_r);
-	DECLARE_WRITE8_MEMBER(nc_sound_w);
-	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
-	DECLARE_WRITE8_MEMBER(nc100_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
-	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
-	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
-	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
-	DECLARE_READ8_MEMBER(nc200_printer_status_r);
-	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
-	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
-	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
+	uint8_t nc_memory_management_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc_memory_management_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_irq_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc_irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nc_key_data_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_display_memory_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc100_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc100_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc100_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t nc200_card_battery_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t nc200_printer_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void nc200_uart_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc200_memory_card_wait_state_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nc200_poweroff_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_PALETTE_INIT(nc);
 	void machine_start_nc200();

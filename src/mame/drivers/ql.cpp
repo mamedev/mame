@@ -155,15 +155,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER( ipc_w );
-	DECLARE_WRITE8_MEMBER( ipc_port1_w );
-	DECLARE_WRITE8_MEMBER( ipc_port2_w );
-	DECLARE_READ8_MEMBER( ipc_port2_r );
-	DECLARE_READ8_MEMBER( ipc_t1_r );
-	DECLARE_READ8_MEMBER( ipc_bus_r );
+	void ipc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ipc_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ipc_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ipc_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ipc_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ipc_bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( ql_baudx4_w );
 	DECLARE_WRITE_LINE_MEMBER( ql_comdata_w );
 	DECLARE_WRITE_LINE_MEMBER( zx8302_mdselck_w );
@@ -201,7 +201,7 @@ public:
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::read )
+uint8_t ql_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	int cart_romoeh = 0;
@@ -260,7 +260,7 @@ READ8_MEMBER( ql_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::write )
+void ql_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x18000 && offset <= 0x18001)
 	{
@@ -316,7 +316,7 @@ WRITE8_MEMBER( ql_state::write )
 //  ipc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_w )
+void ql_state::ipc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_zx8302->comctl_w(0);
 	m_zx8302->comctl_w(1);
@@ -327,7 +327,7 @@ WRITE8_MEMBER( ql_state::ipc_w )
 //  ipc_port1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port1_w )
+void ql_state::ipc_port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -352,7 +352,7 @@ WRITE8_MEMBER( ql_state::ipc_port1_w )
 //  ipc_port2_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_port2_r )
+uint8_t ql_state::ipc_port2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -385,7 +385,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 //  ipc_port2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ql_state::ipc_port2_w )
+void ql_state::ipc_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -435,7 +435,7 @@ WRITE8_MEMBER( ql_state::ipc_port2_w )
 //  ipc_t1_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_t1_r )
+uint8_t ql_state::ipc_t1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_baudx4;
 }
@@ -445,7 +445,7 @@ READ8_MEMBER( ql_state::ipc_t1_r )
 //  ipc_bus_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ql_state::ipc_bus_r )
+uint8_t ql_state::ipc_bus_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

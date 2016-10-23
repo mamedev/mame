@@ -70,8 +70,8 @@ public:
 		, m_lcdc(*this, "hd44780")
 	{ }
 
-	//DECLARE_WRITE8_MEMBER(henry_io_w);
-	DECLARE_READ8_MEMBER(henry_io_r);
+	//void henry_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t henry_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_hprot1();
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
@@ -189,7 +189,7 @@ void hprot1_state::machine_reset()
 {
 }
 
-READ8_MEMBER(hprot1_state::henry_io_r)
+uint8_t hprot1_state::henry_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -210,7 +210,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 }
 
 /*
-WRITE8_MEMBER(hprot1_state::henry_io_w)
+void hprot1_state::henry_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
     static uint8_t p0=0, p1=0, p2=0, p3=0;
     switch (offset)

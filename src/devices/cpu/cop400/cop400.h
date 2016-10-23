@@ -139,8 +139,8 @@ public:
 	static void set_cko(device_t &device, cop400_cko_bond cko) { downcast<cop400_cpu_device &>(device).m_cko = cko; }
 	static void set_microbus(device_t &device, bool has_microbus) { downcast<cop400_cpu_device &>(device).m_has_microbus = has_microbus; }
 
-	DECLARE_READ8_MEMBER( microbus_rd );
-	DECLARE_WRITE8_MEMBER( microbus_wr );
+	uint8_t microbus_rd(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void microbus_wr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

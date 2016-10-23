@@ -18,7 +18,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(prehisle_state::soundcmd_w)
+void prehisle_state::soundcmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -40,14 +40,14 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
+void prehisle_state::D7759_write_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->port_w(space, 0, data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
+void prehisle_state::D7759_upd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 0x80);
 }

@@ -79,7 +79,7 @@
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mm1_state::read )
+uint8_t mm1_state::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
@@ -149,7 +149,7 @@ READ8_MEMBER( mm1_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::write )
+void mm1_state::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
 
@@ -207,7 +207,7 @@ WRITE8_MEMBER( mm1_state::write )
 //  ls259_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::ls259_w )
+void mm1_state::ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int d = BIT(data, 0);
 
@@ -315,7 +315,7 @@ WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
 	m_dmac->hack_w(state);
 }
 
-READ8_MEMBER( mm1_state::mpsc_dack_r )
+uint8_t mm1_state::mpsc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// clear data request
 	m_dmac->dreq2_w(CLEAR_LINE);
@@ -323,7 +323,7 @@ READ8_MEMBER( mm1_state::mpsc_dack_r )
 	return 1;//m_mpsc->dtra_r();
 }
 
-WRITE8_MEMBER( mm1_state::mpsc_dack_w )
+void mm1_state::mpsc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_mpsc->hai_w(data);
 

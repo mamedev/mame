@@ -52,24 +52,24 @@ uint8_t amspdwy_state::amspdwy_wheel_r( int index )
 	return m_wheel_return[index] | ioport(portnames[index])->read();
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
+uint8_t amspdwy_state::amspdwy_wheel_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// player 1
 	return amspdwy_wheel_r(0);
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
+uint8_t amspdwy_state::amspdwy_wheel_1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// player 2
 	return amspdwy_wheel_r(1);
 }
 
-READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
+uint8_t amspdwy_state::amspdwy_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
+void amspdwy_state::amspdwy_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

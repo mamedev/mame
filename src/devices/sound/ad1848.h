@@ -16,10 +16,10 @@ class ad1848_device : public device_t
 {
 public:
 	ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(dack_r);
-	DECLARE_WRITE8_MEMBER(dack_w);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<ad1848_device &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<ad1848_device &>(device).m_drq_cb.set_callback(object); }
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -106,7 +106,7 @@ void nes_nanjing_device::hblank_irq(int scanline, int vblank, int blanked)
 
 }
 
-WRITE8_MEMBER(nes_nanjing_device::write_l)
+void nes_nanjing_device::write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("nanjing write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -149,7 +149,7 @@ WRITE8_MEMBER(nes_nanjing_device::write_l)
 	prg32((m_reg[0] & 0x0f) | ((m_reg[1] & 0x0f) << 4));
 }
 
-READ8_MEMBER(nes_nanjing_device::read_l)
+uint8_t nes_nanjing_device::read_l(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = 0;
 	LOG_MMC(("nanjing read_l, offset: %04x\n", offset));

@@ -15,11 +15,11 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ16_MEMBER(z8000_io_r);
-	DECLARE_WRITE16_MEMBER(z8000_io_w);
+	uint16_t z8000_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void z8000_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER(vi_w);
 	DECLARE_WRITE_LINE_MEMBER(nvi_w);
-	DECLARE_WRITE16_MEMBER(handshake_w);
+	void handshake_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	IRQ_CALLBACK_MEMBER(int_cb);
 	bool halted() { return m_8086_halt; }
 	required_device<cpu_device> m_8086;

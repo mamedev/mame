@@ -56,12 +56,12 @@ const tiny_rom_entry *bml3bus_kanji_device::device_rom_region() const
 	return ROM_NAME( kanji );
 }
 
-READ8_MEMBER( bml3bus_kanji_device::bml3_kanji_r )
+uint8_t bml3bus_kanji_device::bml3_kanji_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[((uint32_t)m_kanji_addr << 1) + offset];
 }
 
-WRITE8_MEMBER( bml3bus_kanji_device::bml3_kanji_w )
+void bml3bus_kanji_device::bml3_kanji_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_kanji_addr &= (0xff << (offset*8));
 	m_kanji_addr |= (data << ((offset^1)*8));

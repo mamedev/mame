@@ -10,7 +10,7 @@
 #include "includes/n8080.h"
 
 
-WRITE8_MEMBER(n8080_state::n8080_video_control_w)
+void n8080_state::n8080_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;

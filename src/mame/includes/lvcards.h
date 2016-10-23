@@ -16,11 +16,11 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(control_port_2_w);
-	DECLARE_WRITE8_MEMBER(control_port_2a_w);
-	DECLARE_READ8_MEMBER(payout_r);
-	DECLARE_WRITE8_MEMBER(lvcards_videoram_w);
-	DECLARE_WRITE8_MEMBER(lvcards_colorram_w);
+	void control_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_port_2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t payout_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lvcards_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lvcards_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lvcards);

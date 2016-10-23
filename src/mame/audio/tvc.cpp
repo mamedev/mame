@@ -92,7 +92,7 @@ void tvc_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t
 //  ports write
 //-------------------------------------------------
 
-WRITE8_MEMBER(tvc_sound_device::write)
+void tvc_sound_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stream->update();
 

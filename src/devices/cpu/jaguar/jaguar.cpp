@@ -1248,7 +1248,7 @@ void jaguar_cpu_device::xor_rn_rn(uint16_t op)
     I/O HANDLING
 ***************************************************************************/
 
-READ32_MEMBER( jaguargpu_cpu_device::ctrl_r  )
+uint32_t jaguargpu_cpu_device::ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (LOG_GPU_IO) logerror("GPU read register @ F021%02X\n", offset * 4);
 
@@ -1256,7 +1256,7 @@ READ32_MEMBER( jaguargpu_cpu_device::ctrl_r  )
 }
 
 
-WRITE32_MEMBER( jaguargpu_cpu_device::ctrl_w )
+void jaguargpu_cpu_device::ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldval, newval;
 
@@ -1340,7 +1340,7 @@ WRITE32_MEMBER( jaguargpu_cpu_device::ctrl_w )
     I/O HANDLING
 ***************************************************************************/
 
-READ32_MEMBER( jaguardsp_cpu_device::ctrl_r )
+uint32_t jaguardsp_cpu_device::ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (LOG_DSP_IO && offset != D_FLAGS)
 		logerror("DSP read register @ F1A1%02X\n", offset * 4);
@@ -1350,7 +1350,7 @@ READ32_MEMBER( jaguardsp_cpu_device::ctrl_r )
 }
 
 
-WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
+void jaguardsp_cpu_device::ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t oldval, newval;
 

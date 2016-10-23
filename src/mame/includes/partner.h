@@ -23,10 +23,10 @@ public:
 
 	uint8_t m_mem_page;
 	uint8_t m_win_mem_page;
-	DECLARE_READ8_MEMBER(partner_floppy_r);
-	DECLARE_WRITE8_MEMBER(partner_floppy_w);
-	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
-	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
+	uint8_t partner_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void partner_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void partner_win_memory_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void partner_mem_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_partner();
 	void machine_start_partner();
 	void machine_reset_partner();

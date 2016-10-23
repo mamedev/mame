@@ -103,20 +103,20 @@ public:
 	uint8_t m_Inputs[64];
 	uint8_t m_codec_data[256];
 	uint8_t m_sys85_data_line_t;
-	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_READ8_MEMBER(irqlatch_r);
-	DECLARE_WRITE8_MEMBER(reel12_w);
-	DECLARE_WRITE8_MEMBER(reel34_w);
-	DECLARE_WRITE8_MEMBER(mmtr_w);
-	DECLARE_READ8_MEMBER(mmtr_r);
-	DECLARE_WRITE8_MEMBER(vfd_w);
-	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
-	DECLARE_READ8_MEMBER(mux_ctrl_r);
-	DECLARE_WRITE8_MEMBER(mux_data_w);
-	DECLARE_READ8_MEMBER(mux_data_r);
-	DECLARE_WRITE8_MEMBER(mux_enable_w);
-	DECLARE_WRITE8_MEMBER(triac_w);
-	DECLARE_READ8_MEMBER(triac_r);
+	void watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mux_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t triac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	void init_decode();
@@ -178,7 +178,7 @@ void bfmsys85_state::machine_reset()
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::watchdog_w)
+void bfmsys85_state::watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -195,7 +195,7 @@ INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::irqlatch_r)
+uint8_t bfmsys85_state::irqlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int result = m_irq_status | 0x02;
 
@@ -206,7 +206,7 @@ READ8_MEMBER(bfmsys85_state::irqlatch_r)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel12_w)
+void bfmsys85_state::reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
@@ -217,7 +217,7 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::reel34_w)
+void bfmsys85_state::reel34_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
@@ -230,7 +230,7 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mmtr_w)
+void bfmsys85_state::mmtr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int  changed = m_mmtr_latch ^ data;
 
@@ -244,13 +244,13 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 }
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::mmtr_r)
+uint8_t bfmsys85_state::mmtr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::vfd_w)
+void bfmsys85_state::vfd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //reset 0x20, clock 0x80, data 0x40
 
@@ -263,7 +263,7 @@ WRITE8_MEMBER(bfmsys85_state::vfd_w)
 // input / output multiplexers ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
+void bfmsys85_state::mux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch ( data & 0xF0 )
 	{
@@ -298,14 +298,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
+uint8_t bfmsys85_state::mux_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// software waits for bit7 to become low
 
 	return 0;
 }
 
-WRITE8_MEMBER(bfmsys85_state::mux_data_w)
+void bfmsys85_state::mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int pattern = 0x01, i,
 	off = m_mux_output_strobe<<4;
@@ -318,14 +318,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 	}
 }
 
-READ8_MEMBER(bfmsys85_state::mux_data_r)
+uint8_t bfmsys85_state::mux_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mux_input;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
+void bfmsys85_state::mux_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -333,14 +333,14 @@ WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
 // payslide triacs ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-WRITE8_MEMBER(bfmsys85_state::triac_w)
+void bfmsys85_state::triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_triac_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-READ8_MEMBER(bfmsys85_state::triac_r)
+uint8_t bfmsys85_state::triac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_triac_latch;
 }

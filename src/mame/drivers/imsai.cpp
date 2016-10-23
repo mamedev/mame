@@ -36,10 +36,10 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 
 private:
@@ -78,19 +78,19 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( imsai )
 INPUT_PORTS_END
 
-READ8_MEMBER( imsai_state::keyin_r )
+uint8_t imsai_state::keyin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
 
-READ8_MEMBER( imsai_state::status_r )
+uint8_t imsai_state::status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (m_term_data) ? 3 : 1;
 }
 
-WRITE8_MEMBER( imsai_state::kbd_put )
+void imsai_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }
@@ -101,7 +101,7 @@ WRITE_LINE_MEMBER(imsai_state::write_uart_clock)
 	m_uart->write_rxc(state);
 }
 
-WRITE8_MEMBER( imsai_state::control_w )
+void imsai_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

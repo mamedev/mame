@@ -192,7 +192,7 @@ void md_std_eeprom_device::device_reset()
  CART + EEPROM
  -------------------------------------------------*/
 
-READ16_MEMBER(md_std_eeprom_device::read)
+uint16_t md_std_eeprom_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -204,7 +204,7 @@ READ16_MEMBER(md_std_eeprom_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_std_eeprom_device::write)
+void md_std_eeprom_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -215,7 +215,7 @@ WRITE16_MEMBER(md_std_eeprom_device::write)
 	}
 }
 
-READ16_MEMBER(md_eeprom_nbajam_device::read)
+uint16_t md_eeprom_nbajam_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -228,7 +228,7 @@ READ16_MEMBER(md_eeprom_nbajam_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nbajam_device::write)
+void md_eeprom_nbajam_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -239,7 +239,7 @@ WRITE16_MEMBER(md_eeprom_nbajam_device::write)
 	}
 }
 
-READ16_MEMBER(md_eeprom_nbajamte_device::read)
+uint16_t md_eeprom_nbajamte_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -252,7 +252,7 @@ READ16_MEMBER(md_eeprom_nbajamte_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nbajamte_device::write)
+void md_eeprom_nbajamte_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -271,7 +271,7 @@ WRITE16_MEMBER(md_eeprom_nbajamte_device::write)
 }
 
 // same as NBAJAMTE above... derived class?
-READ16_MEMBER(md_eeprom_cslam_device::read)
+uint16_t md_eeprom_cslam_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -284,7 +284,7 @@ READ16_MEMBER(md_eeprom_cslam_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_cslam_device::write)
+void md_eeprom_cslam_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -303,7 +303,7 @@ WRITE16_MEMBER(md_eeprom_cslam_device::write)
 }
 
 // same as NBAJAMTE above... derived class?
-READ16_MEMBER(md_eeprom_nflqb_device::read)
+uint16_t md_eeprom_nflqb_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -316,7 +316,7 @@ READ16_MEMBER(md_eeprom_nflqb_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nflqb_device::write)
+void md_eeprom_nflqb_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -327,7 +327,7 @@ WRITE16_MEMBER(md_eeprom_nflqb_device::write)
 	}
 }
 
-READ16_MEMBER(md_eeprom_nhlpa_device::read)
+uint16_t md_eeprom_nhlpa_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -340,7 +340,7 @@ READ16_MEMBER(md_eeprom_nhlpa_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nhlpa_device::write)
+void md_eeprom_nhlpa_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -351,7 +351,7 @@ WRITE16_MEMBER(md_eeprom_nhlpa_device::write)
 	}
 }
 
-READ16_MEMBER(md_eeprom_blara_device::read)
+uint16_t md_eeprom_blara_device::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x380000/2)
 	{
@@ -364,7 +364,7 @@ READ16_MEMBER(md_eeprom_blara_device::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_blara_device::write)
+void md_eeprom_blara_device::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x380000/2)
 	{
@@ -614,7 +614,7 @@ uint8_t md_eeprom_nbajam_device_alt::eeprom_i2c_out()
 }
 
 
-READ16_MEMBER(md_eeprom_nbajam_device_alt::read)
+uint16_t md_eeprom_nbajam_device_alt::read(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{
@@ -626,7 +626,7 @@ READ16_MEMBER(md_eeprom_nbajam_device_alt::read)
 		return 0xffff;
 }
 
-WRITE16_MEMBER(md_eeprom_nbajam_device_alt::write)
+void md_eeprom_nbajam_device_alt::write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset == 0x200000/2)
 	{

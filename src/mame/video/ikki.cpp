@@ -54,7 +54,7 @@ PALETTE_INIT_MEMBER(ikki_state, ikki)
 	}
 }
 
-WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
+void ikki_state::ikki_scrn_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = (data >> 2) & 1;
 }

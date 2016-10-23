@@ -38,21 +38,21 @@ public:
 	uint8_t m_palette_bank;
 
 	// common
-	DECLARE_WRITE8_MEMBER(coin1_w);
-	DECLARE_WRITE8_MEMBER(coin2_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(scroll_bg_w);
+	void coin1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void coin2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_bg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// sauro specific
-	DECLARE_WRITE8_MEMBER(sauro_sound_command_w);
-	DECLARE_READ8_MEMBER(sauro_sound_command_r);
-	DECLARE_WRITE8_MEMBER(sauro_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(sauro_scroll_fg_w);
-	DECLARE_WRITE8_MEMBER(sauro_videoram2_w);
-	DECLARE_WRITE8_MEMBER(sauro_colorram2_w);
-	DECLARE_WRITE8_MEMBER(adpcm_w);
+	void sauro_sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sauro_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sauro_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sauro_scroll_fg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sauro_videoram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sauro_colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);

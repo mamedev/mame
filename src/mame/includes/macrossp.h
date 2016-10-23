@@ -77,15 +77,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_16_device> m_soundlatch;
 
-	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
-	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);
-	DECLARE_READ16_MEMBER(macrossp_soundcmd_r);
-	DECLARE_WRITE16_MEMBER(palette_fade_w);
-	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
-	DECLARE_WRITE32_MEMBER(macrossp_scra_videoram_w);
-	DECLARE_WRITE32_MEMBER(macrossp_scrb_videoram_w);
-	DECLARE_WRITE32_MEMBER(macrossp_scrc_videoram_w);
-	DECLARE_WRITE32_MEMBER(macrossp_text_videoram_w);
+	uint32_t macrossp_soundstatus_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void macrossp_soundcmd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint16_t macrossp_soundcmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void palette_fade_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void macrossp_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void macrossp_scra_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void macrossp_scrb_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void macrossp_scrc_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void macrossp_text_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_quizmoon();
 	void init_macrossp();
 	TILE_GET_INFO_MEMBER(get_macrossp_scra_tile_info);

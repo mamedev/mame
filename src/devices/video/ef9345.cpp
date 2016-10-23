@@ -999,7 +999,7 @@ void ef9345_device::update_scanline(uint16_t scanline)
 	}
 }
 
-READ8_MEMBER( ef9345_device::data_r )
+uint8_t ef9345_device::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset & 7)
 		return m_registers[offset & 7];
@@ -1012,7 +1012,7 @@ READ8_MEMBER( ef9345_device::data_r )
 	return m_state;
 }
 
-WRITE8_MEMBER( ef9345_device::data_w )
+void ef9345_device::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_registers[offset & 7] = data;
 

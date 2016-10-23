@@ -34,10 +34,10 @@ public:
 	required_device<bus_master_ide_controller_device> m_ide2;
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_READ32_MEMBER(ide_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide_write_cs1);
-	DECLARE_READ32_MEMBER(ide2_read_cs1);
-	DECLARE_WRITE32_MEMBER(ide2_write_cs1);
+	uint32_t ide_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide_write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t ide2_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void ide2_write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void set_irq_info(const char *tag, const int irq_num);
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ide_pci_device &>(device).m_irq_handler.set_callback(object); }
 
@@ -60,9 +60,9 @@ private:
 	DECLARE_ADDRESS_MAP(chan2_data_command_map, 32);
 	DECLARE_ADDRESS_MAP(chan2_control_map, 32);
 	DECLARE_ADDRESS_MAP(bus_master_map, 32);
-	DECLARE_READ32_MEMBER(pcictrl_r);
-	DECLARE_WRITE32_MEMBER(pcictrl_w);
-	DECLARE_WRITE32_MEMBER(address_base_w);
+	uint32_t pcictrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void pcictrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void address_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 };
 
 extern const device_type IDE_PCI;

@@ -27,9 +27,9 @@ public:
 	{
 	}
 
-	DECLARE_READ8_MEMBER(rs232_r);
-	DECLARE_WRITE8_MEMBER(rs232_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint8_t rs232_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rs232_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	uint8_t m_term_out;
@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( evmbug )
 INPUT_PORTS_END
 
-READ8_MEMBER( evmbug_state::rs232_r )
+uint8_t evmbug_state::rs232_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static uint8_t temp = 0;
 	temp^=0xff;
@@ -69,7 +69,7 @@ READ8_MEMBER( evmbug_state::rs232_r )
 	return ret;
 }
 
-WRITE8_MEMBER( evmbug_state::rs232_w )
+void evmbug_state::rs232_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_term_out = 0;
@@ -80,7 +80,7 @@ WRITE8_MEMBER( evmbug_state::rs232_w )
 		m_terminal->write(space, 0, m_term_out & 0x7f);
 }
 
-WRITE8_MEMBER( evmbug_state::kbd_put )
+void evmbug_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

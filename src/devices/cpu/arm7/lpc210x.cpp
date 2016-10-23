@@ -45,12 +45,12 @@ lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-READ32_MEMBER(lpc210x_device::arm_E01FC088_r)
+uint32_t lpc210x_device::arm_E01FC088_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0xffffffff;
 }
 
-READ32_MEMBER(lpc210x_device::flash_r)
+uint32_t lpc210x_device::flash_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t ret = (m_flash[offset * 4 + 3] << 24) |
 					(m_flash[offset * 4 + 2] << 16) |
@@ -59,7 +59,7 @@ READ32_MEMBER(lpc210x_device::flash_r)
 	return ret;
 }
 
-WRITE32_MEMBER(lpc210x_device::flash_w)
+void lpc210x_device::flash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//
 }
@@ -100,7 +100,7 @@ void lpc210x_device::device_reset()
 
 /* VIC (Vectored Interrupt Controller) */
 
-READ32_MEMBER( lpc210x_device::vic_r )
+uint32_t lpc210x_device::vic_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -112,7 +112,7 @@ READ32_MEMBER( lpc210x_device::vic_r )
 }
 
 
-WRITE32_MEMBER( lpc210x_device::vic_w )
+void lpc210x_device::vic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -123,7 +123,7 @@ WRITE32_MEMBER( lpc210x_device::vic_w )
 
 /* PIN Select block */
 
-READ32_MEMBER( lpc210x_device::pin_r )
+uint32_t lpc210x_device::pin_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -135,7 +135,7 @@ READ32_MEMBER( lpc210x_device::pin_r )
 }
 
 
-WRITE32_MEMBER( lpc210x_device::pin_w )
+void lpc210x_device::pin_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -146,7 +146,7 @@ WRITE32_MEMBER( lpc210x_device::pin_w )
 
 /* MAM block (memory conttroller) */
 
-READ32_MEMBER( lpc210x_device::mam_r )
+uint32_t lpc210x_device::mam_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -158,7 +158,7 @@ READ32_MEMBER( lpc210x_device::mam_r )
 }
 
 
-WRITE32_MEMBER( lpc210x_device::mam_w )
+void lpc210x_device::mam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -169,7 +169,7 @@ WRITE32_MEMBER( lpc210x_device::mam_w )
 
 /* FIO block */
 
-READ32_MEMBER( lpc210x_device::fio_r )
+uint32_t lpc210x_device::fio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -181,7 +181,7 @@ READ32_MEMBER( lpc210x_device::fio_r )
 }
 
 
-WRITE32_MEMBER( lpc210x_device::fio_w )
+void lpc210x_device::fio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{
@@ -193,35 +193,35 @@ WRITE32_MEMBER( lpc210x_device::fio_w )
 
 /* APB Divider */
 
-READ32_MEMBER( lpc210x_device::apbdiv_r )
+uint32_t lpc210x_device::apbdiv_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("%08x unhandled read from APBDIV offset %08x mem_mask %08x\n", space.device().safe_pc(), offset * 4, mem_mask);
 	return 0x00000000;
 }
 
 
-WRITE32_MEMBER( lpc210x_device::apbdiv_w )
+void lpc210x_device::apbdiv_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%08x unhandled write APBDIV offset %02x data %08x mem_mask %08x\n", space.device().safe_pc(),offset * 4, data, mem_mask);
 }
 
 /* Syscon misc registers */
 
-READ32_MEMBER( lpc210x_device::scs_r )
+uint32_t lpc210x_device::scs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	logerror("%08x unhandled read from SCS offset %08x mem_mask %08x\n", space.device().safe_pc(),offset * 4, mem_mask);
 	return 0x00000000;
 }
 
 
-WRITE32_MEMBER( lpc210x_device::scs_w )
+void lpc210x_device::scs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%08x unhandled write SCS offset %02x data %08x mem_mask %08x\n", space.device().safe_pc(),offset * 4, data, mem_mask);
 }
 
 /* PLL Phase Locked Loop */
 
-READ32_MEMBER( lpc210x_device::pll_r )
+uint32_t lpc210x_device::pll_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -233,7 +233,7 @@ READ32_MEMBER( lpc210x_device::pll_r )
 }
 
 
-WRITE32_MEMBER( lpc210x_device::pll_w )
+void lpc210x_device::pll_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset * 4)
 	{

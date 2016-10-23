@@ -64,14 +64,14 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(so_w);
-	DECLARE_WRITE16_MEMBER(midi_w);
+	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void so_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void midi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER(lcd_ctrl_r);
-	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
-	DECLARE_WRITE8_MEMBER(lcd_data_w);
-	DECLARE_READ16_MEMBER(port0_r);
+	uint8_t lcd_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lcd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t port0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
@@ -134,7 +134,7 @@ void d110_state::machine_reset()
 	port0 = 0x80; // battery ok
 }
 
-WRITE8_MEMBER(d110_state::lcd_ctrl_w)
+void d110_state::lcd_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	lcd->control_w(data);
 	for(int i=0; i != lcd_data_buffer_pos; i++)
@@ -142,13 +142,13 @@ WRITE8_MEMBER(d110_state::lcd_ctrl_w)
 	lcd_data_buffer_pos = 0;
 }
 
-READ8_MEMBER(d110_state::lcd_ctrl_r)
+uint8_t d110_state::lcd_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// Busy flag in the msm622b is bit 7, while the software expects it in bit 0...
 	return lcd->control_r() >> 7;
 }
 
-WRITE8_MEMBER(d110_state::lcd_data_w)
+void d110_state::lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(lcd_data_buffer_pos == sizeof(lcd_data_buffer)) {
 		logerror("Warning: lcd data buffer overflow (%04x)\n", cpu->pc());
@@ -157,12 +157,12 @@ WRITE8_MEMBER(d110_state::lcd_data_w)
 	lcd_data_buffer[lcd_data_buffer_pos++] = data;
 }
 
-WRITE8_MEMBER(d110_state::bank_w)
+void d110_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank")->set_entry(data);
 }
 
-WRITE16_MEMBER(d110_state::midi_w)
+void d110_state::midi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	logerror("midi_out %02x\n", data);
 	midi = data;
@@ -178,7 +178,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d110_state::midi_timer_cb)
 		midi_timer->adjust(attotime::from_hz(1250));
 }
 
-READ16_MEMBER(d110_state::port0_r)
+uint16_t d110_state::port0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return port0;
 }
@@ -188,7 +188,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d110_state::samples_timer_cb)
 	port0 ^= 0x10;
 }
 
-WRITE8_MEMBER(d110_state::so_w)
+void d110_state::so_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// bit 0   = led
 	// bit 1-2 = reverb program a13/a14

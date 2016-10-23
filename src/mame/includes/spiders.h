@@ -30,15 +30,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
-	DECLARE_WRITE8_MEMBER(gfx_rom_intf_w);
-	DECLARE_READ8_MEMBER(gfx_rom_r);
+	void gfx_rom_intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gfx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(update_pia_1);
-	DECLARE_WRITE8_MEMBER(ic60_74123_output_changed);
-	DECLARE_WRITE8_MEMBER(spiders_audio_command_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_a_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
-	DECLARE_WRITE8_MEMBER(spiders_audio_ctrl_w);
+	void ic60_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spiders_audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spiders_audio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spiders_audio_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void spiders_audio_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

@@ -21,16 +21,16 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	template<class _Object> static devcb_base &set_halt_callback(device_t &device, _Object object) { return downcast<m24_z8000_device &>(device).m_halt_out.set_callback(object); }
 
-	DECLARE_READ16_MEMBER(pmem_r);
-	DECLARE_WRITE16_MEMBER(pmem_w);
-	DECLARE_READ16_MEMBER(dmem_r);
-	DECLARE_WRITE16_MEMBER(dmem_w);
-	DECLARE_READ16_MEMBER(i86_io_r);
-	DECLARE_WRITE16_MEMBER(i86_io_w);
-	DECLARE_WRITE8_MEMBER(irqctl_w);
-	DECLARE_WRITE8_MEMBER(serctl_w);
-	DECLARE_READ8_MEMBER(handshake_r);
-	DECLARE_WRITE8_MEMBER(handshake_w);
+	uint16_t pmem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void pmem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dmem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void dmem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t i86_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void i86_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void irqctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t handshake_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void handshake_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(mo_w);
 	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
 	IRQ_CALLBACK_MEMBER(int_cb);

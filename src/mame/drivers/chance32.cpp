@@ -36,21 +36,21 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	DECLARE_WRITE8_MEMBER(chance32_fgram_w)
+	void chance32_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_fgram[offset] = data;
 		m_fg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(chance32_bgram_w)
+	void chance32_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_bgram[offset] = data;
 		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_WRITE8_MEMBER(muxout_w);
-	DECLARE_READ8_MEMBER(mux_r);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void muxout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -112,12 +112,12 @@ uint32_t chance32_state::screen_update_chance32(screen_device &screen, bitmap_in
 }
 
 
-WRITE8_MEMBER(chance32_state::mux_w)
+void chance32_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	mux_data = data;
 }
 
-READ8_MEMBER(chance32_state::mux_r)
+uint8_t chance32_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t res,i;
 	const char *const muxnames[4] = { "IN0", "IN1", "IN2", "IN3" };
@@ -133,7 +133,7 @@ READ8_MEMBER(chance32_state::mux_r)
 }
 
 
-WRITE8_MEMBER(chance32_state::muxout_w)
+void chance32_state::muxout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /* Muxed Lamps
 

@@ -146,14 +146,14 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /*** Main CPU ***/
 
-WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
+void mcatadv_state::mcat_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
-WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
+void mcatadv_state::mcat_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_8_15)
 	{
@@ -165,7 +165,7 @@ WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 }
 #endif
 
-READ16_MEMBER(mcatadv_state::mcat_wd_r)
+uint16_t mcatadv_state::mcat_wd_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m_watchdog->reset_r(space, 0);
 	return 0xc00;
@@ -205,7 +205,7 @@ ADDRESS_MAP_END
 
 /*** Sound ***/
 
-WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
+void mcatadv_state::mcatadv_sound_bw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }

@@ -72,13 +72,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
 }
 
 #if 0
-READ16_MEMBER(dbz_state::dbzcontrol_r)
+uint16_t dbz_state::dbzcontrol_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_control;
 }
 #endif
 
-WRITE16_MEMBER(dbz_state::dbzcontrol_w)
+void dbz_state::dbzcontrol_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* bit 10 = enable '246 readback */
 
@@ -93,12 +93,12 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
-WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
+void dbz_state::dbz_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data >> 8);
 }
 
-WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
+void dbz_state::dbz_sound_cause_nmi(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

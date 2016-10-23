@@ -32,11 +32,11 @@ public:
 	int m_CollisionSprite;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_WRITE8_MEMBER(tinvader_sound_w);
-	DECLARE_WRITE8_MEMBER(tinvader_videoram_w);
-	DECLARE_READ8_MEMBER(zac_s2636_r);
-	DECLARE_WRITE8_MEMBER(zac_s2636_w);
-	DECLARE_READ8_MEMBER(tinvader_port_0_r);
+	void tinvader_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void tinvader_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t zac_s2636_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void zac_s2636_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tinvader_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zac2650);

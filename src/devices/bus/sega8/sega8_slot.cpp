@@ -624,7 +624,7 @@ std::string sega8_cart_slot_device::get_default_card_software()
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(sega8_cart_slot_device::read_cart)
+uint8_t sega8_cart_slot_device::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_cart(space, offset);
@@ -632,7 +632,7 @@ READ8_MEMBER(sega8_cart_slot_device::read_cart)
 		return 0xff;
 }
 
-READ8_MEMBER(sega8_cart_slot_device::read_ram)
+uint8_t sega8_cart_slot_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ram(space, offset);
@@ -645,19 +645,19 @@ READ8_MEMBER(sega8_cart_slot_device::read_ram)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(sega8_cart_slot_device::write_mapper)
+void sega8_cart_slot_device::write_mapper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_mapper(space, offset, data);
 }
 
-WRITE8_MEMBER(sega8_cart_slot_device::write_cart)
+void sega8_cart_slot_device::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_cart(space, offset, data);
 }
 
-WRITE8_MEMBER(sega8_cart_slot_device::write_ram)
+void sega8_cart_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);

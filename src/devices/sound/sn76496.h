@@ -30,9 +30,9 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_ready_handler(device_t &device, _Object object) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER( stereo_w );
+	void stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write(uint8_t data);
-	DECLARE_WRITE8_MEMBER( write );
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:

@@ -153,7 +153,7 @@ void namcos1_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER( namcos1_state::videoram_w )
+void namcos1_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	if (offset < 0x7000)
@@ -172,7 +172,7 @@ WRITE8_MEMBER( namcos1_state::videoram_w )
 }
 
 
-WRITE8_MEMBER( namcos1_state::spriteram_w )
+void namcos1_state::spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */

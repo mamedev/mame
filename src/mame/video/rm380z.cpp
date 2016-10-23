@@ -192,7 +192,7 @@ void rm380z_state::check_scroll_register()
 // 20e2: prints "Ready:"
 // 0195: prints "\n"
 
-WRITE8_MEMBER( rm380z_state::videoram_write )
+void rm380z_state::videoram_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
 
@@ -225,7 +225,7 @@ WRITE8_MEMBER( rm380z_state::videoram_write )
 	m_mainVideoram[offset]=data;
 }
 
-READ8_MEMBER( rm380z_state::videoram_read )
+uint8_t rm380z_state::videoram_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mainVideoram[offset];
 }

@@ -23,7 +23,7 @@ Notes:
 #include "includes/skykid.h"
 
 
-WRITE8_MEMBER(skykid_state::inputport_select_w)
+void skykid_state::inputport_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0xe0) == 0x60)
 		m_inputport_selected = data & 0x07;
@@ -35,7 +35,7 @@ WRITE8_MEMBER(skykid_state::inputport_select_w)
 	}
 }
 
-READ8_MEMBER(skykid_state::inputport_r)
+uint8_t skykid_state::inputport_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_inputport_selected)
 	{
@@ -58,24 +58,24 @@ READ8_MEMBER(skykid_state::inputport_r)
 	}
 }
 
-WRITE8_MEMBER(skykid_state::skykid_led_w)
+void skykid_state::skykid_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0,data & 0x08);
 	output().set_led_value(1,data & 0x10);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_subreset_w)
+void skykid_state::skykid_subreset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset,11);
 	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_bankswitch_w)
+void skykid_state::skykid_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(!BIT(offset,11));
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
+void skykid_state::skykid_irq_1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset,11);
 	m_main_irq_mask = bit;
@@ -83,7 +83,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
+void skykid_state::skykid_irq_2_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bit = !BIT(offset,13);
 	m_mcu_irq_mask = bit;
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, skykid_state )
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(skykid_state::readFF)
+uint8_t skykid_state::readFF(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }

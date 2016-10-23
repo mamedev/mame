@@ -47,7 +47,7 @@ ClawGrip, Jul 2006
 #include "sound/okim6295.h"
 #include "includes/pokechmp.h"
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
+void pokechmp_state::pokechmp_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -60,14 +60,14 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
+void pokechmp_state::pokechmp_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("oki")->base();
 	membank("okibank")->set_base(&ROM[data*0x8000]);
 }
 
 
-WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
+void pokechmp_state::pokechmp_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

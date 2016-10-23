@@ -105,7 +105,7 @@
 
 ***************************************************************************/
 
-WRITE8_MEMBER(vendetta_state::eeprom_w)
+void vendetta_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 - VOC0 - Video banking related */
 	/* bit 1 - VOC1 - Video banking related */
@@ -131,12 +131,12 @@ WRITE8_MEMBER(vendetta_state::eeprom_w)
 
 /********************************************/
 
-READ8_MEMBER(vendetta_state::K052109_r)
+uint8_t vendetta_state::K052109_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_k052109->read(space, offset + 0x2000);
 }
 
-WRITE8_MEMBER(vendetta_state::K052109_w)
+void vendetta_state::K052109_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
@@ -148,7 +148,7 @@ WRITE8_MEMBER(vendetta_state::K052109_w)
 }
 
 
-WRITE8_MEMBER(vendetta_state::_5fe0_w)
+void vendetta_state::_5fe0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0,1 coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -177,19 +177,19 @@ void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
+void vendetta_state::z80_arm_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	timer_set(attotime::from_usec(25), TIMER_Z80_NMI);
 }
 
-WRITE8_MEMBER(vendetta_state::z80_irq_w)
+void vendetta_state::z80_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-READ8_MEMBER(vendetta_state::z80_irq_r)
+uint8_t vendetta_state::z80_irq_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	return 0x00;
@@ -408,7 +408,7 @@ void vendetta_state::machine_reset()
 	m_irq_enabled = 0;
 }
 
-WRITE8_MEMBER( vendetta_state::banking_callback )
+void vendetta_state::banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data >= 0x1c)
 		logerror("PC = %04x : Unknown bank selected %02x\n", machine().device("maincpu")->safe_pc(), data);

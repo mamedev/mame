@@ -143,7 +143,7 @@ void sprint4_state::screen_eof_sprint4(screen_device &screen, bool state)
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_video_ram_w)
+void sprint4_state::sprint4_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;

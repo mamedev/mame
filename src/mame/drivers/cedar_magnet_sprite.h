@@ -29,28 +29,28 @@ public:
 
 	required_device<address_map_bank_device> m_sprite_ram_bankdev;
 
-	DECLARE_READ8_MEMBER(pio0_pa_r);
-	DECLARE_WRITE8_MEMBER(pio0_pa_w);
-//  DECLARE_READ8_MEMBER(pio0_pb_r);
-	DECLARE_WRITE8_MEMBER(pio0_pb_w);
+	uint8_t pio0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t pio0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-//  DECLARE_READ8_MEMBER(pio1_pa_r);
-	DECLARE_WRITE8_MEMBER(pio1_pa_w);
-//  DECLARE_READ8_MEMBER(pio1_pb_r);
-	DECLARE_WRITE8_MEMBER(pio1_pb_w);
+//  uint8_t pio1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-//  DECLARE_READ8_MEMBER(pio2_pa_r);
-	DECLARE_WRITE8_MEMBER(pio2_pa_w);
-//  DECLARE_READ8_MEMBER(pio2_pb_r);
-	DECLARE_WRITE8_MEMBER(pio2_pb_w);
+//  uint8_t pio2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+//  uint8_t pio2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE8_MEMBER(sprite_port80_w);
-	DECLARE_WRITE8_MEMBER(sprite_port84_w);
-	DECLARE_WRITE8_MEMBER(sprite_port88_w);
-	DECLARE_WRITE8_MEMBER(sprite_port8c_w);
-	DECLARE_WRITE8_MEMBER(sprite_port9c_w);
+	void sprite_port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_port84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_port88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_port8c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sprite_port9c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(exzisus_hack_r);
+	uint8_t exzisus_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t m_upperaddr;
 	uint8_t m_loweraddr;

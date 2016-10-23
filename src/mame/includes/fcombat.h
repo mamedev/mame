@@ -57,16 +57,16 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	DECLARE_READ8_MEMBER(fcombat_protection_r);
-	DECLARE_READ8_MEMBER(fcombat_port01_r);
-	DECLARE_WRITE8_MEMBER(e900_w);
-	DECLARE_WRITE8_MEMBER(ea00_w);
-	DECLARE_WRITE8_MEMBER(eb00_w);
-	DECLARE_WRITE8_MEMBER(ec00_w);
-	DECLARE_WRITE8_MEMBER(ed00_w);
-	DECLARE_READ8_MEMBER(e300_r);
-	DECLARE_WRITE8_MEMBER(ee00_w);
-	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
+	uint8_t fcombat_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fcombat_port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void e900_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ea00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eb00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ec00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ed00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t e300_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ee00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fcombat_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_fcombat();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

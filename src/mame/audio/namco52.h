@@ -36,16 +36,16 @@ public:
 	template<class _Object> static devcb_base &set_romread_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_romread.set_callback(object); }
 	template<class _Object> static devcb_base &set_si_callback(device_t &device, _Object object) { return downcast<namco_52xx_device &>(device).m_si.set_callback(object); }
 
-	DECLARE_WRITE8_MEMBER(write);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER( K_r );
-	DECLARE_READ8_MEMBER( SI_r );
-	DECLARE_READ8_MEMBER( R0_r );
-	DECLARE_READ8_MEMBER( R1_r );
-	DECLARE_WRITE8_MEMBER( P_w );
-	DECLARE_WRITE8_MEMBER( R2_w );
-	DECLARE_WRITE8_MEMBER( R3_w );
-	DECLARE_WRITE8_MEMBER( O_w );
+	uint8_t K_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t SI_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t R0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t R1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void P_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void R2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void R3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void O_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

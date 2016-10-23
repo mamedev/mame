@@ -140,18 +140,18 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(ram_r);
-	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
-	DECLARE_READ8_MEMBER(c080_r);
-	DECLARE_WRITE8_MEMBER(c080_w);
-	DECLARE_READ8_MEMBER(c100_r);
-	DECLARE_WRITE8_MEMBER(c100_w);
-	DECLARE_READ8_MEMBER(c800_r);
-	DECLARE_WRITE8_MEMBER(c800_w);
-	DECLARE_READ8_MEMBER(inh_r);
-	DECLARE_WRITE8_MEMBER(inh_w);
+	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c080_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t c800_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t inh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void inh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
@@ -567,7 +567,7 @@ void napple2_state::do_io(address_space &space, int offset)
 	}
 }
 
-READ8_MEMBER(napple2_state::c000_r)
+uint8_t napple2_state::c000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -626,7 +626,7 @@ READ8_MEMBER(napple2_state::c000_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c000_w)
+void napple2_state::c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -640,7 +640,7 @@ WRITE8_MEMBER(napple2_state::c000_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c080_r)
+uint8_t napple2_state::c080_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(!space.debugger_access())
 	{
@@ -658,7 +658,7 @@ READ8_MEMBER(napple2_state::c080_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c080_w)
+void napple2_state::c080_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slot;
 
@@ -671,7 +671,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c100_r)
+uint8_t napple2_state::c100_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int slotnum;
 
@@ -690,7 +690,7 @@ READ8_MEMBER(napple2_state::c100_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c100_w)
+void napple2_state::c100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int slotnum;
 
@@ -707,7 +707,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::c800_r)
+uint8_t napple2_state::c800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0x7ff)
 	{
@@ -727,7 +727,7 @@ READ8_MEMBER(napple2_state::c800_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c800_w)
+void napple2_state::c800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0x7ff)
 	{
@@ -745,7 +745,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 	}
 }
 
-READ8_MEMBER(napple2_state::inh_r)
+uint8_t napple2_state::inh_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_inh_slot != -1)
 	{
@@ -756,7 +756,7 @@ READ8_MEMBER(napple2_state::inh_r)
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::inh_w)
+void napple2_state::inh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_inh_slot != -1)
 	{
@@ -898,7 +898,7 @@ uint8_t napple2_state::read_floatingbus()
     ADDRESS MAP
 ***************************************************************************/
 
-READ8_MEMBER(napple2_state::ram_r)
+uint8_t napple2_state::ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{
@@ -908,7 +908,7 @@ READ8_MEMBER(napple2_state::ram_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(napple2_state::ram_w)
+void napple2_state::ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset < m_ram_size)
 	{

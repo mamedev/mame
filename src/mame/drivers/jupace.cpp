@@ -95,31 +95,31 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( io_r );
-	DECLARE_WRITE8_MEMBER( io_w );
-	DECLARE_READ8_MEMBER( ppi_pa_r );
-	DECLARE_WRITE8_MEMBER( ppi_pa_w );
-	DECLARE_READ8_MEMBER( ppi_pb_r );
-	DECLARE_WRITE8_MEMBER( ppi_pb_w );
-	DECLARE_READ8_MEMBER( ppi_pc_r );
-	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_READ8_MEMBER( ppi_control_r );
-	DECLARE_WRITE8_MEMBER( ppi_control_w );
-	DECLARE_READ8_MEMBER( pio_pa_r );
-	DECLARE_WRITE8_MEMBER( pio_pa_w );
+	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ppi_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ppi_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
-	DECLARE_READ8_MEMBER(pio_ad_r);
-	DECLARE_READ8_MEMBER(pio_bd_r);
-	DECLARE_READ8_MEMBER(pio_ac_r);
-	DECLARE_READ8_MEMBER(pio_bc_r);
-	DECLARE_WRITE8_MEMBER(pio_ad_w);
-	DECLARE_WRITE8_MEMBER(pio_bd_w);
-	DECLARE_WRITE8_MEMBER(pio_ac_w);
-	DECLARE_WRITE8_MEMBER(pio_bc_w);
-	DECLARE_READ8_MEMBER(sby_r);
-	DECLARE_WRITE8_MEMBER(ald_w);
+	uint8_t pio_ad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_bd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_ac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pio_bc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pio_ad_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_bd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_ac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pio_bc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t sby_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ald_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
 private:
@@ -255,7 +255,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 //   io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::io_r )
+uint8_t ace_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 
@@ -288,7 +288,7 @@ READ8_MEMBER( ace_state::io_r )
 //   io_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ace_state::io_w )
+void ace_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cassette->output(1);
 	m_speaker->level_w(1);
@@ -299,22 +299,22 @@ WRITE8_MEMBER( ace_state::io_w )
 //   ppi_r -
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::ppi_pa_r )
+uint8_t ace_state::ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, 0);
 }
 
-READ8_MEMBER( ace_state::ppi_pb_r )
+uint8_t ace_state::ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, 1);
 }
 
-READ8_MEMBER( ace_state::ppi_pc_r )
+uint8_t ace_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, 2);
 }
 
-READ8_MEMBER( ace_state::ppi_control_r )
+uint8_t ace_state::ppi_control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ppi->read(space, 3);
 }
@@ -324,22 +324,22 @@ READ8_MEMBER( ace_state::ppi_control_r )
 //   ppi_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( ace_state::ppi_pa_w )
+void ace_state::ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, 0, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_pb_w )
+void ace_state::ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, 1, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_pc_w )
+void ace_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, 2, data);
 }
 
-WRITE8_MEMBER( ace_state::ppi_control_w )
+void ace_state::ppi_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi->write(space, 3, data);
 }
@@ -349,22 +349,22 @@ WRITE8_MEMBER( ace_state::ppi_control_w )
 //   pio_r -
 //-------------------------------------------------
 
-READ8_MEMBER(ace_state::pio_ad_r)
+uint8_t ace_state::pio_ad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_z80pio->data_read(0);
 }
 
-READ8_MEMBER(ace_state::pio_bd_r)
+uint8_t ace_state::pio_bd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_z80pio->data_read(1);
 }
 
-READ8_MEMBER(ace_state::pio_ac_r)
+uint8_t ace_state::pio_ac_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_z80pio->control_read();
 }
 
-READ8_MEMBER(ace_state::pio_bc_r)
+uint8_t ace_state::pio_bc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_z80pio->control_read();
 }
@@ -374,22 +374,22 @@ READ8_MEMBER(ace_state::pio_bc_r)
 //   pio_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER(ace_state::pio_ad_w)
+void ace_state::pio_ad_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80pio->data_write(0, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_bd_w)
+void ace_state::pio_bd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80pio->data_write(1, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_ac_w)
+void ace_state::pio_ac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80pio->control_write(0, data);
 }
 
-WRITE8_MEMBER(ace_state::pio_bc_w)
+void ace_state::pio_bc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_z80pio->control_write(1, data);
 }
@@ -613,7 +613,7 @@ uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //  I8255A interface
 //-------------------------------------------------
 
-READ8_MEMBER(ace_state::sby_r)
+uint8_t ace_state::sby_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -633,7 +633,7 @@ READ8_MEMBER(ace_state::sby_r)
 	return m_sp0256->sby_r();
 }
 
-WRITE8_MEMBER(ace_state::ald_w)
+void ace_state::ald_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -660,7 +660,7 @@ WRITE8_MEMBER(ace_state::ald_w)
 //  Z80PIO
 //-------------------------------------------------
 
-READ8_MEMBER( ace_state::pio_pa_r )
+uint8_t ace_state::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -680,7 +680,7 @@ READ8_MEMBER( ace_state::pio_pa_r )
 	return 0;
 }
 
-WRITE8_MEMBER( ace_state::pio_pa_w )
+void ace_state::pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 

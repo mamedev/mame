@@ -341,7 +341,7 @@ offs_t cs4031_device::page_offset()
 	return 0xff0000;
 }
 
-READ8_MEMBER( cs4031_device::dma_read_byte )
+uint8_t cs4031_device::dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -349,7 +349,7 @@ READ8_MEMBER( cs4031_device::dma_read_byte )
 	return m_space->read_byte(page_offset() + offset);
 }
 
-WRITE8_MEMBER( cs4031_device::dma_write_byte )
+void cs4031_device::dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -357,7 +357,7 @@ WRITE8_MEMBER( cs4031_device::dma_write_byte )
 	m_space->write_byte(page_offset() + offset, data);
 }
 
-READ8_MEMBER( cs4031_device::dma_read_word )
+uint8_t cs4031_device::dma_read_word(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -368,7 +368,7 @@ READ8_MEMBER( cs4031_device::dma_read_word )
 	return result;
 }
 
-WRITE8_MEMBER( cs4031_device::dma_write_word )
+void cs4031_device::dma_write_word(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -442,7 +442,7 @@ void cs4031_device::nmi()
 	}
 }
 
-READ8_MEMBER( cs4031_device::intc1_slave_ack_r )
+uint8_t cs4031_device::intc1_slave_ack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 2) // IRQ 2
 		return m_intc2->acknowledge();
@@ -495,13 +495,13 @@ WRITE_LINE_MEMBER( cs4031_device::ctc_out2_w )
 //  CHIPSET CONFIGURATION
 //**************************************************************************
 
-WRITE8_MEMBER( cs4031_device::config_address_w )
+void cs4031_device::config_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_address = data;
 	m_address_valid = (m_address < 0x20) ? true : false;
 }
 
-READ8_MEMBER( cs4031_device::config_data_r )
+uint8_t cs4031_device::config_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0xff;
 
@@ -519,7 +519,7 @@ READ8_MEMBER( cs4031_device::config_data_r )
 	return result;
 }
 
-WRITE8_MEMBER( cs4031_device::config_data_w )
+void cs4031_device::config_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_address_valid)
 	{
@@ -721,7 +721,7 @@ void cs4031_device::keyboard_gatea20(int state)
 	a20m();
 }
 
-READ8_MEMBER( cs4031_device::keyb_status_r )
+uint8_t cs4031_device::keyb_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_status_r\n");
@@ -729,14 +729,14 @@ READ8_MEMBER( cs4031_device::keyb_status_r )
 	return m_keybc->status_r(space, 0);
 }
 
-WRITE8_MEMBER( cs4031_device::keyb_command_blocked_w )
+void cs4031_device::keyb_command_blocked_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// command is optionally blocked
 	if (!BIT(m_registers[SOFT_RESET_AND_GATEA20], 7))
 		m_keybc->command_w(space, 0, data);
 }
 
-WRITE8_MEMBER( cs4031_device::keyb_command_w )
+void cs4031_device::keyb_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_command_w: %02x\n", data);
@@ -808,7 +808,7 @@ WRITE8_MEMBER( cs4031_device::keyb_command_w )
 	}
 }
 
-READ8_MEMBER( cs4031_device::keyb_data_r )
+uint8_t cs4031_device::keyb_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_data_r\n");
@@ -816,7 +816,7 @@ READ8_MEMBER( cs4031_device::keyb_data_r )
 	return m_keybc->data_r(space, 0);
 }
 
-WRITE8_MEMBER( cs4031_device::keyb_data_w )
+void cs4031_device::keyb_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::keyb_data_w: %02x\n", data);
@@ -872,7 +872,7 @@ WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
     1 - Fast Gate A20
 
  */
-WRITE8_MEMBER( cs4031_device::sysctrl_w )
+void cs4031_device::sysctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_IO)
 		logerror("cs4031_device::sysctrl_w: %u\n", data);
@@ -889,7 +889,7 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 	m_cpureset = BIT(data, 0);
 }
 
-READ8_MEMBER( cs4031_device::sysctrl_r )
+uint8_t cs4031_device::sysctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = 0; // reserved bits read as 0?
 
@@ -920,7 +920,7 @@ READ8_MEMBER( cs4031_device::sysctrl_r )
     7 - Parity check latch (r) [not emulated]
 */
 
-READ8_MEMBER( cs4031_device::portb_r )
+uint8_t cs4031_device::portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (0)
 		logerror("cs4031_device::portb_r: %02x\n", m_portb);
@@ -928,7 +928,7 @@ READ8_MEMBER( cs4031_device::portb_r )
 	return m_portb;
 }
 
-WRITE8_MEMBER( cs4031_device::portb_w )
+void cs4031_device::portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (0)
 		logerror("cs4031_device::portb_w: %02x\n", data);
@@ -954,7 +954,7 @@ WRITE8_MEMBER( cs4031_device::portb_w )
     7   - NMI mask
     6:0 - RTC address
  */
-WRITE8_MEMBER( cs4031_device::rtc_w )
+void cs4031_device::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (0)
 		logerror("cs4031_device::rtc_w: %02x\n", data);

@@ -497,7 +497,7 @@ void scn2674_device::write_command(uint8_t data)
 }
 
 
-READ8_MEMBER( scn2674_device::read )
+uint8_t scn2674_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	Offset:  Purpose
@@ -546,7 +546,7 @@ READ8_MEMBER( scn2674_device::read )
 }
 
 
-WRITE8_MEMBER( scn2674_device::write )
+void scn2674_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 	Offset:  Purpose

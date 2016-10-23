@@ -57,15 +57,15 @@ public:
 	int m_category_enable;
 	int m_tape_head_pos;
 
-	DECLARE_WRITE8_MEMBER(quizshow_lamps1_w);
-	DECLARE_WRITE8_MEMBER(quizshow_lamps2_w);
-	DECLARE_WRITE8_MEMBER(quizshow_lamps3_w);
-	DECLARE_WRITE8_MEMBER(quizshow_tape_control_w);
-	DECLARE_WRITE8_MEMBER(quizshow_audio_w);
-	DECLARE_WRITE8_MEMBER(quizshow_video_disable_w);
-	DECLARE_READ8_MEMBER(quizshow_timing_r);
-	DECLARE_READ8_MEMBER(quizshow_tape_signal_r);
-	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
+	void quizshow_lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizshow_lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizshow_lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizshow_tape_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizshow_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void quizshow_video_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t quizshow_timing_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t quizshow_tape_signal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void quizshow_main_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 	void init_quizshow();
@@ -129,7 +129,7 @@ uint32_t quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
+void quizshow_state::quizshow_lamps1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -138,7 +138,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
+void quizshow_state::quizshow_lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -147,7 +147,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
+void quizshow_state::quizshow_lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0-d1: start button lamps
 	output().set_lamp_value(8, data >> 0 & 1);
@@ -157,7 +157,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
+void quizshow_state::quizshow_tape_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d2: enable user category select (changes tape head position)
 	output().set_lamp_value(10, data >> 2 & 1);
@@ -170,7 +170,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 	// d4-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
+void quizshow_state::quizshow_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d1: audio out
 	m_dac->write(BIT(data, 1));
@@ -178,13 +178,13 @@ WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 	// d0, d2-d7: N/C
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_video_disable_w)
+void quizshow_state::quizshow_video_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// d0: video disable (looked glitchy when I implemented it, maybe there's more to it)
 	// d1-d7: N/C
 }
 
-READ8_MEMBER(quizshow_state::quizshow_timing_r)
+uint8_t quizshow_state::quizshow_timing_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0x80;
 
@@ -204,13 +204,13 @@ READ8_MEMBER(quizshow_state::quizshow_timing_r)
 	return ret;
 }
 
-READ8_MEMBER(quizshow_state::quizshow_tape_signal_r)
+uint8_t quizshow_state::quizshow_tape_signal_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
 	return machine().rand() & 0x80;
 }
 
-WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
+void quizshow_state::quizshow_main_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_main_ram[offset]=data;
 	m_tilemap->mark_tile_dirty(offset);

@@ -72,7 +72,7 @@ void mos6529_device::device_start()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos6529_device::read )
+uint8_t mos6529_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_input;
 }
@@ -82,7 +82,7 @@ READ8_MEMBER( mos6529_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos6529_device::write )
+void mos6529_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_p0_handler((data>>0)&1);
 	m_p1_handler((data>>1)&1);

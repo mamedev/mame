@@ -162,7 +162,7 @@ some kind of zoom table?
 #define P2TRACKX_PORT_TAG     "P2X"
 #define P2TRACKY_PORT_TAG     "P2Y"
 
-READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
+uint8_t taitoh_state::syvalion_input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
@@ -211,7 +211,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 	}
 }
 
-WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
+void taitoh_state::sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("z80bank")->set_entry(data & 3);
 }

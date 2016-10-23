@@ -704,7 +704,7 @@ void fd800_legacy_device::do_cmd(void)
         30: unit MSB
         31: Interrupt (CBUSY???) (1 -> controller is ready)
 */
-READ8_MEMBER( fd800_legacy_device::cru_r )
+uint8_t fd800_legacy_device::cru_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int reply = 0;
 
@@ -738,7 +738,7 @@ READ8_MEMBER( fd800_legacy_device::cru_r )
     27: FD unit number MSB/extended command code
     28-31: command code
 */
-WRITE8_MEMBER( fd800_legacy_device::cru_w )
+void fd800_legacy_device::cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

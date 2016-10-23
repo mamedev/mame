@@ -101,7 +101,7 @@ void pc_fdc_family_device::device_reset()
 
 // Bit 4-7 control the drive motors
 
-WRITE8_MEMBER( pc_fdc_family_device::dor_w )
+void pc_fdc_family_device::dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	logerror("%s: dor = %02x\n", tag(), data);
 	uint8_t pdor = dor;
@@ -123,17 +123,17 @@ WRITE8_MEMBER( pc_fdc_family_device::dor_w )
 		fdc->reset();
 }
 
-READ8_MEMBER( pc_fdc_family_device::dor_r )
+uint8_t pc_fdc_family_device::dor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dor;
 }
 
-READ8_MEMBER( pc_fdc_family_device::dir_r )
+uint8_t pc_fdc_family_device::dir_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return do_dir_r();
 }
 
-WRITE8_MEMBER( pc_fdc_family_device::ccr_w )
+void pc_fdc_family_device::ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const int rates[4] = { 500000, 300000, 250000, 1000000 };
 	logerror("%s: ccr = %02x\n", tag(), data);
@@ -147,7 +147,7 @@ uint8_t pc_fdc_family_device::do_dir_r()
 	return 0x00;
 }
 
-WRITE8_MEMBER( pc_fdc_xt_device::dor_fifo_w)
+void pc_fdc_xt_device::dor_fifo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	fdc->fifo_w(space, 0, data, mem_mask);
 	dor_w(space, 0, data, mem_mask);

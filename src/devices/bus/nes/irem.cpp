@@ -168,7 +168,7 @@ void nes_h3001_device::pcb_reset()
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_lrog017_device::write_h)
+void nes_lrog017_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("lrog017 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER(nes_lrog017_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_holydivr_device::write_h)
+void nes_holydivr_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("holy diver write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -211,7 +211,7 @@ WRITE8_MEMBER(nes_holydivr_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_tam_s1_device::write_h)
+void nes_tam_s1_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("tam s1 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -235,7 +235,7 @@ WRITE8_MEMBER(nes_tam_s1_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_g101_device::write_h)
+void nes_g101_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("g101 write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -301,7 +301,7 @@ void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 	}
 }
 
-WRITE8_MEMBER(nes_h3001_device::write_h)
+void nes_h3001_device::write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	LOG_MMC(("h3001 write_h, offset %04x, data: %02x\n", offset, data));
 

@@ -94,12 +94,12 @@ public:
 	DECLARE_READ_LINE_MEMBER( hf_r ) { return !m_hf; } // _HF
 
 	// normal configuration
-	DECLARE_WRITE16_MEMBER( data_word_w ) { fifo_write(data); }
-	DECLARE_READ16_MEMBER( data_word_r ) { return (uint16_t)fifo_read(); }
+	void data_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { fifo_write(data); }
+	uint16_t data_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return (uint16_t)fifo_read(); }
 
 	// use these for simple configurations that don't have d8/q8 connected
-	DECLARE_WRITE8_MEMBER( data_byte_w ) { fifo_write(data); }
-	DECLARE_READ8_MEMBER( data_byte_r ) { return (uint8_t)fifo_read(); }
+	void data_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { fifo_write(data); }
+	uint8_t data_byte_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return (uint8_t)fifo_read(); }
 
 protected:
 	// device-level overrides

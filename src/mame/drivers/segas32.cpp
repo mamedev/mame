@@ -728,7 +728,7 @@ void segas32_state::int_control_w(address_space &space, int offset, uint8_t data
 }
 
 
-READ16_MEMBER(segas32_state::interrupt_control_16_r)
+uint16_t segas32_state::interrupt_control_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -746,7 +746,7 @@ READ16_MEMBER(segas32_state::interrupt_control_16_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::interrupt_control_16_w)
+void segas32_state::interrupt_control_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		int_control_w(space, offset*2+0, data);
@@ -755,7 +755,7 @@ WRITE16_MEMBER(segas32_state::interrupt_control_16_w)
 }
 
 
-READ32_MEMBER(segas32_state::interrupt_control_32_r)
+uint32_t segas32_state::interrupt_control_32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
@@ -769,7 +769,7 @@ READ32_MEMBER(segas32_state::interrupt_control_32_r)
 }
 
 
-WRITE32_MEMBER(segas32_state::interrupt_control_32_w)
+void segas32_state::interrupt_control_32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		int_control_w(space, offset*4+0, data);
@@ -920,26 +920,26 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 }
 
 
-READ16_MEMBER(segas32_state::io_chip_r)
+uint16_t segas32_state::io_chip_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return common_io_chip_r(space, 0, offset, mem_mask);
 }
 
 
-WRITE16_MEMBER(segas32_state::io_chip_w)
+void segas32_state::io_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	common_io_chip_w(space, 0, offset, data, mem_mask);
 }
 
 
-READ32_MEMBER(segas32_state::io_chip_0_r)
+uint32_t segas32_state::io_chip_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return common_io_chip_r(space, 0, offset*2+0, mem_mask) |
 			(common_io_chip_r(space, 0, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::io_chip_0_w)
+void segas32_state::io_chip_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		common_io_chip_w(space, 0, offset*2+0, data, mem_mask);
@@ -948,14 +948,14 @@ WRITE32_MEMBER(segas32_state::io_chip_0_w)
 }
 
 
-READ32_MEMBER(segas32_state::io_chip_1_r)
+uint32_t segas32_state::io_chip_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return common_io_chip_r(space, 1, offset*2+0, mem_mask) |
 			(common_io_chip_r(space, 1, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
-WRITE32_MEMBER(segas32_state::io_chip_1_w)
+void segas32_state::io_chip_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		common_io_chip_w(space, 1, offset*2+0, data, mem_mask);
@@ -971,7 +971,7 @@ WRITE32_MEMBER(segas32_state::io_chip_1_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::io_expansion_r)
+uint16_t segas32_state::io_expansion_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset, mem_mask);
@@ -981,7 +981,7 @@ READ16_MEMBER(segas32_state::io_expansion_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::io_expansion_w)
+void segas32_state::io_expansion_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* only LSB matters */
 	if (!ACCESSING_BITS_0_7)
@@ -994,7 +994,7 @@ WRITE16_MEMBER(segas32_state::io_expansion_w)
 }
 
 
-READ32_MEMBER(segas32_state::io_expansion_0_r)
+uint32_t segas32_state::io_expansion_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (!m_custom_io_r[0].isnull())
 		return (m_custom_io_r[0])(space, offset*2+0, mem_mask) |
@@ -1005,7 +1005,7 @@ READ32_MEMBER(segas32_state::io_expansion_0_r)
 }
 
 
-WRITE32_MEMBER(segas32_state::io_expansion_0_w)
+void segas32_state::io_expansion_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* only LSB matters */
 
@@ -1032,7 +1032,7 @@ WRITE32_MEMBER(segas32_state::io_expansion_0_w)
 }
 
 
-READ32_MEMBER(segas32_state::io_expansion_1_r)
+uint32_t segas32_state::io_expansion_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (!m_custom_io_r[1].isnull())
 		return (m_custom_io_r[1])(space, offset*2+0, mem_mask) |
@@ -1043,7 +1043,7 @@ READ32_MEMBER(segas32_state::io_expansion_1_r)
 }
 
 
-WRITE32_MEMBER(segas32_state::io_expansion_1_w)
+void segas32_state::io_expansion_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* only LSB matters */
 	if (ACCESSING_BITS_0_7)
@@ -1070,7 +1070,7 @@ WRITE32_MEMBER(segas32_state::io_expansion_1_w)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::analog_custom_io_r)
+uint16_t segas32_state::analog_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t result;
 	switch (offset)
@@ -1088,7 +1088,7 @@ READ16_MEMBER(segas32_state::analog_custom_io_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::analog_custom_io_w)
+void segas32_state::analog_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1103,7 +1103,7 @@ WRITE16_MEMBER(segas32_state::analog_custom_io_w)
 }
 
 
-READ16_MEMBER(segas32_state::extra_custom_io_r)
+uint16_t segas32_state::extra_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1119,7 +1119,7 @@ READ16_MEMBER(segas32_state::extra_custom_io_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
+void segas32_state::orunners_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1138,7 +1138,7 @@ WRITE16_MEMBER(segas32_state::orunners_custom_io_w)
 }
 
 
-READ16_MEMBER(segas32_state::sonic_custom_io_r)
+uint16_t segas32_state::sonic_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1156,7 +1156,7 @@ READ16_MEMBER(segas32_state::sonic_custom_io_r)
 }
 
 
-WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
+void segas32_state::sonic_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -1179,22 +1179,22 @@ WRITE16_MEMBER(segas32_state::sonic_custom_io_w)
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_state::random_number_16_w)
+void segas32_state::random_number_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
-READ16_MEMBER(segas32_state::random_number_16_r)
+uint16_t segas32_state::random_number_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
 
-WRITE32_MEMBER(segas32_state::random_number_32_w)
+void segas32_state::random_number_32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  osd_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", space.device().safe_pc(), offset*2, data, mem_mask);
 }
 
-READ32_MEMBER(segas32_state::random_number_32_r)
+uint32_t segas32_state::random_number_32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand() ^ (machine().rand() << 16);
 }
@@ -1207,13 +1207,13 @@ READ32_MEMBER(segas32_state::random_number_32_r)
  *
  *************************************/
 
-READ16_MEMBER(segas32_state::shared_ram_16_r)
+uint16_t segas32_state::shared_ram_16_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_z80_shared_ram[offset*2+0] | (m_z80_shared_ram[offset*2+1] << 8);
 }
 
 
-WRITE16_MEMBER(segas32_state::shared_ram_16_w)
+void segas32_state::shared_ram_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_z80_shared_ram[offset*2+0] = data;
@@ -1222,14 +1222,14 @@ WRITE16_MEMBER(segas32_state::shared_ram_16_w)
 }
 
 
-READ32_MEMBER(segas32_state::shared_ram_32_r)
+uint32_t segas32_state::shared_ram_32_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_z80_shared_ram[offset*4+0] | (m_z80_shared_ram[offset*4+1] << 8) |
 			(m_z80_shared_ram[offset*4+2] << 16) | (m_z80_shared_ram[offset*4+3] << 24);
 }
 
 
-WRITE32_MEMBER(segas32_state::shared_ram_32_w)
+void segas32_state::shared_ram_32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_z80_shared_ram[offset*4+0] = data;
@@ -1288,7 +1288,7 @@ void segas32_state::clear_sound_irq(int which)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
+void segas32_state::sound_int_control_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* odd offsets are interrupt acks */
 	if (offset & 1)
@@ -1303,7 +1303,7 @@ WRITE8_MEMBER(segas32_state::sound_int_control_lo_w)
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
+void segas32_state::sound_int_control_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_irq_control[offset] = data;
 	update_sound_irq_state();
@@ -1326,27 +1326,27 @@ WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
  *
  *************************************/
 
-WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
+void segas32_state::sound_bank_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
 	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
+void segas32_state::sound_bank_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
 	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 
-WRITE8_MEMBER(segas32_state::multipcm_bank_w)
+void segas32_state::multipcm_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_multipcm->set_bank(0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
 }
 
 
-WRITE8_MEMBER(segas32_state::scross_bank_w)
+void segas32_state::scross_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_multipcm->set_bank(0x80000 * (data & 7), 0x80000 * (data & 7));
 }
@@ -1359,13 +1359,13 @@ WRITE8_MEMBER(segas32_state::scross_bank_w)
  *
  *************************************/
 
-READ8_MEMBER(segas32_state::sound_dummy_r)
+uint8_t segas32_state::sound_dummy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sound_dummy_value;
 }
 
 
-WRITE8_MEMBER(segas32_state::sound_dummy_w)
+void segas32_state::sound_dummy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_dummy_value = data;
 }
@@ -2649,10 +2649,10 @@ public:
 	void init_orunners();
 
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
-	DECLARE_WRITE16_MEMBER(dual_pcb_comms_w);
-	DECLARE_READ16_MEMBER(dual_pcb_comms_r);
-	DECLARE_READ16_MEMBER(dual_pcb_masterslave);
-	DECLARE_READ16_MEMBER(dual_pcb_slave);
+	void dual_pcb_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t dual_pcb_comms_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dual_pcb_masterslave(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t dual_pcb_slave(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 
 };
@@ -5137,12 +5137,12 @@ void segas32_state::scross_sw2_output( int which, uint16_t data )
  *
  *************************************/
 
-WRITE16_MEMBER(segas32_new_state::dual_pcb_comms_w)
+void segas32_new_state::dual_pcb_comms_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dual_pcb_comms[offset]);
 }
 
-READ16_MEMBER(segas32_new_state::dual_pcb_comms_r)
+uint16_t segas32_new_state::dual_pcb_comms_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_dual_pcb_comms[offset];
 }
@@ -5152,12 +5152,12 @@ READ16_MEMBER(segas32_new_state::dual_pcb_comms_r)
    Probably not a dip/solder link/trace cut, but maybe
    just whichever way the cables are plugged in?
    Both f1en and arescue master units try to set bit 1... */
-READ16_MEMBER(segas32_new_state::dual_pcb_masterslave)
+uint16_t segas32_new_state::dual_pcb_masterslave(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0; // 0/1 master/slave
 }
 
-READ16_MEMBER(segas32_new_state::dual_pcb_slave)
+uint16_t segas32_new_state::dual_pcb_slave(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 1; // 0/1 master/slave
 }

@@ -110,7 +110,7 @@ void dooyong_rom_tilemap_device::static_set_primella_code_bits(device_t &device,
 	tilemap_device.m_primella_color_shift = bits;
 }
 
-WRITE8_MEMBER(dooyong_rom_tilemap_device::ctrl_w)
+void dooyong_rom_tilemap_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset &= 0x07U;
 	uint8_t const old = m_registers[offset];
@@ -248,7 +248,7 @@ dooyong_ram_tilemap_device::dooyong_ram_tilemap_device(machine_config const &mco
 {
 }
 
-WRITE16_MEMBER(dooyong_ram_tilemap_device::tileram_w)
+void dooyong_ram_tilemap_device::tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset &= (64U * 32U) - 1U;
 	uint16_t value(m_tileram[offset]);
@@ -295,25 +295,25 @@ TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
 }
 
 
-READ8_MEMBER(dooyong_z80_state::lastday_tx_r)
+uint8_t dooyong_z80_state::lastday_tx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 11));
 	return m_tx->tileram_r(space, offset & 0x07ffU) >> (lane ? 8 : 0);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::lastday_tx_w)
+void dooyong_z80_state::lastday_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 11));
 	m_tx->tileram_w(space, offset & 0x07ffU, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
 }
 
-READ8_MEMBER(dooyong_z80_state::bluehawk_tx_r)
+uint8_t dooyong_z80_state::bluehawk_tx_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 0));
 	return m_tx->tileram_r(space, offset >> 1) >> (lane ? 8 : 0);
 }
 
-WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
+void dooyong_z80_state::bluehawk_tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	bool const lane(BIT(offset, 0));
 	m_tx->tileram_w(space, offset >> 1, uint16_t(data) << (lane ? 8 : 0), lane ? 0xff00U : 0x00ffU);
@@ -322,7 +322,7 @@ WRITE8_MEMBER(dooyong_z80_state::bluehawk_tx_w)
 
 /* Control registers seem to be different on every game */
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
+void dooyong_z80_ym2203_state::lastday_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0 and 1 are coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -337,7 +337,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::lastday_ctrl_w)
 	flip_screen_set(data & 0x40);
 }
 
-WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
+void dooyong_z80_ym2203_state::pollux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  printf("pollux_ctrl_w %02x\n", data);
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER(dooyong_z80_ym2203_state::pollux_ctrl_w)
 
 
 
-WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
+void dooyong_z80_state::primella_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 0x07);
@@ -381,7 +381,7 @@ WRITE8_MEMBER(dooyong_z80_state::primella_ctrl_w)
 //  logerror("%04x: bankswitch = %02x\n",space.device().safe_pc(),data&0xe0);
 }
 
-READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
+uint8_t dooyong_z80_state::paletteram_flytiger_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_palette_bank) offset |= 0x800;
 
@@ -389,7 +389,7 @@ READ8_MEMBER(dooyong_z80_state::paletteram_flytiger_r)
 }
 
 
-WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
+void dooyong_z80_state::paletteram_flytiger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_palette_bank) offset |= 0x800;
 
@@ -399,7 +399,7 @@ WRITE8_MEMBER(dooyong_z80_state::paletteram_flytiger_w)
 
 }
 
-WRITE8_MEMBER(dooyong_z80_state::flytiger_ctrl_w)
+void dooyong_z80_state::flytiger_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(data & 0x01);
@@ -662,7 +662,7 @@ void dooyong_z80_state::video_start_primella()
 }
 
 
-WRITE16_MEMBER(dooyong_68k_state::ctrl_w)
+void dooyong_68k_state::ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

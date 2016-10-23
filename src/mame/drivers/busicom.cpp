@@ -21,13 +21,13 @@ uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
 	}
 	return 0;
 }
-READ8_MEMBER(busicom_state::keyboard_r)
+uint8_t busicom_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" , "LINE9"};
 	return ioport(keynames[get_bit_selected(m_keyboard_shifter & 0x3ff,10)])->read();
 }
 
-READ8_MEMBER(busicom_state::printer_r)
+uint8_t busicom_state::printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retVal = 0;
 	if (m_drum_index==0) retVal |= 1;
@@ -36,7 +36,7 @@ READ8_MEMBER(busicom_state::printer_r)
 }
 
 
-WRITE8_MEMBER(busicom_state::shifter_w)
+void busicom_state::shifter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(data,0)) {
 		m_keyboard_shifter <<= 1;
@@ -48,7 +48,7 @@ WRITE8_MEMBER(busicom_state::shifter_w)
 	}
 }
 
-WRITE8_MEMBER(busicom_state::printer_w)
+void busicom_state::printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int i,j;
 	if (BIT(data,0)) {
@@ -83,7 +83,7 @@ WRITE8_MEMBER(busicom_state::printer_w)
 
 	}
 }
-WRITE8_MEMBER(busicom_state::status_w)
+void busicom_state::status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 #if 0
 	uint8_t mem_lamp = BIT(data,0);
@@ -93,7 +93,7 @@ WRITE8_MEMBER(busicom_state::status_w)
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }
 
-WRITE8_MEMBER(busicom_state::printer_ctrl_w)
+void busicom_state::printer_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

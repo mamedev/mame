@@ -25,17 +25,17 @@ public:
 	static void set_cpu_tag(device_t &device, const char *tag) { downcast<mb_vcu_device &>(device).m_cpu.set_tag(tag); }
 
 	// I/O operations
-	DECLARE_WRITE8_MEMBER( write_vregs );
-	DECLARE_READ8_MEMBER( read_ram );
-	DECLARE_WRITE8_MEMBER( write_ram );
-	DECLARE_READ8_MEMBER( load_params );
-	DECLARE_READ8_MEMBER( load_gfx );
-	DECLARE_READ8_MEMBER( load_set_clr );
-	DECLARE_WRITE8_MEMBER( background_color_w );
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( vbank_w );
-	DECLARE_READ8_MEMBER( mb_vcu_paletteram_r );
-	DECLARE_WRITE8_MEMBER( mb_vcu_paletteram_w );
+	void write_vregs(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_ram(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t load_params(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t load_gfx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t load_set_clr(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void background_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void vbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mb_vcu_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mb_vcu_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);

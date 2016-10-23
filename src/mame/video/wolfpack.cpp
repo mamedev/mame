@@ -44,51 +44,51 @@ PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
 }
 
 
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_size_w)
+void wolfpack_state::wolfpack_ship_size_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ship_size = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_video_invert_w)
+void wolfpack_state::wolfpack_video_invert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_invert = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_reflect_w)
+void wolfpack_state::wolfpack_ship_reflect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ship_reflect = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pos_select_w)
+void wolfpack_state::wolfpack_pt_pos_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pt_pos_select = data & 1;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_horz_w)
+void wolfpack_state::wolfpack_pt_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pt_horz = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_pt_pic_w)
+void wolfpack_state::wolfpack_pt_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pt_pic = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_w)
+void wolfpack_state::wolfpack_ship_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ship_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_pic_w)
+void wolfpack_state::wolfpack_torpedo_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_torpedo_pic = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_h_precess_w)
+void wolfpack_state::wolfpack_ship_h_precess_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ship_h_precess = data & 0x3f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_ship_pic_w)
+void wolfpack_state::wolfpack_ship_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ship_pic = data & 0x0f;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_h_w)
+void wolfpack_state::wolfpack_torpedo_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_torpedo_h = data;
 }
-WRITE8_MEMBER(wolfpack_state::wolfpack_torpedo_v_w)
+void wolfpack_state::wolfpack_torpedo_v_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_torpedo_v = data;
 }

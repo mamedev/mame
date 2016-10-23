@@ -76,24 +76,24 @@ public:
 	int m_prev_sprites_count;
 	uint8_t m_spotty_sound_cmd;
 
-	DECLARE_WRITE32_MEMBER(limenko_coincounter_w);
-	DECLARE_WRITE32_MEMBER(bg_videoram_w);
-	DECLARE_WRITE32_MEMBER(md_videoram_w);
-	DECLARE_WRITE32_MEMBER(fg_videoram_w);
-	DECLARE_WRITE32_MEMBER(spotty_soundlatch_w);
-	DECLARE_WRITE32_MEMBER(limenko_soundlatch_w);
-	DECLARE_WRITE32_MEMBER(spriteram_buffer_w);
-	DECLARE_WRITE8_MEMBER(spotty_sound_cmd_w);
-	DECLARE_READ8_MEMBER(spotty_sound_cmd_r);
-	DECLARE_READ8_MEMBER(spotty_sound_r);
-	DECLARE_READ32_MEMBER(dynabomb_speedup_r);
-	DECLARE_READ32_MEMBER(legendoh_speedup_r);
-	DECLARE_READ32_MEMBER(sb2003_speedup_r);
-	DECLARE_READ32_MEMBER(spotty_speedup_r);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p2_w);
-	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
+	void limenko_coincounter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void bg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void md_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void fg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void spotty_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void limenko_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void spriteram_buffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void spotty_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t spotty_sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t spotty_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t dynabomb_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t legendoh_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t sb2003_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t spotty_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
 
@@ -118,26 +118,26 @@ public:
   MISC FUNCTIONS
 *****************************************************************************************************/
 
-WRITE32_MEMBER(limenko_state::limenko_coincounter_w)
+void limenko_state::limenko_coincounter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0,data & 0x10000);
 }
 
 
 
-WRITE32_MEMBER(limenko_state::bg_videoram_w)
+void limenko_state::bg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(limenko_state::md_videoram_w)
+void limenko_state::md_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(limenko_state::fg_videoram_w)
+void limenko_state::fg_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -148,7 +148,7 @@ CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
 	return m_spriteram_bit;
 }
 
-WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
+void limenko_state::spriteram_buffer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	rectangle clip(0, 383, 0, 239);
 
@@ -177,7 +177,7 @@ WRITE32_MEMBER(limenko_state::spriteram_buffer_w)
  SOUND FUNCTIONS
  *****************************************************************************************************/
 
-WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
+void limenko_state::limenko_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data >> 16);
 	m_qs1000->set_irq(ASSERT_LINE);
@@ -185,26 +185,26 @@ WRITE32_MEMBER(limenko_state::limenko_soundlatch_w)
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-WRITE32_MEMBER(limenko_state::spotty_soundlatch_w)
+void limenko_state::spotty_soundlatch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data >> 16);
 }
 
-READ8_MEMBER(limenko_state::qs1000_p1_r)
+uint8_t limenko_state::qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER(limenko_state::qs1000_p1_w)
+void limenko_state::qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER(limenko_state::qs1000_p2_w)
+void limenko_state::qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Unknown. Often written with 0
 }
 
-WRITE8_MEMBER(limenko_state::qs1000_p3_w)
+void limenko_state::qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// .... .xxx - Data ROM bank (64kB)
 	// ...x .... - ?
@@ -271,17 +271,17 @@ static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(limenko_state::spotty_sound_cmd_w)
+void limenko_state::spotty_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spotty_sound_cmd = data;
 }
 
-READ8_MEMBER(limenko_state::spotty_sound_cmd_r)
+uint8_t limenko_state::spotty_sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0; //??? some status bit? if set it executes a jump in the code
 }
 
-READ8_MEMBER(limenko_state::spotty_sound_r)
+uint8_t limenko_state::spotty_sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// check m_spotty_sound_cmd bits...
 
@@ -1066,7 +1066,7 @@ ROM_END
 
 
 
-READ32_MEMBER(limenko_state::dynabomb_speedup_r)
+uint32_t limenko_state::dynabomb_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_maincpu->pc() == 0xc25b8)
 	{
@@ -1076,7 +1076,7 @@ READ32_MEMBER(limenko_state::dynabomb_speedup_r)
 	return m_mainram[0xe2784/4];
 }
 
-READ32_MEMBER(limenko_state::legendoh_speedup_r)
+uint32_t limenko_state::legendoh_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_maincpu->pc() == 0x23e32)
 	{
@@ -1086,7 +1086,7 @@ READ32_MEMBER(limenko_state::legendoh_speedup_r)
 	return m_mainram[0x32ab0/4];
 }
 
-READ32_MEMBER(limenko_state::sb2003_speedup_r)
+uint32_t limenko_state::sb2003_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_maincpu->pc() == 0x26da4)
 	{
@@ -1096,7 +1096,7 @@ READ32_MEMBER(limenko_state::sb2003_speedup_r)
 	return m_mainram[0x135800/4];
 }
 
-READ32_MEMBER(limenko_state::spotty_speedup_r)
+uint32_t limenko_state::spotty_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if(m_maincpu->pc() == 0x8560)
 	{

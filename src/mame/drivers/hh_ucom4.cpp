@@ -285,9 +285,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -299,7 +299,7 @@ void ufombs_state::prepare_display()
 	display_matrix(10, 9, plate, grid);
 }
 
-WRITE8_MEMBER(ufombs_state::grid_w)
+void ufombs_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// F,G,H0: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
@@ -307,7 +307,7 @@ WRITE8_MEMBER(ufombs_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(ufombs_state::plate_w)
+void ufombs_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D012,I: vfd matrix plate
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
@@ -315,7 +315,7 @@ WRITE8_MEMBER(ufombs_state::plate_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(ufombs_state::speaker_w)
+void ufombs_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E01: speaker out
 	m_speaker->level_w(data & 3);
@@ -397,9 +397,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_b_r);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -410,7 +410,7 @@ void ssfball_state::prepare_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-WRITE8_MEMBER(ssfball_state::grid_w)
+void ssfball_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D(,E3): vfd matrix grid 0-7(,8)
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -418,7 +418,7 @@ WRITE8_MEMBER(ssfball_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(ssfball_state::plate_w)
+void ssfball_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port[offset] = data;
 
@@ -437,7 +437,7 @@ WRITE8_MEMBER(ssfball_state::plate_w)
 		prepare_display();
 }
 
-READ8_MEMBER(ssfball_state::input_b_r)
+uint8_t ssfball_state::input_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// B: input port 2, where B3 is multiplexed
 	return m_inp_matrix[2]->read() | read_inputs(2);
@@ -541,9 +541,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_a_r);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -554,7 +554,7 @@ void bmsoccer_state::prepare_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-WRITE8_MEMBER(bmsoccer_state::grid_w)
+void bmsoccer_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C01: input mux
 	if (offset == NEC_UCOM4_PORTC)
@@ -566,7 +566,7 @@ WRITE8_MEMBER(bmsoccer_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(bmsoccer_state::plate_w)
+void bmsoccer_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G3: speaker out
 	if (offset == NEC_UCOM4_PORTG)
@@ -583,7 +583,7 @@ WRITE8_MEMBER(bmsoccer_state::plate_w)
 		prepare_display();
 }
 
-READ8_MEMBER(bmsoccer_state::input_a_r)
+uint8_t bmsoccer_state::input_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// port A: multiplexed inputs
 	return read_inputs(2);
@@ -664,9 +664,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -678,7 +678,7 @@ void bmsafari_state::prepare_display()
 	display_matrix(10, 9, plate, grid);
 }
 
-WRITE8_MEMBER(bmsafari_state::grid_w)
+void bmsafari_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D(,E3): vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -686,7 +686,7 @@ WRITE8_MEMBER(bmsafari_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(bmsafari_state::plate_w)
+void bmsafari_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E012,H,I: vfd matrix plate
 	int shift = (offset == NEC_UCOM4_PORTE) ? 8 : (offset - NEC_UCOM4_PORTH) * 4;
@@ -699,7 +699,7 @@ WRITE8_MEMBER(bmsafari_state::plate_w)
 		prepare_display();
 }
 
-WRITE8_MEMBER(bmsafari_state::speaker_w)
+void bmsafari_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
@@ -774,9 +774,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_READ8_MEMBER(input_b_r);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -787,7 +787,7 @@ void splasfgt_state::prepare_display()
 	display_matrix(16, 9, plate, m_grid);
 }
 
-WRITE8_MEMBER(splasfgt_state::grid_w)
+void splasfgt_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G,H,I0: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
@@ -803,7 +803,7 @@ WRITE8_MEMBER(splasfgt_state::grid_w)
 		prepare_display();
 }
 
-WRITE8_MEMBER(splasfgt_state::plate_w)
+void splasfgt_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// F01: speaker out
 	if (offset == NEC_UCOM4_PORTF)
@@ -815,7 +815,7 @@ WRITE8_MEMBER(splasfgt_state::plate_w)
 	prepare_display();
 }
 
-READ8_MEMBER(splasfgt_state::input_b_r)
+uint8_t splasfgt_state::input_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// B: multiplexed buttons
 	return read_inputs(4);
@@ -927,8 +927,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -940,7 +940,7 @@ void bcclimbr_state::prepare_display()
 	display_matrix(20, 6, plate, grid);
 }
 
-WRITE8_MEMBER(bcclimbr_state::grid_w)
+void bcclimbr_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I2: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -952,7 +952,7 @@ WRITE8_MEMBER(bcclimbr_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(bcclimbr_state::plate_w)
+void bcclimbr_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D,E,F: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -1031,35 +1031,35 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(leds_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(tactix_state::leds_w)
+void tactix_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D,F: 4*4 led matrix
 	m_port[offset] = data;
 	display_matrix(4, 4, m_port[NEC_UCOM4_PORTD], m_port[NEC_UCOM4_PORTF]);
 }
 
-WRITE8_MEMBER(tactix_state::speaker_w)
+void tactix_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G0: speaker out
 	m_speaker->level_w(data & 1);
 }
 
-WRITE8_MEMBER(tactix_state::input_w)
+void tactix_state::input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,E0: input mux
 	m_port[offset] = data;
 	m_inp_mux = (m_port[NEC_UCOM4_PORTE] << 4 & 0x10) | m_port[NEC_UCOM4_PORTC];
 }
 
-READ8_MEMBER(tactix_state::input_r)
+uint8_t tactix_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// A: multiplexed inputs
 	return read_inputs(5);
@@ -1145,8 +1145,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1158,7 +1158,7 @@ void invspace_state::prepare_display()
 	display_matrix(19, 9, plate, grid);
 }
 
-WRITE8_MEMBER(invspace_state::grid_w)
+void invspace_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I0: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -1170,7 +1170,7 @@ WRITE8_MEMBER(invspace_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(invspace_state::plate_w)
+void invspace_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E,F,G,H123: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -1249,8 +1249,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1261,7 +1261,7 @@ void efball_state::prepare_display()
 	display_matrix(11, 10, plate, m_grid);
 }
 
-WRITE8_MEMBER(efball_state::grid_w)
+void efball_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// H2: speaker out
 	if (offset == NEC_UCOM4_PORTH)
@@ -1273,7 +1273,7 @@ WRITE8_MEMBER(efball_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(efball_state::plate_w)
+void efball_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// D,E,I: vfd matrix plate
 	int shift = (offset == NEC_UCOM4_PORTI) ? 8 : (offset - NEC_UCOM4_PORTD) * 4;
@@ -1362,8 +1362,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1375,7 +1375,7 @@ void galaxy2_state::prepare_display()
 	display_matrix(15, 10, plate, grid);
 }
 
-WRITE8_MEMBER(galaxy2_state::grid_w)
+void galaxy2_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E3: speaker out
 	if (offset == NEC_UCOM4_PORTE)
@@ -1387,7 +1387,7 @@ WRITE8_MEMBER(galaxy2_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(galaxy2_state::plate_w)
+void galaxy2_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// F,G,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTF) * 4;
@@ -1473,8 +1473,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1486,7 +1486,7 @@ void astrocmd_state::prepare_display()
 	display_matrix(17, 9, plate, grid);
 }
 
-WRITE8_MEMBER(astrocmd_state::grid_w)
+void astrocmd_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D(,E3): vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -1494,7 +1494,7 @@ WRITE8_MEMBER(astrocmd_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(astrocmd_state::plate_w)
+void astrocmd_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E01,F,G,H,I: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -1582,13 +1582,13 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(edracula_state::grid_w)
+void edracula_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -1596,7 +1596,7 @@ WRITE8_MEMBER(edracula_state::grid_w)
 	display_matrix(18, 8, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(edracula_state::plate_w)
+void edracula_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I2: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -1681,15 +1681,15 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
-	DECLARE_WRITE8_MEMBER(input_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(grobot9_state::lamps_w)
+void grobot9_state::lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == NEC_UCOM4_PORTE)
 	{
@@ -1705,13 +1705,13 @@ WRITE8_MEMBER(grobot9_state::lamps_w)
 	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);
 }
 
-WRITE8_MEMBER(grobot9_state::input_w)
+void grobot9_state::input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C012: input mux low
 	m_inp_mux = (m_inp_mux & 8) | (data & 7);
 }
 
-READ8_MEMBER(grobot9_state::input_r)
+uint8_t grobot9_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// A: multiplexed inputs
 	return read_inputs(5);
@@ -1788,7 +1788,7 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(unk_w);
+	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1797,7 +1797,7 @@ void mcompgin_state::prepare_display()
 {
 }
 
-WRITE8_MEMBER(mcompgin_state::unk_w)
+void mcompgin_state::unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E=lcd
 }
@@ -1865,9 +1865,9 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1879,7 +1879,7 @@ void mvbfree_state::prepare_display()
 	display_matrix(10, 14, plate, grid);
 }
 
-WRITE8_MEMBER(mvbfree_state::grid_w)
+void mvbfree_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E23,F,G,H: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -1892,7 +1892,7 @@ WRITE8_MEMBER(mvbfree_state::grid_w)
 		prepare_display();
 }
 
-WRITE8_MEMBER(mvbfree_state::plate_w)
+void mvbfree_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D(,E01): vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -1900,7 +1900,7 @@ WRITE8_MEMBER(mvbfree_state::plate_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(mvbfree_state::speaker_w)
+void mvbfree_state::speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I0: speaker out
 	m_speaker->level_w(data & 1);
@@ -1972,8 +1972,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -1985,7 +1985,7 @@ void tccombat_state::prepare_display()
 	display_matrix(20, 9, plate, grid);
 }
 
-WRITE8_MEMBER(tccombat_state::grid_w)
+void tccombat_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I1: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -1997,7 +1997,7 @@ WRITE8_MEMBER(tccombat_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(tccombat_state::plate_w)
+void tccombat_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E,F123,G,H: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -2071,10 +2071,10 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
-	DECLARE_WRITE8_MEMBER(port_e_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
@@ -2085,7 +2085,7 @@ protected:
 
 // handlers
 
-WRITE8_MEMBER(tmtennis_state::grid_w)
+void tmtennis_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// G,H,I: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTG) * 4;
@@ -2093,7 +2093,7 @@ WRITE8_MEMBER(tmtennis_state::grid_w)
 	display_matrix(12, 12, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(tmtennis_state::plate_w)
+void tmtennis_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D,F: vfd matrix plate
 	int shift = (offset == NEC_UCOM4_PORTF) ? 8 : (offset - NEC_UCOM4_PORTC) * 4;
@@ -2101,7 +2101,7 @@ WRITE8_MEMBER(tmtennis_state::plate_w)
 	display_matrix(12, 12, m_plate, m_grid);
 }
 
-WRITE8_MEMBER(tmtennis_state::port_e_w)
+void tmtennis_state::port_e_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E01: input mux
 	// E2: speaker out
@@ -2110,7 +2110,7 @@ WRITE8_MEMBER(tmtennis_state::port_e_w)
 	m_speaker->level_w(data >> 2 & 1);
 }
 
-READ8_MEMBER(tmtennis_state::input_r)
+uint8_t tmtennis_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
@@ -2235,8 +2235,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -2248,7 +2248,7 @@ void tmpacman_state::prepare_display()
 	display_matrix(19, 8, plate, grid);
 }
 
-WRITE8_MEMBER(tmpacman_state::grid_w)
+void tmpacman_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -2256,7 +2256,7 @@ WRITE8_MEMBER(tmpacman_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(tmpacman_state::plate_w)
+void tmpacman_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E1: speaker out
 	if (offset == NEC_UCOM4_PORTE)
@@ -2340,8 +2340,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -2352,7 +2352,7 @@ void tmscramb_state::prepare_display()
 	display_matrix(17, 10, plate, m_grid);
 }
 
-WRITE8_MEMBER(tmscramb_state::grid_w)
+void tmscramb_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// I2: speaker out
 	if (offset == NEC_UCOM4_PORTI)
@@ -2364,7 +2364,7 @@ WRITE8_MEMBER(tmscramb_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(tmscramb_state::plate_w)
+void tmscramb_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E,F,G,H: vfd matrix plate
 	int shift = (offset - NEC_UCOM4_PORTE) * 4;
@@ -2442,8 +2442,8 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE8_MEMBER(grid_w);
-	DECLARE_WRITE8_MEMBER(plate_w);
+	void grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 // handlers
@@ -2455,7 +2455,7 @@ void tcaveman_state::prepare_display()
 	display_matrix(19, 8, plate, grid);
 }
 
-WRITE8_MEMBER(tcaveman_state::grid_w)
+void tcaveman_state::grid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// C,D: vfd matrix grid
 	int shift = (offset - NEC_UCOM4_PORTC) * 4;
@@ -2463,7 +2463,7 @@ WRITE8_MEMBER(tcaveman_state::grid_w)
 	prepare_display();
 }
 
-WRITE8_MEMBER(tcaveman_state::plate_w)
+void tcaveman_state::plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// E3: speaker out
 	if (offset == NEC_UCOM4_PORTE)
@@ -2541,13 +2541,13 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	DECLARE_WRITE8_MEMBER(output_w);
-	DECLARE_READ8_MEMBER(input_r);
+	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
 
 // handlers
 
-WRITE8_MEMBER(alnchase_state::output_w)
+void alnchase_state::output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset <= NEC_UCOM4_PORTE)
 	{
@@ -2574,7 +2574,7 @@ WRITE8_MEMBER(alnchase_state::output_w)
 	display_matrix(17, 9, m_plate, m_grid);
 }
 
-READ8_MEMBER(alnchase_state::input_r)
+uint8_t alnchase_state::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// A: multiplexed buttons
 	return read_inputs(2);

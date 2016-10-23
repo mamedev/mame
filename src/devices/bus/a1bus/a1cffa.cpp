@@ -88,7 +88,7 @@ void a1bus_cffa_device::device_reset()
 	m_lastdata = 0;
 }
 
-READ8_MEMBER(a1bus_cffa_device::cffa_r)
+uint8_t a1bus_cffa_device::cffa_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (offset & 0xf)
 	{
@@ -120,7 +120,7 @@ READ8_MEMBER(a1bus_cffa_device::cffa_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(a1bus_cffa_device::cffa_w)
+void a1bus_cffa_device::cffa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0xf)
 	{

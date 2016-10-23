@@ -98,8 +98,8 @@ public:
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
 	template<class _Object> static devcb_base &set_byte_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_byte.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( yb_r );
-	DECLARE_WRITE8_MEMBER( yb_w );
+	uint8_t yb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void yb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( test_w );
 	DECLARE_WRITE_LINE_MEMBER( accl_w );

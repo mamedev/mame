@@ -10,11 +10,11 @@ public:
 	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0110pcr_device() {}
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w ); /* color index goes up in step of 2 */
-	DECLARE_WRITE16_MEMBER( step1_word_w );   /* color index goes up in step of 1 */
-	DECLARE_WRITE16_MEMBER( step1_rbswap_word_w );    /* swaps red and blue components */
-	DECLARE_WRITE16_MEMBER( step1_4bpg_word_w );  /* only 4 bits per color gun */
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff); /* color index goes up in step of 2 */
+	void step1_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);   /* color index goes up in step of 1 */
+	void step1_rbswap_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);    /* swaps red and blue components */
+	void step1_4bpg_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);  /* only 4 bits per color gun */
 
 	void restore_colors();
 

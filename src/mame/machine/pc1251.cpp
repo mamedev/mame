@@ -10,21 +10,21 @@
 
 
 
-WRITE8_MEMBER(pc1251_state::pc1251_outa)
+void pc1251_state::pc1251_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outa = data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_outb)
+void pc1251_state::pc1251_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_outb = data;
 }
 
-WRITE8_MEMBER(pc1251_state::pc1251_outc)
+void pc1251_state::pc1251_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(pc1251_state::pc1251_ina)
+uint8_t pc1251_state::pc1251_ina(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outa;
 
@@ -67,7 +67,7 @@ READ8_MEMBER(pc1251_state::pc1251_ina)
 	return data;
 }
 
-READ8_MEMBER(pc1251_state::pc1251_inb)
+uint8_t pc1251_state::pc1251_inb(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int data = m_outb;
 

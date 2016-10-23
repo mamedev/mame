@@ -63,15 +63,15 @@ public:
 
 	uint8_t           m_cur[2][2];
 	virtual void update_interrupts() override;
-	DECLARE_READ16_MEMBER(joystick_r);
-	DECLARE_WRITE16_MEMBER(joystick_w);
-	DECLARE_READ16_MEMBER(trakball_r);
-	DECLARE_READ8_MEMBER(switch_6502_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(via_pa_w);
-	DECLARE_READ8_MEMBER(via_pa_r);
-	DECLARE_WRITE8_MEMBER(via_pb_w);
-	DECLARE_READ8_MEMBER(via_pb_r);
+	uint16_t joystick_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void joystick_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t trakball_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t switch_6502_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_roadblst();
 	void init_peterpak();
 	void init_marble();
@@ -90,12 +90,12 @@ public:
 	void update_timers(int scanline);
 	void decode_gfx(uint16_t *pflookup, uint16_t *molookup);
 	int get_bank(uint8_t prom1, uint8_t prom2, int bpp);
-	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
-	DECLARE_WRITE16_MEMBER( atarisy1_spriteram_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_bankselect_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
-	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
+	uint16_t atarisy1_int3state_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void atarisy1_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void atarisy1_bankselect_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void atarisy1_xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void atarisy1_yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void atarisy1_priority_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static const atari_motion_objects_config s_mob_config;
 };

@@ -217,26 +217,26 @@ void ws_rom_device::device_timer(emu_timer &timer, device_timer_id id, int param
  mapper specific handlers
  -------------------------------------------------*/
 
-READ8_MEMBER(ws_rom_device::read_rom20)
+uint8_t ws_rom_device::read_rom20(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset + m_base20];
 }
 
 
-READ8_MEMBER(ws_rom_device::read_rom30)
+uint8_t ws_rom_device::read_rom30(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_rom[offset + m_base30];
 }
 
 
-READ8_MEMBER(ws_rom_device::read_rom40)
+uint8_t ws_rom_device::read_rom40(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// we still need to mask in some cases, e.g. when game is 512K
 	return m_rom[(offset + m_base40) & (m_rom_size - 1)];
 }
 
 
-READ8_MEMBER(ws_rom_device::read_io)
+uint8_t ws_rom_device::read_io(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = m_io_regs[offset];
 
@@ -266,7 +266,7 @@ READ8_MEMBER(ws_rom_device::read_io)
 	return value;
 }
 
-WRITE8_MEMBER(ws_rom_device::write_io)
+void ws_rom_device::write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -356,17 +356,17 @@ WRITE8_MEMBER(ws_rom_device::write_io)
 	m_io_regs[offset] = data;
 }
 
-READ8_MEMBER(ws_rom_sram_device::read_ram)
+uint8_t ws_rom_sram_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram[m_nvram_base + offset];
 }
 
-WRITE8_MEMBER(ws_rom_sram_device::write_ram)
+void ws_rom_sram_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram[m_nvram_base + offset] = data;
 }
 
-WRITE8_MEMBER(ws_rom_sram_device::write_io)
+void ws_rom_sram_device::write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -379,7 +379,7 @@ WRITE8_MEMBER(ws_rom_sram_device::write_io)
 }
 
 
-READ8_MEMBER(ws_rom_eeprom_device::read_io)
+uint8_t ws_rom_eeprom_device::read_io(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t value = m_io_regs[offset];
 
@@ -400,7 +400,7 @@ READ8_MEMBER(ws_rom_eeprom_device::read_io)
 	return value;
 }
 
-WRITE8_MEMBER(ws_rom_eeprom_device::write_io)
+void ws_rom_eeprom_device::write_io(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{

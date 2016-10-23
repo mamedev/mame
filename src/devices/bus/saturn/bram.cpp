@@ -85,7 +85,7 @@ void saturn_bram_device::nvram_default()
 
 // Battery RAM: single chip
 
-READ32_MEMBER(saturn_bram_device::read_ext_bram)
+uint32_t saturn_bram_device::read_ext_bram(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (offset < m_ext_bram.size()/2)
 		return (m_ext_bram[offset * 2] << 16) | m_ext_bram[offset * 2 + 1];
@@ -96,7 +96,7 @@ READ32_MEMBER(saturn_bram_device::read_ext_bram)
 	}
 }
 
-WRITE32_MEMBER(saturn_bram_device::write_ext_bram)
+void saturn_bram_device::write_ext_bram(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset < m_ext_bram.size()/2)
 	{

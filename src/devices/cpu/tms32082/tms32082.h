@@ -68,8 +68,8 @@ public:
 		INPUT_X4        = 4
 	};
 
-	DECLARE_READ32_MEMBER(mp_param_r);
-	DECLARE_WRITE32_MEMBER(mp_param_w);
+	uint32_t mp_param_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mp_param_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	void set_command_callback(write32_delegate callback);
 

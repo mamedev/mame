@@ -240,17 +240,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
 	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
 
-	DECLARE_WRITE8_MEMBER( cs_w ) { cs_w(data); }
-	DECLARE_READ8_MEMBER( rst_r ) { return rst_r(); }
-	DECLARE_READ8_MEMBER( inp_r ) { return inp_r(); }
-	DECLARE_WRITE8_MEMBER( out_w ) { out_w(data); }
-	DECLARE_READ8_MEMBER( stat_r ) { return stat_r(); }
-	DECLARE_WRITE8_MEMBER( c1_w ) { c1_w(data); }
-	DECLARE_WRITE8_MEMBER( c2_w ) { c2_w(data); }
-	DECLARE_WRITE8_MEMBER( c3_w ) { c3_w(data); }
-	DECLARE_WRITE8_MEMBER( c4_w ) { c4_w(data); }
-	DECLARE_READ8_MEMBER( xmemfl_r ) { return xmemfl_r(offset); }
-	DECLARE_WRITE8_MEMBER( xmemw_w ) { xmemw_w(offset, data); }
+	void cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { cs_w(data); }
+	uint8_t rst_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return rst_r(); }
+	uint8_t inp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return inp_r(); }
+	void out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { out_w(data); }
+	uint8_t stat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return stat_r(); }
+	void c1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { c1_w(data); }
+	void c2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { c2_w(data); }
+	void c3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { c3_w(data); }
+	void c4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { c4_w(data); }
+	uint8_t xmemfl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return xmemfl_r(offset); }
+	void xmemw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { xmemw_w(offset, data); }
 
 	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
 	DECLARE_READ_LINE_MEMBER( nmi_r ) { return m_nmi; }

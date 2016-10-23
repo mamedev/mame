@@ -339,17 +339,17 @@ TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
  *
  *************************************/
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ctrl_w)
+void volfied_state::volfied_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_bank_w)
+void volfied_state::volfied_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_current_bank = data & 7;
 }
 
-WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
+void volfied_state::volfied_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data;
 
@@ -429,7 +429,7 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
  *
  *************************************/
 
-READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
+uint16_t volfied_state::volfied_cchip_ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/*
 	    Bit 2 = Error signal
@@ -438,7 +438,7 @@ READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
+uint16_t volfied_state::volfied_cchip_ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Check for input ports */
 	if (m_current_bank == 0)

@@ -208,7 +208,7 @@ CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
 }
 
 
-READ32_MEMBER(ms32_state::ms32_read_inputs3)
+uint32_t ms32_state::ms32_read_inputs3(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	int a,b,c,d;
 	a = ioport("AN2?")->read(); // unused?
@@ -219,7 +219,7 @@ READ32_MEMBER(ms32_state::ms32_read_inputs3)
 }
 
 
-WRITE32_MEMBER(ms32_state::ms32_sound_w)
+void ms32_state::ms32_sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -228,12 +228,12 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }
 
-READ32_MEMBER(ms32_state::ms32_sound_r)
+uint32_t ms32_state::ms32_sound_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_to_main^0xff;
 }
 
-WRITE32_MEMBER(ms32_state::reset_sub_w)
+void ms32_state::reset_sub_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(data) m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
@@ -244,91 +244,91 @@ WRITE32_MEMBER(ms32_state::reset_sub_w)
 /********** MEMORY MAP **********/
 
 
-READ8_MEMBER(ms32_state::ms32_nvram_r8)
+uint8_t ms32_state::ms32_nvram_r8(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_nvram_8[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
+void ms32_state::ms32_nvram_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nvram_8[offset] = data;
 }
 
-READ8_MEMBER(ms32_state::ms32_priram_r8)
+uint8_t ms32_state::ms32_priram_r8(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_priram[offset];
 }
 
-WRITE8_MEMBER(ms32_state::ms32_priram_w8)
+void ms32_state::ms32_priram_w8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_priram[offset] = data;
 }
 
-READ16_MEMBER(ms32_state::ms32_palram_r16)
+uint16_t ms32_state::ms32_palram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_palram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_palram_w16)
+void ms32_state::ms32_palram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_palram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_rozram_r16)
+uint16_t ms32_state::ms32_rozram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_rozram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_rozram_w16)
+void ms32_state::ms32_rozram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_rozram[offset]);
 	m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_lineram_r16)
+uint16_t ms32_state::ms32_lineram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_lineram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_lineram_w16)
+void ms32_state::ms32_lineram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_lineram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_sprram_r16)
+uint16_t ms32_state::ms32_sprram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_sprram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_sprram_w16)
+void ms32_state::ms32_sprram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sprram[offset]);
 }
 
-READ16_MEMBER(ms32_state::ms32_txram_r16)
+uint16_t ms32_state::ms32_txram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_txram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_txram_w16)
+void ms32_state::ms32_txram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_txram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-READ16_MEMBER(ms32_state::ms32_bgram_r16)
+uint16_t ms32_state::ms32_bgram_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_bgram[offset];
 }
 
-WRITE16_MEMBER(ms32_state::ms32_bgram_w16)
+void ms32_state::ms32_bgram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bgram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset/2);
 	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-WRITE32_MEMBER(ms32_state::pip_w)
+void ms32_state::pip_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_tilemaplayoutcontrol = data;
 
@@ -381,22 +381,22 @@ ADDRESS_MAP_END
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
 
-WRITE16_MEMBER(ms32_state::ms32_extra_w16)
+void ms32_state::ms32_extra_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
-READ16_MEMBER(ms32_state::ms32_extra_r16)
+uint16_t ms32_state::ms32_extra_r16(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_f1superb_extraram[offset];
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
+void ms32_state::ms32_irq2_guess_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	irq_raise(2);
 }
 
-WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
+void ms32_state::ms32_irq5_guess_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	irq_raise(5);
 }
@@ -1340,19 +1340,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-READ8_MEMBER(ms32_state::latch_r)
+uint8_t ms32_state::latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space,0)^0xff;
 }
 
-WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
+void ms32_state::ms32_snd_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank4")->set_entry((data >> 0) & 0x0F);
 	membank("bank5")->set_entry((data >> 4) & 0x0F);
 }
 
-WRITE8_MEMBER(ms32_state::to_main_w)
+void ms32_state::to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_to_main=data;
 	irq_raise(1);

@@ -31,22 +31,22 @@ void rollrace_state::machine_start()
 	save_item(NAME(m_sound_nmi_mask));
 }
 
-READ8_MEMBER(rollrace_state::fake_d800_r)
+uint8_t rollrace_state::fake_d800_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x51;
 }
 
-WRITE8_MEMBER(rollrace_state::fake_d800_w)
+void rollrace_state::fake_d800_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
 
-WRITE8_MEMBER(rollrace_state::nmi_mask_w)
+void rollrace_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_mask = data & 1;
 }
 
-WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
+void rollrace_state::sound_nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sound_nmi_mask = data & 1;
 }

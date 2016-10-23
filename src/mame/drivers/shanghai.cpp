@@ -34,7 +34,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
+	void shanghai_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	DECLARE_PALETTE_INIT(shanghai);
 
@@ -77,7 +77,7 @@ INTERRUPT_GEN_MEMBER(shanghai_state::interrupt)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
 }
 
-WRITE16_MEMBER(shanghai_state::shanghai_coin_w)
+void shanghai_state::shanghai_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

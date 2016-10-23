@@ -88,7 +88,7 @@ void mos8726_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mos8726_device::read )
+uint8_t mos8726_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -100,7 +100,7 @@ READ8_MEMBER( mos8726_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mos8726_device::write )
+void mos8726_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

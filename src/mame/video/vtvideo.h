@@ -27,10 +27,10 @@ public:
 
 	static void set_chargen_tag(device_t &device, const char *tag) { downcast<vt100_video_device &>(device).m_char_rom.set_tag(tag); }
 
-	DECLARE_READ8_MEMBER(lba7_r);
-	DECLARE_WRITE8_MEMBER(dc012_w);
-	DECLARE_WRITE8_MEMBER(dc011_w);
-	DECLARE_WRITE8_MEMBER(brightness_w);
+	uint8_t lba7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dc012_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dc011_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void brightness_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 protected:

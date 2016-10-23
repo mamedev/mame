@@ -120,16 +120,16 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
-	DECLARE_WRITE8_MEMBER(stuntair_fgram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgattrram_w);
-	DECLARE_WRITE8_MEMBER(stuntair_bgxscroll_w);
-	DECLARE_WRITE8_MEMBER(stuntair_nmienable_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank0_w);
-	DECLARE_WRITE8_MEMBER(stuntair_spritebank1_w);
-	DECLARE_WRITE8_MEMBER(stuntair_coin_w);
-	DECLARE_WRITE8_MEMBER(stuntair_sound_w);
-	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
+	void stuntair_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_bgattrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_bgxscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_nmienable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_spritebank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_spritebank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void stuntair_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(stuntair_irq);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -246,45 +246,45 @@ uint32_t stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_in
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::stuntair_bgattrram_w)
+void stuntair_state::stuntair_bgattrram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgattrram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_bgram_w)
+void stuntair_state::stuntair_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_fgram_w)
+void stuntair_state::stuntair_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER( stuntair_state::stuntair_bgxscroll_w )
+void stuntair_state::stuntair_bgxscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_xscroll = data;
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank0_w)
+void stuntair_state::stuntair_spritebank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank0 = data&0x01;
 	// other bits are unused
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_spritebank1_w)
+void stuntair_state::stuntair_spritebank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank1 = data&0x01;
 	// other bits are unused
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
+void stuntair_state::stuntair_nmienable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = data&0x01;
 	if (!m_nmi_enable)
@@ -292,7 +292,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_nmienable_w)
 	// other bits are unused
 }
 
-WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
+void stuntair_state::stuntair_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// lower 2 bits are coin counters, excluding 1st coin(?)
 	machine().bookkeeping().coin_counter_w(0, data >> 0 & 1);
@@ -304,7 +304,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 }
 
 
-WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
+void stuntair_state::stuntair_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -469,7 +469,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-WRITE8_MEMBER(stuntair_state::ay8910_portb_w)
+void stuntair_state::ay8910_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// it writes $e8 and $f0 for music drums?
 	// possibly to discrete sound circuitry?

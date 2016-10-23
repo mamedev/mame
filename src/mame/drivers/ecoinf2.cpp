@@ -59,7 +59,7 @@ public:
 	int strobe_addr;
 	int strobe_amount;
 
-	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
+	void ox_port5c_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ecoinf2();
 
 		void update_lamps(void)
@@ -87,7 +87,7 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_a_strobedat0)
+	void ppi8255_ic10_write_a_strobedat0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (strobe_amount)
 		{
@@ -95,7 +95,7 @@ public:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_b_strobedat1)
+	void ppi8255_ic10_write_b_strobedat1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (strobe_amount)
 		{
@@ -103,7 +103,7 @@ public:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic10_write_c_strobe)
+	void ppi8255_ic10_write_c_strobe(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 //      if (data>=0xf0)
 		{
@@ -120,14 +120,14 @@ public:
 	}
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_a_strobedat0)
+	void ppi8255_ic13_write_a_strobedat0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (strobe_amount)
 		{
 			m_leds[strobe_addr] = (m_leds[strobe_addr] &0xff00) | (data & 0x00ff);
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_ic13_write_b_strobedat1)
+	void ppi8255_ic13_write_b_strobedat1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		if (strobe_amount)
 		{
@@ -135,21 +135,21 @@ public:
 		}
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_ic13_read_c_panel)
+	uint8_t ppi8255_ic13_read_c_panel(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return m_panel->read();
 	}
 
 
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_a_levels)
+	uint8_t ppi8255_ic22_read_a_levels(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return 0;//m_levels->read();
 	}
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_b_coins)
+	uint8_t ppi8255_ic22_read_b_coins(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		return m_coins->read();
 	}
-	DECLARE_READ8_MEMBER(ppi8255_ic22_read_c_misc)
+	uint8_t ppi8255_ic22_read_c_misc(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int combined_meter = m_meters->GetActivity(0) | m_meters->GetActivity(1) |
 							m_meters->GetActivity(2) | m_meters->GetActivity(3) |
@@ -170,7 +170,7 @@ public:
 
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_a_meters)
+	void ppi8255_ic24_write_a_meters(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		for (int meter = 0; meter < 8; meter ++)
 		{
@@ -178,14 +178,14 @@ public:
 		}
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_b_payouts)
+	void ppi8255_ic24_write_b_payouts(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		//TODO: Fix up payout enables - all available bits enable one slide each
 		output().set_value("coinlamp0", data&0x40 );
 		output().set_value("coinlamp1", data&0x80 );
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic24_write_c_inhibits)
+	void ppi8255_ic24_write_c_inhibits(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		machine().bookkeeping().coin_lockout_w(0, (data & 0x01) );
 		machine().bookkeeping().coin_lockout_w(1, (data & 0x02) );
@@ -199,7 +199,7 @@ public:
 
 
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_a_reel01)
+	void ppi8255_ic23_write_a_reel01(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
@@ -208,7 +208,7 @@ public:
 		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
+	void ppi8255_ic23_write_b_reel23(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)
 	{
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
@@ -217,7 +217,7 @@ public:
 		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)
+	uint8_t ppi8255_ic23_read_c_key(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
 		int data = m_optic_pattern;
 		data |= m_key->read();
@@ -229,7 +229,7 @@ public:
 };
 
 
-WRITE8_MEMBER(ecoinf2_state::ox_port5c_out_w)
+void ecoinf2_state::ox_port5c_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Watchdog?
 }

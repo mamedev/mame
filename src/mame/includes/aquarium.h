@@ -48,15 +48,15 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_READ16_MEMBER(aquarium_coins_r);
-	DECLARE_WRITE8_MEMBER(aquarium_snd_ack_w);
-	DECLARE_WRITE16_MEMBER(aquarium_sound_w);
-	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
-	DECLARE_READ8_MEMBER(aquarium_oki_r);
-	DECLARE_WRITE8_MEMBER(aquarium_oki_w);
-	DECLARE_WRITE16_MEMBER(aquarium_txt_videoram_w);
-	DECLARE_WRITE16_MEMBER(aquarium_mid_videoram_w);
-	DECLARE_WRITE16_MEMBER(aquarium_bak_videoram_w);
+	uint16_t aquarium_coins_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void aquarium_snd_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aquarium_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aquarium_z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t aquarium_oki_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void aquarium_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void aquarium_txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aquarium_mid_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void aquarium_bak_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_aquarium();
 	TILE_GET_INFO_MEMBER(get_aquarium_txt_tile_info);
 	TILE_GET_INFO_MEMBER(get_aquarium_mid_tile_info);

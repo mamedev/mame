@@ -52,14 +52,14 @@ public:
 	{ }
 
 	// PPI read/write handlers
-	DECLARE_READ8_MEMBER( unknown_porta_r );
-	DECLARE_READ8_MEMBER( unknown_portb_r );
-	DECLARE_READ8_MEMBER( unknown_portc_r );
-	DECLARE_WRITE8_MEMBER( unknown_porta_w );
-	DECLARE_WRITE8_MEMBER( unknown_portb_w );
-	DECLARE_WRITE8_MEMBER( video_control_w );
-	DECLARE_READ8_MEMBER( bankmotor_limit_r );
-	DECLARE_WRITE8_MEMBER( bankmotor_control_w );
+	uint8_t unknown_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unknown_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t unknown_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void unknown_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void unknown_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bankmotor_limit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bankmotor_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// memory mapping
 	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
@@ -67,12 +67,12 @@ public:
 	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
-	DECLARE_READ16_MEMBER( misc_io_r );
-	DECLARE_WRITE16_MEMBER( misc_io_w );
-	DECLARE_WRITE16_MEMBER( nop_w );
+	uint16_t misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void nop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// Z80 sound CPU read/write handlers
-	DECLARE_READ8_MEMBER( sound_data_r );
+	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// game-specific driver init
 	void init_generic();
@@ -84,10 +84,10 @@ public:
 	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
-	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
-	DECLARE_READ16_MEMBER( sega_road_control_0_r ) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
-	DECLARE_WRITE16_MEMBER( sega_road_control_0_w ) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
+	uint16_t sega_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
+	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
@@ -111,10 +111,10 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 
 	// custom I/O
-	DECLARE_READ16_MEMBER( outrun_custom_io_r );
-	DECLARE_WRITE16_MEMBER( outrun_custom_io_w );
-	DECLARE_READ16_MEMBER( shangon_custom_io_r );
-	DECLARE_WRITE16_MEMBER( shangon_custom_io_w );
+	uint16_t outrun_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void outrun_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t shangon_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void shangon_custom_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// devices
 	required_device<sega_315_5195_mapper_device> m_mapper;

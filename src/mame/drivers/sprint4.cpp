@@ -138,96 +138,96 @@ void sprint4_state::machine_reset()
 }
 
 
-READ8_MEMBER(sprint4_state::sprint4_wram_r)
+uint8_t sprint4_state::sprint4_wram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
 
-READ8_MEMBER(sprint4_state::sprint4_analog_r)
+uint8_t sprint4_state::sprint4_analog_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(sprint4_state::sprint4_coin_r)
+uint8_t sprint4_state::sprint4_coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
 }
-READ8_MEMBER(sprint4_state::sprint4_collision_r)
+uint8_t sprint4_state::sprint4_collision_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
 }
 
 
-READ8_MEMBER(sprint4_state::sprint4_options_r)
+uint8_t sprint4_state::sprint4_options_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_wram_w)
+void sprint4_state::sprint4_wram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_collision_reset_w)
+void sprint4_state::sprint4_collision_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_da_latch_w)
+void sprint4_state::sprint4_da_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_da_latch = data & 15;
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_lamp_w)
+void sprint4_state::sprint4_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value((offset >> 1) & 3, offset & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
+void sprint4_state::sprint4_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
 #endif
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_screech_1_w)
+void sprint4_state::sprint4_screech_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_SCREECH_EN_1, offset & 1);
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_screech_2_w)
+void sprint4_state::sprint4_screech_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_SCREECH_EN_2, offset & 1);
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_screech_3_w)
+void sprint4_state::sprint4_screech_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_SCREECH_EN_3, offset & 1);
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_screech_4_w)
+void sprint4_state::sprint4_screech_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_SCREECH_EN_4, offset & 1);
 }
 
-WRITE8_MEMBER(sprint4_state::sprint4_bang_w)
+void sprint4_state::sprint4_bang_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
-WRITE8_MEMBER(sprint4_state::sprint4_attract_w)
+void sprint4_state::sprint4_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_discrete->write(space, SPRINT4_ATTRACT_EN, data & 1);
 }

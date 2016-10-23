@@ -38,8 +38,8 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_sg1000_expansion_slot_interface overrides
-	virtual DECLARE_READ8_MEMBER(peripheral_r) override;
-	virtual DECLARE_WRITE8_MEMBER(peripheral_w) override;
+	virtual uint8_t peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
+	virtual void peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual bool is_readable(uint8_t offset) override;
 	virtual bool is_writeable(uint8_t offset) override;
 

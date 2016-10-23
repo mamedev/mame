@@ -70,18 +70,18 @@ public:
 	uint8_t m_eeprom_data[0x1000];
 	uint16_t m_eeprom_index;
 
-	DECLARE_READ8_MEMBER(hitpoker_vram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_vram_w);
-	DECLARE_READ8_MEMBER(hitpoker_cram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_cram_w);
-	DECLARE_READ8_MEMBER(hitpoker_paletteram_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_paletteram_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(eeprom_offset_w);
-	DECLARE_WRITE8_MEMBER(eeprom_w);
-	DECLARE_READ8_MEMBER(eeprom_r);
-	DECLARE_READ8_MEMBER(hitpoker_pic_r);
-	DECLARE_WRITE8_MEMBER(hitpoker_pic_w);
+	uint8_t hitpoker_vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hitpoker_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hitpoker_cram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hitpoker_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hitpoker_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hitpoker_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void eeprom_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t hitpoker_pic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void hitpoker_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_hitpoker();
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -127,7 +127,7 @@ uint32_t hitpoker_state::screen_update_hitpoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
+uint8_t hitpoker_state::hitpoker_vram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -137,7 +137,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_vram_r)
 		return ROM[offset+0x8000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
+void hitpoker_state::hitpoker_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  uint8_t *ROM = memregion("maincpu")->base();
 
@@ -145,7 +145,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_vram_w)
 	m_videoram[offset] = data;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
+uint8_t hitpoker_state::hitpoker_cram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -155,12 +155,12 @@ READ8_MEMBER(hitpoker_state::hitpoker_cram_r)
 		return ROM[offset+0xc000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_cram_w)
+void hitpoker_state::hitpoker_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
+uint8_t hitpoker_state::hitpoker_paletteram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
@@ -170,7 +170,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_paletteram_r)
 		return ROM[offset+0xe000];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
+void hitpoker_state::hitpoker_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int r,g,b,datax;
 	m_paletteram[offset] = data;
@@ -185,14 +185,14 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_paletteram_w)
 	m_palette->set_pen_color(offset, pal5bit(r), pal6bit(g), pal5bit(b));
 }
 
-READ8_MEMBER(hitpoker_state::rtc_r)
+uint8_t hitpoker_state::rtc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0x80; //kludge it for now
 }
 
 
 /* tests 0x180, what EEPROM is this one??? it seems to access up to 4KB */
-WRITE8_MEMBER(hitpoker_state::eeprom_offset_w)
+void hitpoker_state::eeprom_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 0)
 		m_eeprom_index = (m_eeprom_index & 0xf00) | (data & 0xff);
@@ -200,13 +200,13 @@ WRITE8_MEMBER(hitpoker_state::eeprom_offset_w)
 		m_eeprom_index = (m_eeprom_index & 0x0ff) | (data << 8 & 0xf00);
 }
 
-WRITE8_MEMBER(hitpoker_state::eeprom_w)
+void hitpoker_state::eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// is 0xbe53 the right address?
 	m_eeprom_data[m_eeprom_index] = data;
 }
 
-READ8_MEMBER(hitpoker_state::eeprom_r)
+uint8_t hitpoker_state::eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*** hack to make it boot ***/
 	int ret = ((m_eeprom_index & 0x1f) == 0x1f) ? 1 : 0;
@@ -218,7 +218,7 @@ READ8_MEMBER(hitpoker_state::eeprom_r)
 	//return m_eeprom_data[m_eeprom_index & 0xfff];
 }
 
-READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
+uint8_t hitpoker_state::hitpoker_pic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 //  logerror("R\n");
 
@@ -236,7 +236,7 @@ READ8_MEMBER(hitpoker_state::hitpoker_pic_r)
 	return m_sys_regs[offset];
 }
 
-WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
+void hitpoker_state::hitpoker_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(offset == 0)
 		m_pic_data = (data & 0xff);// | (data & 0x40) ? 0x80 : 0x00;
@@ -245,7 +245,7 @@ WRITE8_MEMBER(hitpoker_state::hitpoker_pic_w)
 }
 
 #if 0
-READ8_MEMBER(hitpoker_state::test_r)
+uint8_t hitpoker_state::test_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

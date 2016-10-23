@@ -63,24 +63,24 @@ public:
 		, m_ic8(*this, "ic8")
 	{ }
 
-	DECLARE_WRITE8_MEMBER(ic1_b_w);
-	DECLARE_WRITE8_MEMBER(ic2_b_w);
+	void ic1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
-	DECLARE_WRITE8_MEMBER(ic3_b_w);
-	DECLARE_WRITE8_MEMBER(ic4_b_w);
+	void ic3_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic4_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ic4_cb2_w);
-	DECLARE_WRITE8_MEMBER(ic5_b_w);
-	DECLARE_WRITE8_MEMBER(ic6_b_w);
-	DECLARE_WRITE8_MEMBER(ic7_b_w);
-	DECLARE_WRITE8_MEMBER(ic8_a_w);
-	DECLARE_WRITE8_MEMBER(ic8_b_w);
-	DECLARE_READ8_MEMBER(ic1_a_r);
-	DECLARE_READ8_MEMBER(ic2_a_r);
-	DECLARE_READ8_MEMBER(ic4_a_r);
-	DECLARE_READ8_MEMBER(ic5_a_r);
-	DECLARE_READ8_MEMBER(ic6_a_r);
-	DECLARE_READ8_MEMBER(ic6_b_r);
-	DECLARE_READ8_MEMBER(ic7_a_r);
+	void ic5_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic6_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic7_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic8_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ic8_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ic1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic4_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic5_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic6_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic6_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t ic7_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
@@ -354,23 +354,23 @@ static INPUT_PORTS_START( allied )
 INPUT_PORTS_END
 
 // 1 target, 1 rollover
-READ8_MEMBER( allied_state::ic1_a_r )
+uint8_t allied_state::ic1_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("X1A")->read();
 }
 
 // 6 lamps
-WRITE8_MEMBER( allied_state::ic1_b_w )
+void allied_state::ic1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // 8 switches
-READ8_MEMBER( allied_state::ic2_a_r )
+uint8_t allied_state::ic2_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("X2A")->read();
 }
 
-WRITE8_MEMBER( allied_state::ic2_b_w )
+void allied_state::ic2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PB0-4,6 - lamps
 
@@ -389,18 +389,18 @@ WRITE_LINE_MEMBER( allied_state::ic2_cb2_w )
 	}
 }
 
-WRITE8_MEMBER( allied_state::ic3_b_w )
+void allied_state::ic3_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 6 switches
-READ8_MEMBER( allied_state::ic4_a_r )
+uint8_t allied_state::ic4_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("X4A")->read();
 }
 
-WRITE8_MEMBER( allied_state::ic4_b_w )
+void allied_state::ic4_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
 	uint8_t segment, i;
@@ -445,13 +445,13 @@ WRITE_LINE_MEMBER( allied_state::ic4_cb2_w )
 }
 
 // 8 of the adjustment connectors
-READ8_MEMBER( allied_state::ic5_a_r )
+uint8_t allied_state::ic5_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ic5a;
 }
 
 // cabinet solenoids
-WRITE8_MEMBER( allied_state::ic5_b_w )
+void allied_state::ic5_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PB0 - play meter
 // PB1 - replay meter
@@ -472,18 +472,18 @@ WRITE8_MEMBER( allied_state::ic5_b_w )
 }
 
 // 4 adjustments, 3 coin slots, slam tilt
-READ8_MEMBER( allied_state::ic6_a_r )
+uint8_t allied_state::ic6_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ic6a0 | m_ic6a1 | m_ic6a2 | ioport("X6A")->read();
 }
 
 // 1 adjustment, test switch
-READ8_MEMBER( allied_state::ic6_b_r )
+uint8_t allied_state::ic6_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_ic6b4 | ioport("TEST")->read() | m_ic6b7 | 0x4f;
 }
 
-WRITE8_MEMBER( allied_state::ic6_b_w )
+void allied_state::ic6_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PB0-3 to drop targets
 
@@ -491,12 +491,12 @@ WRITE8_MEMBER( allied_state::ic6_b_w )
 }
 
 // 6 inputs
-READ8_MEMBER( allied_state::ic7_a_r )
+uint8_t allied_state::ic7_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("X7A")->read();
 }
 
-WRITE8_MEMBER( allied_state::ic7_b_w )
+void allied_state::ic7_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // PB7 - tilt lamp
 
@@ -554,7 +554,7 @@ WRITE8_MEMBER( allied_state::ic7_b_w )
 }
 
 // playfield solenoids
-WRITE8_MEMBER( allied_state::ic8_a_w )
+void allied_state::ic8_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data & 0x07) < 0x07) // 3 bumpers
 		m_samples->start(0, 0);
@@ -567,7 +567,7 @@ WRITE8_MEMBER( allied_state::ic8_a_w )
 }
 
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
-WRITE8_MEMBER( allied_state::ic8_b_w )
+void allied_state::ic8_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_value("led1", !BIT(data, 0));
 	output().set_value("led2", !BIT(data, 1));

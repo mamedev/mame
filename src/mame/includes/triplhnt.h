@@ -56,11 +56,11 @@ public:
 	int m_sprite_bank;
 	bitmap_ind16 m_helper;
 	tilemap_t* m_bg_tilemap;
-	DECLARE_WRITE8_MEMBER(triplhnt_misc_w);
-	DECLARE_READ8_MEMBER(triplhnt_cmos_r);
-	DECLARE_READ8_MEMBER(triplhnt_input_port_4_r);
-	DECLARE_READ8_MEMBER(triplhnt_misc_r);
-	DECLARE_READ8_MEMBER(triplhnt_da_latch_r);
+	void triplhnt_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t triplhnt_cmos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t triplhnt_input_port_4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t triplhnt_misc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t triplhnt_da_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_triplhnt();
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;

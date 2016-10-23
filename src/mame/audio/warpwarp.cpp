@@ -91,7 +91,7 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::sound_w )
+void warpwarp_sound_device::sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 	m_sound_latch = data & 0x0f;
@@ -128,13 +128,13 @@ WRITE8_MEMBER( warpwarp_sound_device::sound_w )
 	}
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music1_w )
+void warpwarp_sound_device::music1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 	m_music1_latch = data & 0x3f;
 }
 
-WRITE8_MEMBER( warpwarp_sound_device::music2_w )
+void warpwarp_sound_device::music2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 	m_music2_latch = data & 0x3f;

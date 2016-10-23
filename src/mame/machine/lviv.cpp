@@ -47,17 +47,17 @@ INPUT_CHANGED_MEMBER(lviv_state::lviv_reset)
 	machine().schedule_soft_reset();
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_porta_r)
+uint8_t lviv_state::lviv_ppi_0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_portb_r)
+uint8_t lviv_state::lviv_ppi_0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
+uint8_t lviv_state::lviv_ppi_0_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_ppi_port_outputs[0][2] & 0x0f;
 	if (m_cassette->input() > 0.038)
@@ -67,18 +67,18 @@ READ8_MEMBER(lviv_state::lviv_ppi_0_portc_r)
 	return data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_porta_w)
+void lviv_state::lviv_ppi_0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_port_outputs[0][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_portb_w)
+void lviv_state::lviv_ppi_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_port_outputs[0][1] = data;
 	lviv_update_palette(data&0x7f);
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off */
+void lviv_state::lviv_ppi_0_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* tape in/out, video memory on/off */
 {
 	m_ppi_port_outputs[0][2] = data;
 	if (m_ppi_port_outputs[0][1]&0x80)
@@ -87,12 +87,12 @@ WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off
 	lviv_update_memory();
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
+uint8_t lviv_state::lviv_ppi_1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
+uint8_t lviv_state::lviv_ppi_1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)/* keyboard reading */
 {
 	return  ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : ioport("KEY0")->read()) &
 		((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : ioport("KEY1")->read()) &
@@ -104,7 +104,7 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 		((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : ioport("KEY7")->read());
 }
 
-READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
+uint8_t lviv_state::lviv_ppi_1_portc_r(address_space &space, offs_t offset, uint8_t mem_mask)/* keyboard reading */
 {
 	return  ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : ioport("KEY8")->read()) &
 		((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : ioport("KEY9" )->read()) &
@@ -112,24 +112,24 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
 		((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : ioport("KEY11")->read());
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_porta_w)/* kayboard scaning */
+void lviv_state::lviv_ppi_1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* kayboard scaning */
 {
 	m_ppi_port_outputs[1][0] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_portb_w)
+void lviv_state::lviv_ppi_1_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ppi_port_outputs[1][1] = data;
 }
 
-WRITE8_MEMBER(lviv_state::lviv_ppi_1_portc_w)/* kayboard scaning */
+void lviv_state::lviv_ppi_1_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)/* kayboard scaning */
 {
 	m_ppi_port_outputs[1][2] = data;
 }
 
 
 /* I/O */
-READ8_MEMBER(lviv_state::lviv_io_r)
+uint8_t lviv_state::lviv_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_startup_mem_map)
 	{
@@ -154,7 +154,7 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 	}
 }
 
-WRITE8_MEMBER(lviv_state::lviv_io_w)
+void lviv_state::lviv_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)

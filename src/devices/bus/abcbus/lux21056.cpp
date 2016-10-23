@@ -174,22 +174,22 @@ static const z80_daisy_config daisy_chain[] =
 //  Z80DMA
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::memory_read_byte )
+uint8_t luxor_55_21056_device::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21056_device::memory_write_byte )
+void luxor_55_21056_device::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21056_device::io_read_byte )
+uint8_t luxor_55_21056_device::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21056_device::io_write_byte )
+void luxor_55_21056_device::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
@@ -494,7 +494,7 @@ void luxor_55_21056_device::abcbus_c3(uint8_t data)
 //  sasi_status_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
+uint8_t luxor_55_21056_device::sasi_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -529,7 +529,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_status_r )
 //  stat_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::stat_w )
+void luxor_55_21056_device::stat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_stat = data;
 
@@ -541,7 +541,7 @@ WRITE8_MEMBER( luxor_55_21056_device::stat_w )
 //  out_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::out_r )
+uint8_t luxor_55_21056_device::out_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_out;
 
@@ -555,7 +555,7 @@ READ8_MEMBER( luxor_55_21056_device::out_r )
 //  inp_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::inp_w )
+void luxor_55_21056_device::inp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_inp = data;
 
@@ -567,7 +567,7 @@ WRITE8_MEMBER( luxor_55_21056_device::inp_w )
 //  sasi_data_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
+uint8_t luxor_55_21056_device::sasi_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_sasi_data_in->read();
 
@@ -581,7 +581,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_data_r )
 //  sasi_data_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::sasi_data_w )
+void luxor_55_21056_device::sasi_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sasi_data = data;
 
@@ -598,7 +598,7 @@ WRITE8_MEMBER( luxor_55_21056_device::sasi_data_w )
 //  rdy_reset_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::rdy_reset_r )
+uint8_t luxor_55_21056_device::rdy_reset_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	rdy_reset_w(space, offset, 0xff);
 
@@ -610,7 +610,7 @@ READ8_MEMBER( luxor_55_21056_device::rdy_reset_r )
 //  rdy_reset_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::rdy_reset_w )
+void luxor_55_21056_device::rdy_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	set_rdy(0);
 }
@@ -620,7 +620,7 @@ WRITE8_MEMBER( luxor_55_21056_device::rdy_reset_w )
 //  sasi_sel_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::sasi_sel_r )
+uint8_t luxor_55_21056_device::sasi_sel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	sasi_sel_w(space, offset, 0xff);
 
@@ -632,7 +632,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_sel_r )
 //  sasi_sel_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::sasi_sel_w )
+void luxor_55_21056_device::sasi_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sasibus->write_sel(!m_sasi_bsy);
 }
@@ -642,7 +642,7 @@ WRITE8_MEMBER( luxor_55_21056_device::sasi_sel_w )
 //  sasi_rst_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21056_device::sasi_rst_r )
+uint8_t luxor_55_21056_device::sasi_rst_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	sasi_rst_w(space, offset, 0xff);
 
@@ -654,7 +654,7 @@ READ8_MEMBER( luxor_55_21056_device::sasi_rst_r )
 //  sasi_rst_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21056_device::sasi_rst_w )
+void luxor_55_21056_device::sasi_rst_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sasibus->write_rst(1);
 	m_sasibus->write_rst(0);

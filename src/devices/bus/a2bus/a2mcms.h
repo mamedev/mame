@@ -28,8 +28,8 @@ public:
 	// construction/destruction
 	mcms_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(voiceregs_w);
-	DECLARE_WRITE8_MEMBER(control_w);
+	void voiceregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_pen_rand(void) { m_stream->update(); return m_rand; }
 
 	void set_bus_device(a2bus_mcms1_device *pDev) { m_pBusDevice = pDev; }

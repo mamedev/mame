@@ -61,8 +61,8 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<uint8_t> m_p_colorram;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE8_MEMBER(port88_w);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	const uint8_t *m_p_chargen;
 	bool m_cassbit;
@@ -102,7 +102,7 @@ static const z80_daisy_config z9001_daisy_chain[] =
 };
 
 //Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
-WRITE8_MEMBER( z9001_state::port88_w )
+void z9001_state::port88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_beeper->set_state(BIT(data, 7));
 }
@@ -190,7 +190,7 @@ static const gfx_layout z9001_charlayout =
 	8*8                 /* every char takes 8 bytes */
 };
 
-WRITE8_MEMBER( z9001_state::kbd_put )
+void z9001_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(0x0025, data);
 }

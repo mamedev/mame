@@ -37,16 +37,16 @@ public:
 	int m_sn3_ready;
 	uint8_t m_irq_mask;
 
-	DECLARE_WRITE8_MEMBER(SN76496_latch_w);
-	DECLARE_READ8_MEMBER(SN76496_select_r);
-	DECLARE_WRITE8_MEMBER(SN76496_select_w);
+	void SN76496_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t SN76496_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void SN76496_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
-	DECLARE_READ8_MEMBER(t0_r);
-	DECLARE_WRITE8_MEMBER(soundtrigger_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void soundtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(spcforce);

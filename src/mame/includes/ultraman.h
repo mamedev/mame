@@ -37,9 +37,9 @@ public:
 	required_device<k051960_device> m_k051960;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE16_MEMBER(sound_cmd_w);
-	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
-	DECLARE_WRITE16_MEMBER(ultraman_gfxctrl_w);
+	void sound_cmd_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sound_irq_trigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void ultraman_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -103,23 +103,23 @@ public:
 		m_region_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_READ8_MEMBER(cart_select_r);
-	DECLARE_WRITE8_MEMBER(cart_select_w);
-	DECLARE_READ8_MEMBER(bios_ctrl_r);
-	DECLARE_WRITE8_MEMBER(bios_ctrl_w);
-	DECLARE_READ8_MEMBER(read_68k_banked_data);
-	DECLARE_WRITE8_MEMBER(write_68k_banked_data);
-	DECLARE_WRITE8_MEMBER(mt_z80_bank_w);
-	DECLARE_READ8_MEMBER(banked_ram_r);
-	DECLARE_WRITE8_MEMBER(banked_ram_w);
-	DECLARE_WRITE8_MEMBER(bios_port_ctrl_w);
-	DECLARE_READ8_MEMBER(bios_joypad_r);
-	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
-	DECLARE_READ8_MEMBER(vdp1_count_r);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
-	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
-	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
+	uint8_t cart_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cart_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t read_68k_banked_data(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write_68k_banked_data(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mt_z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t banked_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void banked_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bios_port_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bios_joypad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bios_port_7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t vdp1_count_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sms_count_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sms_ioport_dc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t sms_ioport_dd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_mt_crt();
 	void init_mt_slot();
@@ -302,12 +302,12 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 INPUT_PORTS_END
 
 /* MEGATECH specific */
-READ8_MEMBER(mtech_state::cart_select_r )
+uint8_t mtech_state::cart_select_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_mt_cart_select_reg;
 }
 
-READ8_MEMBER(mtech_state::sms_count_r)
+uint8_t mtech_state::sms_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &prg = m_z80snd->space(AS_PROGRAM);
 	if (offset & 0x01)
@@ -317,14 +317,14 @@ READ8_MEMBER(mtech_state::sms_count_r)
 }
 
 
-READ8_MEMBER (mtech_state::sms_ioport_dc_r)
+uint8_t mtech_state::sms_ioport_dc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
 	return (machine().root_device().ioport("PAD1")->read() & 0x3f) | ((machine().root_device().ioport("PAD2")->read() & 0x03) << 6);
 }
 
-READ8_MEMBER (mtech_state::sms_ioport_dd_r)
+uint8_t mtech_state::sms_ioport_dd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
@@ -332,7 +332,7 @@ READ8_MEMBER (mtech_state::sms_ioport_dd_r)
 }
 
 
-WRITE8_MEMBER( mtech_state::mt_sms_standard_rom_bank_w )
+void mtech_state::mt_sms_standard_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = data & 0x1f;
 	//logerror("bank w %02x %02x\n", offset, data);
@@ -453,7 +453,7 @@ void mtech_state::switch_cart(int gameno)
 	}
 }
 
-WRITE8_MEMBER(mtech_state::cart_select_w )
+void mtech_state::cart_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* seems to write the slot number..
 	  but it stores something in (banked?) ram
@@ -464,7 +464,7 @@ WRITE8_MEMBER(mtech_state::cart_select_w )
 }
 
 
-READ8_MEMBER(mtech_state::bios_ctrl_r )
+uint8_t mtech_state::bios_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (offset == 0)
 		return 0;
@@ -474,7 +474,7 @@ READ8_MEMBER(mtech_state::bios_ctrl_r )
 	return m_bios_ctrl[offset];
 }
 
-WRITE8_MEMBER(mtech_state::bios_ctrl_w )
+void mtech_state::bios_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset == 1)
 	{
@@ -490,30 +490,30 @@ WRITE8_MEMBER(mtech_state::bios_ctrl_w )
 /* this sets 0x300000 which may indicate that the 68k can see the instruction rom
    there, this limiting the max game rom capacity to 3meg. */
 
-READ8_MEMBER(mtech_state::read_68k_banked_data )
+uint8_t mtech_state::read_68k_banked_data(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &space68k = m_maincpu->space();
 	uint8_t ret = space68k.read_byte(m_mt_bank_addr + offset);
 	return ret;
 }
 
-WRITE8_MEMBER(mtech_state::write_68k_banked_data )
+void mtech_state::write_68k_banked_data(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &space68k = m_maincpu->space();
 	space68k.write_byte(m_mt_bank_addr + offset,data);
 }
 
-WRITE8_MEMBER(mtech_state::mt_z80_bank_w )
+void mtech_state::mt_z80_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mt_bank_addr = ((m_mt_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-READ8_MEMBER(mtech_state::banked_ram_r )
+uint8_t mtech_state::banked_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)];
 }
 
-WRITE8_MEMBER(mtech_state::banked_ram_w )
+void mtech_state::banked_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_banked_ram[offset + 0x1000 * (m_mt_cart_select_reg & 0x07)] = data;
 }
@@ -538,13 +538,13 @@ static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(mtech_state::bios_port_ctrl_w )
+void mtech_state::bios_port_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bios_port_ctrl = data;
 }
 
 /* the test mode accesses the joypad/stick inputs like this */
-READ8_MEMBER(mtech_state::bios_joypad_r )
+uint8_t mtech_state::bios_joypad_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t retdata = 0;
 
@@ -564,13 +564,13 @@ READ8_MEMBER(mtech_state::bios_joypad_r )
 	return retdata;
 }
 
-WRITE8_MEMBER(mtech_state::bios_port_7f_w)
+void mtech_state::bios_port_7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //  popmessage("CPU #3: I/O port 0x7F write, data %02x", data);
 }
 
 
-READ8_MEMBER(mtech_state::vdp1_count_r)
+uint8_t mtech_state::vdp1_count_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)

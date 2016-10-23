@@ -222,7 +222,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( upd3301_device::read )
+uint8_t upd3301_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -245,7 +245,7 @@ READ8_MEMBER( upd3301_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd3301_device::write )
+void upd3301_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 0x01)
 	{
@@ -386,7 +386,7 @@ WRITE8_MEMBER( upd3301_device::write )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( upd3301_device::dack_w )
+void upd3301_device::dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_y >= (m_l * m_r))
 	{

@@ -28,11 +28,11 @@ public:
 	tilemap_t *m_foreground;
 	tilemap_t *m_background;
 
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(positive_scroll_w);
-	DECLARE_WRITE8_MEMBER(negative_scroll_w);
-	DECLARE_WRITE8_MEMBER(bgvideo_write);
-	DECLARE_WRITE8_MEMBER(fgvideo_write);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void positive_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void negative_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fgvideo_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);

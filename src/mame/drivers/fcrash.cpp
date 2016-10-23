@@ -95,7 +95,7 @@ slampic: no sound. A priority problem between sprites and crowd.
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 
-WRITE16_MEMBER( cps_state::fcrash_soundlatch_w )
+void cps_state::fcrash_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -104,7 +104,7 @@ WRITE16_MEMBER( cps_state::fcrash_soundlatch_w )
 	}
 }
 
-WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
+void cps_state::cawingbl_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -114,7 +114,7 @@ WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
 	}
 }
 
-WRITE8_MEMBER( cps_state::fcrash_snd_bankswitch_w )
+void cps_state::fcrash_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
 	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
@@ -122,7 +122,7 @@ WRITE8_MEMBER( cps_state::fcrash_snd_bankswitch_w )
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER( cps_state::sf2mdt_snd_bankswitch_w )
+void cps_state::sf2mdt_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_1->set_output_gain(0, (data & 0x20) ? 0.0 : 1.0);
 	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
@@ -130,7 +130,7 @@ WRITE8_MEMBER( cps_state::sf2mdt_snd_bankswitch_w )
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER( cps_state::knightsb_snd_bankswitch_w )
+void cps_state::knightsb_snd_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_msm_1->set_output_gain(0, (data & 0x20) ? 0.0 : 1.0);
 	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
@@ -156,12 +156,12 @@ WRITE_LINE_MEMBER(cps_state::m5205_int2)
 
 
 
-WRITE8_MEMBER( cps_state::fcrash_msm5205_0_data_w )
+void cps_state::fcrash_msm5205_0_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_buffer1 = data;
 }
 
-WRITE8_MEMBER( cps_state::fcrash_msm5205_1_data_w )
+void cps_state::fcrash_msm5205_1_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sample_buffer2 = data;
 }
@@ -169,7 +169,7 @@ WRITE8_MEMBER( cps_state::fcrash_msm5205_1_data_w )
 /* not verified */
 #define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 
-WRITE16_MEMBER(cps_state::dinopic_layer_w)
+void cps_state::dinopic_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -198,12 +198,12 @@ WRITE16_MEMBER(cps_state::dinopic_layer_w)
 	}
 }
 
-WRITE16_MEMBER( cps_state::dinopic_layer2_w )
+void cps_state::dinopic_layer2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_cps_a_regs[0x06 / 2] = data;
 }
 
-WRITE16_MEMBER(cps_state::kodb_layer_w)
+void cps_state::kodb_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* layer enable and mask 1&2 registers are written here - passing them to m_cps_b_regs for now for drawing routines */
 	if (offset == 0x06)
@@ -216,7 +216,7 @@ WRITE16_MEMBER(cps_state::kodb_layer_w)
 		m_cps_b_regs[m_layer_mask_reg[2] / 2] = data;
 }
 
-WRITE16_MEMBER(cps_state::knightsb_layer_w)
+void cps_state::knightsb_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -272,7 +272,7 @@ WRITE16_MEMBER(cps_state::knightsb_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::punipic_layer_w)
+void cps_state::punipic_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -323,7 +323,7 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::sf2m1_layer_w)
+void cps_state::sf2m1_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -381,7 +381,7 @@ WRITE16_MEMBER(cps_state::sf2m1_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
+void cps_state::sf2mdt_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
@@ -413,7 +413,7 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
+void cps_state::sf2mdta_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
@@ -445,7 +445,7 @@ WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 	}
 }
 
-WRITE16_MEMBER(cps_state::slampic_layer_w)
+void cps_state::slampic_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -2956,7 +2956,7 @@ ROM_END
 
 // ************************************************************************* VARTHB
 
-WRITE16_MEMBER(cps_state::varthb_layer_w)
+void cps_state::varthb_layer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (data > 0x9000)
 		m_cps_a_regs[0x06 / 2] = data;

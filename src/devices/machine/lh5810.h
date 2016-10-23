@@ -77,8 +77,8 @@ public:
 	template<class _Object> static devcb_base &set_portc_w_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_portc_w_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<lh5810_device &>(device).m_out_int_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER( data_r );
-	DECLARE_WRITE8_MEMBER( data_w );
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

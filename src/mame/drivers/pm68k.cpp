@@ -27,9 +27,9 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t keyin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -38,14 +38,14 @@ private:
 	required_device<generic_terminal_device> m_terminal;
 };
 
-READ16_MEMBER( pm68k_state::keyin_r )
+uint16_t pm68k_state::keyin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
 
-READ16_MEMBER( pm68k_state::status_r )
+uint16_t pm68k_state::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_term_data) ? 0x500 : 0x400;
 }
@@ -73,7 +73,7 @@ void pm68k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( pm68k_state::kbd_put )
+void pm68k_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

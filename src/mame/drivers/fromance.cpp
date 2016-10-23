@@ -84,7 +84,7 @@ with the following code:
  *
  *************************************/
 
-READ8_MEMBER(fromance_state::fromance_commanddata_r)
+uint8_t fromance_state::fromance_commanddata_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_commanddata;
 }
@@ -97,14 +97,14 @@ TIMER_CALLBACK_MEMBER(fromance_state::deferred_commanddata_w)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_commanddata_w)
+void fromance_state::fromance_commanddata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* do this on a timer to let the slave CPU synchronize */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(fromance_state::deferred_commanddata_w),this), data);
 }
 
 
-READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
+uint8_t fromance_state::fromance_busycheck_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
@@ -116,7 +116,7 @@ READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 }
 
 
-READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
+uint8_t fromance_state::fromance_busycheck_sub_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_directionflag)
 		return 0xff;        // standby
@@ -125,7 +125,7 @@ READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_busycheck_sub_w)
+void fromance_state::fromance_busycheck_sub_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_directionflag = 0;
 }
@@ -138,7 +138,7 @@ WRITE8_MEMBER(fromance_state::fromance_busycheck_sub_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_rombank_w)
+void fromance_state::fromance_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data);
 }
@@ -151,7 +151,7 @@ WRITE8_MEMBER(fromance_state::fromance_rombank_w)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_adpcm_reset_w)
+void fromance_state::fromance_adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_reset = (data & 0x01);
 	m_vclk_left = 0;
@@ -160,7 +160,7 @@ WRITE8_MEMBER(fromance_state::fromance_adpcm_reset_w)
 }
 
 
-WRITE8_MEMBER(fromance_state::fromance_adpcm_w)
+void fromance_state::fromance_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_data = data;
 	m_vclk_left = 2;
@@ -194,13 +194,13 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_portselect_w)
+void fromance_state::fromance_portselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portselect = data;
 }
 
 
-READ8_MEMBER(fromance_state::fromance_keymatrix_r)
+uint8_t fromance_state::fromance_keymatrix_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int ret = 0xff;
 
@@ -226,7 +226,7 @@ READ8_MEMBER(fromance_state::fromance_keymatrix_r)
  *
  *************************************/
 
-WRITE8_MEMBER(fromance_state::fromance_coinctr_w)
+void fromance_state::fromance_coinctr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//
 }

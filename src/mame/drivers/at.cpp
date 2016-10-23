@@ -42,9 +42,9 @@ public:
 	void init_at();
 	void init_atpci();
 	void init_megapcpla();
-	DECLARE_READ16_MEMBER(ps1_unk_r);
-	DECLARE_WRITE16_MEMBER(ps1_unk_w);
-	DECLARE_READ8_MEMBER(ps1_portb_r);
+	uint16_t ps1_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ps1_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t ps1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void machine_start_vrom_fix();
 
 	void init_at_common(int xmsbase);
@@ -71,10 +71,10 @@ public:
 	void init_megapc();
 	void init_megapcpl();
 
-	DECLARE_READ16_MEMBER( wd7600_ior );
-	DECLARE_WRITE16_MEMBER( wd7600_iow );
+	uint16_t wd7600_ior(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void wd7600_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
-	DECLARE_WRITE8_MEMBER( wd7600_tc ) { m_isabus->eop_w(offset, data); }
+	void wd7600_tc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_isabus->eop_w(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
 };
 
@@ -121,12 +121,12 @@ static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 ADDRESS_MAP_END
 
-READ16_MEMBER( at_state::ps1_unk_r )
+uint16_t at_state::ps1_unk_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_ps1_reg[offset];
 }
 
-WRITE16_MEMBER( at_state::ps1_unk_w )
+void at_state::ps1_unk_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if((offset == 0) && (data == 0x60))
 		data = 0x68;
@@ -134,7 +134,7 @@ WRITE16_MEMBER( at_state::ps1_unk_w )
 	COMBINE_DATA(&m_ps1_reg[offset]);
 }
 
-READ8_MEMBER( at_state::ps1_portb_r )
+uint8_t at_state::ps1_portb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = m_mb->portb_r(space, offset);
 	/* 0x10 is the dram refresh line bit, 15.085us. */
@@ -199,7 +199,7 @@ void at_state::init_megapcpla()
 	ROM[0x3ffff] = 0x41;  // to correct checksum
 }
 
-READ16_MEMBER( megapc_state::wd7600_ior )
+uint16_t megapc_state::wd7600_ior(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (offset < 4)
 		return m_isabus->dack_r(offset);
@@ -207,7 +207,7 @@ READ16_MEMBER( megapc_state::wd7600_ior )
 		return m_isabus->dack16_r(offset);
 }
 
-WRITE16_MEMBER( megapc_state::wd7600_iow )
+void megapc_state::wd7600_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 4)
 		m_isabus->dack_w(offset, data);

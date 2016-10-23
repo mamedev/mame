@@ -80,16 +80,16 @@ public:
 	DECLARE_PALETTE_INIT(i7000);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
 
-	DECLARE_READ8_MEMBER(i7000_kbd_r);
-	DECLARE_WRITE8_MEMBER(i7000_scanlines_w);
+	uint8_t i7000_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void i7000_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
-WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
+void i7000_state::i7000_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_row = data;
 }
 
-READ8_MEMBER( i7000_state::i7000_kbd_r )
+uint8_t i7000_state::i7000_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0xff;
 

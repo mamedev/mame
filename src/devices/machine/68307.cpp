@@ -14,7 +14,7 @@
   a custom verson here, that may change later if subtle differences exist.
 
 */
-READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
+uint8_t m68307cpu_device::m68307_internal_serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 
@@ -22,7 +22,7 @@ READ8_MEMBER( m68307cpu_device::m68307_internal_serial_r )
 	return 0x0000;
 }
 
-WRITE8_MEMBER(m68307cpu_device::m68307_internal_serial_w)
+void m68307cpu_device::m68307_internal_serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 
@@ -282,7 +282,7 @@ void m68307cpu_device::device_start()
 
 
 
-READ16_MEMBER( m68307cpu_device::m68307_internal_base_r )
+uint16_t m68307cpu_device::m68307_internal_base_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 
@@ -301,7 +301,7 @@ READ16_MEMBER( m68307cpu_device::m68307_internal_base_r )
 	return 0x0000;
 }
 
-WRITE16_MEMBER( m68307cpu_device::m68307_internal_base_w )
+void m68307cpu_device::m68307_internal_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m68307cpu_device *m68k = this;
 

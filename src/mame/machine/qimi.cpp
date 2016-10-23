@@ -168,7 +168,7 @@ uint8_t qimi_t::read(address_space &space, offs_t offset, uint8_t data)
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( qimi_t::write )
+void qimi_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// write to 0x1bfbe resets int status
 	if (offset == 0x1bfbe)

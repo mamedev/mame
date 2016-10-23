@@ -145,7 +145,7 @@ void lc80_state::update_display()
 	}
 }
 
-WRITE8_MEMBER( lc80_state::pio1_pa_w )
+void lc80_state::pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -167,7 +167,7 @@ WRITE8_MEMBER( lc80_state::pio1_pa_w )
 	update_display();
 }
 
-READ8_MEMBER( lc80_state::pio1_pb_r )
+uint8_t lc80_state::pio1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -187,7 +187,7 @@ READ8_MEMBER( lc80_state::pio1_pb_r )
 	return (m_cassette->input() < +0.0);
 }
 
-WRITE8_MEMBER( lc80_state::pio1_pb_w )
+void lc80_state::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -220,7 +220,7 @@ WRITE8_MEMBER( lc80_state::pio1_pb_w )
 	update_display();
 }
 
-READ8_MEMBER( lc80_state::pio2_pb_r )
+uint8_t lc80_state::pio2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

@@ -110,12 +110,12 @@ public:
 	devcb_read8  read_ad_0, read_ad_1, read_ad_2, read_ad_3;
 	devcb_read8  read_ad_4, read_ad_5, read_ad_6, read_ad_7;
 
-	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(ports_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
-	DECLARE_READ8_MEMBER(intregs_r);
-	DECLARE_WRITE8_MEMBER(intregs_w);
+	uint8_t ports_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t intregs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void intregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	bool are_port_bits_output(uint8_t port, uint8_t mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 

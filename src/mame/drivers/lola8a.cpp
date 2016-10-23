@@ -44,13 +44,13 @@ public:
 
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
 
-	DECLARE_READ8_MEMBER(lola8a_port_a_r);
-	DECLARE_WRITE8_MEMBER(lola8a_port_b_w);
+	uint8_t lola8a_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lola8a_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 
-	DECLARE_READ8_MEMBER(keyboard_r);
+	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
@@ -204,13 +204,13 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 	}
 }
 
-READ8_MEMBER(lola8a_state::lola8a_port_a_r)
+uint8_t lola8a_state::lola8a_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	logerror("lola8a_port_a_r\n");
 	return 0x00;
 }
 
-WRITE8_MEMBER(lola8a_state::lola8a_port_b_w)
+void lola8a_state::lola8a_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_portb = data;
 }
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER( lola8a_state::cass_w )
 	m_cass->output(state ? -1.0 : +1.0);
 }
 
-READ8_MEMBER(lola8a_state::keyboard_r)
+uint8_t lola8a_state::keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const char *const keynames[] =
 	{

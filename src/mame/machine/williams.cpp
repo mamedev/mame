@@ -247,7 +247,7 @@ void williams2_state::machine_reset_williams2()
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_vram_select_w)
+void williams_state::williams_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VRAM/ROM banking from bit 0 */
 	membank("bank1")->set_entry(data & 0x01);
@@ -257,7 +257,7 @@ WRITE8_MEMBER(williams_state::williams_vram_select_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
+void williams2_state::williams2_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the low two bits control the paging */
 	switch (data & 0x03)
@@ -299,13 +299,13 @@ TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 	pia_2->cb1_w((param == 0xff) ? 0 : 1);
 }
 
-WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
+void williams_state::williams_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* the high two bits are set externally, and should be 1 */
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data | 0xc0);
 }
 
-WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
+void williams_state::playball_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams_state::williams_deferred_snd_cmd_w),this), data);
 }
@@ -317,7 +317,7 @@ TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 	pia_2->porta_w(param);
 }
 
-WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
+void williams2_state::williams2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(williams2_state::williams2_deferred_snd_cmd_w),this), data);
 }
@@ -370,14 +370,14 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
  *      1000 = right/down full
  */
 
-READ8_MEMBER(williams_state::williams_49way_port_0_r)
+uint8_t williams_state::williams_49way_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
 }
 
 
-READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
+uint8_t williams_state::williams_input_port_49way_0_5_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_port_select)
 		return williams_49way_port_0_r(space, 0);
@@ -393,14 +393,14 @@ READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_cmos_w)
+void williams_state::williams_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* only 4 bits are valid */
 	m_nvram[offset] = data | 0xf0;
 }
 
 
-WRITE8_MEMBER(williams_state::bubbles_cmos_w)
+void williams_state::bubbles_cmos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* bubbles has additional CMOS for a full 8 bits */
 	m_nvram[offset] = data;
@@ -414,7 +414,7 @@ WRITE8_MEMBER(williams_state::bubbles_cmos_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
+void williams_state::williams_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
@@ -422,7 +422,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
+void williams2_state::williams2_watchdog_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
@@ -437,7 +437,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
  *
  *************************************/
 
-WRITE8_MEMBER(williams2_state::williams2_7segment_w)
+void williams2_state::williams2_7segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int n;
 	char dot;
@@ -493,13 +493,13 @@ void williams_state::machine_reset_defender()
 }
 
 
-WRITE8_MEMBER(williams_state::defender_video_control_w)
+void williams_state::defender_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cocktail = data & 0x01;
 }
 
 
-WRITE8_MEMBER(williams_state::defender_bank_select_w)
+void williams_state::defender_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bankc000->set_bank(data & 0x0f);
 }
@@ -512,7 +512,7 @@ WRITE8_MEMBER(williams_state::defender_bank_select_w)
  *
  *************************************/
 
-READ8_MEMBER(williams_state::mayday_protection_r)
+uint8_t williams_state::mayday_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Mayday does some kind of protection check that is not currently understood  */
 	/* However, the results of that protection check are stored at $a190 and $a191 */
@@ -530,7 +530,7 @@ READ8_MEMBER(williams_state::mayday_protection_r)
  *
  *************************************/
 
-WRITE8_MEMBER(williams_state::sinistar_vram_select_w)
+void williams_state::sinistar_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* low two bits are standard */
 	williams_vram_select_w(space, offset, data);
@@ -575,7 +575,7 @@ inline void blaster_state::update_blaster_banking()
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
+void blaster_state::blaster_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
@@ -589,7 +589,7 @@ WRITE8_MEMBER(blaster_state::blaster_vram_select_w)
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
+void blaster_state::blaster_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_rom_bank = data & 0x0f;
 	update_blaster_banking();
@@ -608,7 +608,7 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 }
 
 
-WRITE8_MEMBER(blaster_state::blaster_snd_cmd_w)
+void blaster_state::blaster_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::blaster_deferred_snd_cmd_w),this), data);
 }
@@ -634,7 +634,7 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
+uint8_t williams2_state::tshoot_input_port_0_3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* merge in the gun inputs with the standard data */
 	int data = ioport("IN0")->read();
@@ -650,7 +650,7 @@ WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
 }
 
 
-WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
+void williams2_state::tshoot_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* set the grenade lamp */
 	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
@@ -697,7 +697,7 @@ WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 }
 
 
-WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
+void joust2_state::joust2_snd_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
 	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);

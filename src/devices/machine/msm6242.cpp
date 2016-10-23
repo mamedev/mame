@@ -395,7 +395,7 @@ const char *msm6242_device::irq_type_string(uint8_t irq_type)
 //  read
 //-------------------------------------------------
 
-READ8_MEMBER( msm6242_device::read )
+uint8_t msm6242_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int hour, pm;
 	uint8_t result;
@@ -494,7 +494,7 @@ READ8_MEMBER( msm6242_device::read )
 //  write
 //-------------------------------------------------
 
-WRITE8_MEMBER( msm6242_device::write )
+void msm6242_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{

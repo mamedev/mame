@@ -30,25 +30,25 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-READ8_MEMBER(blktiger_state::blktiger_from_mcu_r)
+uint8_t blktiger_state::blktiger_from_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_i8751_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
+void blktiger_state::blktiger_to_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 	m_z80_latch = data;
 }
 
-READ8_MEMBER(blktiger_state::blktiger_from_main_r)
+uint8_t blktiger_state::blktiger_from_main_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return m_z80_latch;
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
+void blktiger_state::blktiger_to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%02x write\n",data);
 	m_i8751_latch = data;
@@ -56,12 +56,12 @@ WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
 
 
 
-WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
+void blktiger_state::blktiger_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
+void blktiger_state::blktiger_coinlockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (ioport("COIN_LOCKOUT")->read() & 0x01)
 	{

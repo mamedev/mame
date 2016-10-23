@@ -21,8 +21,8 @@ public:
 		dev.m_y_offset = y_offset;
 	}
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void set_sprite_ctrl(uint16_t sprctrl);
 	void eof_callback();

@@ -22,11 +22,11 @@ public:
 		, m_row(*this, "ROW.%u", 0)
 	{ }
 
-	DECLARE_READ8_MEMBER(ctrl_r);
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_READ8_MEMBER(data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
-	DECLARE_READ8_MEMBER(serial_r);
+	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(serial_w);
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
@@ -138,7 +138,7 @@ static INPUT_PORTS_START( zac_2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RH Bank Target 4") PORT_CODE(KEYCODE_COLON)
 INPUT_PORTS_END
 
-READ8_MEMBER( zac_2_state::ctrl_r )
+uint8_t zac_2_state::ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_input_line < 6)
 		return m_row[m_input_line]->read();
@@ -146,22 +146,22 @@ READ8_MEMBER( zac_2_state::ctrl_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( zac_2_state::ctrl_w )
+void zac_2_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_input_line = data & 7;
 }
 
-READ8_MEMBER( zac_2_state::data_r )
+uint8_t zac_2_state::data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("DSW")->read();
 }
 
-WRITE8_MEMBER( zac_2_state::data_w )
+void zac_2_state::data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 // writes to lines HS0-7, no idea what they do
 }
 
-READ8_MEMBER( zac_2_state::serial_r )
+uint8_t zac_2_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 // from printer
 	return 0;

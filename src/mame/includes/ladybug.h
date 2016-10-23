@@ -54,9 +54,9 @@ public:
 	optional_ioport m_p2_control;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	DECLARE_WRITE8_MEMBER(ladybug_videoram_w);
-	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
-	DECLARE_WRITE8_MEMBER(ladybug_flipscreen_w);
+	void ladybug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ladybug_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ladybug_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);

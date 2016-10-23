@@ -51,9 +51,9 @@ public:
 	virtual void scsi_ctrl_changed() override;
 
 	uint8_t read() { return scsi_bus->data_r(); }
-	DECLARE_READ8_MEMBER( read ) { return read(); }
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(); }
 	void write(uint8_t data) { scsi_bus->data_w(scsi_refid, data); }
-	DECLARE_WRITE8_MEMBER( write ) { write(data); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(data); }
 
 	DECLARE_READ_LINE_MEMBER( rst_r ) { return (m_ctrl & S_RST) ? 1 : 0; }
 	DECLARE_READ_LINE_MEMBER( atn_r ) { return (m_ctrl & S_ATN) ? 1 : 0; }

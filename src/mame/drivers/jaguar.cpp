@@ -381,7 +381,7 @@ public:
 	{
 	}
 
-	virtual DECLARE_WRITE16_MEMBER(write_cs0) override
+	virtual void write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override
 	{
 		// the first write is to the device head register
 		if( offset == 6 && (m_status & IDE_STATUS_DRQ))
@@ -546,7 +546,7 @@ static NVRAM_HANDLER( jaguar )
     }
 }
 */
-WRITE32_MEMBER(jaguar_state::eeprom_w)
+void jaguar_state::eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_eeprom_bit_count++;
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
@@ -556,13 +556,13 @@ WRITE32_MEMBER(jaguar_state::eeprom_w)
 	}
 }
 
-READ32_MEMBER(jaguar_state::eeprom_clk)
+uint32_t jaguar_state::eeprom_clk(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_eeprom->clk_write(PULSE_LINE); /* get next bit when reading */
 	return 0;
 }
 
-READ32_MEMBER(jaguar_state::eeprom_cs)
+uint32_t jaguar_state::eeprom_cs(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	m_eeprom->cs_write(CLEAR_LINE);   /* must do at end of an operation */
 	m_eeprom->cs_write(ASSERT_LINE);        /* enable chip for next operation */
@@ -580,7 +580,7 @@ READ32_MEMBER(jaguar_state::eeprom_cs)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::misc_control_r)
+uint32_t jaguar_state::misc_control_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/*  D7    = board reset (low)
 	    D6    = audio must & reset (high)
@@ -593,7 +593,7 @@ READ32_MEMBER(jaguar_state::misc_control_r)
 }
 
 
-WRITE32_MEMBER(jaguar_state::misc_control_w)
+void jaguar_state::misc_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%08X:misc_control_w(%02X)\n", space.device().safe_pcbase(), data);
 
@@ -633,13 +633,13 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::gpuctrl_r)
+uint32_t jaguar_state::gpuctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_gpu->ctrl_r(space, offset);
 }
 
 
-WRITE32_MEMBER(jaguar_state::gpuctrl_w)
+void jaguar_state::gpuctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_gpu->ctrl_w(space, offset, data, mem_mask);
 }
@@ -652,13 +652,13 @@ WRITE32_MEMBER(jaguar_state::gpuctrl_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::dspctrl_r)
+uint32_t jaguar_state::dspctrl_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return m_dsp->ctrl_r(space, offset);
 }
 
 
-WRITE32_MEMBER(jaguar_state::dspctrl_w)
+void jaguar_state::dspctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_dsp->ctrl_w(space, offset, data, mem_mask);
 }
@@ -673,7 +673,7 @@ WRITE32_MEMBER(jaguar_state::dspctrl_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::joystick_r)
+uint32_t jaguar_state::joystick_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint16_t joystick_result = 0xfffe;
 	uint16_t joybuts_result = 0xffef;
@@ -713,7 +713,7 @@ READ32_MEMBER(jaguar_state::joystick_r)
 	return (joystick_result << 16) | joybuts_result;
 }
 
-WRITE32_MEMBER(jaguar_state::joystick_w)
+void jaguar_state::joystick_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/*
 	 *   16        12         8         4         0
@@ -771,7 +771,7 @@ WRITE32_MEMBER(jaguar_state::joystick_w)
  *
  *************************************/
 
-WRITE32_MEMBER(jaguar_state::latch_w)
+void jaguar_state::latch_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("%08X:latch_w(%X)\n", space.device().safe_pcbase(), data);
 
@@ -794,7 +794,7 @@ WRITE32_MEMBER(jaguar_state::latch_w)
  *
  *************************************/
 
-READ32_MEMBER(jaguar_state::eeprom_data_r)
+uint32_t jaguar_state::eeprom_data_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_is_r3000)
 		return m_nvram[offset] | 0xffffff00;
@@ -803,13 +803,13 @@ READ32_MEMBER(jaguar_state::eeprom_data_r)
 }
 
 
-WRITE32_MEMBER(jaguar_state::eeprom_enable_w)
+void jaguar_state::eeprom_enable_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	m_eeprom_enable = true;
 }
 
 
-WRITE32_MEMBER(jaguar_state::eeprom_data_w)
+void jaguar_state::eeprom_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  if (m_eeprom_enable)
 	{
@@ -853,7 +853,7 @@ WRITE32_MEMBER(jaguar_state::eeprom_data_w)
 */
 
 
-WRITE32_MEMBER(jaguar_state::gpu_jump_w)
+void jaguar_state::gpu_jump_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	/* update the data in memory */
 	COMBINE_DATA(m_gpu_jump_address);
@@ -868,7 +868,7 @@ WRITE32_MEMBER(jaguar_state::gpu_jump_w)
 }
 
 
-READ32_MEMBER(jaguar_state::gpu_jump_r)
+uint32_t jaguar_state::gpu_jump_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
@@ -909,7 +909,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 #if ENABLE_SPEEDUP_HACKS
 
 
-READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
+uint32_t jaguar_state::cojagr3k_main_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -957,7 +957,7 @@ READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 #if ENABLE_SPEEDUP_HACKS
 
 
-READ32_MEMBER(jaguar_state::main_gpu_wait_r)
+uint32_t jaguar_state::main_gpu_wait_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_gpu_command_pending)
 		space.device().execute().spin_until_interrupt();
@@ -983,7 +983,7 @@ READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 
 #if ENABLE_SPEEDUP_HACKS
 
-WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
+void jaguar_state::area51_main_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -1017,7 +1017,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
     against 0 must handle that explicitly.
 */
 
-WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
+void jaguar_state::area51mx_main_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint64_t curcycles = m_maincpu->total_cycles();
 
@@ -1059,50 +1059,50 @@ WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 // surely these should be 16-bit natively if the standard Jaguar is driven by a plain 68k?
 // all these trampolines are not good for performance ;-)
 
-READ16_MEMBER(jaguar_state::gpuctrl_r16){ if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpuctrl_w16){ if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::blitter_r16){ if (!(offset&1)) { return blitter_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return blitter_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::blitter_w16){ if (!(offset&1)) { blitter_w(space, offset>>1, data << 16, mem_mask << 16); } else { blitter_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::serial_r16){ if (!(offset&1)) { return serial_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return serial_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::serial_w16){ if (!(offset&1)) { serial_w(space, offset>>1, data << 16, mem_mask << 16); } else { serial_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::dspctrl_r16){ if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::dspctrl_w16){ if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::eeprom_cs16){ if (!(offset&1)) { return eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_cs(space, offset>>1, mem_mask); } }
-READ16_MEMBER(jaguar_state::eeprom_clk16){ if (!(offset&1)) { return eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_clk(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::eeprom_w16){ if (!(offset&1)) { eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { eeprom_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::joystick_r16){ if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::joystick_w16){ if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpuctrl_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return gpuctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpuctrl_r(space, offset>>1, mem_mask); } }
+void jaguar_state::gpuctrl_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpuctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpuctrl_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::blitter_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return blitter_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return blitter_r(space, offset>>1, mem_mask); } }
+void jaguar_state::blitter_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { blitter_w(space, offset>>1, data << 16, mem_mask << 16); } else { blitter_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::serial_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return serial_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return serial_r(space, offset>>1, mem_mask); } }
+void jaguar_state::serial_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { serial_w(space, offset>>1, data << 16, mem_mask << 16); } else { serial_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::dspctrl_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return dspctrl_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dspctrl_r(space, offset>>1, mem_mask); } }
+void jaguar_state::dspctrl_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dspctrl_w(space, offset>>1, data << 16, mem_mask << 16); } else { dspctrl_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::eeprom_cs16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return eeprom_cs(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_cs(space, offset>>1, mem_mask); } }
+uint16_t jaguar_state::eeprom_clk16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return eeprom_clk(space, offset>>1, mem_mask<<16) >> 16;  } else { return eeprom_clk(space, offset>>1, mem_mask); } }
+void jaguar_state::eeprom_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { eeprom_w(space, offset>>1, data << 16, mem_mask << 16); } else { eeprom_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::joystick_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return joystick_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return joystick_r(space, offset>>1, mem_mask); } }
+void jaguar_state::joystick_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { joystick_w(space, offset>>1, data << 16, mem_mask << 16); } else { joystick_w(space, offset>>1, data, mem_mask); } }
 
-READ32_MEMBER(jaguar_state::shared_ram_r){ return m_shared_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::shared_ram_w){ COMBINE_DATA(&m_shared_ram[offset]); }
-READ32_MEMBER(jaguar_state::rom_base_r){ return m_rom_base[offset]; }
-WRITE32_MEMBER(jaguar_state::rom_base_w){ /*ROM!*/ }
-READ32_MEMBER(jaguar_state::cart_base_r){ return m_cart_base[offset]; }
-WRITE32_MEMBER(jaguar_state::cart_base_w){ /*ROM!*/ }
-READ32_MEMBER(jaguar_state::wave_rom_r){ return m_wave_rom[offset]; }
-WRITE32_MEMBER(jaguar_state::wave_rom_w){ /*ROM!*/ }
-READ32_MEMBER(jaguar_state::dsp_ram_r){ return m_dsp_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::dsp_ram_w){ COMBINE_DATA(&m_dsp_ram[offset]); }
-READ32_MEMBER(jaguar_state::gpu_clut_r){ return m_gpu_clut[offset]; }
-WRITE32_MEMBER(jaguar_state::gpu_clut_w){ COMBINE_DATA(&m_gpu_clut[offset]); }
-READ32_MEMBER(jaguar_state::gpu_ram_r){ return m_gpu_ram[offset]; }
-WRITE32_MEMBER(jaguar_state::gpu_ram_w){ COMBINE_DATA(&m_gpu_ram[offset]); }
+uint32_t jaguar_state::shared_ram_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_shared_ram[offset]; }
+void jaguar_state::shared_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_shared_ram[offset]); }
+uint32_t jaguar_state::rom_base_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_rom_base[offset]; }
+void jaguar_state::rom_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ /*ROM!*/ }
+uint32_t jaguar_state::cart_base_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_cart_base[offset]; }
+void jaguar_state::cart_base_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ /*ROM!*/ }
+uint32_t jaguar_state::wave_rom_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_wave_rom[offset]; }
+void jaguar_state::wave_rom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ /*ROM!*/ }
+uint32_t jaguar_state::dsp_ram_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_dsp_ram[offset]; }
+void jaguar_state::dsp_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dsp_ram[offset]); }
+uint32_t jaguar_state::gpu_clut_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_gpu_clut[offset]; }
+void jaguar_state::gpu_clut_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_clut[offset]); }
+uint32_t jaguar_state::gpu_ram_r(address_space &space, offs_t offset, uint32_t mem_mask){ return m_gpu_ram[offset]; }
+void jaguar_state::gpu_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_gpu_ram[offset]); }
 
-READ16_MEMBER(jaguar_state::shared_ram_r16){ if (!(offset&1)) { return shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return shared_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::shared_ram_w16){ if (!(offset&1)) { shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { shared_ram_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::rom_base_r16){ if (!(offset&1)) { return rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return rom_base_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::rom_base_w16){ if (!(offset&1)) { rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { rom_base_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::cart_base_r16){ if (!(offset&1)) { return cart_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return cart_base_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::cart_base_w16){ if (!(offset&1)) { cart_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { cart_base_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::wave_rom_r16){ if (!(offset&1)) { return wave_rom_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return wave_rom_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::wave_rom_w16){ if (!(offset&1)) { wave_rom_w(space, offset>>1, data << 16, mem_mask << 16); } else { wave_rom_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::shared_ram_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return shared_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return shared_ram_r(space, offset>>1, mem_mask); } }
+void jaguar_state::shared_ram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { shared_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { shared_ram_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::rom_base_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return rom_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return rom_base_r(space, offset>>1, mem_mask); } }
+void jaguar_state::rom_base_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { rom_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { rom_base_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::cart_base_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return cart_base_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return cart_base_r(space, offset>>1, mem_mask); } }
+void jaguar_state::cart_base_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { cart_base_w(space, offset>>1, data << 16, mem_mask << 16); } else { cart_base_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::wave_rom_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return wave_rom_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return wave_rom_r(space, offset>>1, mem_mask); } }
+void jaguar_state::wave_rom_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { wave_rom_w(space, offset>>1, data << 16, mem_mask << 16); } else { wave_rom_w(space, offset>>1, data, mem_mask); } }
 
-READ16_MEMBER(jaguar_state::dsp_ram_r16){ if (!(offset&1)) { return dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dsp_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::dsp_ram_w16){ if (!(offset&1)) { dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { dsp_ram_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::gpu_clut_r16){ if (!(offset&1)) { return gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_clut_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpu_clut_w16){ if (!(offset&1)) { gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_clut_w(space, offset>>1, data, mem_mask); } }
-READ16_MEMBER(jaguar_state::gpu_ram_r16){ if (!(offset&1)) { return gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_ram_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::gpu_ram_w16){ if (!(offset&1)) { gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_ram_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::dsp_ram_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return dsp_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return dsp_ram_r(space, offset>>1, mem_mask); } }
+void jaguar_state::dsp_ram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { dsp_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { dsp_ram_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpu_clut_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return gpu_clut_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_clut_r(space, offset>>1, mem_mask); } }
+void jaguar_state::gpu_clut_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpu_clut_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_clut_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::gpu_ram_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return gpu_ram_r(space, offset>>1, mem_mask); } }
+void jaguar_state::gpu_ram_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { gpu_ram_w(space, offset>>1, data, mem_mask); } }
 
 static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, jaguar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
@@ -1192,10 +1192,10 @@ TODO: this needs to be device-ized, of course ...
 
 */
 
-READ16_MEMBER(jaguar_state::butch_regs_r16){ if (!(offset&1)) { return butch_regs_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return butch_regs_r(space, offset>>1, mem_mask); } }
-WRITE16_MEMBER(jaguar_state::butch_regs_w16){ if (!(offset&1)) { butch_regs_w(space, offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(space, offset>>1, data, mem_mask); } }
+uint16_t jaguar_state::butch_regs_r16(address_space &space, offs_t offset, uint16_t mem_mask){ if (!(offset&1)) { return butch_regs_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return butch_regs_r(space, offset>>1, mem_mask); } }
+void jaguar_state::butch_regs_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { butch_regs_w(space, offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(space, offset>>1, data, mem_mask); } }
 
-READ32_MEMBER(jaguar_state::butch_regs_r)
+uint32_t jaguar_state::butch_regs_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch(offset*4)
 	{
@@ -1207,7 +1207,7 @@ READ32_MEMBER(jaguar_state::butch_regs_r)
 	return m_butch_regs[offset];
 }
 
-WRITE32_MEMBER(jaguar_state::butch_regs_w)
+void jaguar_state::butch_regs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_butch_regs[offset]);
 

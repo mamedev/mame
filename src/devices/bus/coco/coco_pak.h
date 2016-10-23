@@ -56,7 +56,7 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_reset() override;
-		virtual DECLARE_WRITE8_MEMBER(write) override;
+		virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 private:
 		void banked_pak_set_bank(uint32_t bank);
 };

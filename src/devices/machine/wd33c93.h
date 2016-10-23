@@ -58,8 +58,8 @@ public:
 
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<wd33c93_device &>(device).m_irq_cb.set_callback(object); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void dma_read_data( int bytes, uint8_t *pData );
 	void dma_write_data(int bytes, uint8_t *pData);

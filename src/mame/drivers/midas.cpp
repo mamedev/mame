@@ -72,14 +72,14 @@ public:
 		m_zoomram(*this, "zoomtable")
 		{ }
 
-	DECLARE_READ16_MEMBER(ret_ffff);
-	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
-	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
-	DECLARE_READ16_MEMBER(hammer_sensor_r);
-	DECLARE_WRITE16_MEMBER(hammer_coin_w);
-	DECLARE_WRITE16_MEMBER(hammer_motor_w);
-	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
-	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
+	uint16_t ret_ffff(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void midas_gfxregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void livequiz_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hammer_sensor_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void hammer_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void hammer_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void midas_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void midas_zoomtable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_livequiz();
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -120,7 +120,7 @@ uint32_t midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-WRITE16_MEMBER(midas_state::midas_eeprom_w)
+void midas_state::midas_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -135,12 +135,12 @@ WRITE16_MEMBER(midas_state::midas_eeprom_w)
 	}
 }
 
-READ16_MEMBER(midas_state::ret_ffff)
+uint16_t midas_state::ret_ffff(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0xffff;
 }
 
-WRITE16_MEMBER(midas_state::midas_gfxregs_w)
+void midas_state::midas_gfxregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -158,7 +158,7 @@ WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 	}
 }
 
-WRITE16_MEMBER(midas_state::midas_zoomtable_w)
+void midas_state::midas_zoomtable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_zoomram[offset]);
 	uint8_t *rgn          =   memregion("zoomy")->base();
@@ -174,7 +174,7 @@ WRITE16_MEMBER(midas_state::midas_zoomtable_w)
                                        Live Quiz Show
 ***************************************************************************************/
 
-WRITE16_MEMBER(midas_state::livequiz_coin_w)
+void midas_state::livequiz_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -222,7 +222,7 @@ ADDRESS_MAP_END
                                           Hammer
 ***************************************************************************************/
 
-READ16_MEMBER(midas_state::hammer_sensor_r)
+uint16_t midas_state::hammer_sensor_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (ioport("HAMMER")->read() & 0x80)
 		return 0xffff;
@@ -230,7 +230,7 @@ READ16_MEMBER(midas_state::hammer_sensor_r)
 	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
 }
 
-WRITE16_MEMBER(midas_state::hammer_coin_w)
+void midas_state::hammer_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -242,7 +242,7 @@ WRITE16_MEMBER(midas_state::hammer_coin_w)
 #endif
 }
 
-WRITE16_MEMBER(midas_state::hammer_motor_w)
+void midas_state::hammer_motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{

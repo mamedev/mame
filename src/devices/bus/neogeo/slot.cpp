@@ -343,7 +343,7 @@ std::string neogeo_cart_slot_device::get_default_card_software()
  rom_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::rom_r)
+uint16_t neogeo_cart_slot_device::rom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->rom_r(space, offset, mem_mask);
@@ -355,7 +355,7 @@ READ16_MEMBER(neogeo_cart_slot_device::rom_r)
  write_banksel
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::banksel_w)
+void neogeo_cart_slot_device::banksel_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->banksel_w(space, offset, data, mem_mask);
@@ -365,7 +365,7 @@ WRITE16_MEMBER(neogeo_cart_slot_device::banksel_w)
  ram_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::ram_r)
+uint16_t neogeo_cart_slot_device::ram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->ram_r(space, offset, mem_mask);
@@ -377,7 +377,7 @@ READ16_MEMBER(neogeo_cart_slot_device::ram_r)
  ram_w
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::ram_w)
+void neogeo_cart_slot_device::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->ram_w(space, offset, data, mem_mask);
@@ -387,7 +387,7 @@ WRITE16_MEMBER(neogeo_cart_slot_device::ram_w)
  addon_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::addon_r)
+uint16_t neogeo_cart_slot_device::addon_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->addon_r(space, offset, mem_mask);
@@ -399,7 +399,7 @@ READ16_MEMBER(neogeo_cart_slot_device::addon_r)
  protection_r
  -------------------------------------------------*/
 
-READ16_MEMBER(neogeo_cart_slot_device::protection_r)
+uint16_t neogeo_cart_slot_device::protection_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->protection_r(space, offset, mem_mask);
@@ -411,7 +411,7 @@ READ16_MEMBER(neogeo_cart_slot_device::protection_r)
  protection_w
  -------------------------------------------------*/
 
-WRITE16_MEMBER(neogeo_cart_slot_device::protection_w)
+void neogeo_cart_slot_device::protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_cart)
 		m_cart->protection_w(space, offset, data, mem_mask);

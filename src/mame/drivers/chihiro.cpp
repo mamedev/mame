@@ -539,8 +539,8 @@ public:
 		dimm_board_memory(nullptr),
 		dimm_board_memory_size(0) { }
 
-	DECLARE_READ32_MEMBER(mediaboard_r);
-	DECLARE_WRITE32_MEMBER(mediaboard_w);
+	uint32_t mediaboard_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void mediaboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	virtual void machine_start() override;
 	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
@@ -1503,7 +1503,7 @@ uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 	return nullptr;
 }
 
-READ32_MEMBER(chihiro_state::mediaboard_r)
+uint32_t chihiro_state::mediaboard_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t r;
 
@@ -1524,7 +1524,7 @@ READ32_MEMBER(chihiro_state::mediaboard_r)
 	return r;
 }
 
-WRITE32_MEMBER(chihiro_state::mediaboard_w)
+void chihiro_state::mediaboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10

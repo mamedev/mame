@@ -116,24 +116,24 @@ void pandoras_state::video_start()
 
 ***************************************************************************/
 
-WRITE8_MEMBER(pandoras_state::pandoras_vram_w)
+void pandoras_state::pandoras_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_videoram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_cram_w)
+void pandoras_state::pandoras_cram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->mark_tile_dirty(offset);
 	m_colorram[offset] = data;
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
+void pandoras_state::pandoras_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_layer0->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
+void pandoras_state::pandoras_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipscreen = data;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

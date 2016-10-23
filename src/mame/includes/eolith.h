@@ -56,18 +56,18 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
 	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
 
-	DECLARE_READ32_MEMBER(eolith_custom_r);
-	DECLARE_WRITE32_MEMBER(systemcontrol_w);
-	DECLARE_WRITE32_MEMBER(sound_w);
-	DECLARE_READ32_MEMBER(hidctch3_pen1_r);
-	DECLARE_READ32_MEMBER(hidctch3_pen2_r);
-	DECLARE_WRITE32_MEMBER(eolith_vram_w);
-	DECLARE_READ32_MEMBER(eolith_vram_r);
-	DECLARE_READ8_MEMBER(sound_cmd_r);
-	DECLARE_WRITE8_MEMBER(sound_p1_w);
-	DECLARE_READ8_MEMBER(qs1000_p1_r);
-	DECLARE_WRITE8_MEMBER(qs1000_p1_w);
-	DECLARE_WRITE8_MEMBER(soundcpu_to_qs1000);
+	uint32_t eolith_custom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void systemcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void sound_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t hidctch3_pen1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint32_t hidctch3_pen2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void eolith_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t eolith_vram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	uint8_t sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void sound_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t qs1000_p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void qs1000_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void soundcpu_to_qs1000(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_eolith();
 	void init_landbrk();

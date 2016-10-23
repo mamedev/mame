@@ -36,8 +36,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER( aha1542_r );
-	DECLARE_WRITE8_MEMBER( aha1542_w );
+	uint8_t aha1542_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void aha1542_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	// device-level overrides

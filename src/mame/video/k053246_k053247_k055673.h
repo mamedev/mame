@@ -80,14 +80,14 @@ public:
 
 	void clear_all();
 
-	DECLARE_READ16_MEMBER( k055673_rom_word_r );
-	DECLARE_READ16_MEMBER( k055673_5bpp_rom_word_r );
+	uint16_t k055673_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t k055673_5bpp_rom_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ8_MEMBER( k053247_r );
-	DECLARE_WRITE8_MEMBER( k053247_w );
-	DECLARE_READ16_MEMBER( k053247_word_r );
-	DECLARE_WRITE16_MEMBER( k053247_word_w );
-	DECLARE_WRITE16_MEMBER( k055673_reg_word_w ); // "OBJSET2" registers
+	uint8_t k053247_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k053247_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t k053247_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void k053247_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void k055673_reg_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff); // "OBJSET2" registers
 
 	void k053247_sprites_draw( bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void k053247_sprites_draw( bitmap_rgb32 &bitmap,const rectangle &cliprect);
@@ -97,16 +97,16 @@ public:
 	int k053247_get_dx( void );
 	int k053247_get_dy( void );
 
-	DECLARE_READ8_MEMBER( k053246_r );
-	DECLARE_WRITE8_MEMBER( k053246_w );
-	DECLARE_READ16_MEMBER( k053246_word_r );
-	DECLARE_WRITE16_MEMBER( k053246_word_w );
+	uint8_t k053246_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void k053246_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t k053246_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void k053246_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void k053246_set_objcha_line( int state);
 	int k053246_is_irq_enabled(void);
 	int k053246_read_register( int regnum);
 
-	DECLARE_READ16_MEMBER( k053246_reg_word_r );    // OBJSET1
+	uint16_t k053246_reg_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);    // OBJSET1
 
 	std::unique_ptr<uint16_t[]>    m_ram;
 

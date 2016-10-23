@@ -46,13 +46,13 @@ PALETTE_INIT_MEMBER(mustache_state, mustache)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::videoram_w)
+void mustache_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_MEMBER(mustache_state::video_control_w)
+void mustache_state::video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (flip_screen() != (data & 0x01))
 	{
@@ -69,7 +69,7 @@ WRITE8_MEMBER(mustache_state::video_control_w)
 	}
 }
 
-WRITE8_MEMBER(mustache_state::scroll_w)
+void mustache_state::scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tilemap->set_scrollx(0, 0x100 - data);
 	m_bg_tilemap->set_scrollx(1, 0x100 - data);

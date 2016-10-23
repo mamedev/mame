@@ -257,12 +257,12 @@ static ADDRESS_MAP_START( jzth_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x710000, 0x710001) AM_READWRITE(bl_710000_r,bl_710000_w) // protection, will erase the VDP address causing writes to 0 unless this returns 0xe
 ADDRESS_MAP_END
 
-READ16_MEMBER(md_boot_state::puckpkmna_70001c_r)
+uint16_t md_boot_state::puckpkmna_70001c_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0e;
 }
 
-READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
+uint16_t md_boot_state::puckpkmna_4b2476_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (!strcmp(machine().system().name, "puckpkmnb")) return 0x3100;
 

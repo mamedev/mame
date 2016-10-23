@@ -62,7 +62,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
  *
  *************************************/
 
-READ8_MEMBER(mexico86_state::kiki_ym2203_r)
+uint8_t mexico86_state::kiki_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t result = m_ymsnd->read(space, offset);
 
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
+void mexico86_state::mexico86_sub_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/

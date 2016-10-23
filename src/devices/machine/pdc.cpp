@@ -376,30 +376,30 @@ WRITE_LINE_MEMBER(pdc_device::i8237_eop_w)
 	if(state) m_dma8237->dreq1_w(0);
 }
 
-READ8_MEMBER(pdc_device::i8237_dma_mem_r)
+uint8_t pdc_device::i8237_dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_pdccpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER(pdc_device::i8237_dma_mem_w)
+void pdc_device::i8237_dma_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pdccpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-READ8_MEMBER(pdc_device::i8237_fdc_dma_r)
+uint8_t pdc_device::i8237_fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = m_fdc->dma_r();
 	if(TRACE_PDC_DMA) logerror("PDC: 8237 DMA CHANNEL 0 READ ADDRESS: %08X, DATA: %02X\n", offset, ret );
 	return ret;
 }
 
-WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
+void pdc_device::i8237_fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(TRACE_PDC_DMA) logerror("PDC: 8237 DMA CHANNEL 0 WRITE ADDRESS: %08X, DATA: %02X\n", offset, data );
 	m_fdc->dma_w(data);
 }
 
-READ8_MEMBER(pdc_device::m68k_dma_r)
+uint8_t pdc_device::m68k_dma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t address;
 	uint8_t data;
@@ -410,7 +410,7 @@ READ8_MEMBER(pdc_device::m68k_dma_r)
 	return data;
 }
 
-WRITE8_MEMBER(pdc_device::m68k_dma_w)
+void pdc_device::m68k_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(TRACE_PDC_DMA) logerror("PDC: 8237 DMA CHANNEL 1 WRITE ADDRESS: %08X, DATA: %02X\n", fdd_68k_dma_address, data );
 	m_m68k_w_cb(data);
@@ -426,7 +426,7 @@ WRITE_LINE_MEMBER(pdc_device::fdc_irq)
 {
 	b_fdc_irq = state != 0;
 }
-READ8_MEMBER(pdc_device::p0_7_r)
+uint8_t pdc_device::p0_7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -454,7 +454,7 @@ READ8_MEMBER(pdc_device::p0_7_r)
 	}
 }
 
-WRITE8_MEMBER(pdc_device::p0_7_w)
+void pdc_device::p0_7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -474,7 +474,7 @@ WRITE8_MEMBER(pdc_device::p0_7_w)
 	}
 }
 
-READ8_MEMBER(pdc_device::fdd_68k_r)
+uint8_t pdc_device::fdd_68k_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t address = offset + 0x21;
 	switch(address)
@@ -484,7 +484,7 @@ READ8_MEMBER(pdc_device::fdd_68k_r)
 			return 0;
 	}
 }
-WRITE8_MEMBER(pdc_device::fdd_68k_w)
+void pdc_device::fdd_68k_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t address = offset + 0x21;
 	switch(address)
@@ -530,21 +530,21 @@ WRITE8_MEMBER(pdc_device::fdd_68k_w)
 	}
 }
 
-WRITE8_MEMBER(pdc_device::p38_w)
+void pdc_device::p38_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if(TRACE_PDC_CMD) logerror("PDC: Port 0x38 WRITE: %i\n", data);
 	//reg_p38 |= data;
 	reg_p38 = data;
 }
 
-READ8_MEMBER(pdc_device::p38_r)
+uint8_t pdc_device::p38_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	reg_p38 ^= 0x20; /* Invert bit 5 (32) */
 	if(TRACE_PDC_CMD) logerror("PDC: Port 0x38 READ: %02X, PC: %X\n", reg_p38, space.device().safe_pc());
 	return reg_p38;
 }
 
-READ8_MEMBER(pdc_device::p39_r)
+uint8_t pdc_device::p39_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 1;
 	if(b_fdc_irq) data |= 8; // Set bit 3
@@ -552,7 +552,7 @@ READ8_MEMBER(pdc_device::p39_r)
 	return data;
 }
 
-WRITE8_MEMBER(pdc_device::p50_5f_w)
+void pdc_device::p50_5f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t address = 0x50 + offset;
 	switch(address)

@@ -1732,7 +1732,7 @@ inline uint16_t *cps_state::cps1_base( int offset, int boundary )
 
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_a_w)
+void cps_state::cps1_cps_a_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_a_regs[offset]);
 
@@ -1758,7 +1758,7 @@ WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 }
 
 
-READ16_MEMBER(cps_state::cps1_cps_b_r)
+uint16_t cps_state::cps1_cps_b_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
@@ -1800,7 +1800,7 @@ READ16_MEMBER(cps_state::cps1_cps_b_r)
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_cps_b_w)
+void cps_state::cps1_cps_b_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
@@ -2052,7 +2052,7 @@ void cps_state::cps1_get_video_base()
 }
 
 
-WRITE16_MEMBER(cps_state::cps1_gfxram_w)
+void cps_state::cps1_gfxram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int page = (offset >> 7) & 0x3c0;
 	COMBINE_DATA(&m_gfxram[offset]);
@@ -2606,13 +2606,13 @@ void cps_state::cps1_render_sprites( screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
+void cps_state::cps2_objram_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		m_objram_bank = data & 1;
 }
 
-READ16_MEMBER(cps_state::cps2_objram1_r)
+uint16_t cps_state::cps2_objram1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		return m_objram2[offset];
@@ -2620,7 +2620,7 @@ READ16_MEMBER(cps_state::cps2_objram1_r)
 		return m_objram1[offset];
 }
 
-READ16_MEMBER(cps_state::cps2_objram2_r)
+uint16_t cps_state::cps2_objram2_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		return m_objram1[offset];
@@ -2628,7 +2628,7 @@ READ16_MEMBER(cps_state::cps2_objram2_r)
 		return m_objram2[offset];
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram1_w)
+void cps_state::cps2_objram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram2[offset]);
@@ -2636,7 +2636,7 @@ WRITE16_MEMBER(cps_state::cps2_objram1_w)
 		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_MEMBER(cps_state::cps2_objram2_w)
+void cps_state::cps2_objram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (m_objram_bank & 1)
 		COMBINE_DATA(&m_objram1[offset]);

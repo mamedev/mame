@@ -35,7 +35,7 @@ INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
 }
 
 
-WRITE8_MEMBER(pooyan_state::irq_enable_w)
+void pooyan_state::irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)

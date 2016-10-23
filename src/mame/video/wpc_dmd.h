@@ -20,14 +20,14 @@ public:
 
 	DECLARE_ADDRESS_MAP(registers, 8);
 
-	DECLARE_WRITE8_MEMBER(bank0_w);
-	DECLARE_WRITE8_MEMBER(bank2_w);
-	DECLARE_WRITE8_MEMBER(bank4_w);
-	DECLARE_WRITE8_MEMBER(bank6_w);
-	DECLARE_WRITE8_MEMBER(bank8_w);
-	DECLARE_WRITE8_MEMBER(banka_w);
-	DECLARE_WRITE8_MEMBER(visible_page_w);
-	DECLARE_WRITE8_MEMBER(firq_scanline_w);
+	void bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bank8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banka_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void visible_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void firq_scanline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

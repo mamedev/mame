@@ -25,24 +25,24 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
-	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
-	DECLARE_READ8_MEMBER(s903_mux_port_r);
-	DECLARE_WRITE8_MEMBER(s903_mux_w);
-	DECLARE_READ8_MEMBER(s905_mux_port_r);
-	DECLARE_WRITE8_MEMBER(s905_mux_w);
-	DECLARE_READ8_MEMBER(pia0_ain_r);
-	DECLARE_READ8_MEMBER(pia0_bin_r);
-	DECLARE_WRITE8_MEMBER(pia0_aout_w);
-	DECLARE_WRITE8_MEMBER(pia0_bout_w);
+	void calomega_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void calomega_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t s903_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void s903_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t s905_mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void s905_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t pia0_ain_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia0_bin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia0_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia0_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_READ8_MEMBER(pia1_ain_r);
-	DECLARE_READ8_MEMBER(pia1_bin_r);
-	DECLARE_WRITE8_MEMBER(pia1_aout_w);
-	DECLARE_WRITE8_MEMBER(pia1_bout_w);
-	DECLARE_WRITE8_MEMBER(lamps_903a_w);
-	DECLARE_WRITE8_MEMBER(lamps_903b_w);
-	DECLARE_WRITE8_MEMBER(lamps_905_w);
+	uint8_t pia1_ain_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t pia1_bin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void pia1_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void pia1_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_903a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_903b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void lamps_905_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);

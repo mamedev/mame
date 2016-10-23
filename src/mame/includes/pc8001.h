@@ -60,12 +60,12 @@ public:
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE8_MEMBER( port10_w );
-	DECLARE_WRITE8_MEMBER( port30_w );
-	DECLARE_READ8_MEMBER( port40_r );
-	DECLARE_WRITE8_MEMBER( port40_w );
+	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port40_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
-	DECLARE_READ8_MEMBER( dma_mem_r );
+	uint8_t dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* video state */
 	int m_width80;
@@ -89,7 +89,7 @@ public:
 
 	required_memory_region m_kanji_rom;
 
-	DECLARE_WRITE8_MEMBER( port31_w );
+	void port31_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
 #endif

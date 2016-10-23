@@ -32,33 +32,33 @@ INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_1)
 }
 
 
-WRITE8_MEMBER(ddribble_state::ddribble_bankswitch_w)
+void ddribble_state::ddribble_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank1")->set_entry(data & 0x07);
 }
 
 
-READ8_MEMBER(ddribble_state::ddribble_sharedram_r)
+uint8_t ddribble_state::ddribble_sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_sharedram[offset];
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_sharedram_w)
+void ddribble_state::ddribble_sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sharedram[offset] = data;
 }
 
-READ8_MEMBER(ddribble_state::ddribble_snd_sharedram_r)
+uint8_t ddribble_state::ddribble_snd_sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_snd_sharedram[offset];
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_snd_sharedram_w)
+void ddribble_state::ddribble_snd_sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_snd_sharedram[offset] = data;
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
+void ddribble_state::ddribble_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* b4-b7: unused */
 	/* b2-b3: unknown */
@@ -68,7 +68,7 @@ WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 	machine().bookkeeping().coin_counter_w(1,(data >> 1) & 0x01);
 }
 
-READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
+uint8_t ddribble_state::ddribble_vlm5030_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand(); /* patch */
 	/* FIXME: remove ? */
@@ -78,7 +78,7 @@ READ8_MEMBER(ddribble_state::ddribble_vlm5030_busy_r)
 #endif
 }
 
-WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
+void ddribble_state::ddribble_vlm5030_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* b7 : vlm data bus OE   */
 

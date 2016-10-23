@@ -228,10 +228,10 @@ ROM_END
                                 BANG
   ============================================================================*/
 
-READ16_MEMBER(bang_state::p1_gun_x){return (m_light0_x->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(bang_state::p1_gun_y){return (m_light0_y->read() * 240 / 0x100) - 4;}
-READ16_MEMBER(bang_state::p2_gun_x){return (m_light1_x->read() * 320 / 0x100) + 1;}
-READ16_MEMBER(bang_state::p2_gun_y){return (m_light1_y->read() * 240 / 0x100) - 4;}
+uint16_t bang_state::p1_gun_x(address_space &space, offs_t offset, uint16_t mem_mask){return (m_light0_x->read() * 320 / 0x100) + 1;}
+uint16_t bang_state::p1_gun_y(address_space &space, offs_t offset, uint16_t mem_mask){return (m_light0_y->read() * 240 / 0x100) - 4;}
+uint16_t bang_state::p2_gun_x(address_space &space, offs_t offset, uint16_t mem_mask){return (m_light1_x->read() * 320 / 0x100) + 1;}
+uint16_t bang_state::p2_gun_y(address_space &space, offs_t offset, uint16_t mem_mask){return (m_light1_y->read() * 240 / 0x100) - 4;}
 
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, bang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                     /* ROM */
@@ -1463,7 +1463,7 @@ ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this,
 ROM_END
 
 
-READ16_MEMBER(gaelco2_state::maniacsqa_prot_r)
+uint16_t gaelco2_state::maniacsqa_prot_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -1505,7 +1505,7 @@ void gaelco2_state::init_maniacsqa()
 
 
 /* the game expects this value each frame to know that the DS5002FP is alive */
-READ16_MEMBER(gaelco2_state::dallas_kludge_r)
+uint16_t gaelco2_state::dallas_kludge_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return 0x0200;
 }

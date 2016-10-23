@@ -476,7 +476,7 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
+void galaxian_state::galaxian_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *videoram = m_videoram;
 	/* update any video up to the current scanline */
@@ -489,7 +489,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_videoram_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::galaxian_objram_w)
+void galaxian_state::galaxian_objram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();
@@ -639,7 +639,7 @@ void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
+void galaxian_state::galaxian_flip_screen_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
@@ -656,7 +656,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_x_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
+void galaxian_state::galaxian_flip_screen_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
@@ -668,7 +668,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_y_w)
 	}
 }
 
-WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
+void galaxian_state::galaxian_flip_screen_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	galaxian_flip_screen_x_w(space, offset, data);
 	galaxian_flip_screen_y_w(space, offset, data);
@@ -682,7 +682,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_flip_screen_xy_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
+void galaxian_state::galaxian_stars_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
 	{
@@ -702,7 +702,7 @@ WRITE8_MEMBER(galaxian_state::galaxian_stars_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
+void galaxian_state::scramble_background_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_enable ^ data) & 0x01)
 	{
@@ -714,7 +714,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_enable_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
+void galaxian_state::scramble_background_red_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_red ^ data) & 0x01)
 	{
@@ -726,7 +726,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_red_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
+void galaxian_state::scramble_background_green_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_green ^ data) & 0x01)
 	{
@@ -738,7 +738,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_green_w)
 }
 
 
-WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
+void galaxian_state::scramble_background_blue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_background_blue ^ data) & 0x01)
 	{
@@ -757,7 +757,7 @@ WRITE8_MEMBER(galaxian_state::scramble_background_blue_w)
  *
  *************************************/
 
-WRITE8_MEMBER(galaxian_state::galaxian_gfxbank_w)
+void galaxian_state::galaxian_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_gfxbank[offset] != data)
 	{

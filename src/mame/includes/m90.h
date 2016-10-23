@@ -33,11 +33,11 @@ public:
 	tilemap_t *m_pf2_wide_layer;
 	uint8_t m_last_pf1;
 	uint8_t m_last_pf2;
-	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
-	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
-	DECLARE_WRITE16_MEMBER(m90_video_control_w);
-	DECLARE_WRITE16_MEMBER(m90_video_w);
+	void m90_coincounter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void quizf1_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void dynablsb_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void m90_video_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void m90_video_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_bomblord();
 	void init_quizf1();
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);

@@ -62,19 +62,19 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_READ8_MEMBER( out_r );
-	DECLARE_WRITE8_MEMBER( inp_w );
-	DECLARE_WRITE8_MEMBER( _4b_w );
-	DECLARE_WRITE8_MEMBER( _9b_w );
-	DECLARE_WRITE8_MEMBER( _8a_w );
-	DECLARE_READ8_MEMBER( _9a_r );
+	uint8_t out_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void inp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _9b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void _8a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t _9a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
 
-	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);
-	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);
+	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
 

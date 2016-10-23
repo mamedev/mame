@@ -261,7 +261,7 @@ void wswan_sound_device::wswan_ch_set_freq( CHAN *ch, uint16_t freq )
 	ch->period = machine().sample_rate() / (3072000 / ((2048 - freq) << 5));
 }
 
-WRITE8_MEMBER( wswan_sound_device::port_w )
+void wswan_sound_device::port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_channel->update();
 

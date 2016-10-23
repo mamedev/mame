@@ -243,13 +243,13 @@ public:
 	required_ioport m_dsw;
 	required_ioport m_unk;
 
-	DECLARE_WRITE8_MEMBER(mux_w);
-	DECLARE_READ8_MEMBER(mux_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE8_MEMBER(sound_comm_w);
-	DECLARE_WRITE8_MEMBER(int_ack_w);
-	DECLARE_WRITE8_MEMBER(led_mux_data_w);
-	DECLARE_WRITE8_MEMBER(led_mux_select_w);
+	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sound_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void led_mux_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_kas89();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -277,7 +277,7 @@ void kas89_state::machine_reset()
 *  Input Ports Demux & Common Routines  *
 ****************************************/
 
-WRITE8_MEMBER(kas89_state::mux_w)
+void kas89_state::mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -289,7 +289,7 @@ WRITE8_MEMBER(kas89_state::mux_w)
 	m_mux_data = data;
 }
 
-READ8_MEMBER(kas89_state::mux_r)
+uint8_t kas89_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_mux_data)
 	{
@@ -324,7 +324,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_sound_nmi_cb)
 }
 
 
-WRITE8_MEMBER(kas89_state::control_w)
+void kas89_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -341,7 +341,7 @@ WRITE8_MEMBER(kas89_state::control_w)
 	machine().bookkeeping().coin_counter_w(1, (data ^ 0xff) & 0x02); /* Credits Out counter */
 }
 
-WRITE8_MEMBER(kas89_state::sound_comm_w)
+void kas89_state::sound_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  This port is used mainly for sound latch, but bit6 activates a
     sort of output port (maybe for a sign?)
@@ -381,7 +381,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 	}
 }
 
-WRITE8_MEMBER(kas89_state::int_ack_w)
+void kas89_state::int_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE );
 }
@@ -391,7 +391,7 @@ WRITE8_MEMBER(kas89_state::int_ack_w)
 *   Output Ports Demux & LEDs Support   *
 ****************************************/
 
-WRITE8_MEMBER(kas89_state::led_mux_data_w)
+void kas89_state::led_mux_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210
@@ -401,7 +401,7 @@ WRITE8_MEMBER(kas89_state::led_mux_data_w)
 	m_leds_mux_data = data;
 }
 
-WRITE8_MEMBER(kas89_state::led_mux_select_w)
+void kas89_state::led_mux_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*  - bits -
     7654 3210

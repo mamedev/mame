@@ -27,8 +27,8 @@ public:
 	{ }
 
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
+	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void mcs51_tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
 	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
@@ -41,7 +41,7 @@ public:
 
 
 
-WRITE8_MEMBER(piggypas_state::ctrl_w)
+void piggypas_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((m_ctrl ^ data) & m_ctrl & 0x04)
 		m_digit_idx = 0;
@@ -51,7 +51,7 @@ WRITE8_MEMBER(piggypas_state::ctrl_w)
 	m_ctrl = data;
 }
 
-WRITE8_MEMBER(piggypas_state::mcs51_tx_callback)
+void piggypas_state::mcs51_tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_digit_value(m_digit_idx++, BITSWAP8(data,7,6,4,3,2,1,0,5) & 0x7f);
 }

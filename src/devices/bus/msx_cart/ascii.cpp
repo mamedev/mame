@@ -72,7 +72,7 @@ void msx_cart_ascii8::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii8::read_cart)
+uint8_t msx_cart_ascii8::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -82,7 +82,7 @@ READ8_MEMBER(msx_cart_ascii8::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii8::write_cart)
+void msx_cart_ascii8::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x6000 && offset < 0x8000)
 	{
@@ -156,7 +156,7 @@ void msx_cart_ascii16::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii16::read_cart)
+uint8_t msx_cart_ascii16::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -166,7 +166,7 @@ READ8_MEMBER(msx_cart_ascii16::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii16::write_cart)
+void msx_cart_ascii16::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x6000 && offset < 0x6800)
 	{
@@ -272,7 +272,7 @@ void msx_cart_ascii8_sram::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii8_sram::read_cart)
+uint8_t msx_cart_ascii8_sram::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -287,7 +287,7 @@ READ8_MEMBER(msx_cart_ascii8_sram::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii8_sram::write_cart)
+void msx_cart_ascii8_sram::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x6000 && offset < 0x8000)
 	{
@@ -397,7 +397,7 @@ void msx_cart_ascii16_sram::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_ascii16_sram::read_cart)
+uint8_t msx_cart_ascii16_sram::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -419,7 +419,7 @@ READ8_MEMBER(msx_cart_ascii16_sram::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_ascii16_sram::write_cart)
+void msx_cart_ascii16_sram::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (offset >= 0x6000 && offset < 0x6800)
 	{
@@ -506,7 +506,7 @@ void msx_cart_msxwrite::initialize_cartridge()
 }
 
 
-READ8_MEMBER(msx_cart_msxwrite::read_cart)
+uint8_t msx_cart_msxwrite::read_cart(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if ( offset >= 0x4000 && offset < 0xC000 )
 	{
@@ -516,7 +516,7 @@ READ8_MEMBER(msx_cart_msxwrite::read_cart)
 }
 
 
-WRITE8_MEMBER(msx_cart_msxwrite::write_cart)
+void msx_cart_msxwrite::write_cart(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// The rom writes to 6fff and 7fff for banking, unknown whether
 	// other locations also trigger banking.

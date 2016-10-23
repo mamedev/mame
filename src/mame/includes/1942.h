@@ -37,18 +37,18 @@ public:
 	void create_palette();
 	DECLARE_PALETTE_INIT(1942);
 	DECLARE_PALETTE_INIT(1942p);
-	DECLARE_WRITE8_MEMBER(c1942p_palette_w);
+	void c1942p_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	DECLARE_WRITE8_MEMBER(c1942_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(c1942_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(c1942_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(c1942_palette_bank_w);
-	DECLARE_WRITE8_MEMBER(c1942_scroll_w);
-	DECLARE_WRITE8_MEMBER(c1942_c804_w);
-	DECLARE_WRITE8_MEMBER(c1942p_f600_w);
-	DECLARE_WRITE8_MEMBER(c1942p_soundlatch_w);
+	void c1942_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942_c804_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942p_f600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void c1942p_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_1942();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

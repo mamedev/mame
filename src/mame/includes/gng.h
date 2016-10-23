@@ -31,14 +31,14 @@ public:
 	uint8_t      m_scrollx[2];
 	uint8_t      m_scrolly[2];
 
-	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);
-	DECLARE_READ8_MEMBER(diamond_hack_r);
-	DECLARE_WRITE8_MEMBER(gng_fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(gng_bgvideoram_w);
-	DECLARE_WRITE8_MEMBER(gng_bgscrollx_w);
-	DECLARE_WRITE8_MEMBER(gng_bgscrolly_w);
-	DECLARE_WRITE8_MEMBER(gng_flipscreen_w);
+	void gng_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gng_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t diamond_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gng_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gng_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gng_bgscrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gng_bgscrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void gng_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_diamond();
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

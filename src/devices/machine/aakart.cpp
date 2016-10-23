@@ -162,14 +162,14 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 #include "debugger.h"
 
-READ8_MEMBER( aakart_device::read )
+uint8_t aakart_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_out_tx_cb(CLEAR_LINE);
 	//machine().debug_break();
 	return m_rx;
 }
 
-WRITE8_MEMBER( aakart_device::write )
+void aakart_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// if(m_new_command) printf("skip cmd %02x\n",data);
 

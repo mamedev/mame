@@ -15,15 +15,15 @@ public:
 	static void set_fg_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_fg_color_base = color; }
 	static void set_tx_colorbase(device_t &device, int color) { downcast<tc0180vcu_device &>(device).m_tx_color_base = color; }
 
-	DECLARE_READ8_MEMBER( get_fb_page );
-	DECLARE_WRITE8_MEMBER( set_fb_page );
-	DECLARE_READ8_MEMBER( get_videoctrl );
-	DECLARE_READ16_MEMBER( ctrl_r );
-	DECLARE_WRITE16_MEMBER( ctrl_w );
-	DECLARE_READ16_MEMBER( scroll_r );
-	DECLARE_WRITE16_MEMBER( scroll_w );
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	uint8_t get_fb_page(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void set_fb_page(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t get_videoctrl(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t ctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t scroll_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
 
 protected:

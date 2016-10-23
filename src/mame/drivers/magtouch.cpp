@@ -98,9 +98,9 @@ public:
 	required_memory_bank m_rombank;
 	required_ioport m_in0;
 
-	DECLARE_READ8_MEMBER(magtouch_io_r);
-	DECLARE_WRITE8_MEMBER(magtouch_io_w);
-	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
+	uint8_t magtouch_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void magtouch_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 };
 
@@ -110,7 +110,7 @@ public:
  *
  *************************************/
 
-READ8_MEMBER(magtouch_state::magtouch_io_r)
+uint8_t magtouch_state::magtouch_io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -121,7 +121,7 @@ READ8_MEMBER(magtouch_state::magtouch_io_r)
 	}
 }
 
-WRITE8_MEMBER(magtouch_state::magtouch_io_w)
+void magtouch_state::magtouch_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(offset)
 	{
@@ -160,7 +160,7 @@ static INPUT_PORTS_START( magtouch )
 INPUT_PORTS_END
 
 //TODO: use atmb device
-WRITE8_MEMBER( magtouch_state::dma8237_1_dack_w ){ m_isabus->dack_w(1, data); }
+void magtouch_state::dma8237_1_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_isabus->dack_w(1, data); }
 
 void magtouch_state::machine_start()
 {

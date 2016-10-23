@@ -37,37 +37,37 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_READ8_MEMBER(lreg_r);
-	DECLARE_WRITE8_MEMBER(lreg_w);
-	DECLARE_READ8_MEMBER(tbuf_r);
-	DECLARE_WRITE8_MEMBER(tbuf_w);
-	DECLARE_READ8_MEMBER(gpio_r);
-	DECLARE_WRITE8_MEMBER(gpio_w);
-	DECLARE_READ8_MEMBER(gpiodir_r);
-	DECLARE_WRITE8_MEMBER(gpiodir_w);
-	DECLARE_READ8_MEMBER(adc_r);
-	DECLARE_WRITE8_MEMBER(adc_w);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t lreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void lreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t tbuf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void tbuf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gpio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gpio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gpiodir_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gpiodir_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t adc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(irq_enable_r);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_READ8_MEMBER(maple_irqlevel_r);
-	DECLARE_WRITE8_MEMBER(maple_irqlevel_w);
-	DECLARE_READ8_MEMBER(irq_pending_r);
-	DECLARE_WRITE8_MEMBER(irq_pending_w);
+	uint8_t irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t maple_irqlevel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void maple_irqlevel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t irq_pending_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void irq_pending_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(jvs_r);
-	DECLARE_WRITE8_MEMBER(jvs_w);
-	DECLARE_WRITE8_MEMBER(jvs_dest_w);
-	DECLARE_READ8_MEMBER(jvs_status_r);
-	DECLARE_WRITE8_MEMBER(jvs_control_w);
-	DECLARE_READ8_MEMBER(jvs_sense_r);
-	DECLARE_WRITE8_MEMBER(jvs_lcr_w);
+	uint8_t jvs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jvs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void jvs_dest_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jvs_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jvs_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t jvs_sense_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void jvs_lcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ8_MEMBER(read_ff);
-	DECLARE_READ8_MEMBER(read_00);
-	DECLARE_READ8_MEMBER(read_78xx);
+	uint8_t read_ff(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t read_78xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 

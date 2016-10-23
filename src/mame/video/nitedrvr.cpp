@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/nitedrvr.h"
 
-WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
+void nitedrvr_state::nitedrvr_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);

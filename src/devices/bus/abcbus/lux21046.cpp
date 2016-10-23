@@ -229,22 +229,22 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-READ8_MEMBER( luxor_55_21046_device::memory_read_byte )
+uint8_t luxor_55_21046_device::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::memory_write_byte )
+void luxor_55_21046_device::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
-READ8_MEMBER( luxor_55_21046_device::io_read_byte )
+uint8_t luxor_55_21046_device::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).read_byte(offset);
 }
 
-WRITE8_MEMBER( luxor_55_21046_device::io_write_byte )
+void luxor_55_21046_device::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
@@ -980,7 +980,7 @@ void luxor_55_21046_device::abcbus_c4(uint8_t data)
 //  3d_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::out_r )
+uint8_t luxor_55_21046_device::out_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_busy)
 	{
@@ -995,7 +995,7 @@ READ8_MEMBER( luxor_55_21046_device::out_r )
 //  4d_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::inp_w )
+void luxor_55_21046_device::inp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_busy)
 	{
@@ -1010,7 +1010,7 @@ WRITE8_MEMBER( luxor_55_21046_device::inp_w )
 //  4b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
+void luxor_55_21046_device::_4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1041,7 +1041,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_4b_w )
 //  9b_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
+void luxor_55_21046_device::_9b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1081,7 +1081,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 //  8a_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
+void luxor_55_21046_device::_8a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -1121,7 +1121,7 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
 //  9a_r -
 //-------------------------------------------------
 
-READ8_MEMBER( luxor_55_21046_device::_9a_r )
+uint8_t luxor_55_21046_device::_9a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 

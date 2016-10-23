@@ -1190,14 +1190,14 @@ offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint
 	return CPU_DISASSEMBLE_NAME(cop410)(this, buffer, pc, oprom, opram, options);
 }
 
-READ8_MEMBER( cop400_cpu_device::microbus_rd )
+uint8_t cop400_cpu_device::microbus_rd(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (LOG_MICROBUS) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
-WRITE8_MEMBER( cop400_cpu_device::microbus_wr )
+void cop400_cpu_device::microbus_wr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_MICROBUS) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
 

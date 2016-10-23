@@ -52,22 +52,22 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	// common
-	DECLARE_WRITE8_MEMBER(videoram_w);
-	DECLARE_WRITE8_MEMBER(charbank_w);
-	DECLARE_WRITE8_MEMBER(videoctrl_w);
-	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE8_MEMBER(adpcm_soundcommand_w);
-	DECLARE_WRITE8_MEMBER(nmi_set_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_0_w);
-	DECLARE_WRITE8_MEMBER(ay8910_control_port_1_w);
-	DECLARE_READ8_MEMBER(fake_0_r);
-	DECLARE_READ8_MEMBER(fake_1_r);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void charbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void videoctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void adpcm_soundcommand_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_control_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void ay8910_control_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fake_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t fake_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// gsword specific
-	DECLARE_READ8_MEMBER(gsword_hack_r);
-	DECLARE_WRITE8_MEMBER(gsword_adpcm_data_w);
-	DECLARE_READ8_MEMBER(gsword_8741_2_r);
-	DECLARE_READ8_MEMBER(gsword_8741_3_r);
+	uint8_t gsword_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void gsword_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t gsword_8741_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gsword_8741_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 

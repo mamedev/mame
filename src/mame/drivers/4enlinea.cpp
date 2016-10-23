@@ -216,11 +216,11 @@ public:
 
 	required_device<ay8910_device> m_ay;
 
-	DECLARE_READ8_MEMBER(serial_r);
-	DECLARE_READ8_MEMBER(serial_status_r);
-	DECLARE_WRITE8_MEMBER(serial_w);
-	DECLARE_WRITE8_MEMBER(serial_status_w);
-	DECLARE_READ8_MEMBER(hack_r);
+	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t serial_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void serial_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
 	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
 
@@ -246,8 +246,8 @@ public:
 	// construction/destruction
 	isa8_cga_4enlinea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ8_MEMBER( _4enlinea_io_read );
-	DECLARE_WRITE8_MEMBER( _4enlinea_mode_control_w );
+	uint8_t _4enlinea_io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void _4enlinea_mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void device_start() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
@@ -265,7 +265,7 @@ isa8_cga_4enlinea_device::isa8_cga_4enlinea_device(const machine_config &mconfig
 }
 
 
-READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
+uint8_t isa8_cga_4enlinea_device::_4enlinea_io_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data;
 
@@ -283,7 +283,7 @@ READ8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_io_read )
 	return data;
 }
 
-WRITE8_MEMBER( isa8_cga_4enlinea_device::_4enlinea_mode_control_w )
+void isa8_cga_4enlinea_device::_4enlinea_mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// TODO
 }
@@ -327,7 +327,7 @@ void isa8_cga_4enlinea_device::device_start()
 }
 
 
-READ8_MEMBER(_4enlinea_state::serial_r)
+uint8_t _4enlinea_state::serial_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if(offset == 0)
 	{
@@ -359,25 +359,25 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enlinea_state )
 	AM_RANGE(0x3bf, 0x3bf) AM_WRITENOP // CGA mode control, TODO
 ADDRESS_MAP_END
 
-READ8_MEMBER(_4enlinea_state::serial_status_r)
+uint8_t _4enlinea_state::serial_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_serial_flags;
 }
 
-WRITE8_MEMBER(_4enlinea_state::serial_status_w)
+void _4enlinea_state::serial_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_serial_flags = data; // probably just clears
 }
 
 /* TODO: do this really routes to 0xe000-0xe001 of Main CPU? */
-WRITE8_MEMBER(_4enlinea_state::serial_w)
+void _4enlinea_state::serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_serial_data[offset] = data;
 	if(offset == 0)
 		m_maincpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
-READ8_MEMBER(_4enlinea_state::hack_r)
+uint8_t _4enlinea_state::hack_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

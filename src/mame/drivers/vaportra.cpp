@@ -20,7 +20,7 @@
 
 /******************************************************************************/
 
-WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
+void vaportra_state::vaportra_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* Force synchronisation between CPUs with fake timer */
 	machine().scheduler().synchronize();
@@ -28,7 +28,7 @@ WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-READ16_MEMBER(vaportra_state::vaportra_control_r)
+uint16_t vaportra_state::vaportra_control_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset << 1)
 	{
@@ -68,7 +68,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-READ8_MEMBER(vaportra_state::vaportra_soundlatch_r)
+uint8_t vaportra_state::vaportra_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_soundlatch->read(space, offset);

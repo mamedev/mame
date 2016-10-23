@@ -486,12 +486,12 @@ CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
 //  generic space fatal error handlers
 //-------------------------------------------------
 
-READ8_MEMBER( driver_device::fatal_generic_read )
+uint8_t driver_device::fatal_generic_read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
 }
 
-WRITE8_MEMBER( driver_device::fatal_generic_write )
+void driver_device::fatal_generic_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

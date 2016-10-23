@@ -43,9 +43,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE8_MEMBER( p2_w );
-	DECLARE_READ8_MEMBER( p3_r );
-	DECLARE_WRITE8_MEMBER( p3_w );
+	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_PALETTE_INIT(jtc_es40);
 	optional_shared_ptr<uint8_t> m_video_ram;
 
@@ -85,9 +85,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( videoram_r );
-	DECLARE_WRITE8_MEMBER( videoram_w );
-	DECLARE_WRITE8_MEMBER( banksel_w );
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t m_video_bank;
 	std::unique_ptr<uint8_t[]> m_color_ram_r;
@@ -98,7 +98,7 @@ public:
 
 /* Read/Write Handlers */
 
-WRITE8_MEMBER( jtc_state::p2_w )
+void jtc_state::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -123,7 +123,7 @@ DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
 	m_centronics_busy = state;
 }
 
-READ8_MEMBER( jtc_state::p3_r )
+uint8_t jtc_state::p3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 
@@ -148,7 +148,7 @@ READ8_MEMBER( jtc_state::p3_r )
 	return data;
 }
 
-WRITE8_MEMBER( jtc_state::p3_w )
+void jtc_state::p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -172,7 +172,7 @@ WRITE8_MEMBER( jtc_state::p3_w )
 	m_speaker->level_w(BIT(data, 7));
 }
 
-READ8_MEMBER( jtces40_state::videoram_r )
+uint8_t jtces40_state::videoram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -184,7 +184,7 @@ READ8_MEMBER( jtces40_state::videoram_r )
 	return data;
 }
 
-WRITE8_MEMBER( jtces40_state::videoram_w )
+void jtces40_state::videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_video_bank & 0x80) m_color_ram_r[offset] = data;
 	if (m_video_bank & 0x40) m_color_ram_g[offset] = data;
@@ -192,7 +192,7 @@ WRITE8_MEMBER( jtces40_state::videoram_w )
 	if (m_video_bank & 0x10) m_video_ram[offset] = data;
 }
 
-WRITE8_MEMBER( jtces40_state::banksel_w )
+void jtces40_state::banksel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_video_bank = offset & 0xf0;
 }

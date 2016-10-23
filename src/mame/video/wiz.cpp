@@ -78,32 +78,32 @@ PALETTE_INIT_MEMBER(wiz_state, wiz)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(wiz_state::wiz_palette_bank_w)
+void wiz_state::wiz_palette_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_palbank[offset] = data & 1;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_char_bank_w)
+void wiz_state::wiz_char_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_charbank[offset] = data & 1;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_sprite_bank_w)
+void wiz_state::wiz_sprite_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_sprite_bank = data & 1;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_bgcolor_w)
+void wiz_state::wiz_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bgcolor = data;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_flipx_w)
+void wiz_state::wiz_flipx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipx = data & 1;
 }
 
-WRITE8_MEMBER(wiz_state::wiz_flipy_w)
+void wiz_state::wiz_flipy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flipy = data & 1;
 }

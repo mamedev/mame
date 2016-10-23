@@ -32,11 +32,11 @@ public:
 
 	/* game id */
 	int m_game_id;
-	DECLARE_READ8_MEMBER(circus_paddle_r);
-	DECLARE_WRITE8_MEMBER(circus_videoram_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_x_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_y_w);
-	DECLARE_WRITE8_MEMBER(circus_clown_z_w);
+	uint8_t circus_paddle_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void circus_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void circus_clown_z_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ripcord();
 	void init_circus();
 	void init_robotbwl();

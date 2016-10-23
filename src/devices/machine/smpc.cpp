@@ -655,7 +655,7 @@ void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t 
  *
  *******************************************/
 
-READ8_MEMBER( saturn_state::stv_SMPC_r )
+uint8_t saturn_state::stv_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int return_data = 0;
 
@@ -680,7 +680,7 @@ READ8_MEMBER( saturn_state::stv_SMPC_r )
 	return return_data;
 }
 
-WRITE8_MEMBER( saturn_state::stv_SMPC_w )
+void saturn_state::stv_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
@@ -848,7 +848,7 @@ uint8_t saturn_state::smpc_direct_mode(uint8_t pad_n)
 	return 0x80 | 0x10 | ((ctrl_read >> shift_bit[hshake]) & 0xf);
 }
 
-READ8_MEMBER( saturn_state::saturn_SMPC_r )
+uint8_t saturn_state::saturn_SMPC_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t return_data = 0;
 
@@ -899,7 +899,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 	return return_data;
 }
 
-WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
+void saturn_state::saturn_SMPC_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x\n", offset, offset>>1, data);
 

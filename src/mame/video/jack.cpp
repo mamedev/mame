@@ -13,25 +13,25 @@
 
 
 
-WRITE8_MEMBER(jack_state::jack_videoram_w)
+void jack_state::jack_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jack_state::jack_colorram_w)
+void jack_state::jack_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_MEMBER(jack_state::jack_flipscreen_r)
+uint8_t jack_state::jack_flipscreen_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 	return 0;
 }
 
-WRITE8_MEMBER(jack_state::jack_flipscreen_w)
+void jack_state::jack_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	flip_screen_set(offset);
 }
@@ -120,7 +120,7 @@ uint32_t jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bi
 
 ***************************************************************************/
 
-WRITE8_MEMBER(jack_state::joinem_scroll_w)
+void jack_state::joinem_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset & 3)
 	{

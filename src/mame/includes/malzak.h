@@ -41,15 +41,15 @@ public:
 
 	/* devices */
 	device_t *m_saa5050;
-	DECLARE_READ8_MEMBER(fake_VRLE_r);
-	DECLARE_READ8_MEMBER(s2636_portA_r);
-	DECLARE_READ8_MEMBER(s2650_data_r);
-	DECLARE_WRITE8_MEMBER(port40_w);
-	DECLARE_WRITE8_MEMBER(port60_w);
-	DECLARE_WRITE8_MEMBER(portc0_w);
-	DECLARE_READ8_MEMBER(collision_r);
-	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
-	DECLARE_READ8_MEMBER(videoram_r);
+	uint8_t fake_VRLE_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t s2636_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t s2650_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t collision_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void malzak_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(malzak);

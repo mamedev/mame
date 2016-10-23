@@ -28,7 +28,7 @@ K007420_CALLBACK_MEMBER(battlnts_state::battlnts_sprite_callback)
 	*color = 0;
 }
 
-WRITE8_MEMBER(battlnts_state::battlnts_spritebank_w)
+void battlnts_state::battlnts_spritebank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spritebank = 1024 * (data & 1);
 }

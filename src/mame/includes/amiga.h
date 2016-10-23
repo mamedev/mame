@@ -444,13 +444,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
 	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
 
-	DECLARE_READ16_MEMBER( cia_r );
-	DECLARE_WRITE16_MEMBER( cia_w );
-	DECLARE_WRITE16_MEMBER( gayle_cia_w );
-	DECLARE_WRITE8_MEMBER( cia_0_port_a_write );
+	uint16_t cia_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void gayle_cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
-	DECLARE_READ8_MEMBER( cia_1_port_a_read );
-	DECLARE_WRITE8_MEMBER( cia_1_port_a_write );
+	uint8_t cia_1_port_a_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cia_1_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
 
 	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
@@ -464,11 +464,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w );
 	DECLARE_WRITE_LINE_MEMBER( centronics_select_w );
 
-	DECLARE_READ16_MEMBER( custom_chip_r );
-	DECLARE_WRITE16_MEMBER( custom_chip_w );
+	uint16_t custom_chip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void custom_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_READ16_MEMBER( rom_mirror_r );
-	DECLARE_READ32_MEMBER( rom_mirror32_r );
+	uint16_t rom_mirror_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint32_t rom_mirror32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	// standard clocks
 	static const int CLK_28M_PAL = XTAL_28_37516MHz;

@@ -271,7 +271,7 @@ void upd765_family_device::set_floppy(floppy_image_device *flop)
 		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(upd765_family_device::index_callback), this));
 }
 
-READ8_MEMBER(upd765_family_device::sra_r)
+uint8_t upd765_family_device::sra_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t sra = 0;
 	int fid = dor & 3;
@@ -294,17 +294,17 @@ READ8_MEMBER(upd765_family_device::sra_r)
 	return sra;
 }
 
-READ8_MEMBER(upd765_family_device::srb_r)
+uint8_t upd765_family_device::srb_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-READ8_MEMBER(upd765_family_device::dor_r)
+uint8_t upd765_family_device::dor_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dor;
 }
 
-WRITE8_MEMBER(upd765_family_device::dor_w)
+void upd765_family_device::dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("dor = %02x\n", data);
 	uint8_t diff = dor ^ data;
@@ -320,16 +320,16 @@ WRITE8_MEMBER(upd765_family_device::dor_w)
 	check_irq();
 }
 
-READ8_MEMBER(upd765_family_device::tdr_r)
+uint8_t upd765_family_device::tdr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER(upd765_family_device::tdr_w)
+void upd765_family_device::tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-READ8_MEMBER(upd765_family_device::msr_r)
+uint8_t upd765_family_device::msr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint32_t msr = 0;
 	switch(main_phase) {
@@ -367,7 +367,7 @@ READ8_MEMBER(upd765_family_device::msr_r)
 	return msr;
 }
 
-WRITE8_MEMBER(upd765_family_device::dsr_w)
+void upd765_family_device::dsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (LOG) logerror("dsr_w %02x\n", data);
 	if(data & 0x80)
@@ -381,7 +381,7 @@ void upd765_family_device::set_rate(int rate)
 	cur_rate = rate;
 }
 
-READ8_MEMBER(upd765_family_device::fifo_r)
+uint8_t upd765_family_device::fifo_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t r = 0xff;
 	switch(main_phase) {
@@ -406,7 +406,7 @@ READ8_MEMBER(upd765_family_device::fifo_r)
 	return r;
 }
 
-WRITE8_MEMBER(upd765_family_device::fifo_w)
+void upd765_family_device::fifo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch(main_phase) {
 	case PHASE_CMD: {
@@ -449,12 +449,12 @@ uint8_t upd765_family_device::do_dir_r()
 	return 0x00;
 }
 
-READ8_MEMBER(upd765_family_device::dir_r)
+uint8_t upd765_family_device::dir_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return do_dir_r();
 }
 
-WRITE8_MEMBER(upd765_family_device::ccr_w)
+void upd765_family_device::ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dsr = (dsr & 0xfc) | (data & 3);
 	cur_rate = rates[data & 3];
@@ -548,12 +548,12 @@ void upd765_family_device::fifo_expect(int size, bool write)
 		enable_transfer();
 }
 
-READ8_MEMBER(upd765_family_device::mdma_r)
+uint8_t upd765_family_device::mdma_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return dma_r();
 }
 
-WRITE8_MEMBER(upd765_family_device::mdma_w)
+void upd765_family_device::mdma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	dma_w(data);
 }
@@ -2494,7 +2494,7 @@ void mcs3201_device::device_start()
 	m_input_handler.resolve_safe(0);
 }
 
-READ8_MEMBER( mcs3201_device::input_r )
+uint8_t mcs3201_device::input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_input_handler();
 }
@@ -2514,7 +2514,7 @@ void tc8566af_device::device_start()
 	save_item(NAME(m_cr1));
 }
 
-WRITE8_MEMBER(tc8566af_device::cr1_w)
+void tc8566af_device::cr1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cr1 = data;
 

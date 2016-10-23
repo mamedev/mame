@@ -1351,7 +1351,7 @@ void corvus_hdc_t::device_start() {
 // Returns:
 //      Value in the controller status register
 //
-READ8_MEMBER ( corvus_hdc_t::status_r ) {
+uint8_t corvus_hdc_t::status_r(address_space &space, offs_t offset, uint8_t mem_mask) {
 	return m_status;
 }
 
@@ -1370,7 +1370,7 @@ READ8_MEMBER ( corvus_hdc_t::status_r ) {
 // Returns:
 //      Value in the controller data register
 //
-READ8_MEMBER ( corvus_hdc_t::read ) {
+uint8_t corvus_hdc_t::read(address_space &space, offs_t offset, uint8_t mem_mask) {
 	uint8_t result;
 
 	if((m_status & CONTROLLER_DIRECTION) == 0) {   // Check to see if we're in Controller-to-Host mode
@@ -1418,7 +1418,7 @@ READ8_MEMBER ( corvus_hdc_t::read ) {
 // Returns:
 //      Nothing
 //
-WRITE8_MEMBER ( corvus_hdc_t::write ) {
+void corvus_hdc_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) {
 	//
 	// Received a byte -- check to see if we should really respond
 	//

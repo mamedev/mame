@@ -288,8 +288,8 @@ public:
 	// construction/destruction
 	ygv608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE16_MEMBER( write );
-	DECLARE_READ16_MEMBER( read );
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 
 	void set_gfxbank(uint8_t gfxbank);
@@ -299,7 +299,7 @@ public:
 	INTERRUPT_GEN_MEMBER( timed_interrupt );
 
 	// to be removed
-	DECLARE_READ16_MEMBER( debug_trigger_r );
+	uint16_t debug_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -327,11 +327,11 @@ public:
 	required_region_ptr<uint16_t> m_charmap;
 	required_ioport m_dsw2;
 
-	DECLARE_READ8_MEMBER(dwarfd_ram_r);
-	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
-	DECLARE_WRITE8_MEMBER(output1_w);
-	DECLARE_WRITE8_MEMBER(output2_w);
-	DECLARE_READ8_MEMBER(qc_b8_r);
+	uint8_t dwarfd_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dwarfd_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t qc_b8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
 	void init_qc();
@@ -345,7 +345,7 @@ public:
 };
 
 
-READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
+uint8_t dwarfd_state::dwarfd_ram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_crt_access == 0)
 	{
@@ -358,12 +358,12 @@ READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 	}
 }
 
-WRITE8_MEMBER(dwarfd_state::dwarfd_ram_w)
+void dwarfd_state::dwarfd_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dw_ram[offset] = data;
 }
 
-WRITE8_MEMBER(dwarfd_state::output1_w)
+void dwarfd_state::output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
  bits:
@@ -378,7 +378,7 @@ WRITE8_MEMBER(dwarfd_state::output1_w)
 */
 }
 
-WRITE8_MEMBER(dwarfd_state::output2_w)
+void dwarfd_state::output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
  bits:
@@ -394,7 +394,7 @@ WRITE8_MEMBER(dwarfd_state::output2_w)
 }
 
 
-READ8_MEMBER(dwarfd_state::qc_b8_r)
+uint8_t dwarfd_state::qc_b8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return machine().rand();
 }

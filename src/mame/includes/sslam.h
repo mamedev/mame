@@ -52,15 +52,15 @@ public:
 	tilemap_t *m_md_tilemap;
 
 	int m_sprites_x_offset;
-	DECLARE_WRITE16_MEMBER(powerbls_sound_w);
-	DECLARE_READ8_MEMBER(playmark_snd_command_r);
-	DECLARE_WRITE8_MEMBER(playmark_oki_w);
-	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
-	DECLARE_WRITE16_MEMBER(sslam_tx_tileram_w);
-	DECLARE_WRITE16_MEMBER(sslam_md_tileram_w);
-	DECLARE_WRITE16_MEMBER(sslam_bg_tileram_w);
-	DECLARE_WRITE16_MEMBER(powerbls_bg_tileram_w);
-	DECLARE_WRITE8_MEMBER(sslam_snd_w);
+	void powerbls_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t playmark_snd_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void playmark_oki_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void playmark_snd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void sslam_tx_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sslam_md_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sslam_bg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void powerbls_bg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void sslam_snd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sslam();
 	void init_powerbls();
 	TILE_GET_INFO_MEMBER(get_sslam_tx_tile_info);

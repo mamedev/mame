@@ -217,7 +217,7 @@ void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char
  read_rom
  -------------------------------------------------*/
 
-READ8_MEMBER(generic_slot_device::read_rom)
+uint8_t generic_slot_device::read_rom(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_rom(space, offset);
@@ -229,7 +229,7 @@ READ8_MEMBER(generic_slot_device::read_rom)
  read16_rom
  -------------------------------------------------*/
 
-READ16_MEMBER(generic_slot_device::read16_rom)
+uint16_t generic_slot_device::read16_rom(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read16_rom(space, offset, mem_mask);
@@ -241,7 +241,7 @@ READ16_MEMBER(generic_slot_device::read16_rom)
  read32_rom
  -------------------------------------------------*/
 
-READ32_MEMBER(generic_slot_device::read32_rom)
+uint32_t generic_slot_device::read32_rom(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read32_rom(space, offset, mem_mask);
@@ -253,7 +253,7 @@ READ32_MEMBER(generic_slot_device::read32_rom)
  read_ram
  -------------------------------------------------*/
 
-READ8_MEMBER(generic_slot_device::read_ram)
+uint8_t generic_slot_device::read_ram(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_cart)
 		return m_cart->read_ram(space, offset);
@@ -265,7 +265,7 @@ READ8_MEMBER(generic_slot_device::read_ram)
  write_ram
  -------------------------------------------------*/
 
-WRITE8_MEMBER(generic_slot_device::write_ram)
+void generic_slot_device::write_ram(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_cart)
 		m_cart->write_ram(space, offset, data);

@@ -62,21 +62,21 @@ public:
 	uint16_t m_current_screen_height;
 
 	void machine_start_a2600();
-	DECLARE_WRITE8_MEMBER(switch_A_w);
-	DECLARE_READ8_MEMBER(switch_A_r);
-	DECLARE_WRITE8_MEMBER(switch_B_w);
+	void switch_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t switch_A_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void switch_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
-	DECLARE_READ8_MEMBER(riot_input_port_8_r);
-	DECLARE_READ16_MEMBER(a2600_read_input_port);
-	DECLARE_READ8_MEMBER(a2600_get_databus_contents);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback);
-	DECLARE_WRITE16_MEMBER(a2600_tia_vsync_callback_pal);
-	DECLARE_WRITE8_MEMBER(cart_over_tia_w);
+	uint8_t riot_input_port_8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint16_t a2600_read_input_port(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t a2600_get_databus_contents(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void a2600_tia_vsync_callback(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void a2600_tia_vsync_callback_pal(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void cart_over_tia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// investigate how the carts mapped here (Mapper JVP) interact with the RIOT device
-	DECLARE_READ8_MEMBER(cart_over_riot_r);
-	DECLARE_WRITE8_MEMBER(cart_over_riot_w);
-	DECLARE_READ8_MEMBER(cart_over_all_r);
-	DECLARE_WRITE8_MEMBER(cart_over_all_w);
+	uint8_t cart_over_riot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cart_over_riot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cart_over_all_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cart_over_all_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:
 	required_device<vcs_control_port_device> m_joy1;
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START(a2600_mem, AS_PROGRAM, 8, a2600_state ) // 6507 has 13-
 ADDRESS_MAP_END
 
 
-READ8_MEMBER(a2600_state::cart_over_all_r)
+uint8_t a2600_state::cart_over_all_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 		m_cart->write_bank(space, offset, 0);
@@ -154,7 +154,7 @@ READ8_MEMBER(a2600_state::cart_over_all_r)
 	return ret;
 }
 
-WRITE8_MEMBER(a2600_state::cart_over_all_w)
+void a2600_state::cart_over_all_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cart->write_bank(space, offset, 0);
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER(a2600_state::cart_over_all_w)
 	/* 0x300 - 0x3ff already masked out */
 }
 
-WRITE8_MEMBER(a2600_state::switch_A_w)
+void a2600_state::switch_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* Left controller port */
 	m_joy1->joy_w( data >> 4 );
@@ -204,7 +204,7 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 //  }
 }
 
-READ8_MEMBER(a2600_state::switch_A_r)
+uint8_t a2600_state::switch_A_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t val = 0;
 
@@ -217,7 +217,7 @@ READ8_MEMBER(a2600_state::switch_A_r)
 	return val;
 }
 
-WRITE8_MEMBER(a2600_state::switch_B_w)
+void a2600_state::switch_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
@@ -225,13 +225,13 @@ WRITE_LINE_MEMBER(a2600_state::irq_callback)
 {
 }
 
-READ8_MEMBER(a2600_state::riot_input_port_8_r)
+uint8_t a2600_state::riot_input_port_8_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_swb->read();
 }
 
 
-READ16_MEMBER(a2600_state::a2600_read_input_port)
+uint16_t a2600_state::a2600_read_input_port(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch( offset )
 	{
@@ -265,7 +265,7 @@ READ16_MEMBER(a2600_state::a2600_read_input_port)
    Q-Bert's Qubes (NTSC,F6) at 0x1594
    Berzerk at 0xF093.
 */
-READ8_MEMBER(a2600_state::a2600_get_databus_contents)
+uint8_t a2600_state::a2600_get_databus_contents(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint16_t  last_address, prev_address;
 	uint8_t   last_byte, prev_byte;
@@ -303,7 +303,7 @@ static const rectangle visarea[4] = {
 };
 #endif
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
+void a2600_state::a2600_tia_vsync_callback(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -320,7 +320,7 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback)
 	}
 }
 
-WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
+void a2600_state::a2600_tia_vsync_callback_pal(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int i;
 
@@ -338,21 +338,21 @@ WRITE16_MEMBER(a2600_state::a2600_tia_vsync_callback_pal)
 }
 
 // TODO: is this the correct behavior for the real hardware?!?
-READ8_MEMBER(a2600_state::cart_over_riot_r)
+uint8_t a2600_state::cart_over_riot_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (!space.debugger_access())
 		m_cart->write_bank(space, offset, 0);
 	return m_riot_ram[0x20 + offset];
 }
 
-WRITE8_MEMBER(a2600_state::cart_over_riot_w)
+void a2600_state::cart_over_riot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cart->write_bank(space, offset, 0);
 	m_riot_ram[0x20 + offset] = data;
 
 }
 
-WRITE8_MEMBER(a2600_state::cart_over_tia_w)
+void a2600_state::cart_over_tia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Both Cart & TIA see these addresses
 	m_cart->write_bank(space, offset, data);

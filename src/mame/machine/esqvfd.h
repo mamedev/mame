@@ -27,7 +27,7 @@ class esqvfd_t : public device_t {
 public:
 	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
+	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write_char(data); }
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();

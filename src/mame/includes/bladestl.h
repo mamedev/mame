@@ -54,12 +54,12 @@ public:
 	int        m_last_track[4];
 
 	/* devices */
-	DECLARE_READ8_MEMBER(trackball_r);
-	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(bladestl_sh_irqtrigger_w);
-	DECLARE_WRITE8_MEMBER(bladestl_port_B_w);
-	DECLARE_READ8_MEMBER(bladestl_speech_busy_r);
-	DECLARE_WRITE8_MEMBER(bladestl_speech_ctrl_w);
+	uint8_t trackball_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bladestl_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bladestl_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void bladestl_port_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t bladestl_speech_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void bladestl_speech_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(bladestl);

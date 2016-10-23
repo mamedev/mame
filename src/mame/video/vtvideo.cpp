@@ -221,13 +221,13 @@ void vt100_video_device::recompute_parameters()
 }
 
 
-READ8_MEMBER(vt100_video_device::lba7_r)
+uint8_t vt100_video_device::lba7_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_lba7;
 }
 
 // Also used by Rainbow-100 ************
-WRITE8_MEMBER(vt100_video_device::dc012_w)
+void vt100_video_device::dc012_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// Writes to [10C] and [0C] are treated differently
 	// - see 3.1.3.9.5 DC012 Programming Information (PC-100 spec)
@@ -319,7 +319,7 @@ WRITE8_MEMBER(vt100_video_device::dc012_w)
 }
 
 // Writing to DC011 resets internal counters (& disturbs display) on real hardware.
-WRITE8_MEMBER(vt100_video_device::dc011_w)
+void vt100_video_device::dc011_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(data, 5))
 	{
@@ -349,7 +349,7 @@ WRITE8_MEMBER(vt100_video_device::dc011_w)
 	recompute_parameters();
 }
 
-WRITE8_MEMBER(vt100_video_device::brightness_w)
+void vt100_video_device::brightness_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//m_palette->set_pen_color(1, data, data, data);
 }

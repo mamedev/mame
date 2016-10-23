@@ -28,10 +28,10 @@ public:
 	std::unique_ptr<uint16_t[]> m_vram;
 	int m_vbuffer;
 
-	DECLARE_WRITE16_MEMBER(eeprom_w);
-	DECLARE_READ16_MEMBER(eolith16_custom_r);
-	DECLARE_WRITE16_MEMBER(vram_w);
-	DECLARE_READ16_MEMBER(vram_r);
+	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t eolith16_custom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t vram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void init_eolith16();
 	void video_start_eolith16();
@@ -42,7 +42,7 @@ public:
 
 
 
-WRITE16_MEMBER(eolith16_state::eeprom_w)
+void eolith16_state::eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vbuffer = (data & 0x80) >> 7;
 	machine().bookkeeping().coin_counter_w(0, data & 1);
@@ -52,7 +52,7 @@ WRITE16_MEMBER(eolith16_state::eeprom_w)
 	//data & 0x100 and data & 0x004 always set
 }
 
-READ16_MEMBER(eolith16_state::eolith16_custom_r)
+uint16_t eolith16_state::eolith16_custom_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	speedup_read();
 	return ioport("SPECIAL")->read();
@@ -60,12 +60,12 @@ READ16_MEMBER(eolith16_state::eolith16_custom_r)
 
 
 
-WRITE16_MEMBER(eolith16_state::vram_w)
+void eolith16_state::vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset + (0x10000/2) * m_vbuffer]);
 }
 
-READ16_MEMBER(eolith16_state::vram_r)
+uint16_t eolith16_state::vram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_vram[offset + (0x10000/2) * m_vbuffer];
 }

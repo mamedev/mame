@@ -37,12 +37,12 @@ public:
 	{ }
 
 	void init_gts3a();
-	DECLARE_WRITE8_MEMBER(segbank_w);
-	DECLARE_READ8_MEMBER(u4a_r);
-	DECLARE_READ8_MEMBER(u4b_r);
-	DECLARE_WRITE8_MEMBER(u4b_w);
-	DECLARE_READ8_MEMBER(dmd_r);
-	DECLARE_WRITE8_MEMBER(dmd_w);
+	void segbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t u4a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t u4b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t dmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -223,7 +223,7 @@ WRITE_LINE_MEMBER( gts3a_state::nmi_w )
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
 
-WRITE8_MEMBER( gts3a_state::segbank_w )
+void gts3a_state::segbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 { // this is all wrong
 	uint32_t seg1,seg2;
 	m_segment[offset] = data;
@@ -232,7 +232,7 @@ WRITE8_MEMBER( gts3a_state::segbank_w )
 	output().set_digit_value(m_digit+(BIT(offset, 1) ? 0 : 20), seg2);
 }
 
-WRITE8_MEMBER( gts3a_state::u4b_w )
+void gts3a_state::u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_u4b = data & 0xe7;
 	bool clk_bit = BIT(data, 6);
@@ -259,7 +259,7 @@ WRITE8_MEMBER( gts3a_state::u4b_w )
 //  printf("B=%s=%X ",machine().describe_context(),data&0xe0);
 }
 
-READ8_MEMBER( gts3a_state::u4a_r )
+uint8_t gts3a_state::u4a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_row < 12)
 		return m_switches[m_row]->read();
@@ -267,7 +267,7 @@ READ8_MEMBER( gts3a_state::u4a_r )
 		return 0xff;
 }
 
-READ8_MEMBER( gts3a_state::u4b_r )
+uint8_t gts3a_state::u4b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_u4b | (ioport("TTS")->read() & 0x18);
 }
@@ -285,12 +285,12 @@ void gts3a_state::init_gts3a()
 	membank("bank1")->configure_entries(0, 32, &dmd[0x0000], 0x4000);
 }
 
-READ8_MEMBER( gts3a_state::dmd_r )
+uint8_t gts3a_state::dmd_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0;
 }
 
-WRITE8_MEMBER( gts3a_state::dmd_w )
+void gts3a_state::dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dmd = data;
 	membank("bank1")->set_entry(data & 0x1f);

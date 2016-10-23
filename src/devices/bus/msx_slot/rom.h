@@ -21,7 +21,7 @@ public:
 
 	virtual void device_start() override;
 
-	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
 private:
 	required_memory_region m_rom_region;

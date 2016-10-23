@@ -82,7 +82,7 @@ void leland_state::video_start_ataxx()
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_scroll_w)
+void leland_state::leland_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -113,7 +113,7 @@ WRITE8_MEMBER(leland_state::leland_scroll_w)
 }
 
 
-WRITE8_MEMBER(leland_state::leland_gfx_port_w)
+void leland_state::leland_gfx_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int scanline = m_screen->vpos();
 	if (scanline > 0)
@@ -278,7 +278,7 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_master_video_addr_w)
+void leland_state::leland_master_video_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	leland_video_addr_w(space, offset, data, 0);
 }
@@ -295,13 +295,13 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
 }
 
 
-WRITE8_MEMBER(leland_state::leland_mvram_port_w)
+void leland_state::leland_mvram_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 
-READ8_MEMBER(leland_state::leland_mvram_port_r)
+uint8_t leland_state::leland_mvram_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return leland_vram_port_r(space, offset, 0);
 }
@@ -314,19 +314,19 @@ READ8_MEMBER(leland_state::leland_mvram_port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::leland_slave_video_addr_w)
+void leland_state::leland_slave_video_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	leland_video_addr_w(space, offset, data, 1);
 }
 
 
-WRITE8_MEMBER(leland_state::leland_svram_port_w)
+void leland_state::leland_svram_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	leland_vram_port_w(space, offset, data, 1);
 }
 
 
-READ8_MEMBER(leland_state::leland_svram_port_r)
+uint8_t leland_state::leland_svram_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return leland_vram_port_r(space, offset, 1);
 }
@@ -339,14 +339,14 @@ READ8_MEMBER(leland_state::leland_svram_port_r)
  *
  *************************************/
 
-WRITE8_MEMBER(leland_state::ataxx_mvram_port_w)
+void leland_state::ataxx_mvram_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(leland_state::leland_delayed_mvram_w),this), 0x00000 | (offset << 8) | data);
 }
 
 
-WRITE8_MEMBER(leland_state::ataxx_svram_port_w)
+void leland_state::ataxx_svram_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	leland_vram_port_w(space, offset, data, 1);
@@ -360,14 +360,14 @@ WRITE8_MEMBER(leland_state::ataxx_svram_port_w)
  *
  *************************************/
 
-READ8_MEMBER(leland_state::ataxx_mvram_port_r)
+uint8_t leland_state::ataxx_mvram_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	return leland_vram_port_r(space, offset, 0);
 }
 
 
-READ8_MEMBER(leland_state::ataxx_svram_port_r)
+uint8_t leland_state::ataxx_svram_port_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
 	return leland_vram_port_r(space, offset, 1);

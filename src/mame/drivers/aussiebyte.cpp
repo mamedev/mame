@@ -92,7 +92,7 @@ INPUT_PORTS_END
     I/O Ports
 
 ************************************************************/
-WRITE8_MEMBER( aussiebyte_state::port15_w )
+void aussiebyte_state::port15_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bankr0")->set_entry(m_port15); // point at ram
 	m_port15 = true;
@@ -110,7 +110,7 @@ WRITE8_MEMBER( aussiebyte_state::port15_w )
 5 Disable 5.25 inch floppy spindle motors.
 6 Unused.
 7 Enable write precompensation on WD2797 controller. */
-WRITE8_MEMBER( aussiebyte_state::port16_w )
+void aussiebyte_state::port16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	floppy_image_device *m_floppy = nullptr;
 	if ((data & 15) == 0)
@@ -137,7 +137,7 @@ WRITE8_MEMBER( aussiebyte_state::port16_w )
 5 - SIO Ch D
 6 - Ext ready 1
 7 - Ext ready 2 */
-WRITE8_MEMBER( aussiebyte_state::port17_w )
+void aussiebyte_state::port17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_port17 = data & 7;
 	m_dma->rdy_w(BIT(m_port17_rdy, data));
@@ -146,19 +146,19 @@ WRITE8_MEMBER( aussiebyte_state::port17_w )
 /* FDC params
 2 EXC: WD2797 clock frequency. H = 5.25"; L = 8"
 3 WIEN: WD2797 Double density select. */
-WRITE8_MEMBER( aussiebyte_state::port18_w )
+void aussiebyte_state::port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fdc->set_unscaled_clock(BIT(data, 2) ? 1e6 : 2e6);
 	m_fdc->dden_w(BIT(data, 3));
 }
 
-READ8_MEMBER( aussiebyte_state::port19_r )
+uint8_t aussiebyte_state::port19_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port19;
 }
 
 // Memory banking
-WRITE8_MEMBER( aussiebyte_state::port1a_w )
+void aussiebyte_state::port1a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	data &= 7;
 	switch (data)
@@ -203,21 +203,21 @@ WRITE8_MEMBER( aussiebyte_state::port1a_w )
 }
 
 // Winchester control
-WRITE8_MEMBER( aussiebyte_state::port1b_w )
+void aussiebyte_state::port1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
 // GPEHB control
-WRITE8_MEMBER( aussiebyte_state::port1c_w )
+void aussiebyte_state::port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 
-WRITE8_MEMBER( aussiebyte_state::port20_w )
+void aussiebyte_state::port20_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_speaker->level_w(BIT(data, 7));
 }
 
-READ8_MEMBER( aussiebyte_state::port28_r )
+uint8_t aussiebyte_state::port28_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_port28;
 }
@@ -227,25 +227,25 @@ READ8_MEMBER( aussiebyte_state::port28_r )
     DMA
 
 ************************************************************/
-READ8_MEMBER( aussiebyte_state::memory_read_byte )
+uint8_t aussiebyte_state::memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::memory_write_byte )
+void aussiebyte_state::memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	prog_space.write_byte(offset, data);
 }
 
-READ8_MEMBER( aussiebyte_state::io_read_byte )
+uint8_t aussiebyte_state::io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	return prog_space.read_byte(offset);
 }
 
-WRITE8_MEMBER( aussiebyte_state::io_write_byte )
+void aussiebyte_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space& prog_space = m_maincpu->space(AS_IO);
 	prog_space.write_byte(offset, data);

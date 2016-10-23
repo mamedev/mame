@@ -195,12 +195,12 @@ void cuda_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 	}
 }
 
-READ8_MEMBER( cuda_device::ddr_r )
+uint8_t cuda_device::ddr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ddrs[offset];
 }
 
-WRITE8_MEMBER( cuda_device::ddr_w )
+void cuda_device::ddr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
@@ -209,7 +209,7 @@ WRITE8_MEMBER( cuda_device::ddr_w )
 	ddrs[offset] = data;
 }
 
-READ8_MEMBER( cuda_device::ports_r )
+uint8_t cuda_device::ports_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t incoming = 0;
 
@@ -268,19 +268,19 @@ READ8_MEMBER( cuda_device::ports_r )
 	return incoming;
 }
 
-WRITE8_MEMBER( cuda_device::ports_w )
+void cuda_device::ports_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	send_port(space, offset, data);
 
 	ports[offset] = data;
 }
 
-READ8_MEMBER( cuda_device::pll_r )
+uint8_t cuda_device::pll_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pll_ctrl;
 }
 
-WRITE8_MEMBER( cuda_device::pll_w )
+void cuda_device::pll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	#ifdef CUDA_SUPER_VERBOSE
 	if (pll_ctrl != data)
@@ -297,12 +297,12 @@ WRITE8_MEMBER( cuda_device::pll_w )
 	pll_ctrl = data;
 }
 
-READ8_MEMBER( cuda_device::timer_ctrl_r )
+uint8_t cuda_device::timer_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return timer_ctrl;
 }
 
-WRITE8_MEMBER( cuda_device::timer_ctrl_w )
+void cuda_device::timer_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	static const attotime rates[4][5] =
 	{
@@ -339,24 +339,24 @@ WRITE8_MEMBER( cuda_device::timer_ctrl_w )
 	timer_ctrl |= (data & ~0xc0);
 }
 
-READ8_MEMBER( cuda_device::timer_counter_r )
+uint8_t cuda_device::timer_counter_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return timer_counter;
 }
 
-WRITE8_MEMBER( cuda_device::timer_counter_w )
+void cuda_device::timer_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 //    printf("%02x to timer counter (PC=%x)\n", data, m_maincpu->pc());
 	timer_counter = data;
 	ripple_counter = timer_counter;
 }
 
-READ8_MEMBER( cuda_device::onesec_r )
+uint8_t cuda_device::onesec_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return onesec;
 }
 
-WRITE8_MEMBER( cuda_device::onesec_w )
+void cuda_device::onesec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
@@ -368,12 +368,12 @@ WRITE8_MEMBER( cuda_device::onesec_w )
 	onesec = data;
 }
 
-READ8_MEMBER( cuda_device::pram_r )
+uint8_t cuda_device::pram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return pram[offset];
 }
 
-WRITE8_MEMBER( cuda_device::pram_w )
+void cuda_device::pram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	pram[offset] = data;
 }

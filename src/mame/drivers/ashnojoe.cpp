@@ -80,14 +80,14 @@ Coin B is not used
 #include "sound/2203intf.h"
 #include "includes/ashnojoe.h"
 
-READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
+uint16_t ashnojoe_state::fake_4a00a_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
 	or just a debug enable/disable register? */
 	return 0;
 }
 
-WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
+void ashnojoe_state::ashnojoe_soundlatch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -119,18 +119,18 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(ashnojoe_state::adpcm_w)
+void ashnojoe_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_adpcm_byte = data;
 }
 
-READ8_MEMBER(ashnojoe_state::sound_latch_r)
+uint8_t ashnojoe_state::sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_soundlatch_status = 0;
 	return m_soundlatch->read(space, 0);
 }
 
-READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
+uint8_t ashnojoe_state::sound_latch_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_soundlatch_status;
 }
@@ -270,7 +270,7 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
+void ashnojoe_state::ym2203_write_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
 	if (data == 0xff)
@@ -279,7 +279,7 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 	m_msm->reset_w(!(data & 0x01));
 }
 
-WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
+void ashnojoe_state::ym2203_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("bank4")->set_entry(data & 0x0f);
 }

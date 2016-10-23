@@ -91,12 +91,12 @@ public:
 	int m_rsxoffs;
 	int m_rsyoffs;
 
-	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
-	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
-	DECLARE_WRITE32_MEMBER(galastrm_input_w);
-	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
-	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
+	void galastrm_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_tc0610_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_tc0610_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	void galastrm_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
+	uint32_t galastrm_adstick_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
+	void galastrm_adstick_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	virtual void video_start() override;

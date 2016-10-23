@@ -72,7 +72,7 @@ int twin16_state::spriteram_process_enable(  )
 
 /* Read/Write Handlers */
 
-WRITE16_MEMBER(twin16_state::CPUA_register_w)
+void twin16_state::CPUA_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -105,7 +105,7 @@ WRITE16_MEMBER(twin16_state::CPUA_register_w)
 	}
 }
 
-WRITE16_MEMBER(twin16_state::CPUB_register_w)
+void twin16_state::CPUB_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -126,7 +126,7 @@ WRITE16_MEMBER(twin16_state::CPUB_register_w)
 	}
 }
 
-WRITE16_MEMBER(fround_state::fround_CPU_register_w)
+void fround_state::fround_CPU_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/*
 	7   6   5   4   3   2   1   0
@@ -146,17 +146,17 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	}
 }
 
-READ8_MEMBER(twin16_state::upd_busy_r)
+uint8_t twin16_state::upd_busy_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_upd7759->busy_r();
 }
 
-WRITE8_MEMBER(twin16_state::upd_reset_w)
+void twin16_state::upd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->reset_w(data & 2);
 }
 
-WRITE8_MEMBER(twin16_state::upd_start_w)
+void twin16_state::upd_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_upd7759->start_w(data & 1);
 }
@@ -627,7 +627,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-WRITE8_MEMBER(twin16_state::volume_callback)
+void twin16_state::volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_k007232->set_volume(0,(data >> 4) * 0x11,0);
 	m_k007232->set_volume(1,0,(data & 0x0f) * 0x11);
@@ -1255,7 +1255,7 @@ void fround_state::init_fround()
 	m_is_fround = true;
 }
 
-WRITE8_MEMBER(cuebrickj_state::nvram_bank_w)
+void cuebrickj_state::nvram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	membank("nvrambank")->set_entry(data);
 }

@@ -374,21 +374,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_2_dataout = state; update_sio0_rxd(); }
 	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout); }
-	DECLARE_READ8_MEMBER(control_r);
-	DECLARE_WRITE8_MEMBER(control_w);
-	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_READ8_MEMBER(control3_r);
-	DECLARE_WRITE8_MEMBER(control3_w);
-	DECLARE_READ16_MEMBER(gn_1fb70000_r);
-	DECLARE_WRITE16_MEMBER(gn_1fb70000_w);
-	DECLARE_READ16_MEMBER(hack1_r);
-	DECLARE_READ8_MEMBER(znsecsel_r);
-	DECLARE_WRITE8_MEMBER(znsecsel_w);
-	DECLARE_READ8_MEMBER(boardconfig_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_READ8_MEMBER(coin_r);
-	DECLARE_READ8_MEMBER(gnet_mahjong_panel_r);
-	DECLARE_READ32_MEMBER(zsg2_ext_r);
+	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint8_t control3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void control3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint16_t gn_1fb70000_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void gn_1fb70000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t hack1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint8_t znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void znsecsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t boardconfig_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t coin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t gnet_mahjong_panel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint32_t zsg2_ext_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_coh3002t_nz();
 
 protected:
@@ -427,12 +427,12 @@ private:
 
 // Misc. controls
 
-READ8_MEMBER(taitogn_state::control_r)
+uint8_t taitogn_state::control_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_control;
 }
 
-WRITE8_MEMBER(taitogn_state::control_w)
+void taitogn_state::control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	// 20 = watchdog
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
@@ -464,22 +464,22 @@ WRITE8_MEMBER(taitogn_state::control_w)
 	m_control = data;
 }
 
-WRITE16_MEMBER(taitogn_state::control2_w)
+void taitogn_state::control2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_control2 = data;
 }
 
-READ8_MEMBER(taitogn_state::control3_r)
+uint8_t taitogn_state::control3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_control3;
 }
 
-WRITE8_MEMBER(taitogn_state::control3_w)
+void taitogn_state::control3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_control3 = data;
 }
 
-READ16_MEMBER(taitogn_state::gn_1fb70000_r)
+uint16_t taitogn_state::gn_1fb70000_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// (1328) 1348 tests mask 0002, 8 times.
 	// Called by 1434, exit at 143c
@@ -491,13 +491,13 @@ READ16_MEMBER(taitogn_state::gn_1fb70000_r)
 	return 2;
 }
 
-WRITE16_MEMBER(taitogn_state::gn_1fb70000_w)
+void taitogn_state::gn_1fb70000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// Writes 0 or 1 all the time, it *may* have somthing to do with
 	// i/o port width, but then maybe not
 }
 
-READ16_MEMBER(taitogn_state::hack1_r)
+uint16_t taitogn_state::hack1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	switch (offset)
 	{
@@ -517,12 +517,12 @@ READ16_MEMBER(taitogn_state::hack1_r)
 
 // Lifted from zn.c
 
-READ8_MEMBER(taitogn_state::znsecsel_r)
+uint8_t taitogn_state::znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_n_znsecsel;
 }
 
-WRITE8_MEMBER(taitogn_state::znsecsel_w)
+void taitogn_state::znsecsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_cat702_1->write_select((data >> 2) & 1);
 	m_cat702_2->write_select((data >> 3) & 1);
@@ -531,14 +531,14 @@ WRITE8_MEMBER(taitogn_state::znsecsel_w)
 	m_n_znsecsel = data;
 }
 
-READ8_MEMBER(taitogn_state::boardconfig_r)
+uint8_t taitogn_state::boardconfig_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// see zn.c
 	return 64|32|8;
 }
 
 
-WRITE8_MEMBER(taitogn_state::coin_w)
+void taitogn_state::coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* 0x01=counter
 	   0x02=coin lock 1
@@ -549,13 +549,13 @@ WRITE8_MEMBER(taitogn_state::coin_w)
 	m_coin_info = data;
 }
 
-READ8_MEMBER(taitogn_state::coin_r)
+uint8_t taitogn_state::coin_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_coin_info;
 }
 
 /* mahjong panel handler (for Usagi & Mahjong Oh) */
-READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
+uint8_t taitogn_state::gnet_mahjong_panel_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch (m_coin_info & 0xcc)
 	{
@@ -572,7 +572,7 @@ READ8_MEMBER(taitogn_state::gnet_mahjong_panel_r)
 	return ioport("P4")->read();
 }
 
-READ32_MEMBER(taitogn_state::zsg2_ext_r)
+uint32_t taitogn_state::zsg2_ext_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	offset *= 2;
 

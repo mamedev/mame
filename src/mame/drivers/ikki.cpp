@@ -26,14 +26,14 @@ TODO:
  *
  *************************************/
 
-READ8_MEMBER(ikki_state::ikki_e000_r)
+uint8_t ikki_state::ikki_e000_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
 	return (m_irq_source << 1);
 }
 
-WRITE8_MEMBER(ikki_state::ikki_coin_counters)
+void ikki_state::ikki_coin_counters(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);

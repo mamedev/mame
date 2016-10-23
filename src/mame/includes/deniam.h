@@ -52,15 +52,15 @@ public:
 	uint16_t         m_coinctrl;
 
 	/* devices */
-	DECLARE_WRITE16_MEMBER(sound_command_w);
-	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
-	DECLARE_WRITE16_MEMBER(deniam_textram_w);
-	DECLARE_WRITE16_MEMBER(deniam_palette_w);
-	DECLARE_READ16_MEMBER(deniam_coinctrl_r);
-	DECLARE_WRITE16_MEMBER(deniam_coinctrl_w);
-	DECLARE_WRITE8_MEMBER(deniam16b_oki_rom_bank_w);
-	DECLARE_WRITE16_MEMBER(deniam16c_oki_rom_bank_w);
+	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deniam_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deniam_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deniam_textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deniam_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t deniam_coinctrl_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void deniam_coinctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void deniam16b_oki_rom_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void deniam16c_oki_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_karianx();
 	void init_logicpro();
 	TILEMAP_MAPPER_MEMBER(scan_pages);

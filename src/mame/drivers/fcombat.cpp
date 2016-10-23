@@ -47,7 +47,7 @@ INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
 
 
 /* is it protection? */
-READ8_MEMBER(fcombat_state::fcombat_protection_r)
+uint8_t fcombat_state::fcombat_protection_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* Must match ONE of these values after a "and  $3E" intruction :
 
@@ -61,7 +61,7 @@ READ8_MEMBER(fcombat_state::fcombat_protection_r)
 
 /* same as exerion again */
 
-READ8_MEMBER(fcombat_state::fcombat_port01_r)
+uint8_t fcombat_state::fcombat_port01_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
 	return ioport(m_cocktail_flip ? "IN1" : "IN0")->read();
@@ -70,17 +70,17 @@ READ8_MEMBER(fcombat_state::fcombat_port01_r)
 
 //bg scrolls
 
-WRITE8_MEMBER(fcombat_state::e900_w)
+void fcombat_state::e900_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fcombat_sh = data;
 }
 
-WRITE8_MEMBER(fcombat_state::ea00_w)
+void fcombat_state::ea00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fcombat_sv = (m_fcombat_sv & 0xff00) | data;
 }
 
-WRITE8_MEMBER(fcombat_state::eb00_w)
+void fcombat_state::eb00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fcombat_sv = (m_fcombat_sv & 0xff) | (data << 8);
 }
@@ -88,17 +88,17 @@ WRITE8_MEMBER(fcombat_state::eb00_w)
 
 // terrain info (ec00=x, ed00=y, return val in e300
 
-WRITE8_MEMBER(fcombat_state::ec00_w)
+void fcombat_state::ec00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_tx = data;
 }
 
-WRITE8_MEMBER(fcombat_state::ed00_w)
+void fcombat_state::ed00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_ty = data;
 }
 
-READ8_MEMBER(fcombat_state::e300_r)
+uint8_t fcombat_state::e300_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	int wx = (m_tx + m_fcombat_sh) / 16;
 	int wy = (m_ty * 2 + m_fcombat_sv) / 16;
@@ -106,7 +106,7 @@ READ8_MEMBER(fcombat_state::e300_r)
 	return memregion("user2")->base()[wx * 32 * 16 + wy];
 }
 
-WRITE8_MEMBER(fcombat_state::ee00_w)
+void fcombat_state::ee00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 }
 

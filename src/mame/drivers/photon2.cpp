@@ -45,10 +45,10 @@ public:
 	uint8_t m_spectrum_port_fe;
 	uint8_t m_nmi_enable;
 
-	DECLARE_WRITE8_MEMBER(membank_w);
-	DECLARE_READ8_MEMBER(fe_r);
-	DECLARE_WRITE8_MEMBER(fe_w);
-	DECLARE_WRITE8_MEMBER(misc_w);
+	void membank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t fe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -207,7 +207,7 @@ uint32_t photon2_state::screen_update_spectrum(screen_device &screen, bitmap_ind
  *
  *************************************/
 
-WRITE8_MEMBER(photon2_state::membank_w)
+void photon2_state::membank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int bank = 0;
 	if (data == 0)
@@ -230,18 +230,18 @@ WRITE8_MEMBER(photon2_state::membank_w)
 	membank("mainbank")->set_entry(bank);
 }
 
-READ8_MEMBER(photon2_state::fe_r)
+uint8_t photon2_state::fe_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon2_state::fe_w)
+void photon2_state::fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_spectrum_port_fe = data;
 	m_speaker->level_w(BIT(data,4));
 }
 
-WRITE8_MEMBER(photon2_state::misc_w)
+void photon2_state::misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = !BIT(data,5);
 }

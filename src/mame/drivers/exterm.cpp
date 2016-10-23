@@ -79,13 +79,13 @@
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::exterm_host_data_w)
+void exterm_state::exterm_host_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_slave->host_w(space,offset / TOWORD(0x00100000), data, 0xffff);
 }
 
 
-READ16_MEMBER(exterm_state::exterm_host_data_r)
+uint16_t exterm_state::exterm_host_data_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_slave->host_r(space,offset / TOWORD(0x00100000), 0xffff);
 }
@@ -125,13 +125,13 @@ uint16_t exterm_state::exterm_trackball_port_r(int which, uint16_t mem_mask)
 }
 
 
-READ16_MEMBER(exterm_state::exterm_input_port_0_r)
+uint16_t exterm_state::exterm_input_port_0_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return exterm_trackball_port_r(0, mem_mask);
 }
 
 
-READ16_MEMBER(exterm_state::exterm_input_port_1_r)
+uint16_t exterm_state::exterm_input_port_1_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return exterm_trackball_port_r(1, mem_mask);
 }
@@ -144,7 +144,7 @@ READ16_MEMBER(exterm_state::exterm_input_port_1_r)
  *
  *************************************/
 
-WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
+void exterm_state::exterm_output_port_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* All the outputs are activated on the rising edge */
 
@@ -181,7 +181,7 @@ TIMER_CALLBACK_MEMBER(exterm_state::sound_delayed_w)
 }
 
 
-WRITE16_MEMBER(exterm_state::sound_latch_w)
+void exterm_state::sound_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(exterm_state::sound_delayed_w),this), data & 0xff);
@@ -203,7 +203,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
 }
 
 
-WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
+void exterm_state::ym2151_data_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	ym2151_device *device = machine().device<ym2151_device>("ymsnd");
 	/* bit 7 of the sound control selects which port */
@@ -211,7 +211,7 @@ WRITE8_MEMBER(exterm_state::ym2151_data_latch_w)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
+void exterm_state::sound_nmi_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/* rate is controlled by the value written here */
 	/* this value is latched into up-counters, which are clocked at the */
@@ -222,7 +222,7 @@ WRITE8_MEMBER(exterm_state::sound_nmi_rate_w)
 }
 
 
-READ8_MEMBER(exterm_state::sound_master_latch_r)
+uint8_t exterm_state::sound_master_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read latch and clear interrupt */
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
@@ -230,7 +230,7 @@ READ8_MEMBER(exterm_state::sound_master_latch_r)
 }
 
 
-READ8_MEMBER(exterm_state::sound_slave_latch_r)
+uint8_t exterm_state::sound_slave_latch_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* read latch and clear interrupt */
 	m_audioslave->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
@@ -238,7 +238,7 @@ READ8_MEMBER(exterm_state::sound_slave_latch_r)
 }
 
 
-READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
+uint8_t exterm_state::sound_nmi_to_slave_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/* a read from here triggers an NMI pulse to the slave */
 	m_audioslave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -246,7 +246,7 @@ READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_control_w)
+void exterm_state::sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 /*
     D7 = to S4-15

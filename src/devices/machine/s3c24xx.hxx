@@ -765,7 +765,7 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_video_update(screen_device &screen, bitmap_rg
 }
 
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_lcd.regs)[offset];
 	switch (offset)
@@ -923,7 +923,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_recalc()
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
+void S3C24_CLASS_NAME::s3c24xx_lcd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_lcd.regs)[offset];
 	verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C24XX_BASE_LCD + (offset << 2), data);
@@ -943,14 +943,14 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_w )
 
 /* LCD Palette */
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_palette_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_lcd_palette_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_lcdpal.regs.data[offset];
 	verboselog( *this, 9, "(LCD) %08X -> %08X\n", S3C24XX_BASE_LCDPAL + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_palette_w )
+void S3C24_CLASS_NAME::s3c24xx_lcd_palette_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(LCD) %08X <- %08X\n", S3C24XX_BASE_LCDPAL + (offset << 2), data);
 	COMBINE_DATA(&m_lcdpal.regs.data[offset]);
@@ -1034,14 +1034,14 @@ uint32_t S3C24_CLASS_NAME::s3c24xx_get_pclk()
 	return s3c24xx_get_hclk() / (1 << BIT( m_clkpow.regs.clkdivn, 0));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_clkpow_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_clkpow.regs)[offset];
 	verboselog( *this, 9, "(CLKPOW) %08X -> %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_clkpow_w )
+void S3C24_CLASS_NAME::s3c24xx_clkpow_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(CLKPOW) %08X <- %08X\n", S3C24XX_BASE_CLKPOW + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_clkpow.regs)[offset]);
@@ -1214,14 +1214,14 @@ ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_request_eint(uint32_t number)
 
 #endif
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_irq_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X -> %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_irq_w )
+void S3C24_CLASS_NAME::s3c24xx_irq_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_irq.regs)[offset];
 	verboselog( *this, 9, "(IRQ) %08X <- %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
@@ -1289,7 +1289,7 @@ uint16_t S3C24_CLASS_NAME::s3c24xx_pwm_calc_observation(int ch)
 	return cnto;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_pwm_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_pwm.regs)[offset];
 	switch (offset)
@@ -1429,7 +1429,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_recalc(int timer)
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_w )
+void S3C24_CLASS_NAME::s3c24xx_pwm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_pwm.regs)[offset];
 	verboselog( *this, 9, "(PWM) %08X <- %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
@@ -1665,53 +1665,53 @@ void S3C24_CLASS_NAME::s3c24xx_dma_w(uint32_t ch, uint32_t offset, uint32_t data
 	}
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_0_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_dma_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_dma_r( 0, offset);
 	verboselog( *this, 9, "(DMA 0) %08X -> %08X\n", S3C24XX_BASE_DMA_0 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_1_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_dma_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_dma_r( 1, offset);
 	verboselog( *this, 9, "(DMA 1) %08X -> %08X\n", S3C24XX_BASE_DMA_1 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_2_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_dma_2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_dma_r( 2, offset);
 	verboselog( *this, 9, "(DMA 2) %08X -> %08X\n", S3C24XX_BASE_DMA_2 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_3_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_dma_3_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_dma_r( 3, offset);
 	verboselog( *this, 9, "(DMA 3) %08X -> %08X\n", S3C24XX_BASE_DMA_3 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_0_w )
+void S3C24_CLASS_NAME::s3c24xx_dma_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(DMA 0) %08X <- %08X\n", S3C24XX_BASE_DMA_0 + (offset << 2), data);
 	s3c24xx_dma_w( 0, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_1_w )
+void S3C24_CLASS_NAME::s3c24xx_dma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(DMA 1) %08X <- %08X\n", S3C24XX_BASE_DMA_1 + (offset << 2), data);
 	s3c24xx_dma_w( 1, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_2_w )
+void S3C24_CLASS_NAME::s3c24xx_dma_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(DMA 2) %08X <- %08X\n", S3C24XX_BASE_DMA_2 + (offset << 2), data);
 	s3c24xx_dma_w( 2, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_3_w )
+void S3C24_CLASS_NAME::s3c24xx_dma_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(DMA 3) %08X <- %08X\n", S3C24XX_BASE_DMA_3 + (offset << 2), data);
 	s3c24xx_dma_w( 3, offset, data, mem_mask);
@@ -1789,7 +1789,7 @@ uint16_t S3C24_CLASS_NAME::s3c24xx_gpio_get_mask( uint32_t con, int val)
 	return mask;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_gpio_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	s3c24xx_gpio_t *gpio = &m_gpio;
 	uint32_t data = ((uint32_t*)&m_gpio.regs)[offset];
@@ -1849,7 +1849,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_r )
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_gpio_w )
+void S3C24_CLASS_NAME::s3c24xx_gpio_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	s3c24xx_gpio_t *gpio = &m_gpio;
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
@@ -1944,7 +1944,7 @@ void S3C24_CLASS_NAME::s3c24xx_memcon_reset()
 	memcon->regs.data[0x24/4] = 0x00AC0000;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_memcon_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	assert(offset < ARRAY_LENGTH(m_memcon.regs.data));
 	uint32_t data = m_memcon.regs.data[offset];
@@ -1952,7 +1952,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_r )
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_memcon_w )
+void S3C24_CLASS_NAME::s3c24xx_memcon_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(MEMCON) %08X <- %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
 	COMBINE_DATA(&m_memcon.regs.data[offset]);
@@ -1966,7 +1966,7 @@ void S3C24_CLASS_NAME::s3c24xx_usb_host_reset()
 	memset( &usbhost->regs, 0, sizeof( usbhost->regs));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_usb_host_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_usbhost.regs.data[offset];
 	switch (offset)
@@ -2003,7 +2003,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_r )
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_host_w )
+void S3C24_CLASS_NAME::s3c24xx_usb_host_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(USB H) %08X <- %08X\n", S3C24XX_BASE_USBHOST + (offset << 2), data);
 	COMBINE_DATA(&m_usbhost.regs.data[offset]);
@@ -2064,14 +2064,14 @@ void S3C24_CLASS_NAME::s3c24xx_uart_w(uint32_t ch, uint32_t offset, uint32_t dat
 	}
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_0_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_uart_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_uart_r( 0, offset);
 //  verboselog( *this, 9, "(UART 0) %08X -> %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_uart_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_uart_r( 1, offset);
 //  verboselog( *this, 9, "(UART 1) %08X -> %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
@@ -2080,7 +2080,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_r )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_uart_2_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_uart_r( 2, offset);
 //  verboselog( *this, 9, "(UART 2) %08X -> %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
@@ -2089,13 +2089,13 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_r )
 
 #endif
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_0_w )
+void S3C24_CLASS_NAME::s3c24xx_uart_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  verboselog( *this, 9, "(UART 0) %08X <- %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	s3c24xx_uart_w( 0, offset, data, mem_mask);
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_w )
+void S3C24_CLASS_NAME::s3c24xx_uart_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  verboselog( *this, 9, "(UART 1) %08X <- %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
 	s3c24xx_uart_w( 1, offset, data, mem_mask);
@@ -2103,7 +2103,7 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_1_w )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_uart_2_w )
+void S3C24_CLASS_NAME::s3c24xx_uart_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 //  verboselog( *this, 9, "(UART 2) %08X <- %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
 	s3c24xx_uart_w( 2, offset, data, mem_mask);
@@ -2141,14 +2141,14 @@ void S3C24_CLASS_NAME::s3c24xx_usb_device_reset()
 	#endif
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_device_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_usb_device_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_usbdev.regs.data[offset];
 	verboselog( *this, 9, "(USB D) %08X -> %08X\n", S3C24XX_BASE_USBDEV + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_usb_device_w )
+void S3C24_CLASS_NAME::s3c24xx_usb_device_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(USB D) %08X <- %08X\n", S3C24XX_BASE_USBDEV + (offset << 2), data);
 	COMBINE_DATA(&m_usbdev.regs.data[offset]);
@@ -2191,7 +2191,7 @@ uint16_t S3C24_CLASS_NAME::s3c24xx_wdt_calc_current_count()
 
 #endif
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_wdt_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_wdt.regs)[offset];
 	switch (offset)
@@ -2247,7 +2247,7 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_recalc()
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_w )
+void S3C24_CLASS_NAME::s3c24xx_wdt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_wdt.regs)[offset];
 	verboselog( *this, 9, "(WDT) %08X <- %08X\n", S3C24XX_BASE_WDT + (offset << 2), data);
@@ -2414,7 +2414,7 @@ void S3C24_CLASS_NAME::iic_resume()
 	m_iic.timer->adjust( attotime::from_usec( 1));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_iic_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_iic.regs)[offset];
 	switch (offset)
@@ -2429,7 +2429,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_r )
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_w )
+void S3C24_CLASS_NAME::s3c24xx_iic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iic.regs)[offset];
 	verboselog( *this, 9, "(IIC) %08X <- %08X\n", S3C24XX_BASE_IIC + (offset << 2), data);
@@ -2573,7 +2573,7 @@ void S3C24_CLASS_NAME::s3c24xx_iis_recalc()
 	}
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_iis_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_iis.regs)[offset];
 #if 0
@@ -2590,7 +2590,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_r )
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_w )
+void S3C24_CLASS_NAME::s3c24xx_iis_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_iis.regs)[offset];
 	verboselog( *this, 9, "(IIS) %08X <- %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
@@ -2644,7 +2644,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_reset()
 	rtc->timer_update->adjust( attotime::from_msec( 1000), 0, attotime::from_msec( 1000));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_rtc.regs)[offset];
 	verboselog( *this, 9, "(RTC) %08X -> %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
@@ -2668,7 +2668,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_recalc()
 	}
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_w )
+void S3C24_CLASS_NAME::s3c24xx_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(RTC) %08X <- %08X\n", S3C24XX_BASE_RTC + (offset << 2), data);
 	COMBINE_DATA(&((uint32_t*)&m_rtc.regs)[offset]);
@@ -2790,7 +2790,7 @@ uint32_t S3C24_CLASS_NAME::iface_adc_data_r(int ch)
 	}
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_adc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_adc.regs)[offset];
 	switch (offset)
@@ -2828,7 +2828,7 @@ void S3C24_CLASS_NAME::s3c24xx_adc_start()
 	#endif
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_adc_w )
+void S3C24_CLASS_NAME::s3c24xx_adc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_adc.regs)[offset];
 	verboselog( *this, 9, "(ADC) %08X <- %08X\n", S3C24XX_BASE_ADC + (offset << 2), data);
@@ -2891,7 +2891,7 @@ void S3C24_CLASS_NAME::s3c24xx_spi_w(uint32_t ch, uint32_t offset, uint32_t data
 	COMBINE_DATA(&((uint32_t*)&m_spi[ch].regs)[offset]);
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_spi_0_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_spi_r( 0, offset);
 	verboselog( *this, 9, "(SPI 0) %08X -> %08X\n", S3C24XX_BASE_SPI_0 + (offset << 2), data);
@@ -2900,7 +2900,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_r )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_spi_1_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = s3c24xx_spi_r( 1, offset);
 	verboselog( *this, 9, "(SPI 1) %08X -> %08X\n", S3C24XX_BASE_SPI_1 + (offset << 2), data);
@@ -2909,7 +2909,7 @@ READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_r )
 
 #endif
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_w )
+void S3C24_CLASS_NAME::s3c24xx_spi_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(SPI 0) %08X <- %08X\n", S3C24XX_BASE_SPI_0 + (offset << 2), data);
 	s3c24xx_spi_w( 0, offset, data, mem_mask);
@@ -2917,7 +2917,7 @@ WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_0_w )
 
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_spi_1_w )
+void S3C24_CLASS_NAME::s3c24xx_spi_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(SPI 1) %08X <- %08X\n", S3C24XX_BASE_SPI_1 + (offset << 2), data);
 	s3c24xx_spi_w( 1, offset, data, mem_mask);
@@ -2935,14 +2935,14 @@ void S3C24_CLASS_NAME::s3c24xx_mmc_reset()
 	memset( &mmc->regs, 0, sizeof( mmc->regs));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_mmc_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_mmc_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_mmc.regs.data[offset];
 	verboselog( *this, 9, "(MMC) %08X -> %08X\n", S3C24XX_BASE_MMC + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_mmc_w )
+void S3C24_CLASS_NAME::s3c24xx_mmc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(MMC) %08X <- %08X\n", S3C24XX_BASE_MMC + (offset << 2), data);
 	COMBINE_DATA(&m_mmc.regs.data[offset]);
@@ -2966,14 +2966,14 @@ void S3C24_CLASS_NAME::s3c24xx_sdi_reset()
 	#endif
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_sdi_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_sdi_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_sdi.regs.data[offset];
 	verboselog( *this, 9, "(SDI) %08X -> %08X\n", S3C24XX_BASE_SDI + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_sdi_w )
+void S3C24_CLASS_NAME::s3c24xx_sdi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(SDI) %08X <- %08X\n", S3C24XX_BASE_SDI + (offset << 2), data);
 	COMBINE_DATA(&m_sdi.regs.data[offset]);
@@ -3158,7 +3158,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_data_w(uint8_t data)
 	s3c24xx_nand_update_ecc( data);
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_nand_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = ((uint32_t*)&m_nand.regs)[offset];
 	switch (offset)
@@ -3224,7 +3224,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_init_ecc()
 	m_nand.ecc_pos = 0;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_nand_w )
+void S3C24_CLASS_NAME::s3c24xx_nand_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t old_value = ((uint32_t*)&m_nand.regs)[offset];
 	verboselog( *this, 9, "(NAND) %08X <- %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
@@ -3322,14 +3322,14 @@ void S3C24_CLASS_NAME::s3c24xx_cam_reset()
 	memset( &cam->regs, 0, sizeof( cam->regs));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_cam_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_cam.regs.data[offset];
 	verboselog( *this, 9, "(CAM) %08X -> %08X\n", S3C24XX_BASE_CAM + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_cam_w )
+void S3C24_CLASS_NAME::s3c24xx_cam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(CAM) %08X <- %08X\n", S3C24XX_BASE_CAM + (offset << 2), data);
 	COMBINE_DATA(&m_cam.regs.data[offset]);
@@ -3347,14 +3347,14 @@ void S3C24_CLASS_NAME::s3c24xx_ac97_reset()
 	memset( &ac97->regs, 0, sizeof( ac97->regs));
 }
 
-READ32_MEMBER( S3C24_CLASS_NAME::s3c24xx_ac97_r )
+uint32_t S3C24_CLASS_NAME::s3c24xx_ac97_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = m_ac97.regs.data[offset];
 	verboselog( *this, 9, "(AC97) %08X -> %08X\n", S3C24XX_BASE_AC97 + (offset << 2), data);
 	return data;
 }
 
-WRITE32_MEMBER( S3C24_CLASS_NAME::s3c24xx_ac97_w )
+void S3C24_CLASS_NAME::s3c24xx_ac97_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	verboselog( *this, 9, "(AC97) %08X <- %08X\n", S3C24XX_BASE_AC97 + (offset << 2), data);
 	COMBINE_DATA(&m_ac97.regs.data[offset]);

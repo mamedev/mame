@@ -218,12 +218,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* Emulate DECO 291 protection (for original express raider, code is cracked on the bootleg)*/
 /*****************************************************************************************/
 
-READ8_MEMBER(exprraid_state::exprraid_prot_data_r)
+uint8_t exprraid_state::exprraid_prot_data_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_prot_value;
 }
 
-READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
+uint8_t exprraid_state::exprraid_prot_status_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	/*
 	    76543210
@@ -235,7 +235,7 @@ READ8_MEMBER(exprraid_state::exprraid_prot_status_r)
 	return 0x02;
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
+void exprraid_state::exprraid_prot_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (data)
 	{
@@ -260,24 +260,24 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 	}
 }
 
-READ8_MEMBER(exprraid_state::sound_cpu_command_r)
+uint8_t exprraid_state::sound_cpu_command_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	m_slave->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
+void exprraid_state::sound_cpu_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_soundlatch->write(space, 0, data);
 	m_slave->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(exprraid_state::exprraid_int_clear_w)
+void exprraid_state::exprraid_int_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 }
 
-READ8_MEMBER(exprraid_state::vblank_r)
+uint8_t exprraid_state::vblank_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return ioport("IN0")->read();
 }

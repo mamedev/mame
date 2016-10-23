@@ -37,8 +37,8 @@ public:
 	static void set_vdc2_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
 
 	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_READ16_MEMBER( read );
-	DECLARE_WRITE16_MEMBER( write );
+	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	inline uint32_t yuv2rgb(uint32_t yuv);
 

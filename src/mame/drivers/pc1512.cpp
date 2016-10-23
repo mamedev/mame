@@ -106,7 +106,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 //  system_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::system_r )
+uint8_t pc1512_state::system_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -178,7 +178,7 @@ READ8_MEMBER( pc1512_state::system_r )
 //  system_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::system_w )
+void pc1512_state::system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -272,7 +272,7 @@ WRITE8_MEMBER( pc1512_state::system_w )
 //  mouse_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::mouse_r )
+uint8_t pc1512_state::mouse_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -295,7 +295,7 @@ READ8_MEMBER( pc1512_state::mouse_r )
 //  mouse_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::mouse_w )
+void pc1512_state::mouse_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -319,7 +319,7 @@ WRITE8_MEMBER( pc1512_state::mouse_w )
 //  dma_page_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::dma_page_w )
+void pc1512_state::dma_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	/*
 
@@ -362,7 +362,7 @@ WRITE8_MEMBER( pc1512_state::dma_page_w )
 //  nmi_mask_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::nmi_mask_w )
+void pc1512_state::nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_nmi_enable = BIT(data, 7);
 }
@@ -377,7 +377,7 @@ WRITE8_MEMBER( pc1512_state::nmi_mask_w )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1512_state::printer_r )
+uint8_t pc1512_state::printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -440,7 +440,7 @@ READ8_MEMBER( pc1512_state::printer_r )
 //  printer_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::printer_r )
+uint8_t pc1640_state::printer_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -504,7 +504,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 //  printer_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pc1512_state::printer_w )
+void pc1512_state::printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	switch (offset)
 	{
@@ -550,7 +550,7 @@ WRITE8_MEMBER( pc1512_state::printer_w )
 //  io_r -
 //-------------------------------------------------
 
-READ8_MEMBER( pc1640_state::io_r )
+uint8_t pc1640_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	offs_t addr = offset & 0x3ff;
@@ -793,7 +793,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( pc1512_state::mouse_x_w )
+void pc1512_state::mouse_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data > m_mouse_x_old)
 		m_mouse_x+=3;
@@ -803,7 +803,7 @@ WRITE8_MEMBER( pc1512_state::mouse_x_w )
 	m_mouse_x_old = data;
 }
 
-WRITE8_MEMBER( pc1512_state::mouse_y_w )
+void pc1512_state::mouse_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (data > m_mouse_y_old)
 		m_mouse_y-=3;
@@ -841,7 +841,7 @@ WRITE_LINE_MEMBER( pc1512_state::eop_w )
 	}
 }
 
-READ8_MEMBER( pc1512_state::memr_r )
+uint8_t pc1512_state::memr_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -849,7 +849,7 @@ READ8_MEMBER( pc1512_state::memr_r )
 	return program.read_byte(page_offset + offset);
 }
 
-WRITE8_MEMBER( pc1512_state::memw_w )
+void pc1512_state::memw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = m_dma_page[m_dma_channel] << 16;
@@ -857,12 +857,12 @@ WRITE8_MEMBER( pc1512_state::memw_w )
 	program.write_byte(page_offset + offset, data);
 }
 
-READ8_MEMBER( pc1512_state::ior1_r )
+uint8_t pc1512_state::ior1_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bus->dack_r(1);
 }
 
-READ8_MEMBER( pc1512_state::ior2_r )
+uint8_t pc1512_state::ior2_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	if (m_nden)
 		return m_fdc->dma_r();
@@ -870,23 +870,23 @@ READ8_MEMBER( pc1512_state::ior2_r )
 		return m_bus->dack_r(2);
 }
 
-READ8_MEMBER( pc1512_state::ior3_r )
+uint8_t pc1512_state::ior3_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	return m_bus->dack_r(3);
 }
 
-WRITE8_MEMBER( pc1512_state::iow0_w )
+void pc1512_state::iow0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_dreq0 = 0;
 	m_dmac->dreq0_w(m_dreq0);
 }
 
-WRITE8_MEMBER( pc1512_state::iow1_w )
+void pc1512_state::iow1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus->dack_w(1, data);
 }
 
-WRITE8_MEMBER( pc1512_state::iow2_w )
+void pc1512_state::iow2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (m_nden)
 		m_fdc->dma_w(data);
@@ -894,7 +894,7 @@ WRITE8_MEMBER( pc1512_state::iow2_w )
 		m_bus->dack_w(2, data);
 }
 
-WRITE8_MEMBER( pc1512_state::iow3_w )
+void pc1512_state::iow3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bus->dack_w(3, data);
 }

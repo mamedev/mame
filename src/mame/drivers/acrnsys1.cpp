@@ -66,9 +66,9 @@ public:
 		m_digit(0)
 	{ }
 
-	DECLARE_READ8_MEMBER(ins8154_b1_port_a_r);
-	DECLARE_WRITE8_MEMBER(ins8154_b1_port_a_w);
-	DECLARE_WRITE8_MEMBER(acrnsys1_led_segment_w);
+	uint8_t ins8154_b1_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ins8154_b1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void acrnsys1_led_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
 private:
@@ -87,7 +87,7 @@ private:
     KEYBOARD HANDLING
 ***************************************************************************/
 // bit 7 is cassin
-READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
+uint8_t acrnsys1_state::ins8154_b1_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0x7f, i, key_line = m_ttl74145->read();
 
@@ -106,7 +106,7 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 }
 
 // bit 6 is cassout
-WRITE8_MEMBER( acrnsys1_state::ins8154_b1_port_a_w )
+void acrnsys1_state::ins8154_b1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_digit = data & 0x47;
 	m_ttl74145->write(m_digit & 7);
@@ -147,7 +147,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
     LED DISPLAY
 ***************************************************************************/
 
-WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
+void acrnsys1_state::acrnsys1_led_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t key_line = m_ttl74145->read();
 

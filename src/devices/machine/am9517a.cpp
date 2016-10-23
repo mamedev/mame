@@ -809,7 +809,7 @@ void am9517a_device::execute_run()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( am9517a_device::read )
+uint8_t am9517a_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 
@@ -873,7 +873,7 @@ READ8_MEMBER( am9517a_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( am9517a_device::write )
+void am9517a_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (!BIT(offset, 3))
 	{
@@ -1103,7 +1103,7 @@ void upd71071_v53_device::device_reset()
 }
 
 
-READ8_MEMBER(upd71071_v53_device::read)
+uint8_t upd71071_v53_device::read(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t ret = 0;
 	int channel = m_selected_channel;
@@ -1187,7 +1187,7 @@ READ8_MEMBER(upd71071_v53_device::read)
 	return ret;
 }
 
-WRITE8_MEMBER(upd71071_v53_device::write)
+void upd71071_v53_device::write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	int channel = m_selected_channel;
 

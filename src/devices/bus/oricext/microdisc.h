@@ -17,9 +17,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_ADDRESS_MAP(map, 8);
-	DECLARE_WRITE8_MEMBER(port_314_w);
-	DECLARE_READ8_MEMBER(port_314_r);
-	DECLARE_READ8_MEMBER(port_318_r);
+	void port_314_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t port_314_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t port_318_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);

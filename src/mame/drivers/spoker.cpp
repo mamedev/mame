@@ -71,16 +71,16 @@ public:
 	uint8_t m_igs_magic[2];
 
 	// common
-	DECLARE_WRITE8_MEMBER(bg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_tile_w);
-	DECLARE_WRITE8_MEMBER(fg_color_w);
-	DECLARE_WRITE8_MEMBER(nmi_and_coins_w);
-	DECLARE_WRITE8_MEMBER(leds_w);
+	void bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// spk116it and spk115it specific
-	DECLARE_WRITE8_MEMBER(video_and_leds_w);
-	DECLARE_WRITE8_MEMBER(magic_w);
-	DECLARE_READ8_MEMBER(magic_r);
+	void video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t magic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
@@ -102,7 +102,7 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-WRITE8_MEMBER(spoker_state::bg_tile_w)
+void spoker_state::bg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -120,13 +120,13 @@ TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);
 }
 
-WRITE8_MEMBER(spoker_state::fg_tile_w)
+void spoker_state::fg_tile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(spoker_state::fg_color_w)
+void spoker_state::fg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -165,7 +165,7 @@ static void show_out(running_machine &machine,  uint8_t *out)
 #endif
 }
 
-WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
+void spoker_state::nmi_and_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if ((data) & (0x22))
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER(spoker_state::nmi_and_coins_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::video_and_leds_w)
+void spoker_state::video_and_leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(4, data & 0x01); // start?
 	output().set_led_value(5, data & 0x04); // l_bet?
@@ -201,7 +201,7 @@ WRITE8_MEMBER(spoker_state::video_and_leds_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::leds_w)
+void spoker_state::leds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	output().set_led_value(0, data & 0x01);  // stop_1
 	output().set_led_value(1, data & 0x02);  // stop_2
@@ -213,7 +213,7 @@ WRITE8_MEMBER(spoker_state::leds_w)
 	show_out(machine(), m_out);
 }
 
-WRITE8_MEMBER(spoker_state::magic_w)
+void spoker_state::magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_igs_magic[offset] = data;
 
@@ -231,7 +231,7 @@ WRITE8_MEMBER(spoker_state::magic_w)
 	}
 }
 
-READ8_MEMBER(spoker_state::magic_r)
+uint8_t spoker_state::magic_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	switch(m_igs_magic[0])
 	{

@@ -72,14 +72,14 @@ public:
 
 	uint8_t m_irq_mask;
 
-	DECLARE_READ8_MEMBER(cmmb_charram_r);
-	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
-	DECLARE_READ8_MEMBER(cmmb_input_r);
-	DECLARE_WRITE8_MEMBER(cmmb_output_w);
-	DECLARE_WRITE8_MEMBER(flash_dbg_0_w);
-	DECLARE_WRITE8_MEMBER(flash_dbg_1_w);
+	uint8_t cmmb_charram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmmb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t cmmb_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void cmmb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_dbg_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	void flash_dbg_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	//DECLARE_READ8_MEMBER(kludge_r);
+	//uint8_t kludge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -114,14 +114,14 @@ uint32_t cmmb_state::screen_update_cmmb(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-READ8_MEMBER(cmmb_state::cmmb_charram_r)
+uint8_t cmmb_state::cmmb_charram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t *GFX = memregion("gfx")->base();
 
 	return GFX[offset];
 }
 
-WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
+void cmmb_state::cmmb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	uint8_t *GFX = memregion("gfx")->base();
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 	m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 }
 
-READ8_MEMBER(cmmb_state::cmmb_input_r)
+uint8_t cmmb_state::cmmb_input_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	//printf("%02x R\n",offset);
 	switch(offset)
@@ -148,7 +148,7 @@ READ8_MEMBER(cmmb_state::cmmb_input_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(cmmb_state::cmmb_output_w)
+void cmmb_state::cmmb_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
@@ -175,12 +175,12 @@ WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 	}
 }
 
-WRITE8_MEMBER(cmmb_state::flash_dbg_0_w)
+void cmmb_state::flash_dbg_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash->write(space,0x2aaa,data);
 }
 
-WRITE8_MEMBER(cmmb_state::flash_dbg_1_w)
+void cmmb_state::flash_dbg_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_flash->write(space,0x5555,data);
 }

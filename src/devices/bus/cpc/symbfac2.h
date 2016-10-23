@@ -26,15 +26,15 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_READ8_MEMBER(ide_cs0_r);
-	DECLARE_WRITE8_MEMBER(ide_cs0_w);
-	DECLARE_READ8_MEMBER(ide_cs1_r);
-	DECLARE_WRITE8_MEMBER(ide_cs1_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
-	DECLARE_READ8_MEMBER(mouse_r);
-	DECLARE_READ8_MEMBER(rom_rewrite_r);
-	DECLARE_WRITE8_MEMBER(rom_rewrite_w);
+	uint8_t ide_cs0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ide_cs0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t ide_cs1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void ide_cs1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
+	uint8_t mouse_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	uint8_t rom_rewrite_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
+	void rom_rewrite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_x);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_y);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_buttons);

@@ -85,35 +85,35 @@ public:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_region_ptr<uint8_t> m_math;
 
-	DECLARE_WRITE16_MEMBER(r2dx_angle_w);
-	DECLARE_WRITE16_MEMBER(r2dx_dx_w);
-	DECLARE_WRITE16_MEMBER(r2dx_dy_w);
-	DECLARE_WRITE16_MEMBER(r2dx_sdistl_w);
-	DECLARE_WRITE16_MEMBER(r2dx_sdisth_w);
-	DECLARE_READ16_MEMBER(r2dx_angle_r);
-	DECLARE_READ16_MEMBER(r2dx_dist_r);
-	DECLARE_READ16_MEMBER(r2dx_sin_r);
-	DECLARE_READ16_MEMBER(r2dx_cos_r);
+	void r2dx_angle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_dx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_dy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_sdistl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_sdisth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t r2dx_angle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t r2dx_dist_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t r2dx_sin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t r2dx_cos_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE16_MEMBER(tile_bank_w);
-	DECLARE_READ16_MEMBER(rdx_v33_unknown_r);
-	DECLARE_WRITE16_MEMBER(mcu_xval_w);
-	DECLARE_WRITE16_MEMBER(mcu_yval_w);
-	DECLARE_WRITE16_MEMBER(mcu_table_w);
-	DECLARE_WRITE16_MEMBER(mcu_table2_w);
-	DECLARE_WRITE16_MEMBER(mcu_prog_w);
-	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
-	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
-	DECLARE_WRITE16_MEMBER(rdx_v33_eeprom_w);
-	DECLARE_WRITE16_MEMBER(zerotm2k_eeprom_w);
-	DECLARE_WRITE16_MEMBER(r2dx_rom_bank_w);
+	void tile_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t rdx_v33_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void mcu_xval_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_yval_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_table_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_table2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_prog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_prog_w2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void mcu_prog_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void rdx_v33_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void zerotm2k_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_rdx_v33();
 	void init_nzerotea();
 	void init_zerotm2k();
 
-	DECLARE_WRITE16_MEMBER(r2dx_tilemapdma_w);
-	DECLARE_WRITE16_MEMBER(r2dx_paldma_w);
-	DECLARE_READ16_MEMBER(r2dx_debug_r);
+	void r2dx_tilemapdma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void r2dx_paldma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t r2dx_debug_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	void r2dx_setbanking(void);
 
@@ -146,7 +146,7 @@ void r2dx_v33_state::machine_start()
 	save_item(NAME(r2dx_i_sdist));
 }
 
-WRITE16_MEMBER(r2dx_v33_state::tile_bank_w)
+void r2dx_v33_state::tile_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7) {
 		int new_bank;
@@ -176,7 +176,7 @@ void r2dx_v33_state::r2dx_setbanking(void)
 	membank("bank3")->set_entry(m_r2dxgameselect);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
+void r2dx_v33_state::rdx_v33_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -211,12 +211,12 @@ WRITE16_MEMBER(r2dx_v33_state::rdx_v33_eeprom_w)
 static uint16_t mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
+void r2dx_v33_state::mcu_prog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_prog[mcu_prog_offs*2] = data;
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
+void r2dx_v33_state::mcu_prog_w2(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
@@ -237,12 +237,12 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 #endif
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
+void r2dx_v33_state::mcu_prog_offs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_prog_offs = data;
 }
 
-READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
+uint16_t r2dx_v33_state::rdx_v33_unknown_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return machine().rand();
 }
@@ -251,13 +251,13 @@ READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
 static uint16_t mcu_xval,mcu_yval;
 
 /* something sent to the MCU for X/Y global screen calculating ... */
-WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
+void r2dx_v33_state::mcu_xval_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_xval = data;
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
+void r2dx_v33_state::mcu_yval_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_yval = data;
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
@@ -266,14 +266,14 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 static uint16_t mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
-WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
+void r2dx_v33_state::mcu_table_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	mcu_data[offset] = data;
 
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
+void r2dx_v33_state::mcu_table2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("mcu_table2_w %04x %04x\n", data, mem_mask);
 
@@ -282,7 +282,7 @@ WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
+void r2dx_v33_state::r2dx_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//printf("rom bank %04x %04x\n", data, mem_mask);
 	m_r2dxbank = data & 0xf;
@@ -290,55 +290,55 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_rom_bank_w)
 
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_angle_w)
+void r2dx_v33_state::r2dx_angle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&r2dx_i_angle);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_dx_w)
+void r2dx_v33_state::r2dx_dx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&r2dx_i_dx);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_dy_w)
+void r2dx_v33_state::r2dx_dy_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&r2dx_i_dy);
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_angle_r)
+uint16_t r2dx_v33_state::r2dx_angle_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_math[((r2dx_i_dy & 0xff) << 8) | (r2dx_i_dx & 0xff)];
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_dist_r)
+uint16_t r2dx_v33_state::r2dx_dist_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return sqrt(double(r2dx_i_sdist));
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_sin_r)
+uint16_t r2dx_v33_state::r2dx_sin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int off = 65536 + (r2dx_i_angle & 0xff)*4;
 	return (m_math[off+0]) | (m_math[off+1] << 8);
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_cos_r)
+uint16_t r2dx_v33_state::r2dx_cos_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	int off = 65536 + (r2dx_i_angle & 0xff)*4;
 	return (m_math[off+2]) | (m_math[off+3] << 8);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_sdistl_w)
+void r2dx_v33_state::r2dx_sdistl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	r2dx_i_sdist = (r2dx_i_sdist & (0xffff0000 | uint16_t(~mem_mask))) | (data & mem_mask);
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_sdisth_w)
+void r2dx_v33_state::r2dx_sdisth_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	r2dx_i_sdist = (r2dx_i_sdist & (0x0000ffff | (uint16_t(~mem_mask)) << 16)) | ((data & mem_mask) << 16);
 }
 
 // these DMA operations seem to use hardcoded addresses on this hardware
-WRITE16_MEMBER(r2dx_v33_state::r2dx_tilemapdma_w)
+void r2dx_v33_state::r2dx_tilemapdma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int src = 0xd000;
 
@@ -350,7 +350,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_tilemapdma_w)
 	}
 }
 
-WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
+void r2dx_v33_state::r2dx_paldma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int src = 0x1f000;
 
@@ -362,7 +362,7 @@ WRITE16_MEMBER(r2dx_v33_state::r2dx_paldma_w)
 	}
 }
 
-READ16_MEMBER(r2dx_v33_state::r2dx_debug_r)
+uint16_t r2dx_v33_state::r2dx_debug_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	// read once on startup, needed for player collisions to work
 	return 0xffff;
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-WRITE16_MEMBER(r2dx_v33_state::zerotm2k_eeprom_w)
+void r2dx_v33_state::zerotm2k_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  printf("zerotm2k_eeprom_w %04x %04x\n", data, mem_mask);
 

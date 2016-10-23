@@ -368,7 +368,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
  *    Operation Port bits are cleared automatically when the requested
  *    operation is completed.
  */
-WRITE16_MEMBER(x68k_state::x68k_crtc_w )
+void x68k_state::x68k_crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset < 0x24)
 		COMBINE_DATA(m_crtc.reg+offset);
@@ -450,7 +450,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 //  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",m_maincpu->safe_pc(),data,offset);
 }
 
-READ16_MEMBER(x68k_state::x68k_crtc_r )
+uint16_t x68k_state::x68k_crtc_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset < 24)
 	{
@@ -481,7 +481,7 @@ READ16_MEMBER(x68k_state::x68k_crtc_r )
 	return 0xffff;
 }
 
-WRITE16_MEMBER(x68k_state::x68k_gvram_w )
+void x68k_state::x68k_gvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 //  int xloc,yloc,pageoffset;
 	/*
@@ -547,7 +547,7 @@ WRITE16_MEMBER(x68k_state::x68k_gvram_w )
 	}
 }
 
-WRITE16_MEMBER(x68k_state::x68k_tvram_w )
+void x68k_state::x68k_tvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t text_mask;
 
@@ -577,7 +577,7 @@ WRITE16_MEMBER(x68k_state::x68k_tvram_w )
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_gvram_r )
+uint16_t x68k_state::x68k_gvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0;
 
@@ -618,12 +618,12 @@ READ16_MEMBER(x68k_state::x68k_gvram_r )
 	return ret;
 }
 
-READ16_MEMBER(x68k_state::x68k_tvram_r )
+uint16_t x68k_state::x68k_tvram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_tvram[offset];
 }
 
-WRITE16_MEMBER(x68k_state::x68k_spritereg_w )
+void x68k_state::x68k_spritereg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_spritereg[offset]);
 	switch(offset)
@@ -671,14 +671,14 @@ WRITE16_MEMBER(x68k_state::x68k_spritereg_w )
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_spritereg_r )
+uint16_t x68k_state::x68k_spritereg_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(offset >= 0x400 && offset < 0x404)
 		return m_spritereg[offset] & 0x3ff;
 	return m_spritereg[offset];
 }
 
-WRITE16_MEMBER(x68k_state::x68k_spriteram_w )
+void x68k_state::x68k_spriteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(m_spriteram+offset);
 	m_video.tile8_dirty[offset / 16] = 1;
@@ -702,7 +702,7 @@ WRITE16_MEMBER(x68k_state::x68k_spriteram_w )
 	}
 }
 
-READ16_MEMBER(x68k_state::x68k_spriteram_r )
+uint16_t x68k_state::x68k_spriteram_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return m_spriteram[offset];
 }

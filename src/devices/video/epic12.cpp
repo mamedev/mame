@@ -687,12 +687,12 @@ void *epic12_device::blit_request_callback_unsafe(void *param, int threadid)
 }
 
 
-READ32_MEMBER( epic12_device::gfx_ready_r )
+uint32_t epic12_device::gfx_ready_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	return 0x00000010;
 }
 
-READ32_MEMBER( epic12_device::gfx_ready_r_unsafe )
+uint32_t epic12_device::gfx_ready_r_unsafe(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	if (m_blitter_busy)
 	{
@@ -703,7 +703,7 @@ READ32_MEMBER( epic12_device::gfx_ready_r_unsafe )
 		return 0x00000010;
 }
 
-WRITE32_MEMBER( epic12_device::gfx_exec_w )
+void epic12_device::gfx_exec_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -742,7 +742,7 @@ WRITE32_MEMBER( epic12_device::gfx_exec_w )
 }
 
 
-WRITE32_MEMBER( epic12_device::gfx_exec_w_unsafe )
+void epic12_device::gfx_exec_w_unsafe(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -814,7 +814,7 @@ void epic12_device::draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect 
 
 
 
-READ32_MEMBER( epic12_device::blitter_r )
+uint32_t epic12_device::blitter_r(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -838,7 +838,7 @@ READ32_MEMBER( epic12_device::blitter_r )
 	return 0;
 }
 
-READ32_MEMBER( epic12_device::blitter_r_unsafe )
+uint32_t epic12_device::blitter_r_unsafe(address_space &space, offs_t offset, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -863,7 +863,7 @@ READ32_MEMBER( epic12_device::blitter_r_unsafe )
 }
 
 
-WRITE32_MEMBER( epic12_device::blitter_w )
+void epic12_device::blitter_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -894,7 +894,7 @@ WRITE32_MEMBER( epic12_device::blitter_w )
 	}
 }
 
-WRITE32_MEMBER( epic12_device::blitter_w_unsafe )
+void epic12_device::blitter_w_unsafe(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch (offset*4)
 	{
@@ -947,13 +947,13 @@ void epic12_device::install_handlers(int addr1, int addr2)
 	space.install_readwrite_handler(addr1, addr2, read , write, U64(0xffffffffffffffff));
 }
 
-READ64_MEMBER( epic12_device::fpga_r )
+uint64_t epic12_device::fpga_r(address_space &space, offs_t offset, uint64_t mem_mask)
 {
 	return 0xff;
 }
 
 // todo, store what's written here and checksum it, different microcode probably leads to slightly different blitter timings
-WRITE64_MEMBER( epic12_device::fpga_w )
+void epic12_device::fpga_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{

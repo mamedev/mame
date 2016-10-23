@@ -65,7 +65,7 @@ void cpc_doubler_device::device_reset()
 	// TODO
 }
 
-READ8_MEMBER(cpc_doubler_device::ext_tape_r)
+uint8_t cpc_doubler_device::ext_tape_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t data = 0;
 	if(m_tape->input() > 0.03)

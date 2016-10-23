@@ -167,7 +167,7 @@ void k007121_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-READ8_MEMBER( k007121_device::ctrlram_r )
+uint8_t k007121_device::ctrlram_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	assert(offset < 8);
 
@@ -175,7 +175,7 @@ READ8_MEMBER( k007121_device::ctrlram_r )
 }
 
 
-WRITE8_MEMBER( k007121_device::ctrl_w )
+void k007121_device::ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	assert(offset < 8);
 

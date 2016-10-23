@@ -100,16 +100,16 @@ public:
 	/* memory */
 	uint16_t       m_bitmap0[0x40000/2];
 	uint16_t       m_bitmap1[0x40000/2];
-	DECLARE_WRITE16_MEMBER(pasha2_misc_w);
-	DECLARE_WRITE16_MEMBER(pasha2_palette_w);
-	DECLARE_WRITE16_MEMBER(vbuffer_set_w);
-	DECLARE_WRITE16_MEMBER(vbuffer_clear_w);
-	DECLARE_WRITE16_MEMBER(bitmap_0_w);
-	DECLARE_WRITE16_MEMBER(bitmap_1_w);
-	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
-	DECLARE_READ16_MEMBER(pasha2_speedup_r);
-	DECLARE_WRITE16_MEMBER(oki1_bank_w);
-	DECLARE_WRITE16_MEMBER(oki2_bank_w);
+	void pasha2_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pasha2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbuffer_set_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void vbuffer_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bitmap_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void bitmap_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void pasha2_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t pasha2_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void oki1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	void oki2_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_pasha2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -122,7 +122,7 @@ public:
 };
 
 
-WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
+void pasha2_state::pasha2_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 	{
@@ -144,7 +144,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 	}
 }
 
-WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
+void pasha2_state::pasha2_palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int color;
 
@@ -159,22 +159,22 @@ WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
 	m_palette->set_pen_color(offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 }
 
-WRITE16_MEMBER(pasha2_state::vbuffer_set_w)
+void pasha2_state::vbuffer_set_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vbuffer = 1;
 }
 
-WRITE16_MEMBER(pasha2_state::vbuffer_clear_w)
+void pasha2_state::vbuffer_clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_vbuffer = 0;
 }
 
-WRITE16_MEMBER(pasha2_state::bitmap_0_w)
+void pasha2_state::bitmap_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_bitmap0[offset + m_vbuffer * 0x20000 / 2]);
 }
 
-WRITE16_MEMBER(pasha2_state::bitmap_1_w)
+void pasha2_state::bitmap_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// handle overlapping pixels without writing them
 	switch (mem_mask)
@@ -198,19 +198,19 @@ WRITE16_MEMBER(pasha2_state::bitmap_1_w)
 	COMBINE_DATA(&m_bitmap1[offset + m_vbuffer * 0x20000 / 2]);
 }
 
-WRITE16_MEMBER(pasha2_state::oki1_bank_w)
+void pasha2_state::oki1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(pasha2_state::oki2_bank_w)
+void pasha2_state::oki2_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (offset)
 		m_oki2->set_rom_bank(data & 1);
 }
 
-WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
+void pasha2_state::pasha2_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 #ifdef MAME_DEBUG
 	if (data)
@@ -468,7 +468,7 @@ ROM_START( pasha2 )
 	ROM_LOAD( "pp2.um53",     0x00000, 0x80000, CRC(8a29ad03) SHA1(3e9b0c86d8e3bb0b7691f68ad45431f6f9e8edbd) )
 ROM_END
 
-READ16_MEMBER(pasha2_state::pasha2_speedup_r)
+uint16_t pasha2_state::pasha2_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	if(space.device().safe_pc() == 0x8302)
 		space.device().execute().spin_until_interrupt();

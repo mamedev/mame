@@ -28,9 +28,9 @@ public:
 	{
 	}
 
-	DECLARE_READ16_MEMBER(keyin_r);
-	DECLARE_READ16_MEMBER(status_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	uint16_t keyin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	uint16_t status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
+	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -58,19 +58,19 @@ static INPUT_PORTS_START( codata )
 INPUT_PORTS_END
 
 
-READ16_MEMBER( codata_state::keyin_r )
+uint16_t codata_state::keyin_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = m_term_data;
 	m_term_data = 0;
 	return ret << 8;
 }
 
-READ16_MEMBER( codata_state::status_r )
+uint16_t codata_state::status_r(address_space &space, offs_t offset, uint16_t mem_mask)
 {
 	return (m_term_data) ? 0x500 : 0x400;
 }
 
-WRITE8_MEMBER( codata_state::kbd_put )
+void codata_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_term_data = data;
 }

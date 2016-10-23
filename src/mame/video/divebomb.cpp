@@ -58,38 +58,38 @@ K051316_CB_MEMBER(divebomb_state::zoom_callback_2)
  *
  *************************************/
 
-WRITE8_MEMBER(divebomb_state::fgram_w)
+void divebomb_state::fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap1_enable_w)
+void divebomb_state::rozcpu_wrap1_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz1_wrap = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_enable1_w)
+void divebomb_state::rozcpu_enable1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz1_enable = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_enable2_w)
+void divebomb_state::rozcpu_enable2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz2_enable = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_wrap2_enable_w)
+void divebomb_state::rozcpu_wrap2_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	roz2_wrap = !(data & 1);
 }
 
 
-WRITE8_MEMBER(divebomb_state::rozcpu_pal_w)
+void divebomb_state::rozcpu_pal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	//.... ..xx  K051316 1 palette select
 	//..xx ....  K051316 2 palette select
