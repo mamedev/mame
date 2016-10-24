@@ -2202,12 +2202,19 @@ static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int w
 //  copyline_rgb32
 //============================================================
 
-static inline void copyline_rgb32_palette(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
+static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 {
-	for (int x = 0; x < width; x++)
+	if (palette != nullptr)
 	{
-		rgb_t srcpix = *src++;
-		*dst++ = palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		for (int x = 0; x < width; x++)
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+	}
+	else
+	{
+		memcpy(dst, src, sizeof(uint32_t) * width);
 	}
 }
 
@@ -2216,12 +2223,19 @@ static inline void copyline_rgb32_palette(uint32_t *dst, const uint32_t *src, in
 //  copyline_argb32
 //============================================================
 
-static inline void copyline_argb32_palette(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
+static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width, const rgb_t *palette)
 {
-	for (int x = 0; x < width; x++)
+	if (palette != nullptr)
 	{
-		rgb_t srcpix = *src++;
-		*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		for (int x = 0; x < width; x++)
+		{
+			rgb_t srcpix = *src++;
+			*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+		}
+	}
+	else
+	{
+		memcpy(dst, src, sizeof(uint32_t) * width);
 	}
 }
 
@@ -2343,7 +2357,7 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 
 	// loop over Y
 	int tex_format = PRIMFLAG_GET_TEXFORMAT(flags);
-	if ((tex_format == TEXFORMAT_RGB32 || tex_format == TEXFORMAT_ARGB32) && texsource->palette == nullptr)
+	if ((tex_format == TEXFORMAT_RGB32 || tex_format == TEXFORMAT_ARGB32) && texsource->palette == nullptr && texsource->width == texsource->rowpixels)
 	{
 		memcpy((BYTE *)rect.pBits, texsource->base, sizeof(uint32_t) * texsource->width * texsource->height);
 	}
@@ -2362,11 +2376,11 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 					break;
 
 				case TEXFORMAT_RGB32:
-					copyline_rgb32_palette((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette);
+					copyline_rgb32((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette);
 					break;
 
 				case TEXFORMAT_ARGB32:
-					copyline_argb32_palette((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette);
+					copyline_argb32((uint32_t *)dst, (uint32_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette);
 					break;
 
 				case TEXFORMAT_YUY16:
